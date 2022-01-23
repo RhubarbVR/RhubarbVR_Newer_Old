@@ -33,7 +33,7 @@ namespace RhuEngine.Components
 
 		public string sessionID = " ";
 
-		public IEnumerable<SessionInfo> sessions;
+		public SessionInfo[] sessions;
 
 		private void RenderDebugWindow() {
 			UI.WindowBegin("===---===   Debug Window   ===---===", ref debugPose);
@@ -112,13 +112,17 @@ PacketsSent {WorldManager.FocusedWorld?.NetStatistics?.PacketsSent}": "No NetSta
 					Task.Run(async () => sessions = (await Engine.netApiManager.GetSessions()).ToArray());
 				}
 				var count = 1;
-				foreach (var item in sessions ?? new SessionInfo[0]) {
+				for (int i = 0; i < sessions.Length; i++) {
+					var item = sessions[i];
 					if (count % 3 != 1) {
 						UI.SameLine();
 					}
 					UI.PushId(count);
 					if (UI.Button(" " + item.SessionName)) {
-						WorldManager.JoinNewWorld(item.SessionId, WorldObjects.World.FocusLevel.Focused,item.SessionName);
+						try {
+							WorldManager.JoinNewWorld(item.SessionId, WorldObjects.World.FocusLevel.Focused, item.SessionName);
+						}
+						catch { }
 					}
 					UI.PopId();
 					count++;
@@ -137,7 +141,10 @@ PacketsSent {WorldManager.FocusedWorld?.NetStatistics?.PacketsSent}": "No NetSta
 						UI.SameLine();
 						UI.Space(-Engine.UISettings.padding);
 						if (UI.Button("X")) {
-							WorldManager.FocusedWorld.Dispose();
+							try {
+								WorldManager.FocusedWorld.Dispose();
+							}
+							catch { }
 							Task.Run(async () => { Thread.Sleep(300); sessions = (await Engine.netApiManager.GetSessions()).ToArray(); });
 						}
 						UI.PopTint();
@@ -159,7 +166,10 @@ PacketsSent {WorldManager.FocusedWorld?.NetStatistics?.PacketsSent}": "No NetSta
 							UI.SameLine();
 							UI.Space(-Engine.UISettings.padding);
 							if (UI.Button("X")) {
-								item.Dispose();
+								try {
+									item.Dispose();
+								}
+								catch { }
 								Task.Run(async () => { Thread.Sleep(300); sessions = (await Engine.netApiManager.GetSessions()).ToArray(); });
 							}
 							UI.PopTint();

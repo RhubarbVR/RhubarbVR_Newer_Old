@@ -11,6 +11,13 @@ namespace RhuEngine.DataStructure
 	{
 		[Key(0)]
 		public Dictionary<string, IDataNode> _nodeGroup = new();
+		
+		public IDataNode this[string key]
+		{
+			get => GetValue(key);
+			set => SetValue(key, value);
+		}
+
 		public byte[] GetByteArray() {
 			return Serializer.Save(_nodeGroup);
 		}
