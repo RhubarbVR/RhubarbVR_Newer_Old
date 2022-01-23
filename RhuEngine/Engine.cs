@@ -51,6 +51,8 @@ namespace RhuEngine
 					assetsFolder = "Assets",
 					displayPreference = _forceFlatscreen ? DisplayMode.Flatscreen : DisplayMode.MixedReality,
 					disableFlatscreenMRSim = _noVRSim,
+					flatscreenHeight = 720,
+					flatscreenWidth = 1280,
 				};
 			}
 		}
