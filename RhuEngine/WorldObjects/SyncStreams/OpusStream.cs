@@ -60,7 +60,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		private const int SAMPLE_FRAME_COUNT = 48000 / 1000 * 60;
+		private const int SAMPLE_FRAME_COUNT = 48000 / 1000 * 40;
 
 		public override void OnLoaded() {
 			_output = Sound.CreateStream(5f);
