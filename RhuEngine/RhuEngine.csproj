@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<AssemblyName>RhuEngineDebug</AssemblyName>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<AssemblyName>RhuEngine</AssemblyName>
+	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <!-- Hide platform project folders from the solution explorer -->
+  <ItemGroup>
+    <Compile Remove="ImguiVeldrid\**" />
+    <Compile Remove="Operation RhubarbVRTests\**" />
+    <Compile Remove="Platforms\**" />
+    <Compile Remove="SharedModels\**" />
+    <EmbeddedResource Remove="ImguiVeldrid\**" />
+    <EmbeddedResource Remove="Operation RhubarbVRTests\**" />
+    <EmbeddedResource Remove="Platforms\**" />
+    <EmbeddedResource Remove="SharedModels\**" />
+    <None Remove="ImguiVeldrid\**" />
+    <None Remove="Operation RhubarbVRTests\**" />
+    <None Remove="Platforms\**" />
+    <None Remove="SharedModels\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LiteNetLib" Version="0.9.5.2" />
+    <PackageReference Include="MessagePack" Version="2.3.85" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
+    <PackageReference Include="StereoKit" Version="0.3.5-preview.6" />
+    <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Operation RhubarbVRTests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="ImguiVeldrid\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="SharedModels\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpusDotNet\OpusDotNet.csproj" />
+    <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
+  </ItemGroup>
+</Project>

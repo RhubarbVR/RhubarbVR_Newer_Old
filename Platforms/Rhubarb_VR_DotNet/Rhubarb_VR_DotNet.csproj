@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<AssemblyName>MilkSnake</AssemblyName>
+		<ApplicationIcon>MilkSnake.ico</ApplicationIcon>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<AssemblyName>RhubarbVR</AssemblyName>
+		<ApplicationIcon>RhubarbVR.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net5.0</TargetFramework>
+		<RootNamespace>Rhubarb_VR</RootNamespace>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://rhubarbvr.net/</PackageProjectUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="StereoKit" Version="0.3.5-preview.6" />
+	</ItemGroup>
+
+	<!-- Copy assets, and build the app's shaders into the final app folder -->
+	<ItemGroup>
+		<Content Include="$(SolutionDir)Assets\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\%(RecursiveDir)%(Filename)%(Extension)</Link>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="..\..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\RhuEngine\RhuEngine.csproj" />
+	</ItemGroup>
+
+</Project>
