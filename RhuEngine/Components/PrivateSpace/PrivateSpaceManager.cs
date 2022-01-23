@@ -89,9 +89,9 @@ PacketsSent {WorldManager.FocusedWorld?.NetStatistics?.PacketsSent}": "No NetSta
 
 		private void RenderPrivateWindow() {
 #if DEBUG
-			UI.WindowBegin("Private UI: MilkSnake", ref privatePose, UIWin.Normal, UIMove.FaceUser);
+			UI.WindowBegin($"Private UI: MilkSnake Version:{Engine.version}", ref privatePose, UIWin.Normal, UIMove.FaceUser);
 #else
-			UI.WindowBegin("Private UI", ref privatePose, UIWin.Normal, UIMove.FaceUser);
+			UI.WindowBegin($"Private UI Version:{Engine.version}", ref privatePose, UIWin.Normal, UIMove.FaceUser);
 #endif
 			UI.Toggle("Console", ref Console);
 			UI.SameLine();

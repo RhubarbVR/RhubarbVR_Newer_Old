@@ -14,6 +14,12 @@ namespace RhuEngine
 
 		private readonly bool _noVRSim = false;
 
+		public readonly Version version = new(1, 0, 0);
+#if DEBUG
+		public const bool IS_MILK_SNAKE = true;
+#else
+		public const bool IS_MILK_SNAKE = false;
+#endif
 		public Engine() {
 		}
 

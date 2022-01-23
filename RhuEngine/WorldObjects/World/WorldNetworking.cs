@@ -141,7 +141,11 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		private const string KEY = "MyNameISJeffryFromRhubarbVR";
+#if DEBUG
+		private string KEY => $"MyNameISJeffryFromMilksnake{worldManager.Engine.version.Major}{worldManager.Engine.version.Minor}";
+#else
+		private string KEY => $"MyNameISJeffryFromRhubarbVR{worldManager.Engine.version.Major}{worldManager.Engine.version.Minor}";
+#endif
 
 		public ConcurrentDictionary<string, bool> NatIntroductionSuccessIsGood = new();
 		public ConcurrentDictionary<string, NetPeer> NatConnection = new();
