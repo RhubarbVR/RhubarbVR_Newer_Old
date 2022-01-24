@@ -44,6 +44,11 @@ namespace RhuEngine.Components
 			}
 		}
 
+		public override void Dispose() {
+			base.Dispose();
+			_soundInst.Stop();
+		}
+
 		public override void OnLoaded() {
 			LoadAudio();
 		}
