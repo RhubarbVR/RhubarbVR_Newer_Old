@@ -68,7 +68,6 @@ namespace RhuEngine.WorldObjects
 			try {
 				Log.Info("Starting WebSocket Client");
 				_client = new ClientWebSocket();
-
 				var cernts = new System.Security.Cryptography.X509Certificates.X509CertificateCollection();
 				foreach (var item in NetApiManager.LetsEncrypt) {
 					cernts.Add(new System.Security.Cryptography.X509Certificates.X509Certificate(item));
