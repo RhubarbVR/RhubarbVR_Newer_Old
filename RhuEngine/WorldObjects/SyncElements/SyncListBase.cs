@@ -6,6 +6,8 @@ using System.Linq;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 
+using StereoKit;
+
 namespace RhuEngine.WorldObjects
 {
 	public abstract class SyncListBase<T> : SyncObject, INetworkedObject, IEnumerable<ISyncObject> , IChangeable where T : ISyncObject
@@ -14,6 +16,8 @@ namespace RhuEngine.WorldObjects
 
 		public event Action<IChangeable> Changed;
 		public T this[int i] => _syncObjects[i];
+
+		public T this[NetPointer pointer] => _syncObjects.Where((val)=> val.Pointer == pointer).First();
 
 		public int Count => _syncObjects.Count;
 
@@ -25,6 +29,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void AddInternal(T newElement) {
+			newElement.OnDispose += NewElement_OnDispose;
 			var offsetindex = 0;
 			if (typeof(IOffsetableElement).IsAssignableFrom(newElement.GetType())) {
 				var offset = (IOffsetableElement)newElement;
@@ -57,16 +62,35 @@ namespace RhuEngine.WorldObjects
 			Changed?.Invoke(this);
 		}
 
+		private void FixAllNames() {
+			for (var i = 0; i < Count; i++) {
+				_syncObjects[i].ChangeName(i.ToString());
+			}
+		}
 
-		public void RemoveInternal(object value) {
-			((T)value).OnDispose -= RemoveInternal;
+		private void NewElement_OnDispose(object obj) {
+			if(obj is T castedObject) {
+				RemoveInternal(castedObject);
+				BroadcastRemove(castedObject);
+			}
+		}
+
+		public void RemoveInternal(T value) {
+			if (IsRemoved) {
+				return;
+			}
+			value.OnDispose -= NewElement_OnDispose;
 			lock (_locker) {
-				_syncObjects.Remove((T)value);
+				_syncObjects.Remove(value);
+				FixAllNames();
 			}
 			Changed?.Invoke(this);
 		}
 
 		private void ReorderList() {
+			if (IsRemoved) {
+				return;
+			}
 			var newOrder = from e in _syncObjects.AsParallel()
 						   orderby (typeof(IOffsetableElement).IsAssignableFrom(e.GetType()) ? ((IOffsetableElement)e).Offset : 0) ascending
 						   select e;
@@ -80,13 +104,29 @@ namespace RhuEngine.WorldObjects
 		}
 
 		internal void BroadcastAdd(T data) {
+			if (IsRemoved || IsDestroying) {
+				return;
+			}
 			if (NoSync) {
 				return;
 			}
 			var sendData = new DataNodeGroup();
 			sendData.SetValue("type", new DataNode<int>(1));
 			sendData.SetValue("ElementData", SaveElement(data));
-			World.BroadcastDataToAll(Pointer, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
+			World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
+		}
+
+		internal void BroadcastRemove(T data) {
+			if (IsRemoved || IsDestroying) {
+				return;
+			}
+			if (NoSync) {
+				return;
+			}
+			var sendData = new DataNodeGroup();
+			sendData.SetValue("type", new DataNode<int>(2));
+			sendData.SetValue("ref", new DataNode<NetPointer>(data.Pointer));
+			World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
 		}
 
 		public abstract T LoadElement(IDataNode data);
@@ -101,6 +141,12 @@ namespace RhuEngine.WorldObjects
 			switch (((DataNode<int>)nodeGroup.GetValue("type")).Value) {
 				case 1:
 					AddInternal(LoadElement(nodeGroup["ElementData"]));
+					break;
+				case 2:
+					var objecte = this[(DataNode<NetPointer>)nodeGroup["ref"]];
+					Log.Info("Removed net");
+					RemoveInternal(objecte);
+					objecte.Destroy();
 					break;
 				default:
 					break;
@@ -118,15 +164,24 @@ namespace RhuEngine.WorldObjects
 		}
 
 		IEnumerator<ISyncObject> IEnumerable<ISyncObject>.GetEnumerator() {
-			foreach (var item in _syncObjects) {
-				yield return item;
+			lock (_syncObjects.SyncRoot) {
+				for (var i = 0; i < _syncObjects.Count; i++) {
+					yield return _syncObjects[i];
+				}
 			}
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() {
 			return ((IEnumerable<IWorldObject>)this).GetEnumerator();
 		}
-
+		public override void Dispose() {
+			base.Dispose();
+			for (var i = 0; i < _syncObjects.Count; i++) {
+				_syncObjects[i].IsDestroying = true;
+				_syncObjects[i].Dispose();
+			}
+			_syncObjects.Clear();
+		}
 
 	}
 }

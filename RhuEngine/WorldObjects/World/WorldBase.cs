@@ -102,6 +102,14 @@ namespace RhuEngine.WorldObjects
 							worldManager.FocusedWorld._focus = FocusLevel.Background;
 						}
 						worldManager.FocusedWorld = this;
+						if (GetLocalUser() is not null) {
+							GetLocalUser().isPresent.Value = true;
+						}
+					}
+					else {
+						if (GetLocalUser() is not null) {
+							GetLocalUser().isPresent.Value = false;
+						}
 					}
 					LastFocusChange = DateTime.UtcNow;
 					UpdateFocus();
@@ -122,6 +130,7 @@ namespace RhuEngine.WorldObjects
 		[OnChanged(nameof(SessionNameChanged))]
 		public Sync<string> SessionName;
 
+		[Default("New World")]
 		public Sync<string> WorldName;
 
 		public string WorldDebugName => $"{(IsPersonalSpace ? "P" : "")}{((worldManager.LocalWorld == this) ? "L" : "")} {SessionName.Value}";
@@ -186,6 +195,18 @@ namespace RhuEngine.WorldObjects
 			}
 			catch { }
 			try {
+				if (!IsLoading) {
+					GetLocalUser()?.userRoot.Target?.Entity.Dispose();
+					if (_netManager is not null) {
+						for (var i = 0; i < 3; i++) {
+							_netManager.PollEvents();
+							Thread.Sleep(100);
+						}
+					}
+				}
+			}
+			catch { }
+			try {
 				_client?.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None).Wait();
 			}
 			catch { }
@@ -197,6 +218,7 @@ namespace RhuEngine.WorldObjects
 				_netManager?.DisconnectAll();
 			}
 			catch { }
+			GC.Collect();
 		}
 	}
 }

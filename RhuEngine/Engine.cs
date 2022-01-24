@@ -44,6 +44,18 @@ namespace RhuEngine
 			_noVRSim = arg.Any((v) => v.ToLower() == "--no-vr-sim");
 			this.outputCapture = outputCapture;
 		}
+		private string _mainMic;
+
+		public string MainMic
+		{
+			get => _mainMic;
+			set {
+				_mainMic = value;
+				MicChanged?.Invoke(value);
+			}
+		}
+
+		public Action<string> MicChanged;
 
 		public SKSettings Settings
 		{
@@ -71,6 +83,9 @@ namespace RhuEngine
 		public IManager[] _managers;
 
 		public void Init() {
+			Platform.ForceFallbackKeyboard = true;
+			World.OcclusionEnabled = true;
+			World.RaycastEnabled = true;
 			_managers = new IManager[] { worldManager, netApiManager };
 			foreach (var item in _managers) {
 				item.Init(this);

@@ -94,7 +94,7 @@ namespace RhuEngine.WorldObjects
 			if (IsLinked || NoSync) {
 				return;
 			}
-			World.BroadcastDataToAll(Pointer, new DataNode<NetPointer>(_targetPointer), LiteNetLib.DeliveryMethod.ReliableOrdered);
+			World.BroadcastDataToAll(this, new DataNode<NetPointer>(_targetPointer), LiteNetLib.DeliveryMethod.ReliableOrdered);
 		}
 
 		public void Received(Peer sender, IDataNode data) {

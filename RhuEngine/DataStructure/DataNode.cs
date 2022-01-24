@@ -1,4 +1,6 @@
-﻿using MessagePack;
+﻿using System.Runtime.CompilerServices;
+
+using MessagePack;
 
 using SharedModels;
 
@@ -27,5 +29,7 @@ namespace RhuEngine.DataStructure
 			Value = Serializer.Read<DataNode<T>>(arrBytes).Value;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static implicit operator T(DataNode<T> data) => data.Value;
 	}
 }

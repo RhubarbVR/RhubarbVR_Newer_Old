@@ -19,6 +19,7 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public Sync<bool> AllowSprint;
 
+		//Make rotation head based
 		public void ProcessMovement(Vec3 movementVector, float rotation, UserRoot userRoot, bool sprint) {
 			userRoot.Entity.position.Value = userRoot.Entity.position.Value + (movementVector * ((sprint & AllowSprint.Value) ? SprintMovementSpeed.Value : MovementSpeed.Value));
 			userRoot.Entity.rotation.Value = userRoot.Entity.rotation.Value * Quat.FromAngles(0, rotation * ((sprint & AllowSprint.Value) ? SprintRotationSpeed.Value : RotationSpeed.Value), 0);

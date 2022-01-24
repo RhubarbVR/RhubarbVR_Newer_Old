@@ -70,9 +70,11 @@ namespace RhuEngine.WorldObjects
 
 		public void LoadInput(string deviceName = null) {
 			if (deviceName is null) {
-				// TODO: Bind to audio input changes
+				deviceName = Engine.MainMic;
+				Engine.MicChanged += LoadInput;
 			}
 			if (!Microphone.Start(deviceName)) {
+				Log.Err($"Failed to load Mic {deviceName ?? "System Default"}");
 				return;
 			}
 			_input = Microphone.Sound;
@@ -111,7 +113,7 @@ namespace RhuEngine.WorldObjects
 				var outpack = new byte[BitRate.Value];
 				var amount = _encoder.Encode(dataPacket, SAMPLE_FRAME_COUNT, outpack, outpack.Length);
 				Array.Resize(ref outpack, amount);
-				World.BroadcastDataToAll(Pointer, new DataNode<byte[]>(outpack), LiteNetLib.DeliveryMethod.Unreliable);
+				World.BroadcastDataToAll(this, new DataNode<byte[]>(outpack), LiteNetLib.DeliveryMethod.Unreliable);
 			}
 		}
 	}

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -12,10 +14,29 @@ namespace RhuEngine.WorldObjects
 {
 	public class SyncObject : ISyncObject
 	{
+		private readonly HashSet<IDisposable> _disposables = new();
+
+		public void AddDisposable(IDisposable disposable) {
+			lock (disposable) {
+				_disposables.Add(disposable);
+			}
+		}
+
+		public void RemoveDisposable(IDisposable disposable) {
+			lock (disposable) {
+				_disposables.Remove(disposable);
+			}
+		}
+		public bool IsDestroying
+		{
+			get; set;
+		}
+
 		public bool IsRemoved
 		{
 			get; private set;
 		}
+
 
 		public NetPointer Pointer
 		{
@@ -36,7 +57,7 @@ namespace RhuEngine.WorldObjects
 			get; private set;
 		}
 
-		public string Name
+		public virtual string Name
 		{
 			get; private set;
 		}
@@ -48,22 +69,38 @@ namespace RhuEngine.WorldObjects
 
 		public EditLevel EditLevel => (LocalEditLevel == EditLevel.None) ? Parent?.EditLevel ?? EditLevel.None : LocalEditLevel;
 
-
-
 		public virtual bool Persistence => true;
 
 		public event Action<object> OnDispose;
 
 		public virtual void Destroy() {
-			Task.Run(Dispose);
+			Task.Run(() => {
+				try {
+					IsDestroying = true;
+					Dispose();
+				}
+				catch (Exception e) {
+					Log.Err($"Error When Destroying {Name} {Pointer} type:{GetType().GetFormattedName()} Error:{e}");
+				}
+			});
 		}
 
 		public virtual void Dispose() {
+			if (IsRemoved) {
+				return;
+			}
 			OnDispose?.Invoke(this);
 			IsRemoved = true;
 			if (typeof(IGlobalStepable).IsAssignableFrom(GetType())) {
 				World.UnregisterGlobalStepable((IGlobalStepable)this);
 			}
+			foreach (var item in _disposables.ToArray()) {
+				if(item is SyncObject @object) {
+					@object.IsDestroying = true;
+				}
+				item?.Dispose();
+			}
+			World.UnRegisterWorldObject(this);
 		}
 
 		public virtual void FirstCreation() {
@@ -103,6 +140,7 @@ namespace RhuEngine.WorldObjects
 				if (typeof(SyncObject).IsAssignableFrom(item.FieldType) && !((item.GetCustomAttribute<NoSaveAttribute>() != null) && (item.GetCustomAttribute<NoSyncAttribute>() != null))) {
 					var instance = (SyncObject)Activator.CreateInstance(item.FieldType);
 					instance.Initialize(World, this, item.Name, networkedObject, deserialize,netPointer);
+					AddDisposable(instance);
 					if (typeof(ISync).IsAssignableFrom(item.FieldType)) {
 						var startValue = item.GetCustomAttribute<DefaultAttribute>();
 						if (startValue != null) {

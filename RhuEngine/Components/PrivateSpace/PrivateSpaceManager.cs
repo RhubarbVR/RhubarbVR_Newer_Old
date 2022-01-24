@@ -36,8 +36,28 @@ namespace RhuEngine.Components
 		public SessionInfo[] sessions;
 
 		private void RenderDebugWindow() {
-			UI.WindowBegin("===---===   Debug Window   ===---===", ref debugPose);
+			UI.WindowBegin("===---===     Debug Window     ===---===", ref debugPose);
 			UI.Text(@$"
+
+=====---- EngineStatistics ----=====
+Is Login {Engine.netApiManager.IsLoggedIn}
+Username {Engine.netApiManager.User?.UserName??"Null"}
+
+worldManager stepTime {WorldManager.TotalStepTime * 1000f:f3}ms
+FPS {1 / Time.Elapsedf:f3}
+RunningTime {Time.Totalf:f3}
+Worlds Open {WorldManager.worlds.Count()}
+Soft Keyboard Open {Platform.KeyboardVisible}
+File Picker Open {Platform.FilePickerVisible}
+Eyes Tracked {Input.EyesTracked.IsActive()}
+Main Mic {Engine.MainMic?? "System Default"}
+XRType {Backend.XRType}
+Bounds Pose {StereoKit.World.BoundsPose}
+Bounds Size {StereoKit.World.BoundsSize}
+Has Bounds {StereoKit.World.HasBounds}
+Occlusion Enabled {StereoKit.World.OcclusionEnabled}
+Raycast Enabled {StereoKit.World.RaycastEnabled}
+
 
 =====---- Focused World ----=====
 LastFocusChange {WorldManager.FocusedWorld?.LastFocusChange}
@@ -45,7 +65,10 @@ IsLoading {WorldManager.FocusedWorld?.IsLoading}
 IsLoadingNet {WorldManager.FocusedWorld?.IsLoadingNet}
 WaitingForState {WorldManager.FocusedWorld?.WaitingForWorldStartState}
 IsDeserializing {WorldManager.FocusedWorld?.IsDeserializing}
+World Name {WorldManager.FocusedWorld?.WorldName.Value??"Null"}
+Session Name {WorldManager.FocusedWorld?.SessionName.Value ?? "Null"}
 
+MasterUserID {WorldManager.FocusedWorld?.MasterUser}
 UserID {WorldManager.FocusedWorld?.LocalUserID}
 UserCount {WorldManager.FocusedWorld?.Users.Count}
 
@@ -56,12 +79,6 @@ WorldObjects {WorldManager.FocusedWorld?.WorldObjectsCount}
 RenderComponents {WorldManager.FocusedWorld?.RenderingComponentsCount}
 GlobalStepables {WorldManager.FocusedWorld?.GlobalStepableCount}
 stepTime {(WorldManager.FocusedWorld?.stepTime * 1000f).Value:f3}ms
-
-=====---- EngineStatistics ----=====
-worldManager stepTime {WorldManager.TotalStepTime * 1000f:f3}ms
-FPS {1 / Time.Elapsedf:f3}
-RunningTime {Time.Totalf:f3}
-Worlds Open {WorldManager.worlds.Count()}
 
 =====FocusedWorld NetStatistics=====
 {((WorldManager.FocusedWorld?.NetStatistics is not null)?
@@ -112,7 +129,7 @@ PacketsSent {WorldManager.FocusedWorld?.NetStatistics?.PacketsSent}": "No NetSta
 					Task.Run(async () => sessions = (await Engine.netApiManager.GetSessions()).ToArray());
 				}
 				var count = 1;
-				for (int i = 0; i < sessions.Length; i++) {
+				for (var i = 0; i < (sessions?.Length??0); i++) {
 					var item = sessions[i];
 					if (count % 3 != 1) {
 						UI.SameLine();

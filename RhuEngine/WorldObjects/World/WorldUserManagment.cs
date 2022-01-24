@@ -62,7 +62,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public User GetLocalUser() {
-			return LocalUserID <= 0 ? null : (LocalUserID - 1) < Users.Count ? Users[Users.Count - LocalUserID] : null;
+			return Users is null ? null : LocalUserID <= 0 ? null : (LocalUserID - 1) < Users.Count ? Users[Users.Count - LocalUserID] : null;
 		}
 	}
 }

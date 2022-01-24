@@ -16,6 +16,8 @@ namespace RhuEngine.WorldObjects.ECS
 		public SyncRef<Entity> parent;
 		[Default("Entity")]
 		public Sync<string> name;
+		public override string Name => name.Value;
+
 		[OnChanged(nameof(TransValueChange))]
 		public Sync<Vec3> position;
 		[OnChanged(nameof(TransValueChange))]
@@ -378,8 +380,9 @@ namespace RhuEngine.WorldObjects.ECS
 			World.RegisterEntity(this);
 		}
 		public override void Dispose() {
-			World.UnregisterEntity(this);
 			base.Dispose();
+			World.UnregisterEntity(this);
+			World.UnregisterUpdatingEntity(this);
 		}
 
 		public Entity() {

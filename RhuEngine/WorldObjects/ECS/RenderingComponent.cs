@@ -8,10 +8,12 @@
 		public override void RemoveListObject() {
 			World.UnregisterRenderObject(this);
 		}
-		public override void Destroy() {
+
+		public override void Dispose() {
 			World.UnregisterRenderObject(this);
-			base.Destroy();
+			base.Dispose();
 		}
+
 		public virtual void Render() {
 
 		}

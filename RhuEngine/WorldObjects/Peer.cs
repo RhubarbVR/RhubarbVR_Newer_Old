@@ -64,5 +64,9 @@ namespace RhuEngine.WorldObjects
 				NetPeer.Send(Serializer.Save(new DataPacked(data,ID)), reliableOrdered);
 			}
 		}
+
+		internal void KillRelayConnection() {
+			NetPeer = null;
+		}
 	}
 }

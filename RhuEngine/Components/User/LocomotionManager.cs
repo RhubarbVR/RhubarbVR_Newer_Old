@@ -32,6 +32,7 @@ namespace RhuEngine.Components
 				if (locModule is null) {
 					return;
 				}
+				// Todo: this is very broken needs to be redone
 				var headDir = Vec3.Zero;
 				headDir += Input.Key(Key.W).IsActive() & !Input.Key(Key.Shift).IsActive() ? Vec3.Forward : Vec3.Zero;
 				headDir += Input.Key(Key.S).IsActive() & !Input.Key(Key.Shift).IsActive() ? -Vec3.Forward : Vec3.Zero;

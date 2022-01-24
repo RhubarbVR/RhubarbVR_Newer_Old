@@ -82,6 +82,9 @@ namespace RhuEngine.Managers
 			if ((focusLevel != World.FocusLevel.PrivateOverlay) && !localWorld) {
 				Task.Run(() => world.StartNetworking(true));
 			}
+			else {
+				world.WaitingForWorldStartState = false;
+			}
 			worlds.Add(world);
 
 			ShowLoadingFeedback(world, focusLevel);
@@ -136,6 +139,8 @@ namespace RhuEngine.Managers
 			PrivateOverlay = CreateNewWorld(World.FocusLevel.PrivateOverlay);
 			PrivateOverlay.RootEntity.AddChild("PrivateSpace").AttachComponent<PrivateSpaceManager>();
 			LocalWorld = CreateNewWorld(World.FocusLevel.Focused, true);
+			LocalWorld.SessionName.Value = "Local World";
+			LocalWorld.WorldName.Value = "Local World";
 			FocusedWorld = LocalWorld;
 			LocalWorld.BuildLocalWorld();
 			LocalWorld.SessionName.Value = "LocalWorld";

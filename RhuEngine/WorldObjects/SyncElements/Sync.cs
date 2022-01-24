@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
@@ -35,7 +36,7 @@ namespace RhuEngine.WorldObjects
 			if (IsLinked || NoSync) {
 				return;
 			}
-			World.BroadcastDataToAll(Pointer, typeof(T).IsEnum ? new DataNode<int>((int)(object)_value) : new DataNode<T>(_value), LiteNetLib.DeliveryMethod.ReliableOrdered);
+			World.BroadcastDataToAll(this, typeof(T).IsEnum ? new DataNode<int>((int)(object)_value) : new DataNode<T>(_value), LiteNetLib.DeliveryMethod.ReliableOrdered);
 		}
 		public void Received(Peer sender, IDataNode data) {
 			if (IsLinked || NoSync) {
@@ -105,5 +106,7 @@ namespace RhuEngine.WorldObjects
 			IsLinked = true;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static implicit operator T(Sync<T> data) => data.Value;
 	}
 }

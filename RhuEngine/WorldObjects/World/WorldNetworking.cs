@@ -27,12 +27,12 @@ namespace RhuEngine.WorldObjects
 		private ClientWebSocket _client;
 		public bool IsNetworked { get; private set; } = false;
 		public bool IsLoadingNet { get; private set; } = true;
-		public bool WaitingForWorldStartState { get; private set; } = true;
+		public bool WaitingForWorldStartState { get; internal set; } = true;
 
-		//todo: set value when host leaves also part of binding peers to users
-		public short MasterUser { get; set; } = 1;
+		public ushort MasterUser { get; set; } = 1;
 
 		public List<RelayPeer> relayServers = new();
+		public List<Peer> peers = new();
 
 		private NetManager _netManager;
 		private readonly EventBasedNatPunchListener _natPunchListener = new();
@@ -151,6 +151,20 @@ namespace RhuEngine.WorldObjects
 		public ConcurrentDictionary<string, NetPeer> NatConnection = new();
 		public ConcurrentDictionary<string, string> NatUserIDS = new();
 
+		private void FindNewMaster() {
+			for (var i = 0; i < Users.Count; i++) {
+				var user = Users[i];
+				if (user.IsConnected) {
+					MasterUser = (ushort)i;
+					break;
+				}
+			}
+		}
+
+		private void PeerDisconect(Peer peer) {
+			FindNewMaster();
+		}
+
 		private void LoadNatManager() {
 			_natPunchListener.NatIntroductionSuccess += (point, addrType, token) => {
 				Log.Info($"NatIntroductionSuccess {point}  {addrType}  {token}");
@@ -169,6 +183,15 @@ namespace RhuEngine.WorldObjects
 			_clientListener.NetworkReceiveEvent += ClientListener_NetworkReceiveEvent;
 
 			_clientListener.PeerDisconnectedEvent += (peer, disconnectInfo) => {
+				if (peer.Tag is Peer rpeer) {
+					PeerDisconect(rpeer);
+				}
+				else if (peer.Tag is RelayPeer repeer) {
+					relayServers.Remove(repeer);
+					foreach (var item in repeer.peers) {
+						PeerDisconect(item);
+					}
+				}
 				Console.WriteLine($"PeerDisconnected: " + disconnectInfo.Reason);
 				if (disconnectInfo.AdditionalData.AvailableBytes > 0) {
 					Console.WriteLine("Disconnect data: " + disconnectInfo.AdditionalData.GetInt());
@@ -207,6 +230,7 @@ namespace RhuEngine.WorldObjects
 						Log.Info("World state loaded");
 						IsDeserializing = false;
 						AddLocalUser();
+						FindNewMaster();
 					}
 					catch (Exception ex) {
 						Log.Err("Failed to load world state" + ex);
@@ -224,9 +248,11 @@ namespace RhuEngine.WorldObjects
 						_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
 					}
 					catch (Exception ex) {
+#if DEBUG
 						if (deliveryMethod != DeliveryMethod.Unreliable && peer.User is not null) {
 							Log.Err($"Failed to Process NetData target:{target.Value.HexString()} Error:{ex}");
 						}
+#endif
 					}
 				}
 				catch { }
@@ -234,6 +260,9 @@ namespace RhuEngine.WorldObjects
 		}
 
 		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod) {
+			if (IsDisposed) {
+				return;
+			}
 			try {
 				var data = reader.GetRemainingBytes();
 				if (peer.Tag is Peer) {
@@ -245,6 +274,12 @@ namespace RhuEngine.WorldObjects
 
 					if (Serializer.TryToRead<DataPacked>(data, out var packed)) {
 						ProcessPackedData(new DataNodeGroup(packed.Data), deliveryMethod, tag[packed.Id]);
+					}
+					else if (Serializer.TryToRead<OtherUserLeft>(data, out var otherUserLeft)) {
+						var rpeer = tag.peers[otherUserLeft.id];
+						tag.peers.Remove(rpeer);
+						rpeer.KillRelayConnection();
+						PeerDisconect(rpeer);
 					}
 					else if (Serializer.TryToRead<DataNodeGroup>(data,out _)) {
 						throw new Exception("Got a datanode group not a packed");
@@ -268,6 +303,7 @@ namespace RhuEngine.WorldObjects
 
 		public void ProcessUserConnection(Peer peer) {
 			Log.Info("User connected");
+			peers.Add(peer);
 			if (IsLoading) {
 				return;
 			}
@@ -278,6 +314,7 @@ namespace RhuEngine.WorldObjects
 				peer.Send(dataGroup.GetByteArray(), DeliveryMethod.ReliableOrdered);
 			}
 			LoadUserIn(peer);
+			FindNewMaster();
 		}
 
 		private void PeerConnected(NetPeer peer) {
@@ -385,20 +422,23 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public void BroadcastDataToAll(NetPointer target, IDataNode data, DeliveryMethod deliveryMethod) {
+		public void BroadcastDataToAll(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
+			if (target.IsRemoved) {
+				return;
+			}
 			if (_netManager is null) {
 				return;
 			}
 			if (IsLoading) {
 				return;
 			}
-			if (target.GetOwnerID() == 0) {
+			if (target.Pointer.GetOwnerID() == 0) {
 				//LocalValue
 				return;
 			}
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
-			netData.SetValue("Pointer", new DataNode<NetPointer>(target));
+			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
 			_netManager.SendToAll(netData.GetByteArray(), deliveryMethod);
 		}
 

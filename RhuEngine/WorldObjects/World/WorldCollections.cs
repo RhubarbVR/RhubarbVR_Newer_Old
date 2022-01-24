@@ -58,7 +58,18 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 		}
-
+		public void UnRegisterWorldObject(IWorldObject worldObject) {
+			if (!_worldObjects.TryRemove(worldObject.Pointer, out _)) {
+				Log.Warn($"World Object Failed To remove {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
+			}
+			else {
+				if (typeof(INetworkedObject).IsAssignableFrom(worldObject.GetType())) {
+					if (!_networkedObjects.TryRemove(worldObject.Pointer, out _)) {
+						Log.Warn($"INetworkedObject Failed To remove {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
+					}
+				}
+			}
+		}
 		public IWorldObject GetWorldObject(NetPointer value) {
 			return _worldObjects.TryGetValue(value, out var data) ? data : null;
 		}
@@ -91,7 +102,6 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 		public void UnregisterEntity(Entity data) {
-
 			lock (_entities) {
 				_entities.Remove(data);
 			}

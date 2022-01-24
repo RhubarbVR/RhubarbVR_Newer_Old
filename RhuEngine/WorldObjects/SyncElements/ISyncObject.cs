@@ -7,6 +7,8 @@ namespace RhuEngine.WorldObjects
 {
 	public interface ISyncObject : IWorldObject
 	{
+		bool IsDestroying { get; set; }
+
 		public event Action<object> OnDispose;
 
 		public void ChangeName(string name);
