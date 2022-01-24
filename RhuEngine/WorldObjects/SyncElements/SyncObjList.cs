@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
@@ -12,6 +13,28 @@ namespace RhuEngine.WorldObjects
 	{
 		public T Add(bool networkedObject = false, bool deserialize = false);
 	}
+
+	public class SyncValueList<T> : SyncObjList<Sync<T>>
+	{
+		public T this[int index]
+		{
+			get => base[index].Value;
+			set => base[index].Value = value;
+		}
+
+		public override void OnAddedElement(Sync<T> element) {
+			element.Changed += ChildElementOnChanged;
+		}
+
+
+		public override void OnElementRemmoved(Sync<T> element) {
+			element.Changed -= ChildElementOnChanged;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static implicit operator T[](SyncValueList<T> data) => data.ToArray().Select((objec) => ((Sync<T>)objec).Value).ToArray();
+	}
+
 	public class SyncObjList<T> : SyncListBase<T>, ISyncObjectList<T>, INetworkedObject, IEnumerable<ISyncObject> where T : ISyncObject, new()
 	{
 		public T AddWithCustomRefIds(bool networkedObject = false, bool deserialize = false,Func<NetPointer> func = null) {

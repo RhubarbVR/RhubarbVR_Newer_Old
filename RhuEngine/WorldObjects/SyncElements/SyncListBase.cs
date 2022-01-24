@@ -15,6 +15,15 @@ namespace RhuEngine.WorldObjects
 		private readonly SynchronizedCollection<T> _syncObjects = new(5);
 
 		public event Action<IChangeable> Changed;
+
+		public void ChildElementOnChanged(IChangeable changeable) {
+			Changed?.Invoke(changeable);
+		}
+
+		public T GetValue(int index) {
+			return _syncObjects[index];
+		}
+
 		public T this[int i] => _syncObjects[i];
 
 		public T this[NetPointer pointer] => _syncObjects.Where((val)=> val.Pointer == pointer).First();
@@ -28,7 +37,15 @@ namespace RhuEngine.WorldObjects
 			_syncObjects[index].Destroy();
 		}
 
+		public virtual void OnAddedElement(T element) {
+
+		}
+
+		public virtual void OnElementRemmoved(T element) {
+
+		}
 		public void AddInternal(T newElement) {
+			OnAddedElement(newElement);
 			newElement.OnDispose += NewElement_OnDispose;
 			var offsetindex = 0;
 			if (typeof(IOffsetableElement).IsAssignableFrom(newElement.GetType())) {
@@ -79,6 +96,7 @@ namespace RhuEngine.WorldObjects
 			if (IsRemoved) {
 				return;
 			}
+			OnElementRemmoved(value);
 			value.OnDispose -= NewElement_OnDispose;
 			lock (_locker) {
 				_syncObjects.Remove(value);
