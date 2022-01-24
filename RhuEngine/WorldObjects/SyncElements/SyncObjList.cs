@@ -16,7 +16,7 @@ namespace RhuEngine.WorldObjects
 
 	public class SyncValueList<T> : SyncObjList<Sync<T>>
 	{
-		public T this[int index]
+		public new T this[int index]
 		{
 			get => base[index].Value;
 			set => base[index].Value = value;
