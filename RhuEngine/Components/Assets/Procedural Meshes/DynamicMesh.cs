@@ -10,6 +10,7 @@ namespace RhuEngine.Components
 	{
 		[OnChanged(nameof(UpdateMeshData))]
 		public SyncValueList<Vertex> verts;
+
 		[OnChanged(nameof(UpdateMeshData))]
 		public SyncValueList<uint> inds;
 

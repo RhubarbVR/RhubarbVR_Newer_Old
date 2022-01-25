@@ -20,7 +20,6 @@ namespace RhuEngine.Components
 		[Default(16)]
 		public Sync<int> subdivisions;
 
-
 		[OnChanged(nameof(LoadMesh))]
 		public Sync<Vec3> direction;
 

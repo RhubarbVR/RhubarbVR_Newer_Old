@@ -11,20 +11,26 @@ namespace RhuEngine.Components
 	{
 		[OnAssetLoaded(nameof(LoadMaterial))]
 		public AssetRef<Shader> shader;
+
 		[OnChanged(nameof(UpdateValues))]
 		[Default(DepthTest.Less)]
 		public Sync<DepthTest> depthTest;
+
 		[OnChanged(nameof(UpdateValues))]
 		[Default(true)]
 		public Sync<bool> depthWrite;
+
 		[OnChanged(nameof(UpdateValues))]
 		[Default(Cull.Back)]
 		public Sync<Cull> faceCull;
+
 		[OnChanged(nameof(UpdateValues))]
 		public Sync<int> queueOffset;
+
 		[OnChanged(nameof(UpdateValues))]
 		[Default(Transparency.None)]
 		public Sync<Transparency> transparency;
+
 		[OnChanged(nameof(UpdateValues))]
 		public Sync<bool> wireframe;
 
