@@ -6,7 +6,7 @@ using System.Threading;
 
 using RhuEngine.Managers;
 using RhuEngine.WorldObjects.ECS;
-
+using RhuEngine.AssetSystem;
 using StereoKit;
 
 namespace RhuEngine.WorldObjects
@@ -18,9 +18,13 @@ namespace RhuEngine.WorldObjects
 
 		public bool IsPersonalSpace { get; private set; }
 
+		public readonly AssetSession assetSession;
 		public readonly WorldManager worldManager;
+		public Engine Engine => worldManager.Engine;
+
 		public World(WorldManager worldManager) {
 			this.worldManager = worldManager;
+			assetSession = new AssetSession(worldManager.Engine.assetManager);
 		}
 
 
@@ -190,6 +194,7 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			IsDisposed = true;
+			assetSession.Dispose();
 			try {
 				worldManager.RemoveWorld(this);
 			}

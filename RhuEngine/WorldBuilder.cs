@@ -14,6 +14,16 @@ namespace RhuEngine
 	{
 		public static void BuildLocalWorld(this World world) {
 			Log.Info("Building Local World");
+
+			var picMesh = world.RootEntity.AddChild("Floor");
+			picMesh.position.Value = new Vec3(0, 0.25f, -0.5f);
+			picMesh.rotation.Value = Quat.FromAngles(90, 0, 0);
+			picMesh.scale.Value = new Vec3(3);
+			var (pmesh, mit, prender) = picMesh.AttachMeshWithMeshRender<PlaneMesh, UnlitShader>();
+			var textur = picMesh.AttachComponent<StaticTexture>();
+			textur.url.Value = "https://cataas.com/cat/says/Base%20Url%20For%20RhubarbVR";
+			mit.faceCull.Value = Cull.None;
+			mit.SetPram("diffuse", textur);
 			var floor = world.RootEntity.AddChild("Floor");
 			floor.position.Value = new Vec3(0, 0, 0);
 			var (mesh, _, render) = floor.AttachMeshWithMeshRender<BoxMesh, PBRShader>();

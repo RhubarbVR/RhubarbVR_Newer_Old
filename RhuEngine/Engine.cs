@@ -78,6 +78,8 @@ namespace RhuEngine
 
 		public WorldManager worldManager = new();
 
+		public AssetManager assetManager = new();
+
 		public OutputCapture outputCapture;
 
 		public IManager[] _managers;
@@ -86,7 +88,7 @@ namespace RhuEngine
 			Platform.ForceFallbackKeyboard = true;
 			World.OcclusionEnabled = true;
 			World.RaycastEnabled = true;
-			_managers = new IManager[] { worldManager, netApiManager };
+			_managers = new IManager[] { netApiManager, assetManager , worldManager };
 			foreach (var item in _managers) {
 				item.Init(this);
 			}
