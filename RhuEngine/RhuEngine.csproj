@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="LibVLCSharp" Version="3.6.5" />
     <PackageReference Include="LiteNetLib" Version="0.9.5.2" />
     <PackageReference Include="MessagePack" Version="2.3.85" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
@@ -34,7 +35,7 @@
     <PackageReference Include="StereoKit" Version="0.3.5" />
     <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
-    <PackageReference Include="TextCopy" Version="6.0.0" />
+    <PackageReference Include="TextCopy" Version="6.1.0" />
   </ItemGroup>
 
   <ItemGroup>
