@@ -190,6 +190,9 @@ namespace RhuEngine.Managers
 	X509Certificate cert,
 	X509Chain chain,
 	SslPolicyErrors policyErrors) {
+			if(policyErrors == SslPolicyErrors.None) {
+				return true;
+			}
 			var foundCert = chain.ChainElements[1].Certificate.RawData;
 			return LetsEncrypt.Any((val) => val.SequenceEqual(foundCert));
 		}
