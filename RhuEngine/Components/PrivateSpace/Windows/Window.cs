@@ -27,5 +27,13 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 
 		}
 
+		public void CloseDraw() {
+			UI.PushTint(new Color(1f, 0f, 0f));
+			if (UI.ButtonAt("X",new Vec3(0.2f, Engine.UISettings.padding * 3, 0), new Vec2(Engine.UISettings.padding * 3))) {
+				IsOpen = false;
+			}
+			UI.PopTint();
+		}
+
 	}
 }
