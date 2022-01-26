@@ -79,7 +79,7 @@ PacketsSent {WorldManager.FocusedWorld?.NetStatistics?.PacketsSent}" : "No NetSt
 			UI.WindowEnd();
 			Hierarchy.Pop();
 		}
-		public DebugWindow(Engine engine, WorldManager worldManager):base(engine,worldManager) {
+		public DebugWindow(Engine engine, WorldManager worldManager, WorldObjects.World world) :base(engine,worldManager,world) {
 		}
 	}
 }

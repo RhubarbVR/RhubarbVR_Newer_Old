@@ -110,7 +110,7 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 			}
 			UI.WindowEnd();
 		}
-		public LoginWindow(Engine engine, WorldManager worldManager):base(engine,worldManager) {
+		public LoginWindow(Engine engine, WorldManager worldManager, WorldObjects.World world) :base(engine,worldManager,world) {
 #if DEBUG
 			var number = (int)(random.NextDouble() * 100);
 			username = $"DebugUser{number}";

@@ -13,10 +13,13 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 		public abstract bool? OnLogin { get; }
 		public Engine Engine { get; }
 		public WorldManager WorldManager { get; }
+		public WorldObjects.World World { get; }
+
 		public abstract string Name { get; }
-		public Window(Engine engine, WorldManager worldManager) {
+		public Window(Engine engine, WorldManager worldManager, WorldObjects.World world) {
 			Engine = engine;
 			WorldManager = worldManager;
+			World = world;
 		}
 
 		public Pose windowPose = new(-.2f, 0.2f, -0.2f, Quat.LookDir(1, 0, 1));

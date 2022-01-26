@@ -66,7 +66,7 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 			}
 			UI.WindowEnd();
 		}
-		public SessionWindow(Engine engine, WorldManager worldManager):base(engine,worldManager) {
+		public SessionWindow(Engine engine, WorldManager worldManager,WorldObjects.World world):base(engine,worldManager,world) {
 		}
 	}
 }

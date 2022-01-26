@@ -26,5 +26,10 @@ namespace RhuEngine.AssetSystem
 				assetSession.Manager.tasks.Remove(this);
 			});
 		}
+
+		public void Stop() {
+			runningTask.Dispose();
+			assetSession.Manager.tasks.Remove(this);
+		}
 	}
 }

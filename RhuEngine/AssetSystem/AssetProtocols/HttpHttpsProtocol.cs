@@ -22,7 +22,11 @@ namespace RhuEngine.AssetSystem.AssetProtocals
 
 		public async Task<byte[]> ProccessAsset(Uri uri) {
 			Log.Info("Loading asset URL:" + uri);
-			using var client = new HttpClient();
+			var HttpClientHandler = new HttpClientHandler {
+				AllowAutoRedirect = true,
+			};
+			using var client = new HttpClient(HttpClientHandler);
+			HttpClientHandler.ServerCertificateCustomValidationCallback = NetApiManager.ValidateRemoteCertificate;
 			Log.Info("Client");
 			using var response = await client.GetAsync(uri);
 			if (response.StatusCode == System.Net.HttpStatusCode.OK) {

@@ -22,7 +22,7 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 			UI.WindowEnd();
 			Hierarchy.Pop();
 		}
-		public ConsoleWindow(Engine engine, WorldManager worldManager):base(engine,worldManager) {
+		public ConsoleWindow(Engine engine, WorldManager worldManager, WorldObjects.World world) :base(engine,worldManager,world) {
 		}
 	}
 }
