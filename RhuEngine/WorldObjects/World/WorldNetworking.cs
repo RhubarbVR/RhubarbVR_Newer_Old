@@ -154,7 +154,7 @@ namespace RhuEngine.WorldObjects
 			for (var i = 0; i < Users.Count; i++) {
 				var user = Users[i];
 				if (user.IsConnected) {
-					MasterUser = (ushort)i;
+					MasterUser = (ushort)(i + 1);
 					break;
 				}
 			}
