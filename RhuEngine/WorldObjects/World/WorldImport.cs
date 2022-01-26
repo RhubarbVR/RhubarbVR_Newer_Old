@@ -104,7 +104,7 @@ namespace RhuEngine.WorldObjects
 				mit.SetPram("diffuse", textur);
 			}
 			else {
-				Log.Err("Not support raw textures");
+				Log.Err("Not support raw Video");
 			}
 		}
 

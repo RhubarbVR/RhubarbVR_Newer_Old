@@ -205,6 +205,7 @@ namespace RhuEngine.WorldObjects
 			_netManager.Start();
 			_netManager.EnableStatistics = true;
 			_netManager.MaxConnectAttempts = 5;
+			_netManager.DisconnectTimeout = 5000;
 			_netManager.UpdateTime = 10;
 		}
 
