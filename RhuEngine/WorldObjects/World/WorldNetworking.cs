@@ -444,6 +444,7 @@ namespace RhuEngine.WorldObjects
 		public void AddLocalUser() {
 			ItemIndex = 176;
 			LocalUserID = (ushort)(Users.Count + 1);
+			Log.Info($"Loaded local User with id{LocalUserID}");
 			var user = Users.Add();
 			user.userID.Value = worldManager.Engine.netApiManager.User?.Id ?? "null";
 		}

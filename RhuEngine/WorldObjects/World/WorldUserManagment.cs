@@ -28,9 +28,9 @@ namespace RhuEngine.WorldObjects
 			else {
 				var user = GetUserFromID(peer.UserID);
 				if (user == null) {
-					Log.Info("User built from peer");
+					Log.Info($"User built from peer {(Users.Count + 1)}");
 					var userid = (ushort)(Users.Count + 1);
-					var pos = 176u;
+					var pos = 176u; 
 					user = Users.AddWithCustomRefIds(false, false, () => {
 						var netPointer = NetPointer.BuildID(pos, userid);
 						pos++;
