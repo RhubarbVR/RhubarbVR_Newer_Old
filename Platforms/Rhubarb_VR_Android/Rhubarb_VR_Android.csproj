@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-		<AssemblyName>MilkSnake</AssemblyName>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-		<AssemblyName>RhubarbVR</AssemblyName>
-	</PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <AssemblyName>MilkSnake</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <AssemblyName>RhubarbVR</AssemblyName>
+  </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -121,7 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="StereoKit">
-      <Version>0.3.5-preview.6</Version>
+      <Version>0.3.5</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.3.1.3" />
     <PackageReference Include="Xamarin.AndroidX.Legacy.Support.V4">
@@ -131,7 +131,7 @@
       <Version>2.3.1.3</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Google.Android.Material" Version="1.4.0.4" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.7.1" />
   </ItemGroup>
   <ItemGroup>
     <SKShader Include="$(SolutionDir)Assets\**\*.hlsl" BuildRoot="$(SolutionDir)Assets" BuildTo="Assets" />

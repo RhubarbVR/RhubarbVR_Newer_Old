@@ -3,6 +3,8 @@ using RhuEngine.WorldObjects.ECS;
 
 using StereoKit;
 
+using TextCopy;
+
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]

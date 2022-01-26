@@ -30,10 +30,7 @@ namespace RhuEngine.AssetSystem
 			if (useCache) {
 				asset = Manager.GetCacheAsset(uri);
 			}
-			if (asset is null) {
-				return GetLocalAsset(uri);
-			}
-			return asset;
+			return asset is null ? GetLocalAsset(uri) : asset;
 		}
 
 		private byte[] GetLocalAsset(Uri uri) {

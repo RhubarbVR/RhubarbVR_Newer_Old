@@ -34,7 +34,8 @@ namespace RhuEngine
 					colors[w + (h * Width)] = new Color32(color.R, color.G, color.B, color.A);
 				}
 			}
-			return Tex.FromColors(colors, Width, Height, Srgb);
+			var newtex = Tex.FromColors(colors, Width, Height, Srgb);
+			return newtex;
 		}
 	}
 }

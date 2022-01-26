@@ -81,14 +81,14 @@ namespace RhuEngine.WorldObjects
 
 		public bool IsLinked { get; private set; }
 
-		public ILinker drivenFromObj;
+		public ILinker linkedFromObj;
 
-		public NetPointer LinkedFrom => drivenFromObj.Pointer;
+		public NetPointer LinkedFrom => linkedFromObj.Pointer;
 
 		public bool NoSync { get; set; }
 
 		public void KillLink() {
-			drivenFromObj.RemoveLinkLocation();
+			linkedFromObj.RemoveLinkLocation();
 			IsLinked = false;
 		}
 
@@ -102,7 +102,7 @@ namespace RhuEngine.WorldObjects
 				KillLink();
 			}
 			value.SetLinkLocation(this);
-			drivenFromObj = value;
+			linkedFromObj = value;
 			IsLinked = true;
 		}
 

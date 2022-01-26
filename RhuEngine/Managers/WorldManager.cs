@@ -78,6 +78,9 @@ namespace RhuEngine.Managers
 			world.Initialize(!localWorld, false, false, focusLevel == World.FocusLevel.PrivateOverlay);
 			world.RootEntity.name.Value = "Root";
 			world.RootEntity.AttachComponent<SimpleSpawn>();
+			if(focusLevel != World.FocusLevel.PrivateOverlay) {
+				world.RootEntity.AttachComponent<ClipBoardImport>();
+			}
 			world.SessionName.Value = sessionName;
 			if ((focusLevel != World.FocusLevel.PrivateOverlay) && !localWorld) {
 				Task.Run(() => world.StartNetworking(true));
