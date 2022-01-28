@@ -98,6 +98,8 @@ namespace RhuEngine.WorldObjects
 				var scaler = target.AttachComponent<TextureScaler>();
 				scaler.scale.SetLinkerTarget(pmesh.dimensions);
 				var textur = target.AttachComponent<VideoPlayer>();
+				var soundSource = target.AttachComponent<SoundSource>();
+				soundSource.sound.Target = textur.audioPlayer;
 				scaler.texture.Target = textur;
 				textur.Url.Value = data;
 				mit.faceCull.Value = Cull.None;
