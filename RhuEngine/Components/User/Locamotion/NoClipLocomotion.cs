@@ -1,4 +1,5 @@
-﻿using RhuEngine.WorldObjects;
+﻿using RhuEngine.Utils;
+using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
 using StereoKit;
@@ -19,10 +20,16 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public Sync<bool> AllowSprint;
 
+		private float _rotationX;
+		private float _rotationY;
+
 		//Make rotation head based
-		public void ProcessMovement(Vec3 movementVector, float rotation, UserRoot userRoot, bool sprint) {
-			userRoot.Entity.position.Value = userRoot.Entity.position.Value + (movementVector * ((sprint & AllowSprint.Value) ? SprintMovementSpeed.Value : MovementSpeed.Value));
-			userRoot.Entity.rotation.Value = userRoot.Entity.rotation.Value * Quat.FromAngles(0, rotation * ((sprint & AllowSprint.Value) ? SprintRotationSpeed.Value : RotationSpeed.Value), 0);
+		public void ProcessMovement(Vec3 movementVector, Vec3 rotation, UserRoot userRoot, bool sprint) {
+			_rotationX += rotation.x * ((sprint & AllowSprint.Value) ? SprintRotationSpeed.Value : RotationSpeed.Value);
+			_rotationY += rotation.y * ((sprint & AllowSprint.Value) ? SprintRotationSpeed.Value : RotationSpeed.Value);
+			_rotationX = MathR.Clamp(_rotationX, -90, 90);
+			userRoot.Entity.position.Value += (movementVector * ((sprint & AllowSprint.Value) ? SprintMovementSpeed.Value : MovementSpeed.Value));
+			userRoot.Entity.rotation.Value = Quat.FromAngles(new Vec3(_rotationX,_rotationY,0));
 		}
 	}
 }

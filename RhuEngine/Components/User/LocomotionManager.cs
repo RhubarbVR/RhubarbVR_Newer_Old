@@ -43,13 +43,26 @@ namespace RhuEngine.Components
 				if (headMovement) {
 					headDir += (Input.Controller(Handed.Left).stick.X0Y * new Vec3(-1, 0, -1)) + (Vec3.Forward * Input.Controller(Handed.Right).stick.y);
 				}
+
 				var headLocal = user.Target.userRoot.Target.head.Target.GlobalTrans.GetLocal(user.Target.userRoot.Target.Entity.parent.Target.GlobalTrans);
 				var moveVec = Quat.FromAngles(0f, 0f, 180f) * headLocal.Rotation * headDir;
 				if (!headMovement) {
-					moveVec += Quat.FromAngles(0f, 0f, 180f) * Input.Controller(Handed.Left).pose.ToMatrix().GetLocal(user.Target.userRoot.Target.Entity.parent.Target.GlobalTrans).Rotation * Input.Controller(Handed.Left).stick.X0Y;
-					moveVec += Quat.FromAngles(0f, 0f, 180f) * Input.Controller(Handed.Right).pose.ToMatrix().GetLocal(user.Target.userRoot.Target.Entity.parent.Target.GlobalTrans).Rotation * (Vec3.UnitZ * Input.Controller(Handed.Right).stick.y);
+					moveVec += Quat.FromAngles(0f, 0f, 180f) *
+					           Input.Controller(Handed.Left).pose.ToMatrix().GetLocal(user.Target.userRoot.Target.Entity.parent.Target.GlobalTrans).Rotation *
+					           Input.Controller(Handed.Left).stick.X0Y;
+					moveVec += Quat.FromAngles(0f, 0f, 180f) *
+					           Input.Controller(Handed.Right).pose.ToMatrix().GetLocal(user.Target.userRoot.Target.Entity.parent.Target.GlobalTrans).Rotation *
+					           (Vec3.UnitZ * Input.Controller(Handed.Right).stick.y);
 				}
-				locModule.ProcessMovement(moveVec * Time.Elapsedf, (Input.Controller(Handed.Right).stick.x + (Input.Key(Key.Z).IsActive() ? 1 : 0) + (Input.Key(Key.X).IsActive() ? -1 : 0)) * Time.Elapsedf, user.Target.userRoot.Target, Input.Key(Key.Ctrl).IsActive() | (Input.Controller(Handed.Left).trigger > 0.9f) | (Input.Controller(Handed.Right).trigger > 0.9f));
+
+				var mouseDelta = Input.Key(Key.Space).IsActive() ? Input.Mouse.posChange * Time.Elapsedf : Vec2.Zero;
+				Vec3 rotation = new Vec3(-mouseDelta.y,
+					((Input.Controller(Handed.Right).stick.x + (Input.Key(Key.Z).IsActive() ? 1 : 0)
+					                                        + (Input.Key(Key.X).IsActive() ? -1 : 0)) * Time.Elapsedf) -mouseDelta.x, 0);
+				
+
+				locModule.ProcessMovement(moveVec * Time.Elapsedf, rotation, user.Target.userRoot.Target,
+					Input.Key(Key.Ctrl).IsActive() | (Input.Controller(Handed.Left).trigger > 0.9f) | (Input.Controller(Handed.Right).trigger > 0.9f));
 			}
 		}
 
