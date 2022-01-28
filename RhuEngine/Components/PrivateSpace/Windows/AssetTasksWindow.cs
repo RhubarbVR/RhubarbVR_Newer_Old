@@ -24,7 +24,7 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 			else {
 				var num = 0;
 				foreach (var item in World.assetSession.Manager.tasks) {
-					UI.Text($"Task{num} TaskID:{item.runningTask.Id} Uri{item.assetUri} Status:{item.runningTask.Status}");
+					UI.Text($"Task{num} TaskID:{item.runningTask.Id} Uri{item.assetUri} Status:{item.runningTask.Status} {((item.runningTask.Status == System.Threading.Tasks.TaskStatus.Faulted)?$"Error:{item.runningTask.Exception}":"")}");
 					UI.SameLine();
 					UI.PushId(num);
 					if(UI.Button("Stop Task")) {
