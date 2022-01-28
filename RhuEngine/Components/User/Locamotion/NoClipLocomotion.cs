@@ -28,7 +28,10 @@ namespace RhuEngine.Components
 			_rotationX += rotation.x * ((sprint & AllowSprint.Value) ? SprintRotationSpeed.Value : RotationSpeed.Value);
 			_rotationY += rotation.y * ((sprint & AllowSprint.Value) ? SprintRotationSpeed.Value : RotationSpeed.Value);
 			_rotationX = MathR.Clamp(_rotationX, -90, 90);
-			userRoot.Entity.position.Value += (movementVector * ((sprint & AllowSprint.Value) ? SprintMovementSpeed.Value : MovementSpeed.Value));
+			
+			var moveVec = Quat.FromAngles(_rotationX, _rotationY, 180f) * movementVector;
+			
+			userRoot.Entity.position.Value += (moveVec * ((sprint & AllowSprint.Value) ? SprintMovementSpeed.Value : MovementSpeed.Value));
 			userRoot.Entity.rotation.Value = Quat.FromAngles(new Vec3(_rotationX,_rotationY,0));
 		}
 	}

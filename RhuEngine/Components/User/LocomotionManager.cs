@@ -61,7 +61,7 @@ namespace RhuEngine.Components
 					                                        + (Input.Key(Key.X).IsActive() ? -1 : 0)) * Time.Elapsedf) -mouseDelta.x, 0);
 				
 
-				locModule.ProcessMovement(moveVec * Time.Elapsedf, rotation, user.Target.userRoot.Target,
+				locModule.ProcessMovement(headDir * Time.Elapsedf, rotation, user.Target.userRoot.Target,
 					Input.Key(Key.Ctrl).IsActive() | (Input.Controller(Handed.Left).trigger > 0.9f) | (Input.Controller(Handed.Right).trigger > 0.9f));
 			}
 		}
