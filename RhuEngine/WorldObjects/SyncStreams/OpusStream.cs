@@ -91,7 +91,6 @@ namespace RhuEngine.WorldObjects
 			var dataPacket = new float[SAMPLE_FRAME_COUNT];
 			var amount = _decoder.Decode(@in, @in.Length, dataPacket, SAMPLE_FRAME_COUNT);
 			_output.WriteSamples(dataPacket, amount);
-
 		}
 
 		public void Step() {
@@ -113,7 +112,7 @@ namespace RhuEngine.WorldObjects
 				var outpack = new byte[BitRate.Value];
 				var amount = _encoder.Encode(dataPacket, SAMPLE_FRAME_COUNT, outpack, outpack.Length);
 				Array.Resize(ref outpack, amount);
-				World.BroadcastDataToAll(this, new DataNode<byte[]>(outpack), LiteNetLib.DeliveryMethod.Unreliable);
+				World.BroadcastDataToAll(this, new DataNode<byte[]>(outpack), LiteNetLib.DeliveryMethod.Sequenced);
 			}
 		}
 	}

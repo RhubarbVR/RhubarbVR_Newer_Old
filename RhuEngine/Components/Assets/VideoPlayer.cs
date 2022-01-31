@@ -7,6 +7,7 @@ using System;
 using LibVLCSharp.Shared;
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace RhuEngine.Components
 {
@@ -39,15 +40,34 @@ namespace RhuEngine.Components
 				audio = Sound.CreateStream(5f);
 				Load(audio);
 			}
-
 			public void PlayAudio(IntPtr data, IntPtr samples, uint count, long pts) {
+				//			Witness
+				//				267102006613639180 (humbletim)
+				//			you:
+				//				F32L!
+				//			vlc:
+				//				S16N.
+				//			you:
+				//				F32L!!!!!!
+				//			vlc:
+				//				S16N.
+				//			you:
+				//				S16N(FL32).
+				//			vlc:
+				//				correct.
 				if (audio is null) {
 					return;
 				};
 				var Count = (int)count;
-				var buffer = new float[Count];
+				var buffer = new short[Count];
 				Marshal.Copy(samples, buffer, 0, Count);
-				audio.WriteSamples(buffer);
+				audio.WriteSamples(GetAudio(buffer));
+			}
+
+
+			public float[] GetAudio(short[] data) {
+				return (from samp in data
+					   select (float)samp * (1 / 32768.0f)).ToArray();
 			}
 
 		}
@@ -68,8 +88,8 @@ namespace RhuEngine.Components
 				Load(_texer);
 			}
 		}
-
-		int AudioSetup(ref IntPtr opaque, ref IntPtr format, ref uint rate, ref uint channels) {
+		public static IntPtr formatData;
+		static unsafe int AudioSetup(ref IntPtr opaque, ref IntPtr format, ref uint rate, ref uint channels) {
 			channels = 1;
 			rate = 48000;
 			return 0;
@@ -87,13 +107,14 @@ namespace RhuEngine.Components
 						Thread.Sleep(10);
 					}
 				}
-				_mediaPlayer.SetAudioFormatCallback(AudioSetup,null);
-				_mediaPlayer.SetAudioFormat("F32L", 48000, 1);
+				_mediaPlayer.SetAudioFormatCallback(AudioSetup, null);
 				_mediaPlayer.SetAudioCallbacks(audioPlayer.PlayAudio, null, null,null, null);
-				//_mediaPlayer.SetVideoFormat("RGBA", 1920, 1080, sizeof(float) * 4);
 				//_mediaPlayer.SetVideoCallbacks(LibVLCVideoLockCb, null, null);
 				_mediaPlayer.Play(media.SubItems[0]);
 			}
+		}
+		IntPtr LibVLCVideoLockCb(IntPtr opaque, IntPtr planes) {
+			return IntPtr.Zero;
 		}
 
 		private void StartLoadVideo() {

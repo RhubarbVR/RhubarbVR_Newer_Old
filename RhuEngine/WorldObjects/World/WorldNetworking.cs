@@ -249,7 +249,7 @@ namespace RhuEngine.WorldObjects
 					}
 					catch (Exception ex) {
 #if DEBUG
-						if (deliveryMethod != DeliveryMethod.Unreliable && peer.User is not null) {
+						if (deliveryMethod == DeliveryMethod.ReliableOrdered && peer.User is not null) {
 							Log.Err($"Failed to Process NetData target:{target.Value.HexString()} Error:{ex}");
 						}
 #endif
