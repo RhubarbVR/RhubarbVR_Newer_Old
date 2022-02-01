@@ -58,15 +58,16 @@ namespace RhuEngine.Components
 				if (audio is null) {
 					return;
 				};
-				var Count = (int)count;
-				var buffer = new short[Count];
-				Marshal.Copy(samples, buffer, 0, Count);
-				audio.WriteSamples(GetAudio(buffer));
+				var newbuff = new float[count];
+				for (var i = 0; i < count; i++) {
+					newbuff[i] = (Marshal.ReadInt16(samples + (sizeof(short) * i)) * (1 / 32768.0f));
+				}
+				audio.WriteSamples(newbuff);
 			}
 
 
 			public float[] GetAudio(short[] data) {
-				return (from samp in data
+				return (from samp in data.AsParallel()
 					   select (float)samp * (1 / 32768.0f)).ToArray();
 			}
 
@@ -109,10 +110,29 @@ namespace RhuEngine.Components
 				}
 				_mediaPlayer.SetAudioFormatCallback(AudioSetup, null);
 				_mediaPlayer.SetAudioCallbacks(audioPlayer.PlayAudio, null, null,null, null);
-				//_mediaPlayer.SetVideoCallbacks(LibVLCVideoLockCb, null, null);
+				_mediaPlayer.SetVideoFormatCallbacks(LibVLCVideoFormatCb, null);
+				_mediaPlayer.SetVideoCallbacks(LibVLCVideoLockCb, LibVLCVideoUnlockCb, null);
 				_mediaPlayer.Play(media.SubItems[0]);
 			}
 		}
+
+		uint LibVLCVideoFormatCb(ref IntPtr opaque, IntPtr chroma, ref uint width, ref uint height, ref uint pitches, ref uint lines) {
+			var e = new Tex(TexType.ImageNomips);;
+			e.SetSize((int)width, (int)height);
+			Load(e);
+			//don't know how to force to rgb
+			Log.Info($"Format:{Marshal.PtrToStringAnsi(chroma)} width{width} height{height}");
+			return 1;
+		}
+
+		void LibVLCVideoUnlockCb(IntPtr opaque, IntPtr picture, IntPtr planes) {
+			if(Value is null) {
+				return;
+			}
+			//need to load colors
+			//Value.SetColors(Value.Width, Value.Height, planes);
+		}
+
 		IntPtr LibVLCVideoLockCb(IntPtr opaque, IntPtr planes) {
 			return IntPtr.Zero;
 		}
