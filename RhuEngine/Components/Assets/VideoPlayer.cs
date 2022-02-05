@@ -67,7 +67,7 @@ namespace RhuEngine.Components
 
 
 			public float[] GetAudio(short[] data) {
-				return (from samp in data.AsParallel()
+				return (from samp in data
 					   select (float)samp * (1 / 32768.0f)).ToArray();
 			}
 
