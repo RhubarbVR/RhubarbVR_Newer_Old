@@ -9,6 +9,7 @@ using RhuEngine.WorldObjects.ECS;
 using RhuEngine.AssetSystem;
 using StereoKit;
 using RhuEngine.Components;
+using System.IO;
 
 namespace RhuEngine.WorldObjects
 {
@@ -43,25 +44,37 @@ namespace RhuEngine.WorldObjects
 			if (path.EndsWith(".mlv")) {
 				return AssetType.Video;
 			}
+			if (path.EndsWith(".png")) {
+				return AssetType.Texture;
+			}
+			if (path.EndsWith(".jpeg")) {
+				return AssetType.Texture;
+			}
+			if (path.EndsWith(".bmp")) {
+				return AssetType.Texture;
+			}
 			return AssetType.Texture;
 		}
 
-		public AssetType GetAssetTypeOfString(string data,out bool WasUri) {
+		public AssetType GetAssetTypeOfString(ref string data,out bool WasUri) {
 			if (data == null) {
 				WasUri = false;
 				return AssetType.Unknown;
+			}
+			if (File.Exists(data)) {
+				WasUri = false;
+				return GetAssetTypeFromPath(data);
 			}
 			if (Uri.TryCreate(data, UriKind.Absolute, out var uri)) {
 				WasUri = true;
 				return IsVideoStreaming(uri) ? AssetType.Video : GetAssetTypeFromPath(uri.AbsolutePath);
 			}
-			else {
-				WasUri = false;
-			}	
+			WasUri = false;
 			return AssetType.Unknown;
 		} 
 
-		private void BuildTextureString(Entity target,string data,bool wasUri) {
+		private void BuildTextureString(Entity target,string data, byte[] rawdata,bool wasUri) {
+			Log.Info($"Loaded Texture Data {data} Uri{wasUri}");
 			if (wasUri) {
 				target.position.Value = new Vec3(0, 0.25f, -0.5f);
 				target.rotation.Value = Quat.FromAngles(90, 0, 0);
@@ -80,11 +93,22 @@ namespace RhuEngine.WorldObjects
 				mit.SetPram("diffuse", textur);
 			}
 			else {
-				Log.Err("Not support raw textures");
+				if (rawdata == null) {
+					if (File.Exists(data)) {
+						var newuri = LoadLocalAsset(File.ReadAllBytes(data),data);
+						BuildTextureString(target, newuri.ToString(), null, true);
+					}
+					else {
+						Log.Err("Texture Load Uknown" + data);
+					}
+				} else {
+					var newuri = LoadLocalAsset(rawdata, data);
+					BuildTextureString(target, newuri.ToString(), null, true);
+				}
 			}
 		}
 
-		private void BuildVideoString(Entity target, string data, bool wasUri) {
+		private void BuildVideoString(Entity target, string data,byte[] rawdata, bool wasUri) {
 			if (wasUri) {
 				target.position.Value = new Vec3(0, 0.25f, -0.5f);
 				target.rotation.Value = Quat.FromAngles(90, 0, 0);
@@ -106,22 +130,38 @@ namespace RhuEngine.WorldObjects
 				mit.SetPram("diffuse", textur);
 			}
 			else {
-				Log.Err("Not support raw Video");
+				if (rawdata == null) {
+					if (File.Exists(data)) {
+						var newuri = LoadLocalAsset(File.ReadAllBytes(data), data);
+						BuildVideoString(target, newuri.ToString(), null, true);
+					}
+					else {
+						Log.Err("Video Load Uknown" + data);
+					}
+				}
+				else {
+					var newuri = LoadLocalAsset(rawdata, data);
+					BuildVideoString(target, newuri.ToString(), null, true);
+				}
 			}
 		}
 
 		public void ImportString(string data) {
+			if (string.IsNullOrEmpty(data)) {
+				Log.Err("Import string was empty");
+				return;
+			}
 			var spawnroot = GetLocalUser()?.userRoot.Target?.Entity?.parent.Target??RootEntity;
 			var assetEntity = spawnroot.AddChild("Imported Asset");
-			switch (GetAssetTypeOfString(data, out var wasUri)) {
+			switch (GetAssetTypeOfString(ref data, out var wasUri)) {
 				case AssetType.Unknown:
 					Log.Err($"Do not know what to do with {data}");
 					break;
 				case AssetType.Texture:
-					BuildTextureString(assetEntity,data,wasUri);
+					BuildTextureString(assetEntity,data,null,wasUri);
 					break;
 				case AssetType.Video:
-					BuildVideoString(RootEntity,data,wasUri);
+					BuildVideoString(RootEntity,data,null,wasUri);
 					break;
 				default:
 					break;

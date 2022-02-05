@@ -25,7 +25,8 @@ namespace RhuEngine.Components
 			}
 			try {
 				Log.Info("Starting load of static Asset");
-				World.assetSession.AssetLoadingTask(LoadAsset, new Uri(url), useCache);
+				var uri = new Uri(url);
+				World.assetSession.AssetLoadingTask(LoadAsset, uri, useCache || uri.Scheme.ToLower() == "local");
 			}
 			catch (Exception e) {
 				Log.Info($"Error Loading static Asset {e}");

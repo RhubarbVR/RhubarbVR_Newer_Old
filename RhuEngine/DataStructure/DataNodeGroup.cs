@@ -50,5 +50,9 @@ namespace RhuEngine.DataStructure
 			}
 			SetByteArray(data);
 		}
+
+		public DataNodeGroup(Dictionary<string, IDataNode> data) {
+			_nodeGroup = data;
+		}
 	}
 }

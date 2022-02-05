@@ -38,6 +38,13 @@ namespace RhuEngine.Components
 			if (Engine.netApiManager.IsLoggedIn) {
 				UI.Label("Hello " + Engine.netApiManager.User?.UserName ?? "null");
 				UI.SameLine();
+				if (UI.Button("FilePicker")) {
+					try {
+						Platform.FilePicker(PickerMode.Open, (open, path) => { if (open) { World.ImportString(path.CleanPath()); } });
+					}
+					catch { }
+				}
+				UI.SameLine();
 				if (UI.Button("Logout")) {
 					Engine.netApiManager.Logout();
 				}

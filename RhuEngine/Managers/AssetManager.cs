@@ -48,7 +48,7 @@ namespace RhuEngine.Managers
 		}
 
 		public string GetAssetDir(Uri asset) {
-			return $"{CacheDir}\\{asset.Host}{asset.Port}\\";
+			return asset.Scheme.ToLower() == "local" ? $"{CacheDir}\\local\\" : $"{CacheDir}\\{asset.Host}{asset.Port}\\";
 		}
 
 		public bool IsCache(Uri asset) {
@@ -74,10 +74,18 @@ namespace RhuEngine.Managers
 		}
 
 		public void Dispose() {
+			try {
+				if (Directory.Exists($"{CacheDir}\\local\\")) {
+					Directory.Delete($"{CacheDir}\\local\\", true);
+				}
+			}
+			catch (Exception e) {
+				Log.Err($"Failed to clear cach {e}");
+			}
 		}
 
 		public void Init(Engine engine) {
-			protocols = new[] { new HttpHttpsProtocol(this) };
+			protocols = new IAssetProtocol[] { new HttpHttpsProtocol(this), new FtpFtpsProtocol(this) };
 		}
 
 		public void Step() {

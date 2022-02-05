@@ -11,6 +11,7 @@ using LiteNetLib;
 
 using Newtonsoft.Json;
 
+using RhuEngine.AssetSystem.RequestStructs;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 using RhuEngine.Managers;
@@ -267,13 +268,28 @@ namespace RhuEngine.WorldObjects
 				var data = reader.GetRemainingBytes();
 				if (peer.Tag is Peer) {
 					var tag = peer.Tag as Peer;
-					ProcessPackedData(new DataNodeGroup(data), deliveryMethod, tag);
+					if (Serializer.TryToRead<Dictionary<string, IDataNode>>(data, out var keyValuePairs)) {
+						ProcessPackedData(new DataNodeGroup(keyValuePairs), deliveryMethod, tag);
+					}
+					else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
+						AssetResponses(assetRequest, tag, deliveryMethod);
+					}
+					else {
+						throw new Exception("Uknown Data from User");
+					}
 				}
 				else if (peer.Tag is RelayPeer) {
 					var tag = peer.Tag as RelayPeer;
-
 					if (Serializer.TryToRead<DataPacked>(data, out var packed)) {
-						ProcessPackedData(new DataNodeGroup(packed.Data), deliveryMethod, tag[packed.Id]);
+						if(Serializer.TryToRead<Dictionary<string, IDataNode>>(data,out var keyValuePairs)) {
+							ProcessPackedData(new DataNodeGroup(keyValuePairs), deliveryMethod, tag[packed.Id]);
+						}
+						else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
+							AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+						}
+						else {
+							throw new Exception("Uknown Data from relay");
+						}
 					}
 					else if (Serializer.TryToRead<OtherUserLeft>(data, out var otherUserLeft)) {
 						var rpeer = tag.peers[otherUserLeft.id];

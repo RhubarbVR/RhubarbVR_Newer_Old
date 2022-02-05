@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Linq;
-
+using System.Text.RegularExpressions;
+using System.IO;
 using StereoKit;
 
 namespace RhuEngine
 {
 	public static class Helper
 	{
+		public static string CleanPath(this string path) {
+			var regexSearch = new string(Path.GetInvalidPathChars());
+			var r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
+			return r.Replace(path, "");
+		}
 		public static Matrix RotNormalized(this Matrix oldmatrix) {
 			oldmatrix.Decompose(out var trans, out var rot, out var scale);
 			return Matrix.TRS(trans, rot, scale);

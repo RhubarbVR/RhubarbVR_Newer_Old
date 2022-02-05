@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -34,8 +35,13 @@ namespace RhuEngine.Components
 		}
 
 		public override void LoadAsset(byte[] data) {
-			Load(new ImageSharpTexture(new MemoryStream(data), true).CreateTexture());
-			TextValueChanged();
+			try {
+				Load(new ImageSharpTexture(new MemoryStream(data), true).CreateTexture());
+				TextValueChanged();
+			}
+			catch(Exception err) {
+				Log.Err($"Failed to load Static Texture Error {err}");
+			}
 		}
 	}
 }
