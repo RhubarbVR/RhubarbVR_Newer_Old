@@ -12,33 +12,110 @@ using RhuEngine.AssetSystem.RequestStructs;
 using LiteNetLib;
 using System.Threading.Tasks;
 using SharedModels;
+using System.Collections.Generic;
 
 namespace RhuEngine.WorldObjects
 {
 	public partial class World
 	{
-		private void AssetResponses(IAssetRequest assetRequest,Peer peer, DeliveryMethod deliveryMethod) {
 
+		public Dictionary<string, LocalAssetLoadTask> loadTasks = new();
+
+		public class LocalAssetLoadTask
+		{
+			public bool ReadyToStart { get; private set; } = false;
+			private readonly World _world;
+			public bool IsLoading { get; private set; } = true;
+
+			public byte[] Data { get; private set; }
+
+			public LocalAssetLoadTask(World world,string url) {
+				_world = world;
+				Url = url;
+				try {
+					_world.loadTasks.Add(url, this);
+					ReadyToStart = true;
+				}
+				catch {
+					ReadyToStart = false;
+				}
+			}
+
+			public byte[] WaitForByteArray() {
+				while (IsLoading) {
+					Thread.Sleep(10);
+				}
+				return Data;
+			}
+
+			public byte[] Load(Uri uri) {
+				var userID = uri.AbsolutePath.Substring(0, uri.AbsolutePath.IndexOf('/'));
+				var user = _world.GetUserFromID(userID);
+				if (user == null) {
+					Log.Err("User was null when loadeding LocalAsset");
+					return null;
+				}
+				if (user.CurrentPeer == null) {
+					Log.Err("User Peer was null when loadeding LocalAsset");
+					return null;
+				}
+				user.CurrentPeer.Send(Serializer.Save<IAssetRequest>(new RequestAsset { URL = uri.AbsolutePath }), DeliveryMethod.ReliableSequenced);
+				while (true) {
+					Thread.Sleep(10);
+				}
+
+				IsLoading = false;
+			}
+
+			public string Url { get; private set; }
+		}
+
+		public List<LocalAssetSendTask> sendTasks = new();
+
+		public class LocalAssetSendTask
+		{
+			private readonly World _world;
+
+			public LocalAssetSendTask(World world,string url,Peer requester) {
+				_world = world;
+				Url = url;
+				Requester = requester;
+				world.sendTasks.Add(this);
+			}
+
+			public string Url { get; }
+			public Peer Requester { get; private set; }
+		}
+
+		private void AssetResponses(IAssetRequest assetRequest,Peer peer, DeliveryMethod deliveryMethod) {
+			if (assetRequest is RequestAsset request) {
+				Log.Info("User Wants LocalAsset" + request.URL);
+				new LocalAssetSendTask(this, request.URL, peer);
+			}
+			else if (assetRequest is AssetChunk assetChunk) {
+
+			}
+			else if (assetRequest is AssetResponse response) {
+			
+			}
 		}
 
 		
 
 		public byte[] RequestAssets(Uri uri) {
-			var userID = uri.AbsolutePath.Substring(0,uri.AbsolutePath.IndexOf('/'));
-			var user = GetUserFromID(userID);
-			if (user == null) {
-				Log.Err("User was null when loadeding LocalAsset");
-				return null;
+			var loadTask = new LocalAssetLoadTask(this, uri.AbsolutePath);
+			if (loadTask.ReadyToStart) {
+				return loadTask.Load(uri);
 			}
-			if(user.CurrentPeer == null) {
-				Log.Err("User Peer was null when loadeding LocalAsset");
-				return null;
+			else {
+				if (loadTasks.TryGetValue(uri.AbsolutePath, out loadTask)) {
+					return loadTask.WaitForByteArray();
+				}
+				else {
+					Log.Err("Asset Load Task Not found");
+					return null;
+				}
 			}
-			user.CurrentPeer.Send(Serializer.Save<IAssetRequest>(new RequestAsset { URL = uri.AbsolutePath }), DeliveryMethod.ReliableSequenced);
-			while (true) {
-				Thread.Sleep(10);
-			}
-			return null;
 		}
 
 		public Uri LoadLocalAsset(byte[] data,string fileExs) {
