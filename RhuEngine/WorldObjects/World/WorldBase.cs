@@ -24,7 +24,7 @@ namespace RhuEngine.WorldObjects
 
 		public World(WorldManager worldManager) {
 			this.worldManager = worldManager;
-			assetSession = new AssetSession(worldManager.Engine.assetManager);
+			assetSession = new AssetSession(worldManager.Engine.assetManager,this);
 		}
 
 

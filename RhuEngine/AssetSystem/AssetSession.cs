@@ -11,6 +11,8 @@ namespace RhuEngine.AssetSystem
 	{
 		public readonly AssetManager Manager;
 
+		public World World { get; private set; }
+
 		public void AssetLoadingTask(Action<byte[]> action,Uri asset,bool useCache) {
 			var task = new AssetTask(action,this,asset,useCache);
 			Manager.tasks.Add(task);
@@ -34,11 +36,11 @@ namespace RhuEngine.AssetSystem
 		}
 
 		private byte[] GetLocalAsset(Uri uri) {
-			throw new Exception("Not supported at moment");
-			return null;
+			return World.RequestAssets(uri);
 		}
 
-		public AssetSession(AssetManager manager) {
+		public AssetSession(AssetManager manager,World world) {
+			World = world;
 			Manager = manager;
 			Manager.assetSessions.Add(this);
 		}
