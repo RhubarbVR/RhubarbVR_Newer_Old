@@ -32,7 +32,7 @@ namespace RhuEngine.WorldObjects
 			}
 			var user = GetLocalUser();
 			var id = Guid.NewGuid().ToString();
-			var uri = new Uri($"local://{user.userID.Value}/{id}{addedEnd}");
+			var uri = new Uri($"local:///{user.userID.Value}/{id}{addedEnd}");
 			Engine.assetManager.CacheAsset(uri, data);
 			return uri;
 		}

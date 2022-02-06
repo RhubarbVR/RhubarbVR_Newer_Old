@@ -40,7 +40,7 @@ namespace RhuEngine.Components
 				UI.SameLine();
 				if (UI.Button("FilePicker")) {
 					try {
-						Platform.FilePicker(PickerMode.Open, (open, path) => { if (open) { World.ImportString(path.CleanPath()); } });
+						Platform.FilePicker(PickerMode.Open, (open, path) => { if (open) { WorldManager.FocusedWorld.ImportString(path.CleanPath()); } });
 					}
 					catch { }
 				}

@@ -23,6 +23,7 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 =====---- EngineStatistics ----=====
 Is Login {Engine.netApiManager.IsLoggedIn}
 Username {Engine.netApiManager.User?.UserName ?? "Null"}
+UserID {Engine.netApiManager.User?.Id ?? "Null"}
 
 worldManager stepTime {WorldManager.TotalStepTime * 1000f:f3}ms
 FPS {1 / Time.Elapsedf:f3}
@@ -41,6 +42,7 @@ Raycast Enabled {StereoKit.World.RaycastEnabled}
 
 
 =====---- Focused World ----=====
+UserID {WorldManager.FocusedWorld.GetLocalUser()?.userID.Value ?? "Null"}
 LastFocusChange {WorldManager.FocusedWorld?.LastFocusChange}
 IsLoading {WorldManager.FocusedWorld?.IsLoading}
 IsLoadingNet {WorldManager.FocusedWorld?.IsLoadingNet}
