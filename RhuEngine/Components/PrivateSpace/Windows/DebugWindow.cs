@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using RhuEngine.Managers;
+using RhuEngine.WorldObjects;
 
 using StereoKit;
 
@@ -13,6 +14,21 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 		public override bool? OnLogin => null;
 
 		public override string Name => "Debug";
+
+		private string GetUserList() {
+			var returnstring = "";
+			var currentUserID = 0;
+			if (WorldManager.FocusedWorld != null) {
+				foreach (User item in WorldManager.FocusedWorld.Users) {
+					returnstring += $"User: {currentUserID} UserRef: {item.Pointer} PeerLoaded: {item.CurrentPeer != null} UserID: {item.userID.Value} IsLocal: {WorldManager.FocusedWorld.GetLocalUser() == item} SyncStreamsCount:{item.syncStreams.Count} isPresent:{item.isPresent.Value} \n";
+					currentUserID++;
+				}
+			}
+			else {
+				returnstring = "Not in session\n";
+			}
+			return returnstring;
+		}
 
 		public override void Update() {
 			Hierarchy.Push(Matrix.S(0.5f));
@@ -62,7 +78,8 @@ WorldObjects {WorldManager.FocusedWorld?.WorldObjectsCount}
 RenderComponents {WorldManager.FocusedWorld?.RenderingComponentsCount}
 GlobalStepables {WorldManager.FocusedWorld?.GlobalStepableCount}
 stepTime {(WorldManager.FocusedWorld?.stepTime * 1000f).Value:f3}ms
-
+=====    FocusedWorld Users    =====
+{GetUserList()}
 =====FocusedWorld NetStatistics=====
 {((WorldManager.FocusedWorld?.NetStatistics is not null) ?
 $@"BytesReceived {WorldManager.FocusedWorld?.NetStatistics?.BytesReceived.ToString()}

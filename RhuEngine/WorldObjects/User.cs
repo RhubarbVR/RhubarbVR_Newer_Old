@@ -15,7 +15,7 @@ namespace RhuEngine.WorldObjects
 		
 		[NoSyncUpdate]
 		public Sync<string> userID;
-
+		[Default(true)]
 		public Sync<bool> isPresent;
 
 		public Peer CurrentPeer { get; set; }
