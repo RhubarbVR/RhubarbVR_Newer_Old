@@ -12,7 +12,11 @@ namespace RhuEngine.Managers
 {
 	public class AssetManager : IManager
 	{
-		public string CacheDir = AppDomain.CurrentDomain.BaseDirectory + "\\Cache";
+		public AssetManager(string cachePath) {
+			CacheDir = cachePath is null ? AppDomain.CurrentDomain.BaseDirectory + "\\Cache" : cachePath;
+
+		}
+		public string CacheDir = "";
 
 		public SynchronizedCollection<AssetSession> assetSessions = new();
 
@@ -80,7 +84,7 @@ namespace RhuEngine.Managers
 				}
 			}
 			catch (Exception e) {
-				Log.Err($"Failed to clear cach {e}");
+				Log.Err($"Failed to clear Local cache {e}");
 			}
 		}
 

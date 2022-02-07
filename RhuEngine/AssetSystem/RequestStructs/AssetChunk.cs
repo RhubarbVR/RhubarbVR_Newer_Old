@@ -10,7 +10,7 @@ namespace RhuEngine.AssetSystem.RequestStructs
 		[Key(0)]
 		public string URL { get; set; }
 		[Key(1)]
-		public ulong ChunkID;
+		public long ChunkID;
 		[Key(2)]
 		public byte[] data;
 	}

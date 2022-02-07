@@ -18,6 +18,7 @@ namespace RhuEngine.WorldObjects
 {
 	public partial class World
 	{
+		public const DeliveryMethod ASSET_DELIVERY_METHOD = DeliveryMethod.ReliableUnordered;
 
 		public Dictionary<string, LocalAssetLoadTask> loadTasks = new();
 
@@ -49,17 +50,18 @@ namespace RhuEngine.WorldObjects
 			}
 
 			public byte[] Load(Uri uri) {
-				var userID = uri.AbsolutePath.Substring(0, uri.AbsolutePath.IndexOf('/'));
+				var path = uri.AbsolutePath;
+				var userID = path.Substring(0, path.IndexOf('/'));
 				var user = _world.GetUserFromID(userID);
 				if (user == null) {
-					Log.Err("User was null when loadeding LocalAsset");
+					Log.Err($"User was null when loadeding LocalAsset UserID: {userID} Path {path}");
 					return null;
 				}
 				if (user.CurrentPeer == null) {
 					Log.Err("User Peer was null when loadeding LocalAsset");
 					return null;
 				}
-				user.CurrentPeer.Send(Serializer.Save<IAssetRequest>(new RequestAsset { URL = uri.AbsolutePath }), DeliveryMethod.ReliableSequenced);
+				user.CurrentPeer.Send(Serializer.Save<IAssetRequest>(new RequestAsset { URL = path }), ASSET_DELIVERY_METHOD);
 				while (true) {
 					Thread.Sleep(10);
 				}
@@ -76,11 +78,42 @@ namespace RhuEngine.WorldObjects
 		{
 			private readonly World _world;
 
+			public Task Task { get; private set; }
+
 			public LocalAssetSendTask(World world,string url,Peer requester) {
 				_world = world;
 				Url = url;
 				Requester = requester;
 				world.sendTasks.Add(this);
+				Task = Task.Run(SendLoop);
+			}
+
+			public uint maxChunkSizeBytes = 1024 * 15;
+
+			public void SendLoop() {
+				var asset = _world.assetSession.GetAsset(new Uri($"local:///{Url}"), true);
+				double devis = 0;
+				for (var i = maxChunkSizeBytes; i >= 0; i--) {
+					devis = (((double)asset.LongLength) / i);
+					if((devis % 1) == 0) {
+						break;
+					}
+				}
+				var chunksize = (uint)devis;
+				var chunkAmount = asset.LongLength/chunksize;
+				Log.Info($"Sending asset with chunkSize:{chunksize} ChunkAmount:{chunkAmount} assetSize{asset.LongLength}");
+				if (asset != null) {
+					Requester.Send(Serializer.Save<IAssetRequest>(new AssetResponse { URL = Url,ChunkAmount = chunkAmount,ChunkSizeBytes = chunksize}), ASSET_DELIVERY_METHOD);
+					var chunkBuffer = new byte[chunksize];
+					var remainingChunks = chunkAmount;
+					while (remainingChunks == 0) {
+						Array.Copy(asset,(remainingChunks - 1)*chunksize, chunkBuffer,0, chunkBuffer.Length);
+						Requester.Send(Serializer.Save<IAssetRequest>(new AssetChunk { URL = Url,ChunkID = remainingChunks, data =  chunkBuffer}), ASSET_DELIVERY_METHOD);
+						remainingChunks--;
+						Thread.Sleep(10);
+					}
+					Log.Info("Sent all Chunks");
+				}
 			}
 
 			public string Url { get; }
@@ -96,7 +129,7 @@ namespace RhuEngine.WorldObjects
 
 			}
 			else if (assetRequest is AssetResponse response) {
-			
+				Log.Info($"Asset Resived with chunkSize:{response.ChunkSizeBytes} ChunkAmount:{response.ChunkAmount} assetSize{response.ChunkAmount * response.ChunkSizeBytes}");
 			}
 		}
 

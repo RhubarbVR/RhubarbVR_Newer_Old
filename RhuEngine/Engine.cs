@@ -14,6 +14,8 @@ namespace RhuEngine
 
 		private readonly bool _noVRSim = false;
 
+		private readonly string _cachePathOverRide = null; 
+
 		public readonly Version version = new(1, 0, 0);
 #if DEBUG
 		public const bool IS_MILK_SNAKE = true;
@@ -40,8 +42,24 @@ namespace RhuEngine
 		}
 
 		public Engine(string[] arg, OutputCapture outputCapture) : base() {
-			_forceFlatscreen = arg.Any((v) => v.ToLower() == "--no-vr");
-			_noVRSim = arg.Any((v) => v.ToLower() == "--no-vr-sim");
+			_forceFlatscreen = arg.Any((v) => v.ToLower() == "--no-vr") | arg.Any((v) => v.ToLower() == "-no-vr");
+			_noVRSim = arg.Any((v) => v.ToLower() == "--no-vr-sim") | arg.Any((v) => v.ToLower() == "-no-vr-sim");
+			for (var i = 0; i < arg.Length; i++) {
+				if(arg[i].ToLower() == "--cache-override" | arg[i].ToLower() == "-cache-override") {
+					if (i + 1 <= arg.Length) {
+						_cachePathOverRide = arg[i + 1];
+					}
+					else {
+						Log.Err("Cache Path not specified");
+					}
+				}
+			}
+			if (arg.Length <= 0) {
+				Log.Info($"Launched with no arguments");
+			}
+			else {
+				Log.Info($"Launched with {(_forceFlatscreen ? "forceFlatscreen " : "")}{(_noVRSim ? "noVRSim " : "")}{((_cachePathOverRide != null) ? "Cache Override: " + _cachePathOverRide + " " : "")}");
+			}
 			this.outputCapture = outputCapture;
 		}
 		private string _mainMic;
@@ -78,7 +96,7 @@ namespace RhuEngine
 
 		public WorldManager worldManager = new();
 
-		public AssetManager assetManager = new();
+		public AssetManager assetManager;
 
 		public OutputCapture outputCapture;
 
@@ -88,6 +106,7 @@ namespace RhuEngine
 			Platform.ForceFallbackKeyboard = true;
 			World.OcclusionEnabled = true;
 			World.RaycastEnabled = true;
+			assetManager = new AssetManager(_cachePathOverRide);
 			_managers = new IManager[] { netApiManager, assetManager , worldManager };
 			foreach (var item in _managers) {
 				item.Init(this);
