@@ -74,7 +74,7 @@ namespace RhuEngine.Managers
 
 		public World CreateNewWorld(World.FocusLevel focusLevel, bool localWorld = false,string sessionName = null) {
 			var world = new World(this) {
-				Focus = focusLevel
+				Focus = World.FocusLevel.Background
 			};
 			world.Initialize(!localWorld, false, false, focusLevel == World.FocusLevel.PrivateOverlay);
 			world.RootEntity.name.Value = "Root";
@@ -90,23 +90,20 @@ namespace RhuEngine.Managers
 				world.WaitingForWorldStartState = false;
 			}
 			worlds.Add(world);
-
 			ShowLoadingFeedback(world, focusLevel);
 			return world;
 		}
 
 		public World JoinNewWorld(string sessionID, World.FocusLevel focusLevel,string sessionName = null) {
 			var world = new World(this) {
-				Focus = focusLevel
+				Focus = World.FocusLevel.Background
 			};
 			world.Initialize(true, true, true, false);
 			world.SessionID.SetValueNoOnChangeAndNetworking(sessionID);
 			world.SessionName.SetValueNoOnChangeAndNetworking(sessionName);
 			Task.Run(() => world.StartNetworking(false));
 			worlds.Add(world);
-
 			ShowLoadingFeedback(world, focusLevel);
-
 			return world;
 		}
 
@@ -132,9 +129,7 @@ namespace RhuEngine.Managers
 				Task.Run(() => world.StartNetworking(true));
 			}
 			worlds.Add(world);
-
 			ShowLoadingFeedback(world, focusLevel);
-
 			return world;
 		}
 
@@ -145,9 +140,20 @@ namespace RhuEngine.Managers
 			LocalWorld = CreateNewWorld(World.FocusLevel.Focused, true);
 			LocalWorld.SessionName.Value = "Local World";
 			LocalWorld.WorldName.Value = "Local World";
-			FocusedWorld = LocalWorld;
 			LocalWorld.BuildLocalWorld();
 			LocalWorld.SessionName.Value = "LocalWorld";
+			engine.netApiManager.HasGoneOfline += NetApiManager_HasGoneOfline;
+		}
+
+		private void NetApiManager_HasGoneOfline() {
+			if(LocalWorld != null) {
+				LocalWorld.Focus = World.FocusLevel.Focused;
+			}
+			foreach (var item in worlds) {
+				if(!(item.IsPersonalSpace || LocalWorld == item)) {
+					Task.Run(() => item.Dispose());
+				}
+			}
 		}
 
 		public void Step() {

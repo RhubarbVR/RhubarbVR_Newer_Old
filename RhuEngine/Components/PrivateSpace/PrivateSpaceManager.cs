@@ -22,77 +22,87 @@ namespace RhuEngine.Components
 
 		private void RenderPrivateWindow() {
 			UI.WindowBegin("PriveWindow", ref privatePose,UIWin.Body);
-			foreach (var item in windows) {
+			if (Engine.netApiManager.IsOnline) {
+				foreach (var item in windows) {
 
-				if (item.OnLogin is null) {
-					UI.Toggle(item.Name, ref item.IsOpen);
-					UI.SameLine();
-				}else if(item.OnLogin.Value == Engine.netApiManager.IsLoggedIn) {
-					UI.Toggle(item.Name, ref item.IsOpen);
-					UI.SameLine();
-				}
-				else if(item.IsOpen) {
-					item.IsOpen = false;
-				}
-			}
-			if (Engine.netApiManager.IsLoggedIn) {
-				UI.Label("Hello " + Engine.netApiManager.User?.UserName ?? "null");
-				UI.SameLine();
-				if (UI.Button("FilePicker")) {
-					try {
-						Platform.FilePicker(PickerMode.Open, (open, path) => { if (open) { WorldManager.FocusedWorld.ImportString(path.CleanPath()); } });
-					}
-					catch { }
-				}
-				UI.SameLine();
-				if (UI.Button("Logout")) {
-					Engine.netApiManager.Logout();
-				}
-				UI.Text("World switcher");
-				if (WorldManager.FocusedWorld is not null) {
-					UI.PushEnabled(false);
-					var e = true;
-					UI.Toggle(" " + WorldManager.FocusedWorld.SessionName.Value, ref e);
-					UI.PopEnabled();
-					if (WorldManager.LocalWorld != WorldManager.FocusedWorld) {
-						UI.PushTint(new Color(0.8f, 0, 0));
+					if (item.OnLogin is null) {
+						UI.Toggle(item.Name, ref item.IsOpen);
 						UI.SameLine();
-						UI.Space(-Engine.UISettings.padding);
-						if (UI.Button("X")) {
-							try {
-								WorldManager.FocusedWorld.Dispose();
-							}
-							catch { }
-						}
-						UI.PopTint();
+					}
+					else if (item.OnLogin.Value == Engine.netApiManager.IsLoggedIn) {
+						UI.Toggle(item.Name, ref item.IsOpen);
+						UI.SameLine();
+					}
+					else if (item.IsOpen) {
+						item.IsOpen = false;
 					}
 				}
-				var count = 2;
-				for (var i = 0; i < WorldManager.worlds.Count; i++) {
-					var item = WorldManager.worlds[i];
-					if (item.Focus == WorldObjects.World.FocusLevel.Background) {
-						if (count % 3 != 1) {
-							UI.SameLine();
+				if (Engine.netApiManager.IsLoggedIn) {
+					UI.Label("Hello " + Engine.netApiManager.User?.UserName ?? "null");
+					UI.SameLine();
+					if (UI.Button("FilePicker")) {
+						try {
+							Platform.FilePicker(PickerMode.Open, (open, path) => { if (open) { WorldManager.FocusedWorld.ImportString(path.CleanPath()); } });
 						}
-						UI.PushId(count);
-						if (UI.Button(" " + item.SessionName.Value)) {
-							item.Focus = WorldObjects.World.FocusLevel.Focused;
-						}
-						if (WorldManager.LocalWorld != item) {
+						catch { }
+					}
+					UI.SameLine();
+					if (UI.Button("Logout")) {
+						Engine.netApiManager.Logout();
+					}
+					UI.Text("World switcher");
+					if (WorldManager.FocusedWorld is not null) {
+						UI.PushEnabled(false);
+						var e = true;
+						UI.Toggle(" " + WorldManager.FocusedWorld.SessionName.Value, ref e);
+						UI.PopEnabled();
+						if (WorldManager.LocalWorld != WorldManager.FocusedWorld) {
 							UI.PushTint(new Color(0.8f, 0, 0));
 							UI.SameLine();
 							UI.Space(-Engine.UISettings.padding);
 							if (UI.Button("X")) {
 								try {
-									item.Dispose();
+									WorldManager.FocusedWorld.Dispose();
 								}
 								catch { }
 							}
 							UI.PopTint();
 						}
-						UI.PopId();
-						count++;
 					}
+					var count = 2;
+					for (var i = 0; i < WorldManager.worlds.Count; i++) {
+						var item = WorldManager.worlds[i];
+						if (item.Focus == WorldObjects.World.FocusLevel.Background) {
+							if (count % 3 != 1) {
+								UI.SameLine();
+							}
+							UI.PushId(count);
+							if (UI.Button(" " + item.SessionName.Value)) {
+								item.Focus = WorldObjects.World.FocusLevel.Focused;
+							}
+							if (WorldManager.LocalWorld != item) {
+								UI.PushTint(new Color(0.8f, 0, 0));
+								UI.SameLine();
+								UI.Space(-Engine.UISettings.padding);
+								if (UI.Button("X")) {
+									try {
+										item.Dispose();
+									}
+									catch { }
+								}
+								UI.PopTint();
+							}
+							UI.PopId();
+							count++;
+						}
+					}
+				}
+			}
+			else {
+				if(UI.Button("Go Online")) {
+					try {
+						Engine.netApiManager.UpdateCheckForInternetConnection();	
+					}catch { }
 				}
 			}
 			UI.WindowEnd();
