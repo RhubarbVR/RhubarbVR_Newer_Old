@@ -41,7 +41,7 @@ namespace RhuEngine.WorldObjects
 					peer.User = user;
 				}
 				else {
-					Log.Info("User found from peer");
+					Log.Info($"User found from peer UserID:{peer.UserID}");
 					if (user.CurrentPeer == peer) {
 						Log.Info("Already bond to user");
 						return;
@@ -62,7 +62,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public User GetLocalUser() {
-			return Users is null ? null : LocalUserID <= 0 ? null : (LocalUserID - 1) < Users.Count ? Users[Users.Count - LocalUserID] : null;
+			return Users is null ? null : LocalUserID <= 0 ? null : (LocalUserID - 1) < Users.Count ? Users[LocalUserID - 1] : null;
 		}
 	}
 }

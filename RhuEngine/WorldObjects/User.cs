@@ -15,12 +15,13 @@ namespace RhuEngine.WorldObjects
 		
 		[NoSyncUpdate]
 		public Sync<string> userID;
+
 		[Default(true)]
 		public Sync<bool> isPresent;
 
 		public Peer CurrentPeer { get; set; }
 
-		public bool IsConnected  => (CurrentPeer?.NetPeer?.ConnectionState ?? ConnectionState.Disconnected) != ConnectionState.Connected;
+		public bool IsConnected  => (CurrentPeer?.NetPeer?.ConnectionState ?? LiteNetLib.ConnectionState.Disconnected) == LiteNetLib.ConnectionState.Connected;
 
 		public override void OnLoaded() {
 			base.OnLoaded();

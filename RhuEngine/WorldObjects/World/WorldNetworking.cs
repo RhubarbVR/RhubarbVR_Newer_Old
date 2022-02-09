@@ -232,6 +232,11 @@ namespace RhuEngine.WorldObjects
 						IsDeserializing = false;
 						AddLocalUser();
 						FindNewMaster();
+						foreach (var peer1 in _netManager.ConnectedPeerList) {
+							if (peer1.Tag is Peer contpeer) {
+								LoadUserIn(contpeer);
+							}
+						}
 					}
 					catch (Exception ex) {
 						Log.Err("Failed to load world state" + ex);
