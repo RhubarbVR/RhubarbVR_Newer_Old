@@ -182,6 +182,9 @@ namespace RhuEngine.Managers
 		}
 
 		private void WriteCookiesToDisk(string file, CookieContainer cookieJar) {
+			if (!Directory.Exists(Path.GetDirectoryName(file))) {
+				Directory.CreateDirectory(Path.GetDirectoryName(file));
+			}
 			using Stream stream = File.Create(file);
 			try {
 				StereoKit.Log.Info("Writing cookies to disk...");
@@ -237,12 +240,12 @@ namespace RhuEngine.Managers
 				catch (Exception ex) {
 					Log.Err($"Failed To Clear Cookies {ex}");
 				}
-				WriteCookiesToDisk(COOKIEPATH, Cookies);
+				WriteCookiesToDisk(_cookiePath, Cookies);
 			}
 		}
 
 		public void Dispose() {
-			WriteCookiesToDisk(COOKIEPATH, Cookies);
+			WriteCookiesToDisk(_cookiePath, Cookies);
 		}
 
 		public Uri BaseAddress =>
@@ -252,7 +255,10 @@ namespace RhuEngine.Managers
 #else
 				_httpClient?.BaseAddress ?? new Uri("https://RhubarbVR.net/");
 #endif
-		private const string COOKIEPATH = "RhuCookies";
+		public NetApiManager(string path) {
+			_cookiePath = path is null ? AppDomain.CurrentDomain.BaseDirectory + "\\RhuCookies" : path + "\\RhuCookies";
+		}
+		private readonly string _cookiePath;
 
 		private Engine Engine { get; set; }
 
@@ -275,7 +281,7 @@ namespace RhuEngine.Managers
 			HttpClientHandler = new HttpClientHandler {
 				AllowAutoRedirect = true,
 				UseCookies = true,
-				CookieContainer = ReadCookiesFromDisk("RhuCookies")
+				CookieContainer = ReadCookiesFromDisk(_cookiePath)
 			};
 			HttpClientHandler.ServerCertificateCustomValidationCallback = ValidateRemoteCertificate;
 			_httpClient = new HttpClient(HttpClientHandler) {

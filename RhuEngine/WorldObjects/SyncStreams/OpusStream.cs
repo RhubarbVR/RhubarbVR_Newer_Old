@@ -6,6 +6,7 @@ using RhuEngine.WorldObjects.ECS;
 using OpusDotNet;
 
 using StereoKit;
+using System.Collections.Generic;
 
 namespace RhuEngine.WorldObjects
 {
@@ -83,27 +84,36 @@ namespace RhuEngine.WorldObjects
 			_loadedDevice = true;
 		}
 
+		private readonly Queue<byte[]> _audioQueue = new(3);
+
 		public override void Received(Peer sender, IDataNode data) {
 			if (_output is null || _encoder is null || _decoder is null || NoSync) {
 				return;
 			}
-			var @in = ((DataNode<byte[]>)data).Value;
-			var dataPacket = new float[SAMPLE_FRAME_COUNT];
-			var amount = _decoder.Decode(@in, @in.Length, dataPacket, SAMPLE_FRAME_COUNT);
-			_output.WriteSamples(dataPacket, amount);
+			_audioQueue.Enqueue(((DataNode<byte[]>)data).Value);
 		}
 
 		public void Step() {
+			if (NoSync) {
+				return;
+			}
 			if (_encoder is null || _decoder is null) {
 				return;
 			}
 			if (!_loadedDevice) {
 				return;
 			}
-			if (_input is null) {
-				return;
+			else {
+				if (_output is null) {
+					return;
+				}
+				if (_output.UnreadSamples < SAMPLE_FRAME_COUNT) {
+					var audio = new float[_input.UnreadSamples];
+					var packed = _audioQueue.Dequeue();
+					_decoder.Decode(packed, packed.Length, audio, audio.Length);
+				}
 			}
-			if (NoSync) {
+			if (_input is null) {
 				return;
 			}
 			if (_input.UnreadSamples >= SAMPLE_FRAME_COUNT) {

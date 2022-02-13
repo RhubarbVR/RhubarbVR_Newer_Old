@@ -14,7 +14,6 @@ namespace RhuEngine.Managers
 	{
 		public AssetManager(string cachePath) {
 			CacheDir = cachePath is null ? AppDomain.CurrentDomain.BaseDirectory + "\\Cache" : cachePath;
-
 		}
 		public string CacheDir = "";
 

@@ -208,6 +208,10 @@ namespace RhuEngine.WorldObjects
 			_netManager.MaxConnectAttempts = 5;
 			_netManager.DisconnectTimeout = 5000;
 			_netManager.UpdateTime = 10;
+			_netManager.ChannelsCount = 3;
+			//0 is main
+			//1 is syncStreams
+			//2 is assetPackeds
 		}
 
 		public NetStatistics NetStatistics => _netManager?.Statistics;
@@ -460,8 +464,29 @@ namespace RhuEngine.WorldObjects
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			_netManager.SendToAll(netData.GetByteArray(), deliveryMethod);
+			_netManager.SendToAll(netData.GetByteArray(),0, deliveryMethod);
 		}
+
+		public void BroadcastDataToAllStream(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
+			if (target.IsRemoved) {
+				return;
+			}
+			if (_netManager is null) {
+				return;
+			}
+			if (IsLoading) {
+				return;
+			}
+			if (target.Pointer.GetOwnerID() == 0) {
+				//LocalValue
+				return;
+			}
+			var netData = new DataNodeGroup();
+			netData.SetValue("Data", data);
+			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
+			_netManager.SendToAll(netData.GetByteArray(),1, deliveryMethod);
+		}
+
 
 		public void AddLocalUser() {
 			ItemIndex = 176;

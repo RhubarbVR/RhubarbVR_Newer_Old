@@ -14,7 +14,9 @@ namespace RhuEngine
 
 		private readonly bool _noVRSim = false;
 
-		private readonly string _cachePathOverRide = null; 
+		private readonly string _cachePathOverRide = null;
+
+		private readonly string _userDataPathOverRide = null;
 
 		public readonly Version version = new(1, 0, 0);
 #if DEBUG
@@ -53,12 +55,20 @@ namespace RhuEngine
 						Log.Err("Cache Path not specified");
 					}
 				}
+				if (arg[i].ToLower() == "--userdata-override" | arg[i].ToLower() == "-userdata-override") {
+					if (i + 1 <= arg.Length) {
+						_userDataPathOverRide = arg[i + 1];
+					}
+					else {
+						Log.Err("User Data Path not specified");
+					}
+				}
 			}
 			if (arg.Length <= 0) {
 				Log.Info($"Launched with no arguments");
 			}
 			else {
-				Log.Info($"Launched with {(_forceFlatscreen ? "forceFlatscreen " : "")}{(_noVRSim ? "noVRSim " : "")}{((_cachePathOverRide != null) ? "Cache Override: " + _cachePathOverRide + " " : "")}");
+				Log.Info($"Launched with {(_forceFlatscreen ? "forceFlatscreen " : "")}{(_noVRSim ? "noVRSim " : "")}{((_cachePathOverRide != null) ? "Cache Override: " + _cachePathOverRide + " " : "")}{((_userDataPathOverRide != null) ? "UserData Override: " + _userDataPathOverRide + " " : "")}");
 			}
 			this.outputCapture = outputCapture;
 		}
@@ -92,7 +102,7 @@ namespace RhuEngine
 				};
 			}
 		}
-		public NetApiManager netApiManager = new();
+		public NetApiManager netApiManager;
 
 		public WorldManager worldManager = new();
 
@@ -106,6 +116,7 @@ namespace RhuEngine
 			Platform.ForceFallbackKeyboard = true;
 			World.OcclusionEnabled = true;
 			World.RaycastEnabled = true;
+			netApiManager = new NetApiManager(_userDataPathOverRide);
 			assetManager = new AssetManager(_cachePathOverRide);
 			_managers = new IManager[] { netApiManager, assetManager , worldManager };
 			foreach (var item in _managers) {
