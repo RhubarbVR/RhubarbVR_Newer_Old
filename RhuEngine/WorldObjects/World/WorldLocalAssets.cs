@@ -94,7 +94,7 @@ namespace RhuEngine.WorldObjects
 				var asset = _world.assetSession.GetAsset(new Uri($"local:///{Url}"), true);
 				double devis = 0;
 				for (var i = maxChunkSizeBytes; i >= 0; i--) {
-					devis = (((double)asset.LongLength) / i);
+					devis = ((double)asset.LongLength) / i;
 					if((devis % 1) == 0) {
 						break;
 					}

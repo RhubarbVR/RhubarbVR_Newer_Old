@@ -6,6 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Security;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -14,6 +16,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 using SharedModels;
+
+using StereoKit;
 
 namespace RhuEngine.Managers
 {
@@ -80,9 +84,13 @@ namespace RhuEngine.Managers
 		private HttpClientHandler HttpClientHandler { get; set; }
 		public CookieContainer Cookies => HttpClientHandler?.CookieContainer;
 		public async Task<AccountCreationResponse> SignUp(string username, string email, string password, DateTime dateOfBirth) {
-			var data = await SendPost<AccountCreationResponse, UserRegistration>("/api/authentication/Register", new UserRegistration { Username = username, Email = email, Password = password, DateOfBirth = dateOfBirth });
-			;
-			return data.Data;
+			try {
+				var data = await SendPost<AccountCreationResponse, UserRegistration>("/api/authentication/Register", new UserRegistration { Username = username, Email = email, Password = password, DateOfBirth = dateOfBirth });
+				return data.Data;
+			}
+			catch (HttpRequestException requestException) {
+				throw ProssesHttpRequestException(requestException);
+			}
 		}
 
 		private LoginResponse ProcessLoginResponse(HttpDataResponse<LoginResponse> data) {
@@ -94,6 +102,9 @@ namespace RhuEngine.Managers
 					login = true;
 				}
 			}
+			else {
+				UpdateCheckForInternetConnection();
+			}
 			if (!login) {
 				IsLoggedIn = false;
 				User = null;
@@ -102,18 +113,72 @@ namespace RhuEngine.Managers
 		}
 
 		public async Task<LoginResponse> Login(string email, string password) {
-			var data = await SendPost<LoginResponse, UserLogin>("/api/authentication/Login", new UserLogin { Email = email, Password = password });
-			return ProcessLoginResponse(data);
+			try { 
+				var data = await SendPost<LoginResponse, UserLogin>("/api/authentication/Login", new UserLogin { Email = email, Password = password });
+				return ProcessLoginResponse(data);
+			}
+			catch (HttpRequestException requestException) {
+				throw ProssesHttpRequestException(requestException);
+			}
 		}
 
 		public async Task<LoginResponse> GetMe() {
-			var data = await SendGet<LoginResponse>("/api/authentication/GetMe");
-			return ProcessLoginResponse(data);
+			try {
+				var data = await SendGet<LoginResponse>("/api/authentication/GetMe");
+				return ProcessLoginResponse(data);
+			}
+			catch (HttpRequestException requestException) {
+				throw ProssesHttpRequestException(requestException);
+			}
 		}
 
 		public async Task<IEnumerable<SessionInfo>> GetSessions() {
-			var data = await SendGet<IEnumerable<SessionInfo>>("/api/SessionInfo/GetAllSessions");
-			return data.Data;
+			try {
+				var data = await SendGet<IEnumerable<SessionInfo>>("/api/SessionInfo/GetAllSessions");
+				return data.Data;
+			}
+			catch (HttpRequestException requestException) {
+				throw ProssesHttpRequestException(requestException);
+			}
+		}
+
+		public Exception ProssesHttpRequestException(HttpRequestException requestException) {
+			if (requestException.InnerException is WebException webException && webException.Status == WebExceptionStatus.NameResolutionFailure) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is WebException webExceptione && webExceptione.Status == WebExceptionStatus.Timeout) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is WebException webExceptiond && webExceptiond.Status == WebExceptionStatus.ConnectFailure) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is SocketException socketException && socketException.SocketErrorCode == SocketError.HostDown) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is SocketException socketExceptione && socketExceptione.SocketErrorCode == SocketError.HostNotFound) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is SocketException socketExceptionee && socketExceptionee.SocketErrorCode == SocketError.HostUnreachable) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is SocketException socketExceptioneee && socketExceptioneee.SocketErrorCode == SocketError.TimedOut) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is IOException ioException) {
+				if (ioException.InnerException is SocketException socketException2 && socketException2.SocketErrorCode == SocketError.HostDown) {
+					return new ConnectToServerError(this);
+				}
+				else if (ioException.InnerException is SocketException socketExceptione2 && socketExceptione2.SocketErrorCode == SocketError.HostNotFound) {
+					return new ConnectToServerError(this);
+				}
+				else if (ioException.InnerException is SocketException socketExceptionee2 && socketExceptionee2.SocketErrorCode == SocketError.HostUnreachable) {
+					return new ConnectToServerError(this);
+				}
+				else if (ioException.InnerException is SocketException socketExceptioneee2 && socketExceptioneee2.SocketErrorCode == SocketError.TimedOut) {
+					return new ConnectToServerError(this);
+				}
+			}
+			return requestException;
 		}
 
 		private void WriteCookiesToDisk(string file, CookieContainer cookieJar) {
@@ -152,6 +217,27 @@ namespace RhuEngine.Managers
 						item.Dispose();
 					}
 				}
+				//Reomve All Cookies
+				try {
+					var cookies = Cookies.GetCookies(BaseAddress);
+					foreach (Cookie co in cookies) {
+						co.Expires = DateTime.Now.Subtract(TimeSpan.FromDays(1));
+					}
+					var uri = new UriBuilder(BaseAddress) {
+						Scheme = ((BaseAddress.Scheme == Uri.UriSchemeHttps) && !RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) ? "wss" : "ws",
+						Port = RuntimeInformation.FrameworkDescription.StartsWith("Mono ") ? 80 : BaseAddress.Port
+					};
+					if (RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) {
+						var ucookies = Cookies.GetCookies(BaseAddress);
+						foreach (Cookie co in ucookies) {
+							co.Expires = DateTime.Now.Subtract(TimeSpan.FromDays(1));
+						}
+					}
+				}
+				catch (Exception ex) {
+					Log.Err($"Failed To Clear Cookies {ex}");
+				}
+				WriteCookiesToDisk(COOKIEPATH, Cookies);
 			}
 		}
 

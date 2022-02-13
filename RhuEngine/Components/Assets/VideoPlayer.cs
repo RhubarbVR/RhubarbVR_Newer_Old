@@ -60,7 +60,7 @@ namespace RhuEngine.Components
 				};
 				var newbuff = new float[count];
 				for (var i = 0; i < count; i++) {
-					newbuff[i] = (Marshal.ReadInt16(samples + (sizeof(short) * i)) * (1 / 32768.0f));
+					newbuff[i] = Marshal.ReadInt16(samples + (sizeof(short) * i)) * (1 / 32768.0f);
 				}
 				audio.WriteSamples(newbuff);
 			}

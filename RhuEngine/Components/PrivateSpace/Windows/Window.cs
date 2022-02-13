@@ -24,8 +24,28 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 
 		public Pose windowPose = new(-.2f, 0.2f, -0.2f, Quat.LookDir(1, 0, 1));
 
-		public bool IsOpen;
 
+		private bool _isOpen;
+
+		public bool IsOpen
+		{
+			get => _isOpen;
+			set {
+				_isOpen = value;
+				if (_isOpen) {
+					OnOpen();
+				}
+				else {
+					OnClose();
+				}
+			}
+		}
+		public virtual void OnOpen() {
+
+		}
+		public virtual void OnClose() {
+
+		}
 		public virtual void Update() {
 
 		}

@@ -33,6 +33,11 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 
 		public override string Name => "Login";
 
+		public override void OnOpen() {
+			base.OnOpen();
+			error = "";
+		}
+
 		public override void Update() {
 
 #if DEBUG
@@ -74,7 +79,7 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 								}
 							}
 							catch (Exception ex) {
-								error = ex.ToString();
+								error = ex is ConnectToServerError ? "Server Is Down" : ex.ToString();
 							}
 						});
 					}
@@ -101,12 +106,16 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 								}
 							}
 							catch (Exception ex) {
-								error = ex.ToString();
+								error = ex is ConnectToServerError ? "Server Is Down" : ex.ToString();
 							}
 						});
 					}
 				}
+				var LastCreateAccountScreen = CreateAccountScreen;
 				UI.Toggle("Create Account or Login", ref CreateAccountScreen);
+				if (CreateAccountScreen != LastCreateAccountScreen) {
+					error = "";
+				}
 			}
 			UI.WindowEnd();
 		}

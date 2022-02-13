@@ -26,11 +26,19 @@ namespace RhuEngine.Components
 				foreach (var item in windows) {
 
 					if (item.OnLogin is null) {
-						UI.Toggle(item.Name, ref item.IsOpen);
+						var _open = item.IsOpen;
+						UI.Toggle(item.Name, ref _open);
+						if (_open != item.IsOpen) {
+							item.IsOpen = _open;
+						}
 						UI.SameLine();
 					}
 					else if (item.OnLogin.Value == Engine.netApiManager.IsLoggedIn) {
-						UI.Toggle(item.Name, ref item.IsOpen);
+						var _open = item.IsOpen;
+						UI.Toggle(item.Name, ref _open);
+						if(_open != item.IsOpen) {
+							item.IsOpen = _open;
+						}
 						UI.SameLine();
 					}
 					else if (item.IsOpen) {
@@ -113,6 +121,13 @@ namespace RhuEngine.Components
 			base.OnLoaded();
 			windows = new Window[] { new DebugWindow(Engine,WorldManager,World),new ConsoleWindow(Engine,WorldManager, World), new AssetTasksWindow(Engine,WorldManager,World) ,new SessionWindow(Engine, WorldManager, World), new LoginWindow(Engine,WorldManager, World) };
 			privatePose = new(-.2f, 0.2f, -0.2f, Quat.LookDir(1, 0, 1));
+			Engine.netApiManager.HasGoneOfline += NetApiManager_HasGoneOfline;
+		}
+
+		private void NetApiManager_HasGoneOfline() {
+			foreach (var item in windows) {
+				item.IsOpen = false;
+			}
 		}
 
 		readonly bool _uIOpen = true;

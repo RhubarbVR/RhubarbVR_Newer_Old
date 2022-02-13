@@ -53,7 +53,7 @@ namespace RhuEngine.WorldObjects
 			if (path.EndsWith(".bmp")) {
 				return AssetType.Texture;
 			}
-			return AssetType.Texture;
+			return AssetType.Unknown;
 		}
 
 		public AssetType GetAssetTypeOfString(ref string data,out bool WasUri) {
