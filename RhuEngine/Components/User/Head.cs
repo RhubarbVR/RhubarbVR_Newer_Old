@@ -27,7 +27,7 @@ namespace RhuEngine.Components
 			if (World.IsPersonalSpace) {
 				var handVal = WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target?.head.Target;
 				if (handVal is not null) {
-					var focusUserHand = WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target.head.Target;
+					var focusUserHand = WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target?.head.Target;
 					Entity.LocalTrans = focusUserHand?.LocalTrans ?? Matrix.Identity;
 				}
 			}

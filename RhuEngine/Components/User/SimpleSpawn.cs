@@ -44,7 +44,7 @@ namespace RhuEngine.Components
 					var mesh = head.AttachMesh<CylinderMesh, UIShader>().Item1;
 					mesh.depth.Value = 0.1f;
 					mesh.diameter.Value = 0.1f;
-					var opus = user.FindOrCreateSyncStream<RawAudioStream>("MainOpusStream");
+					var opus = user.FindOrCreateSyncStream<OpusStream>("MainOpusStream");
 					var audioPlayer = head.AttachComponent<SoundSource>();
 					audioPlayer.volume.Value = 0f; // so you do not here yourself for a sec
 					audioPlayer.sound.Target = opus;

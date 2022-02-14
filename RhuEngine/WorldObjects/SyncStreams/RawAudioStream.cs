@@ -28,7 +28,9 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public override float[] ProssesAudioSamples(byte[] data) {
-			return bitSize.Value switch {
+			return data is null
+				? (new float[SampleCount])
+				: bitSize.Value switch {
 				SampleBitSize.byte8bits => ReadByte8bits(data),
 				SampleBitSize.short16bits => ReadShort16bits(data),
 				SampleBitSize.float32bits => ReadFloat32bits(data),

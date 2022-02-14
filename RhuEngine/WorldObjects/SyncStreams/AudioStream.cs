@@ -20,7 +20,7 @@ namespace RhuEngine.WorldObjects
 			ms60
 		}
 
-		[Default(AudioFrameTime.ms2_5)]
+		[Default(AudioFrameTime.ms60)]
 		public Sync<AudioFrameTime> frameSize;
 
 		public float TimeInMs
@@ -62,7 +62,7 @@ namespace RhuEngine.WorldObjects
 		private bool _loadedDevice = false;
 		
 		public override void OnLoaded() {
-			_output = Sound.CreateStream(1f);
+			_output = Sound.CreateStream(5f);
 			Load(_output);
 		}
 
@@ -89,12 +89,31 @@ namespace RhuEngine.WorldObjects
 			throw new NotImplementedException();
 		}
 
+		private float[] _samples = new float[0];
 
-		public Queue<byte[]> audioData = new(3);
+		private readonly Queue<byte[]> _samplesQueue = new Queue<byte[]>(3);
+
+		private float[] _currentData = new float[1];
+
+		private long _currsorPos = 0;
+		private long _startPos = 0;
+
+
+		private float ReadSample() {
+			_currsorPos++;
+			if ((_startPos + _currentData.LongLength) > _currsorPos) {
+				return _currentData[_currsorPos - _startPos];
+			}
+			else {
+				_startPos = _currsorPos;
+				_currentData = _samplesQueue.Count > 0 ? ProssesAudioSamples(_samplesQueue.Dequeue()) : ProssesAudioSamples(null);
+				return _currentData[0];
+			}
+		}
 
 		public override void Received(Peer sender, IDataNode data) {
 			if (data is DataNode<byte[]> dataNode) {
-				audioData.Enqueue(dataNode);
+				_samplesQueue.Enqueue(dataNode);
 			}
 		}
 
@@ -110,14 +129,14 @@ namespace RhuEngine.WorldObjects
 				if(_output is null) {
 					return;
 				}
-				if (_output.TotalSamples - _output.CursorSamples >= SampleCount) {
-					if (audioData.Count > 0) {
-						_output.WriteSamples(ProssesAudioSamples(audioData.Dequeue()));
-					}
-					else {
-						_output.WriteSamples(new float[SampleCount]);
-					}
+				var count = Math.Max(0, (int)(0.1f * 48000) - (_output.TotalSamples - _output.CursorSamples));
+				if (_samples.Length < count) {
+					_samples = new float[count];
 				}
+				for (var i = 0; i < count; i++) {
+					_samples[i] = ReadSample();
+				}
+				_output.WriteSamples(_samples, count);
 			}
 			else {
 				if (_input is null) {
