@@ -61,15 +61,24 @@ namespace RhuEngine.WorldObjects
 
 		public void Send(byte[] data, DeliveryMethod reliableOrdered) {
 			if( ID == 0) {
-				NetPeer.Send(data, reliableOrdered);
+				NetPeer.Send(data, 0,reliableOrdered);
 			}
 			else {
-				NetPeer.Send(Serializer.Save(new DataPacked(data,ID)), reliableOrdered);
+				NetPeer.Send(Serializer.Save(new DataPacked(data,ID)),0, reliableOrdered);
 			}
 		}
 
 		internal void KillRelayConnection() {
 			NetPeer = null;
+		}
+
+		public void SendAsset(byte[] data, DeliveryMethod reliableOrdered) {
+			if (ID == 0) {
+				NetPeer.Send(data,3, reliableOrdered);
+			}
+			else {
+				NetPeer.Send(Serializer.Save(new DataPacked(data, ID)),3, reliableOrdered);
+			}
 		}
 	}
 }

@@ -108,7 +108,7 @@ namespace RhuEngine.WorldObjects
 					var remainingChunks = chunkAmount;
 					while (remainingChunks == 0) {
 						Array.Copy(asset,(remainingChunks - 1)*chunksize, chunkBuffer,0, chunkBuffer.Length);
-						Requester.Send(Serializer.Save<IAssetRequest>(new AssetChunk { URL = Url,ChunkID = remainingChunks, data =  chunkBuffer}), ASSET_DELIVERY_METHOD);
+						Requester.SendAsset(Serializer.Save<IAssetRequest>(new AssetChunk { URL = Url,ChunkID = remainingChunks, data =  chunkBuffer}), ASSET_DELIVERY_METHOD);
 						remainingChunks--;
 						Thread.Sleep(10);
 					}

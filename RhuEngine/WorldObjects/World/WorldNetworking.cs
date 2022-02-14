@@ -293,6 +293,9 @@ namespace RhuEngine.WorldObjects
 					else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
 						AssetResponses(assetRequest, tag, deliveryMethod);
 					}
+					else if(Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
+						ProcessPackedData(new DataNodeGroup(streamDataPacked.Data), deliveryMethod, tag);
+					}
 					else {
 						throw new Exception("Uknown Data from User");
 					}
@@ -494,7 +497,7 @@ namespace RhuEngine.WorldObjects
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			_netManager.SendToAll(netData.GetByteArray(),1, deliveryMethod);
+			_netManager.SendToAll(Serializer.Save(new StreamDataPacked(netData.GetByteArray())),1, deliveryMethod);
 		}
 
 
