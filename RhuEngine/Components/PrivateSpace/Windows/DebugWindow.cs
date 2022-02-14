@@ -20,7 +20,7 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 			var currentUserID = 0;
 			if (WorldManager.FocusedWorld != null) {
 				foreach (User item in WorldManager.FocusedWorld.Users) {
-					returnstring += $"User: {currentUserID + 1} UserRef: {item.Pointer} PeerLoaded: {item.CurrentPeer != null} UserID: {item.userID.Value} IsLocal: {WorldManager.FocusedWorld.GetLocalUser() == item} SyncStreamsCount: {item.syncStreams.Count} isPresent: {item.isPresent.Value} isConnected: {item.IsConnected} peerID: {item.CurrentPeer?.ID.ToString()??"null"} \n";
+					returnstring += $"User: {currentUserID + 1} UserRef: {item.Pointer} PeerLoaded: {item.CurrentPeer != null} UserID: {item.userID.Value} IsLocal: {WorldManager.FocusedWorld.GetLocalUser() == item} SyncStreamsCount: {item.syncStreams.Count} isPresent: {item.isPresent.Value} isConnected: {item.IsConnected} peerID: {item.CurrentPeer?.ID.ToString()??"null"}  latency{item.CurrentPeer?.latency??-1}\n";
 					currentUserID++;
 				}
 			}
@@ -92,7 +92,7 @@ PacketsSent {WorldManager.FocusedWorld?.NetStatistics?.PacketsSent}" : "No NetSt
 ");
 			var serverindex = 0;
 			foreach (var item in WorldManager.FocusedWorld?.relayServers) {
-				UI.Text($"RelayServer{serverindex} Connections{item.peers.Count}");
+				UI.Text($"RelayServer{serverindex} Connections{item.peers.Count} latency{item.latency}");
 				serverindex++;
 			}
 			UI.WindowEnd();

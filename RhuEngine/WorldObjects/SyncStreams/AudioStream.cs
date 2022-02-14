@@ -105,7 +105,7 @@ namespace RhuEngine.WorldObjects
 				return _currentData[_currsorPos - _startPos];
 			}
 			else {
-				_startPos = _currsorPos;
+				_startPos = _currsorPos + 1;
 				_currentData = _samplesQueue.Count > 0 ? ProssesAudioSamples(_samplesQueue.Dequeue()) : ProssesAudioSamples(null);
 				return _currentData[0];
 			}

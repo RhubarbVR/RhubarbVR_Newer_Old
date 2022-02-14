@@ -10,6 +10,7 @@ namespace RhuEngine.WorldObjects
 {
 	public class RelayPeer
 	{
+		public int latency = 0;
 		public NetPeer NetPeer { get; private set; }
 		public World World { get; }
 
@@ -49,6 +50,8 @@ namespace RhuEngine.WorldObjects
 		public string UserID { get;private set; }
 		public ushort ID { get;private set; }
 		public NetPeer NetPeer { get; private set; }
+
+		public int latency = 0;
 
 		public Peer(NetPeer netPeer,string userID, ushort id = 0) {
 			NetPeer = netPeer;

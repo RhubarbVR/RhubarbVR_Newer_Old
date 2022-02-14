@@ -32,7 +32,9 @@ namespace RhuEngine.WorldObjects
 				_decoder = null;
 			}
 			try {
-				_encoder = new OpusEncoder(typeOfStream.Value, 48000, 1);
+				_encoder = new OpusEncoder(typeOfStream.Value, 48000, 1) {
+					VBR = true
+				};
 				_decoder = new OpusDecoder(48000, 1);
 			}
 			catch (Exception ex) {

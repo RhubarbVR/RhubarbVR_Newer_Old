@@ -181,6 +181,7 @@ namespace RhuEngine.WorldObjects
 			_clientListener.ConnectionRequestEvent += request => request.AcceptIfKey(KEY);
 
 			_clientListener.NetworkReceiveEvent += ClientListener_NetworkReceiveEvent;
+			_clientListener.NetworkLatencyUpdateEvent += ClientListener_NetworkLatencyUpdateEvent;
 
 			_clientListener.PeerDisconnectedEvent += (peer, disconnectInfo) => {
 				if (peer.Tag is Peer rpeer) {
@@ -212,6 +213,15 @@ namespace RhuEngine.WorldObjects
 			//0 is main
 			//1 is syncStreams
 			//2 is assetPackeds
+		}
+
+		private void ClientListener_NetworkLatencyUpdateEvent(NetPeer peer, int latency) {
+			if (peer.Tag is Peer rupeer) {
+				rupeer.latency = latency;
+			}
+			else if (peer.Tag is RelayPeer repeer) {
+				repeer.latency = latency;
+			}
 		}
 
 		public NetStatistics NetStatistics => _netManager?.Statistics;
