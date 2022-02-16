@@ -18,7 +18,7 @@ namespace RhuEngine.WorldObjects
 
 		[Default(8000)]
 		public Sync<int> BitRate;
-
+		
 		private OpusDecoder _decoder;
 		private OpusEncoder _encoder;
 

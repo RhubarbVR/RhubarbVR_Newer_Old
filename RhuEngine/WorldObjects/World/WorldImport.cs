@@ -38,6 +38,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public AssetType GetAssetTypeFromPath(string path) {
+			path = path.ToLower();
 			if (path.EndsWith(".mp4")) {
 				return AssetType.Video;
 			}
@@ -50,10 +51,28 @@ namespace RhuEngine.WorldObjects
 			if (path.EndsWith(".jpeg")) {
 				return AssetType.Texture;
 			}
+			if (path.EndsWith(".jpg")) {
+				return AssetType.Texture;
+			}
 			if (path.EndsWith(".bmp")) {
 				return AssetType.Texture;
 			}
-			return AssetType.Unknown;
+			if (path.EndsWith(".pdm")) {
+				return AssetType.Texture;
+			}
+			if (path.EndsWith(".gif")) {
+				return AssetType.Texture;
+			}
+			if (path.EndsWith(".tiff")) {
+				return AssetType.Texture;
+			}
+			if (path.EndsWith(".tga")) {
+				return AssetType.Texture;
+			}
+			if (path.EndsWith(".webp")) {
+				return AssetType.Texture;
+			}
+			return path.EndsWith(".bmp") ? AssetType.Texture : AssetType.Unknown;
 		}
 
 		public AssetType GetAssetTypeOfString(ref string data,out bool WasUri) {

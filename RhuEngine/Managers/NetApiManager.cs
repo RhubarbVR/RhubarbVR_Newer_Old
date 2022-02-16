@@ -102,9 +102,6 @@ namespace RhuEngine.Managers
 					login = true;
 				}
 			}
-			else {
-				UpdateCheckForInternetConnection();
-			}
 			if (!login) {
 				IsLoggedIn = false;
 				User = null;
