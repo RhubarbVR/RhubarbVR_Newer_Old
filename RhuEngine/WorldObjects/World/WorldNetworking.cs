@@ -303,13 +303,13 @@ namespace RhuEngine.WorldObjects
 				else if (peer.Tag is RelayPeer) {
 					var tag = peer.Tag as RelayPeer;
 					if (Serializer.TryToRead<DataPacked>(data, out var packed)) {
-						if(Serializer.TryToRead<Dictionary<string, IDataNode>>(data,out var keyValuePairs)) {
+						if(Serializer.TryToRead<Dictionary<string, IDataNode>>(packed.Data, out var keyValuePairs)) {
 							ProcessPackedData(new DataNodeGroup(keyValuePairs), deliveryMethod, tag[packed.Id]);
 						}
-						else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
+						else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
 							AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
 						}
-						else if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
+						else if (Serializer.TryToRead<StreamDataPacked>(packed.Data, out var streamDataPacked)) {
 							ProcessPackedData(new DataNodeGroup(streamDataPacked.Data), deliveryMethod, tag[packed.Id]);
 						}
 						else {
