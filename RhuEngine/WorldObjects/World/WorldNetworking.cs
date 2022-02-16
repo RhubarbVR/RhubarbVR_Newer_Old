@@ -309,6 +309,9 @@ namespace RhuEngine.WorldObjects
 						else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
 							AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
 						}
+						else if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
+							ProcessPackedData(new DataNodeGroup(streamDataPacked.Data), deliveryMethod, tag[packed.Id]);
+						}
 						else {
 							throw new Exception("Uknown Data from relay");
 						}
