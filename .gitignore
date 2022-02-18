@@ -386,3 +386,5 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+Platforms/Rhubarb_VR_DotNet/.DS_Store
+Platforms/.DS_Store
