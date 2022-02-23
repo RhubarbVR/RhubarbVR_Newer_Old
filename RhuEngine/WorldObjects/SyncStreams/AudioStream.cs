@@ -91,7 +91,7 @@ namespace RhuEngine.WorldObjects
 
 		private float[] _samples = new float[0];
 
-		private readonly Queue<byte[]> _samplesQueue = new Queue<byte[]>(3);
+		private readonly Queue<byte[]> _samplesQueue = new(3);
 
 		private float[] _currentData = new float[1];
 

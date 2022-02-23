@@ -5,6 +5,10 @@ using System.Linq;
 using RhuEngine.Managers;
 
 using StereoKit;
+using RhuEngine.Settings;
+using System.IO;
+using RhuSettings;
+using System.Collections.Generic;
 
 namespace RhuEngine
 {
@@ -43,9 +47,12 @@ namespace RhuEngine
 			set { _globalSettings = value; UI.Settings = value; }
 		}
 
+		public readonly string SettingsFile;
+
 		public Engine(string[] arg, OutputCapture outputCapture) : base() {
 			_forceFlatscreen = arg.Any((v) => v.ToLower() == "--no-vr") | arg.Any((v) => v.ToLower() == "-no-vr");
 			_noVRSim = arg.Any((v) => v.ToLower() == "--no-vr-sim") | arg.Any((v) => v.ToLower() == "-no-vr-sim");
+			string settingsArg = null;
 			for (var i = 0; i < arg.Length; i++) {
 				if(arg[i].ToLower() == "--cache-override" | arg[i].ToLower() == "-cache-override") {
 					if (i + 1 <= arg.Length) {
@@ -63,6 +70,14 @@ namespace RhuEngine
 						Log.Err("User Data Path not specified");
 					}
 				}
+				if (arg[i].ToLower() == "--settings" | arg[i].ToLower() == "-settings") {
+					if (i + 1 <= arg.Length) {
+						settingsArg = arg[i + 1];
+					}
+					else {
+						Log.Err("Settings not specified");
+					}
+				}
 			}
 			if (arg.Length <= 0) {
 				Log.Info($"Launched with no arguments");
@@ -71,7 +86,43 @@ namespace RhuEngine
 				Log.Info($"Launched with {(_forceFlatscreen ? "forceFlatscreen " : "")}{(_noVRSim ? "noVRSim " : "")}{((_cachePathOverRide != null) ? "Cache Override: " + _cachePathOverRide + " " : "")}{((_userDataPathOverRide != null) ? "UserData Override: " + _userDataPathOverRide + " " : "")}");
 			}
 			this.outputCapture = outputCapture;
+
+			var lists = new List<DataList>();
+			SettingsFile = _userDataPathOverRide + "\\settings.json";
+			if (File.Exists(SettingsFile)) {
+				var text = File.ReadAllText(SettingsFile);
+				var liet = SettingsManager.GetDataFromJson(text);
+				lists.Add(liet);
+			}
+			if (!string.IsNullOrWhiteSpace(settingsArg)) {
+				foreach (var item in settingsArg.Split('|')) {
+					var text = File.Exists(item) ? File.ReadAllText(item) : item;
+					try {
+						var liet = SettingsManager.GetDataFromJson(text);
+						lists.Add(liet);
+					}
+					catch (Exception e) {
+						Log.Err("Error loading settings ERROR:" + e.ToString(), true);
+					}
+				}
+			}
+			MainSettings = lists.Count == 0 ? new MainSettingsObject() : SettingsManager.LoadSettingsObject<MainSettingsObject>(lists.ToArray());
 		}
+
+		public void SaveSettings() {
+			var data = SettingsManager.GetDataListFromSettingsObject(MainSettings,new DataList());
+			File.WriteAllText(SettingsFile, SettingsManager.GetJsonFromDataList(data).ToString());
+		}
+		public void ReloadSettings() {
+			var lists = new List<DataList>();
+			if (File.Exists(SettingsFile)) {
+				var text = File.ReadAllText(SettingsFile);
+				var liet = SettingsManager.GetDataFromJson(text);
+				lists.Add(liet);
+			}
+			MainSettings = lists.Count == 0 ? new MainSettingsObject() : SettingsManager.LoadSettingsObject<MainSettingsObject>(lists.ToArray());
+		}
+
 		private string _mainMic;
 
 		public string MainMic
@@ -108,6 +159,12 @@ namespace RhuEngine
 
 		public AssetManager assetManager;
 
+		public InputManager inputManager = new();
+
+		//public WebBrowserManager webBrowserManager = new();
+
+		public MainSettingsObject MainSettings;
+
 		public OutputCapture outputCapture;
 
 		public IManager[] _managers;
@@ -118,9 +175,14 @@ namespace RhuEngine
 			World.RaycastEnabled = true;
 			netApiManager = new NetApiManager(_userDataPathOverRide);
 			assetManager = new AssetManager(_cachePathOverRide);
-			_managers = new IManager[] { netApiManager, assetManager , worldManager };
+			_managers = new IManager[] { inputManager, netApiManager, assetManager , worldManager };
 			foreach (var item in _managers) {
-				item.Init(this);
+				try {
+					item.Init(this);
+				}
+				catch (Exception ex) {
+					Log.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
+				}
 			}
 		}
 

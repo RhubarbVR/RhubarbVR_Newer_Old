@@ -15,6 +15,9 @@ namespace RhuEngine.Components
 		[OnAssetLoaded(nameof(TextScale))]
 		public AssetRef<Tex> texture;
 
+		[OnChanged(nameof(TextScale))]
+		public Sync<float> scaleMultiplier;
+
 		public Linker<Vec2> scale;
 
 		private void TextScale(Tex asset) {
@@ -22,7 +25,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			if (scale.Linked) {
-				scale.LinkedValue = new Vec2(asset.Width, asset.Height) / asset.Height;
+				scale.LinkedValue = new Vec2(asset.Width, asset.Height) / asset.Height * scaleMultiplier;
 			}
 		}
 

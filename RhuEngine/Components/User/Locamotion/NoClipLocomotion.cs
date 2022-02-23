@@ -6,23 +6,26 @@ using StereoKit;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "User" })]
-	public class NoClipLocomotion : Component, ILocomotionModule
+	public class NoClipLocomotion : LocomotionModule
 	{
 		[Default(1f)]
 		public Sync<float> MovementSpeed;
 		[Default(30f)]
 		public Sync<float> RotationSpeed;
 		[Default(2f)]
-		public Sync<float> SprintMovementSpeed;
+		public Sync<float> MovementSpeedMultiplier;
 		[Default(80f)]
-		public Sync<float> SprintRotationSpeed;
+		public Sync<float> RotationSpeedMultiplier;
 		[Default(true)]
-		public Sync<bool> AllowSprint;
+		public Sync<bool> AllowMultiplier;
 
-		//Make rotation head based
-		public void ProcessMovement(Vec3 movementVector, float rotation, UserRoot userRoot, bool sprint) {
-			userRoot.Entity.position.Value = userRoot.Entity.position.Value + (movementVector * ((sprint & AllowSprint.Value) ? SprintMovementSpeed.Value : MovementSpeed.Value));
-			userRoot.Entity.rotation.Value = userRoot.Entity.rotation.Value * Quat.FromAngles(0, rotation * ((sprint & AllowSprint.Value) ? SprintRotationSpeed.Value : RotationSpeed.Value), 0);
+		public override void OnAttach() {
+			base.OnAttach();
+			locmotionName.Value = "No Clip";
+		}
+
+		public override void ProcessMovement() {
+			
 		}
 	}
 }

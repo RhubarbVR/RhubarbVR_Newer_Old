@@ -119,7 +119,7 @@ namespace RhuEngine.Components
 
 		public override void OnLoaded() {
 			base.OnLoaded();
-			windows = new Window[] { new DebugWindow(Engine,WorldManager,World),new ConsoleWindow(Engine,WorldManager, World), new AssetTasksWindow(Engine,WorldManager,World) ,new SessionWindow(Engine, WorldManager, World), new LoginWindow(Engine,WorldManager, World) };
+			windows = new Window[] { new SettingsWindow(Engine, WorldManager, World), new DebugWindow(Engine,WorldManager,World),new ConsoleWindow(Engine,WorldManager, World), new AssetTasksWindow(Engine,WorldManager,World) ,new SessionWindow(Engine, WorldManager, World), new LoginWindow(Engine,WorldManager, World) };
 			privatePose = new(-.2f, 0.2f, -0.2f, Quat.LookDir(1, 0, 1));
 			Engine.netApiManager.HasGoneOfline += NetApiManager_HasGoneOfline;
 		}

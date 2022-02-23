@@ -26,7 +26,7 @@ namespace RhuEngine
 			mit.SetPram("diffuse", textur);
 			var floor = world.RootEntity.AddChild("Floor");
 			floor.position.Value = new Vec3(0, 0, 0);
-			var (mesh, _, render) = floor.AttachMeshWithMeshRender<BoxMesh, PBRShader>();
+			var (mesh, _, render) = floor.AttachMeshWithMeshRender<CubeMesh, PBRShader>();
 			render.colorLinear.Value = new Color(0.9f, 0.9f, 0.9f);
 			mesh.dimensions.Value = new Vec3(10, 0.01f, 10);
 			var spinningCubes = world.RootEntity.AddChild("SpinningCubes");
@@ -72,7 +72,7 @@ namespace RhuEngine
 
 
 			var shader = root.GetFirstComponentOrAttach<UnlitClipShader>();
-			var boxMesh = root.AttachComponent<BoxMesh>();
+			var boxMesh = root.AttachComponent<CubeMesh>();
 			boxMesh.dimensions.Value = new Vec3(0.4f, 0.4f, 0.4f);
 			var mit = root.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;
@@ -91,7 +91,7 @@ namespace RhuEngine
 
 		}
 
-		public static void BuildGroup(BoxMesh boxMesh, DynamicMaterial mit, Entity entity, Color color) {
+		public static void BuildGroup(CubeMesh boxMesh, DynamicMaterial mit, Entity entity, Color color) {
 			for (var i = 0; i < 6; i++) {
 				var cubeHolder = entity.AddChild("CubeHolder");
 				cubeHolder.rotation.Value = Quat.FromAngles(NextFloat() * 180, NextFloat() * 180, NextFloat() * 180);
@@ -102,7 +102,7 @@ namespace RhuEngine
 			}
 		}
 
-		public static void AttachRender(BoxMesh boxMesh, DynamicMaterial mit, Entity entity, Color color) {
+		public static void AttachRender(CubeMesh boxMesh, DynamicMaterial mit, Entity entity, Color color) {
 			var meshRender = entity.AttachComponent<MeshRender>();
 			meshRender.colorLinear.Value = color;
 			meshRender.materials.Add().Target = mit;

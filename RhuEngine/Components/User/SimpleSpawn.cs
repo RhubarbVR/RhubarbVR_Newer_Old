@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 				var userRoot = userEntity.AttachComponent<UserRoot>();
 				userEntity.AttachComponent<LocomotionManager>().user.Target = World.GetLocalUser();
 				if (!World.IsPersonalSpace) {
-					userEntity.AttachMesh<BoxMesh, UIShader>().Item1.dimensions.Value = new Vec3(0.1f, 0.1f, 0.1f);
+					userEntity.AttachMesh<CubeMesh, UIShader>().Item1.dimensions.Value = new Vec3(0.1f, 0.1f, 0.1f);
 				}
 				var leftHand = userEntity.AddChild("LeftHand");
 				var leftComp = leftHand.AttachComponent<Hand>();
@@ -28,14 +28,14 @@ namespace RhuEngine.Components
 				leftComp.user.Target = World.GetLocalUser();
 				userRoot.leftHand.Target = leftHand;
 				if (!World.IsPersonalSpace) {
-					leftHand.AttachMesh<BoxMesh, UIShader>().Item1.dimensions.Value = new Vec3(0.1f, 0.1f, 0.1f);
+					leftHand.AttachMesh<CubeMesh, UIShader>().Item1.dimensions.Value = new Vec3(0.1f, 0.1f, 0.1f);
 				}
 				var rightHand = userEntity.AddChild("RightHand");
 				var rightComp = rightHand.AttachComponent<Hand>();
 				rightComp.hand.Value = Handed.Right;
 				rightComp.user.Target = World.GetLocalUser();
 				if (!World.IsPersonalSpace) {
-					rightHand.AttachMesh<BoxMesh, UIShader>().Item1.dimensions.Value = new Vec3(0.1f, 0.1f, 0.1f);
+					rightHand.AttachMesh<CubeMesh, UIShader>().Item1.dimensions.Value = new Vec3(0.1f, 0.1f, 0.1f);
 				}
 				userRoot.rightHand.Target = rightHand;
 				var head = userEntity.AddChild("Head");
