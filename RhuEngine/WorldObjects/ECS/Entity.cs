@@ -88,7 +88,7 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 
-		public Matrix GlobalToLocal(Matrix point,bool Child) {
+		public Matrix GlobalToLocal(Matrix point,bool Child = true) {
 			var parentMatrix = Child ? GlobalTrans : parent.Target?.GlobalTrans ?? Matrix.Identity;
 			var newLocal = point * parentMatrix.Inverse;
 			return newLocal;

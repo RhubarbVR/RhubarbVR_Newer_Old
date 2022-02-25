@@ -27,6 +27,9 @@ namespace RhuEngine.WorldObjects
 				_disposables.Remove(disposable);
 			}
 		}
+
+		public User LocalUser => World.GetLocalUser();
+
 		public bool IsDestroying
 		{
 			get; set;

@@ -52,10 +52,10 @@ namespace RhuEngine.Settings
 		public InputManager.InputTypes negevitveY = InputManager.InputTypes.None;
 
 		public ControllerAixsSettingsObject(InputManager.InputTypes up, InputManager.InputTypes down, InputManager.InputTypes left, InputManager.InputTypes right) {
-			positiveX = up;
-			negevitveX = down;
-			positiveY = left;
-			negevitveY = right;
+			positiveY = up;
+			negevitveY = down;
+			positiveX = left;
+			negevitveX = right;
 		}
 		public ControllerAixsSettingsObject() {
 

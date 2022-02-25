@@ -15,33 +15,34 @@ namespace RhuEngine.Components
 
 		public float MoveSpeed => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.MoveSpeed);
 
-		public float Jump => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Jump);
+		public float Jump => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Jump) * Time.Elapsedf;
 
-		public float Forward => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Forward);
+		public float Forward => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Forward) * Time.Elapsedf;
 
-		public float Back => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Back);
+		public float Back => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Back) * Time.Elapsedf;
 
-		public float Right => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Right);
+		public float Right => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Right) * Time.Elapsedf;
 
-		public float Left => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Left);
+		public float Left => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Left) * Time.Elapsedf;
 
-		public float FlyDown => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.FlyDown);
+		public float FlyDown => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.FlyDown) * Time.Elapsedf;
 
-		public float FlyUp => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.FlyUp);
+		public float FlyUp => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.FlyUp) * Time.Elapsedf;
 
-		public float RotateLeft => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateLeft);
+		public float RotateLeft => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateLeft) * Time.Elapsedf;
 
-		public float RotateRight => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateRight);
+		public float RotateRight => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateRight) * Time.Elapsedf;
 
 		public Entity UserRootEnity => World.GetLocalUser()?.userRoot.Target?.Entity;
 
-		public void ProcessMovement(Matrix addingMatrix) {
+		public void ProcessGlobalRotToUserRootMovement(Matrix addingMatrix,Matrix globalmat) {
 			if(UserRootEnity is null) {
 				return;
 			}
-			if (Engine.MainSettings.InputSettings.HeadBasedMovement) {
-
-			}
+			var childM = UserRootEnity.GlobalToLocal(globalmat);
+			var targetHeadM = addingMatrix * childM;
+			var userRootAdd = childM.Inverse * targetHeadM;
+			UserRootEnity.LocalTrans = userRootAdd * UserRootEnity.LocalTrans;
 		}
 
 	}

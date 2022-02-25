@@ -135,11 +135,22 @@ namespace RhuEngine.Managers
 			return controllerInput.GetInputFloatFromController(inputType,controller);
 		}
 
-		public float GetInputFloatFromMainController(InputTypes inputType) {
-			return GetInputFloatFromController(inputType, _engine.MainSettings.InputSettings.RightHanded ? Input.Controller(Handed.Right) : Input.Controller(Handed.Left), _engine.MainSettings.InputSettings.MainControllerInputSettings);
+		public Handed GetHand(bool main) {
+			return main
+				? _engine.MainSettings.InputSettings.RightHanded ? Handed.Right : Handed.Left
+				: _engine.MainSettings.InputSettings.RightHanded ? Handed.Left : Handed.Right;
 		}
+
+		public float GetInputFloatFromMainController(InputTypes inputType) {
+			return GetInputFloatFromController(inputType, GetController(true), _engine.MainSettings.InputSettings.MainControllerInputSettings);
+		}
+
+		private Controller GetController(bool v) {
+			return Input.Controller(GetHand(v));
+		}
+
 		public float GetInputFloatFromSeccondController(InputTypes inputType) {
-			return GetInputFloatFromController(inputType, _engine.MainSettings.InputSettings.RightHanded ? Input.Controller(Handed.Left) : Input.Controller(Handed.Right), _engine.MainSettings.InputSettings.MainControllerInputSettings);
+			return GetInputFloatFromController(inputType, GetController(false), _engine.MainSettings.InputSettings.SecondaryControllerInputSettings);
 		}
 		public float GetInputFloat(InputTypes inputType,bool? mainController = null) {
 			var main = GetInputFloatFromKeyboard(inputType) + GetInputFloatFromGamePad(inputType);
@@ -155,7 +166,7 @@ namespace RhuEngine.Managers
 					main += GetInputFloatFromSeccondController(inputType);
 				}
 			}
-			return Math.Max(Math.Min(main, 0), 1);
+			return Math.Max(Math.Min(main, 1), 0);
 		}
 
 		public bool GetInputBool(InputTypes inputType, bool? mainController = null) {
