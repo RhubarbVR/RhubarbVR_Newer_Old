@@ -11,6 +11,9 @@ namespace RhuEngine.Settings
 		[SettingsField("If your primary hand is the left hand")]
 		public bool RightHanded = true;
 
+		[SettingsField("Head Movemnet use head as bases of movemnt")]
+		public bool HeadBasedMovement = false;
+
 		[SettingsField("Keyboard Settings")]
 		public KeyboardInputSettingsObject KeyboardInputSettings = new();
 

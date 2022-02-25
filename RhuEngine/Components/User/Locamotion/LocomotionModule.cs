@@ -33,6 +33,16 @@ namespace RhuEngine.Components
 
 		public float RotateRight => Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateRight);
 
+		public Entity UserRootEnity => World.GetLocalUser()?.userRoot.Target?.Entity;
+
+		public void ProcessMovement(Matrix addingMatrix) {
+			if(UserRootEnity is null) {
+				return;
+			}
+			if (Engine.MainSettings.InputSettings.HeadBasedMovement) {
+
+			}
+		}
 
 	}
 }
