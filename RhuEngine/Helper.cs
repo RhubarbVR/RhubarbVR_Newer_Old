@@ -13,6 +13,11 @@ namespace RhuEngine
 			var r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
 			return r.Replace(path, "");
 		}
+		
+		public static string TouchUpPath(this string path) {
+			return path.Replace("\\", "/");
+		}
+
 		public static Matrix RotNormalized(this Matrix oldmatrix) {
 			oldmatrix.Decompose(out var trans, out var rot, out var scale);
 			return Matrix.TRS(trans, rot, scale);

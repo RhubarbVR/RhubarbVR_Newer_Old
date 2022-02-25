@@ -9,6 +9,7 @@ using RhuEngine.Settings;
 using System.IO;
 using RhuSettings;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace RhuEngine
 {
@@ -46,8 +47,20 @@ namespace RhuEngine
 
 		public readonly string SettingsFile;
 
-		public Engine(string[] arg, OutputCapture outputCapture) : base() {
-			outputCapture.LogsPath = _userDataPathOverRide is null ? AppDomain.CurrentDomain.BaseDirectory + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
+		public static string BaseDir = AppDomain.CurrentDomain.BaseDirectory;
+
+		public static Engine MainEngine;
+
+		public static string GetBaseDir() {
+			return BaseDir;
+		}
+
+		public Engine(string[] arg, OutputCapture outputCapture, string baseDir = null) : base() {
+			MainEngine = this;
+			if (baseDir is not null) {
+				BaseDir = baseDir;
+			}
+			outputCapture.LogsPath = _userDataPathOverRide is null ? GetBaseDir() + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
 			outputCapture.Start();
 			string error = null;
 			_forceFlatscreen = arg.Any((v) => v.ToLower() == "--no-vr") | arg.Any((v) => v.ToLower() == "-no-vr");
@@ -79,7 +92,7 @@ namespace RhuEngine
 					}
 				}
 			}
-			outputCapture.LogsPath = _userDataPathOverRide is null ? AppDomain.CurrentDomain.BaseDirectory + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
+			outputCapture.LogsPath = _userDataPathOverRide is null ? GetBaseDir() + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
 			outputCapture.Start();
 			if (error is not null) {
 				Log.Err(error);

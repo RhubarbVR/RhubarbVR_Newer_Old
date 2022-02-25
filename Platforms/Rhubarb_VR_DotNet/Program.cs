@@ -9,14 +9,8 @@ class SKLoader
 		// before Initialize is called.
 		SK.PreLoadLibrary();
 
-		// If the app has a constructor that takes a string array, then
-		// we'll use that, and pass the command line arguments into it on
-		// creation
-		var appType = typeof(Engine);
 		var cap = new OutputCapture();
-		var app = appType.GetConstructor(new Type[] { typeof(string[]),typeof(OutputCapture) }) != null
-			? (Engine)Activator.CreateInstance(appType, new object[] { args, cap})
-			: (Engine)Activator.CreateInstance(appType);
+		var app = new Engine(args, cap);
 		if (app == null) {
 			throw new Exception("StereoKit loader couldn't construct an instance of the App!");
 		}
