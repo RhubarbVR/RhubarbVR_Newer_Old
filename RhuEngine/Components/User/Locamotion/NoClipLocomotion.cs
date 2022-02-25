@@ -62,7 +62,6 @@ namespace RhuEngine.Components
 		}
 
 		public override void ProcessMovement() {
-			Log.Info(MovementSpeed.Value.ToString());
 			if(UserRootEnity is null) {
 				return;
 			}
