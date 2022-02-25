@@ -13,7 +13,7 @@ namespace RhuEngine.Managers
 	public class AssetManager : IManager
 	{
 		public AssetManager(string cachePath) {
-			CacheDir = cachePath is null ? Engine.GetBaseDir() + "\\Cache" : cachePath;
+			CacheDir = cachePath is null ? AppDomain.CurrentDomain.BaseDirectory + "\\Cache" : cachePath;
 		}
 
 		public string CacheDir = "";

@@ -47,21 +47,10 @@ namespace RhuEngine
 
 		public readonly string SettingsFile;
 
-		public static string BaseDir = AppDomain.CurrentDomain.BaseDirectory;
-
 		public static Engine MainEngine;
-
-		public static string GetBaseDir() {
-			return BaseDir;
-		}
 
 		public Engine(string[] arg, OutputCapture outputCapture, string baseDir = null) : base() {
 			MainEngine = this;
-			if (baseDir is not null) {
-				BaseDir = baseDir;
-			}
-			outputCapture.LogsPath = _userDataPathOverRide is null ? GetBaseDir() + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
-			outputCapture.Start();
 			string error = null;
 			_forceFlatscreen = arg.Any((v) => v.ToLower() == "--no-vr") | arg.Any((v) => v.ToLower() == "-no-vr");
 			_noVRSim = arg.Any((v) => v.ToLower() == "--no-vr-sim") | arg.Any((v) => v.ToLower() == "-no-vr-sim");
@@ -92,7 +81,7 @@ namespace RhuEngine
 					}
 				}
 			}
-			outputCapture.LogsPath = _userDataPathOverRide is null ? GetBaseDir() + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
+			outputCapture.LogsPath = _userDataPathOverRide is null ? AppDomain.CurrentDomain.BaseDirectory + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
 			outputCapture.Start();
 			if (error is not null) {
 				Log.Err(error);

@@ -61,7 +61,7 @@ namespace RhuEngine
 
 		public void Start() {
 			Directory.CreateDirectory(LogsPath.TouchUpPath());
-			_writer = new StreamWriter(File.Create((LogsPath + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".txt").TouchUpPath()));
+			_writer = new StreamWriter(LogsPath + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".txt");
 		}
 
 		public void LogCall(LogLevel level, string text) {

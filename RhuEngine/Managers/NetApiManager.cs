@@ -253,7 +253,7 @@ namespace RhuEngine.Managers
 				_httpClient?.BaseAddress ?? new Uri("https://RhubarbVR.net/");
 #endif
 		public NetApiManager(string path) {
-			_cookiePath = path is null ? Engine.GetBaseDir() + "\\RhuCookies" : path + "\\RhuCookies";
+			_cookiePath = path is null ? AppDomain.CurrentDomain.BaseDirectory + "\\RhuCookies" : path + "\\RhuCookies";
 		}
 		private readonly string _cookiePath;
 
