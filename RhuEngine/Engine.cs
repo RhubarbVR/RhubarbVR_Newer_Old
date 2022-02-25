@@ -28,9 +28,6 @@ namespace RhuEngine
 #else
 		public const bool IS_MILK_SNAKE = false;
 #endif
-		public Engine() {
-		}
-
 		public readonly static UISettings DefaultSettings = new(){
 			backplateBorder = 1f * Units.mm2m,
 			backplateDepth = 0.4f,
@@ -50,6 +47,9 @@ namespace RhuEngine
 		public readonly string SettingsFile;
 
 		public Engine(string[] arg, OutputCapture outputCapture) : base() {
+			outputCapture.LogsPath = _userDataPathOverRide is null ? AppDomain.CurrentDomain.BaseDirectory + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
+			outputCapture.Start();
+			string error = null;
 			_forceFlatscreen = arg.Any((v) => v.ToLower() == "--no-vr") | arg.Any((v) => v.ToLower() == "-no-vr");
 			_noVRSim = arg.Any((v) => v.ToLower() == "--no-vr-sim") | arg.Any((v) => v.ToLower() == "-no-vr-sim");
 			string settingsArg = null;
@@ -59,7 +59,7 @@ namespace RhuEngine
 						_cachePathOverRide = arg[i + 1];
 					}
 					else {
-						Log.Err("Cache Path not specified");
+						error = "Cache Path not specified";
 					}
 				}
 				if (arg[i].ToLower() == "--userdata-override" | arg[i].ToLower() == "-userdata-override") {
@@ -67,7 +67,7 @@ namespace RhuEngine
 						_userDataPathOverRide = arg[i + 1];
 					}
 					else {
-						Log.Err("User Data Path not specified");
+						error = "User Data Path not specified";
 					}
 				}
 				if (arg[i].ToLower() == "--settings" | arg[i].ToLower() == "-settings") {
@@ -75,9 +75,14 @@ namespace RhuEngine
 						settingsArg = arg[i + 1];
 					}
 					else {
-						Log.Err("Settings not specified");
+						error = "Settings not specified";
 					}
 				}
+			}
+			outputCapture.LogsPath = _userDataPathOverRide is null ? AppDomain.CurrentDomain.BaseDirectory + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
+			outputCapture.Start();
+			if (error is not null) {
+				Log.Err(error);
 			}
 			if (arg.Length <= 0) {
 				Log.Info($"Launched with no arguments");
