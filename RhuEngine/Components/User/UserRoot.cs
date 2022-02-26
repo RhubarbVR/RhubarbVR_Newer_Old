@@ -43,7 +43,7 @@ namespace RhuEngine.Components
 					Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
 				}
 				
-				Renderer.CameraRoot = ((SK.ActiveDisplayMode == DisplayMode.Flatscreen & SK.Settings.disableFlatscreenMRSim) ? head.Target?.GlobalTrans ?? Matrix.S(1) : Entity.GlobalTrans) * (StereoKit.World.HasBounds? StereoKit.World.BoundsPose.ToMatrix(): Matrix.Identity);
+				Renderer.CameraRoot = ((SK.ActiveDisplayMode == DisplayMode.Flatscreen & SK.Settings.disableFlatscreenMRSim) ? head.Target?.GlobalTrans ?? Matrix.S(1) : Entity.GlobalTrans) * Matrix.T(new Vec3(0, StereoKit.World.BoundsSize.y, 0));
 			}
 			else {
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Vec3>>("UserPos").Value = Entity.position.Value;
