@@ -95,7 +95,7 @@ namespace RhuEngine
 			this.outputCapture = outputCapture;
 
 			var lists = new List<DataList>();
-			SettingsFile = (_userDataPathOverRide is not null) ?_userDataPathOverRide : AppDomain.CurrentDomain.BaseDirectory + "\\settings.json";
+			SettingsFile = ((_userDataPathOverRide is not null) ?_userDataPathOverRide : AppDomain.CurrentDomain.BaseDirectory) + "\\settings.json";
 			if (File.Exists(SettingsFile)) {
 				var text = File.ReadAllText(SettingsFile);
 				var liet = SettingsManager.GetDataFromJson(text);

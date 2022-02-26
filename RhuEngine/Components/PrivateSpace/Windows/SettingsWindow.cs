@@ -20,11 +20,21 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 			CloseDraw();
 			UI.Text($"Not done can save then edit the settings.json saved to {Engine.SettingsFile}");
 			if(UI.Button("Save Settings")) {
-				Engine.SaveSettings();
+				try {
+					Engine.SaveSettings();
+				}
+				catch (Exception ex) {
+					Log.Err("Failed to save settings " + ex.ToString());
+				}
 			}
 			UI.SameLine();
 			if (UI.Button("Load Settings")) {
-				Engine.ReloadSettings();
+				try { 
+					Engine.ReloadSettings();
+				}
+				catch (Exception ex) {
+					Log.Err("Failed to Load settings " + ex.ToString());
+				}
 			}
 			UI.WindowEnd();
 			Hierarchy.Pop();
