@@ -53,7 +53,7 @@ namespace RhuEngine.Components
 
 		private void ProcessHeadBased() {
 			var speed = AllowMultiplier ? SKMath.Lerp(MovementSpeed, MaxSprintSpeed, MoveSpeed) : MovementSpeed;
-			var pos = new Vec3(Right - Left, FlyUp - FlyDown, -Forward + Back) * speed;
+			var pos = new Vec3(Right - Left, FlyUp - FlyDown, Back - Forward) * speed;
 			var Rotspeed = AllowMultiplier ? SKMath.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
 			var rot = Quat.FromAngles(0, (RotateRight - RotateLeft) * RotationSpeed, 0);
 			var AddToMatrix = Matrix.T(pos);

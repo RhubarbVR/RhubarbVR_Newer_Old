@@ -42,7 +42,8 @@ namespace RhuEngine.Components
 					var focusUserRoot = WorldManager.FocusedWorld.GetLocalUser().userRoot.Target;
 					Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
 				}
-				Renderer.CameraRoot = (SK.ActiveDisplayMode == DisplayMode.Flatscreen & SK.Settings.disableFlatscreenMRSim) ? head.Target?.GlobalTrans ?? Matrix.S(1) : Entity.GlobalTrans;
+				
+				Renderer.CameraRoot = ((SK.ActiveDisplayMode == DisplayMode.Flatscreen & SK.Settings.disableFlatscreenMRSim) ? head.Target?.GlobalTrans ?? Matrix.S(1) : Entity.GlobalTrans) * (StereoKit.World.HasBounds? StereoKit.World.BoundsPose.ToMatrix(): Matrix.Identity);
 			}
 			else {
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Vec3>>("UserPos").Value = Entity.position.Value;
