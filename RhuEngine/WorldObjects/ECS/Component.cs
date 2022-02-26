@@ -58,5 +58,9 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		public event Action OffsetChanged;
+
+		public void AddWorldCoroutine(Action action) {
+			World.AddCoroutine(action);
+		}
 	}
 }

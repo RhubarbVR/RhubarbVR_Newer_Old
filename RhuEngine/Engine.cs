@@ -176,13 +176,10 @@ namespace RhuEngine
 
 		public IManager[] _managers;
 
-		public Pose Bounds;
-
 		public void Init() {
 			Platform.ForceFallbackKeyboard = true;
 			World.OcclusionEnabled = true;
 			World.RaycastEnabled = true;
-			Bounds = World.BoundsPose;
 			netApiManager = new NetApiManager(_userDataPathOverRide);
 			assetManager = new AssetManager(_cachePathOverRide);
 			_managers = new IManager[] { inputManager, netApiManager, assetManager , worldManager };

@@ -27,7 +27,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			if (user.Target == World.GetLocalUser()) {
-				Entity.LocalTrans = Input.Hand(hand.Value).wrist.ToMatrix() * Renderer.CameraRoot.Inverse * Engine.Bounds.ToMatrix();
+				Entity.LocalTrans = Input.Hand(hand.Value).wrist.ToMatrix() * Renderer.CameraRoot.Inverse;
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Vec3>>($"HandPos{hand.Value}").Value = Entity.position.Value;
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Quat>>($"HandRot{hand.Value}").Value = Entity.rotation.Value;
 			}

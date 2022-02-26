@@ -12,9 +12,16 @@ namespace RhuEngine
 {
 	public static class WorldBuilder
 	{
+		public static void BuildUITest(Entity entity) {
+			entity.position.Value = new Vec3(0, 1, 0);
+			var pannel = entity.AddChild("PannelRoot");
+			pannel.AttachComponent<UIWindow>();
+			pannel.AddChild("Button").AttachComponent<UIButton>();
+		}
+
 		public static void BuildLocalWorld(this World world) {
 			Log.Info("Building Local World");
-
+			BuildUITest(world.RootEntity.AddChild("UITest"));
 			var picMesh = world.RootEntity.AddChild("Floor");
 			picMesh.position.Value = new Vec3(0, 0.25f, -0.5f);
 			picMesh.rotation.Value = Quat.FromAngles(90, 0, 0);

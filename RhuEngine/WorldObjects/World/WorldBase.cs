@@ -150,6 +150,7 @@ namespace RhuEngine.WorldObjects
 		public void Step() {
 			_netManager?.PollEvents();
 			_netManager?.NatPunchModule.PollEvents();
+			UpdateCoroutine();
 			if (IsLoading | (_focus == FocusLevel.Background)) {
 				return;
 			}
