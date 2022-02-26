@@ -40,10 +40,10 @@ namespace RhuEngine.Components
 			var AddToMatrix = Matrix.T(pos);
 			switch (Engine.inputManager.GetHand(isMain)) {
 				case Handed.Left:
-					ProcessGlobalRotToUserRootMovement(AddToMatrix,LocalUser.userRoot.Target?.leftHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
+					ProcessGlobalRotToUserRootMovement(AddToMatrix,Matrix.R(Quat.FromAngles(90,0,0)) * LocalUser.userRoot.Target?.leftHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
 					break;
 				case Handed.Right:
-					ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot.Target?.rightHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
+					ProcessGlobalRotToUserRootMovement(AddToMatrix, Matrix.R(Quat.FromAngles(90, 0, 0)) * LocalUser.userRoot.Target?.rightHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
 					break;
 				default:
 					break;
