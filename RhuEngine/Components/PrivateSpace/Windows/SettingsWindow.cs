@@ -16,7 +16,7 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 
 		public override void Update() {
 			Hierarchy.Push(Matrix.S(0.5f));
-			UI.WindowBegin("    ===---===   Console Window   ===---===", ref windowPose, new Vec2(0.4f, 0));
+			UI.WindowBegin("    ===---===   Settings Window   ===---===", ref windowPose, new Vec2(0.4f, 0));
 			CloseDraw();
 			UI.Text($"Not done can save then edit the settings.json saved to {Engine.SettingsFile}");
 			if(UI.Button("Save Settings")) {
