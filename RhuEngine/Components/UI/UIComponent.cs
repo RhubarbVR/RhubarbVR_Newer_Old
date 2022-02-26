@@ -5,7 +5,17 @@ using StereoKit;
 
 namespace RhuEngine.Components
 {
-	public class UIComponent: Component
+	public class UIComponent: RenderingComponent
 	{
+		public override void AddListObject() {
+			World.RegisterRenderObject(this);
+		}
+		public override void RemoveListObject() {
+			World.UnregisterRenderObject(this);
+		}
+
+		public override void Render() {
+
+		}
 	}
 }

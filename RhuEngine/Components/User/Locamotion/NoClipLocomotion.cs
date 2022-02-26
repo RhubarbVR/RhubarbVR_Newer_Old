@@ -30,8 +30,8 @@ namespace RhuEngine.Components
 			var tempLeft = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Left, isMain) * Time.Elapsedf;
 			var tempFlyUp = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.FlyUp, isMain) * Time.Elapsedf;
 			var tempFlyDown = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.FlyDown, isMain) * Time.Elapsedf;
-			var tempForward = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Left, isMain) * Time.Elapsedf;
-			var tempBack = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Left, isMain) * Time.Elapsedf;
+			var tempForward = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Forward, isMain) * Time.Elapsedf;
+			var tempBack = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Back, isMain) * Time.Elapsedf;
 			var pos = new Vec3(tempRight - tempLeft, tempFlyUp - tempFlyDown, -tempForward + tempBack) * speed;
 			var Rotspeed = AllowMultiplier ? SKMath.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
 			var tempRotateRight = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateRight, isMain) * Time.Elapsedf;
