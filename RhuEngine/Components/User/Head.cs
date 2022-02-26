@@ -45,7 +45,7 @@ namespace RhuEngine.Components
 						user.Target.FindOrCreateSyncStream<SyncValueStream<Quat>>("HeadRot").Value = Entity.rotation.Value;
 					}
 					else {
-						Entity.LocalTrans = Input.Head.ToMatrix(1) * Renderer.CameraRoot.Inverse;
+						Entity.LocalTrans = Input.Head.ToMatrix(1) * Renderer.CameraRoot.Inverse * Matrix.T(new Vec3(0, StereoKit.World.BoundsSize.y, 0));
 						user.Target.FindOrCreateSyncStream<SyncValueStream<Vec3>>("HeadPos").Value = Entity.position.Value;
 						user.Target.FindOrCreateSyncStream<SyncValueStream<Quat>>("HeadRot").Value = Entity.rotation.Value;
 					}
