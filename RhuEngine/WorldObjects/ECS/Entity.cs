@@ -55,13 +55,13 @@ namespace RhuEngine.WorldObjects.ECS
 		private void OnOrderOffsetChange() {
 			OffsetChanged?.Invoke();
 		}
-
+		[Exsposed]
 		public T AttachComponent<T>() where T : Component, new() {
 			var comp = components.Add<T>();
 			comp.OnAttach();
 			return comp;
 		}
-
+		[Exsposed]
 		public T GetFirstComponentOrAttach<T>() where T : Component, new() {
 			foreach (var item in components) {
 				if (item.GetType() == typeof(T)) {
@@ -70,7 +70,7 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 			return AttachComponent<T>();
 		}
-
+		[Exsposed]
 		public T GetFirstComponent<T>() where T : Component {
 			foreach (var item in components) {
 				if (item.GetType() == typeof(T)) {
@@ -79,7 +79,7 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 			return null;
 		}
-
+		[Exsposed]
 		public IEnumerable<T> GetAllComponents<T>() where T : Component {
 			foreach (var item in components) {
 				if (typeof(T).IsAssignableFrom(item.GetType())) {
@@ -87,48 +87,50 @@ namespace RhuEngine.WorldObjects.ECS
 				}
 			}
 		}
-
+		[Exsposed]
 		public Matrix GlobalToLocal(Matrix point,bool Child = true) {
 			var parentMatrix = Child ? GlobalTrans : parent.Target?.GlobalTrans ?? Matrix.Identity;
 			var newLocal = point * parentMatrix.Inverse;
 			return newLocal;
 		}
-
+		[Exsposed]
 		public void GlobalToLocal(Matrix point, bool Child, out Vec3 translation, out Quat rotation, out Vec3 scale) {
 			GlobalToLocal(point,Child).Decompose(out translation, out rotation, out scale);
 		}
-
+		[Exsposed]
 		public Vec3 GlobalPointToLocal(Vec3 point, bool Child = true) {
 			GlobalToLocal(Matrix.T(point),Child,out var newTranslation, out _, out _);
 			return newTranslation;
 		}
+		[Exsposed]
 		public Vec3 GlobalScaleToLocal(Vec3 Scale, bool Child = true) {
 			GlobalToLocal(Matrix.S(Scale), Child, out _, out _, out var newScale);
 			return newScale;
 		}
+		[Exsposed]
 		public Quat GlobalRotToLocal(Quat Rot, bool Child = true) {
 			GlobalToLocal(Matrix.R(Rot), Child, out _, out var newRotation, out _);
 			return newRotation;
 		}
-
+		[Exsposed]
 		public Matrix LocalToGlobal(Matrix point,bool Child = true) {
 			return point * (Child ? GlobalTrans : _internalParent?.GlobalTrans ?? Matrix.Identity);
 		}
-
+		[Exsposed]
 		public void LocalToGlobal(Matrix point, bool Child, out Vec3 translation, out Quat rotation, out Vec3 scale) {
 			LocalToGlobal(point, Child).Decompose(out translation, out rotation, out scale);
 		}
-
+		[Exsposed]
 		public Quat LocalRotToGlobal(Quat Rot, bool Child = true) {
 			LocalToGlobal(Matrix.R(Rot),Child,out _, out var newRotation, out _);
 			return newRotation;
 		}
-
+		[Exsposed]
 		public Vec3 LocalScaleToGlobal(Vec3 scale, bool Child = true) {
 			LocalToGlobal(Matrix.S(scale), Child, out _, out _, out var newScale);
 			return newScale;
 		}
-
+		[Exsposed]
 		public Vec3 LocalPosToGlobal(Vec3 pos, bool Child = true) {
 			LocalToGlobal(Matrix.T(pos), Child, out var newPos, out _, out _);
 			return newPos;
@@ -151,7 +153,7 @@ namespace RhuEngine.WorldObjects.ECS
 		public event Action EnabledChanged;
 
 		private bool _hasUpdatingComponentSave;
-
+		[Exsposed]
 		public bool HasUpdatingComponent
 		{
 			get {
@@ -224,6 +226,7 @@ namespace RhuEngine.WorldObjects.ECS
 			EnabledChanged?.Invoke();
 			UpdateEnableList();
 		}
+		[Exsposed]
 		public bool IsEnabled => parentEnabled && enabled.Value;
 		private void ParentChanged() {
 			if (World.RootEntity == this) {
@@ -261,7 +264,7 @@ namespace RhuEngine.WorldObjects.ECS
 				parent.Target = _internalParent;
 			}
 		}
-
+		[Exsposed]
 		public void SetParent(Entity entity, bool preserverGlobal = true, bool resetPos = false) {
 			var mach = GlobalTrans;
 			parent.Target = entity;
@@ -272,12 +275,13 @@ namespace RhuEngine.WorldObjects.ECS
 				GlobalTrans = entity.GlobalTrans;
 			}
 		}
+		[Exsposed]
 		public bool IsRoot => World?.RootEntity == this;
 
 		public event Action<Entity> GlobalTransformChange;
 
 		public event Action OffsetChanged;
-
+		[Exsposed]
 		public Matrix GlobalTrans
 		{
 			get {
@@ -305,7 +309,7 @@ namespace RhuEngine.WorldObjects.ECS
 				}
 			}
 		}
-
+		[Exsposed]
 		public Matrix LocalTrans {
 			get {
 				if (_dirtyLocal) {
@@ -368,7 +372,7 @@ namespace RhuEngine.WorldObjects.ECS
 				}
 			}
 		}
-
+		[Exsposed]
 		public Entity AddChild(string name = "Entity") {
 			var entity = children.Add();
 			entity.parent.Target = this;

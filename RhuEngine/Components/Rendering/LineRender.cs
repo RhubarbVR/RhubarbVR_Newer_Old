@@ -24,6 +24,7 @@ namespace RhuEngine.Components
 				colorEnd.Value = Color32.White;
 			}
 		}
+
 		public SyncObjList<LineElement> lineElements;
 
 		public override void Render() {

@@ -39,7 +39,7 @@ namespace RhuEngine.WorldObjects
 		public override void OnLoaded() {
 			NetValue = _targetPointer;
 		}
-
+		[Exsposed]
 		public virtual NetPointer Value
 		{
 			get => _targetPointer;
@@ -65,7 +65,7 @@ namespace RhuEngine.WorldObjects
 		private T _target;
 
 		public IWorldObject TargetIWorldObject { get => Target; set { if (value != null) { Value = value.Pointer; } } }
-
+		[Exsposed]
 		public virtual T Target
 		{
 			get => _target == null || (_target?.IsRemoved ?? false) || _target?.World != World ? null : _target;

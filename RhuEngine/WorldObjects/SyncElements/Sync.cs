@@ -17,6 +17,7 @@ namespace RhuEngine.WorldObjects
 
 		private T _value;
 
+		[Exsposed]
 		public T Value
 		{
 			get => _value;

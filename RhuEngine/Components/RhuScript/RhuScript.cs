@@ -6,6 +6,8 @@ using RhuEngine.Components.ScriptNodes;
 using System;
 using RhuEngine.DataStructure;
 using SharedModels;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RhuEngine.Components
 {
@@ -22,8 +24,32 @@ namespace RhuEngine.Components
 			set {
 				_MainMethod = value;
 				_MainMethod.LoadIntoWorld(World, this);
+				LoadLocalValues();
 			}
 		}
+
+		public uint AmountOfLocalValues { get; set; }
+
+		public ScriptNodeWrite[] LocalValueNode = new ScriptNodeWrite[0];
+
+		public void LoadLocalValues() {
+			LocalValueNode = new ScriptNodeWrite[0];
+			var nodeList = new List<IScriptNode>();
+			_MainMethod.GetChildrenAll(nodeList);
+			var e = from values in from value in nodeList
+									where value is ScriptNodeWrite
+									select (value as ScriptNodeWrite)
+					orderby values.NodeIndex descending
+					select values;
+			foreach (var item in e) {
+				if(LocalValueNode.Length < item.NodeIndex) {
+					LocalValueNode = new ScriptNodeWrite[item.NodeIndex + 1];
+					AmountOfLocalValues = item.NodeIndex + 1;
+				}
+				LocalValueNode[item.NodeIndex] = item;
+			}
+		}
+
 		[Exsposed]
 		public void InfoLog(string msg) {
 			Log.Info("[RhuScript] "+ msg);
@@ -43,7 +69,7 @@ namespace RhuEngine.Components
 				return null;
 			}
 			try {
-				return MainMethod?.Invoke();
+				return MainMethod?.Invoke(new ScriptNodeDataHolder(AmountOfLocalValues));
 			}
 			catch (Exception e) 
 			{

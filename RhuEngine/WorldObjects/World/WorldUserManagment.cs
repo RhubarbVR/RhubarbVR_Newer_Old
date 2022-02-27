@@ -56,11 +56,15 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 		}
-
+		[Exsposed]
+		public User GetMasterUser() {
+			return Users[MasterUser];
+		}
+		[Exsposed]
 		public User GetHostUser() {
 			return Users[0];
 		}
-
+		[Exsposed]
 		public User GetLocalUser() {
 			return Users is null ? null : LocalUserID <= 0 ? null : (LocalUserID - 1) < Users.Count ? Users[LocalUserID - 1] : null;
 		}
