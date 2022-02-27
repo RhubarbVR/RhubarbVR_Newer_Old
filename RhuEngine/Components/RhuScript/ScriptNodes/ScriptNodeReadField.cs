@@ -11,6 +11,9 @@ namespace RhuEngine.Components.ScriptNodes
 	[MessagePackObject()]
 	public class ScriptNodeReadField : IScriptNode
 	{
+		[IgnoreMember]
+		public string Text => "Read " + Field + " Type: "+ ReturnType.GetFormattedName();
+
 		[Key(0)]
 		public IScriptNode ScriptNode;
 		[IgnoreMember]
@@ -25,10 +28,10 @@ namespace RhuEngine.Components.ScriptNodes
 		public RhuScript RhuScript { get; private set; }
 		public void LoadField() {
 			var field = ScriptNode.ReturnType?.GetField(Field);
-			if (field.GetCustomAttribute<UnExsposedAttribute>() is not null) {
+			if (field.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
 				return;
 			}
-			if (field.GetCustomAttribute<ExsposedAttribute>() is null) {
+			if (field.GetCustomAttribute<ExsposedAttribute>(true) is null) {
 				if (!typeof(IWorldObject).IsAssignableFrom(field.GetType())) {
 					return;
 				}
@@ -56,10 +59,10 @@ namespace RhuEngine.Components.ScriptNodes
 		}
 
 		public ScriptNodeReadField(IScriptNode node, FieldInfo fieldInfo) {
-			if (fieldInfo.GetCustomAttribute<UnExsposedAttribute>() is not null) {
+			if (fieldInfo.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
 				throw new Exception("Not Exposed");
 			}
-			if (fieldInfo.GetCustomAttribute<ExsposedAttribute>() is null) {
+			if (fieldInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
 				if (!typeof(IWorldObject).IsAssignableFrom(fieldInfo.GetType())) {
 					throw new Exception("Not Exposed");
 				}

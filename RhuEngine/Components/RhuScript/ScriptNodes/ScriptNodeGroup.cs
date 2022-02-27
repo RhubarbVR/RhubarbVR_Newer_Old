@@ -11,6 +11,8 @@ namespace RhuEngine.Components.ScriptNodes
 	[MessagePackObject()]
 	public class ScriptNodeGroup : IScriptNode
 	{
+		[IgnoreMember]
+		public string Text => "Group";
 		[IgnoreMember()]
 		public RhuScript RhuScript { get; private set; }
 		[Key(0)]

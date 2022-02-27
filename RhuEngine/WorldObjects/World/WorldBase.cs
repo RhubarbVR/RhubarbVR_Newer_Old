@@ -8,6 +8,7 @@ using RhuEngine.Managers;
 using RhuEngine.WorldObjects.ECS;
 using RhuEngine.AssetSystem;
 using StereoKit;
+using RhuEngine.Components;
 
 namespace RhuEngine.WorldObjects
 {
@@ -31,7 +32,7 @@ namespace RhuEngine.WorldObjects
 		public void Initialize(bool networkedWorld, bool networkedObject, bool deserialize, bool isPersonalSpace) {
 			IsPersonalSpace = isPersonalSpace;
 			foreach (var item in GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)) {
-				if (typeof(SyncObject).IsAssignableFrom(item.FieldType)) {
+				if (typeof(SyncObject).IsAssignableFrom(item.FieldType) && item.GetCustomAttribute<NoLoadAttribute>() is null) {
 					var instance = (SyncObject)Activator.CreateInstance(item.FieldType);
 					instance.Initialize(this, this, item.Name, networkedObject, deserialize);
 					if (typeof(ISync).IsAssignableFrom(item.FieldType)) {
@@ -120,7 +121,12 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 		}
-
+		[NoSync]
+		[NoSave]
+		[NoShow]
+		[UnExsposed]
+		[NoLoad]
+		public ScriptBuilder FocusedScriptBuilder = null;
 
 		[NoShow]
 		public Entity RootEntity;

@@ -22,6 +22,10 @@ namespace RhuEngine
 			var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
 			method.Prams[0] = new ScriptNodeConst("Hello World");
 			script.MainMethod = method;
+			var ScripEditor = entity.AddChild("ScripEditor");
+			ScripEditor.position.Value = new Vec3(0, -0.1f, 0);
+			var VisualScriptBuilder = ScripEditor.AttachComponent<VisualScriptBuilder>();
+			VisualScriptBuilder.script.Target = script;
 		}
 
 		public static void BuildLocalWorld(this World world) {

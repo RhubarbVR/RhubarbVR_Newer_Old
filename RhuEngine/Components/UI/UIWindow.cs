@@ -16,7 +16,13 @@ namespace RhuEngine.Components
 		public Sync<UIWin> WindowType;
 		[Default(UIMove.FaceUser)]
 		public Sync<UIMove> MoveType;
+		public Sync<Color> TintColor;
 
+		public SyncDelegate OnWindowGrab;
+		public override void OnAttach() {
+			base.OnAttach();
+			TintColor.Value = Color.White;
+		}
 		public override void AddListObject() {
 			World.RegisterRenderObject(this);
 		}
@@ -25,6 +31,7 @@ namespace RhuEngine.Components
 		}
 
 		public override void Render() {
+			UI.PushTint(TintColor);
 			var pose = Pose.Identity;
 			UI.PushId(Pointer.GetHashCode());
 			Hierarchy.Push(Entity.GlobalTrans);
@@ -56,8 +63,9 @@ namespace RhuEngine.Components
 			UI.PopId();
 			if(!((pose.position.v == Pose.Identity.position.v) && (pose.orientation.q == Pose.Identity.orientation.q))) {
 				Entity.LocalTrans = pose.ToMatrix() * Entity.LocalTrans;
+				World.AddCoroutine(() => OnWindowGrab.Target?.Invoke());
 			}
+			UI.PopTint();
 		}
-
 	}
 }

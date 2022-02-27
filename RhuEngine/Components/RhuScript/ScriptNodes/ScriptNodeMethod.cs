@@ -11,6 +11,21 @@ namespace RhuEngine.Components.ScriptNodes
 	[MessagePackObject()]
 	public class ScriptNodeMethod : IScriptNode
 	{
+		[IgnoreMember]
+		public string Text
+		{
+			get {
+				var text = Method;
+				text += "(";
+				foreach (var item in PramTypes) {
+					text += item?.GetFormattedName();
+				}
+				text += ") Return:";
+				text += ReturnType?.GetFormattedName();
+				return text;
+			}
+		}
+
 		[Key(0)]
 		public IScriptNode ScriptNode;
 		[Key(1)]
@@ -36,7 +51,7 @@ namespace RhuEngine.Components.ScriptNodes
 			if (method.IsGenericMethod) {
 				method.MakeGenericMethod(GenericArgument);
 			}
-			if (method.GetCustomAttribute<ExsposedAttribute>() is null) {
+			if (method.GetCustomAttribute<ExsposedAttribute>(true) is null) {
 				return;
 			}
 			_method = method;
@@ -80,7 +95,7 @@ namespace RhuEngine.Components.ScriptNodes
 		}
 
 		public ScriptNodeMethod(IScriptNode node, MethodInfo methodInfo) {
-			if (methodInfo.GetCustomAttribute<ExsposedAttribute>() is null) {
+			if (methodInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
 				throw new Exception("Not Exposed");
 			}
 			ScriptNode = node;

@@ -11,6 +11,8 @@ namespace RhuEngine.Components.ScriptNodes
 	[MessagePackObject()]
 	public class ScriptNodeWriteField : IScriptNode
 	{
+		[IgnoreMember]
+		public string Text => "Write " + Field + " Type: " + ReturnType.GetFormattedName();
 		[Key(0)]
 		public IScriptNode ScriptNode;
 		[Key(1)]
@@ -32,13 +34,13 @@ namespace RhuEngine.Components.ScriptNodes
 
 		public void LoadField() {
 			var field = ScriptNode.ReturnType?.GetField(Field);
-			if (field.GetCustomAttribute<UnExsposedAttribute>() is not null) {
+			if (field.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
 				return;
 			}
-			if (field.GetCustomAttribute<NoWriteExsposedAttribute>() is not null) {
+			if (field.GetCustomAttribute<NoWriteExsposedAttribute>(true) is not null) {
 				return;
 			}
-			if (field.GetCustomAttribute<ExsposedAttribute>() is null) {
+			if (field.GetCustomAttribute<ExsposedAttribute>(true) is null) {
 				return;
 			}
 			_field = field;
@@ -65,13 +67,13 @@ namespace RhuEngine.Components.ScriptNodes
 		}
 
 		public ScriptNodeWriteField(IScriptNode node, FieldInfo fieldInfo) {
-			if (fieldInfo.GetCustomAttribute<UnExsposedAttribute>() is not null) {
+			if (fieldInfo.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
 				throw new Exception("Not Exposed");
 			}
-			if (fieldInfo.GetCustomAttribute<NoWriteExsposedAttribute>() is not null) {
+			if (fieldInfo.GetCustomAttribute<NoWriteExsposedAttribute>(true) is not null) {
 				throw new Exception("Not Exposed");
 			}
-			if (fieldInfo.GetCustomAttribute<ExsposedAttribute>() is null) {
+			if (fieldInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
 				throw new Exception("Not Exposed");
 			}
 			ScriptNode = node;

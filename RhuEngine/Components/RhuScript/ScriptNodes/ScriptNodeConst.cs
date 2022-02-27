@@ -19,6 +19,8 @@ namespace RhuEngine.Components.ScriptNodes
 		public Type ReturnType => Value?.GetType();
 		[IgnoreMember]
 		public World World { get; private set; }
+		[IgnoreMember]
+		public string Text => "Cost Value " + ReturnType?.GetFormattedName();
 
 		public object Invoke(ScriptNodeDataHolder dataHolder) {
 			return Value;

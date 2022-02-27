@@ -11,6 +11,8 @@ namespace RhuEngine.Components.ScriptNodes
 	[MessagePackObject()]
 	public class ScriptNodeRoot : IScriptNode
 	{
+		[IgnoreMember]
+		public string Text => "Root Script";
 		[IgnoreMember()]
 		public RhuScript RhuScript { get; private set; }
 

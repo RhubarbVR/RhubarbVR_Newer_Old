@@ -23,7 +23,15 @@ namespace RhuEngine.WorldObjects
 		public T GetValue(int index) {
 			return _syncObjects[index];
 		}
-
+		public void Clear() {
+			var sendData = new DataNodeGroup();
+			sendData.SetValue("type", new DataNode<int>(3));
+			World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
+			foreach (var item in _syncObjects) {
+				item.Dispose();
+			}
+			_syncObjects.Clear();
+		}
 		public T this[int i] => _syncObjects[i];
 
 		public T this[NetPointer pointer] => _syncObjects.Where((val)=> val.Pointer == pointer).First();
@@ -165,6 +173,12 @@ namespace RhuEngine.WorldObjects
 					Log.Info("Removed net");
 					RemoveInternal(objecte);
 					objecte.Destroy();
+					break;
+				case 3:
+					foreach (var item in _syncObjects) {
+						item.Dispose();
+					}
+					_syncObjects.Clear();
 					break;
 				default:
 					break;

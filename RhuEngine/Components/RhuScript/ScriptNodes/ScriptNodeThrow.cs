@@ -11,6 +11,9 @@ namespace RhuEngine.Components.ScriptNodes
 	[MessagePackObject()]
 	public class ScriptNodeThrow : IScriptNode
 	{
+		[IgnoreMember]
+		public string Text => "Throw";
+
 		[Key(0)]
 		public IScriptNode ScriptNode;
 

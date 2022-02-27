@@ -11,6 +11,8 @@ namespace RhuEngine.Components.ScriptNodes
 	[MessagePackObject()]
 	public class ScriptNodeWrite : IScriptNode
 	{
+		[IgnoreMember]
+		public string Text => "Write Local Value";
 		[IgnoreMember()]
 		public RhuScript RhuScript { get; private set; }
 		[Key(0)]

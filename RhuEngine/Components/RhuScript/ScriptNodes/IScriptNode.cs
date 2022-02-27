@@ -20,6 +20,7 @@ namespace RhuEngine.Components.ScriptNodes
 	[Union(9, typeof(ScriptNodeWriteField))]
 	public interface IScriptNode
 	{
+		public string Text { get; }
 		public RhuScript RhuScript { get; }
 		public World World { get; }
 		public void LoadIntoWorld(World world, RhuScript rhuScript);

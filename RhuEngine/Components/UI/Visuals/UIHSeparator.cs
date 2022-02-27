@@ -6,7 +6,7 @@ using StereoKit;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI\\Visuals" })]
-	public class HSeparator : UIComponent
+	public class UIHSeparator : UIComponent
 	{
 		public override void RenderUI() {
 			UI.HSeparator();

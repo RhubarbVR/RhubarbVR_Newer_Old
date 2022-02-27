@@ -11,6 +11,8 @@ namespace RhuEngine.Components.ScriptNodes
 	[MessagePackObject()]
 	public class ScriptNodeWorld : IScriptNode
 	{
+		[IgnoreMember]
+		public string Text => "World";
 		[IgnoreMember()]
 		public RhuScript RhuScript { get; private set; }
 

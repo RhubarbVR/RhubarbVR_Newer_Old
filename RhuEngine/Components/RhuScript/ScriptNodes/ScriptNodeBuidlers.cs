@@ -14,7 +14,7 @@ namespace RhuEngine.Components.ScriptNodes
 			var methods = new List<ScriptNodeMethod>();
 			if (node.ReturnType is not null) {
 				foreach (var item in node.ReturnType.GetMethods()) {
-					if (item.GetCustomAttribute<ExsposedAttribute>() is not null) {
+					if (item.GetCustomAttribute<ExsposedAttribute>(true) is not null) {
 						methods.Add(new ScriptNodeMethod(node, item));
 					}
 				}
@@ -78,8 +78,8 @@ namespace RhuEngine.Components.ScriptNodes
 			if (node.ReturnType is not null) {
 				foreach (var item in node.ReturnType.GetMethods()) {
 					if (item.Name == method) {
-						if (item.GetCustomAttribute<UnExsposedAttribute>() is null) {
-							if (item.GetCustomAttribute<ExsposedAttribute>() is not null) {
+						if (item.GetCustomAttribute<UnExsposedAttribute>(true) is null) {
+							if (item.GetCustomAttribute<ExsposedAttribute>(true) is not null) {
 								methods.Add(new ScriptNodeMethod(node, item));
 							}
 						}
