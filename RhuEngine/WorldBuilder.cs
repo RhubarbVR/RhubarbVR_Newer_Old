@@ -7,7 +7,7 @@ using RhuEngine.WorldObjects.ECS;
 using StereoKit;
 
 using World = RhuEngine.WorldObjects.World;
-
+using RhuEngine.Components.ScriptNodes;
 namespace RhuEngine
 {
 	public static class WorldBuilder
@@ -16,7 +16,12 @@ namespace RhuEngine
 			entity.position.Value = new Vec3(0, 1, 0);
 			var pannel = entity.AddChild("PannelRoot");
 			pannel.AttachComponent<UIWindow>();
-			pannel.AddChild("Button").AttachComponent<UIButton>();
+			var button = pannel.AddChild("Button").AttachComponent<UIButton>();
+			var script = pannel.AttachComponent<RhuScript>();
+			button.onClick.Target = script.CallMainMethod;
+			var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
+			method.Prams[0] = new ScriptNodeConst("Hello World");
+			script.MainMethod = method;
 		}
 
 		public static void BuildLocalWorld(this World world) {
