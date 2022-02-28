@@ -15,12 +15,14 @@ namespace RhuEngine.Components.ScriptNodes
 		public RhuScript RhuScript { get; private set; }
 		[Key(0)]
 		public object Value { get; set; }
+		[Key(1)]
+		public Type ConstType;
 		[IgnoreMember()]
-		public Type ReturnType => Value?.GetType();
+		public Type ReturnType => ConstType;
 		[IgnoreMember]
 		public World World { get; private set; }
 		[IgnoreMember]
-		public string Text => "Cost Value " + ReturnType?.GetFormattedName();
+		public string Text => "Input Value \n" + ReturnType?.GetFormattedName();
 
 		public object Invoke(ScriptNodeDataHolder dataHolder) {
 			return Value;
@@ -32,6 +34,10 @@ namespace RhuEngine.Components.ScriptNodes
 		}
 		public ScriptNodeConst(object value) {
 			Value = value;
+			ConstType = value.GetType();
+		}
+		public ScriptNodeConst(Type value) {
+			ConstType = value;
 		}
 		public ScriptNodeConst() {
 
@@ -42,6 +48,9 @@ namespace RhuEngine.Components.ScriptNodes
 
 		public void GetChildrenAll(List<IScriptNode> scriptNodes) {
 
+		}
+
+		public void ClearChildren() {
 		}
 	}
 }

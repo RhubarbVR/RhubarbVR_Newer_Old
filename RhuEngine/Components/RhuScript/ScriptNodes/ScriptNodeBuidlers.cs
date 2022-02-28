@@ -21,6 +21,17 @@ namespace RhuEngine.Components.ScriptNodes
 			}
 			return methods.ToArray();
 		}
+		public static ScriptNodeMethod[] GetNodeMethods(Type node) {
+			var methods = new List<ScriptNodeMethod>();
+			if (node is not null) {
+				foreach (var item in node.GetMethods()) {
+					if (item.GetCustomAttribute<ExsposedAttribute>(true) is not null) {
+						methods.Add(new ScriptNodeMethod(node, item));
+					}
+				}
+			}
+			return methods.ToArray();
+		}
 		public static ScriptNodeWriteField[] GetNodeFieldsWrite(this IScriptNode node) {
 			var fields = new List<ScriptNodeWriteField>();
 			if (node.ReturnType is not null) {
@@ -33,6 +44,18 @@ namespace RhuEngine.Components.ScriptNodes
 			}
 			return fields.ToArray();
 		}
+		public static ScriptNodeWriteField[] GetNodeFieldsWrite(Type node) {
+			var fields = new List<ScriptNodeWriteField>();
+			if (node is not null) {
+				foreach (var item in node.GetFields()) {
+					try {
+						fields.Add(new ScriptNodeWriteField(node, item));
+					}
+					catch { }
+				}
+			}
+			return fields.ToArray();
+		}
 		public static ScriptNodeReadField[] GetNodeFieldsRead(this IScriptNode node) {
 			var fields = new List<ScriptNodeReadField>();
 			if (node.ReturnType is not null) {
@@ -41,6 +64,18 @@ namespace RhuEngine.Components.ScriptNodes
 							fields.Add(new ScriptNodeReadField(node, item));
 						}
 						catch { }
+				}
+			}
+			return fields.ToArray();
+		}
+		public static ScriptNodeReadField[] GetNodeFieldsRead(Type node) {
+			var fields = new List<ScriptNodeReadField>();
+			if (node is not null) {
+				foreach (var item in node.GetFields()) {
+					try {
+						fields.Add(new ScriptNodeReadField(node, item));
+					}
+					catch { }
 				}
 			}
 			return fields.ToArray();

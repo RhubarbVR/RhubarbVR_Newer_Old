@@ -28,6 +28,9 @@ namespace RhuEngine
 		}
 
 		public static string GetFormattedName(this Type type) {
+			if(type == null) {
+				return "Null";
+			}
 			if (type.IsGenericType) {
 				var genericArguments = type.GetGenericArguments()
 									.Select(x => x.Name)

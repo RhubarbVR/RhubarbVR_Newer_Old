@@ -36,5 +36,7 @@ namespace RhuEngine.Components.ScriptNodes
 
 		public void GetChildrenAll(List<IScriptNode> scriptNodes) {
 		}
+		public void ClearChildren() {
+		}
 	}
 }

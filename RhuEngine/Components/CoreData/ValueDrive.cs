@@ -5,7 +5,7 @@ using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Relations" })]
+	[Category(new string[] { "CoreData" })]
 	public class ValueDriver<T> : Component, IUpdatingComponent
 	{
 		public Linker<T> driver;

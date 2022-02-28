@@ -12,7 +12,7 @@ namespace RhuEngine.Components.ScriptNodes
 	public class ScriptNodeRoot : IScriptNode
 	{
 		[IgnoreMember]
-		public string Text => "Root Script";
+		public string Text => "Root Script\nRhuScript";
 		[IgnoreMember()]
 		public RhuScript RhuScript { get; private set; }
 
@@ -29,6 +29,8 @@ namespace RhuEngine.Components.ScriptNodes
 
 		public void GetChildrenAll(List<IScriptNode> scriptNodes) {
 
+		}
+		public void ClearChildren() {
 		}
 		public void LoadIntoWorld(World world, RhuScript rhuScript) {
 			World = world;

@@ -28,5 +28,6 @@ namespace RhuEngine.Components.ScriptNodes
 		public object Invoke(ScriptNodeDataHolder dataHolder);
 		public void GetChildren(List<IScriptNode> scriptNodes);
 		public void GetChildrenAll(List<IScriptNode> scriptNodes);
+		void ClearChildren();
 	}
 }

@@ -16,11 +16,20 @@ namespace RhuEngine.Components.ScriptNodes
 		{
 			get {
 				var text = Method;
-				text += "(";
-				foreach (var item in PramTypes) {
-					text += item?.GetFormattedName();
-				}
-				text += ") Return:";
+				//text += "\n ( ";
+				//foreach (var item in _method?.GetParameters()) {
+				//	text += item.ParameterType?.GetFormattedName();
+				//	text += " ";
+				//	text += item.Name;
+				//	if (item.HasDefaultValue) {
+				//		text += " = ";
+				//		text += item.DefaultValue.ToString();
+				//	}
+				//	text += ",";
+				//}
+				//text = text.Substring(0, text.Length - 1);
+				//text += ") \n";
+				text += "\n";
 				text += ReturnType?.GetFormattedName();
 				return text;
 			}
@@ -37,19 +46,21 @@ namespace RhuEngine.Components.ScriptNodes
 		[Key(3)]
 		public Type[] PramTypes;
 		[IgnoreMember]
-		public bool IsGeneric => _method.IsGenericMethod;
+		public bool IsGeneric => _method?.IsGenericMethod??false;
 		[Key(4)]
 		public Type GenericArgument;
+		[Key(5)]
+		public Type InputType;
 		[IgnoreMember]
-		public Type ReturnType => _method.ReturnType;
+		public Type ReturnType => _method?.ReturnType;
 		[IgnoreMember]
 		public World World { get; private set; }
 		[IgnoreMember()]
 		public RhuScript RhuScript { get; private set; }
 		public void LoadMethod() {
-			var method = ScriptNode.ReturnType?.GetMethod(Method, PramTypes);
-			if (method.IsGenericMethod) {
-				method.MakeGenericMethod(GenericArgument);
+			var method = InputType?.GetMethod(Method, PramTypes);
+			if (method.IsGenericMethod && GenericArgument is not null) {
+				method = method?.MakeGenericMethod(GenericArgument);
 			}
 			if (method.GetCustomAttribute<ExsposedAttribute>(true) is null) {
 				return;
@@ -67,9 +78,9 @@ namespace RhuEngine.Components.ScriptNodes
 		public void LoadIntoWorld(World world, RhuScript rhuScript) {
 			RhuScript = rhuScript;
 			World = world;
-			ScriptNode.LoadIntoWorld(world, rhuScript);
+			ScriptNode?.LoadIntoWorld(world, rhuScript);
 			foreach (var item in Prams) {
-				item.LoadIntoWorld(world, rhuScript);
+				item?.LoadIntoWorld(world, rhuScript);
 			}
 			LoadMethod();
 		}
@@ -93,19 +104,32 @@ namespace RhuEngine.Components.ScriptNodes
 				item.GetChildrenAll(scriptNodes);
 			}
 		}
-
 		public ScriptNodeMethod(IScriptNode node, MethodInfo methodInfo) {
 			if (methodInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
 				throw new Exception("Not Exposed");
 			}
-			ScriptNode = node;
 			Method = methodInfo.Name;
+			ScriptNode = node;
+			InputType = node.ReturnType;
+			PramTypes = methodInfo.GetParameters().Select((pram) => pram.ParameterType).ToArray();
+			Prams = new IScriptNode[PramTypes.Length];
+			_method = methodInfo;
+		}
+		public ScriptNodeMethod(Type node, MethodInfo methodInfo) {
+			if (methodInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+				throw new Exception("Not Exposed");
+			}
+			Method = methodInfo.Name;
+			InputType = node;
 			PramTypes = methodInfo.GetParameters().Select((pram) => pram.ParameterType).ToArray();
 			Prams = new IScriptNode[PramTypes.Length];
 			_method = methodInfo;
 		}
 		public ScriptNodeMethod() {
 
+		}
+		public void ClearChildren() {
+			ScriptNode = null;
 		}
 	}
 }

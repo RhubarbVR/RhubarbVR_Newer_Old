@@ -12,7 +12,7 @@ namespace RhuEngine.Components.ScriptNodes
 	public class ScriptNodeWorld : IScriptNode
 	{
 		[IgnoreMember]
-		public string Text => "World";
+		public string Text => "World Const\nWorld";
 		[IgnoreMember()]
 		public RhuScript RhuScript { get; private set; }
 
@@ -31,7 +31,8 @@ namespace RhuEngine.Components.ScriptNodes
 		public void GetChildren(List<IScriptNode> scriptNodes) {
 
 		}
-
+		public void ClearChildren() {
+		}
 		public void GetChildrenAll(List<IScriptNode> scriptNodes) {
 
 		}

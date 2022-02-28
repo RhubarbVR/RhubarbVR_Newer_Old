@@ -58,8 +58,4 @@
     <ProjectReference Include="..\OpusDotNet\OpusDotNet.csproj" />
     <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\RhuScript\ScriptBuilders\VisualForm\" />
-  </ItemGroup>
 </Project>

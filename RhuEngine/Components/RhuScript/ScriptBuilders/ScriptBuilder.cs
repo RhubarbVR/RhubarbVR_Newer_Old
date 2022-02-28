@@ -14,6 +14,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "RhuScript\\ScriptBuilders" })]
 	public abstract class ScriptBuilder : Component
 	{
+		[OnChanged(nameof(OnRhuScriptAdded))]
 		public SyncRef<RhuScript> script;
 
 		public IScriptNode ScriptNode
@@ -25,6 +26,8 @@ namespace RhuEngine.Components
 				}
 			}
 		}
+		public abstract void OnRhuScriptAdded();
+
 		public abstract void OnGainFocus();
 
 		public abstract void OnLostFocus();

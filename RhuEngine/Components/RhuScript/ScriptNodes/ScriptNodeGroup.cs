@@ -47,5 +47,8 @@ namespace RhuEngine.Components.ScriptNodes
 				item.LoadIntoWorld(world, rhuScript);
 			}
 		}
+		public void ClearChildren() {
+			Children.Clear();
+		}
 	}
 }

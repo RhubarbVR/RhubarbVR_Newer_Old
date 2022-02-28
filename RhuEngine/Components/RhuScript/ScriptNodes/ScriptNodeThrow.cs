@@ -12,7 +12,7 @@ namespace RhuEngine.Components.ScriptNodes
 	public class ScriptNodeThrow : IScriptNode
 	{
 		[IgnoreMember]
-		public string Text => "Throw";
+		public string Text => "Throw\nvoid";
 
 		[Key(0)]
 		public IScriptNode ScriptNode;
@@ -36,13 +36,16 @@ namespace RhuEngine.Components.ScriptNodes
 		public void GetChildren(List<IScriptNode> scriptNodes) {
 			scriptNodes.Add(ScriptNode);
 		}
-
+		public void ClearChildren() {
+			ScriptNode = null;
+		}
 		public void GetChildrenAll(List<IScriptNode> scriptNodes) {
 			scriptNodes.Add(ScriptNode);
 			ScriptNode.GetChildrenAll(scriptNodes);
 		}
 
 		public void LoadIntoWorld(World world, RhuScript rhuScript) {
+			ScriptNode?.LoadIntoWorld(world, rhuScript);
 			World = world;
 			RhuScript = rhuScript;
 		}

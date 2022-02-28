@@ -8,6 +8,7 @@ using RhuEngine.DataStructure;
 using SharedModels;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace RhuEngine.Components
 {
@@ -69,7 +70,13 @@ namespace RhuEngine.Components
 				return null;
 			}
 			try {
-				return MainMethod?.Invoke(new ScriptNodeDataHolder(AmountOfLocalValues));
+				WorldThreadSafty.MethodCalls++;
+				if (WorldThreadSafty.MethodCalls > WorldThreadSafty.MaxCalls) {
+					throw new StackOverflowException();
+				}
+				var method = MainMethod?.Invoke(new ScriptNodeDataHolder(AmountOfLocalValues));
+				WorldThreadSafty.MethodCalls--;
+				return method;
 			}
 			catch (Exception e) 
 			{

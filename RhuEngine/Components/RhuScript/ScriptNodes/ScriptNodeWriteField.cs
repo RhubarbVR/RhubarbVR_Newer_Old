@@ -12,15 +12,17 @@ namespace RhuEngine.Components.ScriptNodes
 	public class ScriptNodeWriteField : IScriptNode
 	{
 		[IgnoreMember]
-		public string Text => "Write " + Field + " Type: " + ReturnType.GetFormattedName();
+		public string Text => "Write " + Field + "\n " + InputType.GetFormattedName();
 		[Key(0)]
 		public IScriptNode ScriptNode;
 		[Key(1)]
 		public IScriptNode SetValue;
 		[IgnoreMember]
 		private FieldInfo _field;
-		[Key(1)]
+		[Key(2)]
 		public string Field;
+		[Key(3)]
+		public Type InputType;
 		[IgnoreMember]
 		public Type ReturnType => typeof(void);
 		[IgnoreMember]
@@ -33,7 +35,7 @@ namespace RhuEngine.Components.ScriptNodes
 		}
 
 		public void LoadField() {
-			var field = ScriptNode.ReturnType?.GetField(Field);
+			var field = InputType?.GetField(Field);
 			if (field.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
 				return;
 			}
@@ -53,17 +55,26 @@ namespace RhuEngine.Components.ScriptNodes
 		public void LoadIntoWorld(World world, RhuScript rhuScript) {
 			RhuScript = rhuScript;
 			World = world;
-			ScriptNode.LoadIntoWorld(world, rhuScript);
+			ScriptNode?.LoadIntoWorld(world, rhuScript);
 			LoadField();
 		}
 
 		public void GetChildren(List<IScriptNode> scriptNodes) {
 			scriptNodes.Add(ScriptNode);
+			scriptNodes.Add(SetValue);
+
 		}
 
 		public void GetChildrenAll(List<IScriptNode> scriptNodes) {
 			scriptNodes.Add(ScriptNode);
 			ScriptNode.GetChildrenAll(scriptNodes);
+			scriptNodes.Add(SetValue);
+			SetValue.GetChildrenAll(scriptNodes);
+		}
+
+		public void ClearChildren() {
+			ScriptNode = null;
+			SetValue = null;
 		}
 
 		public ScriptNodeWriteField(IScriptNode node, FieldInfo fieldInfo) {
@@ -76,7 +87,22 @@ namespace RhuEngine.Components.ScriptNodes
 			if (fieldInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
 				throw new Exception("Not Exposed");
 			}
+			InputType = node.ReturnType;
 			ScriptNode = node;
+			Field = fieldInfo.Name;
+			_field = fieldInfo;
+		}
+		public ScriptNodeWriteField(Type node, FieldInfo fieldInfo) {
+			if (fieldInfo.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
+				throw new Exception("Not Exposed");
+			}
+			if (fieldInfo.GetCustomAttribute<NoWriteExsposedAttribute>(true) is not null) {
+				throw new Exception("Not Exposed");
+			}
+			if (fieldInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+				throw new Exception("Not Exposed");
+			}
+			InputType = node;
 			Field = fieldInfo.Name;
 			_field = fieldInfo;
 		}

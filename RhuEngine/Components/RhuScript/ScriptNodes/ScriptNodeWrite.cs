@@ -12,7 +12,7 @@ namespace RhuEngine.Components.ScriptNodes
 	public class ScriptNodeWrite : IScriptNode
 	{
 		[IgnoreMember]
-		public string Text => "Write Local Value";
+		public string Text => "Write Local\n Value";
 		[IgnoreMember()]
 		public RhuScript RhuScript { get; private set; }
 		[Key(0)]
@@ -20,7 +20,7 @@ namespace RhuEngine.Components.ScriptNodes
 		[Key(1)]
 		public uint NodeIndex;
 		[IgnoreMember()]
-		public Type ReturnType => scriptNode.ReturnType;
+		public Type ReturnType => scriptNode?.ReturnType;
 		[IgnoreMember]
 		public World World { get; private set; }
 		public void GetChildren(List<IScriptNode> scriptNodes) {
@@ -36,10 +36,13 @@ namespace RhuEngine.Components.ScriptNodes
 			dataHolder.localValues[NodeIndex] = value;
 			return value;
 		}
-
+		public void ClearChildren() {
+			scriptNode = null;
+		}
 		public void LoadIntoWorld(World world, RhuScript rhuScript) {
 			World = world;
 			RhuScript = rhuScript;
+			scriptNode?.LoadIntoWorld(world, rhuScript);
 		}
 	}
 }

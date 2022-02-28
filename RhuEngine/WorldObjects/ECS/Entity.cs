@@ -93,7 +93,6 @@ namespace RhuEngine.WorldObjects.ECS
 			var newLocal = point * parentMatrix.Inverse;
 			return newLocal;
 		}
-		[Exsposed]
 		public void GlobalToLocal(Matrix point, bool Child, out Vec3 translation, out Quat rotation, out Vec3 scale) {
 			GlobalToLocal(point,Child).Decompose(out translation, out rotation, out scale);
 		}
@@ -116,7 +115,6 @@ namespace RhuEngine.WorldObjects.ECS
 		public Matrix LocalToGlobal(Matrix point,bool Child = true) {
 			return point * (Child ? GlobalTrans : _internalParent?.GlobalTrans ?? Matrix.Identity);
 		}
-		[Exsposed]
 		public void LocalToGlobal(Matrix point, bool Child, out Vec3 translation, out Quat rotation, out Vec3 scale) {
 			LocalToGlobal(point, Child).Decompose(out translation, out rotation, out scale);
 		}

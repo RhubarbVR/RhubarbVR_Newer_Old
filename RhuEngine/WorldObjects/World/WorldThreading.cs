@@ -12,6 +12,14 @@ using System.Collections.Generic;
 
 namespace RhuEngine.WorldObjects
 {
+	public static class WorldThreadSafty
+	{
+		[ThreadStatic]
+		public static uint MethodCalls = 0;
+
+		public static uint MaxCalls = 100;
+	}
+
 	public partial class World
 	{
 		private readonly List<Action> _actions = new();
