@@ -22,7 +22,7 @@ namespace RhuEngine.Components
 		[Exsposed]
 		public void PreviousPage() {
 			CurrentPage.Value--;
-			if (CurrentPage <= 0) {
+			if (CurrentPage < 0) {
 				CurrentPage.Value = MaxPages - 1;
 			}
 		}
