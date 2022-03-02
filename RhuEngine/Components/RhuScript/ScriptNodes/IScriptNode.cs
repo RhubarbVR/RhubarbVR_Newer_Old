@@ -18,6 +18,7 @@ namespace RhuEngine.Components.ScriptNodes
 	[Union(7, typeof(ScriptNodeRead))]
 	[Union(8, typeof(ScriptNodeReadField))]
 	[Union(9, typeof(ScriptNodeWriteField))]
+	[Union(10, typeof(ScriptNodeIf))]
 	public interface IScriptNode
 	{
 		public string Text { get; }

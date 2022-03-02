@@ -15,13 +15,14 @@ namespace RhuEngine.Components
 	[Category(new string[] { "RhuScript\\ScriptBuilders\\VisualForm" })]
 	public class InitNode : Node
 	{
+		public SyncRef<NodeButton> FlowOut;
 		public SyncRef<UIButtonSafe> SafeButton;
 
 		public SyncRef<UILabel> ErrorLable;
 		public override string NodeName => "Init";
 
 		public override void LoadViusual(Entity entity) {
-			LoadNodeButton(entity, typeof(Action), 0.035f, "Flow Out", true);
+			FlowOut.Target = LoadNodeButton(entity, typeof(Action), 0.035f, "Flow Out", true);
 			var clickButton = entity.AttachComponent<UIButton>();
 			entity.AttachComponent<UISameLine>();
 			var safeButton = entity.AttachComponent<UIButtonSafe>();

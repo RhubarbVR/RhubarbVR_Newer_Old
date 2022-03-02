@@ -30,6 +30,7 @@ namespace RhuEngine.Components
 
 		public NodeButton LoadNodeButton(Entity entity,Type type,float level,string text,bool isOut = false) {
 			var Out = entity.AttachComponent<NodeButton>();
+			Out.Node.Target = this;
 			Out.IsOutput.Value = isOut;
 			Out.TargetType.Value = type;
 			Out.Level.Value = level;

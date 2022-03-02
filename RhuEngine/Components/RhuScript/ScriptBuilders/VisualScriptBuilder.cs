@@ -163,7 +163,11 @@ namespace RhuEngine.Components
 
 		public class NodeBuilder
 		{
+			public Matrix RootPos;
+			public Vec3 pos;
 			public InitNode node;
+			public NodeButton LastFlowPoint;
+			public NodeButton LastInputPoint;
 			public IScriptNode CurrentNode;
 			public IScriptNode LastNode;
 		}
@@ -180,15 +184,25 @@ namespace RhuEngine.Components
 			if (node is null) {
 				return;
 			}
-			if(Builder is null) {
+			if(Builder is null) {;
 				Builder = new NodeBuilder {
-					node = SpawnNode<InitNode>()
+					node = SpawnNode<InitNode>(),
 				};
+				Builder.RootPos = Builder.node.Entity.GlobalTrans;
 			}
 			Builder.LastNode = Builder.CurrentNode;
 			Builder.CurrentNode = node;
+			
 			if (node is ScriptNodeMethod scriptNodeMethod) {
-
+				Log.Info("Loaded ScriptNodeMethod");
+				Builder.pos -= new Vec3(0.1f, 0, 0);
+				var spawnNode = SpawnNode<MethodNode>();
+				spawnNode.Entity.GlobalTrans = Matrix.T(Builder.pos) * Builder.RootPos;
+				spawnNode.InputType.Value = spawnNode.InputType;
+				spawnNode.GenericArgument.Value = spawnNode.GenericArgument;
+				spawnNode.PramTypes.Clear();
+				spawnNode.PramTypes.Append(scriptNodeMethod.PramTypes); 
+				spawnNode.Method.Value = scriptNodeMethod.Method;
 			}
 			else if (node is ScriptNodeConst scriptNodeConst) {
 

@@ -31,6 +31,16 @@ namespace RhuEngine.WorldObjects
 			element.Changed -= ChildElementOnChanged;
 		}
 
+		public void Add(T value) {
+			Add().Value = value;
+		}
+
+		public void Append(IEnumerable<T> values) {
+			foreach (var item in values) {
+				Add(item);
+			}
+		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static implicit operator T[](SyncValueList<T> data) => data.ToArray().Select((objec) => ((Sync<T>)objec).Value).ToArray();
 	}
