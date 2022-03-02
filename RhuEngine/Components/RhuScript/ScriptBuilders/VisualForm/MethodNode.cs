@@ -35,18 +35,16 @@ namespace RhuEngine.Components
 		public override string NodeName => Method;
 
 		private void LoadMethod() {
-			Log.Info($"Loading Method Input{InputType.Value}  Method{Method.Value} PramTypes {PramTypes.Count}");
 			if(Window.Target is not null) {
 				Window.Target.Text.Value = Method.Value;
 			}
-			var method = InputType.Value?.GetMethod(Method, (PramTypes.Count == 0)? null:PramTypes);
+			var method = InputType.Value?.GetMethod(Method.Value, (PramTypes.Count == 0)? Type.EmptyTypes: PramTypes);
 			if ((method?.IsGenericMethod??false) && GenericArgument.Value is not null) {
 				method = method?.MakeGenericMethod(GenericArgument.Value);
 			}
 			if (method?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
 				return;
 			}
-			Log.Info($"Method loaded");
 			if (Prams.Count > 0) {
 				foreach (SyncRef<NodeButton> item in Prams) {
 					item.Target?.Destroy();

@@ -197,9 +197,10 @@ namespace RhuEngine.Components
 				Log.Info("Loaded ScriptNodeMethod");
 				Builder.pos -= new Vec3(0.1f, 0, 0);
 				var spawnNode = SpawnNode<MethodNode>();
-				spawnNode.Entity.GlobalTrans = Matrix.T(Builder.pos) * Builder.RootPos;
-				spawnNode.InputType.Value = spawnNode.InputType;
-				spawnNode.GenericArgument.Value = spawnNode.GenericArgument;
+				var textsize = Text.Size(scriptNodeMethod.Method).x;
+				spawnNode.Entity.GlobalTrans = Matrix.T(Builder.pos - new Vec3(textsize/2,0,0)) * Builder.RootPos;
+				spawnNode.InputType.Value = scriptNodeMethod.InputType;
+				spawnNode.GenericArgument.Value = scriptNodeMethod.GenericArgument;
 				spawnNode.PramTypes.Clear();
 				spawnNode.PramTypes.Append(scriptNodeMethod.PramTypes); 
 				spawnNode.Method.Value = scriptNodeMethod.Method;
