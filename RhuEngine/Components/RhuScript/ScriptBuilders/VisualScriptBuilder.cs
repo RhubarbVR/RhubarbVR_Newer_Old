@@ -188,15 +188,18 @@ namespace RhuEngine.Components
 				Builder = new NodeBuilder {
 					node = SpawnNode<InitNode>(),
 				};
+				Builder.LastFlowPoint = Builder.node.FlowOut.Target;
 				Builder.RootPos = Builder.node.Entity.GlobalTrans;
 			}
 			Builder.LastNode = Builder.CurrentNode;
 			Builder.CurrentNode = node;
 			
 			if (node is ScriptNodeMethod scriptNodeMethod) {
-				Log.Info("Loaded ScriptNodeMethod");
 				Builder.pos -= new Vec3(0.1f, 0, 0);
 				var spawnNode = SpawnNode<MethodNode>();
+				if (Builder.LastFlowPoint is not null) {
+					Builder.LastFlowPoint.ConnectedTo.Target = spawnNode.FlowIn.Target;
+				}
 				var textsize = Text.Size(scriptNodeMethod.Method).x;
 				spawnNode.Entity.GlobalTrans = Matrix.T(Builder.pos - new Vec3(textsize/2,0,0)) * Builder.RootPos;
 				spawnNode.InputType.Value = scriptNodeMethod.InputType;
