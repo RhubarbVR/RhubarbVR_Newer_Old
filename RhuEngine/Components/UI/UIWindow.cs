@@ -53,7 +53,9 @@ namespace RhuEngine.Components
 				foreach (Entity childEntity in Entity.children) {
 					foreach (var item in childEntity.components) {
 						if (item is UIComponent comp) {
-							comp.RenderUI();
+							if (comp.Enabled) {
+								comp.RenderUI();
+							}
 						}
 					}
 				}

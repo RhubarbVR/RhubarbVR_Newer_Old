@@ -30,10 +30,17 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 			return returnstring;
 		}
 
+		public bool ShowVolumes = false;
+
 		public override void Update() {
 			Hierarchy.Push(Matrix.S(0.5f));
 			UI.WindowBegin("    ===---===     Debug Window     ===---===", ref windowPose, new Vec2(0.4f, 0));
 			CloseDraw();
+			var e = ShowVolumes;
+			UI.Toggle("ShowVolumes", ref e);
+			if(e != ShowVolumes) {
+				UI.ShowVolumes = e;
+			}
 			UI.Text(@$"
 
 =====---- EngineStatistics ----=====

@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "RhuScript\\ScriptBuilders" })]
 	public abstract class ScriptBuilder : Component
 	{
-		[OnChanged(nameof(OnRhuScriptAdded))]
+		[OnChanged(nameof(OnRhuScriptAddedInt))]
 		public SyncRef<RhuScript> script;
 
 		public IScriptNode ScriptNode
@@ -26,6 +26,14 @@ namespace RhuEngine.Components
 				}
 			}
 		}
+		public void OnRhuScriptAddedInt() {
+			if (script.Target is not null) {
+				script.Target.OnClearError.Target = OnClearError;
+				script.Target.OnError.Target = OnError;
+			}
+			OnRhuScriptAdded();
+		}
+
 		public abstract void OnRhuScriptAdded();
 
 		public abstract void OnGainFocus();
@@ -48,6 +56,13 @@ namespace RhuEngine.Components
 		public abstract void LoadFromScript();
 		[Exsposed]
 		public abstract void Compile();
+		[Exsposed]
+
+		public abstract void OnError();
+
+		[Exsposed]
+
+		public abstract void OnClearError();
 
 	}
 }

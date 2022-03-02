@@ -27,9 +27,9 @@ namespace RhuEngine.WorldObjects
 					return;
 				}
 				Delegate @delegate = value;
-				if (@delegate.Target == null) {
-					_type = @delegate.Method.DeclaringType;
-					_method = @delegate.Method.Name;
+				if (@delegate?.Target == null) {
+					_type = @delegate?.Method.DeclaringType;
+					_method = @delegate?.Method.Name;
 					base.Target = null;
 				}
 				else {

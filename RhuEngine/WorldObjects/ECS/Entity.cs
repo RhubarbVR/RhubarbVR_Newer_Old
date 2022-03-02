@@ -61,6 +61,13 @@ namespace RhuEngine.WorldObjects.ECS
 			comp.OnAttach();
 			return comp;
 		}
+		public T AttachComponent<T>(Action<T> beforeAttach) where T : Component, new() {
+			var comp = components.Add<T>();
+			beforeAttach.Invoke(comp);
+			comp.OnAttach();
+			return comp;
+		}
+
 		[Exsposed]
 		public T GetFirstComponentOrAttach<T>() where T : Component, new() {
 			foreach (var item in components) {

@@ -19,8 +19,10 @@ namespace RhuEngine
 			var button = pannel.AddChild("Button").AttachComponent<UIButton>();
 			var script = pannel.AttachComponent<RhuScript>();
 			button.onClick.Target = script.CallMainMethod;
+			//Hello World
 			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
 			//method.Prams[0] = new ScriptNodeConst("Hello World");
+			//Test for stack overflow
 			var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("CallMainMethod")[0];
 			script.MainMethod = method;
 			var ScripEditor = entity.AddChild("ScripEditor");

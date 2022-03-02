@@ -31,6 +31,24 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(LoadScriptNodes))]
 		public Sync<Type> OutPutType;
 
+		public SyncObjList<SyncRef<Node>> nodes;
+
+		public override void OnError() {
+			foreach (SyncRef<Node> item in nodes) {
+				if(item.Target is not null) {
+					item.Target.OnErrorInt();
+				}
+			}
+		}
+
+		public override void OnClearError() {
+			foreach (SyncRef<Node> item in nodes) {
+				if (item.Target is not null) {
+					item.Target.OnClearErrorInt();
+				}
+			}
+		}
+
 		public override void OnAttach() {
 			var Window = Entity.AddChild("Edit Window").AttachComponent<UIWindow>();
 			WindowTint.SetLinkerTarget(Window.TintColor);
@@ -153,9 +171,9 @@ namespace RhuEngine.Components
 		private T SpawnNode<T>()where T : Node,new() {
 			var entity = Entity.AddChild(typeof(T).GetFormattedName());
 			entity.GlobalTrans = Matrix.TS(new Vec3(-0.05f, 0.05f, -0.035f),new Vec3(1.5f)) * (EditWindow.Target?.Entity.GlobalTrans ?? Matrix.Identity);
-			var node = entity.AttachComponent<T>();
-			node.VScriptBuilder.Target = this;
-			return node;
+			var ret = entity.AttachComponent<T>((node) => node.VScriptBuilder.Target = this);
+			nodes.Add().Target = ret;
+			return ret;
 		}
 
 		private void LoadNodes(IScriptNode node, NodeBuilder Builder = null) {

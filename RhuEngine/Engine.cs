@@ -176,7 +176,9 @@ namespace RhuEngine
 
 		public IManager[] _managers;
 
+		public TextStyle MainTextStyle;
 		public void Init() {
+			MainTextStyle = Text.MakeStyle(Font.Default, 0.02f, new Color(0.890f, 0.580f, 0.027f));
 			Platform.ForceFallbackKeyboard = true;
 			World.OcclusionEnabled = true;
 			World.RaycastEnabled = true;

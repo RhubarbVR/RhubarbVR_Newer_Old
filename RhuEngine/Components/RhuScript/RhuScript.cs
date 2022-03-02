@@ -15,6 +15,20 @@ namespace RhuEngine.Components
 	[Category(new string[] { "RhuScript" })]
 	public class RhuScript : Component,IUpdatingComponent
 	{
+		[Exsposed]
+		public (Action, SafeCall) ClearErrorsSafe(SafeCall safeCall) {
+			return (() => ClearError(), SafeCall.MakeResponses(safeCall._number,Engine));
+		}
+
+		public void ClearError() {
+			Log.Info("RhuScript Errors Cleared");
+			Error = null;
+			OnClearError.Target?.Invoke();
+		}
+		public SyncDelegate OnError;
+		
+		public SyncDelegate OnClearError;
+
 		public Exception Error;
 
 		public IScriptNode _MainMethod;
@@ -82,6 +96,7 @@ namespace RhuEngine.Components
 			{
 				Error = e;
 				Log.Err("Error in RhuScript Error: " + e.ToString());
+				OnError.Target?.Invoke();
 			}
 			return null;
 		}
