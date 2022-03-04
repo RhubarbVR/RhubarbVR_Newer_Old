@@ -15,11 +15,14 @@ namespace RhuEngine.Components
 	[Category(new string[] { "RhuScript\\ScriptBuilders\\VisualForm" })]
 	public class InitNode : Node
 	{
-		public SyncRef<NodeButton> FlowOut;
 		public SyncRef<UIButtonSafe> SafeButton;
 
 		public SyncRef<UILabel> ErrorLable;
 		public override string NodeName => "Init";
+
+		public override void Gen(VisualScriptBuilder visualScriptBuilder, IScriptNode node, VisualScriptBuilder.NodeBuilder builder) {
+			throw new NotImplementedException();
+		}
 
 		public override void LoadViusual(Entity entity) {
 			FlowOut.Target = LoadNodeButton(entity, typeof(Action), 0.035f, "Flow Out", true);
@@ -59,6 +62,7 @@ namespace RhuEngine.Components
 			}
 			SafeButton.Target.Enabled.Value = false;
 			SafeButton.Target.onClick.Target = null;
+			Entity.GlobalTrans = Matrix.T(-0.1f, 0, 0) * Entity.GlobalTrans;
 		}
 
 		public override void OnError() {
@@ -76,6 +80,7 @@ namespace RhuEngine.Components
 
 			SafeButton.Target.Enabled.Value = true;
 			SafeButton.Target.onClick.Target = VScriptBuilder.Target.script.Target.ClearErrorsSafe;
+			Entity.GlobalTrans = Matrix.T(0.1f,0,0) * Entity.GlobalTrans;
 		}
 	}
 }

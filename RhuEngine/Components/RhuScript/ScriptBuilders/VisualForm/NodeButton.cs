@@ -21,12 +21,13 @@ namespace RhuEngine.Components
 		public Sync<float> Level;
 		public Sync<bool> IsClicked;
 		public Sync<bool> RenderLabel;
-		public SyncDelegate<Action<bool, NodeButton,Type>> Clicked;
+		public SyncDelegate<Action<bool, NodeButton, Type>> Clicked;
 		public SyncRef<NodeButton> ConnectedTo;
 
-		public Vec3 LastGlobalPos; // Way to get other nodes pos
+		public Pose LastGlobalPos; // Way to get other nodes pos
 		public override void RenderUI() {
 			var typecolor = TargetType.Value.GetTypeColor();
+			var typecolor2 = (ConnectedTo.Target?.TargetType.Value).GetTypeColor();
 			UI.PushTint(typecolor * 2f);
 			UI.PushId(Pointer.GetHashCode());
 			var enabled = IsClicked.Value;
@@ -35,17 +36,17 @@ namespace RhuEngine.Components
 			var pos = IsOutput
 				? (UI.LayoutAt - UI.LayoutRemaining.XY0).X0Z + new Vec3(0, ypos, 0)
 				: UI.LayoutAt + new Vec3((Engine.UISettings.padding * 1.35f) + (0.025f / 2), ypos + Engine.UISettings.padding, 0);
-			var centerPos = pos + new Vec3(-buttonSize/2, -buttonSize/2,0);
-			LastGlobalPos = Hierarchy.ToWorld(centerPos);
-			if (Helper.IsHovering(FingerId.Index,JointId.Tip,pos, new Vec3((Engine.UISettings.padding + buttonSize) / 2, (Engine.UISettings.padding + buttonSize)/2, buttonSize*3), out var hand)) {
+			var centerPos = pos + new Vec3(-buttonSize / 2, -buttonSize / 2, 0);
+			LastGlobalPos = Hierarchy.ToWorld(new Pose(centerPos, Quat.Identity));
+			if (Helper.IsHovering(FingerId.Index, JointId.Tip, pos, new Vec3((Engine.UISettings.padding + buttonSize) / 2, (Engine.UISettings.padding + buttonSize) / 2, buttonSize * 3), out var hand)) {
 				var textpos = Input.Hand(hand).Get(FingerId.Index, JointId.Tip).Pose.position;
 				Hierarchy.Enabled = false;
-				Text.Add($"{ToolTipText.Value}\n Type: {TargetType.Value.GetFormattedName()}", Matrix.TS(0.1f, -0.01f, -0.05f,0.9f) * new Pose(textpos, Quat.LookAt(textpos, Input.Head.position)).ToMatrix(),Engine.MainTextStyle);
+				Text.Add($"{ToolTipText.Value}\n Type: {TargetType.Value.GetFormattedName()}", Matrix.TS((hand == Handed.Right)?0.1f:-0.1f, -0.01f, -0.05f, 0.9f) * new Pose(textpos, Quat.LookAt(textpos, Input.Head.position)).ToMatrix(), Engine.MainTextStyle);
 				Hierarchy.Enabled = true;
 			}
-			
-			if (UI.ToggleAt(" ",ref enabled, pos, new Vec2(buttonSize))) {
-				AddWorldCoroutine(() => Clicked.Target?.Invoke(enabled,this, TargetType));
+
+			if (UI.ToggleAt(" ", ref enabled, pos, new Vec2(buttonSize))) {
+				AddWorldCoroutine(() => Clicked.Target?.Invoke(enabled, this, TargetType));
 			}
 			UI.PopId();
 			UI.PopTint();
@@ -53,9 +54,22 @@ namespace RhuEngine.Components
 				UI.Label(ToolTipText.Value);
 			}
 
-			if(ConnectedTo.Target is not null) {
+			if (ConnectedTo.Target is not null) {
 				// Whould like to make better at some point 
-				Lines.Add(centerPos, Hierarchy.ToLocal(ConnectedTo.Target.LastGlobalPos), typecolor,0.01f);
+				var startPos = centerPos;
+				var endPos = Hierarchy.ToLocal(ConnectedTo.Target.LastGlobalPos);
+				var lasttarget = startPos;
+				var m = startPos.Dist(endPos.position) * 0.5f;
+				var handle1 = (-Vec3.Right * m) + startPos;
+				var handle2 = (endPos.Right * m) + endPos.position;
+				var CurveSteps = (m * 100);
+				for (var i = 0; i < CurveSteps; i++) {
+					var poser = (float)(i) / ((float)CurveSteps);
+					var current = Helper.Bezier(startPos, handle1, handle2, endPos.position, poser);
+					Lines.Add(lasttarget, current + ((lasttarget - current).Normalized * 0.01f), ((i % 2) == 1) ? typecolor: typecolor2, 0.01f);
+					lasttarget = current;
+				}
+				Lines.Add(lasttarget, endPos.position, typecolor, 0.01f);
 			}
 		}
 	}

@@ -158,6 +158,9 @@ namespace RhuEngine.Components
 
 		public override void LoadFromScript() {
 			FocusScriptBuilder();
+			foreach (SyncRef<Node> item in nodes) {
+				item.Target?.Entity.Destroy();
+			}
 			LoadNodes(ScriptNode);
 		}
 
@@ -166,10 +169,13 @@ namespace RhuEngine.Components
 			public Matrix RootPos;
 			public Vec3 pos;
 			public InitNode node;
+			public Node LastCompNode;
 			public NodeButton LastFlowPoint;
 			public NodeButton LastInputPoint;
 			public IScriptNode CurrentNode;
 			public IScriptNode LastNode;
+
+			public bool Flow = true;
 		}
 
 		private T SpawnNode<T>()where T : Node,new() {
@@ -180,7 +186,27 @@ namespace RhuEngine.Components
 			return ret;
 		}
 
-		private void LoadNodes(IScriptNode node, NodeBuilder Builder = null) {
+		private void Poser(Entity target,NodeBuilder Builder,string text) {
+			if (Builder.LastInputPoint is null) {
+				Builder.pos -= new Vec3(0.2f, 0, 0);
+				var textsize = Text.Size(text).x;
+				target.GlobalTrans = Matrix.T(Builder.pos - new Vec3(textsize / 1.9f, 0, 0)) * Builder.RootPos;
+			}
+			else {
+				if(!Builder.Flow) {
+					Builder.pos += new Vec3(0.2f, 0, 0);
+					var textsize = Text.Size(text).x;
+					target.GlobalTrans = Matrix.T(Builder.pos + new Vec3(textsize / 1.9f, 0, 0)) * Builder.RootPos;
+				}
+				else {
+					Builder.pos += new Vec3(0.2f, -0.15f, 0);
+					var textsize = Text.Size(text).x;
+					target.GlobalTrans = Matrix.T(Builder.pos + new Vec3(textsize / 1.9f, 0, 0)) * Builder.RootPos;
+				}
+			}
+		}
+
+		public void LoadNodes(IScriptNode node, NodeBuilder Builder = null) {
 			if (node is null) {
 				return;
 			}
@@ -195,30 +221,31 @@ namespace RhuEngine.Components
 			Builder.CurrentNode = node;
 			
 			if (node is ScriptNodeMethod scriptNodeMethod) {
-				Builder.pos -= new Vec3(0.1f, 0, 0);
 				var spawnNode = SpawnNode<MethodNode>();
-				if (Builder.LastFlowPoint is not null) {
-					Builder.LastFlowPoint.ConnectedTo.Target = spawnNode.FlowIn.Target;
-				}
-				var textsize = Text.Size(scriptNodeMethod.Method).x;
-				spawnNode.Entity.GlobalTrans = Matrix.T(Builder.pos - new Vec3(textsize/2,0,0)) * Builder.RootPos;
-				spawnNode.InputType.Value = scriptNodeMethod.InputType;
-				spawnNode.GenericArgument.Value = scriptNodeMethod.GenericArgument;
-				spawnNode.PramTypes.Clear();
-				spawnNode.PramTypes.Append(scriptNodeMethod.PramTypes); 
-				spawnNode.Method.Value = scriptNodeMethod.Method;
+				Poser(spawnNode.Entity, Builder, scriptNodeMethod.Method);
+				spawnNode.Gen(this, node, Builder);
+				Builder.LastCompNode = spawnNode;
 			}
 			else if (node is ScriptNodeConst scriptNodeConst) {
-
+				var spawnNode = SpawnNode<NodeConst>();
+				Poser(spawnNode.Entity, Builder, spawnNode.NodeName);
+				spawnNode.Gen(this, node, Builder);
+				Builder.LastCompNode = spawnNode;
 			}
 			else if (node is ScriptNodeGroup scriptNodeGroup) {
-
+		
 			}
 			else if (node is ScriptNodeWorld scriptNodeWorld) {
-
+				var spawnNode = SpawnNode<NodeWorld>();
+				Poser(spawnNode.Entity, Builder, spawnNode.NodeName);
+				spawnNode.Gen(this, node, Builder);
+				Builder.LastCompNode = spawnNode;
 			}
 			else if (node is ScriptNodeRoot scriptNodeRoot) {
-
+				var spawnNode = SpawnNode<NodeRoot>();
+				Poser(spawnNode.Entity, Builder, spawnNode.NodeName);
+				spawnNode.Gen(this, node, Builder);
+				Builder.LastCompNode = spawnNode;
 			}
 			else if (node is ScriptNodeThrow scriptNodeThrow) {
 

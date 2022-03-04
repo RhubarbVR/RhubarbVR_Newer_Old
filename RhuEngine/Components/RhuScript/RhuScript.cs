@@ -15,6 +15,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "RhuScript" })]
 	public class RhuScript : Component,IUpdatingComponent
 	{
+
 		[Exsposed]
 		public (Action, SafeCall) ClearErrorsSafe(SafeCall safeCall) {
 			return (() => ClearError(), SafeCall.MakeResponses(safeCall._number,Engine));
@@ -66,7 +67,7 @@ namespace RhuEngine.Components
 		}
 
 		[Exsposed]
-		public void InfoLog(string msg) {
+		public void InfoLog(string msg = "Hello World") {
 			Log.Info("[RhuScript] "+ msg);
 		}
 		[Exsposed]

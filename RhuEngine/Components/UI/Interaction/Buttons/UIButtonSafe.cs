@@ -14,11 +14,11 @@ namespace RhuEngine.Components
 			_number = number;
 		}
 		internal static SafeCall MakeResponses(long number,Engine Engine) {
-			return new SafeCall(((number * Engine.version.GetHashCode()) << Engine.version.Major) >> Engine.version.Minor);
+			return new SafeCall(number * Engine.version.GetHashCode());
 		}
 	}
 
-	[Category(new string[] { "UI\\Buttons" })]
+	[Category(new string[] { "UI\\Interaction\\Buttons" })]
 	public class UIButtonSafe : UIComponent
 	{
 		[Default("Safe Button")]
@@ -36,7 +36,7 @@ namespace RhuEngine.Components
 			result |= (long)_rand.Next(int.MinValue, int.MaxValue);
 			var e = new SafeCall(result);
 			var resonses = onClick.Target?.Invoke(e);
-			if(resonses.Value.Item2._number == ((result * Engine.version.GetHashCode()) << Engine.version.Major) >> Engine.version.Minor) {
+			if(resonses.Value.Item2._number == result * Engine.version.GetHashCode()) {
 				resonses.Value.Item1.Invoke();
 			}
 		}

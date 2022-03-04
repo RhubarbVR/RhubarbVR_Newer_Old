@@ -18,6 +18,9 @@ namespace RhuEngine.Datatypes
 		public int GetOwnerID() {
 			return (ushort)(id & 0xFFFFuL);
 		}
+
+		public bool IsLocal => GetID() == 0;
+
 		public static NetPointer BuildID(ulong position, ushort user) {
 			return new NetPointer((position << 16) | (user & 0xFFFFuL));
 		}

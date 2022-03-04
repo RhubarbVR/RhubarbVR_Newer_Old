@@ -52,6 +52,7 @@ namespace RhuEngine.DataStructure
 	[Union(41, typeof(DataNode<Vertex>))]
 	[Union(42, typeof(DataNode<float[]>))]
 	[Union(43, typeof(DataNode<int[]>))]
+	[Union(100, typeof(DataNode<object>))]
 
 	public interface IDataNode
 	{

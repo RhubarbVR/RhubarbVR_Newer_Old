@@ -47,6 +47,15 @@ namespace RhuEngine.WorldObjects
 			return netPointer;
 		}
 
+		public NetPointer NextLocalRefID() {
+			NetPointer netPointer;
+			lock (_buildRefIDLock) {
+				netPointer = NetPointer.BuildID(ItemIndex, 0);
+				ItemIndex++;
+			}
+			return netPointer;
+		}
+
 		public void RegisterWorldObject(IWorldObject worldObject) {
 			if (!_worldObjects.TryAdd(worldObject.Pointer, worldObject)) {
 				Log.Warn($"World Object Failed To add {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");

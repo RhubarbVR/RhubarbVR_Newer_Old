@@ -31,6 +31,9 @@ namespace RhuEngine.Components
 				if (locModule is null) {
 					return;
 				}
+				if (Platform.KeyboardVisible) {
+					return;
+				}
 				locModule.ProcessMovement();
 			}
 		}

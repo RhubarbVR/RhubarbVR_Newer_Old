@@ -144,6 +144,12 @@ namespace RhuEngine.WorldObjects
 					var instance = (SyncObject)Activator.CreateInstance(item.FieldType);
 					instance.Initialize(World, this, item.Name, networkedObject, deserialize,netPointer);
 					AddDisposable(instance);
+					if (typeof(ISyncProperty).IsAssignableFrom(item.FieldType)) {
+						var startValue = item.GetCustomAttribute<BindPropertyAttribute>();
+						if (startValue != null) {
+							((ISyncProperty)instance).Bind(startValue.Data, this);
+						}
+					}
 					if (typeof(ISync).IsAssignableFrom(item.FieldType)) {
 						var startValue = item.GetCustomAttribute<DefaultAttribute>();
 						if (startValue != null) {

@@ -74,7 +74,14 @@ namespace RhuEngine.WorldObjects
 			var obj = new DataNodeGroup();
 			var refID = new DataNode<NetPointer>(@object.Pointer);
 			obj.SetValue("Pointer", refID);
-			var Value = typeof(T).IsEnum ? new DataNode<int>((int)(object)value) : (IDataNode)new DataNode<T>(value);
+			var inputType = typeof(T);
+			IDataNode Value;
+			if (inputType == typeof(Type)) {
+				Value = new DataNode<string>(((Type)(object)value)?.FullName);
+			}
+			else {
+				Value = inputType.IsEnum ? new DataNode<int>((int)(object)value) : new DataNode<T>(value);
+			}
 			obj.SetValue("Value", Value);
 			return obj;
 		}

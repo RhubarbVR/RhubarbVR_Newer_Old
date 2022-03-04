@@ -24,7 +24,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		private void BroadcastValue() {
-			if (IsLinked || NoSync) {
+			if (IsLinkedTo || NoSync) {
 				return;
 			}
 			World.BroadcastDataToAll(this, typeof(T).IsEnum ? new DataNode<int>((int)(object)_value) : new DataNode<T>(_value), LiteNetLib.DeliveryMethod.Unreliable);
@@ -60,7 +60,7 @@ namespace RhuEngine.WorldObjects
 			_value = value;
 		}
 
-		public bool IsLinked { get; private set; }
+		public bool IsLinkedTo { get; private set; }
 
 		[NoSave]
 		[NoSync]
@@ -69,23 +69,25 @@ namespace RhuEngine.WorldObjects
 
 		public NetPointer LinkedFrom => drivenFromObj.Pointer;
 
+		public object Object { get => _value; set => _value = (T)value; }
+
 		public void KillLink() {
 			drivenFromObj.RemoveLinkLocation();
-			IsLinked = false;
+			IsLinkedTo = false;
 		}
 
 		public void Link(ILinker value) {
-			if (!IsLinked) {
+			if (!IsLinkedTo) {
 				ForceLink(value);
 			}
 		}
 		public void ForceLink(ILinker value) {
-			if (IsLinked) {
+			if (IsLinkedTo) {
 				KillLink();
 			}
 			value.SetLinkLocation(this);
 			drivenFromObj = value;
-			IsLinked = true;
+			IsLinkedTo = true;
 		}
 
 	}

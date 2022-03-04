@@ -5,10 +5,12 @@ using StereoKit;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "UI\\Buttons" })]
-	public class UIButtonRound : UIComponent
+	[Category(new string[] { "UI\\Interaction\\Buttons" })]
+	public class UIButtonRoundAt : UIComponent
 	{
 		public AssetRef<Sprite> Image;
+
+		public Sync<Vec3> TopLeft;
 
 		public Sync<float> Diameter;
 
@@ -16,7 +18,7 @@ namespace RhuEngine.Components
 
 		public override void RenderUI() {
 			UI.PushId(Pointer.GetHashCode());
-			if (UI.ButtonRound("RoundButton",Image.Asset,Diameter)) {
+			if (UI.ButtonRoundAt("RoundButton",Image.Asset, TopLeft, Diameter)) {
 				AddWorldCoroutine(() => onClick.Target?.Invoke());
 			}
 			UI.PopId();

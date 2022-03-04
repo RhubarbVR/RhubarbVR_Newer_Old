@@ -82,7 +82,9 @@ namespace RhuEngine.WorldObjects
 			if (typeof(ISyncObject).IsAssignableFrom(@object.GetType())) {
 				onLoaded.Add(((ISyncObject)@object).OnLoaded);
 			}
-			return typeof(T).IsEnum ? (T)(object)((DataNode<int>)data.GetValue("Value")).Value : ((DataNode<T>)data.GetValue("Value")).Value;
+			return typeof(T) == typeof(Type)
+				? (T)(object)Type.GetType(((DataNode<string>)data.GetValue("Value")).Value, false, false)
+				: typeof(T).IsEnum ? (T)(object)((DataNode<int>)data.GetValue("Value")).Value : ((DataNode<T>)data.GetValue("Value")).Value;
 		}
 
 		public void ListDeserialize<T>(DataNodeGroup data, ISyncObjectList<T> @object) where T : ISyncObject, new() {

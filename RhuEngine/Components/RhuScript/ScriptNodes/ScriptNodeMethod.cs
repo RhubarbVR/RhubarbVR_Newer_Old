@@ -52,6 +52,8 @@ namespace RhuEngine.Components.ScriptNodes
 		[Key(5)]
 		public Type InputType;
 		[IgnoreMember]
+		public object[] Defaults;
+		[IgnoreMember]
 		public Type ReturnType => _method?.ReturnType;
 		[IgnoreMember]
 		public World World { get; private set; }
@@ -62,8 +64,23 @@ namespace RhuEngine.Components.ScriptNodes
 			if (method.IsGenericMethod && GenericArgument is not null) {
 				method = method?.MakeGenericMethod(GenericArgument);
 			}
-			if (method.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+			if (method?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+				if (InputType?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+					return;
+				}
+				else {
+					if (!method.IsStatic) {
+						return;
+					}
+				}
+			}
+			if (method.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
 				return;
+			}
+			var prams = method.GetParameters();
+			Defaults = new object[prams.Length];
+			for (var i = 0; i < prams.Length; i++) {
+				Defaults[i] = prams[i].DefaultValue;
 			}
 			_method = method;
 		}
@@ -71,9 +88,9 @@ namespace RhuEngine.Components.ScriptNodes
 		public object Invoke(ScriptNodeDataHolder dataHolder) {
 			var prams = new object[Prams.Length];
 			for (var i = 0; i < prams.Length; i++) {
-				prams[i] = Prams[i]?.Invoke(dataHolder);
+				prams[i] = Prams[i] == null ? Defaults.Length > 0 ? Defaults[i] : null : Prams[i].Invoke(dataHolder);
 			}
-			return _method?.Invoke(ScriptNode.Invoke(dataHolder), prams);
+			return _method?.Invoke(ScriptNode?.Invoke(dataHolder), prams);
 		}
 		public void LoadIntoWorld(World world, RhuScript rhuScript) {
 			RhuScript = rhuScript;
@@ -97,15 +114,29 @@ namespace RhuEngine.Components.ScriptNodes
 		}
 
 		public void GetChildrenAll(List<IScriptNode> scriptNodes) {
-			scriptNodes.Add(ScriptNode);
-			ScriptNode.GetChildrenAll(scriptNodes);
+			if (ScriptNode is not null) {
+				scriptNodes.Add(ScriptNode);
+				ScriptNode.GetChildrenAll(scriptNodes);
+			}
 			foreach (var item in Prams) {
-				scriptNodes.Add(item);
-				item.GetChildrenAll(scriptNodes);
+				if (item is not null) {
+					scriptNodes.Add(item);
+					item.GetChildrenAll(scriptNodes);
+				}
 			}
 		}
 		public ScriptNodeMethod(IScriptNode node, MethodInfo methodInfo) {
-			if (methodInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+			if (methodInfo?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+				if (node.ReturnType?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+					throw new Exception("Not Exposed");
+				}
+				else {
+					if (!methodInfo.IsStatic) {
+						throw new Exception("Not Exposed");
+					}
+				}
+			}
+			if (methodInfo.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
 				throw new Exception("Not Exposed");
 			}
 			Method = methodInfo.Name;
@@ -116,7 +147,17 @@ namespace RhuEngine.Components.ScriptNodes
 			_method = methodInfo;
 		}
 		public ScriptNodeMethod(Type node, MethodInfo methodInfo) {
-			if (methodInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+			if (methodInfo?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+				if (node.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+					throw new Exception("Not Exposed");
+				}
+				else {
+					if (!methodInfo.IsStatic) {
+						throw new Exception("Not Exposed");
+					}
+				}
+			}
+			if(methodInfo.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
 				throw new Exception("Not Exposed");
 			}
 			Method = methodInfo.Name;

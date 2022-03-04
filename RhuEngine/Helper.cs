@@ -41,6 +41,23 @@ namespace RhuEngine
 			}
 			return type.Name;
 		}
+		public static unsafe int GetHashCodeSafe(this string s) {
+			fixed (char* str = s.ToCharArray()) {
+				var chPtr = str;
+				var num = 0x15051505;
+				var num2 = num;
+				var numPtr = (int*)chPtr;
+				for (var i = s.Length; i > 0; i -= 4) {
+					num = ((num << 5) + num + (num >> 0x1b)) ^ numPtr[0];
+					if (i <= 2) {
+						break;
+					}
+					num2 = ((num2 << 5) + num2 + (num2 >> 0x1b)) ^ numPtr[1];
+					numPtr += 2;
+				}
+				return num + (num2 * 0x5d588b65);
+			}
+		}
 
 		public static Color GetTypeColor(this Type type) {
 			if(type is null) {
@@ -61,8 +78,8 @@ namespace RhuEngine
 			if (type == typeof(Action)) {
 				return new Color(1,1,1);
 			}
-			if (type == typeof(Action)) {
-				return new Color(1, 1, 1);
+			if (type == typeof(object)) {
+				return new Color(0.68f, 0.82f, 0.3137254901960784f);
 			}
 			if (type == typeof(byte)) {
 				return new Color(0, 0.1f, 1) * new Color(0, 1f, 0.7f);
@@ -100,7 +117,7 @@ namespace RhuEngine
 			if (typeof(ILinkable).IsAssignableFrom(type)) {
 				return type.GenericTypeArguments[0].GetTypeColor()* new Color(0.5f,0.5f,0.5f);
 			}
-			var hashCode = type.GetFormattedName().GetHashCode();
+			var hashCode = type.GetFormattedName().GetHashCodeSafe();
 			var h = (float)(int)(ushort)hashCode / 65545f;
 			var s = (float)(int)(byte)(hashCode >> 16) / 255f / 2f;
 			var v = 0.5f + ((float)(int)(byte)(hashCode >> 24) / 255f * 0.5f);
@@ -123,6 +140,19 @@ namespace RhuEngine
 			}
 			handed = Handed.Max;
 			return false;
+		}
+
+
+		public static Vec3 Bezier(Vec3 a, Vec3 b, Vec3 c, Vec3 d, float t) {
+			var it = Vec3.Lerp(b, c, t);
+			return Vec3.Lerp(Vec3.Lerp(Vec3.Lerp(a, b, t), it, t), Vec3.Lerp(it, Vec3.Lerp(c, d, t), t), t);
+		}
+
+		public static float Dist(this Vec3 start, Vec3 end) {
+			return System.Numerics.Vector3.Distance(start.v, end.v);
+		}
+		public static float DistSquared(this Vec3 start, Vec3 end) {
+			return System.Numerics.Vector3.DistanceSquared(start.v, end.v);
 		}
 	}
 }

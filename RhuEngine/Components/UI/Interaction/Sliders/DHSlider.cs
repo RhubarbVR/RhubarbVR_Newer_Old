@@ -5,7 +5,7 @@ using StereoKit;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "UI\\Interaction" })]
+	[Category(new string[] { "UI\\Interaction\\Sliders" })]
 	public class DHSlider : UIComponent
 	{
 		public Sync<double> Value;

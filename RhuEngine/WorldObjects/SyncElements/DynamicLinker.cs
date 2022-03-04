@@ -1,18 +1,13 @@
 ﻿namespace RhuEngine.WorldObjects
 {
-	public class Linker<T> : SyncRef<ILinkerMember<T>>, ILinker
+	public class DynamicLinker : SyncRef<ILinkable>, ILinker
 	{
-		public Linker() { }
+		public DynamicLinker() { }
 
-		public T LinkedValue
+		public object LinkedValue
 		{
-			get => Target.Value;
-			set {
-				if (Target is null) {
-					return;
-				}
-				Target.Value = value;
-			}
+			get => Target.Object;
+			set => Target.Object = value;
 		}
 
 		private ILinkable _linked;
@@ -33,7 +28,7 @@
 		public void RemoveLinkLocation() {
 			_linked = null;
 		}
-		public void SetLinkerTarget(ILinkerMember<T> Target) {
+		public void SetLinkerTarget(ILinkable Target) {
 			base.Target = Target;
 		}
 		public override void OnChanged() {
@@ -56,12 +51,6 @@
 		public override void Dispose() {
 			Unlink();
 			base.Dispose();
-		}
-
-		public void SetValue(object value) {
-			if (Linked) {
-				LinkedValue = (T)value;
-			}
 		}
 	}
 }

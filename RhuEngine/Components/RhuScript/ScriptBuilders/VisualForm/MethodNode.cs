@@ -17,10 +17,7 @@ namespace RhuEngine.Components
 	public class MethodNode : Node
 	{
 		public SyncRef<Entity> UI;
-		public SyncRef<NodeButton> FlowOut;
-		public SyncRef<NodeButton> FlowIn;
 		public SyncRef<NodeButton> Input;
-		public SyncRef<NodeButton> Output;
 		public SyncObjList<SyncRef<NodeButton>> Prams;
 
 		public Sync<Type> InputType;
@@ -43,6 +40,16 @@ namespace RhuEngine.Components
 				method = method?.MakeGenericMethod(GenericArgument.Value);
 			}
 			if (method?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+				if (InputType.Value?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+					return;
+				}
+				else {
+					if (!method.IsStatic) {
+						return;
+					}
+				}
+			}
+			if (method.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
 				return;
 			}
 			if (Prams.Count > 0) {
@@ -60,13 +67,22 @@ namespace RhuEngine.Components
 			if(UI.Target is null) {
 				return;
 			}
+			if((InputType.Value?.IsAbstract ?? false) && (InputType.Value?.IsSealed ?? false)) {
+				if(Input.Target is not null) {
+					Input.Target.Enabled.Value = false;
+				}
+			}
+			else {
+				if (Input.Target is not null) {
+					Input.Target.Enabled.Value = true;
+				}
+			}
 			foreach (var item in method.GetParameters()) {
-				if (item.HasDefaultValue) {
-					LoadNodeButton(UI.Target, item.ParameterType, -0.001f, item.Name + " = " + item.DefaultValue?.ToString() ?? "Null").RenderLabel.Value = true;
-				}
-				else {
-					LoadNodeButton(UI.Target, item.ParameterType, -0.001f, item.Name).RenderLabel.Value = true;
-				}
+				var node = item.HasDefaultValue
+					? LoadNodeButton(UI.Target, item.ParameterType, -0.001f, item.Name + " = " + item.DefaultValue?.ToString() ?? "Null")
+					: LoadNodeButton(UI.Target, item.ParameterType, -0.001f, item.Name);
+				node.RenderLabel.Value = true;
+				Prams.Add().Target = node;
 			}
 		}
 
@@ -74,15 +90,43 @@ namespace RhuEngine.Components
 			FlowOut.Target = LoadNodeButton(entity, typeof(Action), 0.035f, "Flow Out", true);
 			FlowIn.Target = LoadNodeButton(entity, typeof(Action), 0.035f, "Flow In", false);
 			Output.Target = LoadNodeButton(entity, typeof(void), -0.001f, "Output", true);
-			Input.Target = LoadNodeButton(entity, typeof(World), -0.001f, "Input");
+			Input.Target = LoadNodeButton(entity, typeof(World), -0.001f, "Target");
 			Input.Target.RenderLabel.Value = true;
 			UI.Target = entity;
+			FlowButtons.Add().Target = FlowOut.Target;
+			FlowButtons.Add().Target = FlowIn.Target;
+
 		}
 
 		public override void OnClearError() {
 		}
 
 		public override void OnError() {
+		}
+
+		public override void Gen(VisualScriptBuilder visualScriptBuilder, IScriptNode node, VisualScriptBuilder.NodeBuilder Builder) {
+			var scriptNodeMethod = (ScriptNodeMethod)node;
+			Same(Builder);
+			InputType.Value = scriptNodeMethod.InputType;
+			GenericArgument.Value = scriptNodeMethod.GenericArgument;
+			PramTypes.Clear();
+			PramTypes.Append(scriptNodeMethod.PramTypes);
+			Method.Value = scriptNodeMethod.Method;
+			Builder.LastInputPoint = Input.Target;
+			var lastpos = Builder.pos;
+			var lastFlow = Builder.Flow;
+			visualScriptBuilder.LoadNodes(scriptNodeMethod.ScriptNode, Builder);
+			Builder.pos = lastpos;
+			Builder.Flow = lastFlow;
+			var count = 0;
+			foreach (var item in scriptNodeMethod.Prams) {
+				Builder.LastInputPoint = Prams[count].Target;
+				lastpos += new Vec3(0, -0.15f, 0);
+				Builder.pos = lastpos;
+				Builder.Flow = lastFlow;
+				visualScriptBuilder.LoadNodes(item, Builder);
+				count++;
+			}
 		}
 	}
 }

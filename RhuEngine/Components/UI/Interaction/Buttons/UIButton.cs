@@ -5,7 +5,7 @@ using StereoKit;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "UI\\Buttons" })]
+	[Category(new string[] { "UI\\Interaction\\Buttons" })]
 	public class UIButton : UIComponent
 	{
 		[Default("Click Me")]

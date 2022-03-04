@@ -14,8 +14,25 @@ namespace RhuEngine.Components.ScriptNodes
 			var methods = new List<ScriptNodeMethod>();
 			if (node.ReturnType is not null) {
 				foreach (var item in node.ReturnType.GetMethods()) {
-					if (item.GetCustomAttribute<ExsposedAttribute>(true) is not null) {
+					try {
 						methods.Add(new ScriptNodeMethod(node, item));
+					}
+					catch {
+
+					}
+				}
+			}
+			return methods.ToArray();
+		}
+		public static ScriptNodeMethod[] GetNodeMethods(Type node,string name) {
+			var methods = new List<ScriptNodeMethod>();
+			if (node is not null) {
+				foreach (var item in node.GetMethods()) {
+					if (item.Name == name) {
+						try {
+							methods.Add(new ScriptNodeMethod(node, item));
+						}
+						catch { }
 					}
 				}
 			}
@@ -25,9 +42,10 @@ namespace RhuEngine.Components.ScriptNodes
 			var methods = new List<ScriptNodeMethod>();
 			if (node is not null) {
 				foreach (var item in node.GetMethods()) {
-					if (item.GetCustomAttribute<ExsposedAttribute>(true) is not null) {
+					try {
 						methods.Add(new ScriptNodeMethod(node, item));
 					}
+					catch { }
 				}
 			}
 			return methods.ToArray();
@@ -113,11 +131,10 @@ namespace RhuEngine.Components.ScriptNodes
 			if (node.ReturnType is not null) {
 				foreach (var item in node.ReturnType.GetMethods()) {
 					if (item.Name == method) {
-						if (item.GetCustomAttribute<UnExsposedAttribute>(true) is null) {
-							if (item.GetCustomAttribute<ExsposedAttribute>(true) is not null) {
-								methods.Add(new ScriptNodeMethod(node, item));
-							}
+						try {
+							methods.Add(new ScriptNodeMethod(node, item));
 						}
+						catch { }
 					}
 				}
 			}
@@ -142,6 +159,7 @@ namespace RhuEngine.Components.ScriptNodes
 				new ScriptNodeWorld(),
 				new ScriptNodeThrow(),
 			};
+			list.AddRange(GetNodeMethods(typeof(RhuScriptStatics)));
 			if (typeRequirement is not null) {
 				list = (from e in list
 						where e.ReturnType == typeRequirement

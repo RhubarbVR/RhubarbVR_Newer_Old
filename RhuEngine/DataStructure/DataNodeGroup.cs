@@ -23,7 +23,7 @@ namespace RhuEngine.DataStructure
 		}
 
 		public IDataNode GetValue(string key) {
-			return _nodeGroup.TryGetValue(key, out var value) ? value : default;
+			return _nodeGroup.TryGetValue(key, out var value) ? value : null;
 		}
 
 		public T GetValue<T>(string key) {
