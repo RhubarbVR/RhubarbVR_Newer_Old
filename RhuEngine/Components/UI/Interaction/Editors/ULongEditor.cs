@@ -8,9 +8,9 @@ using StereoKit;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI\\Interaction\\Editors" })]
-	public class IntEditor : Editor
+	public class ULongEditor : Editor
 	{
-		public Linker<int> Linker;
+		public Linker<ulong> Linker;
 
 		[BindProperty(nameof(EditStringText))]
 		public SyncProperty<string> EditString;
@@ -19,18 +19,18 @@ namespace RhuEngine.Components
 		{
 			get {
 				try {
-					return GetValue.Target is not null ? ((int)GetValue.Target.Invoke()).ToString() : Linker.Linked ? Linker.LinkedValue.ToString() : string.Empty;
+					return GetValue.Target is not null ? ((ulong)GetValue.Target.Invoke()).ToString() : Linker.Linked ? Linker.LinkedValue.ToString() : string.Empty;
 				}
 				catch { return string.Empty; }
 			}
 			set {
 				try {
 					if (SetValue.Target is not null) {
-						SetValue.Target.Invoke(int.Parse(value));
+						SetValue.Target.Invoke(ulong.Parse(value));
 					}
 					else {
 						if (Linker.Linked) {
-							Linker.LinkedValue = int.Parse(value);
+							Linker.LinkedValue = ulong.Parse(value);
 						}
 					}
 				}
@@ -38,11 +38,11 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public int Number
+		public ulong Number
 		{
 			get {
 				try {
-					return GetValue.Target is not null ? ((int)GetValue.Target.Invoke()) : Linker.Linked ? Linker.LinkedValue : 0;
+					return GetValue.Target is not null ? ((ulong)GetValue.Target.Invoke()) : Linker.Linked ? Linker.LinkedValue : 0;
 				}
 				catch { return 0; }
 			}

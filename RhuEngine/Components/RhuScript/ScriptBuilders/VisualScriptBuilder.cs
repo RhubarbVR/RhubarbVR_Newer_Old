@@ -194,7 +194,7 @@ namespace RhuEngine.Components
 			}
 			else {
 				if(!Builder.Flow) {
-					Builder.pos += new Vec3(0.2f, 0, 0);
+					Builder.pos += new Vec3(0.2f, 0.15f, 0);
 					var textsize = Text.Size(text).x;
 					target.GlobalTrans = Matrix.T(Builder.pos + new Vec3(textsize / 1.9f, 0, 0)) * Builder.RootPos;
 				}
