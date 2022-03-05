@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 	{
 		[Default(1f)]
 		public Sync<float> MovementSpeed;
-		[Default(30f)]
+		[Default(50f)]
 		public Sync<float> RotationSpeed;
 		[Default(2f)]
 		public Sync<float> MaxSprintSpeed;
@@ -34,8 +34,8 @@ namespace RhuEngine.Components
 			var tempBack = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Back, isMain) * Time.Elapsedf;
 			var pos = new Vec3(tempRight - tempLeft, tempFlyUp - tempFlyDown, -tempForward + tempBack) * speed;
 			var Rotspeed = AllowMultiplier ? SKMath.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
-			var tempRotateRight = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateRight, isMain) * Time.Elapsedf;
-			var tempRotateLeft = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateLeft, isMain) * Time.Elapsedf;
+			var tempRotateRight = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateLeft, isMain) * Time.Elapsedf;
+			var tempRotateLeft = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateRight, isMain) * Time.Elapsedf;
 			var rot = Quat.FromAngles(0, (tempRotateRight - tempRotateLeft) * RotationSpeed, 0);
 			var AddToMatrix = Matrix.T(pos);
 			switch (Engine.inputManager.GetHand(isMain)) {

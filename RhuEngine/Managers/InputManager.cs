@@ -7,8 +7,6 @@ using RhuEngine.AssetSystem.AssetProtocals;
 using System.IO;
 using System.Threading.Tasks;
 using StereoKit;
-using HidSharp;
-using HidSharp.Utility;
 using RhuEngine.Settings;
 
 namespace RhuEngine.Managers
@@ -47,9 +45,6 @@ namespace RhuEngine.Managers
 
 		public void Init(Engine engine) {
 			_engine = engine;
-			foreach (var item in DeviceList.Local.GetHidDevices()) {
-				Log.Info($"{item.GetFriendlyName()}");
-			}
 		}
 
 		public float GetInputFloatFromKeyboard(InputTypes inputType) {

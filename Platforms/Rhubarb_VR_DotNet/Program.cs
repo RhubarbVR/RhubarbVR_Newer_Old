@@ -10,7 +10,7 @@ class SKLoader
 		SK.PreLoadLibrary();
 
 		var cap = new OutputCapture();
-		var app = new Engine(args, cap);
+		var app = new Engine(args, cap, AppDomain.CurrentDomain.BaseDirectory);
 		if (app == null) {
 			throw new Exception("StereoKit loader couldn't construct an instance of the App!");
 		}

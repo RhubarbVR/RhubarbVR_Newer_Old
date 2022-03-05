@@ -39,7 +39,7 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 			var e = ShowVolumes;
 			UI.Toggle("ShowVolumes", ref e);
 			if(e != ShowVolumes) {
-				UI.ShowVolumes = e;
+				UI.ShowVolumes = ShowVolumes= e;
 			}
 			UI.Text(@$"
 

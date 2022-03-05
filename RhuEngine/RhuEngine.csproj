@@ -29,9 +29,6 @@
 
   <ItemGroup>
     <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
-    <PackageReference Include="CefGlue.Common" Version="91.4472.28" />
-    <PackageReference Include="HidSharp" Version="2.1.0" />
-    <PackageReference Include="LibVLCSharp" Version="3.6.5" />
     <PackageReference Include="LiteNetLib" Version="0.9.5.2" />
     <PackageReference Include="MessagePack" Version="2.3.85" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

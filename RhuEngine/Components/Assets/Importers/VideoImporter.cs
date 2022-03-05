@@ -40,18 +40,18 @@ namespace RhuEngine.Components
 
 		public override void Import(string data, bool wasUri, byte[] rawdata) {
 			if (wasUri) {
-				Log.Info("Build video");
-				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<PlaneMesh, UnlitShader>();
-				var scaler = Entity.AttachComponent<TextureScaler>();
-				scaler.scale.SetLinkerTarget(pmesh.dimensions);
-				scaler.scaleMultiplier.Value = 0.1f;
-				var textur = Entity.AttachComponent<VideoPlayer>();
-				var soundSource = Entity.AttachComponent<SoundSource>();
-				soundSource.sound.Target = textur.audio;
-				scaler.texture.Target = textur;
-				textur.Url.Value = data;
-				mit.faceCull.Value = Cull.None;
-				mit.SetPram("diffuse", textur);
+				Log.Info("Build video not supported");
+				//var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<PlaneMesh, UnlitShader>();
+				//var scaler = Entity.AttachComponent<TextureScaler>();
+				//scaler.scale.SetLinkerTarget(pmesh.dimensions);
+				//scaler.scaleMultiplier.Value = 0.1f;
+				//var textur = Entity.AttachComponent<VideoPlayer>();
+				//var soundSource = Entity.AttachComponent<SoundSource>();
+				//soundSource.sound.Target = textur.audio;
+				//scaler.texture.Target = textur;
+				//textur.Url.Value = data;
+				//mit.faceCull.Value = Cull.None;
+				//mit.SetPram("diffuse", textur);
 			}
 			else {
 				if (rawdata == null) {

@@ -20,10 +20,10 @@ namespace RhuEngine
 			var script = pannel.AttachComponent<RhuScript>();
 			button.onClick.Target = script.CallMainMethod;
 			//Hello World with number
-			var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
-			method.Prams[0] = tostring;
-			tostring.Prams[0] = new ScriptNodeConst(10);
+			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
+			//var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
+			//method.Prams[0] = tostring;
+			//tostring.Prams[0] = new ScriptNodeConst(10);
 			//normal hello world
 			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
 			//method.Prams[0] = new ScriptNodeConst("Hi there is has been changed");
@@ -31,6 +31,11 @@ namespace RhuEngine
 			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
 			//Test for stack overflow
 			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("CallMainMethod")[0];
+			//Test for fields
+			var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
+			var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
+			method.Prams[0] = tostring;
+			tostring.Prams[0] = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeFieldsRead()[0];
 			script.MainMethod = method;
 			var ScripEditor = entity.AddChild("ScripEditor");
 			ScripEditor.position.Value = new Vec3(0, -0.1f, 0);
@@ -41,15 +46,15 @@ namespace RhuEngine
 		public static void BuildLocalWorld(this World world) {
 			Log.Info("Building Local World");
 			BuildUITest(world.RootEntity.AddChild("UITest"));
-			var picMesh = world.RootEntity.AddChild("Floor");
-			picMesh.position.Value = new Vec3(0, 0.25f, -0.5f);
-			picMesh.rotation.Value = Quat.FromAngles(90, 0, 0);
-			picMesh.scale.Value = new Vec3(3);
-			var (pmesh, mit, prender) = picMesh.AttachMeshWithMeshRender<PlaneMesh, UnlitShader>();
-			var textur = picMesh.AttachComponent<StaticTexture>();
-			textur.url.Value = "https://cataas.com/cat/says/Base%20Url%20For%20RhubarbVR";
-			mit.faceCull.Value = Cull.None;
-			mit.SetPram("diffuse", textur);
+			//var picMesh = world.RootEntity.AddChild("Pic");
+			//picMesh.position.Value = new Vec3(0, 0.25f, -0.5f);
+			//picMesh.rotation.Value = Quat.FromAngles(90, 0, 0);
+			//picMesh.scale.Value = new Vec3(3);
+			//var (pmesh, mit, prender) = picMesh.AttachMeshWithMeshRender<PlaneMesh, UnlitShader>();
+			//var textur = picMesh.AttachComponent<StaticTexture>();
+			//textur.url.Value = "https://cataas.com/cat/says/Base%20Url%20For%20RhubarbVR";
+			//mit.faceCull.Value = Cull.None;
+			//mit.SetPram("diffuse", textur);
 			var floor = world.RootEntity.AddChild("Floor");
 			floor.position.Value = new Vec3(0, 0, 0);
 			var (mesh, _, render) = floor.AttachMeshWithMeshRender<CubeMesh, PBRShader>();

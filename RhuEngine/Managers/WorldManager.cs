@@ -45,7 +45,7 @@ namespace RhuEngine.Managers
 			if (SaveLocalWorld) {
 				var data = LocalWorld.Serialize(new SyncObjectSerializerObject(false));
 				var json = MessagePack.MessagePackSerializer.ConvertToJson(data.GetByteArray(), Serializer.Options);
-				File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "LocalWorldTest.json", json);
+				File.WriteAllText(Engine.BaseDir + "LocalWorldTest.json", json);
 			}
 			for (var i = worlds.Count - 1; i >= 0; i--) {
 				try {

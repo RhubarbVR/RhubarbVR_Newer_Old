@@ -26,6 +26,7 @@ namespace RhuEngine.Components
 		public Linker<bool> IsFocusedLinker;
 
 		[OnChanged(nameof(LoadScriptNodes))]
+		[Default(typeof(Entity))]
 		public Sync<Type> InputType;
 
 		[OnChanged(nameof(LoadScriptNodes))]
@@ -256,11 +257,20 @@ namespace RhuEngine.Components
 			else if (node is ScriptNodeRead scriptNodeRead) {
 
 			}
-			else if (node is ScriptNodeReadField scriptNodeReadField) {
+			else if (node is ScriptNodeIf scriptNodeIf) {
 
 			}
+			else if (node is ScriptNodeReadField scriptNodeReadField) {
+				var spawnNode = SpawnNode<NodeReadField>();
+				Poser(spawnNode.Entity, Builder, scriptNodeReadField.Field);
+				spawnNode.Gen(this, node, Builder);
+				Builder.LastCompNode = spawnNode;
+			}
 			else if (node is ScriptNodeWriteField scriptNodeWriteField) {
-
+				var spawnNode = SpawnNode<NodeWriteField>();
+				Poser(spawnNode.Entity, Builder, scriptNodeWriteField.Field);
+				spawnNode.Gen(this, node, Builder);
+				Builder.LastCompNode = spawnNode;
 			}
 			else {
 				Log.Err($"Uknown node type: {node.GetType().GetFormattedName()}");

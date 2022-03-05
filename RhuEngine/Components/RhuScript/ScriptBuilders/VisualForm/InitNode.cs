@@ -15,6 +15,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "RhuScript\\ScriptBuilders\\VisualForm" })]
 	public class InitNode : Node
 	{
+		public override bool HideFlow => false;
 		public SyncRef<UIButtonSafe> SafeButton;
 
 		public SyncRef<UILabel> ErrorLable;

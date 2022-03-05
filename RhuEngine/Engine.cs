@@ -49,7 +49,15 @@ namespace RhuEngine
 
 		public static Engine MainEngine;
 
+		public static string BaseDir = AppDomain.CurrentDomain.BaseDirectory;
+
 		public Engine(string[] arg, OutputCapture outputCapture, string baseDir = null) : base() {
+			if(baseDir is null) {
+				baseDir = AppDomain.CurrentDomain.BaseDirectory;
+			}
+			else {
+				BaseDir = baseDir;
+			}
 			MainEngine = this;
 			string error = null;
 			_forceFlatscreen = arg.Any((v) => v.ToLower() == "--no-vr") | arg.Any((v) => v.ToLower() == "-no-vr");
@@ -81,7 +89,7 @@ namespace RhuEngine
 					}
 				}
 			}
-			outputCapture.LogsPath = _userDataPathOverRide is null ? AppDomain.CurrentDomain.BaseDirectory + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
+			outputCapture.LogsPath = _userDataPathOverRide is null ? baseDir + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
 			outputCapture.Start();
 			if (error is not null) {
 				Log.Err(error);
@@ -95,7 +103,7 @@ namespace RhuEngine
 			this.outputCapture = outputCapture;
 
 			var lists = new List<DataList>();
-			SettingsFile = ((_userDataPathOverRide is not null) ?_userDataPathOverRide : AppDomain.CurrentDomain.BaseDirectory) + "\\settings.json";
+			SettingsFile = ((_userDataPathOverRide is not null) ?_userDataPathOverRide : baseDir) + "\\settings.json";
 			if (File.Exists(SettingsFile)) {
 				var text = File.ReadAllText(SettingsFile);
 				var liet = SettingsManager.GetDataFromJson(text);
@@ -184,7 +192,7 @@ namespace RhuEngine
 			World.RaycastEnabled = true;
 			netApiManager = new NetApiManager(_userDataPathOverRide);
 			assetManager = new AssetManager(_cachePathOverRide);
-			_managers = new IManager[] { inputManager, netApiManager, assetManager , worldManager };
+			_managers = new IManager[] { inputManager, netApiManager, assetManager, worldManager };
 			foreach (var item in _managers) {
 				try {
 					item.Init(this);
@@ -193,17 +201,29 @@ namespace RhuEngine
 					Log.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
 				}
 			}
+			Log.Info("Engine Started");
 		}
 
 		public void Step() {
 			foreach (var item in _managers) {
-				item.Step();
+				try {
+					item.Step();
+				}
+				catch (Exception ex) {
+					Log.Err($"Failed to step {item.GetType().GetFormattedName()} Error: {ex}");
+				}
 			}
 		}
 
 		public void Dispose() {
+			Log.Info("Engine Disposed");
 			foreach (var item in _managers) {
-				item.Dispose();
+				try {
+					item.Dispose();
+				}
+				catch (Exception ex) {
+					Log.Err($"Failed to Disposed {item.GetType().GetFormattedName()} Error: {ex}");
+				}
 			}
 		}
 	}

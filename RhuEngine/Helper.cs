@@ -115,7 +115,9 @@ namespace RhuEngine
 				return new Color(0f, 1f, 1f) * new Color(0f, 1f, 0.5f);
 			}
 			if (typeof(ILinkable).IsAssignableFrom(type)) {
-				return type.GenericTypeArguments[0].GetTypeColor()* new Color(0.5f,0.5f,0.5f);
+				if (type.GenericTypeArguments.Length > 0) {
+					return type.GenericTypeArguments[0].GetTypeColor() * new Color(0.5f, 0.5f, 0.5f);
+				}
 			}
 			var hashCode = type.GetFormattedName().GetHashCodeSafe();
 			var h = (float)(int)(ushort)hashCode / 65545f;

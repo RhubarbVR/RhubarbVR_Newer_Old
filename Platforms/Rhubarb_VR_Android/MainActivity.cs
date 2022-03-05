@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Runtime;
 using Android.Views;
 using Android.Content;
@@ -8,12 +9,10 @@ using System;
 using Android.Graphics;
 using Java.Lang;
 using System.Threading.Tasks;
+using RhuEngine;
 using Android;
+using Android.Support.V4.Content;
 using Android.Support.V4.App;
-using AndroidX.AppCompat.App;
-using AndroidX.Core.Content;
-using AndroidX.Core.App;
-using System.IO;
 
 namespace RhuEngine
 {
@@ -55,47 +54,40 @@ namespace RhuEngine
 
 		static bool _running = false;
 		void Run(IntPtr activityHandle) {
-			if (_running) {
-				return;
-			}
+				if (_running) {
+					return;
+				}
 
-			_running = true;
+				_running = true;
+			var runningtask = Task.Run(() => {
+				if ((ContextCompat.CheckSelfPermission(this, Manifest.Permission.RecordAudio) != Android.Content.PM.Permission.Granted) || (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != Android.Content.PM.Permission.Granted) || (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Android.Content.PM.Permission.Granted)) {
+					ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.RecordAudio, Manifest.Permission.WriteExternalStorage, Manifest.Permission.ReadExternalStorage }, 1);
+				}
+				var cap = new OutputCapture();
+				_app = new Engine(new string[] { "" }, cap, System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments));
+				if (_app == null) {
+					throw new System.Exception("StereoKit loader couldn't construct an instance of the App!");
+				}
 
-			// For requesting permission to use the Microphone
-			if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.RecordAudio) != Android.Content.PM.Permission.Granted) {
-				ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.RecordAudio }, 1);
-			}
-			if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != Android.Content.PM.Permission.Granted) {
-				ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.WriteExternalStorage }, 1);
-			}
-			if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Android.Content.PM.Permission.Granted) {
-				ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ReadExternalStorage }, 1);
-			}
+				// Initialize StereoKit, and the app
+				var settings = _app.Settings;
+				settings.androidActivity = activityHandle;
+				settings.assetsFolder = "";
 
-			var cap = new OutputCapture();
-			_app = new Engine(new string[] { "" }, cap, System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments));
-			if (_app == null) {
-				throw new System.Exception("StereoKit loader couldn't construct an instance of the App!");
-			}
+				if (!SK.Initialize(settings)) {
+					return;
+				}
 
-			// Initialize StereoKit, and the app
-			var settings = _app.Settings;
-			settings.androidActivity = activityHandle;
-			settings.assetsFolder = "";
+				_app.Init();
 
-			if (!SK.Initialize(settings)) {
-				return;
-			}
+				// Now loop until finished, and then shut down
+				while (SK.Step(_app.Step)) { }
+				cap.DisableSingleString = true;
+				_app.Dispose();
+				SK.Shutdown();
 
-			_app.Init();
-
-			// Now loop until finished, and then shut down
-			while (SK.Step(_app.Step)) { }
-			cap.DisableSingleString = true;
-			_app.Dispose();
-			SK.Shutdown();
-
-			Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
+				Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
+			});
 		}
 
 		// Events related to surface state changes

@@ -15,6 +15,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "RhuScript\\ScriptBuilders\\VisualForm" })]
 	public abstract class Node : Component
 	{
+		public virtual bool HideFlow => true;
 		public SyncRef<NodeButton> FlowOut;
 		public SyncRef<NodeButton> FlowIn;
 		public SyncRef<NodeButton> Output;
@@ -43,6 +44,9 @@ namespace RhuEngine.Components
 
 		[Exsposed]
 		public void UnHover(Handed handed) {
+			if(!HideFlow) {
+				return;
+			}
 			var DoHide = true;
 			foreach (SyncRef<NodeButton> item in FlowButtons) {
 				if (item.Target is not null) {
@@ -65,6 +69,9 @@ namespace RhuEngine.Components
 
 		[Exsposed]
 		public void Hover(Handed handed) {
+			if (!HideFlow) {
+				return;
+			}
 			foreach (SyncRef<NodeButton> item in FlowButtons) {
 				if (item.Target is not null) {
 					item.Target.Enabled.Value = true;

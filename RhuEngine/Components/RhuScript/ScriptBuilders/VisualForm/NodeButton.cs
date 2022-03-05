@@ -34,6 +34,15 @@ namespace RhuEngine.Components
 			_loadedTo = ConnectedTo.Target;
 		}
 
+		public override void Dispose() {
+			if (_loadedTo != null) {
+				_loadedTo?.ConnectFrom.Remove(this);
+			}
+			ConnectedTo.Target?.ConnectFrom.Add(this);
+			_loadedTo = null;
+			base.Dispose();
+		}
+
 		public HashSet<NodeButton> ConnectFrom = new();
 
 		public Pose LastGlobalPos; // Way to get other nodes pos
