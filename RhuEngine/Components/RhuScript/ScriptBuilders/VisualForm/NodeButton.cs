@@ -22,7 +22,19 @@ namespace RhuEngine.Components
 		public Sync<bool> IsClicked;
 		public Sync<bool> RenderLabel;
 		public SyncDelegate<Action<bool, NodeButton, Type>> Clicked;
+		[OnChanged(nameof(ConnectedToChange))]
 		public SyncRef<NodeButton> ConnectedTo;
+		[NoLoad][NoSave][NoSync][NoSyncUpdate]
+		NodeButton _loadedTo;
+		private void ConnectedToChange() {
+			if(_loadedTo != ConnectedTo.Target) {
+				_loadedTo?.ConnectFrom.Remove(this);
+			}
+			ConnectedTo.Target?.ConnectFrom.Add(this);
+			_loadedTo = ConnectedTo.Target;
+		}
+
+		public HashSet<NodeButton> ConnectFrom = new();
 
 		public Pose LastGlobalPos; // Way to get other nodes pos
 		public override void RenderUI() {

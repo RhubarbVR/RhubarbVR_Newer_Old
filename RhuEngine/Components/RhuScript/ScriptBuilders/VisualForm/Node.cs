@@ -34,8 +34,42 @@ namespace RhuEngine.Components
 			window.Text.Value = NodeName;
 			window.WindowType.Value = UIWin.Normal;
 			var UI = Entity.AddChild("UI");
+			var header = UI.AttachComponent<UIHeaderHover>();
+			header.OnHoverLost.Target = UnHover;
+			header.OnHover.Target = Hover;
 			UI.AttachComponent<UIGroup>();
 			LoadViusual(UI);
+		}
+
+		[Exsposed]
+		public void UnHover(Handed handed) {
+			var DoHide = true;
+			foreach (SyncRef<NodeButton> item in FlowButtons) {
+				if (item.Target is not null) {
+					if(item.Target.ConnectedTo.Target is not null) {
+						DoHide = false;
+					}
+					if (item.Target.ConnectFrom.Count > 0) {
+						DoHide = false;
+					}
+				}
+			}
+			if (DoHide) {
+				foreach (SyncRef<NodeButton> item in FlowButtons) {
+					if (item.Target is not null) {
+						item.Target.Enabled.Value = false;
+					}
+				}
+			}
+		}
+
+		[Exsposed]
+		public void Hover(Handed handed) {
+			foreach (SyncRef<NodeButton> item in FlowButtons) {
+				if (item.Target is not null) {
+					item.Target.Enabled.Value = true;
+				}
+			}
 		}
 
 		public NodeButton LoadNodeButton(Entity entity,Type type,float level,string text,bool isOut = false) {
@@ -84,6 +118,8 @@ namespace RhuEngine.Components
 				Output.Target.ConnectedTo.Target = Builder.LastInputPoint;
 				Builder.Flow = false;
 			}
+			Hover(Handed.Max);
+			UnHover(Handed.Max);
 		}
 	}
 }
