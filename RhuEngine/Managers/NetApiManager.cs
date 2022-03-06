@@ -256,9 +256,9 @@ namespace RhuEngine.Managers
 		}
 
 		public Uri BaseAddress =>
-				_httpClient?.BaseAddress ?? new Uri("http://localhost:5000/"); 
+				//_httpClient?.BaseAddress ?? new Uri("http://localhost:5000/"); 
 #if DEBUG
-				//_httpClient?.BaseAddress ?? new Uri("https://unstable.family/");
+				_httpClient?.BaseAddress ?? new Uri("https://unstable.family/");
 #else
 				_httpClient?.BaseAddress ?? new Uri("https://RhubarbVR.net/");
 #endif
