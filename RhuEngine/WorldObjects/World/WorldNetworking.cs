@@ -207,8 +207,8 @@ namespace RhuEngine.WorldObjects
 			_netManager.NatPunchModule.Init(_natPunchListener);
 			_netManager.Start();
 			_netManager.EnableStatistics = true;
-			_netManager.MaxConnectAttempts = 5;
-			_netManager.DisconnectTimeout = 5000;
+			_netManager.MaxConnectAttempts = 15;
+			_netManager.DisconnectTimeout = 10000;
 			_netManager.UpdateTime = 10;
 			_netManager.ChannelsCount = 3;
 			//0 is main
