@@ -193,6 +193,7 @@ namespace RhuEngine.WorldObjects
 							var peer = request.Accept();
 							peer.Tag = NatUserIDS[e[0]];
 							NatIntroductionSuccessIsGood.TryAdd(e[0], true);
+							NatConnection.TryAdd(e[0], peer);
 						}
 						else {
 							Log.Info($"ConnectionRequestEvent Reject Key invalied");
