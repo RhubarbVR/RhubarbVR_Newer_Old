@@ -22,6 +22,9 @@ namespace RhuEngine.WorldObjects
 		private OpusDecoder _decoder;
 		private OpusEncoder _encoder;
 
+
+		public override bool IsRunning => (_encoder is not null) && (_decoder is not null);
+
 		private void LoadOpus() {
 			if (_encoder is not null) {
 				_encoder.Dispose();
@@ -32,9 +35,7 @@ namespace RhuEngine.WorldObjects
 				_decoder = null;
 			}
 			try {
-				_encoder = new OpusEncoder(typeOfStream.Value, 48000, 1) {
-					VBR = true
-				};
+				_encoder = new OpusEncoder(typeOfStream.Value, 48000, 1);
 				_decoder = new OpusDecoder(48000, 1);
 			}
 			catch (Exception ex) {

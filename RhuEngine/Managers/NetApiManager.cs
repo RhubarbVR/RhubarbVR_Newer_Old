@@ -119,6 +119,16 @@ namespace RhuEngine.Managers
 			}
 		}
 
+		public async Task<PublicUser> GetUserInfo(string id) {
+			try {
+				var data = await SendGet<PublicUser>($"/api/userinfo/FromUserID?id={id}");
+				return data.Data;
+			}
+			catch (HttpRequestException requestException) {
+				throw ProssesHttpRequestException(requestException);
+			}
+		}
+
 		public async Task<LoginResponse> GetMe() {
 			try {
 				var data = await SendGet<LoginResponse>("/api/authentication/GetMe");
@@ -246,9 +256,9 @@ namespace RhuEngine.Managers
 		}
 
 		public Uri BaseAddress =>
-				//_httpClient?.BaseAddress ?? new Uri("http://localhost:5000/"); 
+				_httpClient?.BaseAddress ?? new Uri("http://localhost:5000/"); 
 #if DEBUG
-				_httpClient?.BaseAddress ?? new Uri("https://unstable.family/");
+				//_httpClient?.BaseAddress ?? new Uri("https://unstable.family/");
 #else
 				_httpClient?.BaseAddress ?? new Uri("https://RhubarbVR.net/");
 #endif

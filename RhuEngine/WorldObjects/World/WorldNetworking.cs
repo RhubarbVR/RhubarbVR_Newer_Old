@@ -154,7 +154,7 @@ namespace RhuEngine.WorldObjects
 		private void FindNewMaster() {
 			for (var i = 0; i < Users.Count; i++) {
 				var user = Users[i];
-				if (user.IsConnected) {
+				if (user.IsConnected || user.IsLocalUser) {
 					MasterUser = (ushort)(i + 1);
 					break;
 				}
@@ -436,6 +436,7 @@ namespace RhuEngine.WorldObjects
 					});
 					break;
 				case ConnectionType.Relay:
+					NatUserIDS.TryAdd(user.Data, user.UserID);
 					RelayConnect(user);
 					break;
 				default:

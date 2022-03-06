@@ -31,7 +31,26 @@ namespace SharedModels
 
 	}
 
+	public class PublicUser
+	{
 
+		public PublicUser(IRhubarbIdentity user) {
+			EmailConfirmed = user?.EmailConfirmed??false;
+			UserName = user?.UserName;
+			Id = user?.Id;
+			NormalizedUserName = user?.NormalizedUserName;
+		}
+
+		public PublicUser() {
+		}
+		public bool EmailConfirmed { get; set; }
+
+		public string NormalizedUserName { get; set; }
+
+		public string UserName { get; set; }
+
+		public string Id { get; set; }
+	}
 
 	public class PrivateUser : IRhubarbIdentity
 	{

@@ -37,6 +37,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
+		public virtual bool IsRunning => true;
 		public int SampleCount => (int)(48000 / 1000 * TimeInMs);
 
 		public event Action<Sound> OnAssetLoaded;
@@ -67,6 +68,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void LoadInput(string deviceName = null) {
+			return;
 			if (deviceName is null) {
 				deviceName = Engine.MainMic;
 				Engine.MicChanged += LoadInput;
@@ -123,6 +125,9 @@ namespace RhuEngine.WorldObjects
 
 		public void Step() {
 			if (NoSync) {
+				return;
+			}
+			if (!IsRunning) {
 				return;
 			}
 			if (!_loadedDevice) {

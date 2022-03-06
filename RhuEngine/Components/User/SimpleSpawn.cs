@@ -46,7 +46,7 @@ namespace RhuEngine.Components
 					mesh.diameter.Value = 0.1f;
 					var opus = user.FindOrCreateSyncStream<OpusStream>("MainOpusStream");
 					var audioPlayer = head.AttachComponent<SoundSource>();
-					audioPlayer.volume.Value = 0f; // so you do not here yourself for a sec
+					audioPlayer.volume.Value = 0f;
 					audioPlayer.sound.Target = opus;
 					head.AttachComponent<UserAudioManager>().audioVolume.SetLinkerTarget(audioPlayer.volume);
 					opus.LoadInput();

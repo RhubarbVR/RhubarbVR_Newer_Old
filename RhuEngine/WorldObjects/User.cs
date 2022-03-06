@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 using LiteNetLib;
 
@@ -12,9 +13,22 @@ namespace RhuEngine.WorldObjects
 		public SyncRef<UserRoot> userRoot;
 
 		public SyncAbstractObjList<SyncStream> syncStreams;
-		
+		[Exsposed]
+		public string NormalizedUserName { get; private set; }
+		[Exsposed]
+		public string UserName { get;private set; }
+
 		[NoSyncUpdate]
+		[OnChanged(nameof(UserIDLoad))]
 		public Sync<string> userID;
+
+		public void UserIDLoad() {
+			Task.Run(async () => {
+				var e = await Engine.netApiManager.GetUserInfo(userID);
+				UserName = e.UserName;
+				NormalizedUserName = e.NormalizedUserName;
+			});
+		}
 
 		[Default(true)]
 		public Sync<bool> isPresent;
@@ -22,6 +36,8 @@ namespace RhuEngine.WorldObjects
 		public Peer CurrentPeer { get; set; }
 
 		public bool IsConnected  => (CurrentPeer?.NetPeer?.ConnectionState ?? LiteNetLib.ConnectionState.Disconnected) == LiteNetLib.ConnectionState.Connected;
+
+		public bool IsLocalUser => World.GetLocalUser() == this;
 
 		public override void OnLoaded() {
 			base.OnLoaded();
