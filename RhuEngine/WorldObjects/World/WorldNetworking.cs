@@ -79,7 +79,7 @@ namespace RhuEngine.WorldObjects
 				var uri = new UriBuilder(dist) {
 					//Check if Android so it can be insecure 
 					Scheme = ((dist.Scheme == Uri.UriSchemeHttps) && !RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) ? "wss" : "ws",
-					Port = 	RuntimeInformation.FrameworkDescription.StartsWith("Mono ")?80:dist.Port
+					Port = RuntimeInformation.FrameworkDescription.StartsWith("Mono ") ? 80 : dist.Port
 				};
 				//this disgusts me i needed the auth cookie if android
 				if (RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) {
@@ -170,16 +170,38 @@ namespace RhuEngine.WorldObjects
 			_natPunchListener.NatIntroductionSuccess += (point, addrType, token) => {
 				Log.Info($"NatIntroductionSuccess {point}  {addrType}  {token}");
 				NatIntroductionSuccessIsGood[token] = true;
-				var peer = _netManager.Connect(point, KEY);
+				var peer = _netManager.Connect(point, token + "~" + KEY);
 				peer.Tag = NatUserIDS[token];
 				NatConnection.TryAdd(token, peer);
 			};
 
-			_natPunchListener.NatIntroductionRequest += (point, addrType, token) => NatIntroductionSuccessIsGood.TryAdd(token, false);
+			_natPunchListener.NatIntroductionRequest += (point, addrType, token) => {
+				Log.Info($"NatIntroductionRequest {point}  {addrType}  {token}");
+				NatIntroductionSuccessIsGood.TryAdd(token, false);
+			};
 
 			_clientListener.PeerConnectedEvent += PeerConnected;
 
-			_clientListener.ConnectionRequestEvent += request => request.AcceptIfKey(KEY);
+			_clientListener.ConnectionRequestEvent += request => {
+				try {
+					var key = request.Data.GetString();
+					if (key.Contains('~')) {
+						var e = request.Data.GetString().Split('~');
+						if (e[1] == KEY) {
+							var peer = request.Accept();
+							peer.Tag = NatUserIDS[e[0]];
+						}
+						else {
+							request.Reject();
+						}
+					}
+					else {
+						request.AcceptIfKey(KEY);
+					}
+				} catch{
+					request.Reject();
+				}
+			};
 
 			_clientListener.NetworkReceiveEvent += ClientListener_NetworkReceiveEvent;
 			_clientListener.NetworkLatencyUpdateEvent += ClientListener_NetworkLatencyUpdateEvent;
@@ -227,7 +249,7 @@ namespace RhuEngine.WorldObjects
 
 		public NetStatistics NetStatistics => _netManager?.Statistics;
 
-		private void ProcessPackedData(DataNodeGroup dataGroup, DeliveryMethod deliveryMethod,Peer peer) {
+		private void ProcessPackedData(DataNodeGroup dataGroup, DeliveryMethod deliveryMethod, Peer peer) {
 			if (WaitingForWorldStartState) {
 				try {
 					var worldData = dataGroup.GetValue("WorldData");
@@ -294,7 +316,7 @@ namespace RhuEngine.WorldObjects
 					else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
 						AssetResponses(assetRequest, tag, deliveryMethod);
 					}
-					else if(Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
+					else if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
 						ProcessPackedData(new DataNodeGroup(streamDataPacked.Data), deliveryMethod, tag);
 					}
 					else {
@@ -304,7 +326,7 @@ namespace RhuEngine.WorldObjects
 				else if (peer.Tag is RelayPeer) {
 					var tag = peer.Tag as RelayPeer;
 					if (Serializer.TryToRead<DataPacked>(data, out var packed)) {
-						if(Serializer.TryToRead<Dictionary<string, IDataNode>>(packed.Data, out var keyValuePairs)) {
+						if (Serializer.TryToRead<Dictionary<string, IDataNode>>(packed.Data, out var keyValuePairs)) {
 							ProcessPackedData(new DataNodeGroup(keyValuePairs), deliveryMethod, tag[packed.Id]);
 						}
 						else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
@@ -323,7 +345,7 @@ namespace RhuEngine.WorldObjects
 						rpeer.KillRelayConnection();
 						PeerDisconect(rpeer);
 					}
-					else if (Serializer.TryToRead<DataNodeGroup>(data,out _)) {
+					else if (Serializer.TryToRead<DataNodeGroup>(data, out _)) {
 						throw new Exception("Got a datanode group not a packed");
 					}
 					else {
@@ -361,7 +383,7 @@ namespace RhuEngine.WorldObjects
 
 		private void PeerConnected(NetPeer peer) {
 			Log.Info("Peer connected");
-			if (peer.EndPoint.Address.ToString().Contains("127.0.0.1") && peer.Tag is not RelayPeer) {	// this is to make debuging essayer
+			if (peer.EndPoint.Address.ToString().Contains("127.0.0.1") && peer.Tag is not RelayPeer) {  // this is to make debuging essayer
 				return;
 			}
 			if (peer.Tag is RelayPeer relayPeer) {
@@ -371,7 +393,7 @@ namespace RhuEngine.WorldObjects
 			}
 			else if (peer.Tag is string @string) {
 				Log.Err("Normal Peer Loaded");
-				var newpeer = new Peer(peer,@string);
+				var newpeer = new Peer(peer, @string);
 				peer.Tag = newpeer;
 				ProcessUserConnection(newpeer);
 			}
@@ -429,7 +451,7 @@ namespace RhuEngine.WorldObjects
 							}
 							NatIntroductionSuccessIsGood.TryRemove(user.Data, out _);
 							NatConnection.TryRemove(user.Data, out _);
-							NatUserIDS.TryRemove(user.Data,out _);
+							NatUserIDS.TryRemove(user.Data, out _);
 						}
 						catch (Exception e) {
 							Log.Err($"Excerption when trying to hole punch {e}");
@@ -460,7 +482,7 @@ namespace RhuEngine.WorldObjects
 					peer.Tag = relay;
 				}
 			}
-			catch(Exception e) {
+			catch (Exception e) {
 				Log.Err("Relay Connect Error:" + e.ToString());
 			}
 		}
@@ -482,7 +504,7 @@ namespace RhuEngine.WorldObjects
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			_netManager.SendToAll(netData.GetByteArray(),0, deliveryMethod);
+			_netManager.SendToAll(netData.GetByteArray(), 0, deliveryMethod);
 		}
 
 		public void BroadcastDataToAllStream(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
@@ -502,12 +524,12 @@ namespace RhuEngine.WorldObjects
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			_netManager.SendToAll(Serializer.Save(new StreamDataPacked(netData.GetByteArray())),1, deliveryMethod);
+			_netManager.SendToAll(Serializer.Save(new StreamDataPacked(netData.GetByteArray())), 1, deliveryMethod);
 		}
 
 
 		public void AddLocalUser() {
-			var Olduser = GetUserFromID(Engine.netApiManager.User?.Id??"Null");
+			var Olduser = GetUserFromID(Engine.netApiManager.User?.Id ?? "Null");
 			if (Olduser is null) {
 				ItemIndex = 176;
 				LocalUserID = (ushort)(Users.Count + 1);
