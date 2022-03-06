@@ -32,9 +32,11 @@ namespace RhuEngine.WorldObjects
 					var userid = (ushort)(Users.Count + 1);
 					var pos = 176u; 
 					user = Users.AddWithCustomRefIds(false, false, () => {
-						var netPointer = NetPointer.BuildID(pos, userid);
-						pos++;
-						return netPointer;
+						lock (_buildRefIDLock) {
+							var netPointer = NetPointer.BuildID(pos, userid);
+							pos++;
+							return netPointer;
+						}
 					});
 					user.userID.Value = peer.UserID;
 					user.CurrentPeer = peer;

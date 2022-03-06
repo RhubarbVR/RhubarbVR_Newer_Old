@@ -120,7 +120,7 @@ namespace RhuEngine.Managers
 				Focus = World.FocusLevel.Background
 			};
 			world.Initialize(!localWorld, false, true, focusLevel == World.FocusLevel.PrivateOverlay);
-			var loader = new SyncObjectDeserializerObject(false);
+			var loader = new SyncObjectDeserializerObject(true);
 			world.Deserialize(data, loader);
 			foreach (var item in loader.onLoaded) {
 				item?.Invoke();

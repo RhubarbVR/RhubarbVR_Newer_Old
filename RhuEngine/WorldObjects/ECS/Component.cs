@@ -7,6 +7,8 @@ namespace RhuEngine.WorldObjects.ECS
 		[NoSave]
 		[NoShow]
 		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
 		public Entity Entity { get; private set; }
 
 		public override void OnInitialize() {

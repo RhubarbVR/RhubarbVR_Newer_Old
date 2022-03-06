@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -243,14 +244,14 @@ namespace RhuEngine.WorldObjects
 							item?.Invoke();
 						}
 						Log.Info("World state loaded");
-						IsDeserializing = false;
-						AddLocalUser();
-						FindNewMaster();
 						foreach (var peer1 in _netManager.ConnectedPeerList) {
 							if (peer1.Tag is Peer contpeer) {
 								LoadUserIn(contpeer);
 							}
 						}
+						IsDeserializing = false;
+						AddLocalUser();
+						FindNewMaster();
 					}
 					catch (Exception ex) {
 						Log.Err("Failed to load world state" + ex);
@@ -506,11 +507,22 @@ namespace RhuEngine.WorldObjects
 
 
 		public void AddLocalUser() {
-			ItemIndex = 176;
-			LocalUserID = (ushort)(Users.Count + 1);
-			Log.Info($"Loaded local User with id{LocalUserID}");
-			var user = Users.Add();
-			user.userID.Value = worldManager.Engine.netApiManager.User?.Id ?? "null";
+			var Olduser = GetUserFromID(Engine.netApiManager.User?.Id??"Null");
+			if (Olduser is null) {
+				ItemIndex = 176;
+				LocalUserID = (ushort)(Users.Count + 1);
+				Log.Info($"Loaded local User with id{LocalUserID}");
+				var user = Users.Add();
+				user.userID.Value = worldManager.Engine.netApiManager.User?.Id ?? "null";
+			}
+			else {
+				LocalUserID = (ushort)(Users.IndexOf(Olduser) + 1);
+				var e = from objec in _worldObjects
+						where objec.Key.GetOwnerID() == LocalUserID
+						orderby objec.Key.id descending
+						select objec.Key;
+				ItemIndex = e.First().ItemIndex() + 10;
+			}
 		}
 	}
 }

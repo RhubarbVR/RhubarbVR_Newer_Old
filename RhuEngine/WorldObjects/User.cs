@@ -24,6 +24,7 @@ namespace RhuEngine.WorldObjects
 
 		public void UserIDLoad() {
 			Task.Run(async () => {
+				if (userID == null) { return; }
 				var e = await Engine.netApiManager.GetUserInfo(userID);
 				UserName = e.UserName;
 				NormalizedUserName = e.NormalizedUserName;
@@ -53,6 +54,7 @@ namespace RhuEngine.WorldObjects
 				}
 				catch { }
 			}
+			UserIDLoad();
 		}
 
 		public T FindSyncStream<T>(string name) where T : SyncStream {

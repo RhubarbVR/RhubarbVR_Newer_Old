@@ -55,7 +55,7 @@ namespace RhuEngine.WorldObjects
 		public void SetValue(object value) {
 			lock (_locker) {
 				try {
-					Value = (T)value;
+					_value = (T)value;
 				}
 				catch { }
 			}

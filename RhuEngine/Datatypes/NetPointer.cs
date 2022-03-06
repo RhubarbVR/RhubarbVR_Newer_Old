@@ -15,10 +15,12 @@ namespace RhuEngine.Datatypes
 		public ulong GetID() {
 			return id;
 		}
-		public int GetOwnerID() {
+		public ushort GetOwnerID() {
 			return (ushort)(id & 0xFFFFuL);
 		}
-
+		public ulong ItemIndex() {
+			return id << 16;
+		}
 		public bool IsLocal => GetID() == 0;
 
 		public static NetPointer BuildID(ulong position, ushort user) {

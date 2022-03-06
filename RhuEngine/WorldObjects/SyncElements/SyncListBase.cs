@@ -16,6 +16,10 @@ namespace RhuEngine.WorldObjects
 
 		public event Action<IChangeable> Changed;
 
+		public int IndexOf(T value) {
+			return _syncObjects.IndexOf(value);
+		}
+
 		public void ChildElementOnChanged(IChangeable changeable) {
 			Changed?.Invoke(changeable);
 		}

@@ -231,9 +231,13 @@ namespace RhuEngine.Components
 			_material.Wireframe = wireframe.Value;
 		}
 
+		public override void OnAttach() {
+			base.OnAttach();
+			LoadMaterial();
+		}
+
 		public override void OnLoaded() {
 			base.OnLoaded();
-			LoadMaterial();
 		}
 	}
 }
