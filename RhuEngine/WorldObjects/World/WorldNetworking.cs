@@ -187,11 +187,12 @@ namespace RhuEngine.WorldObjects
 					var key = request.Data.GetString();
 					Log.Info($"ConnectionRequestEvent Key: {key}");
 					if (key.Contains('~')) {
-						var e = request.Data.GetString().Split('~');
+						var e = key.Split('~');
 						if (e[1] == KEY) {
 							Log.Info($"ConnectionRequestEvent Accepted");
 							var peer = request.Accept();
 							peer.Tag = NatUserIDS[e[0]];
+							NatIntroductionSuccessIsGood.TryAdd(e[0], true);
 						}
 						else {
 							Log.Info($"ConnectionRequestEvent Reject Key invalied");
@@ -395,7 +396,7 @@ namespace RhuEngine.WorldObjects
 				relayPeer.OnConnect();
 			}
 			else if (peer.Tag is string @string) {
-				Log.Err("Normal Peer Loaded");
+				Log.Info("Normal Peer Loaded");
 				var newpeer = new Peer(peer, @string);
 				peer.Tag = newpeer;
 				ProcessUserConnection(newpeer);
