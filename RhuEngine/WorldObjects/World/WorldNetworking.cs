@@ -170,7 +170,7 @@ namespace RhuEngine.WorldObjects
 			_natPunchListener.NatIntroductionSuccess += (point, addrType, token) => {
 				Log.Info($"NatIntroductionSuccess {point}  {addrType}  {token}");
 				NatIntroductionSuccessIsGood[token] = true;
-				var peer = _netManager.Connect(point, token + "~" + KEY);
+				var peer = _netManager.Connect(point, token + '~' + KEY);
 				peer.Tag = NatUserIDS[token];
 				NatConnection.TryAdd(token, peer);
 			};
@@ -185,13 +185,16 @@ namespace RhuEngine.WorldObjects
 			_clientListener.ConnectionRequestEvent += request => {
 				try {
 					var key = request.Data.GetString();
+					Log.Info($"ConnectionRequestEvent Key: {key}");
 					if (key.Contains('~')) {
 						var e = request.Data.GetString().Split('~');
 						if (e[1] == KEY) {
+							Log.Info($"ConnectionRequestEvent Accepted");
 							var peer = request.Accept();
 							peer.Tag = NatUserIDS[e[0]];
 						}
 						else {
+							Log.Info($"ConnectionRequestEvent Reject Key invalied");
 							request.Reject();
 						}
 					}
