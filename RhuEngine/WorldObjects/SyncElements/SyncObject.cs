@@ -125,7 +125,6 @@ namespace RhuEngine.WorldObjects
 			InitializeMembers(networkedObject, deserialize,netPointer);
 			OnInitialize();
 			if (!deserialize) {
-				FirstCreation();
 				OnLoaded();
 			}
 			if (typeof(IGlobalStepable).IsAssignableFrom(GetType())) {

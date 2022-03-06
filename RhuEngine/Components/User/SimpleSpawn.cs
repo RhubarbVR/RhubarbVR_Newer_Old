@@ -16,7 +16,6 @@ namespace RhuEngine.Components
 			}
 			if (user.userRoot.Target is null) {
 				var userEntity = Entity.AddChild("User");
-				userEntity.persistence.Value = false;
 				var userRoot = userEntity.AttachComponent<UserRoot>();
 				userEntity.AttachComponent<LocomotionManager>().user.Target = World.GetLocalUser();
 				if (!World.IsPersonalSpace) {
@@ -28,14 +27,14 @@ namespace RhuEngine.Components
 				leftComp.user.Target = World.GetLocalUser();
 				userRoot.leftHand.Target = leftHand;
 				if (!World.IsPersonalSpace) {
-					leftHand.AttachMesh<CubeMesh, UIShader>().Item1.dimensions.Value = new Vec3(0.1f, 0.1f, 0.1f);
+					leftHand.AttachMesh<SphereMesh, UIShader>().Item1.diameter.Value = 0.06f;
 				}
 				var rightHand = userEntity.AddChild("RightHand");
 				var rightComp = rightHand.AttachComponent<Hand>();
 				rightComp.hand.Value = Handed.Right;
 				rightComp.user.Target = World.GetLocalUser();
 				if (!World.IsPersonalSpace) {
-					rightHand.AttachMesh<CubeMesh, UIShader>().Item1.dimensions.Value = new Vec3(0.1f, 0.1f, 0.1f);
+					rightHand.AttachMesh<SphereMesh, UIShader>().Item1.diameter.Value = 0.06f;
 				}
 				userRoot.rightHand.Target = rightHand;
 				var head = userEntity.AddChild("Head");

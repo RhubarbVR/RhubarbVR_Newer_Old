@@ -5,6 +5,7 @@ using RhuEngine.WorldObjects.ECS;
 using StereoKit;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace RhuEngine.WorldObjects
 {
@@ -68,7 +69,10 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void LoadInput(string deviceName = null) {
-			return;
+			if (RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) {
+				Log.Err("Android And mic is buggy");
+				return;
+			}
 			if (deviceName is null) {
 				deviceName = Engine.MainMic;
 				Engine.MicChanged += LoadInput;

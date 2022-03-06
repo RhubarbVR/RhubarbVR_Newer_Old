@@ -26,6 +26,9 @@ namespace RhuEngine.WorldObjects
 			newElement.Initialize(World, this, "List element", networkedObject, deserialize);
 			if (!networkedObject) {
 				BroadcastAdd(newElement);
+				if (!deserialize) {
+					newElement.FirstCreation();
+				}
 			}
 			AddInternal(newElement);
 			return newElement;
