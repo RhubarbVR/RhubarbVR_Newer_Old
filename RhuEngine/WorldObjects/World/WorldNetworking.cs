@@ -410,54 +410,67 @@ namespace RhuEngine.WorldObjects
 				Log.Err("Peer had no tag noidea what to do");
 			}
 		}
-
+		public HashSet<ConnectToUser> connectionsBeingStarting = new();
+		public object UserJoinLock = new();
 		private void ConnectToUser(ConnectToUser user) {
 			if (user is null) {
 				return;
 			}
-			Log.Info("Connecting to user " + user.ConnectionType.ToString() + " Token:" + user.Data + " UserID:" + user.UserID);
-			LoadMsg = "Connecting to user";
-			switch (user.ConnectionType) {
-				case ConnectionType.Direct:
-					LoadMsg = "Direct Connected to User";
-					var idUri = new Uri(user.Data);
-					var dpeer = _netManager.Connect(idUri.Host, idUri.Port, KEY);
-					dpeer.Tag = user.UserID;
-					break;
-				case ConnectionType.HolePunch:
-					Task.Run(() => {
-						try {
-							LoadMsg = "Trying to HolePunch to User";
-							var peerCount = _netManager.ConnectedPeersCount;
-							Log.Info("Server: " + worldManager.Engine.netApiManager.BaseAddress.Host);
-							NatUserIDS.TryAdd(user.Data, user.UserID);
-							_netManager.NatPunchModule.SendNatIntroduceRequest(worldManager.Engine.netApiManager.BaseAddress.Host, 7856, user.Data);
-							for (var i = 0; i < 60; i++) {
-								if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
-									if (NatConnection.TryGetValue(user.Data, out var peer)) {
-										break;
-									}
-								}
-								LoadMsg = $"HolePuch Try{((uint)(i / 10))}";
-								//Like this so i can add update Msgs
-								Thread.Sleep(100);
-							}
-							if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var value) && value) {
-								if (NatConnection.TryGetValue(user.Data, out var peer)) {
-									if ((peer?.ConnectionState ?? ConnectionState.Disconnected) != ConnectionState.Connected) {
-										try {
-											if (peer is not null) {
-												peer.Disconnect();
-											}
+			Task.Run(() => {
+				lock (connectionsBeingStarting) {
+					connectionsBeingStarting.Add(user);
+				}
+				lock (UserJoinLock) {
+					Log.Info("Connecting to user " + user.ConnectionType.ToString() + " Token:" + user.Data + " UserID:" + user.UserID);
+					LoadMsg = "Connecting to user";
+					switch (user.ConnectionType) {
+						case ConnectionType.Direct:
+							LoadMsg = "Direct Connected to User";
+							var idUri = new Uri(user.Data);
+							var dpeer = _netManager.Connect(idUri.Host, idUri.Port, KEY);
+							dpeer.Tag = user.UserID;
+							break;
+						case ConnectionType.HolePunch:
+							try {
+								LoadMsg = "Trying to HolePunch to User";
+								var peerCount = _netManager.ConnectedPeersCount;
+								Log.Info("Server: " + worldManager.Engine.netApiManager.BaseAddress.Host);
+								NatUserIDS.TryAdd(user.Data, user.UserID);
+								_netManager.NatPunchModule.SendNatIntroduceRequest(worldManager.Engine.netApiManager.BaseAddress.Host, 7856, user.Data);
+								for (var i = 0; i < 60; i++) {
+									if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
+										if (NatConnection.TryGetValue(user.Data, out var peer)) {
+											break;
 										}
-										catch { }
+									}
+									LoadMsg = $"HolePuch Try{(uint)(i / 10)}";
+									//Like this so i can add update Msgs
+									Thread.Sleep(100);
+								}
+								if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var value) && value) {
+									if (NatConnection.TryGetValue(user.Data, out var peer)) {
+										if ((peer?.ConnectionState ?? ConnectionState.Disconnected) != ConnectionState.Connected) {
+											try {
+												if (peer is not null) {
+													peer.Disconnect();
+												}
+											}
+											catch {
+												return;
+											}
+											LoadMsg = "Failed To Hole Punch now using relay";
+											Log.Info("Failed To Hole Punch now using relay");
+											RelayConnect(user);
+										}
+										else {
+											LoadMsg = "HolePunch succeeded";
+											Log.Info("HolePunch succeeded");
+										}
+									}
+									else {
 										LoadMsg = "Failed To Hole Punch now using relay";
 										Log.Info("Failed To Hole Punch now using relay");
 										RelayConnect(user);
-									}
-									else {
-										LoadMsg = "HolePunch succeeded";
-										Log.Info("HolePunch succeeded");
 									}
 								}
 								else {
@@ -465,30 +478,29 @@ namespace RhuEngine.WorldObjects
 									Log.Info("Failed To Hole Punch now using relay");
 									RelayConnect(user);
 								}
+								NatIntroductionSuccessIsGood.TryRemove(user.Data, out _);
+								NatConnection.TryRemove(user.Data, out _);
+								NatUserIDS.TryRemove(user.Data, out _);
 							}
-							else {
-								LoadMsg = "Failed To Hole Punch now using relay";
-								Log.Info("Failed To Hole Punch now using relay");
-								RelayConnect(user);
+							catch (Exception e) {
+								Log.Err($"Excerption when trying to hole punch {e}");
+								return;
 							}
-							NatIntroductionSuccessIsGood.TryRemove(user.Data, out _);
-							NatConnection.TryRemove(user.Data, out _);
-							NatUserIDS.TryRemove(user.Data, out _);
-						}
-						catch (Exception e) {
-							Log.Err($"Excerption when trying to hole punch {e}");
-						}
-					});
-					break;
-				case ConnectionType.Relay:
-					LoadMsg = "Relay connecting to user";
-					NatUserIDS.TryAdd(user.Data, user.UserID);
-					RelayConnect(user);
-					break;
-				default:
-					break;
-			}
-			LoadMsg = "Waiting for world state";
+							break;
+						case ConnectionType.Relay:
+							LoadMsg = "Relay connecting to user";
+							NatUserIDS.TryAdd(user.Data, user.UserID);
+							RelayConnect(user);
+							break;
+						default:
+							break;
+					}
+					lock (connectionsBeingStarting) {
+						connectionsBeingStarting.Remove(user);
+					}
+					LoadMsg = "Waiting for world state";
+				}
+			});
 		}
 
 		private void RelayConnect(ConnectToUser user) {
@@ -511,6 +523,7 @@ namespace RhuEngine.WorldObjects
 			catch (Exception e) {
 				LoadMsg = "Relay Connect Error:" + e.ToString();
 				Log.Err("Relay Connect Error:" + e.ToString());
+				throw new Exception("Failed to use relay");
 			}
 		}
 

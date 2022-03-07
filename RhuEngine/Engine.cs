@@ -10,6 +10,7 @@ using System.IO;
 using RhuSettings;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace RhuEngine
 {
@@ -185,26 +186,56 @@ namespace RhuEngine
 		public IManager[] _managers;
 
 		public TextStyle MainTextStyle;
+
+		public string IntMsg = "Starting Engine";
+
+		public bool EngineStarting = true;
+
 		public void Init() {
 			MainTextStyle = Text.MakeStyle(Font.Default, 0.02f, new Color(0.890f, 0.580f, 0.027f));
 			Platform.ForceFallbackKeyboard = true;
 			World.OcclusionEnabled = true;
 			World.RaycastEnabled = true;
-			netApiManager = new NetApiManager(_userDataPathOverRide);
-			assetManager = new AssetManager(_cachePathOverRide);
-			_managers = new IManager[] { inputManager, netApiManager, assetManager, worldManager };
-			foreach (var item in _managers) {
-				try {
-					item.Init(this);
+			Task.Run(() => {
+				IntMsg = "Building NetApiManager";
+				netApiManager = new NetApiManager(_userDataPathOverRide);
+				IntMsg = "Building AssetManager";
+				assetManager = new AssetManager(_cachePathOverRide);
+				_managers = new IManager[] { inputManager, netApiManager, assetManager, worldManager };
+				foreach (var item in _managers) {
+					IntMsg = $"Starting {item.GetType().Name}";
+					try {
+						item.Init(this);
+					}
+					catch (Exception ex) {
+						Log.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
+						IntMsg = $"Failed to start {item.GetType().GetFormattedName()} Error:{ex}";
+						throw new Exception("LockLoad");
+					}
 				}
-				catch (Exception ex) {
-					Log.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
-				}
-			}
-			Log.Info("Engine Started");
+				EngineStarting = false;
+				Log.Info("Engine Started");
+			});
 		}
 
+		private Vec3 _oldPlayerPos = Vec3.Zero;
+		private Vec3 _loadingPos = Vec3.Zero;
+
 		public void Step() {
+			if (EngineStarting) {
+				try {
+					var textpos = Matrix.T(Vec3.Forward * 0.25f) * Input.Head.ToMatrix();
+					var playerPos = Renderer.CameraRoot.Translation;
+					_loadingPos += playerPos - _oldPlayerPos;
+					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(Time.Elapsedf * 5f, 1);
+					_oldPlayerPos = playerPos;
+					Text.Add($"Loading Engine\n{IntMsg}...", new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix());
+				}
+				catch (Exception ex) {
+					Log.Err("Failed to update msg text Error: " + ex.ToString());
+				}
+				return;
+			}
 			foreach (var item in _managers) {
 				try {
 					item.Step();
