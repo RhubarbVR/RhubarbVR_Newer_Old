@@ -28,6 +28,7 @@ namespace RhuEngine.WorldObjects
 			assetSession = new AssetSession(worldManager.Engine.assetManager,this);
 		}
 
+		public string LoadMsg = "Starting to LoadWorld";
 
 		public void Initialize(bool networkedWorld, bool networkedObject, bool deserialize, bool isPersonalSpace) {
 			IsPersonalSpace = isPersonalSpace;

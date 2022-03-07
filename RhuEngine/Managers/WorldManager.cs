@@ -57,17 +57,23 @@ namespace RhuEngine.Managers
 			}
 		}
 
+		private readonly Stack<World> _isRunngin = new();
+
 		private Task ShowLoadingFeedback(World world, World.FocusLevel focusLevel) {
 			return Task.Run(() => {
+				_isRunngin.Push(world);
 				while (world.IsLoading && !world.IsDisposed) {
-					Thread.Sleep(10);
+					Thread.Sleep(100);
 				}
 				if (world.IsDisposed) {
 					Log.Err($"Failed to start world {world.WorldDebugName}");
+					Thread.Sleep(3000);
+					_isRunngin.Pop();
 				}
 				else {
 					Log.Info($"Done loading world {world.WorldDebugName}");
 					world.Focus = focusLevel;
+					_isRunngin.Pop();
 				}
 			});
 		}
@@ -155,7 +161,7 @@ namespace RhuEngine.Managers
 				}
 			}
 		}
-
+		public Vec3 LoadingPos = Vec3.One;
 		public void Step() {
 			float totalStep = 0;
 			for (var i = worlds.Count - 1; i >= 0; i--) {
@@ -172,6 +178,24 @@ namespace RhuEngine.Managers
 					totalStep += (float)_stepStopwatch.Elapsed.TotalSeconds;
 				}
 			}
+
+			try {
+				if (_isRunngin.Count != 0) {
+					var world = _isRunngin.Peek();
+					var textpos = Matrix.T(Vec3.Forward * 0.25f) * Input.Head.ToMatrix();
+					LoadingPos = LoadingPos + ((textpos.Translation - LoadingPos) * Math.Min(Time.Elapsedf * 5f, 1));
+					if (world.IsLoading && !world.IsDisposed) {
+						Text.Add($"Loading World: \n{world.LoadMsg}", new Pose(LoadingPos, Quat.LookAt(LoadingPos, Input.Head.position)).ToMatrix());
+					}
+					else {
+						Text.Add($"World is dead {Engine.netApiManager.User?.UserName ?? "JIM"}", new Pose(LoadingPos, Quat.LookAt(LoadingPos, Input.Head.position)).ToMatrix());
+					}
+				}
+			}
+			catch (Exception ex) {
+				Log.Err("Failed to update joining msg text Error: " + ex.ToString());
+			}
+
 			TotalStepTime = totalStep;
 		}
 

@@ -26,8 +26,8 @@ namespace RhuEngine.WorldObjects
 			Task.Run(async () => {
 				if (userID == null) { return; }
 				var e = await Engine.netApiManager.GetUserInfo(userID);
-				UserName = e.UserName;
-				NormalizedUserName = e.NormalizedUserName;
+				UserName = e?.UserName;
+				NormalizedUserName = e?.NormalizedUserName;
 			});
 		}
 
