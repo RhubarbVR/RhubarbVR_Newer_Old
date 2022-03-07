@@ -57,35 +57,35 @@ namespace RhuEngine.Managers
 			}
 		}
 
-		private readonly Stack<World> _isRunngin = new();
+		private readonly Stack<World> _isRunning = new();
 
 		private Task ShowLoadingFeedback(World world, World.FocusLevel focusLevel) {
 			return Task.Run(() => {
-				_isRunngin.Push(world);
+				_isRunning.Push(world);
 				while (world.IsLoading && !world.IsDisposed) {
 					Thread.Sleep(100);
 				}
 				if (world.IsDisposed) {
 					Log.Err($"Failed to start world {world.WorldDebugName}");
 					Thread.Sleep(3000);
-					_isRunngin.Pop();
+					_isRunning.Pop();
 				}
 				else {
 					Log.Info($"Done loading world {world.WorldDebugName}");
 					world.Focus = focusLevel;
-					_isRunngin.Pop();
+					_isRunning.Pop();
 				}
 			});
 		}
 
-		public World CreateNewWorld(World.FocusLevel focusLevel, bool localWorld = false,string sessionName = null) {
+		public World CreateNewWorld(World.FocusLevel focusLevel, bool localWorld = false, string sessionName = null) {
 			var world = new World(this) {
 				Focus = World.FocusLevel.Background
 			};
 			world.Initialize(!localWorld, false, false, focusLevel == World.FocusLevel.PrivateOverlay);
 			world.RootEntity.name.Value = "Root";
 			world.RootEntity.AttachComponent<SimpleSpawn>();
-			if(focusLevel != World.FocusLevel.PrivateOverlay) {
+			if (focusLevel != World.FocusLevel.PrivateOverlay) {
 				world.RootEntity.AttachComponent<ClipBoardImport>();
 			}
 			world.SessionName.Value = sessionName;
@@ -100,7 +100,7 @@ namespace RhuEngine.Managers
 			return world;
 		}
 
-		public World JoinNewWorld(string sessionID, World.FocusLevel focusLevel,string sessionName = null) {
+		public World JoinNewWorld(string sessionID, World.FocusLevel focusLevel, string sessionName = null) {
 			var world = new World(this) {
 				Focus = World.FocusLevel.Background
 			};
@@ -152,16 +152,15 @@ namespace RhuEngine.Managers
 		}
 
 		private void NetApiManager_HasGoneOfline() {
-			if(LocalWorld != null) {
+			if (LocalWorld != null) {
 				LocalWorld.Focus = World.FocusLevel.Focused;
 			}
 			foreach (var item in worlds) {
-				if(!(item.IsPersonalSpace || LocalWorld == item)) {
+				if (!(item.IsPersonalSpace || LocalWorld == item)) {
 					Task.Run(() => item.Dispose());
 				}
 			}
 		}
-		public Vec3 LoadingPos = Vec3.One;
 		public void Step() {
 			float totalStep = 0;
 			for (var i = worlds.Count - 1; i >= 0; i--) {
@@ -179,24 +178,35 @@ namespace RhuEngine.Managers
 				}
 			}
 
+			UpdateJoinMessage();
+
+			TotalStepTime = totalStep;
+		}
+
+		private Vec3 _oldPlayerPos = Vec3.Zero;
+		private Vec3 _loadingPos = Vec3.Zero;
+		private void UpdateJoinMessage() {
 			try {
-				if (_isRunngin.Count != 0) {
-					var world = _isRunngin.Peek();
+				if (_isRunning.Count != 0) {
+					var world = _isRunning.Peek();
 					var textpos = Matrix.T(Vec3.Forward * 0.25f) * Input.Head.ToMatrix();
-					LoadingPos = LoadingPos + ((textpos.Translation - LoadingPos) * Math.Min(Time.Elapsedf * 5f, 1));
+					var playerPos = Renderer.CameraRoot.Translation;
+					_loadingPos += (playerPos - _oldPlayerPos);
+					_loadingPos += ((textpos.Translation - _loadingPos) * Math.Min(Time.Elapsedf * 5f, 1));
+					_oldPlayerPos = playerPos;
 					if (world.IsLoading && !world.IsDisposed) {
-						Text.Add($"Loading World: \n{world.LoadMsg}", new Pose(LoadingPos, Quat.LookAt(LoadingPos, Input.Head.position)).ToMatrix());
+						Text.Add($"Loading World: \n{world.LoadMsg}", new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix());
 					}
 					else {
-						Text.Add($"World is dead {Engine.netApiManager.User?.UserName ?? "JIM"}", new Pose(LoadingPos, Quat.LookAt(LoadingPos, Input.Head.position)).ToMatrix());
+						if (!world.IsDisposed) {
+							Text.Add($"Failed to load world{(Engine.netApiManager.User?.UserName == null ? "" : ", JIM")}", new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix());
+						}
 					}
 				}
 			}
 			catch (Exception ex) {
 				Log.Err("Failed to update joining msg text Error: " + ex.ToString());
 			}
-
-			TotalStepTime = totalStep;
 		}
 
 		public void RemoveWorld(World world) {
