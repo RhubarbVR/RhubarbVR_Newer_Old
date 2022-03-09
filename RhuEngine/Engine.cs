@@ -11,6 +11,7 @@ using RhuSettings;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace RhuEngine
 {
@@ -186,6 +187,8 @@ namespace RhuEngine
 		public IManager[] _managers;
 
 		public TextStyle MainTextStyle;
+
+		public StaticResources staticResources = new();
 
 		public string IntMsg = "Starting Engine";
 
