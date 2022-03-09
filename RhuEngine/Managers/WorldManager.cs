@@ -191,8 +191,8 @@ namespace RhuEngine.Managers
 					var world = _isRunning.Peek();
 					var textpos = Matrix.T(Vec3.Forward * 0.25f) * Input.Head.ToMatrix();
 					var playerPos = Renderer.CameraRoot.Translation;
-					_loadingPos += (playerPos - _oldPlayerPos);
-					_loadingPos += ((textpos.Translation - _loadingPos) * Math.Min(Time.Elapsedf * 5f, 1));
+					_loadingPos += playerPos - _oldPlayerPos;
+					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(Time.Elapsedf * 5f, 1);
 					_oldPlayerPos = playerPos;
 					if (world.IsLoading && !world.IsDisposed) {
 						Text.Add($"Loading World: \n{world.LoadMsg}", new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix());

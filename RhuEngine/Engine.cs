@@ -194,7 +194,12 @@ namespace RhuEngine
 
 		public bool EngineStarting = true;
 
+		public Material LoadingLogo = null;
+
 		public void Init() {
+			Renderer.EnableSky = false;
+			LoadingLogo = new Material(Shader.UnlitClip);
+			LoadingLogo.SetTexture("diffuse", staticResources.RhubarbLogoV2);
 			MainTextStyle = Text.MakeStyle(Font.Default, 0.02f, new Color(0.890f, 0.580f, 0.027f));
 			Platform.ForceFallbackKeyboard = true;
 			World.OcclusionEnabled = true;
@@ -217,6 +222,8 @@ namespace RhuEngine
 					}
 				}
 				EngineStarting = false;
+				LoadingLogo = null;
+				Renderer.EnableSky = true;
 				Log.Info("Engine Started");
 			});
 		}
@@ -232,7 +239,9 @@ namespace RhuEngine
 					_loadingPos += playerPos - _oldPlayerPos;
 					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(Time.Elapsedf * 5f, 1);
 					_oldPlayerPos = playerPos;
-					Text.Add($"Loading Engine\n{IntMsg}...", new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix());
+					var rootMatrix = new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix();
+					Text.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0,-0.06f,0) * rootMatrix);
+					Mesh.Quad.Draw(LoadingLogo, Matrix.TS(0, 0.06f, 0,0.25f) * rootMatrix);
 				}
 				catch (Exception ex) {
 					Log.Err("Failed to update msg text Error: " + ex.ToString());

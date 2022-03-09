@@ -21,6 +21,13 @@ namespace RhuEngine
 		public Tex LoadTexture(string name) {
 			return Tex.FromMemory(GetStaticResource(name));
 		}
+
+		public Tex RhubarbLogoV1 => LoadTexture("RhuEngine.Res.RhubarbVR.png");
+		public Tex RhubarbLogoV2 => LoadTexture("RhuEngine.Res.RhubarbVR2.png");
+
+		public Tex Grid => LoadTexture("RhuEngine.Res.Grid.jpg");
+		public Tex Null => LoadTexture("RhuEngine.Res.nulltexture.jpg");
+
 		//public Font LoadFont(string name) {
 		//	return Font.FromMemory(GetStaticResource(name));
 		//}

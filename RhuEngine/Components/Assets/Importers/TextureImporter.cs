@@ -27,7 +27,7 @@ namespace RhuEngine.Components
 		public override void Import(string data, bool wasUri, byte[] rawdata) {
 			Log.Info($"Loaded Texture Data {data} Uri{wasUri}");
 			if (wasUri) {
-				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<PlaneMesh, UnlitShader>();
+				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<PlaneMesh, UnlitClipShader>();
 				var scaler = Entity.AttachComponent<TextureScaler>();
 				scaler.scale.SetLinkerTarget(pmesh.dimensions);
 				scaler.scaleMultiplier.Value = 0.1f;
