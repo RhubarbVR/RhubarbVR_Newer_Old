@@ -240,7 +240,7 @@ namespace RhuEngine
 					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(Time.Elapsedf * 5f, 1);
 					_oldPlayerPos = playerPos;
 					var rootMatrix = new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix();
-					Text.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0,-0.06f,0) * rootMatrix);
+					Text.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0,-0.07f,0) * rootMatrix);
 					Mesh.Quad.Draw(LoadingLogo, Matrix.TS(0, 0.06f, 0,0.25f) * rootMatrix);
 				}
 				catch (Exception ex) {
