@@ -97,7 +97,9 @@ namespace RhuEngine.WorldObjects
 
 		private float[] _samples = new float[0];
 
-		private readonly Queue<byte[]> _samplesQueue = new(3);
+		private const int MAX_QUEUE_SIZE = 5;
+
+		private readonly Queue<byte[]> _samplesQueue = new(MAX_QUEUE_SIZE);
 
 		private float[] _currentData = new float[1];
 
@@ -112,6 +114,11 @@ namespace RhuEngine.WorldObjects
 			}
 			else {
 				_startPos = _currsorPos + 1;
+				if(_samplesQueue.Count > MAX_QUEUE_SIZE) {
+					for (var i = 0; i < MAX_QUEUE_SIZE - _samplesQueue.Count; i++) {
+						_samplesQueue.Dequeue(); // Drop Packed
+					}
+				}
 				_currentData = _samplesQueue.Count > 0 ? ProssesAudioSamples(_samplesQueue.Dequeue()) : ProssesAudioSamples(null);
 				return _currentData[0];
 			}

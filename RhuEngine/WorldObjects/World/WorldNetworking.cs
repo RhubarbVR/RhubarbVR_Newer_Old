@@ -434,11 +434,11 @@ namespace RhuEngine.WorldObjects
 							NatUserIDS.TryAdd(user.Data, user.UserID);
 							_netManager.NatPunchModule.SendNatIntroduceRequest(worldManager.Engine.netApiManager.BaseAddress.Host, 7856, user.Data);
 							for (var i = 0; i < 60; i++) {
-								if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
-									if (NatConnection.TryGetValue(user.Data, out var peer)) {
-										break;
-									}
-								}
+								//if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
+								//	if (NatConnection.TryGetValue(user.Data, out var peer)) {
+								//		break;
+								//	}
+								//}
 								LoadMsg = $"HolePuch Try{(uint)(i / 10)}";
 								//Like this so i can add update Msgs
 								Thread.Sleep(100);
