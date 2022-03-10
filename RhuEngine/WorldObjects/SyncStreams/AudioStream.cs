@@ -162,7 +162,7 @@ namespace RhuEngine.WorldObjects
 					var audioPacked = new float[SampleCount];
 					_input.ReadSamples(ref audioPacked);
 					if (ShouldSendAudioPacked(audioPacked)) {
-						World.BroadcastDataToAllStream(this, new DataNode<byte[]>(SendAudioSamples(audioPacked)), LiteNetLib.DeliveryMethod.ReliableUnordered);
+						World.BroadcastDataToAllStream(this, new DataNode<byte[]>(SendAudioSamples(audioPacked)), LiteNetLib.DeliveryMethod.Sequenced);
 					}
 				}
 			}

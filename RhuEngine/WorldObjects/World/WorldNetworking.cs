@@ -262,31 +262,35 @@ namespace RhuEngine.WorldObjects
 					if (worldData == null) {
 						throw new Exception();
 					}
-					try {
-						LoadMsg = "World state loading";
-						WaitingForWorldStartState = false;
-						_worldObjects.Clear();
-						var deserializer = new SyncObjectDeserializerObject(false);
-						Deserialize((DataNodeGroup)worldData, deserializer);
-						LocalUserID = (ushort)(Users.Count + 1);
-						foreach (var item in deserializer.onLoaded) {
-							item?.Invoke();
-						}
-						Log.Info("World state loaded");
-						LoadMsg = "World state loaded";
-						foreach (var peer1 in _netManager.ConnectedPeerList) {
-							if (peer1.Tag is Peer contpeer) {
-								LoadUserIn(contpeer);
+					Task.Run(() => {
+						try {
+							LoadMsg = "World state Found";
+							while (ActiveConnections.Count > 0) {
+								Thread.Sleep(1000);
 							}
+							_worldObjects.Clear();
+							var deserializer = new SyncObjectDeserializerObject(false);
+							Deserialize((DataNodeGroup)worldData, deserializer);
+							LocalUserID = (ushort)(Users.Count + 1);
+							foreach (var item in deserializer.onLoaded) {
+								item?.Invoke();
+							}
+							Log.Info(LoadMsg = "World state loaded");
+							foreach (var peer1 in _netManager.ConnectedPeerList) {
+								if (peer1.Tag is Peer contpeer) {
+									LoadUserIn(contpeer);
+								}
+							}
+							IsDeserializing = false;
+							WaitingForWorldStartState = false;
+							AddLocalUser();
+							FindNewMaster();
 						}
-						IsDeserializing = false;
-						AddLocalUser();
-						FindNewMaster();
-					}
-					catch (Exception ex) {
-						Log.Err("Failed to load world state" + ex);
-						LoadMsg = "Failed to load world state" + ex;
-					}
+						catch (Exception ex) {
+							Log.Err("Failed to load world state" + ex);
+							LoadMsg = "Failed to load world state" + ex;
+						}
+					});
 				}
 				catch { }
 			}
@@ -411,22 +415,29 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public object UserJoinLock = new();
+		public List<ConnectToUser> ActiveConnections = new();
+
 		private void ConnectToUser(ConnectToUser user) {
-			if (user is null) {
-				return;
-			}
+			Task.Run(() => {
+				lock (ActiveConnections) {
+					ActiveConnections.Add(user);
+				}
+				if (user is null) {
+					return;
+				}
 				Log.Info("Connecting to user " + user.ConnectionType.ToString() + " Token:" + user.Data + " UserID:" + user.UserID);
 				LoadMsg = "Connecting to user";
-			switch (user.ConnectionType) {
-				case ConnectionType.Direct:
-					LoadMsg = "Direct Connected to User";
-					var idUri = new Uri(user.Data);
-					var dpeer = _netManager.Connect(idUri.Host, idUri.Port, KEY);
-					dpeer.Tag = user.UserID;
-					break;
-				case ConnectionType.HolePunch:
-					Task.Run(() => {
+				switch (user.ConnectionType) {
+					case ConnectionType.Direct:
+						LoadMsg = "Direct Connected to User";
+						var idUri = new Uri(user.Data);
+						var dpeer = _netManager.Connect(idUri.Host, idUri.Port, KEY);
+						dpeer.Tag = user.UserID;
+						lock (ActiveConnections) {
+							ActiveConnections.Remove(user);
+						}
+						break;
+					case ConnectionType.HolePunch:
 						try {
 							LoadMsg = "Trying to HolePunch to User";
 							var peerCount = _netManager.ConnectedPeersCount;
@@ -434,11 +445,13 @@ namespace RhuEngine.WorldObjects
 							NatUserIDS.TryAdd(user.Data, user.UserID);
 							_netManager.NatPunchModule.SendNatIntroduceRequest(worldManager.Engine.netApiManager.BaseAddress.Host, 7856, user.Data);
 							for (var i = 0; i < 60; i++) {
-								//if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
-								//	if (NatConnection.TryGetValue(user.Data, out var peer)) {
-								//		break;
-								//	}
-								//}
+								if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
+									if (NatConnection.TryGetValue(user.Data, out var peer)) {
+										if ((peer?.ConnectionState ?? ConnectionState.Disconnected) == ConnectionState.Connected) {
+											break;
+										}
+									}
+								}
 								LoadMsg = $"HolePuch Try{(uint)(i / 10)}";
 								//Like this so i can add update Msgs
 								Thread.Sleep(100);
@@ -454,25 +467,33 @@ namespace RhuEngine.WorldObjects
 										catch {
 											return;
 										}
-										LoadMsg = "Failed To Hole Punch now using relay";
-										Log.Info("Failed To Hole Punch now using relay");
+										Log.Info(LoadMsg = "Failed To Hole Punch now using relay");
 										RelayConnect(user);
+										lock (ActiveConnections) {
+											ActiveConnections.Remove(user);
+										}
 									}
 									else {
-										LoadMsg = "HolePunch succeeded";
-										Log.Info("HolePunch succeeded");
+										Log.Info(LoadMsg = "HolePunch succeeded");
+										lock (ActiveConnections) {
+											ActiveConnections.Remove(user);
+										}
 									}
 								}
 								else {
-									LoadMsg = "Failed To Hole Punch now using relay";
-									Log.Info("Failed To Hole Punch now using relay");
+									Log.Info(LoadMsg = "Failed To Hole Punch now using relay");
 									RelayConnect(user);
+									lock (ActiveConnections) {
+										ActiveConnections.Remove(user);
+									}
 								}
 							}
 							else {
-								LoadMsg = "Failed To Hole Punch now using relay";
-								Log.Info("Failed To Hole Punch now using relay");
+								Log.Info(LoadMsg = "Failed To Hole Punch now using relay");
 								RelayConnect(user);
+								lock (ActiveConnections) {
+									ActiveConnections.Remove(user);
+								}
 							}
 							NatIntroductionSuccessIsGood.TryRemove(user.Data, out _);
 							NatConnection.TryRemove(user.Data, out _);
@@ -482,17 +503,20 @@ namespace RhuEngine.WorldObjects
 							Log.Err($"Excerption when trying to hole punch {e}");
 							return;
 						}
-					});
-					break;
-				case ConnectionType.Relay:
-					LoadMsg = "Relay connecting to user";
-					NatUserIDS.TryAdd(user.Data, user.UserID);
-					RelayConnect(user);
-					break;
-				default:
-					break;
-			}
-			LoadMsg = "Waiting for world state";
+						break;
+					case ConnectionType.Relay:
+						LoadMsg = "Relay connecting to user";
+						NatUserIDS.TryAdd(user.Data, user.UserID);
+						RelayConnect(user);
+						lock (ActiveConnections) {
+							ActiveConnections.Remove(user);
+						}
+						break;
+					default:
+						break;
+				}
+				LoadMsg = "Waiting for world state";
+			});
 		}
 
 		private void RelayConnect(ConnectToUser user) {
@@ -500,21 +524,18 @@ namespace RhuEngine.WorldObjects
 			try {
 				var peer = _netManager.Connect(worldManager.Engine.netApiManager.BaseAddress.Host, 7857, user.Data);
 				if (peer.Tag is not null) {
-					Log.Info("Adding another Relay Client");
-					LoadMsg = "Adding another Relay Client";
+					Log.Info(LoadMsg = "Adding another Relay Client");
 					var relay = peer.Tag as RelayPeer;
 					relay.LoadNewPeer(user);
 				}
 				else {
-					Log.Info("Start New Relay Server");
-					LoadMsg = "Start New Relay Server";
+					Log.Info(LoadMsg = "Start New Relay Server");
 					var relay = new RelayPeer(peer, this, user.UserID);
 					peer.Tag = relay;
 				}
 			}
 			catch (Exception e) {
-				LoadMsg = "Relay Connect Error:" + e.ToString();
-				Log.Err("Relay Connect Error:" + e.ToString());
+				Log.Err(LoadMsg = "Relay Connect Error:" + e.ToString());
 				throw new Exception("Failed to use relay");
 			}
 		}
