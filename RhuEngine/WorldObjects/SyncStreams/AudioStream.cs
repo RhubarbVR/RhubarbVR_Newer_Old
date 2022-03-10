@@ -104,7 +104,7 @@ namespace RhuEngine.WorldObjects
 		private long _currsorPos = 0;
 		private long _startPos = 0;
 
-
+		//Todo: make read a whole array
 		private float ReadSample() {
 			_currsorPos++;
 			if ((_startPos + _currentData.LongLength) > _currsorPos) {

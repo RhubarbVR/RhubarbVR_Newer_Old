@@ -16,7 +16,15 @@ namespace RhuEngine.WorldObjects
 		[Default(Application.VoIP)]
 		public Sync<Application> typeOfStream;
 
-		[Default(8000)]
+		[OnChanged(nameof(LoadOpus))]
+		[Default(Bandwidth.MediumBand)]
+		public Sync<Bandwidth> MaxBandwidth;
+
+		[OnChanged(nameof(LoadOpus))]
+		[Default(true)]
+		public Sync<bool> DTX;
+
+		[Default(64000)]
 		public Sync<int> BitRate;
 		
 		private OpusDecoder _decoder;
@@ -35,7 +43,11 @@ namespace RhuEngine.WorldObjects
 				_decoder = null;
 			}
 			try {
-				_encoder = new OpusEncoder(typeOfStream.Value, 48000, 1);
+				_encoder = new OpusEncoder(typeOfStream.Value, 48000, 1) {
+					VBR = true,
+					DTX = DTX,
+					MaxBandwidth = MaxBandwidth
+				};
 				_decoder = new OpusDecoder(48000, 1);
 			}
 			catch (Exception ex) {
@@ -49,7 +61,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public override byte[] SendAudioSamples(float[] audio) {
-			var outpack = new byte[BitRate.Value];
+			var outpack = new byte[BitRate.Value/8];
 			var amount = _encoder.Encode(audio, SampleCount, outpack, outpack.Length);
 			Array.Resize(ref outpack, amount);
 			return outpack;
