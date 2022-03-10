@@ -419,6 +419,7 @@ namespace RhuEngine.WorldObjects
 			Task.Run(() => {
 				lock (connectionsBeingStarting) {
 					connectionsBeingStarting.Add(user);
+					Log.Info($"User added to connection queue UUID{user.UserID}");
 				}
 				lock (UserJoinLock) {
 					Log.Info("Connecting to user " + user.ConnectionType.ToString() + " Token:" + user.Data + " UserID:" + user.UserID);
