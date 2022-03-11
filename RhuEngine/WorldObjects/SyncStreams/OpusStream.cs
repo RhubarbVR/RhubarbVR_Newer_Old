@@ -23,13 +23,20 @@ namespace RhuEngine.WorldObjects
 		[OnChanged(nameof(LoadOpus))]
 		[Default(true)]
 		public Sync<bool> DTX;
+		[OnChanged(nameof(UpdateFrameSize))]
 
 		[Default(64000)]
 		public Sync<int> BitRate;
 		
 		private OpusDecoder _decoder;
 		private OpusEncoder _encoder;
+		
+		private int _packedSize = 134;
 
+		public override void UpdateFrameSize() {
+			base.UpdateFrameSize();
+			_packedSize = (BitRate.Value / 8 / TimeScale) + 1;
+		}
 
 		public override bool IsRunning => (_encoder is not null) && (_decoder is not null);
 
@@ -61,7 +68,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public override byte[] SendAudioSamples(float[] audio) {
-			var outpack = new byte[BitRate.Value/8];
+			var outpack = new byte[_packedSize];
 			var amount = _encoder.Encode(audio, SampleCount, outpack, outpack.Length);
 			Array.Resize(ref outpack, amount);
 			return outpack;

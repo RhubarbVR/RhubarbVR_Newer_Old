@@ -32,10 +32,17 @@ namespace RhuEngine
 			//Test for stack overflow
 			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("CallMainMethod")[0];
 			//Test for fields
+			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
+			//var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
+			//method.Prams[0] = tostring;
+			//tostring.Prams[0] = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeFieldsRead()[0];
 			var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
 			var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
 			method.Prams[0] = tostring;
-			tostring.Prams[0] = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeFieldsRead()[0];
+			var add = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "Add")[0];
+			tostring.Prams[0] = add;
+			add.Prams[0] = new ScriptNodeConst(2);
+			add.Prams[1] = new ScriptNodeConst(2);
 			script.MainMethod = method;
 			var ScripEditor = entity.AddChild("ScripEditor");
 			ScripEditor.position.Value = new Vec3(0, -0.1f, 0);

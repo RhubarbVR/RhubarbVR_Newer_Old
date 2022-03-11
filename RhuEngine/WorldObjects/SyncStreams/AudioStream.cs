@@ -20,9 +20,13 @@ namespace RhuEngine.WorldObjects
 			ms40,
 			ms60
 		}
-
+		[OnChanged(nameof(UpdateFrameSize))]
 		[Default(AudioFrameTime.ms60)]
 		public Sync<AudioFrameTime> frameSize;
+
+		public virtual void UpdateFrameSize() {
+
+		}
 
 		public float TimeInMs
 		{
@@ -33,6 +37,20 @@ namespace RhuEngine.WorldObjects
 					AudioFrameTime.ms20 => 20,
 					AudioFrameTime.ms40 => 40,
 					AudioFrameTime.ms60 => 60,
+					_ => 10,
+				};
+			}
+		}
+
+		public int TimeScale
+		{
+			get {
+				return frameSize.Value switch {
+					AudioFrameTime.ms2_5 => 4000,
+					AudioFrameTime.ms5 => 200,
+					AudioFrameTime.ms20 => 50,
+					AudioFrameTime.ms40 => 25,
+					AudioFrameTime.ms60 => 16,
 					_ => 10,
 				};
 			}
@@ -64,6 +82,7 @@ namespace RhuEngine.WorldObjects
 		private bool _loadedDevice = false;
 		
 		public override void OnLoaded() {
+			UpdateFrameSize();
 			_output = Sound.CreateStream(5f);
 			Load(_output);
 		}
