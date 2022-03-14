@@ -21,7 +21,7 @@ namespace RhuEngine.WorldObjects
 			ms60
 		}
 		[OnChanged(nameof(UpdateFrameSize))]
-		[Default(AudioFrameTime.ms60)]
+		[Default(AudioFrameTime.ms40)]
 		public Sync<AudioFrameTime> frameSize;
 
 		public virtual void UpdateFrameSize() {
@@ -116,7 +116,7 @@ namespace RhuEngine.WorldObjects
 
 		private float[] _samples = new float[0];
 
-		private const int MAX_QUEUE_SIZE = 5;
+		private const int MAX_QUEUE_SIZE = 3;
 
 		private readonly Queue<byte[]> _samplesQueue = new(MAX_QUEUE_SIZE);
 
@@ -181,7 +181,7 @@ namespace RhuEngine.WorldObjects
 					var audioPacked = new float[SampleCount];
 					_input.ReadSamples(ref audioPacked);
 					if (ShouldSendAudioPacked(audioPacked)) {
-						World.BroadcastDataToAllStream(this, new DataNode<byte[]>(SendAudioSamples(audioPacked)), LiteNetLib.DeliveryMethod.Sequenced);
+						World.BroadcastDataToAllStream(this, new DataNode<byte[]>(SendAudioSamples(audioPacked)), LiteNetLib.DeliveryMethod.Unreliable);
 					}
 				}
 			}
