@@ -31,7 +31,7 @@ namespace RhuEngine
 #else
 		public const bool IS_MILK_SNAKE = false;
 #endif
-		public readonly static UISettings DefaultSettings = new(){
+		public readonly static UISettings DefaultSettings = new() {
 			backplateBorder = 1f * Units.mm2m,
 			backplateDepth = 0.4f,
 			depth = 10 * Units.mm2m,
@@ -54,7 +54,7 @@ namespace RhuEngine
 		public static string BaseDir = AppDomain.CurrentDomain.BaseDirectory;
 
 		public Engine(string[] arg, OutputCapture outputCapture, string baseDir = null) : base() {
-			if(baseDir is null) {
+			if (baseDir is null) {
 				baseDir = AppDomain.CurrentDomain.BaseDirectory;
 			}
 			else {
@@ -66,7 +66,7 @@ namespace RhuEngine
 			_noVRSim = arg.Any((v) => v.ToLower() == "--no-vr-sim") | arg.Any((v) => v.ToLower() == "-no-vr-sim");
 			string settingsArg = null;
 			for (var i = 0; i < arg.Length; i++) {
-				if(arg[i].ToLower() == "--cache-override" | arg[i].ToLower() == "-cache-override") {
+				if (arg[i].ToLower() == "--cache-override" | arg[i].ToLower() == "-cache-override") {
 					if (i + 1 <= arg.Length) {
 						_cachePathOverRide = arg[i + 1];
 					}
@@ -105,7 +105,7 @@ namespace RhuEngine
 			this.outputCapture = outputCapture;
 
 			var lists = new List<DataList>();
-			SettingsFile = ((_userDataPathOverRide is not null) ?_userDataPathOverRide : baseDir) + "\\settings.json";
+			SettingsFile = ((_userDataPathOverRide is not null) ? _userDataPathOverRide : baseDir) + "\\settings.json";
 			if (File.Exists(SettingsFile)) {
 				var text = File.ReadAllText(SettingsFile);
 				var liet = SettingsManager.GetDataFromJson(text);
@@ -127,7 +127,7 @@ namespace RhuEngine
 		}
 
 		public void SaveSettings() {
-			var data = SettingsManager.GetDataListFromSettingsObject(MainSettings,new DataList());
+			var data = SettingsManager.GetDataListFromSettingsObject(MainSettings, new DataList());
 			File.WriteAllText(SettingsFile, SettingsManager.GetJsonFromDataList(data).ToString());
 		}
 		public void ReloadSettings() {
@@ -195,6 +195,23 @@ namespace RhuEngine
 		public bool EngineStarting = true;
 
 		public Material LoadingLogo = null;
+		public void ColorizeFingers(Handed hand,int size, Gradient horizontal, Gradient vertical) {
+			var tex = new Tex(TexType.Image, TexFormat.Rgba32Linear) {
+				AddressMode = TexAddress.Clamp
+			};
+			var pixels = new Color32[size * size];
+			for (var y = 0; y < size; y++) {
+				var v = vertical.Get(1 - y / (size - 1.0f));
+				for (var x = 0; x < size; x++) {
+					var h = horizontal.Get(x / (size - 1.0f));
+					pixels[x + y * size] = v * h;
+				}
+			}
+			tex.SetColors(size, size, pixels);
+			var copyhand = Default.MaterialHand.Copy();
+			copyhand[MatParamName.DiffuseTex] = tex;
+			Input.Hand(hand).Material = copyhand;
+		}
 
 		public void Init() {
 			Renderer.EnableSky = false;
@@ -204,6 +221,20 @@ namespace RhuEngine
 			Platform.ForceFallbackKeyboard = true;
 			World.OcclusionEnabled = true;
 			World.RaycastEnabled = true;
+			ColorizeFingers(Handed.Left,16,
+				new Gradient(
+					new GradientKey(Color.HSV(0.4f, 1, 0.5f), 0.5f)),
+				new Gradient(
+					new GradientKey(new Color(1, 1, 1, 0), 0),
+					new GradientKey(new Color(1, 1, 1, 0), 0.4f),
+					new GradientKey(new Color(1, 1, 1, 1), 0.9f)));
+			ColorizeFingers(Handed.Right, 16,
+				new Gradient(
+					new GradientKey(Color.HSV(1f, 1, 0.5f), 0.5f)),
+				new Gradient(
+					new GradientKey(new Color(1, 1, 1, 0), 0),
+					new GradientKey(new Color(1, 1, 1, 0), 0.4f),
+					new GradientKey(new Color(1, 1, 1, 1), 0.9f)));
 			Task.Run(() => {
 				IntMsg = "Building NetApiManager";
 				netApiManager = new NetApiManager(_userDataPathOverRide);
@@ -240,8 +271,8 @@ namespace RhuEngine
 					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(Time.Elapsedf * 5f, 1);
 					_oldPlayerPos = playerPos;
 					var rootMatrix = new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix();
-					Text.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0,-0.07f,0) * rootMatrix);
-					Mesh.Quad.Draw(LoadingLogo, Matrix.TS(0, 0.06f, 0,0.25f) * rootMatrix);
+					Text.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0, -0.07f, 0) * rootMatrix);
+					Mesh.Quad.Draw(LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
 				}
 				catch (Exception ex) {
 					Log.Err("Failed to update msg text Error: " + ex.ToString());
