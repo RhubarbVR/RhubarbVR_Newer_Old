@@ -25,7 +25,7 @@ namespace RhuEngine.WorldObjects
 		public Sync<AudioFrameTime> frameSize;
 
 		public virtual void UpdateFrameSize() {
-			_output = Sound.CreateStream(TimeInMs / 450);
+			_output = Sound.CreateStream(TimeInMs / 3000);
 		}
 
 		public float TimeInMs
