@@ -21,7 +21,7 @@ namespace RhuEngine.WorldObjects
 			ms60
 		}
 		[OnChanged(nameof(UpdateFrameSize))]
-		[Default(AudioFrameTime.ms40)]
+		[Default(AudioFrameTime.ms20)]
 		public Sync<AudioFrameTime> frameSize;
 
 		public virtual void UpdateFrameSize() {
@@ -83,7 +83,7 @@ namespace RhuEngine.WorldObjects
 		
 		public override void OnLoaded() {
 			UpdateFrameSize();
-			_output = Sound.CreateStream(5f);
+			_output = Sound.CreateStream(0.5f);
 			Load(_output);
 		}
 
@@ -116,7 +116,7 @@ namespace RhuEngine.WorldObjects
 
 		private float[] _samples = new float[0];
 
-		private const int MAX_QUEUE_SIZE = 3;
+		private const int MAX_QUEUE_SIZE = 2;
 
 		private readonly Queue<byte[]> _samplesQueue = new(MAX_QUEUE_SIZE);
 
