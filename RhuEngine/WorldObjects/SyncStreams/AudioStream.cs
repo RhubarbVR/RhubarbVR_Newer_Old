@@ -20,8 +20,9 @@ namespace RhuEngine.WorldObjects
 			ms40,
 			ms60
 		}
+
 		[OnChanged(nameof(UpdateFrameSize))]
-		[Default(AudioFrameTime.ms20)]
+		[Default(AudioFrameTime.ms40)]
 		public Sync<AudioFrameTime> frameSize;
 
 		public virtual void UpdateFrameSize() {
