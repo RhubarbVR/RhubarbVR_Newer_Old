@@ -83,6 +83,7 @@ namespace RhuEngine
 				// Now loop until finished, and then shut down
 				while (SK.Step(_app.Step)) { }
 				cap.DisableSingleString = true;
+				_app.IsCloseing = true;
 				_app.Dispose();
 				SK.Shutdown();
 

@@ -154,6 +154,8 @@ namespace RhuEngine.WorldObjects
 		/// </summary>
 		public float stepTime = 0f;
 
+		public object RenderLock = new();
+
 		public void Step() {
 			_netManager?.PollEvents();
 			_netManager?.NatPunchModule.PollEvents();
@@ -187,8 +189,10 @@ namespace RhuEngine.WorldObjects
 			}
 
 			try {
-				foreach (var item in _renderingComponents) {
-					item.Render();
+				lock (RenderLock) {
+					foreach (var item in _renderingComponents) {
+						item.Render();
+					}
 				}
 			}
 			catch (Exception e) {

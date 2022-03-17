@@ -1,44 +1,77 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
+using LibVLCSharp.Shared;
+
+using RhuEngine.VLC;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
 using StereoKit;
+
+
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets" })]
 	public class VideoTexture : AssetProvider<Tex>
 	{
-		[OnChanged(nameof(LoadTexture))]
-		[Default("https://cataas.com/cat/says/Base%20Url%20For%20RhubarbVR")]
-		public Sync<string> url;
+		public VlcVideoSourceProvider vlcVideoSourceProvider = null;
+		public AudioOutput audioOutput;
 
-		public async Task UpdateTexture() {
-			Log.Info("Loading img URL:" + url.Value);
-			using var client = new HttpClient();
-			Log.Info("Client");
-			using var response = await client.GetAsync(url.Value);
-			using var streamToReadFrom = await response.Content.ReadAsStreamAsync();
+		LibVLC _libVLC;
+		MediaPlayer _mediaPlayer;
 
+		private async Task LoadVideo() {
 			try {
-				Log.Info("Downloaded");
-				var _texture = new ImageSharpTexture(streamToReadFrom, true);
-				Load(_texture.CreateTexture());
+				if (vlcVideoSourceProvider != null) {
+					Log.Info("Reloading Loading Video Player");
+					Load(null);
+					vlcVideoSourceProvider.Dispose();
+					vlcVideoSourceProvider = null;
+					_libVLC = null;
+					_mediaPlayer = null;
+				}
+				else {
+					Log.Info("Loading Video Player");
+				}
+				vlcVideoSourceProvider = new VlcVideoSourceProvider();
+				Load(vlcVideoSourceProvider.VideoSource);
+
+				Core.Initialize();
+				_libVLC = new LibVLC(enableDebugLogs: true);
+				_mediaPlayer = new MediaPlayer(_libVLC);
+				vlcVideoSourceProvider.LoadPlayer(_mediaPlayer);
+				vlcVideoSourceProvider.RelaodTex += VlcVideoSourceProvider_RelaodTex;
+				vlcVideoSourceProvider.LoadAudio += audioOutput.WriteAudio;
+
+				//var media = new Media(_libVLC, "C:\\Users\\Faolan\\Pictures\\Trains.mp4",FromType.FromPath);
+				var uri = new Uri("https://rhubarbvr.net/Trains.mp4");
+				var media = new Media(_libVLC, uri);
+				if (VideoImporter.IsVideoStreaming(uri)) {
+					await media.Parse(MediaParseOptions.ParseNetwork);
+				}
+				while (media.State == VLCState.Buffering) {
+							Thread.Sleep(10);
+				}
+				_mediaPlayer.Play(media);
+				//_mediaPlayer.Play(media.SubItems[0]);
 			}
-			catch {
-				Log.Info($"Failed to initialize image");
-				Load(null);
+			catch (Exception ex) 
+			{
+				Log.Err($"Failed to start Video Player Error:{ex}");
 			}
 		}
 
-		private void LoadTexture() {
-			UpdateTexture().ConfigureAwait(false);
+		private void VlcVideoSourceProvider_RelaodTex() {
+			Load(null);
+			Load(vlcVideoSourceProvider.VideoSource);
 		}
 
 		public override void OnLoaded() {
 			base.OnLoaded();
-			LoadTexture();
+			LoadVideo().ConfigureAwait(false);
 		}
 	}
 }

@@ -2,69 +2,63 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using Vlc.DotNet.Core.Interops;
-using Vlc.DotNet.Core.Interops.Signatures;
+using LibVLCSharp;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
-using Vlc.DotNet.Core;
 using System.ComponentModel;
 using StereoKit;
+using LibVLCSharp.Shared;
 
 namespace RhuEngine.VLC
 {
-
-	/// <summary>
-	/// The class that can provide a Wpf Image Source to display the video.
-	/// </summary>
 	public class VlcVideoSourceProvider : INotifyPropertyChanged, IDisposable
 	{
-        /// <summary>
-        /// The memory mapped file that contains the picture data
-        /// </summary>
-        private MemoryMappedFile _memoryMappedFile;
+		public VlcVideoSourceProvider() {
+			VideoSource = new Tex(TexType.Dynamic, TexFormat.Rgba32Linear);
+		}
+		/// <summary>
+		/// The memory mapped file that contains the picture data
+		/// </summary>
+		private MemoryMappedFile _memoryMappedFile;
 
-        /// <summary>
-        /// The view that contains the pointer to the buffer that contains the picture data
-        /// </summary>
-        private MemoryMappedViewAccessor _memoryMappedView;
-
-		private bool _isAlphaChannelEnabled;
-		private bool _playerCreated;
+		/// <summary>
+		/// The view that contains the pointer to the buffer that contains the picture data
+		/// </summary>
+		private MemoryMappedViewAccessor _memoryMappedView;
 
 		/// <summary>
 		/// The media player instance. You must call <see cref="CreatePlayer"/> before using this.
 		/// </summary>
-		public VlcMediaPlayer MediaPlayer { get; private set; }
+		public MediaPlayer MediaPlayer { get; private set; }
 
-		/// <summary>
-		/// Defines if <see cref="VideoSource"/> pixel format is <see cref="PixelFormats.Bgr32"/> or <see cref="PixelFormats.Bgra32"/>
-		/// </summary>
-		public bool IsAlphaChannelEnabled
-		{
-			get => _isAlphaChannelEnabled;
+		public event Action RelaodTex;
 
-			set {
-				_isAlphaChannelEnabled = !_playerCreated
-					? value
-					:                    throw new InvalidOperationException("IsAlphaChannelEnabled property should be changed only before CreatePlayer method is called.");
-			}
-		}
+		public event Action<float[]> LoadAudio;
+
+		public Tex VideoSource { get; private set; }
+
+		public int Pitches { get; private set; }
+
 
 		/// <summary>
 		/// Creates the player. This method must be called before using <see cref="MediaPlayer"/>
 		/// </summary>
-		/// <param name="vlcLibDirectory">The directory where to find the vlc library</param>
-		/// <param name="vlcMediaPlayerOptions">The initialization options to be given to libvlc</param>
-		public void CreatePlayer(DirectoryInfo vlcLibDirectory, params string[] vlcMediaPlayerOptions) {
-			var directoryInfo = vlcLibDirectory ?? throw new ArgumentNullException(nameof(vlcLibDirectory));
-
-			MediaPlayer = new VlcMediaPlayer(directoryInfo, vlcMediaPlayerOptions);
-
-			MediaPlayer.SetVideoFormatCallbacks(VideoFormat, CleanupVideo);
-			MediaPlayer.SetVideoCallbacks(LockVideo, null, DisplayVideo, IntPtr.Zero);
-
-			_playerCreated = true;
+		public void LoadPlayer(MediaPlayer mediaPlayer) {
+			MediaPlayer = mediaPlayer;
+			MediaPlayer.EnableHardwareDecoding = true;
+			MediaPlayer.SetVideoFormatCallbacks(VideoFormat, null);
+			MediaPlayer.SetVideoCallbacks(LockVideo, null, DisplayVideo);
+			MediaPlayer.SetAudioFormat("S16N", 48000, 1);
+			mediaPlayer.SetAudioCallbacks(PlayAudio, null, null, null, null);
+		}
+		public unsafe void PlayAudio(IntPtr data, IntPtr samples, uint count, long pts) {
+			var ptr = (float*)samples;
+			var newbuff = new float[count];
+			for (var i = 0; i < count; i++) {
+				newbuff[i] = Marshal.ReadInt16(samples + (sizeof(short) * i)) * (1 / 32768.0f);
+			}
+			LoadAudio?.Invoke(newbuff);
 		}
 
 		/// <summary>
@@ -80,7 +74,7 @@ namespace RhuEngine.VLC
 
 		#region Vlc video callbacks
 		/// <summary>
-		/// Called by vlc when the video format is needed. This method allocats the picture buffers for vlc and tells it to set the chroma to RV32
+		/// Called by vlc when the video format is needed. This method allocats the picture buffers for vlc and tells it to set the chroma to RV24
 		/// </summary>
 		/// <param name="userdata">The user data that will be given to the <see cref="LockVideo"/> callback. It contains the pointer to the buffer</param>
 		/// <param name="chroma">The chroma</param>
@@ -89,15 +83,15 @@ namespace RhuEngine.VLC
 		/// <param name="pitches">The buffer width</param>
 		/// <param name="lines">The buffer height</param>
 		/// <returns>The number of buffers allocated</returns>
-		private uint VideoFormat(out IntPtr userdata, IntPtr chroma, ref uint width, ref uint height, ref uint pitches, ref uint lines) {
-			var pixelFormat = TexFormat.Bgra32;
-			FourCCConverter.ToFourCC("RV32", chroma);
+
+		private uint VideoFormat(ref IntPtr userdata, IntPtr chroma, ref uint width, ref uint height, ref uint pitches, ref uint lines) {
+			FourCCConverter.ToFourCC("RV24", chroma);
 
 			//Correct video width and height according to TrackInfo
-			var md = MediaPlayer.GetMedia();
+			var md = MediaPlayer.Media;
 			foreach (var track in md.Tracks) {
-				if (track.Type == MediaTrackTypes.Video) {
-					var trackInfo = (VideoTrack)track.TrackInfo;
+				if (track.TrackType == TrackType.Video) {
+					var trackInfo = track.Data.Video;
 					if (trackInfo.Width > 0 && trackInfo.Height > 0) {
 						width = trackInfo.Width;
 						height = trackInfo.Height;
@@ -110,37 +104,33 @@ namespace RhuEngine.VLC
 				}
 			}
 
-			pitches = GetAlignedDimension((uint)(width * 32) / 8, 32);
-			lines = GetAlignedDimension(height, 32);
+			pitches = GetAlignedDimension((uint)(width * 24) / 8, 24);
+			lines = GetAlignedDimension(height, 24);
 
 			var size = pitches * lines;
-            _memoryMappedFile = MemoryMappedFile.CreateNew(null, size);
+			_memoryMappedFile = MemoryMappedFile.CreateNew(null, size);
 			var handle = _memoryMappedFile.SafeMemoryMappedFileHandle.DangerousGetHandle();
-			var args = new {
-				width = width,
-				height = height,
-				pixelFormat = pixelFormat,
-				pitches = pitches
-			};
-
-			//this.dispatcher.Invoke((Action)(() => {
-			//	this.VideoSource = (InteropBitmap)Imaging.CreateBitmapSourceFromMemorySection(handle,
-			//		(int)args.width, (int)args.height, args.pixelFormat, (int)args.pitches, 0);
-			//}));
+			VideoSource.SetSize((int)width, (int)height);
+			Pitches = (int)pitches;
 			_memoryMappedView = _memoryMappedFile.CreateViewAccessor();
 			var viewHandle = _memoryMappedView.SafeMemoryMappedViewHandle.DangerousGetHandle();
 			userdata = viewHandle;
+			RelaodTex?.Invoke();
 			return 1;
 		}
-		/// <summary>
-		/// Called by Vlc when it requires a cleanup
-		/// </summary>
-		/// <param name="userdata">The parameter is not used</param>
-		private void CleanupVideo(ref IntPtr userdata) {
-			// This callback may be called by Dispose in the Dispatcher thread, in which case it deadlocks if we call RemoveVideo again in the same thread.
-			//if (!_disposedValue) {
-			//	this.dispatcher.Invoke(RemoveVideo);
-			//}
+
+		public byte[] rgbaData = null;
+
+		unsafe void Convert(int pixelCount, IntPtr rgbData) {
+			if ((rgbaData?.Length ?? 0) != pixelCount * sizeof(uint)) {
+				rgbaData = new byte[pixelCount * sizeof(uint)];
+			}
+			fixed (byte* rgbaP = &rgbaData[0]) {
+				var rgbP = (byte*)rgbData;
+				for (long i = 0, offsetRgb = 0; i < pixelCount - 1; i++, offsetRgb += 3) {
+					((uint*)rgbaP)[i] = *(uint*)(rgbP + offsetRgb) | 0xff000000;
+				}
+			}
 		}
 
 		/// <summary>
@@ -151,7 +141,7 @@ namespace RhuEngine.VLC
 		/// <returns>The pointer that is passed to the other callbacks as a picture identifier, this is not used</returns>
 		private IntPtr LockVideo(IntPtr userdata, IntPtr planes) {
 			Marshal.WriteIntPtr(planes, userdata);
-			return userdata;
+			return planes;
 		}
 
 		/// <summary>
@@ -160,10 +150,18 @@ namespace RhuEngine.VLC
 		/// <param name="userdata">The pointer to the buffer (the out parameter of the <see cref="VideoFormat"/> callback)</param>
 		/// <param name="picture">The pointer returned by the <see cref="LockVideo"/> callback. This is not used.</param>
 		private void DisplayVideo(IntPtr userdata, IntPtr picture) {
-			// Invalidates the bitmap
-			//this.dispatcher.BeginInvoke((Action)(() => {
-			//	(this.VideoSource as InteropBitmap)?.Invalidate();
-			//}));
+			if (Engine.MainEngine.IsCloseing) {
+				return;
+			}
+			if (VideoSource != null) {
+				lock (Engine.MainEngine.RenderLock) {
+					Convert(VideoSource.Width * VideoSource.Height, userdata);
+					if (rgbaData.Length < VideoSource.Width * VideoSource.Height) {
+						return;
+					}
+					VideoSource.SetColors(VideoSource.Width, VideoSource.Height, rgbaData);
+				}
+			}
 		}
 		#endregion
 
@@ -171,10 +169,10 @@ namespace RhuEngine.VLC
 		/// Removes the video (must be called from the Dispatcher thread)
 		/// </summary>
 		private void RemoveVideo() {
-            _memoryMappedView?.Dispose();
-            _memoryMappedView = null;
-            _memoryMappedFile?.Dispose();
-            _memoryMappedFile = null;
+			_memoryMappedView?.Dispose();
+			_memoryMappedView = null;
+			_memoryMappedFile?.Dispose();
+			_memoryMappedFile = null;
 		}
 
 		#region IDisposable Support
@@ -189,7 +187,7 @@ namespace RhuEngine.VLC
 				_disposedValue = true;
 				MediaPlayer?.Dispose();
 				MediaPlayer = null;
-				//this.dispatcher.BeginInvoke((Action)this.RemoveVideo);
+				RemoveVideo();
 			}
 		}
 

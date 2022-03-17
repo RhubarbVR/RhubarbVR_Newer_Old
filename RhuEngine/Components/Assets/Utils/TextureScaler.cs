@@ -20,12 +20,12 @@ namespace RhuEngine.Components
 
 		public Linker<Vec2> scale;
 
-		private void TextScale(Tex asset) {
-			if(asset is null) {
+		private void TextScale() {
+			if(texture.Asset is null) {
 				return;
 			}
 			if (scale.Linked) {
-				scale.LinkedValue = new Vec2(asset.Width, asset.Height) / asset.Height * scaleMultiplier;
+				scale.LinkedValue = new Vec2(texture.Asset.Width, texture.Asset.Height) / texture.Asset.Height * scaleMultiplier;
 			}
 		}
 

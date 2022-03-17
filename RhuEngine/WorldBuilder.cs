@@ -53,15 +53,18 @@ namespace RhuEngine
 		public static void BuildLocalWorld(this World world) {
 			Log.Info("Building Local World");
 			BuildUITest(world.RootEntity.AddChild("UITest"));
-			//var picMesh = world.RootEntity.AddChild("Pic");
-			//picMesh.position.Value = new Vec3(0, 0.25f, -0.5f);
-			//picMesh.rotation.Value = Quat.FromAngles(90, 0, 0);
-			//picMesh.scale.Value = new Vec3(3);
-			//var (pmesh, mit, prender) = picMesh.AttachMeshWithMeshRender<PlaneMesh, UnlitShader>();
-			//var textur = picMesh.AttachComponent<StaticTexture>();
-			//textur.url.Value = "https://cataas.com/cat/says/Base%20Url%20For%20RhubarbVR";
-			//mit.faceCull.Value = Cull.None;
-			//mit.SetPram("diffuse", textur);
+			var main = world.RootEntity.AddChild("main");
+			main.position.Value = new Vec3(1, 1, 0);
+			main.rotation.Value = Quat.LookDir(Vec3.Up);
+			var (pmesh, mit, prender) = main.AttachMeshWithMeshRender<PlaneMesh, UnlitClipShader>();
+			var scaler = main.AttachComponent<TextureScaler>();
+			scaler.scale.SetLinkerTarget(pmesh.dimensions);
+			scaler.scaleMultiplier.Value = 0.5f;
+			var textur = main.AttachComponent<VideoTexture>();
+			main.AttachComponent<SoundSource>().sound.Target = textur.audioOutput;
+			scaler.texture.Target = textur;
+			mit.faceCull.Value = Cull.None;
+			mit.SetPram("diffuse", textur);
 			var floor = world.RootEntity.AddChild("Floor");
 			floor.position.Value = new Vec3(0, 0, 0);
 			var (mesh, _, render) = floor.AttachMeshWithMeshRender<CubeMesh, PBRShader>();

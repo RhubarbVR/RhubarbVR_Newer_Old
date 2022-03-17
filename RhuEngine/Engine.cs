@@ -17,6 +17,8 @@ namespace RhuEngine
 {
 	public class Engine : IDisposable
 	{
+		public readonly object RenderLock = new();
+
 		private readonly bool _forceFlatscreen = false;
 
 		private readonly bool _noVRSim = false;
@@ -170,6 +172,9 @@ namespace RhuEngine
 				};
 			}
 		}
+
+		public bool IsCloseing { get; set; }
+
 		public NetApiManager netApiManager;
 
 		public WorldManager worldManager = new();
