@@ -66,7 +66,7 @@ namespace RhuEngine.WorldObjects
 					Thread.Sleep(10);
 				}
 
-				IsLoading = false;
+				//IsLoading = false;
 			}
 
 			public string Url { get; private set; }

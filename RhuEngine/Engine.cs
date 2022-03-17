@@ -201,10 +201,10 @@ namespace RhuEngine
 			};
 			var pixels = new Color32[size * size];
 			for (var y = 0; y < size; y++) {
-				var v = vertical.Get(1 - y / (size - 1.0f));
+				var v = vertical.Get(1 - (y / (size - 1.0f)));
 				for (var x = 0; x < size; x++) {
 					var h = horizontal.Get(x / (size - 1.0f));
-					pixels[x + y * size] = v * h;
+					pixels[x + (y * size)] = v * h;
 				}
 			}
 			tex.SetColors(size, size, pixels);

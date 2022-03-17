@@ -32,11 +32,12 @@
     <PackageReference Include="LiteNetLib" Version="0.9.5.2" />
     <PackageReference Include="MessagePack" Version="2.3.85" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.0" />
     <PackageReference Include="StereoKit" Version="0.3.6-preview.3" />
     <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
     <PackageReference Include="TextCopy" Version="6.1.0" />
+    <PackageReference Include="Vlc.DotNet.Core" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>

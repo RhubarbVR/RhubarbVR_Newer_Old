@@ -149,6 +149,13 @@ namespace RhuEngine.WorldObjects
 		}
 
 		private bool ShouldSendAudioPacked(float[] samples) {
+			var sum = 0f;
+			for (var i = 0; i < samples.Length; i++) {
+				sum += samples[i];
+			}
+			var average = sum / samples.Length;
+
+
 			return true;
 		}
 
