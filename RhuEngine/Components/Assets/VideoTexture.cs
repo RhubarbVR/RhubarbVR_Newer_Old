@@ -18,10 +18,21 @@ namespace RhuEngine.Components
 	public class VideoTexture : AssetProvider<Tex>
 	{
 		public VlcVideoSourceProvider vlcVideoSourceProvider = null;
-		public AudioOutput audioOutput;
+
+		[OnChanged(nameof(UpdateVideo))]
+		public SyncObjList<AudioOutput> AudioChannels;
 
 		LibVLC _libVLC;
 		MediaPlayer _mediaPlayer;
+
+		public override void OnAttach() {
+			base.OnAttach();
+			AudioChannels.Add();
+		}
+
+		public void UpdateVideo() {
+			LoadVideo().ConfigureAwait(false);
+		}
 
 		private async Task LoadVideo() {
 			try {
@@ -36,16 +47,21 @@ namespace RhuEngine.Components
 				else {
 					Log.Info("Loading Video Player");
 				}
-				vlcVideoSourceProvider = new VlcVideoSourceProvider();
+				vlcVideoSourceProvider = new VlcVideoSourceProvider {
+					ChannelCount = (uint)AudioChannels.Count
+				};
 				Load(vlcVideoSourceProvider.VideoSource);
-
 				Core.Initialize();
 				_libVLC = new LibVLC(enableDebugLogs: false);
 				_mediaPlayer = new MediaPlayer(_libVLC);
 				vlcVideoSourceProvider.LoadPlayer(_mediaPlayer);
 				vlcVideoSourceProvider.RelaodTex += VlcVideoSourceProvider_RelaodTex;
-				vlcVideoSourceProvider.LoadAudio += audioOutput.WriteAudio;
-
+				vlcVideoSourceProvider.LoadAudio += (samps,chan) => {
+					if (AudioChannels.Count <= chan) {
+						return;
+					}
+					AudioChannels[chan].WriteAudio(samps);
+				};
 				//var media = new Media(_libVLC, "C:\\Users\\Faolan\\Pictures\\Trains.mp4",FromType.FromPath);
 				var uri = new Uri("https://rhubarbvr.net/Trains.mp4");
 				var media = new Media(_libVLC, uri);
@@ -71,7 +87,7 @@ namespace RhuEngine.Components
 
 		public override void OnLoaded() {
 			base.OnLoaded();
-			LoadVideo().ConfigureAwait(false);
+			UpdateVideo();
 		}
 	}
 }

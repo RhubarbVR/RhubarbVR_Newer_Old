@@ -34,12 +34,21 @@ namespace RhuEngine.VLC
 
 		public event Action RelaodTex;
 
-		public event Action<float[]> LoadAudio;
+		public event Action<float[],int> LoadAudio;
 
 		public Tex VideoSource { get; private set; }
 
 		public int Pitches { get; private set; }
 
+		private uint _channelCount;
+
+		private uint _loadedChannelCount;
+
+		public uint ChannelCount
+		{
+			get => _loadedChannelCount;
+			set => _channelCount = value;
+		}
 
 		/// <summary>
 		/// Creates the player. This method must be called before using <see cref="MediaPlayer"/>
@@ -49,16 +58,18 @@ namespace RhuEngine.VLC
 			MediaPlayer.EnableHardwareDecoding = true;
 			MediaPlayer.SetVideoFormatCallbacks(VideoFormat, null);
 			MediaPlayer.SetVideoCallbacks(LockVideo, null, DisplayVideo);
-			MediaPlayer.SetAudioFormat("S16N", 48000, 1);
+			MediaPlayer.SetAudioFormat("S16N", 48000, _channelCount);
+			_loadedChannelCount = _channelCount;
 			mediaPlayer.SetAudioCallbacks(PlayAudio, null, null, null, null);
 		}
 		public unsafe void PlayAudio(IntPtr data, IntPtr samples, uint count, long pts) {
-			var ptr = (float*)samples;
-			var newbuff = new float[count];
-			for (var i = 0; i < count; i++) {
-				newbuff[i] = Marshal.ReadInt16(samples + (sizeof(short) * i)) * (1 / 32768.0f);
+			for (var c = 0; c < _loadedChannelCount; c++) {
+				var newbuff = new float[count];
+				for (var i = 0; i < count; i++) {
+					newbuff[i] = Marshal.ReadInt16(samples + (sizeof(short) * ((i  * (int)_loadedChannelCount) + c))) * (1 / 32768.0f);
+				}
+				LoadAudio?.Invoke(newbuff, c);
 			}
-			LoadAudio?.Invoke(newbuff);
 		}
 
 		/// <summary>
