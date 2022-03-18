@@ -15,7 +15,7 @@ using StereoKit;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets" })]
-	public class VideoTexture : AssetProvider<Tex>
+	public class VideoTexture : StaticAsset<Tex>
 	{
 		public VlcVideoSourceProvider vlcVideoSourceProvider = null;
 
@@ -31,10 +31,15 @@ namespace RhuEngine.Components
 		}
 
 		public void UpdateVideo() {
-			LoadVideo().ConfigureAwait(false);
+			LoadVideoPlayer();
 		}
 
-		private async Task LoadVideo() {
+		public override void OnLoaded() {
+			UpdateVideo();
+			base.OnLoaded();
+		}
+
+		private void LoadVideoPlayer() {
 			try {
 				if (vlcVideoSourceProvider != null) {
 					Log.Info("Reloading Loading Video Player");
@@ -56,23 +61,13 @@ namespace RhuEngine.Components
 				_mediaPlayer = new MediaPlayer(_libVLC);
 				vlcVideoSourceProvider.LoadPlayer(_mediaPlayer);
 				vlcVideoSourceProvider.RelaodTex += VlcVideoSourceProvider_RelaodTex;
-				vlcVideoSourceProvider.LoadAudio += (samps,chan) => {
+				vlcVideoSourceProvider.LoadAudio += (samps, chan) => {
 					if (AudioChannels.Count <= chan) {
 						return;
 					}
 					AudioChannels[chan].WriteAudio(samps);
 				};
-				//var media = new Media(_libVLC, "C:\\Users\\Faolan\\Pictures\\Trains.mp4",FromType.FromPath);
-				var uri = new Uri("https://rhubarbvr.net/Trains.mp4");
-				var media = new Media(_libVLC, uri);
-				if (VideoImporter.IsVideoStreaming(uri)) {
-					await media.Parse(MediaParseOptions.ParseNetwork);
-				}
-				while (media.State == VLCState.Buffering) {
-							Thread.Sleep(10);
-				}
-				_mediaPlayer.Play(media);
-				//_mediaPlayer.Play(media.SubItems[0]);
+				LoadMedia().ConfigureAwait(false);
 			}
 			catch (Exception ex) 
 			{
@@ -85,9 +80,62 @@ namespace RhuEngine.Components
 			Load(vlcVideoSourceProvider.VideoSource);
 		}
 
-		public override void OnLoaded() {
-			base.OnLoaded();
-			UpdateVideo();
+		public bool StopLoad = false;//Stops a asset loading over each other
+
+		private async Task LoadMedia() {
+			StopLoad = true; 
+			if (_mediaPlayer == null) {
+				return;
+			}
+			if (url.Value == null) {
+				return;
+			}
+			var uri = new Uri(url);
+			if ((useCache || uri.Scheme.ToLower() == "local") && !VideoImporter.IsVideoStreaming(uri)) {
+				Log.Info("Loading static video");
+				CurrentTask?.Stop();
+				CurrentTask = World.assetSession.AssetLoadingTask((data) => {
+					if (data != null) {
+						var media = new Media(_libVLC, Engine.assetManager.GetAssetFile(uri));
+						while (media.State == VLCState.Buffering) {
+							Thread.Sleep(10);
+						}
+						_mediaPlayer.Play(media);
+					}
+					else {
+						Log.Err("Failed to load assets");
+					}
+				}, uri, true);
+					
+			}
+			else {
+				Log.Info("Loading stream video");
+				StopLoad = false;
+				var media = new Media(_libVLC, uri);
+				if (VideoImporter.IsVideoStreaming(uri)) {
+					await media.Parse(MediaParseOptions.ParseNetwork);
+				}
+				while (media.State == VLCState.Buffering) {
+					Thread.Sleep(10);
+				}
+				if (StopLoad) {
+					return;
+				}
+				_mediaPlayer.Play(media);
+			}
+		}
+
+		public override void StartLoadAsset() {
+			if (url.Value == null) {
+				return;
+			}
+			try {
+				Log.Info("Starting load of static Asset Video");
+				LoadMedia().ConfigureAwait(false);
+			}
+			catch (Exception e) {
+				Log.Info($"Error Loading static Asset {e}");
+			}
 		}
 	}
 }

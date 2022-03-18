@@ -13,10 +13,11 @@ namespace RhuEngine.AssetSystem
 
 		public World World { get; private set; }
 
-		public void AssetLoadingTask(Action<byte[]> action,Uri asset,bool useCache) {
+		public AssetTask AssetLoadingTask(Action<byte[]> action,Uri asset,bool useCache) {
 			var task = new AssetTask(action,this,asset,useCache);
 			Manager.tasks.Add(task);
 			task.Start();
+			return task;
 		}
 
 		public byte[] GetAsset(Uri uri,bool useCache) {

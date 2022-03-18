@@ -14,15 +14,63 @@ namespace RhuEngine.Components
 		public static bool IsValidImport(string path) {
 			path = path.ToLower();
 			return
-				path.EndsWith(".png") ||
-				path.EndsWith(".jpeg") ||
-				path.EndsWith(".jpg") ||
-				path.EndsWith(".bmp") ||
-				path.EndsWith(".pdm") ||
-				path.EndsWith(".gif") ||
-				path.EndsWith(".tiff") ||
-				path.EndsWith(".tga") ||
-				path.EndsWith(".webp");
+				path.EndsWith(".asx") ||
+				path.EndsWith(".dts") ||
+				path.EndsWith(".gxf") ||
+				path.EndsWith(".m2v") ||
+				path.EndsWith(".m3u") ||
+				path.EndsWith(".m4v") ||
+				path.EndsWith(".mpeg1") ||
+				path.EndsWith(".mpeg2") ||
+				path.EndsWith(".mts") ||
+				path.EndsWith(".mxf") ||
+				path.EndsWith(".ogm") ||
+				path.EndsWith(".pls") ||
+				path.EndsWith(".bup") ||
+				path.EndsWith(".a52") ||
+				path.EndsWith(".aac") ||
+				path.EndsWith(".b4s") ||
+				path.EndsWith(".cue") ||
+				path.EndsWith(".divx") ||
+				path.EndsWith(".dv") ||
+				path.EndsWith(".flv") ||
+				path.EndsWith(".m1v") ||
+				path.EndsWith(".m2ts") ||
+				path.EndsWith(".mkv") ||
+				path.EndsWith(".mov") ||
+				path.EndsWith(".mpeg4") ||
+				path.EndsWith(".oma") ||
+				path.EndsWith(".spx") ||
+				path.EndsWith(".ts") ||
+				path.EndsWith(".vlc") ||
+				path.EndsWith(".vob") ||
+				path.EndsWith(".xspf") ||
+				path.EndsWith(".dat") ||
+				path.EndsWith(".bin") ||
+				path.EndsWith(".ifo") ||
+				path.EndsWith(".part") ||
+				path.EndsWith(".avi") ||
+				path.EndsWith(".mpeg") ||
+				path.EndsWith(".mpg") ||
+				path.EndsWith(".flac") ||
+				path.EndsWith(".m4a") ||
+				path.EndsWith(".mp1") ||
+				path.EndsWith(".ogg") ||
+				path.EndsWith(".wav") ||
+				path.EndsWith(".xm") ||
+				path.EndsWith(".3gp") ||
+				path.EndsWith(".srt") ||
+				path.EndsWith(".wmv") ||
+				path.EndsWith(".ac3") ||
+				path.EndsWith(".asf") ||
+				path.EndsWith(".mod") ||
+				path.EndsWith(".mp2") ||
+				path.EndsWith(".mp3") ||
+				path.EndsWith(".mp4") ||
+				path.EndsWith(".wma") ||
+				path.EndsWith(".mka") ||
+				path.EndsWith(".m4p") ||
+				path.EndsWith(".3g2");
 		}
 		public static bool IsStreamingProtocol(string scheme) {
 			return scheme.ToLower() switch {
@@ -40,18 +88,29 @@ namespace RhuEngine.Components
 
 		public override void Import(string data, bool wasUri, byte[] rawdata) {
 			if (wasUri) {
-				Log.Info("Build video not supported");
-				//var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<PlaneMesh, UnlitShader>();
-				//var scaler = Entity.AttachComponent<TextureScaler>();
-				//scaler.scale.SetLinkerTarget(pmesh.dimensions);
-				//scaler.scaleMultiplier.Value = 0.1f;
-				//var textur = Entity.AttachComponent<VideoPlayer>();
-				//var soundSource = Entity.AttachComponent<SoundSource>();
-				//soundSource.sound.Target = textur.audio;
-				//scaler.texture.Target = textur;
-				//textur.Url.Value = data;
-				//mit.faceCull.Value = Cull.None;
-				//mit.SetPram("diffuse", textur);
+				Log.Info("Building video");
+				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<PlaneMesh, UnlitClipShader>();
+				var scaler = Entity.AttachComponent<TextureScaler>();
+				scaler.scale.SetLinkerTarget(pmesh.dimensions);
+				scaler.scaleMultiplier.Value = 0.5f;
+				var textur = Entity.AttachComponent<VideoTexture>();
+				textur.url.Value = data;
+				var left = Entity.AddChild("left");
+				var rignt = Entity.AddChild("rignt");
+				left.position.Value = Vec3.Right * -0.5f;
+				rignt.position.Value = Vec3.Right * 0.5f;
+				left.position.Value += Vec3.Forward * 0.2f;
+				rignt.position.Value += Vec3.Forward * 0.2f;
+				left.scale.Value = new Vec3(0.1f);
+				rignt.scale.Value = new Vec3(0.1f);
+				textur.AudioChannels.Add();
+				left.AttachMesh<SphereMesh, UnlitShader>();
+				rignt.AttachMesh<SphereMesh, UnlitShader>();
+				left.AttachComponent<SoundSource>().sound.Target = textur.AudioChannels[0];
+				rignt.AttachComponent<SoundSource>().sound.Target = textur.AudioChannels[1];
+				scaler.texture.Target = textur;
+				mit.faceCull.Value = Cull.None;
+				mit.SetPram("diffuse", textur);
 			}
 			else {
 				if (rawdata == null) {
