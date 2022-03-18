@@ -159,7 +159,8 @@ namespace RhuEngine.VLC
 					if (rgbaData.Length < VideoSource.Width * VideoSource.Height) {
 						return;
 					}
-					VideoSource.SetColors(VideoSource.Width, VideoSource.Height, rgbaData);
+					//TODO: make rendedr only once on a current frame
+					SK.ExecuteOnMain(() => VideoSource.SetColors(VideoSource.Width, VideoSource.Height, rgbaData));
 				}
 			}
 		}

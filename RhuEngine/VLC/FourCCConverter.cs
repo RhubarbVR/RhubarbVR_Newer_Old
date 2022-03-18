@@ -19,9 +19,9 @@ namespace RhuEngine.VLC
 				return string.Format(
 					"{0}{1}{2}{3}",
 					(char)(fourCC & 0xff),
-					(char)(fourCC >> 8 & 0xff),
-					(char)(fourCC >> 16 & 0xff),
-					(char)(fourCC >> 24 & 0xff));
+					(char)((fourCC >> 8) & 0xff),
+					(char)((fourCC >> 16) & 0xff),
+					(char)((fourCC >> 24) & 0xff));
 			}
 
 			/// <summary>
