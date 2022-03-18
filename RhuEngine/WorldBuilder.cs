@@ -8,6 +8,8 @@ using StereoKit;
 
 using World = RhuEngine.WorldObjects.World;
 using RhuEngine.Components.ScriptNodes;
+using System.Collections.Generic;
+
 namespace RhuEngine
 {
 	public static class WorldBuilder
@@ -25,8 +27,8 @@ namespace RhuEngine
 			//method.Prams[0] = tostring;
 			//tostring.Prams[0] = new ScriptNodeConst(10);
 			//normal hello world
-			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			//method.Prams[0] = new ScriptNodeConst("Hi there is has been changed");
+			var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
+			method.Prams[0] = new ScriptNodeConst("Hi there is has been changed");
 			//Hello Word
 			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
 			//Test for stack overflow
@@ -36,18 +38,44 @@ namespace RhuEngine
 			//var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
 			//method.Prams[0] = tostring;
 			//tostring.Prams[0] = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeFieldsRead()[0];
-			var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
-			method.Prams[0] = tostring;
-			var add = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "Add")[0];
-			tostring.Prams[0] = add;
-			add.Prams[0] = new ScriptNodeConst(2);
-			add.Prams[1] = new ScriptNodeConst(2);
+			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
+			//var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
+			//method.Prams[0] = tostring;
+			//var inc = 2;
+			//var add = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "Add")[0];
+			//inc++;
+			//var e = AddNodeSpawn(new ScriptNodeMethod[1] {add},ref inc);
+			//var length = 8;
+			//for (var i = 0; i < length; i++) {
+			//	e = AddNodeSpawn(e, ref inc);
+			//}
+			//Console.WriteLine("Nodes" + e.Length);
+			//foreach (var item in e) {
+			//	item.Prams[0] = new ScriptNodeConst(1);
+			//	inc++;
+			//	item.Prams[1] = new ScriptNodeConst(1);
+			//	inc++;
+			//}
+			//Console.WriteLine($"Nodes are {inc}");
+			//tostring.Prams[0] = add;
 			script.MainMethod = method;
 			var ScripEditor = entity.AddChild("ScripEditor");
 			ScripEditor.position.Value = new Vec3(0, -0.1f, 0);
 			var VisualScriptBuilder = ScripEditor.AttachComponent<VisualScriptBuilder>();
 			VisualScriptBuilder.script.Target = script;
+		}
+
+		public static ScriptNodeMethod[] AddNodeSpawn(ScriptNodeMethod[] scriptNodeMethod,ref int inc) {
+			var e = new List<ScriptNodeMethod>();
+			foreach (var item in scriptNodeMethod) {
+				item.Prams[0] = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "Add")[0];
+				inc++;
+				item.Prams[1] = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "Add")[0];
+				inc++;
+				e.Add((ScriptNodeMethod)item.Prams[0]);
+				e.Add((ScriptNodeMethod)item.Prams[1]);
+			}
+			return e.ToArray();
 		}
 
 		public static void BuildLocalWorld(this World world) {

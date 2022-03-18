@@ -40,7 +40,7 @@ namespace RhuEngine.Components
 				Load(vlcVideoSourceProvider.VideoSource);
 
 				Core.Initialize();
-				_libVLC = new LibVLC(enableDebugLogs: true);
+				_libVLC = new LibVLC(enableDebugLogs: false);
 				_mediaPlayer = new MediaPlayer(_libVLC);
 				vlcVideoSourceProvider.LoadPlayer(_mediaPlayer);
 				vlcVideoSourceProvider.RelaodTex += VlcVideoSourceProvider_RelaodTex;
