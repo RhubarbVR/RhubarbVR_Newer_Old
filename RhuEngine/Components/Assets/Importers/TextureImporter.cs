@@ -36,6 +36,7 @@ namespace RhuEngine.Components
 				textur.url.Value = data;
 				mit.faceCull.Value = Cull.None;
 				mit.SetPram("diffuse", textur);
+				Destroy();
 			}
 			else {
 				if (rawdata == null) {

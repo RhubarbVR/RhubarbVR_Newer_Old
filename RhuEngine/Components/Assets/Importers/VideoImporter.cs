@@ -111,6 +111,7 @@ namespace RhuEngine.Components
 				scaler.texture.Target = textur;
 				mit.faceCull.Value = Cull.None;
 				mit.SetPram("diffuse", textur);
+				Destroy();
 			}
 			else {
 				if (rawdata == null) {
