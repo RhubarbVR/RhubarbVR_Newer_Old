@@ -36,6 +36,7 @@ namespace RhuEngine.Components
 
 		public override void LoadAsset(byte[] data) {
 			try {
+				Load(null);
 				Load(new ImageSharpTexture(new MemoryStream(data), true).CreateTexture());
 				TextValueChanged();
 			}

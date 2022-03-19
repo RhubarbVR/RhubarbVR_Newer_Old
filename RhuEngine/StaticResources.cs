@@ -7,8 +7,7 @@ using System.IO;
 
 namespace RhuEngine
 {
-	public class StaticResources
-	{
+	public class StaticResources {
 		public Stream GetStaticResourceStream(string name) {
 			return Assembly.GetCallingAssembly().GetManifestResourceStream(name);
 		}
@@ -21,12 +20,20 @@ namespace RhuEngine
 		public Tex LoadTexture(string name) {
 			return Tex.FromMemory(GetStaticResource(name));
 		}
+		private Tex _rhubarbLogoV1;
 
-		public Tex RhubarbLogoV1 => LoadTexture("RhuEngine.Res.RhubarbVR.png");
-		public Tex RhubarbLogoV2 => LoadTexture("RhuEngine.Res.RhubarbVR2.png");
+		public Tex RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("RhuEngine.Res.RhubarbVR.png");
+		private Tex _rhubarbLogoV2;
 
-		public Tex Grid => LoadTexture("RhuEngine.Res.Grid.jpg");
-		public Tex Null => LoadTexture("RhuEngine.Res.nulltexture.jpg");
+		public Tex RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("RhuEngine.Res.RhubarbVR2.png");
+
+		private Tex _grip;
+
+		public Tex Grid => _grip ??= LoadTexture("RhuEngine.Res.Grid.jpg");
+
+		private Tex _null;
+
+		public Tex Null => _null ??= LoadTexture("RhuEngine.Res.nulltexture.jpg");
 
 		//public Font LoadFont(string name) {
 		//	return Font.FromMemory(GetStaticResource(name));

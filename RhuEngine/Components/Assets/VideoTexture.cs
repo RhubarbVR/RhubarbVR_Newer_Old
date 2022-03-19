@@ -35,15 +35,16 @@ namespace RhuEngine.Components
 		}
 
 		public override void OnLoaded() {
+			Load(null);
 			UpdateVideo();
 			base.OnLoaded();
 		}
 
 		private void LoadVideoPlayer() {
 			try {
+				Load(null);
 				if (vlcVideoSourceProvider != null) {
 					Log.Info("Reloading Loading Video Player");
-					Load(null);
 					vlcVideoSourceProvider.Dispose();
 					vlcVideoSourceProvider = null;
 					_libVLC = null;
@@ -55,7 +56,6 @@ namespace RhuEngine.Components
 				vlcVideoSourceProvider = new VlcVideoSourceProvider {
 					ChannelCount = (uint)AudioChannels.Count
 				};
-				Load(vlcVideoSourceProvider.VideoSource);
 				Core.Initialize();
 				_libVLC = new LibVLC(enableDebugLogs: false);
 				_mediaPlayer = new MediaPlayer(_libVLC);

@@ -116,8 +116,7 @@ namespace RhuEngine.Components
 					return Tex.White;
 				}
 				else {
-					//Need to change to loading texture
-					return value.Asset ?? Tex.Black;
+					return value.Asset ?? Engine.staticResources.Null;
 				}
 			}
 		}
