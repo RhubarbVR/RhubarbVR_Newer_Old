@@ -5,7 +5,7 @@ using System.Reflection;
 using MessagePack;
 using MessagePack.Formatters;
 
-namespace SharedModels
+namespace SharedModels.GameSpecific
 {
 
 	public class FormatterAttribute : Attribute

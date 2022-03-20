@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.WebSockets;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -18,6 +18,9 @@ using RhuEngine.Datatypes;
 using RhuEngine.Managers;
 
 using SharedModels;
+using SharedModels.GameSpecific;
+using SharedModels.Session;
+using SharedModels.UserSession;
 
 using StereoKit;
 
@@ -26,9 +29,8 @@ namespace RhuEngine.WorldObjects
 	public partial class World : IWorldObject
 	{
 
-		private ClientWebSocket _client;
-		public bool IsNetworked { get; private set; } = false;
-		public bool IsLoadingNet { get; private set; } = true;
+		public bool IsNetworked { get; internal set; } = false;
+		public bool IsLoadingNet { get; internal set; } = true;
 		public bool WaitingForWorldStartState { get; internal set; } = true;
 
 		public ushort MasterUser { get; set; } = 1;
@@ -44,102 +46,101 @@ namespace RhuEngine.WorldObjects
 			if (newWorld) {
 				IsDeserializing = false;
 				AddLocalUser();
-				StartWebSocketClient(false);
-				IsLoadingNet = false;
+				ConnectedToSession(false);
 				WaitingForWorldStartState = false;
 			}
 			else {
 				LocalUserID = 0;
 				IsLoadingNet = true;
 				IsDeserializing = true;
-				StartWebSocketClient(true);
+				ConnectedToSession(true);
 			}
 		}
 
-		private void SessionNameChanged() {
-			if (LocalUserID != 1) {
+		internal void SessionInfoChanged() {
+			if (MasterUser != LocalUserID) {
 				return;
 			}
-			try {
-				_client?.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("SetSessionName^&^" + SessionName.Value)), WebSocketMessageType.Text, true, CancellationToken.None);
+			if (!IsNetworked) {
+				return;
 			}
-			catch { }
+			var sessionInfo = new SessionInfo {
+				ActiveUsers = Users.Select(user => (((User)user)?.isPresent?.Value??false) && (((User)user).IsConnected || ((User)user).IsLocalUser)).Where((val) => val).Count(),
+				Admins = Admins,
+				AssociatedGroup = AssociatedGroup.Value,
+				IsHidden = IsHidden.Value,
+				MaxUsers = MaxUserCount.Value,
+				ThumNail = ThumNail.Value,
+				SessionTags = SessionTags,
+				SessionAccessLevel = AccessLevel.Value,
+				SessionName = SessionName.Value,
+				NormalizedSessionName = SessionName.Value.Normalize(),
+				SessionId = SessionID.Value
+			};
+			var sessionConnection = new SessionCreation {
+				SessionInfo = sessionInfo,
+				UserConnectionInfo = null,
+				ForceJoin = Array.Empty<string>()
+			};
+			Engine.netApiManager.SendDataToSocked(new SessionRequest { RequestType = RequestType.UpdateSession, RequestData = JsonConvert.SerializeObject(sessionConnection), ID = sessionInfo.SessionId });
 		}
 
-		private void StartWebSocketClient(bool joiningSession) {
-			try {
-				Log.Info("Starting WebSocket Client");
-				_client = new ClientWebSocket();
-				var cernts = new System.Security.Cryptography.X509Certificates.X509CertificateCollection();
-				foreach (var item in NetApiManager.LetsEncrypt) {
-					cernts.Add(new System.Security.Cryptography.X509Certificates.X509Certificate(item));
-				}
-				_client.Options.ClientCertificates = cernts;
-				var dist = new Uri(worldManager.Engine.netApiManager.BaseAddress, "/ws/session");
-				var uri = new UriBuilder(dist) {
-					//Check if Android so it can be insecure 
-					Scheme = ((dist.Scheme == Uri.UriSchemeHttps) && !RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) ? "wss" : "ws",
-					Port = RuntimeInformation.FrameworkDescription.StartsWith("Mono ") ? 80 : dist.Port
-				};
-				//this disgusts me i needed the auth cookie if android
-				if (RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) {
-					worldManager.Engine.netApiManager.Cookies.SetCookies(uri.Uri, worldManager.Engine.netApiManager.Cookies.GetCookieHeader(worldManager.Engine.netApiManager.BaseAddress));
-				}
-				_client.Options.Cookies = worldManager.Engine.netApiManager.Cookies;
-				//Its for the quest users aaaaaaa
-				Log.Info($"Using {uri.Uri}");
-				var connection = _client.ConnectAsync(uri.Uri, CancellationToken.None);
-				connection.Wait();
-				Log.Info($"WebSocket Client {connection.Status}");
-				Task.Run(() => {
-					if (joiningSession) {
-						WaitingForWorldStartState = true;
-						_client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("JoinSession^&^" + JsonConvert.SerializeObject(new UserSessionInfo { ConnectionType = ConnectionType.HolePunch }) + "^&^" + SessionID.Value)), WebSocketMessageType.Text, true, CancellationToken.None);
+		private void ConnectedToSession(bool joiningSession) {
+			Task.Run(async () => {
+				IsLoadingNet= true;
+				LoadNatManager();
+				try {
+					var Pings = new Dictionary<string, int>();
+					var servers = await Engine.netApiManager.GetRelayHoleServers();
+					foreach (var item in servers) {
+						var pingSender = new Ping();
+						var e = pingSender.Send(new Uri(item.IP).Host, 500);
+						if ((e?.Status ?? IPStatus.Unknown) == IPStatus.Success) {
+							Pings.Add(item.IP, (int)e.RoundtripTime);
+						}
+					}
+					//TODO: add support for changeing on connection info 
+					var userConnection = new UserConnectionInfo {
+						ConnectionType = ConnectionType.HolePunch,
+						ServerPingLevels = Pings,
+						Data = null
+					};
+					if (!joiningSession) {
+						SessionID.Value = Guid.NewGuid().ToString();
+						var sessionInfo = new SessionInfo {
+							ActiveUsers = 1,
+							Admins = Admins,
+							AssociatedGroup = AssociatedGroup.Value,
+							IsHidden = IsHidden.Value,
+							MaxUsers = MaxUserCount.Value,
+							ThumNail = ThumNail.Value,
+							SessionTags = SessionTags,
+							SessionAccessLevel = AccessLevel.Value,
+							SessionName = SessionName.Value,
+							NormalizedSessionName = SessionName.Value.Normalize(),
+							SessionId = SessionID.Value
+						};
+						var sessionConnection = new SessionCreation {
+							SessionInfo = sessionInfo,
+							UserConnectionInfo = userConnection,
+							ForceJoin = Array.Empty<string>()
+						};
+						Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = SessionID.Value, RequestData = JsonConvert.SerializeObject(sessionConnection), RequestType = RequestType.CreateSession });
+
 					}
 					else {
-						_client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("CreateSession^&^" + JsonConvert.SerializeObject(new UserSessionInfo { ConnectionType = ConnectionType.HolePunch }))), WebSocketMessageType.Text, true, CancellationToken.None);
+						var sessionConnection = new JoinSession {
+							SessionID = SessionID.Value,
+							UserConnectionInfo = userConnection,
+						};
+						Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = SessionID.Value, RequestData = JsonConvert.SerializeObject(sessionConnection), RequestType = RequestType.JoinSession });
 					}
-					var WaitingForSessionID = true;
-					while (_client.State == WebSocketState.Open) {
-						var buffer = new ArraySegment<byte>(new byte[1024]);
-						var task = _client.ReceiveAsync(buffer, CancellationToken.None);
-						task.Wait();
-						if (WaitingForSessionID) {
-							if (joiningSession) {
-								var data = Encoding.UTF8.GetString(buffer.Array);
-								if (data.Remove(5) == "Added") {
-									IsDeserializing = true;
-									IsLoadingNet = false;
-									WaitingForSessionID = false;
-								}
-								else {
-									Log.Err(data);
-									Dispose();
-								}
-							}
-							else {
-								SessionID.Value = Encoding.UTF8.GetString(buffer.Array);
-								Log.Info(SessionID.Value);
-								WaitingForSessionID = false;
-							}
-						}
-						else {
-							ConnectToUser(JsonConvert.DeserializeObject<ConnectToUser>(Encoding.UTF8.GetString(buffer.Array)));
-						}
-					}
-				});
-				try {
-					LoadNatManager();
+					IsLoadingNet = false;
 				}
 				catch (Exception ex) {
-					Log.Err($"Faild to start NatManager {ex}");
-					Dispose();
+					LoadMsg = "Failed to Connected To Session" + ex.Message;
 				}
-			}
-			catch (Exception e) {
-				Log.Err($"Faild to start WebSocket Client {e}");
-				Dispose();
-			}
+			});
 		}
 
 #if DEBUG
@@ -417,7 +418,7 @@ namespace RhuEngine.WorldObjects
 
 		public List<ConnectToUser> ActiveConnections = new();
 
-		private void ConnectToUser(ConnectToUser user) {
+		public void ConnectToUser(ConnectToUser user) {
 			Task.Run(() => {
 				lock (ActiveConnections) {
 					ActiveConnections.Add(user);
@@ -443,7 +444,8 @@ namespace RhuEngine.WorldObjects
 							var peerCount = _netManager.ConnectedPeersCount;
 							Log.Info("Server: " + worldManager.Engine.netApiManager.BaseAddress.Host);
 							NatUserIDS.TryAdd(user.Data, user.UserID);
-							_netManager.NatPunchModule.SendNatIntroduceRequest(worldManager.Engine.netApiManager.BaseAddress.Host, 7856, user.Data);
+							var eidUri = new Uri(user.Server);
+							_netManager.NatPunchModule.SendNatIntroduceRequest(eidUri.Host,eidUri.Port, user.Data);
 							for (var i = 0; i < 60; i++) {
 								if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
 									if (NatConnection.TryGetValue(user.Data, out var peer)) {
@@ -522,7 +524,8 @@ namespace RhuEngine.WorldObjects
 		private void RelayConnect(ConnectToUser user) {
 			Log.Info("Relay Connect Client");
 			try {
-				var peer = _netManager.Connect(worldManager.Engine.netApiManager.BaseAddress.Host, 7857, user.Data);
+				var eidUri = new Uri(user.Server);
+				var peer = _netManager.Connect(eidUri.Host, eidUri.Port + 1, user.Data);
 				if (peer.Tag is not null) {
 					Log.Info(LoadMsg = "Adding another Relay Client");
 					var relay = peer.Tag as RelayPeer;

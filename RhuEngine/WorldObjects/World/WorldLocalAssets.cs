@@ -13,6 +13,7 @@ using LiteNetLib;
 using System.Threading.Tasks;
 using SharedModels;
 using System.Collections.Generic;
+using SharedModels.GameSpecific;
 
 namespace RhuEngine.WorldObjects
 {

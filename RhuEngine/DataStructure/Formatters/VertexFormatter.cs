@@ -3,6 +3,7 @@ using MessagePack;
 using MessagePack.Formatters;
 
 using SharedModels;
+using SharedModels.GameSpecific;
 
 using StereoKit;
 

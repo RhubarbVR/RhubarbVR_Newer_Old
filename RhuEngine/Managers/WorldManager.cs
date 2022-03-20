@@ -11,6 +11,7 @@ using RhuEngine.DataStructure;
 using RhuEngine.WorldObjects;
 
 using SharedModels;
+using SharedModels.GameSpecific;
 
 using StereoKit;
 
@@ -66,7 +67,7 @@ namespace RhuEngine.Managers
 					Thread.Sleep(100);
 				}
 				if (world.IsDisposed) {
-					Log.Err($"Failed to start world {world.WorldDebugName}");
+					Log.Err($"Failed to start world {world.WorldDebugName} Error {world.LoadMsg}");
 					Thread.Sleep(3000);
 					_isRunning.Pop();
 				}
@@ -76,6 +77,19 @@ namespace RhuEngine.Managers
 					_isRunning.Pop();
 				}
 			});
+		}
+
+		public World GetWorldBySessionID(string sessionID) {
+			for (var i = worlds.Count - 1; i >= 0; i--) {
+				try {
+					if (worlds[i].SessionID.Value == sessionID) {
+						return worlds[i];
+					}
+				}
+				catch { 
+				}
+			}
+			return null;
 		}
 
 		public World CreateNewWorld(World.FocusLevel focusLevel, bool localWorld = false, string sessionName = null) {
@@ -198,9 +212,7 @@ namespace RhuEngine.Managers
 						Text.Add($"Loading World: \n{world.LoadMsg}", new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix());
 					}
 					else {
-						if (!world.IsDisposed) {
-							Text.Add($"Failed to load world{(Engine.netApiManager.User?.UserName == null ? "" : ", JIM")}", new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix());
-						}
+						Text.Add($"Failed to load world{(Engine.netApiManager.User?.UserName == null ? ", JIM": "")}\nError {world.LoadMsg}", new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix());
 					}
 				}
 			}

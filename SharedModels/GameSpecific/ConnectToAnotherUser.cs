@@ -5,7 +5,7 @@ using System.Text;
 using MessagePack;
 using MessagePack.Formatters;
 
-namespace SharedModels
+namespace SharedModels.GameSpecific
 {
 
 	[Formatter]

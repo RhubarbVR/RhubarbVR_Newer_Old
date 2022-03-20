@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using SharedModels.UserInfo;
+
 namespace SharedModels
 {
 	public class LoginResponse
@@ -26,7 +28,7 @@ namespace SharedModels
 		public LoginResponse(IRhubarbIdentity user) {
 			Login = true;
 			Message = $"Login as {user.UserName}";
-			User = new PrivateUser(user.TwoFactorEnabled, user.PhoneNumberConfirmed, user.PhoneNumber, user.EmailConfirmed, user.NormalizedEmail, user.Email, user.NormalizedUserName, user.UserName, user.Id, user.DateOfBirth);
+			User = new PrivateUser(user);
 		}
 
 	}
@@ -49,23 +51,27 @@ namespace SharedModels
 
 		public string UserName { get; set; }
 
+		public List<string> Roles { get; set; }
+
 		public string Id { get; set; }
 	}
 
 	public class PrivateUser : IRhubarbIdentity
 	{
 
-		public PrivateUser(bool twoFactorEnabled, bool phoneNumberConfirmed, string phoneNumber, bool emailConfirmed, string normalizedEmail, string email, string normalizedUserName, string userName, string id, DateTime dateof) {
-			TwoFactorEnabled = twoFactorEnabled;
-			PhoneNumberConfirmed = phoneNumberConfirmed;
-			PhoneNumber = phoneNumber;
-			EmailConfirmed = emailConfirmed;
-			NormalizedEmail = normalizedEmail;
-			Email = email;
-			NormalizedUserName = normalizedUserName;
-			UserName = userName;
-			Id = id;
-			DateOfBirth = dateof;
+		public PrivateUser(IRhubarbIdentity rhubarbIdentity) {
+			TwoFactorEnabled = rhubarbIdentity.TwoFactorEnabled;
+			PhoneNumberConfirmed = rhubarbIdentity.PhoneNumberConfirmed;
+			PhoneNumber = rhubarbIdentity.PhoneNumber;
+			EmailConfirmed = rhubarbIdentity.EmailConfirmed;
+			NormalizedEmail = rhubarbIdentity.NormalizedEmail;
+			Email = rhubarbIdentity.Email;
+			NormalizedUserName = rhubarbIdentity.NormalizedUserName;
+			UserName=rhubarbIdentity.UserName;
+			Id=rhubarbIdentity.Id;
+			DateOfBirth = rhubarbIdentity.DateOfBirth;
+			Friends = rhubarbIdentity.Friends;
+			FriendRequests	= rhubarbIdentity.FriendRequests;
 		}
 
 		public PrivateUser() {
@@ -90,5 +96,8 @@ namespace SharedModels
 		public string Id { get; set; }
 
 		public DateTime DateOfBirth { get; set; }
+
+		public string[] Friends { get; set; }
+		public FriendRequest[] FriendRequests { get; set; }
 	}
 }

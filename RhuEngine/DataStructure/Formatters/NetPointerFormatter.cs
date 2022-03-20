@@ -5,6 +5,7 @@ using MessagePack.Formatters;
 using RhuEngine.Datatypes;
 
 using SharedModels;
+using SharedModels.GameSpecific;
 
 namespace RhuEngine.DataStructure.Formatters
 {

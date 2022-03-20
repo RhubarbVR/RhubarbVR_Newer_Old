@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using RhuEngine.Managers;
 
 using SharedModels;
+using SharedModels.Session;
 
 using StereoKit;
 

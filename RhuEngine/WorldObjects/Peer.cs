@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using LiteNetLib;
 using SharedModels;
+using SharedModels.GameSpecific;
+using SharedModels.Session;
 
 using StereoKit;
 

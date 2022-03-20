@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SharedModels
+namespace SharedModels.UserInfo
 {
 
 	public interface IRhubarbIdentity
@@ -28,5 +28,9 @@ namespace SharedModels
 		public string Id { get; set; }
 
 		public DateTime DateOfBirth { get; set; }
+
+		public string[] Friends { get; set; }
+
+		public FriendRequest[] FriendRequests { get; set; }
 	}
 }

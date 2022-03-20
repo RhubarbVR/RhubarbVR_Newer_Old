@@ -6,6 +6,8 @@ using LiteNetLib;
 
 using RhuEngine.Components;
 
+using StereoKit;
+
 namespace RhuEngine.WorldObjects
 {
 	public class User : SyncObject
@@ -32,8 +34,11 @@ namespace RhuEngine.WorldObjects
 		}
 
 		[Default(true)]
+		[OnChanged(nameof(PresentChange))]
 		public Sync<bool> isPresent;
-
+		public void PresentChange() {
+			World.SessionInfoChanged();
+		}
 		public Peer CurrentPeer { get; set; }
 
 		public bool IsConnected  => (CurrentPeer?.NetPeer?.ConnectionState ?? LiteNetLib.ConnectionState.Disconnected) == LiteNetLib.ConnectionState.Connected;

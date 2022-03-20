@@ -4,6 +4,7 @@ using MessagePack.Formatters;
 
 using StereoKit;
 using SharedModels;
+using SharedModels.GameSpecific;
 
 namespace RhuEngine.DataStructure.Formatters
 {
