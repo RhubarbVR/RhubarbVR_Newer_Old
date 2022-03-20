@@ -79,6 +79,7 @@ namespace RhuEngine.WorldObjects
 					item.SetValue(this, instance);
 				}
 			}
+			StartTime.Value = DateTime.UtcNow;
 			if (isPersonalSpace | !networkedWorld) {
 				IsDeserializing = false;
 				IsLoadingNet = false;
@@ -178,6 +179,11 @@ namespace RhuEngine.WorldObjects
 		[NoSave]
 		[OnChanged(nameof(SessionInfoChanged))]
 		public SyncValueList<string> Admins;
+
+		[NoSave]
+		public Sync<DateTime> StartTime;
+
+		public double WorldTime => (StartTime - DateTime.UtcNow).TotalSeconds;
 
 		[Default("New World")]
 		public Sync<string> WorldName;

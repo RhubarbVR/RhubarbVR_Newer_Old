@@ -21,9 +21,25 @@ namespace RhuEngine.Components
 
 		[OnChanged(nameof(UpdateVideo))]
 		public SyncObjList<AudioOutput> AudioChannels;
+		[OnChanged(nameof(PlayBackUpdate))]
+		public SyncPlayback Playback;
 
 		LibVLC _libVLC;
 		MediaPlayer _mediaPlayer;
+
+		private void PlayBackUpdate() {
+			if(_mediaPlayer is not null) {
+				if (Playback.Playing) {
+					_mediaPlayer.Play();
+				}
+				else {
+					_mediaPlayer.Pause();
+					_mediaPlayer.NextFrame();
+				}
+				_mediaPlayer.SetRate(Playback.Value.Speed);
+				_mediaPlayer.Position = (float)(1 / Playback.ClipLength * Playback.Position);
+			}
+		}
 
 		public override void OnAttach() {
 			base.OnAttach();
@@ -35,9 +51,14 @@ namespace RhuEngine.Components
 		}
 
 		public override void OnLoaded() {
+			Playback.StateChange += Playback_StateChange;
 			Load(null);
 			UpdateVideo();
 			base.OnLoaded();
+		}
+
+		private double Playback_StateChange() {
+			return (double)(_mediaPlayer?.Length ?? -1L) / 1000;
 		}
 
 		private void LoadVideoPlayer() {
@@ -59,6 +80,8 @@ namespace RhuEngine.Components
 				Core.Initialize();
 				_libVLC = new LibVLC(enableDebugLogs: false);
 				_mediaPlayer = new MediaPlayer(_libVLC);
+				_mediaPlayer.LengthChanged += MediaPlayer_LengthChanged;
+				_mediaPlayer.Buffering += MediaPlayer_Buffering;
 				vlcVideoSourceProvider.LoadPlayer(_mediaPlayer);
 				vlcVideoSourceProvider.RelaodTex += VlcVideoSourceProvider_RelaodTex;
 				vlcVideoSourceProvider.LoadAudio += (samps, chan) => {
@@ -67,12 +90,23 @@ namespace RhuEngine.Components
 					}
 					AudioChannels[chan].WriteAudio(samps);
 				};
-				LoadMedia().ConfigureAwait(false);
+				Task.Run(LoadMedia);
 			}
 			catch (Exception ex) 
 			{
 				Log.Err($"Failed to start Video Player Error:{ex}");
 			}
+		}
+
+		private void MediaPlayer_Buffering(object sender, MediaPlayerBufferingEventArgs e) {
+			if(_mediaPlayer is not null) {
+				return;
+			}
+			_mediaPlayer.Position = (float)Playback.Position;
+		}
+
+		private void MediaPlayer_LengthChanged(object sender, MediaPlayerLengthChangedEventArgs e) {
+			Playback.ClipLength = (double)e.Length /1000;
 		}
 
 		private void VlcVideoSourceProvider_RelaodTex() {
@@ -83,7 +117,8 @@ namespace RhuEngine.Components
 		public bool StopLoad = false;//Stops a asset loading over each other
 
 		private async Task LoadMedia() {
-			StopLoad = true; 
+			StopLoad = true;
+			Load(null);
 			if (_mediaPlayer == null) {
 				return;
 			}
@@ -100,7 +135,9 @@ namespace RhuEngine.Components
 						while (media.State == VLCState.Buffering) {
 							Thread.Sleep(10);
 						}
+						VlcVideoSourceProvider_RelaodTex();
 						_mediaPlayer.Play(media);
+						PlayBackUpdate();
 					}
 					else {
 						Log.Err("Failed to load assets");
@@ -121,7 +158,9 @@ namespace RhuEngine.Components
 				if (StopLoad) {
 					return;
 				}
+				VlcVideoSourceProvider_RelaodTex();
 				_mediaPlayer.Play(media);
+				PlayBackUpdate();
 			}
 		}
 
@@ -131,7 +170,7 @@ namespace RhuEngine.Components
 			}
 			try {
 				Log.Info("Starting load of static Asset Video");
-				LoadMedia().ConfigureAwait(false);
+				Task.Run(LoadMedia);
 			}
 			catch (Exception e) {
 				Log.Info($"Error Loading static Asset {e}");

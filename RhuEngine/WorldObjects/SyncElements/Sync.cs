@@ -9,6 +9,7 @@ namespace RhuEngine.WorldObjects
 {
 	public interface ISync
 	{
+		public void SetStartingObject();
 		public void SetValue(object value);
 	}
 	public class Sync<T> : SyncObject, ILinkerMember<T>, ISync, INetworkedObject, IChangeable
@@ -26,12 +27,16 @@ namespace RhuEngine.WorldObjects
 					var lastVal = _value;
 					_value = value;
 					BroadcastValue();
+					UpdatedValue();
 					if (!EqualityComparer<T>.Default.Equals(lastVal, _value)) {
 						Changed?.Invoke(this);
 					}
 				}
 			}
 		}
+		public virtual void UpdatedValue() {
+		}
+
 		public object Object { get => _value; set => _value = (T)value; }
 		private void BroadcastValue() {
 			if (IsLinkedTo || NoSync) {
@@ -48,6 +53,7 @@ namespace RhuEngine.WorldObjects
 				_value = newValue;
 				Changed?.Invoke(this);
 			}
+			UpdatedValue();
 		}
 
 		public event Action<IChangeable> Changed;
@@ -59,25 +65,37 @@ namespace RhuEngine.WorldObjects
 				}
 				catch { }
 			}
+			UpdatedValue();
 		}
 		public override void InitializeMembers(bool networkedObject, bool deserializeFunc, Func<NetPointer> func) {
 		}
 
+		public virtual T OnSave(SyncObjectSerializerObject serializerObject) {
+			return _value;
+		}
+
+		public virtual void OnLoad(SyncObjectDeserializerObject serializerObject) {
+		}
+
+
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
-			return SyncObjectSerializerObject.CommonValueSerialize(this, _value);
+			return SyncObjectSerializerObject.CommonValueSerialize(this, OnSave(syncObjectSerializerObject));
 		}
 
 		public override void Deserialize(IDataNode data, SyncObjectDeserializerObject syncObjectSerializerObject) {
 			_value = syncObjectSerializerObject.ValueDeserialize<T>((DataNodeGroup)data, this);
+			OnLoad(syncObjectSerializerObject);
 		}
 
 		public void SetValueNoOnChange(T value) {
 			_value = value;
 			BroadcastValue();
+			UpdatedValue();
 		}
 
 		public void SetValueNoOnChangeAndNetworking(T value) {
 			_value = value;
+			UpdatedValue();
 		}
 
 		public bool IsLinkedTo { get; private set; }
@@ -87,6 +105,8 @@ namespace RhuEngine.WorldObjects
 		public NetPointer LinkedFrom => linkedFromObj.Pointer;
 
 		public bool NoSync { get; set; }
+
+		public virtual T StartingValue => default;
 
 		public void KillLink() {
 			linkedFromObj.RemoveLinkLocation();
@@ -105,6 +125,11 @@ namespace RhuEngine.WorldObjects
 			value.SetLinkLocation(this);
 			linkedFromObj = value;
 			IsLinkedTo = true;
+		}
+
+		public void SetStartingObject() {
+			_value = StartingValue;
+			UpdatedValue();
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -154,6 +154,9 @@ namespace RhuEngine.WorldObjects
 						if (startValue != null) {
 							((ISync)instance).SetValue(startValue.Data);
 						}
+						else {
+							((ISync)instance).SetStartingObject();
+						}
 					}
 					if (typeof(IAssetRef).IsAssignableFrom(item.FieldType)) {
 						var startValue = item.GetCustomAttribute<OnAssetLoadedAttribute>();

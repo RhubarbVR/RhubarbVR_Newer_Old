@@ -50,8 +50,9 @@ namespace RhuEngine.DataStructure
 	[Union(39, typeof(DataNode<SystemInfo>))]
 	[Union(40, typeof(DataNode<UISettings>))]
 	[Union(41, typeof(DataNode<Vertex>))]
-	[Union(42, typeof(DataNode<float[]>))]
-	[Union(43, typeof(DataNode<int[]>))]
+	[Union(42, typeof(DataNode<Playback>))]
+	[Union(43, typeof(DataNode<float[]>))]
+	[Union(44, typeof(DataNode<int[]>))]
 	[Union(100, typeof(DataNode<object>))]
 
 	public interface IDataNode

@@ -90,5 +90,7 @@ namespace RhuEngine.WorldObjects
 			IsLinkedTo = true;
 		}
 
+		public void SetStartingObject() {
+		}
 	}
 }

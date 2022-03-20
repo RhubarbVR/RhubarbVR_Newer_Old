@@ -44,7 +44,7 @@ namespace RhuEngine.Components.PrivateSpace.Windows
 #if DEBUG
 			UI.WindowBegin($"    Account UI: MilkSnake Version:{Engine.version}", ref windowPose, new Vec2(0.4f, 0), UIWin.Normal, UIMove.FaceUser);
 #else
-			UI.WindowBegin($"Account UI: Version:{Engine.version}", ref windowPose, UIWin.Normal, UIMove.FaceUser);
+			UI.WindowBegin($"    Account UI: Version:{Engine.version}", ref windowPose, UIWin.Normal, UIMove.FaceUser);
 #endif
 			CloseDraw();
 			if (!Engine.netApiManager.IsLoggedIn) {
