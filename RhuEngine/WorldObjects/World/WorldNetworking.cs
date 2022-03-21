@@ -558,6 +558,7 @@ namespace RhuEngine.WorldObjects
 				//LocalValue
 				return;
 			}
+			Console.WriteLine("SentValue to " + target.GetType().GetFormattedName() + " " + target.Pointer.HexString());
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));

@@ -27,7 +27,7 @@ namespace RhuEngine.WorldObjects
 			if (IsLinkedTo || NoSync) {
 				return;
 			}
-			World.BroadcastDataToAll(this, typeof(T).IsEnum ? new DataNode<int>((int)(object)_value) : new DataNode<T>(_value), LiteNetLib.DeliveryMethod.Unreliable);
+			World.BroadcastDataToAllStream(this, typeof(T).IsEnum ? new DataNode<int>((int)(object)_value) : new DataNode<T>(_value), LiteNetLib.DeliveryMethod.Unreliable);
 		}
 		public override void Received(Peer sender, IDataNode data) {
 			if (NoSync) {
