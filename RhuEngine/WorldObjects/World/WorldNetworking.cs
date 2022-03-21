@@ -240,7 +240,7 @@ namespace RhuEngine.WorldObjects
 			_netManager.DisconnectTimeout = 10000;
 			_netManager.UpdateTime = 10;
 			_netManager.ChannelsCount = 3;
-			_relay.UpdateTime = 120;
+			_netManager.UpdateTime = 120;
 			//0 is main
 			//1 is syncStreams
 			//2 is assetPackeds
