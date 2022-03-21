@@ -17,9 +17,12 @@ namespace RhuEngine.Components
 
 		public Linker<Quat> rot;
 
+		public Linker<Vec3> scale;
+
 		public override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);
 			rot.SetLinkerTarget(Entity.rotation);
+			scale.SetLinkerTarget(Entity.scale);
 		}
 
 		public override void Step() {

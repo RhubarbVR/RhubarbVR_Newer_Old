@@ -21,9 +21,12 @@ namespace RhuEngine.Components
 
 		public Linker<Quat> rot;
 
+		public Linker<Vec3> scale;
+
 		public override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);
 			rot.SetLinkerTarget(Entity.rotation);
+			scale.SetLinkerTarget(Entity.scale);
 		}
 
 		public override void Step() {
@@ -31,9 +34,11 @@ namespace RhuEngine.Components
 				return;
 			}
 			if (user.Target != World.GetLocalUser()) {
+				var userScale = user.Target.FindSyncStream<SyncValueStream<Vec3>>("UserScale");
 				var userPos = user.Target.FindSyncStream<SyncValueStream<Vec3>>("UserPos");
 				var userRot = user.Target.FindSyncStream<SyncValueStream<Quat>>("UserRot");
 				Entity.position.Value = userPos?.Value ?? Vec3.Zero;
+				Entity.scale.Value = userScale?.Value ?? Vec3.Zero;
 				Entity.rotation.Value = userRot?.Value ?? Quat.Identity;
 				return;
 			}
@@ -45,6 +50,7 @@ namespace RhuEngine.Components
 				Renderer.CameraRoot = (SK.ActiveDisplayMode == DisplayMode.Flatscreen & SK.Settings.disableFlatscreenMRSim) ? head.Target?.GlobalTrans ?? Matrix.S(1) : Entity.GlobalTrans;
 			}
 			else {
+				user.Target.FindOrCreateSyncStream<SyncValueStream<Vec3>>("UserScale").Value = Entity.scale.Value;
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Vec3>>("UserPos").Value = Entity.position.Value;
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Quat>>("UserRot").Value = Entity.rotation.Value;
 			}
