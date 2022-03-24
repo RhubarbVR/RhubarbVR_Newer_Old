@@ -9,6 +9,10 @@ namespace RhuEngine
 {
 	public static class Helper
 	{
+		public static Matrix CastToNormal(this Assimp.Matrix4x4 matrix) {
+			return new Matrix(matrix.A1, matrix.A2, matrix.A3, matrix.A4, matrix.B1, matrix.B2, matrix.B3, matrix.B4, matrix.C1, matrix.C2, matrix.C3, matrix.C4, matrix.D1, matrix.D2, matrix.D3, matrix.D4);
+		}
+
 		public static string CleanPath(this string path) {
 			var regexSearch = new string(Path.GetInvalidPathChars());
 			var r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));

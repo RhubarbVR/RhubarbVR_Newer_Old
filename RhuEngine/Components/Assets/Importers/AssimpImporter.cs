@@ -5,6 +5,7 @@ using StereoKit;
 using Assimp;
 using System.Threading.Tasks;
 using System.Net.Http;
+using System;
 
 namespace RhuEngine.Components
 {
@@ -56,25 +57,107 @@ namespace RhuEngine.Components
 
 		AssimpContext _assimpContext;
 
-		public async Task ImportAsync(string path_url, bool isUrl, byte[] rawData) {
-			_assimpContext?.Dispose();
-			_assimpContext = new AssimpContext();
-			if (isUrl) {
-				using var client = new HttpClient();
-				using var response = await client.GetAsync(path_url);
-				using var streamToReadFrom = await response.Content.ReadAsStreamAsync();
-				_assimpContext.ImportFileFromStream(streamToReadFrom);
+		private class AssimpHolder
+		{
+			public Entity root;
+			public Entity assetEntity;
+			public Scene scene;
+			public AssimpHolder(Scene scene,Entity _root,Entity _assetEntity) {
+				this.scene = scene;
+				root = _root;
+				assetEntity = _assetEntity;
 			}
-			else {
-				if (rawData is null) {
-					_assimpContext.ImportFileFromStream(new MemoryStream(rawData));
+		}
+
+		public async Task ImportAsync(string path_url, bool isUrl, byte[] rawData) {
+			try {
+				_assimpContext ??= new AssimpContext();
+				Scene scene;
+				if (isUrl) {
+					using var client = new HttpClient();
+					using var response = await client.GetAsync(path_url);
+					using var streamToReadFrom = await response.Content.ReadAsStreamAsync();
+					scene = _assimpContext.ImportFileFromStream(streamToReadFrom);
 				}
 				else {
-					_assimpContext.ImportFile(path_url);
+					if (rawData is null) {
+						scene = _assimpContext.ImportFile(path_url);
+					}
+					else {
+						scene = _assimpContext.ImportFileFromStream(new MemoryStream(rawData));
+					}
+				}
+				if (scene is null) {
+					Log.Err("failed to Load Model Scene not loaded");
+					return;
+				}
+				var root = Entity.AddChild("Root");
+				var AssimpHolder = new AssimpHolder(scene,root,root.AddChild("Assets"));
+				
+				LoadNode(root, scene.RootNode,AssimpHolder);
+			}catch(Exception e) {
+				Log.Err($"failed to Load Model Error {e}");
+			}
+		}
+
+		private static void LoadNode(Entity ParrentEntity,Assimp.Node node, AssimpHolder scene) {
+			var entity = ParrentEntity.AddChild(node.Name);
+			entity.LocalTrans = node.Transform.CastToNormal();
+			if (node.HasChildren) {
+				foreach (var item in node.Children) {
+					LoadNode(entity, item, scene);
 				}
 			}
-			Log.Err("Not Supported At the Moment");
+			LoadMeshNode(entity, node, scene);
 		}
+
+		private static void LoadMesh(Entity entity, AssimpHolder scene) {
+			if (!scene.scene.HasMeshes) {
+				return;
+			}
+		}
+
+		private static void LoadMaterials(Entity entity, AssimpHolder scene) {
+			if (!scene.scene.HasMaterials) {
+				return;
+			}
+		}
+
+		private static void Loadights(Entity entity, AssimpHolder scene) {
+			if (!scene.scene.HasLights) {
+				return;
+			}
+		}
+		private static void LoadTextures(Entity entity, AssimpHolder scene) {
+			if (!scene.scene.HasTextures) {
+				return;
+			}
+		}
+
+		private static void LoadAnimations(Entity entity, AssimpHolder scene) {
+			if (!scene.scene.HasAnimations) {
+				return;
+			}
+		}
+
+		private static void LoadCameras(Entity entity, AssimpHolder scene) {
+			if (!scene.scene.HasCameras) {
+				return;
+			}
+		}
+		
+		private static void LoadMeshNode(Entity entity, Assimp.Node node, AssimpHolder scene) {
+			if (!node.HasMeshes) {
+				return;
+			}
+			foreach (var item in node.MeshIndices) {
+			}
+		}
+
+		private static void LoadLight(Entity entity, Assimp.Node node, Scene scene) {
+			
+		}
+
 		public override void Import(string path_url, bool isUrl, byte[] rawData) {
 			ImportAsync(path_url,isUrl,rawData).ConfigureAwait(false);
 		}
