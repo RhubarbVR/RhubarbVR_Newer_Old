@@ -1,8 +1,11 @@
 ﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
-
+using System.IO;
 using StereoKit;
 using Assimp;
+using System.Threading.Tasks;
+using System.Net.Http;
+
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Importers" })]
@@ -51,8 +54,29 @@ namespace RhuEngine.Components
 				path.EndsWith(".ndo");
 		}
 
-		public override void Import(string path_url, bool isUrl, byte[] rawData) {
+		AssimpContext _assimpContext;
+
+		public async Task ImportAsync(string path_url, bool isUrl, byte[] rawData) {
+			_assimpContext?.Dispose();
+			_assimpContext = new AssimpContext();
+			if (isUrl) {
+				using var client = new HttpClient();
+				using var response = await client.GetAsync(path_url);
+				using var streamToReadFrom = await response.Content.ReadAsStreamAsync();
+				_assimpContext.ImportFileFromStream(streamToReadFrom);
+			}
+			else {
+				if (rawData is null) {
+					_assimpContext.ImportFileFromStream(new MemoryStream(rawData));
+				}
+				else {
+					_assimpContext.ImportFile(path_url);
+				}
+			}
 			Log.Err("Not Supported At the Moment");
+		}
+		public override void Import(string path_url, bool isUrl, byte[] rawData) {
+			ImportAsync(path_url,isUrl,rawData).ConfigureAwait(false);
 		}
 	}
 }
