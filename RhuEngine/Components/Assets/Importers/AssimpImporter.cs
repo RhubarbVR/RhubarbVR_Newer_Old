@@ -6,6 +6,7 @@ using Assimp;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System;
+using System.Collections.Generic;
 
 namespace RhuEngine.Components
 {
@@ -62,6 +63,9 @@ namespace RhuEngine.Components
 			public Entity root;
 			public Entity assetEntity;
 			public Scene scene;
+
+			public List<AssetProvider<Tex>> textures = new();
+
 			public AssimpHolder(Scene scene,Entity _root,Entity _assetEntity) {
 				this.scene = scene;
 				root = _root;
@@ -93,7 +97,13 @@ namespace RhuEngine.Components
 				}
 				var root = Entity.AddChild("Root");
 				var AssimpHolder = new AssimpHolder(scene,root,root.AddChild("Assets"));
-				
+				LoadMesh(AssimpHolder.assetEntity, AssimpHolder);
+				LoadMaterials(AssimpHolder.assetEntity, AssimpHolder);
+				Loadights(AssimpHolder.assetEntity, AssimpHolder);
+				LoadTextures(AssimpHolder.assetEntity, AssimpHolder);
+				LoadAnimations(AssimpHolder.assetEntity, AssimpHolder);
+				LoadCameras(AssimpHolder.assetEntity, AssimpHolder);
+				LoadLight(AssimpHolder.assetEntity, AssimpHolder);
 				LoadNode(root, scene.RootNode,AssimpHolder);
 			}catch(Exception e) {
 				Log.Err($"failed to Load Model Error {e}");
@@ -132,6 +142,20 @@ namespace RhuEngine.Components
 			if (!scene.scene.HasTextures) {
 				return;
 			}
+			foreach (var item in scene.scene.Textures) {
+				if (item.HasCompressedData) {
+					var newuri = entity.World.LoadLocalAsset(item.CompressedData, item.Filename + item.CompressedFormatHint);
+					var tex = entity.AttachComponent<StaticTexture>();
+					scene.textures.Add(tex);
+					tex.url.Value = newuri.ToString();
+				}
+				else if (item.HasNonCompressedData) {
+					Log.Err("not supported");
+				}
+				else {
+					Log.Err("Texture had no data to be found");
+				}
+			}
 		}
 
 		private static void LoadAnimations(Entity entity, AssimpHolder scene) {
@@ -145,17 +169,18 @@ namespace RhuEngine.Components
 				return;
 			}
 		}
-		
+		private static void LoadLight(Entity entity, AssimpHolder scene) {
+			if (!scene.scene.HasLights) {
+				return;
+			}
+		}
+
 		private static void LoadMeshNode(Entity entity, Assimp.Node node, AssimpHolder scene) {
 			if (!node.HasMeshes) {
 				return;
 			}
 			foreach (var item in node.MeshIndices) {
 			}
-		}
-
-		private static void LoadLight(Entity entity, Assimp.Node node, Scene scene) {
-			
 		}
 
 		public override void Import(string path_url, bool isUrl, byte[] rawData) {
