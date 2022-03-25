@@ -84,12 +84,7 @@ namespace RhuEngine.Components
 					scene = _assimpContext.ImportFileFromStream(streamToReadFrom);
 				}
 				else {
-					if (rawData is null) {
-						scene = _assimpContext.ImportFile(path_url);
-					}
-					else {
-						scene = _assimpContext.ImportFileFromStream(new MemoryStream(rawData));
-					}
+					scene = rawData is null ? _assimpContext.ImportFile(path_url) : _assimpContext.ImportFileFromStream(new MemoryStream(rawData));
 				}
 				if (scene is null) {
 					Log.Err("failed to Load Model Scene not loaded");
@@ -111,6 +106,7 @@ namespace RhuEngine.Components
 		}
 
 		private static void LoadNode(Entity ParrentEntity,Assimp.Node node, AssimpHolder scene) {
+			Log.Info($"Loaded Node {node.Name} Parrent {node.Parent?.Name??"NULL"}");
 			var entity = ParrentEntity.AddChild(node.Name);
 			entity.LocalTrans = node.Transform.CastToNormal();
 			if (node.HasChildren) {
@@ -123,26 +119,36 @@ namespace RhuEngine.Components
 
 		private static void LoadMesh(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasMeshes) {
+				Log.Info($"No Meshes");
 				return;
 			}
 		}
 
 		private static void LoadMaterials(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasMaterials) {
+				Log.Info($"No Materials");
 				return;
+			}
+			foreach (var item in scene.scene.Materials) {
 			}
 		}
 
 		private static void Loadights(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasLights) {
+				Log.Info($"No lights");
 				return;
+			}
+			foreach (var item in scene.scene.Lights) {
+				//Need to add light component
 			}
 		}
 		private static void LoadTextures(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasTextures) {
+				Log.Info($"No Textures");
 				return;
 			}
 			foreach (var item in scene.scene.Textures) {
+				Log.Info($"Loaded Texture {item.Filename}");
 				if (item.HasCompressedData) {
 					var newuri = entity.World.LoadLocalAsset(item.CompressedData, item.Filename + item.CompressedFormatHint);
 					var tex = entity.AttachComponent<StaticTexture>();
@@ -160,17 +166,21 @@ namespace RhuEngine.Components
 
 		private static void LoadAnimations(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasAnimations) {
+				Log.Info("No Animations");
 				return;
 			}
+			Log.Err("not supported");
 		}
 
 		private static void LoadCameras(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasCameras) {
+				Log.Info("No Cameras");
 				return;
 			}
 		}
 		private static void LoadLight(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasLights) {
+				Log.Info("No Lights");
 				return;
 			}
 		}
