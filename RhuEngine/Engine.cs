@@ -4,7 +4,6 @@ using System.Linq;
 
 using RhuEngine.Managers;
 
-using StereoKit;
 using RhuEngine.Settings;
 using System.IO;
 using RhuSettings;
@@ -12,16 +11,20 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Reflection;
+using RhuEngine.Linker;
+using RNumerics;
 
 namespace RhuEngine
 {
 	public class Engine : IDisposable
 	{
+		public IEngineLink EngineLink { get; private set; }
+
 		public readonly object RenderLock = new();
 
-		private readonly bool _forceFlatscreen = false;
+		public readonly bool _forceFlatscreen = false;
 
-		private readonly bool _noVRSim = false;
+		public readonly bool _noVRSim = false;
 
 		private readonly string _cachePathOverRide = null;
 
@@ -33,21 +36,6 @@ namespace RhuEngine
 #else
 		public const bool IS_MILK_SNAKE = false;
 #endif
-		public readonly static UISettings DefaultSettings = new() {
-			backplateBorder = 1f * Units.mm2m,
-			backplateDepth = 0.4f,
-			depth = 10 * Units.mm2m,
-			gutter = 10 * Units.mm2m,
-			padding = 10 * Units.mm2m
-		};
-
-		static UISettings _globalSettings = DefaultSettings;
-
-		public UISettings UISettings
-		{
-			get => _globalSettings;
-			set { _globalSettings = value; UI.Settings = value; }
-		}
 
 		public readonly string SettingsFile;
 
@@ -55,7 +43,12 @@ namespace RhuEngine
 
 		public static string BaseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-		public Engine(string[] arg, OutputCapture outputCapture, string baseDir = null) : base() {
+		public Action OnEngineStarted;
+
+		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null) : base() {
+			EngineLink = _EngineLink;
+			_EngineLink.BindEngine(this);
+			EngineLink.LoadStatics();
 			if (baseDir is null) {
 				baseDir = AppDomain.CurrentDomain.BaseDirectory;
 			}
@@ -96,13 +89,13 @@ namespace RhuEngine
 			outputCapture.LogsPath = _userDataPathOverRide is null ? baseDir + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
 			outputCapture.Start();
 			if (error is not null) {
-				Log.Err(error);
+				RLog.Err(error);
 			}
 			if (arg.Length <= 0) {
-				Log.Info($"Launched with no arguments");
+				RLog.Info($"Launched with no arguments");
 			}
 			else {
-				Log.Info($"Launched with {(_forceFlatscreen ? "forceFlatscreen " : "")}{(_noVRSim ? "noVRSim " : "")}{((_cachePathOverRide != null) ? "Cache Override: " + _cachePathOverRide + " " : "")}{((_userDataPathOverRide != null) ? "UserData Override: " + _userDataPathOverRide + " " : "")}");
+				RLog.Info($"Launched with {(_forceFlatscreen ? "forceFlatscreen " : "")}{(_noVRSim ? "noVRSim " : "")}{((_cachePathOverRide != null) ? "Cache Override: " + _cachePathOverRide + " " : "")}{((_userDataPathOverRide != null) ? "UserData Override: " + _userDataPathOverRide + " " : "")}");
 			}
 			this.outputCapture = outputCapture;
 
@@ -121,7 +114,7 @@ namespace RhuEngine
 						lists.Add(liet);
 					}
 					catch (Exception e) {
-						Log.Err("Error loading settings ERROR:" + e.ToString(), true);
+						RLog.Err("Error loading settings ERROR:" + e.ToString());
 					}
 				}
 			}
@@ -155,24 +148,6 @@ namespace RhuEngine
 
 		public Action<string> MicChanged;
 
-		public SKSettings Settings
-		{
-			get {
-				return new SKSettings {
-#if DEBUG
-					appName = "Milk Snake",
-#else
-					appName = "RhubarbVR",
-#endif
-					assetsFolder = "Assets",
-					displayPreference = _forceFlatscreen ? DisplayMode.Flatscreen : DisplayMode.MixedReality,
-					disableFlatscreenMRSim = _noVRSim,
-					flatscreenHeight = 720,
-					flatscreenWidth = 1280,
-				};
-			}
-		}
-
 		public bool IsCloseing { get; set; }
 
 		public NetApiManager netApiManager;
@@ -183,15 +158,11 @@ namespace RhuEngine
 
 		public InputManager inputManager = new();
 
-		//public WebBrowserManager webBrowserManager = new();
-
 		public MainSettingsObject MainSettings;
 
 		public OutputCapture outputCapture;
 
 		public IManager[] _managers;
-
-		public TextStyle MainTextStyle;
 
 		public StaticResources staticResources = new();
 
@@ -199,47 +170,18 @@ namespace RhuEngine
 
 		public bool EngineStarting = true;
 
-		public Material LoadingLogo = null;
-		public void ColorizeFingers(Handed hand,int size, Gradient horizontal, Gradient vertical) {
-			var tex = new Tex(TexType.Image, TexFormat.Rgba32Linear) {
-				AddressMode = TexAddress.Clamp
-			};
-			var pixels = new Color32[size * size];
-			for (var y = 0; y < size; y++) {
-				var v = vertical.Get(1 - (y / (size - 1.0f)));
-				for (var x = 0; x < size; x++) {
-					var h = horizontal.Get(x / (size - 1.0f));
-					pixels[x + (y * size)] = v * h;
-				}
-			}
-			tex.SetColors(size, size, pixels);
-			var copyhand = Default.MaterialHand.Copy();
-			copyhand[MatParamName.DiffuseTex] = tex;
-			Input.Hand(hand).Material = copyhand;
-		}
+		public RMaterial LoadingLogo = null;
+
 
 		public void Init() {
-			Renderer.EnableSky = false;
-			LoadingLogo = new Material(Shader.UnlitClip);
-			LoadingLogo.SetTexture("diffuse", staticResources.RhubarbLogoV2);
-			MainTextStyle = Text.MakeStyle(Font.Default, 0.02f, new Color(0.890f, 0.580f, 0.027f));
-			Platform.ForceFallbackKeyboard = true;
-			World.OcclusionEnabled = true;
-			World.RaycastEnabled = true;
-			ColorizeFingers(Handed.Left,16,
-				new Gradient(
-					new GradientKey(Color.HSV(0.4f, 1, 0.5f), 0.5f)),
-				new Gradient(
-					new GradientKey(new Color(1, 1, 1, 0), 0),
-					new GradientKey(new Color(1, 1, 1, 0), 0.4f),
-					new GradientKey(new Color(1, 1, 1, 1), 0.9f)));
-			ColorizeFingers(Handed.Right, 16,
-				new Gradient(
-					new GradientKey(Color.HSV(1f, 1, 0.5f), 0.5f)),
-				new Gradient(
-					new GradientKey(new Color(1, 1, 1, 0), 0),
-					new GradientKey(new Color(1, 1, 1, 0), 0.4f),
-					new GradientKey(new Color(1, 1, 1, 1), 0.9f)));
+			EngineLink.Start();
+			IntMsg = $"Engine started Can Render {EngineLink.CanRender} Can Audio {EngineLink.CanAudio} Can input {EngineLink.CanInput}";
+			RLog.Info(IntMsg);
+			if (EngineLink.CanRender) {
+				RRenderer.EnableSky = false;
+				LoadingLogo = new RMaterial(RShader.UnlitClip);
+				LoadingLogo["diffuse"] = staticResources.RhubarbLogoV2;
+			}
 			Task.Run(() => {
 				IntMsg = "Building NetApiManager";
 				netApiManager = new NetApiManager(_userDataPathOverRide);
@@ -252,35 +194,40 @@ namespace RhuEngine
 						item.Init(this);
 					}
 					catch (Exception ex) {
-						Log.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
+						RLog.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
 						IntMsg = $"Failed to start {item.GetType().GetFormattedName()} Error:{ex}";
 						throw new Exception("LockLoad");
 					}
 				}
-				EngineStarting = false;
-				LoadingLogo = null;
-				Renderer.EnableSky = true;
-				Log.Info("Engine Started");
+				if (EngineLink.CanRender) {
+					EngineStarting = false;
+					LoadingLogo = null;
+					RRenderer.EnableSky = true;
+				}
+				RLog.Info("Engine Started");
+				OnEngineStarted?.Invoke();
 			});
 		}
 
-		private Vec3 _oldPlayerPos = Vec3.Zero;
-		private Vec3 _loadingPos = Vec3.Zero;
+		private Vector3f _oldPlayerPos = Vector3f.Zero;
+		private Vector3f _loadingPos = Vector3f.Zero;
 
 		public void Step() {
 			if (EngineStarting) {
-				try {
-					var textpos = Matrix.T(Vec3.Forward * 0.25f) * Input.Head.ToMatrix();
-					var playerPos = Renderer.CameraRoot.Translation;
-					_loadingPos += playerPos - _oldPlayerPos;
-					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(Time.Elapsedf * 5f, 1);
-					_oldPlayerPos = playerPos;
-					var rootMatrix = new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix();
-					Text.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0, -0.07f, 0) * rootMatrix);
-					Mesh.Quad.Draw(LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
-				}
-				catch (Exception ex) {
-					Log.Err("Failed to update msg text Error: " + ex.ToString());
+				if (EngineLink.CanRender) {
+					try {
+						var textpos = Matrix.T(Vector3f.Forward * 0.25f) * (EngineLink.CanInput ? RInput.Head.HeadMatrix : Matrix.S(1));
+						var playerPos = RRenderer.CameraRoot.Translation;
+						_loadingPos += playerPos - _oldPlayerPos;
+						_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
+						_oldPlayerPos = playerPos;
+						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt((EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero), _loadingPos));
+						RText.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0, -0.07f, 0) * rootMatrix);
+						RMesh.Quad.Draw(LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
+					}
+					catch (Exception ex) {
+						RLog.Err("Failed to update msg text Error: " + ex.ToString());
+					}
 				}
 				return;
 			}
@@ -289,19 +236,20 @@ namespace RhuEngine
 					item.Step();
 				}
 				catch (Exception ex) {
-					Log.Err($"Failed to step {item.GetType().GetFormattedName()} Error: {ex}");
+					RLog.Err($"Failed to step {item.GetType().GetFormattedName()} Error: {ex}");
 				}
 			}
+			RWorld.RunOnMain();
 		}
 
 		public void Dispose() {
-			Log.Info("Engine Disposed");
+			RLog.Info("Engine Disposed");
 			foreach (var item in _managers) {
 				try {
 					item.Dispose();
 				}
 				catch (Exception ex) {
-					Log.Err($"Failed to Disposed {item.GetType().GetFormattedName()} Error: {ex}");
+					RLog.Err($"Failed to Disposed {item.GetType().GetFormattedName()} Error: {ex}");
 				}
 			}
 		}

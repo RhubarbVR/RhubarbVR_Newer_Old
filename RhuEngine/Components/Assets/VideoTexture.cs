@@ -9,13 +9,12 @@ using RhuEngine.VLC;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
-
+using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets" })]
-	public class VideoTexture : StaticAsset<Tex>
+	public class VideoTexture : StaticAsset<RTexture2D>
 	{
 		public VlcVideoSourceProvider vlcVideoSourceProvider = null;
 
@@ -62,17 +61,20 @@ namespace RhuEngine.Components
 		}
 
 		private void LoadVideoPlayer() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			try {
 				Load(null);
 				if (vlcVideoSourceProvider != null) {
-					Log.Info("Reloading Loading Video Player");
+					RLog.Info("Reloading Loading Video Player");
 					vlcVideoSourceProvider.Dispose();
 					vlcVideoSourceProvider = null;
 					_libVLC = null;
 					_mediaPlayer = null;
 				}
 				else {
-					Log.Info("Loading Video Player");
+					RLog.Info("Loading Video Player");
 				}
 				vlcVideoSourceProvider = new VlcVideoSourceProvider {
 					ChannelCount = (uint)AudioChannels.Count
@@ -85,6 +87,9 @@ namespace RhuEngine.Components
 				vlcVideoSourceProvider.LoadPlayer(_mediaPlayer);
 				vlcVideoSourceProvider.RelaodTex += VlcVideoSourceProvider_RelaodTex;
 				vlcVideoSourceProvider.LoadAudio += (samps, chan) => {
+					if (!Engine.EngineLink.CanAudio) {
+						return;
+					}
 					if (AudioChannels.Count <= chan) {
 						return;
 					}
@@ -94,7 +99,7 @@ namespace RhuEngine.Components
 			}
 			catch (Exception ex) 
 			{
-				Log.Err($"Failed to start Video Player Error:{ex}");
+				RLog.Err($"Failed to start Video Player Error:{ex}");
 			}
 		}
 
@@ -117,17 +122,20 @@ namespace RhuEngine.Components
 		public bool StopLoad = false;//Stops a asset loading over each other
 
 		private async Task LoadMedia() {
-			StopLoad = true;
-			Load(null);
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			if (_mediaPlayer == null) {
 				return;
 			}
 			if (url.Value == null) {
 				return;
 			}
+			StopLoad = true;
+			Load(null);
 			var uri = new Uri(url);
 			if ((useCache || uri.Scheme.ToLower() == "local") && !VideoImporter.IsVideoStreaming(uri)) {
-				Log.Info("Loading static video");
+				RLog.Info("Loading static video");
 				CurrentTask?.Stop();
 				CurrentTask = World.assetSession.AssetLoadingTask((data) => {
 					if (data != null) {
@@ -136,17 +144,17 @@ namespace RhuEngine.Components
 							Thread.Sleep(10);
 						}
 						VlcVideoSourceProvider_RelaodTex();
-						_mediaPlayer.Play(media);
+						_mediaPlayer?.Play(media);
 						PlayBackUpdate();
 					}
 					else {
-						Log.Err("Failed to load assets");
+						RLog.Err("Failed to load assets");
 					}
 				}, uri, true);
 					
 			}
 			else {
-				Log.Info("Loading stream video");
+				RLog.Info("Loading stream video");
 				StopLoad = false;
 				var media = new Media(_libVLC, uri);
 				if (VideoImporter.IsVideoStreaming(uri)) {
@@ -169,11 +177,11 @@ namespace RhuEngine.Components
 				return;
 			}
 			try {
-				Log.Info("Starting load of static Asset Video");
+				RLog.Info("Starting load of static Asset Video");
 				Task.Run(LoadMedia);
 			}
 			catch (Exception e) {
-				Log.Info($"Error Loading static Asset {e}");
+				RLog.Info($"Error Loading static Asset {e}");
 			}
 		}
 	}

@@ -5,8 +5,6 @@ using MessagePack;
 using SharedModels;
 using SharedModels.GameSpecific;
 
-using StereoKit;
-
 namespace RhuEngine.DataStructure
 {
 	[MessagePackObject]

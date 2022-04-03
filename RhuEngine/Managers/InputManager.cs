@@ -6,8 +6,8 @@ using RhuEngine.AssetSystem;
 using RhuEngine.AssetSystem.AssetProtocals;
 using System.IO;
 using System.Threading.Tasks;
-using StereoKit;
 using RhuEngine.Settings;
+using RhuEngine.Linker;
 
 namespace RhuEngine.Managers
 {
@@ -71,10 +71,10 @@ namespace RhuEngine.Managers
 				_ => 0,
 			};
 			if (keyboard.MousePositive == inputType) {
-				keyboardInput = Input.Mouse.scrollChange;
+				keyboardInput = RInput.Mouse.ScrollChange;
 			}
 			if (keyboard.MouseNegevitve == inputType) {
-				keyboardInput = -Input.Mouse.scrollChange;
+				keyboardInput = -RInput.Mouse.ScrollChange;
 			}
 			return keyboardInput;
 		}
@@ -126,7 +126,7 @@ namespace RhuEngine.Managers
 			return 0f;
 		}
 
-		public float GetInputFloatFromController(InputTypes inputType,Controller controller, ControllerInputSettingsObject controllerInput) {
+		public float GetInputFloatFromController(InputTypes inputType,IRController controller, ControllerInputSettingsObject controllerInput) {
 			return controllerInput.GetInputFloatFromController(inputType,controller);
 		}
 
@@ -140,8 +140,8 @@ namespace RhuEngine.Managers
 			return GetInputFloatFromController(inputType, GetController(true), _engine.MainSettings.InputSettings.MainControllerInputSettings);
 		}
 
-		private Controller GetController(bool v) {
-			return Input.Controller(GetHand(v));
+		private IRController GetController(bool v) {
+			return RInput.Controller(GetHand(v));
 		}
 
 		public float GetInputFloatFromSeccondController(InputTypes inputType) {

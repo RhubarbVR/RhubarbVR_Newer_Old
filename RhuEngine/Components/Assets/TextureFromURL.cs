@@ -3,31 +3,34 @@ using System.Threading.Tasks;
 
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
+using RhuEngine.Linker;
 
-using StereoKit;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets" })]
-	public class TextureFromURL : AssetProvider<Tex>
+	public class TextureFromURL : AssetProvider<RTexture2D>
 	{
 		[OnChanged(nameof(LoadTexture))]
 		[Default("https://cataas.com/cat/says/Base%20Url%20For%20RhubarbVR")]
 		public Sync<string> url;
 
 		public async Task UpdateTexture() {
-			Log.Info("Loading img URL:" + url.Value);
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
+			RLog.Info("Loading img URL:" + url.Value);
 			using var client = new HttpClient();
-			Log.Info("Client");
+			RLog.Info("Client");
 			using var response = await client.GetAsync(url.Value);
 			using var streamToReadFrom = await response.Content.ReadAsStreamAsync();
 
 			try {
-				Log.Info("Downloaded");
+				RLog.Info("Downloaded");
 				var _texture = new ImageSharpTexture(streamToReadFrom, true);
 				Load(_texture.CreateTexture());
 			}
 			catch {
-				Log.Info($"Failed to initialize image");
+				RLog.Info($"Failed to initialize image");
 				Load(null);
 			}
 		}

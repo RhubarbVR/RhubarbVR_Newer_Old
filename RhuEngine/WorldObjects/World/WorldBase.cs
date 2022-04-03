@@ -7,10 +7,10 @@ using System.Threading;
 using RhuEngine.Managers;
 using RhuEngine.WorldObjects.ECS;
 using RhuEngine.AssetSystem;
-using StereoKit;
 using RhuEngine.Components;
 using SharedModels.Session;
 using SharedModels.UserSession;
+using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
@@ -54,7 +54,7 @@ namespace RhuEngine.WorldObjects
 						if (startValue != null) {
 							var method = GetType().GetMethod(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 							if (method is null) {
-								Log.Err($"Method {startValue.Data} not found");
+								RLog.Err($"Method {startValue.Data} not found");
 							}
 							else {
 								var prams = method.GetParameters();
@@ -65,7 +65,7 @@ namespace RhuEngine.WorldObjects
 									((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[1] { obj });
 								}
 								else {
-									Log.Err($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
+									RLog.Err($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
 								}
 							}
 						}
@@ -82,8 +82,9 @@ namespace RhuEngine.WorldObjects
 			StartTime.Value = DateTime.UtcNow;
 			if (isPersonalSpace | !networkedWorld) {
 				IsDeserializing = false;
-				IsLoadingNet = false;
 				AddLocalUser();
+				IsLoadingNet = false;
+				LoadMsg = "Done loading none networked world";
 			}
 		}
 
@@ -215,7 +216,7 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			catch (Exception e) {
-				Log.Err($"Failed to update global stepables for session {WorldDebugName}. Error: {e}");
+				RLog.Err($"Failed to update global stepables for session {WorldDebugName}. Error: {e}");
 			}
 			try {
 				var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
@@ -230,18 +231,20 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			catch (Exception e) {
-				Log.Err($"Failed to update entities for session {WorldDebugName}. Error: {e}");
+				RLog.Err($"Failed to update entities for session {WorldDebugName}. Error: {e}");
 			}
 
 			try {
-				lock (RenderLock) {
-					foreach (var item in _renderingComponents) {
-						item.Render();
+				if (Engine.EngineLink.CanRender) {
+					lock (RenderLock) {
+						foreach (var item in _renderingComponents) {
+							item.Render();
+						}
 					}
 				}
 			}
 			catch (Exception e) {
-				Log.Err($"Failed to build render queue for session {WorldDebugName}. Error {e}");
+				RLog.Err($"Failed to build render queue for session {WorldDebugName}. Error {e}");
 			}
 		}
 

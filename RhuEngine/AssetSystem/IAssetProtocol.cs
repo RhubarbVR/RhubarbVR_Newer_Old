@@ -9,7 +9,7 @@ namespace RhuEngine.AssetSystem
 	{
 		public string[] Schemes { get; }
 
-		public Task<byte[]> ProccessAsset(Uri uri);
+		public Task<byte[]> ProccessAsset(Uri uri, Action<float> ProgressUpdate = null);
 
 		public void UploadAsset(Uri uri,byte[] data);
 	}

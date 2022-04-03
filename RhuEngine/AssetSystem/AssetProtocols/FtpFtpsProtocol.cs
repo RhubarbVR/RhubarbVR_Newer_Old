@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using RhuEngine.Managers;
 
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine.AssetSystem.AssetProtocals
 {
@@ -21,15 +21,15 @@ namespace RhuEngine.AssetSystem.AssetProtocals
 			Manager = assetManager;
 		}
 
-		public async Task<byte[]> ProccessAsset(Uri uri) {
-			Log.Info("Loading asset URL:" + uri);
+		public async Task<byte[]> ProccessAsset(Uri uri, Action<float> ProgressUpdate = null) {
+			RLog.Info("Loading asset URL:" + uri);
 			var HttpClientHandler = new HttpClientHandler {
 				AllowAutoRedirect = true,
 			};
 			var request = (FtpWebRequest)WebRequest.Create(uri);
 			request.Method = WebRequestMethods.Ftp.DownloadFile;
 			request.Credentials = new NetworkCredential("anonymous", "rhubarbUser@RhubarbVR.net");
-			Log.Info("Client");
+			RLog.Info("Client");
 			var response = (FtpWebResponse)request.GetResponse();
 			if (response.StatusCode == FtpStatusCode.CommandOK) {
 				var bytearray = new byte[response.ContentLength];

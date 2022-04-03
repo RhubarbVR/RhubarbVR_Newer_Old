@@ -25,6 +25,7 @@ namespace RhubarbVR_Android
 		
 		public static void UpdateIdValues()
 		{
+			global::LibVLCSharp.Resource.String.app_name = global::RhubarbVR_Android.Resource.String.app_name;
 			global::Xamarin.Essentials.Resource.Attribute.alpha = global::RhubarbVR_Android.Resource.Attribute.alpha;
 			global::Xamarin.Essentials.Resource.Attribute.coordinatorLayoutStyle = global::RhubarbVR_Android.Resource.Attribute.coordinatorLayoutStyle;
 			global::Xamarin.Essentials.Resource.Attribute.font = global::RhubarbVR_Android.Resource.Attribute.font;

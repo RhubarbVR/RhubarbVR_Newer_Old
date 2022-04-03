@@ -6,7 +6,7 @@ using RhuEngine.AssetSystem;
 using RhuEngine.AssetSystem.AssetProtocals;
 using System.IO;
 using System.Threading.Tasks;
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine.Managers
 {
@@ -24,7 +24,7 @@ namespace RhuEngine.Managers
 
 		public SynchronizedCollection<AssetTask> tasks = new();
 
-		public byte[] GetAsset(Uri asset, bool useCache) {
+		public byte[] GetAsset(Uri asset, bool useCache, Action<float> ProgressUpdate = null) {
 			byte[] assetData = null;
 			var lowerScema = asset.Scheme.ToLower();
 			if (useCache) {
@@ -33,7 +33,7 @@ namespace RhuEngine.Managers
 			if (assetData is null) {
 				foreach (var item in protocols) {
 					if (item.Schemes.Contains(lowerScema) && assetData is null) {
-						assetData = item.ProccessAsset(asset).Result;
+						assetData = item.ProccessAsset(asset, ProgressUpdate).Result;
 					}
 				}
 			}
@@ -68,12 +68,12 @@ namespace RhuEngine.Managers
 			}
 			catch(Exception e) 
 			{
-				Log.Err("Error creating Asset Cache Dir Error:" + e.ToString());
+				RLog.Err("Error creating Asset Cache Dir Error:" + e.ToString());
 			}
 			try {
 				File.WriteAllBytes(GetAssetFile(asset), data);
 			}catch(Exception e) {
-				Log.Err("Error creating Asset Cache File Error:" + e.ToString());
+				RLog.Err("Error creating Asset Cache File Error:" + e.ToString());
 			}
 		}
 
@@ -84,7 +84,7 @@ namespace RhuEngine.Managers
 				}
 			}
 			catch (Exception e) {
-				Log.Err($"Failed to clear Local cache {e}");
+				RLog.Err($"Failed to clear Local cache {e}");
 			}
 		}
 

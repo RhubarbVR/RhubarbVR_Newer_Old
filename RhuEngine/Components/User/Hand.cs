@@ -1,7 +1,8 @@
 ﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
+using RhuEngine.Linker;
+using RNumerics;
 
 namespace RhuEngine.Components
 {
@@ -13,11 +14,11 @@ namespace RhuEngine.Components
 
 		public Sync<Handed> hand;
 
-		public Linker<Vec3> pos;
+		public Linker<Vector3f> pos;
 
-		public Linker<Quat> rot;
+		public Linker<Quaternionf> rot;
 
-		public Linker<Vec3> scale;
+		public Linker<Vector3f> scale;
 
 		public override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);
@@ -26,17 +27,20 @@ namespace RhuEngine.Components
 		}
 
 		public override void Step() {
+			if (!Engine.EngineLink.CanInput) {
+				return;
+			}
 			if (user.Target is null) {
 				return;
 			}
 			if (user.Target == World.GetLocalUser()) {
-				Entity.LocalTrans = Input.Hand(hand.Value).wrist.ToMatrix() * Renderer.CameraRoot.Inverse;
-				user.Target.FindOrCreateSyncStream<SyncValueStream<Vec3>>($"HandPos{hand.Value}").Value = Entity.position.Value;
-				user.Target.FindOrCreateSyncStream<SyncValueStream<Quat>>($"HandRot{hand.Value}").Value = Entity.rotation.Value;
+				Entity.LocalTrans = RInput.Hand(hand.Value).Wrist * RRenderer.CameraRoot.Inverse;
+				user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>($"HandPos{hand.Value}").Value = Entity.position.Value;
+				user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>($"HandRot{hand.Value}").Value = Entity.rotation.Value;
 			}
 			else {
-				var possition = user.Target.FindSyncStream<SyncValueStream<Vec3>>($"HandPos{hand.Value}")?.Value ?? Vec3.Zero;
-				var rotation = user.Target.FindSyncStream<SyncValueStream<Quat>>($"HandRot{hand.Value}")?.Value ?? Quat.Identity;
+				var possition = user.Target.FindSyncStream<SyncValueStream<Vector3f>>($"HandPos{hand.Value}")?.Value ?? Vector3f.Zero;
+				var rotation = user.Target.FindSyncStream<SyncValueStream<Quaternionf>>($"HandRot{hand.Value}")?.Value ?? Quaternionf.Identity;
 				Entity.LocalTrans = Matrix.TR(possition, rotation);
 			}
 		}

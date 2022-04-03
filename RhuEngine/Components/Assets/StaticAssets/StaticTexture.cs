@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
+using RhuEngine.Linker;
+
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets\\StaticAssets" })]
-	public class StaticTexture : StaticAsset<Tex>
+	public class StaticTexture : StaticAsset<RTexture2D>
 	{
 
 		[Default(TexSample.Anisotropic)]
@@ -36,12 +37,15 @@ namespace RhuEngine.Components
 
 		public override void LoadAsset(byte[] data) {
 			try {
+				if (!Engine.EngineLink.CanRender) {
+					return;
+				}
 				Load(null);
 				Load(new ImageSharpTexture(new MemoryStream(data), true).CreateTexture());
 				TextValueChanged();
 			}
 			catch(Exception err) {
-				Log.Err($"Failed to load Static Texture Error {err}");
+				RLog.Err($"Failed to load Static Texture Error {err}");
 			}
 		}
 	}

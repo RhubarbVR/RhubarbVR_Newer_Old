@@ -1,14 +1,17 @@
 ﻿using RhuEngine.WorldObjects.ECS;
+using RhuEngine.Linker;
 
-using StereoKit;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Shaders" })]
-	public class PBRShader : AssetProvider<Shader>
+	public class PBRShader : AssetProvider<RShader>
 	{
-		Shader _shader;
+		RShader _shader;
 		private void LoadShader() {
-			_shader = Shader.PBR;
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
+			_shader = RShader.PBR;
 			Load(_shader);
 		}
 		public override void OnLoaded() {

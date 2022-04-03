@@ -1,7 +1,7 @@
 ﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 using System.IO;
-using StereoKit;
+using RhuEngine.Linker;
 using Assimp;
 using System.Threading.Tasks;
 using System.Net.Http;
@@ -64,7 +64,7 @@ namespace RhuEngine.Components
 			public Entity assetEntity;
 			public Scene scene;
 
-			public List<AssetProvider<Tex>> textures = new();
+			public List<AssetProvider<RTexture2D>> textures = new();
 
 			public AssimpHolder(Scene scene,Entity _root,Entity _assetEntity) {
 				this.scene = scene;
@@ -87,7 +87,7 @@ namespace RhuEngine.Components
 					scene = rawData is null ? _assimpContext.ImportFile(path_url) : _assimpContext.ImportFileFromStream(new MemoryStream(rawData));
 				}
 				if (scene is null) {
-					Log.Err("failed to Load Model Scene not loaded");
+					RLog.Err("failed to Load Model Scene not loaded");
 					return;
 				}
 				var root = Entity.AddChild("Root");
@@ -101,12 +101,12 @@ namespace RhuEngine.Components
 				LoadLight(AssimpHolder.assetEntity, AssimpHolder);
 				LoadNode(root, scene.RootNode,AssimpHolder);
 			}catch(Exception e) {
-				Log.Err($"failed to Load Model Error {e}");
+				RLog.Err($"failed to Load Model Error {e}");
 			}
 		}
 
 		private static void LoadNode(Entity ParrentEntity,Assimp.Node node, AssimpHolder scene) {
-			Log.Info($"Loaded Node {node.Name} Parrent {node.Parent?.Name??"NULL"}");
+			RLog.Info($"Loaded Node {node.Name} Parrent {node.Parent?.Name??"NULL"}");
 			var entity = ParrentEntity.AddChild(node.Name);
 			entity.LocalTrans = node.Transform.CastToNormal();
 			if (node.HasChildren) {
@@ -119,23 +119,26 @@ namespace RhuEngine.Components
 
 		private static void LoadMesh(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasMeshes) {
-				Log.Info($"No Meshes");
+				RLog.Info($"No Meshes");
 				return;
+			}
+			foreach (var item in scene.scene.Meshes) {
 			}
 		}
 
 		private static void LoadMaterials(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasMaterials) {
-				Log.Info($"No Materials");
+				RLog.Info($"No Materials");
 				return;
 			}
 			foreach (var item in scene.scene.Materials) {
+				
 			}
 		}
 
 		private static void Loadights(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasLights) {
-				Log.Info($"No lights");
+				RLog.Info($"No lights");
 				return;
 			}
 			foreach (var item in scene.scene.Lights) {
@@ -144,11 +147,11 @@ namespace RhuEngine.Components
 		}
 		private static void LoadTextures(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasTextures) {
-				Log.Info($"No Textures");
+				RLog.Info($"No Textures");
 				return;
 			}
 			foreach (var item in scene.scene.Textures) {
-				Log.Info($"Loaded Texture {item.Filename}");
+				RLog.Info($"Loaded Texture {item.Filename}");
 				if (item.HasCompressedData) {
 					var newuri = entity.World.LoadLocalAsset(item.CompressedData, item.Filename + item.CompressedFormatHint);
 					var tex = entity.AttachComponent<StaticTexture>();
@@ -156,31 +159,31 @@ namespace RhuEngine.Components
 					tex.url.Value = newuri.ToString();
 				}
 				else if (item.HasNonCompressedData) {
-					Log.Err("not supported");
+					RLog.Err("not supported");
 				}
 				else {
-					Log.Err("Texture had no data to be found");
+					RLog.Err("Texture had no data to be found");
 				}
 			}
 		}
 
 		private static void LoadAnimations(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasAnimations) {
-				Log.Info("No Animations");
+				RLog.Info("No Animations");
 				return;
 			}
-			Log.Err("not supported");
+			RLog.Err("not supported");
 		}
 
 		private static void LoadCameras(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasCameras) {
-				Log.Info("No Cameras");
+				RLog.Info("No Cameras");
 				return;
 			}
 		}
 		private static void LoadLight(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasLights) {
-				Log.Info("No Lights");
+				RLog.Info("No Lights");
 				return;
 			}
 		}

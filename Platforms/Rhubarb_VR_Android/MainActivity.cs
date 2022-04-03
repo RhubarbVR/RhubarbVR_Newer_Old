@@ -13,6 +13,7 @@ using RhuEngine;
 using Android;
 using Android.Support.V4.Content;
 using Android.Support.V4.App;
+using RStereoKit;
 
 namespace RhuEngine
 {
@@ -64,13 +65,14 @@ namespace RhuEngine
 					ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.RecordAudio, Manifest.Permission.WriteExternalStorage, Manifest.Permission.ReadExternalStorage }, 1);
 				}
 				var cap = new OutputCapture();
-				_app = new Engine(new string[] { "" }, cap, System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments));
+				var skstereo = new RhuStereoKit();
+				_app = new Engine(skstereo,new string[] { "" }, cap, System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments));
 				if (_app == null) {
 					throw new System.Exception("StereoKit loader couldn't construct an instance of the App!");
 				}
 
 				// Initialize StereoKit, and the app
-				var settings = _app.Settings;
+				var settings = skstereo.Settings;
 				settings.androidActivity = activityHandle;
 				settings.assetsFolder = "";
 

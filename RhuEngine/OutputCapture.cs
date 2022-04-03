@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine
 {
@@ -54,7 +54,7 @@ namespace RhuEngine
 		}
 
 		public OutputCapture() {
-			Log.Subscribe(LogCall);
+			RLog.Subscribe(LogCall);
 			_stdOutWriter = Console.Out;
 			Console.SetOut(this);
 		}
@@ -72,7 +72,7 @@ namespace RhuEngine
 
 		public new void Dispose() 
 		{
-			Log.Unsubscribe(LogCall);
+			RLog.Unsubscribe(LogCall);
 			base.Dispose();
 			_writer.Dispose();
 		}

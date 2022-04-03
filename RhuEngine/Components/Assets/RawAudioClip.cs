@@ -1,22 +1,22 @@
 ﻿using System.Threading.Tasks;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
-using StereoKit;
 using System;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.Linq;
+using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
-	public class RawAudioClip : SyncObject, IAssetProvider<Sound>
+	public class RawAudioClip : SyncObject, IAssetProvider<RSound>
 	{
 
-		public event Action<Sound> OnAssetLoaded;
+		public event Action<RSound> OnAssetLoaded;
 
-		public Sound Value { get; private set; }
+		public RSound Value { get; private set; }
 
-		public void Load(Sound data) {
+		public void Load(RSound data) {
 			Value = data;
 			Loaded = data != null;
 			OnAssetLoaded?.Invoke(data);
@@ -29,10 +29,13 @@ namespace RhuEngine.Components
 			base.Dispose();
 		}
 
-		public Sound audio;
+		public RSound audio;
 
 		public override void OnLoaded() {
-			audio = Sound.CreateStream(5f);
+			if (!Engine.EngineLink.CanAudio) {
+				return;
+			}
+			audio = RSound.CreateStream(5f);
 			Load(audio);
 		}
 

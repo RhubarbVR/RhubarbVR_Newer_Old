@@ -13,9 +13,8 @@ using RhuEngine.WorldObjects;
 using SharedModels;
 using SharedModels.GameSpecific;
 
-using StereoKit;
-
-using World = RhuEngine.WorldObjects.World;
+using RNumerics;
+using RhuEngine.Linker;
 
 namespace RhuEngine.Managers
 {
@@ -53,7 +52,7 @@ namespace RhuEngine.Managers
 					worlds[i].Dispose();
 				}
 				catch (Exception ex) {
-					Log.Err($"Failed to dispose world {worlds[i].WorldDebugName}. Error: {ex}");
+					RLog.Err($"Failed to dispose world {worlds[i].WorldDebugName}. Error: {ex}");
 				}
 			}
 		}
@@ -67,12 +66,12 @@ namespace RhuEngine.Managers
 					Thread.Sleep(100);
 				}
 				if (world.IsDisposed) {
-					Log.Err($"Failed to start world {world.WorldDebugName} Error {world.LoadMsg}");
+					RLog.Err($"Failed to start world {world.WorldDebugName} Error {world.LoadMsg}");
 					Thread.Sleep(3000);
 					_isRunning.Pop();
 				}
 				else {
-					Log.Info($"Done loading world {world.WorldDebugName}");
+					RLog.Info($"Done loading world {world.WorldDebugName}");
 					world.Focus = focusLevel;
 					_isRunning.Pop();
 				}
@@ -155,13 +154,21 @@ namespace RhuEngine.Managers
 
 		public void Init(Engine engine) {
 			Engine = engine;
+			Engine.IntMsg = "Creating Personal Space";
 			PrivateOverlay = CreateNewWorld(World.FocusLevel.PrivateOverlay);
-			PrivateOverlay.RootEntity.AddChild("PrivateSpace").AttachComponent<PrivateSpaceManager>();
+			Engine.IntMsg = "Done Creating Personal Space";
+			//TODO Add Back
+			//PrivateOverlay.RootEntity.AddChild("PrivateSpace").AttachComponent<PrivateSpaceManager>();
+			Engine.IntMsg = "Creating Local World";
 			LocalWorld = CreateNewWorld(World.FocusLevel.Focused, true);
+			Engine.IntMsg = "Loading Local World Data";
 			LocalWorld.SessionName.Value = "Local World";
 			LocalWorld.WorldName.Value = "Local World";
 			LocalWorld.BuildLocalWorld();
-			LocalWorld.SessionName.Value = "LocalWorld";
+			while (LocalWorld.IsLoading) {
+				Engine.IntMsg = LocalWorld.LoadMsg;
+				Thread.Sleep(10);
+			}
 			engine.netApiManager.HasGoneOfline += NetApiManager_HasGoneOfline;
 		}
 
@@ -183,7 +190,7 @@ namespace RhuEngine.Managers
 					worlds[i].Step();
 				}
 				catch (Exception ex) {
-					Log.Err($"Failed to step world {worlds[i].WorldDebugName}. Error: {ex}");
+					RLog.Err($"Failed to step world {worlds[i].WorldDebugName}. Error: {ex}");
 				}
 				finally {
 					_stepStopwatch.Stop();
@@ -197,27 +204,27 @@ namespace RhuEngine.Managers
 			TotalStepTime = totalStep;
 		}
 
-		private Vec3 _oldPlayerPos = Vec3.Zero;
-		private Vec3 _loadingPos = Vec3.Zero;
+		private Vector3f _oldPlayerPos = Vector3f.Zero;
+		private Vector3f _loadingPos = Vector3f.Zero;
 		private void UpdateJoinMessage() {
 			try {
 				if (_isRunning.Count != 0) {
 					var world = _isRunning.Peek();
-					var textpos = Matrix.T(Vec3.Forward * 0.25f) * Input.Head.ToMatrix();
-					var playerPos = Renderer.CameraRoot.Translation;
+					var textpos = Matrix.T(Vector3f.Forward * 0.25f) * RInput.Head.HeadMatrix;
+					var playerPos = RRenderer.CameraRoot.Translation;
 					_loadingPos += playerPos - _oldPlayerPos;
-					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(Time.Elapsedf * 5f, 1);
+					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
 					_oldPlayerPos = playerPos;
 					if (world.IsLoading && !world.IsDisposed) {
-						Text.Add($"Loading World: \n{world.LoadMsg}", new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix());
+						RText.Add($"Loading World: \n{world.LoadMsg}", Matrix.TR(_loadingPos, Quaternionf.LookAt((Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero), _loadingPos)));
 					}
 					else {
-						Text.Add($"Failed to load world{(Engine.netApiManager.User?.UserName == null ? ", JIM": "")}\nError {world.LoadMsg}", new Pose(_loadingPos, Quat.LookAt(_loadingPos, Input.Head.position)).ToMatrix());
+						RText.Add($"Failed to load world{(Engine.netApiManager.User?.UserName == null ? ", JIM": "")}\nError {world.LoadMsg}", Matrix.TR(_loadingPos, Quaternionf.LookAt((Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero), _loadingPos)));
 					}
 				}
 			}
 			catch (Exception ex) {
-				Log.Err("Failed to update joining msg text Error: " + ex.ToString());
+				RLog.Err("Failed to update joining msg text Error: " + ex.ToString());
 			}
 		}
 

@@ -1,6 +1,5 @@
 ﻿using RhuEngine.Datatypes;
-
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
@@ -23,12 +22,12 @@ namespace RhuEngine.WorldObjects
 		
 		private void LoadUserIn(Peer peer) {
 			if (peer.User is not null) {
-				Log.Info("Peer already has peer");
+				RLog.Info("Peer already has peer");
 			}
 			else {
 				var user = GetUserFromID(peer.UserID);
 				if (user == null) {
-					Log.Info($"User built from peer {Users.Count + 1}");
+					RLog.Info($"User built from peer {Users.Count + 1}");
 					var userid = (ushort)(Users.Count + 1);
 					var pos = 176u; 
 					user = Users.AddWithCustomRefIds(false, false, () => {
@@ -43,13 +42,13 @@ namespace RhuEngine.WorldObjects
 					peer.User = user;
 				}
 				else {
-					Log.Info($"User found from peer UserID:{peer.UserID}");
+					RLog.Info($"User found from peer UserID:{peer.UserID}");
 					if (user.CurrentPeer == peer) {
-						Log.Info("Already bond to user");
+						RLog.Info("Already bond to user");
 						return;
 					}
 					if ((user.CurrentPeer?.NetPeer?.ConnectionState ?? LiteNetLib.ConnectionState.Disconnected) == LiteNetLib.ConnectionState.Connected) {
-						Log.Err("User already loaded can only join a world once");
+						RLog.Err("User already loaded can only join a world once");
 						peer.NetPeer.Disconnect();
 					}
 					else {

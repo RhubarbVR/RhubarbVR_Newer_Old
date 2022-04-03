@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using LiteNetLib;
+
+using RhuEngine.Linker;
+
 using SharedModels;
 using SharedModels.GameSpecific;
 using SharedModels.Session;
 
-using StereoKit;
 
 namespace RhuEngine.WorldObjects
 {
@@ -35,10 +37,10 @@ namespace RhuEngine.WorldObjects
 			return newpeer;
 		}
 		public void OnConnect() {
-			Log.Info("PeerServerConnected");
+			RLog.Info("PeerServerConnected");
 			peers.Clear();
 			//first peer is loading in key
-			Log.Info("Loading First Relay Peer");
+			RLog.Info("Loading First Relay Peer");
 			var firstpeer = new Peer(NetPeer,StartingPeerID, 1);
 			peers.Add(firstpeer);
 			World.ProcessUserConnection(firstpeer);

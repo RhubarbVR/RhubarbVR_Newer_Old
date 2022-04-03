@@ -7,7 +7,7 @@ using RhuEngine.AssetSystem;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
@@ -27,13 +27,13 @@ namespace RhuEngine.Components
 				return;
 			}
 			try {
-				Log.Info("Starting load of static Asset");
+				RLog.Info("Starting load of static Asset");
 				var uri = new Uri(url);
 				CurrentTask?.Stop();
 				CurrentTask = World.assetSession.AssetLoadingTask(LoadAsset, uri, useCache || uri.Scheme.ToLower() == "local");
 			}
 			catch (Exception e) {
-				Log.Info($"Error Loading static Asset {e}");
+				RLog.Info($"Error Loading static Asset {e}");
 			}
 		}
 

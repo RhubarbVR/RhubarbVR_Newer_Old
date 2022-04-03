@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
 
+using RhuEngine.Linker;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
 
 namespace RhuEngine.WorldObjects
 {
@@ -48,7 +48,7 @@ namespace RhuEngine.WorldObjects
 		public void BindMethod(string name, object obje) {
 			var method = obje.GetType().GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			if (method is null) {
-				Log.Err($"Method not found {name}");
+				RLog.Err($"Method not found {name}");
 			}
 			else {
 				var prams = method.GetParameters();
@@ -59,7 +59,7 @@ namespace RhuEngine.WorldObjects
 					LoadChange += (obj) => method.Invoke(obje, new object[1] { obj });
 				}
 				else {
-					Log.Err($"Cannot use method {name} on type {GetType().GetFormattedName()}");
+					RLog.Err($"Cannot use method {name} on type {GetType().GetFormattedName()}");
 				}
 			}
 		}

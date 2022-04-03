@@ -1,7 +1,8 @@
 ﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
+using RNumerics;
+using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
@@ -11,11 +12,11 @@ namespace RhuEngine.Components
 	{
 		public SyncRef<User> user;
 
-		public Linker<Vec3> pos;
+		public Linker<Vector3f> pos;
 
-		public Linker<Quat> rot;
+		public Linker<Quaternionf> rot;
 
-		public Linker<Vec3> scale;
+		public Linker<Vector3f> scale;
 
 		public override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);
@@ -23,10 +24,11 @@ namespace RhuEngine.Components
 			scale.SetLinkerTarget(Entity.scale);
 		}
 
-		public float headRotY;
-		public float headRotX;
 
 		public override void Step() {
+			if (!Engine.EngineLink.CanInput) {
+				return;
+			}
 			if (World.IsPersonalSpace) {
 				var handVal = WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target?.head.Target;
 				if (handVal is not null) {
@@ -39,23 +41,13 @@ namespace RhuEngine.Components
 					return;
 				}
 				if (user.Target == World.GetLocalUser()) {
-					if (SK.ActiveDisplayMode == DisplayMode.Flatscreen & SK.Settings.disableFlatscreenMRSim) {
-						var mousePos = Input.Mouse.posChange;
-						headRotX += mousePos.y / 50;
-						headRotY += mousePos.x / 50;
-						Entity.LocalTrans = Matrix.TR(new Vec3(0, 0.75f, 0), Quat.FromAngles(headRotX, headRotY, 0));
-						user.Target.FindOrCreateSyncStream<SyncValueStream<Vec3>>("HeadPos").Value = Entity.position.Value;
-						user.Target.FindOrCreateSyncStream<SyncValueStream<Quat>>("HeadRot").Value = Entity.rotation.Value;
-					}
-					else {
-						Entity.LocalTrans = Input.Head.ToMatrix(1) * Renderer.CameraRoot.Inverse;
-						user.Target.FindOrCreateSyncStream<SyncValueStream<Vec3>>("HeadPos").Value = Entity.position.Value;
-						user.Target.FindOrCreateSyncStream<SyncValueStream<Quat>>("HeadRot").Value = Entity.rotation.Value;
-					}
+						Entity.LocalTrans = RInput.Head.HeadMatrix * RRenderer.CameraRoot.Inverse;
+						user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("HeadPos").Value = Entity.position.Value;
+						user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>("HeadRot").Value = Entity.rotation.Value;
 				}
 				else {
-					var position = user.Target.FindSyncStream<SyncValueStream<Vec3>>("HeadPos")?.Value ?? Vec3.Zero;
-					var rotation = user.Target.FindSyncStream<SyncValueStream<Quat>>("HeadRot")?.Value ?? Quat.Identity;
+					var position = user.Target.FindSyncStream<SyncValueStream<Vector3f>>("HeadPos")?.Value ?? Vector3f.Zero;
+					var rotation = user.Target.FindSyncStream<SyncValueStream<Quaternionf>>("HeadRot")?.Value ?? Quaternionf.Identity;
 					Entity.LocalTrans = Matrix.TR(position, rotation);
 				}
 			}

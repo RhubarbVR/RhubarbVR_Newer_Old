@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using StereoKit;
-
+using RNumerics;
+using RhuEngine.Linker;
 namespace RhuEngine.WorldObjects.ECS
 {
 	public class Entity : SyncObject, IOffsetableElement {
@@ -19,11 +18,11 @@ namespace RhuEngine.WorldObjects.ECS
 		public override string Name => name.Value;
 
 		[OnChanged(nameof(TransValueChange))]
-		public Sync<Vec3> position;
+		public Sync<Vector3f> position;
 		[OnChanged(nameof(TransValueChange))]
-		public Sync<Quat> rotation;
+		public Sync<Quaternionf> rotation;
 		[OnChanged(nameof(TransValueChange))]
-		public Sync<Vec3> scale;
+		public Sync<Vector3f> scale;
 		[Default(true)]
 		[OnChanged(nameof(OnEnableChange))]
 		public Sync<bool> enabled;
@@ -111,21 +110,21 @@ namespace RhuEngine.WorldObjects.ECS
 			var newLocal = point * parentMatrix.Inverse;
 			return newLocal;
 		}
-		public void GlobalToLocal(Matrix point, bool Child, out Vec3 translation, out Quat rotation, out Vec3 scale) {
+		public void GlobalToLocal(Matrix point, bool Child, out Vector3f translation, out Quaternionf rotation, out Vector3f scale) {
 			GlobalToLocal(point,Child).Decompose(out translation, out rotation, out scale);
 		}
 		[Exsposed]
-		public Vec3 GlobalPointToLocal(Vec3 point, bool Child = true) {
+		public Vector3f GlobalPointToLocal(Vector3f point, bool Child = true) {
 			GlobalToLocal(Matrix.T(point),Child,out var newTranslation, out _, out _);
 			return newTranslation;
 		}
 		[Exsposed]
-		public Vec3 GlobalScaleToLocal(Vec3 Scale, bool Child = true) {
+		public Vector3f GlobalScaleToLocal(Vector3f Scale, bool Child = true) {
 			GlobalToLocal(Matrix.S(Scale), Child, out _, out _, out var newScale);
 			return newScale;
 		}
 		[Exsposed]
-		public Quat GlobalRotToLocal(Quat Rot, bool Child = true) {
+		public Quaternionf GlobalRotToLocal(Quaternionf Rot, bool Child = true) {
 			GlobalToLocal(Matrix.R(Rot), Child, out _, out var newRotation, out _);
 			return newRotation;
 		}
@@ -133,21 +132,21 @@ namespace RhuEngine.WorldObjects.ECS
 		public Matrix LocalToGlobal(Matrix point,bool Child = true) {
 			return point * (Child ? GlobalTrans : _internalParent?.GlobalTrans ?? Matrix.Identity);
 		}
-		public void LocalToGlobal(Matrix point, bool Child, out Vec3 translation, out Quat rotation, out Vec3 scale) {
+		public void LocalToGlobal(Matrix point, bool Child, out Vector3f translation, out Quaternionf rotation, out Vector3f scale) {
 			LocalToGlobal(point, Child).Decompose(out translation, out rotation, out scale);
 		}
 		[Exsposed]
-		public Quat LocalRotToGlobal(Quat Rot, bool Child = true) {
+		public Quaternionf LocalRotToGlobal(Quaternionf Rot, bool Child = true) {
 			LocalToGlobal(Matrix.R(Rot),Child,out _, out var newRotation, out _);
 			return newRotation;
 		}
 		[Exsposed]
-		public Vec3 LocalScaleToGlobal(Vec3 scale, bool Child = true) {
+		public Vector3f LocalScaleToGlobal(Vector3f scale, bool Child = true) {
 			LocalToGlobal(Matrix.S(scale), Child, out _, out _, out var newScale);
 			return newScale;
 		}
 		[Exsposed]
-		public Vec3 LocalPosToGlobal(Vec3 pos, bool Child = true) {
+		public Vector3f LocalPosToGlobal(Vector3f pos, bool Child = true) {
 			LocalToGlobal(Matrix.T(pos), Child, out var newPos, out _, out _);
 			return newPos;
 		}
@@ -265,7 +264,7 @@ namespace RhuEngine.WorldObjects.ECS
 				return;
 			}
 			if (World != parent.Target.World) {
-				Log.Warn("tried to set parent from another world");
+				RLog.Warn("tried to set parent from another world");
 				return;
 			}
 			if (!parent.Target.CheckIfParented(this)) {
@@ -308,7 +307,7 @@ namespace RhuEngine.WorldObjects.ECS
 				return _cachedGlobalMatrix;
 			}
 			set {
-				var parentMatrix = Matrix.S(Vec3.One);
+				var parentMatrix = Matrix.S(Vector3f.One);
 				if (_internalParent != null) {
 					parentMatrix = _internalParent.GlobalTrans;
 				}
@@ -335,7 +334,7 @@ namespace RhuEngine.WorldObjects.ECS
 				return _cachedLocalMatrix;
 			}
 			set {
-				var parentMatrix = Matrix.S(Vec3.One);
+				var parentMatrix = Matrix.S(Vector3f.One);
 				if (_internalParent != null) {
 					parentMatrix = _internalParent.GlobalTrans;
 				}
@@ -375,8 +374,8 @@ namespace RhuEngine.WorldObjects.ECS
 
 		public override void FirstCreation() {
 			base.FirstCreation();
-			rotation.Value = Quat.Identity;
-			scale.Value = Vec3.One;
+			rotation.Value = Quaternionf.Identity;
+			scale.Value = Vector3f.One;
 		}
 
 		public void Step() {

@@ -2,8 +2,7 @@
 
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
-
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
@@ -25,11 +24,11 @@ namespace RhuEngine.Components
 		}
 
 		public override void Import(string data, bool wasUri, byte[] rawdata) {
-			Log.Info($"Loaded Texture Data {data} Uri{wasUri}");
+			RLog.Info($"Loaded Texture Data {data} Uri{wasUri}");
 			if (wasUri) {
-				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<PlaneMesh, UnlitClipShader>();
+				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<RectangleMesh, UnlitClipShader>();
 				var scaler = Entity.AttachComponent<TextureScaler>();
-				scaler.scale.SetLinkerTarget(pmesh.dimensions);
+				scaler.scale.SetLinkerTarget(pmesh.Dimensions);
 				scaler.scaleMultiplier.Value = 0.1f;
 				var textur = Entity.AttachComponent<StaticTexture>();
 				scaler.texture.Target = textur;
@@ -45,7 +44,7 @@ namespace RhuEngine.Components
 						Import(newuri.ToString(), true,null);
 					}
 					else {
-						Log.Err("Texture Load Uknown" + data);
+						RLog.Err("Texture Load Uknown" + data);
 					}
 				}
 				else {

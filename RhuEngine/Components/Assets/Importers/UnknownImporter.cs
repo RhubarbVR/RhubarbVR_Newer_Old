@@ -4,7 +4,7 @@ using System.Linq;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
+using RNumerics;
 
 namespace RhuEngine.Components
 {
@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 
 		public byte[] rawData;
 
-		public SyncRef<UIWindow> Window;
+		//public SyncRef<UIWindow> Window;
 
 		public SyncRef<Entity> UI;
 
@@ -30,20 +30,21 @@ namespace RhuEngine.Components
 							where typeof(Importer).IsAssignableFrom(t)
 							where t != typeof(UnknownImporter)
 							select t;
-			var window = Entity.AttachComponent<UIWindow>();
-			Entity.rotation.Value *= Quat.FromAngles(90,0,180);
-			Window.Target = window;
-			window.Text.Value = "Importer";
-			window.WindowType.Value = UIWin.Normal;
-			UI.Target = Entity.AddChild("UI");
-			foreach (var item in importers) {
-				var button = UI.Target.AttachComponent<UIButton>();
-				button.Text.Value = item.Name.Remove(item.Name.Length - 8);
-				var dataHolder = UI.Target.AttachComponent<AddSingleValuePram<string>>();
-				dataHolder.Value.Value = item.FullName;
-				dataHolder.Target.Target = RunImport;
-				button.onClick.Target = dataHolder.Call;
-			}
+			// TODO UI added back
+			//var window = Entity.AttachComponent<UIWindow>();
+			//Entity.rotation.Value *= Quaternionf.CreateFromYawPitchRoll(90,0,180);
+			//Window.Target = window;
+			//window.Text.Value = "Importer";
+			//window.WindowType.Value = UIWin.Normal;
+			//UI.Target = Entity.AddChild("UI");
+			//foreach (var item in importers) {
+			//	var button = UI.Target.AttachComponent<UIButton>();
+			//	button.Text.Value = item.Name.Remove(item.Name.Length - 8);
+			//	var dataHolder = UI.Target.AttachComponent<AddSingleValuePram<string>>();
+			//	dataHolder.Value.Value = item.FullName;
+			//	dataHolder.Target.Target = RunImport;
+			//	button.onClick.Target = dataHolder.Call;
+			//}
 		}
 
 		[Exsposed]
@@ -55,8 +56,8 @@ namespace RhuEngine.Components
 					importer.Import(path_url, isUrl, rawData);
 				}
 			}
-			Entity.rotation.Value *= Quat.FromAngles(90, 0, 180).Inverse;
-			Window.Target?.Destroy();
+			Entity.rotation.Value *= Quaternionf.CreateFromEuler(90, 0, 180).Inverse;
+			//Window.Target?.Destroy();
 			UI.Target?.Destroy();
 			Destroy();
 		}

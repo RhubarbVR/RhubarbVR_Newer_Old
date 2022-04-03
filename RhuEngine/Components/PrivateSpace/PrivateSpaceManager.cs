@@ -1,150 +1,151 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Threading;
+//using System.Threading.Tasks;
 
-using RhuEngine.Components.PrivateSpace.Windows;
-using RhuEngine.WorldObjects.ECS;
+//using RhuEngine.Components.PrivateSpace.Windows;
+//using RhuEngine.WorldObjects.ECS;
 
-using SharedModels;
+//using SharedModels;
 
-using StereoKit;
+//using RNumerics;
+//using RhuEngine.Linker;
 
-namespace RhuEngine.Components
-{
-	[UpdateLevel(UpdateEnum.Rendering)]
-	public class PrivateSpaceManager : RenderingComponent
-	{
-		public Pose privatePose;
+//namespace RhuEngine.Components
+//{
+//	[UpdateLevel(UpdateEnum.Rendering)]
+//	public class PrivateSpaceManager : RenderingComponent
+//	{
+//		public Pose privatePose;
 
-		public Window[] windows;
+//		public Window[] windows;
 
-		private void RenderPrivateWindow() {
-			UI.WindowBegin("PriveWindow", ref privatePose,UIWin.Body);
-			if (Engine.netApiManager.IsOnline) {
-				foreach (var item in windows) {
+//		private void RenderPrivateWindow() {
+//			UI.WindowBegin("PriveWindow", ref privatePose,UIWin.Body);
+//			if (Engine.netApiManager.IsOnline) {
+//				foreach (var item in windows) {
 
-					if (item.OnLogin is null) {
-						var _open = item.IsOpen;
-						UI.Toggle(item.Name, ref _open);
-						if (_open != item.IsOpen) {
-							item.IsOpen = _open;
-						}
-						UI.SameLine();
-					}
-					else if (item.OnLogin.Value == Engine.netApiManager.IsLoggedIn) {
-						var _open = item.IsOpen;
-						UI.Toggle(item.Name, ref _open);
-						if(_open != item.IsOpen) {
-							item.IsOpen = _open;
-						}
-						UI.SameLine();
-					}
-					else if (item.IsOpen) {
-						item.IsOpen = false;
-					}
-				}
-				if (Engine.netApiManager.IsLoggedIn) {
-					UI.Label("Hello " + Engine.netApiManager.User?.UserName ?? "null");
-					UI.SameLine();
-					if (UI.Button("FilePicker")) {
-						try {
-							Platform.FilePicker(PickerMode.Open, (open, path) => { if (open) { WorldManager.FocusedWorld.ImportString(path.CleanPath()); } });
-						}
-						catch { }
-					}
-					UI.SameLine();
-					if (UI.Button("Logout")) {
-						Engine.netApiManager.Logout();
-					}
-					UI.Text("World switcher");
-					if (WorldManager.FocusedWorld is not null) {
-						UI.PushEnabled(false);
-						var e = true;
-						UI.Toggle(" " + WorldManager.FocusedWorld.SessionName.Value, ref e);
-						UI.PopEnabled();
-						if (WorldManager.LocalWorld != WorldManager.FocusedWorld) {
-							UI.PushTint(new Color(0.8f, 0, 0));
-							UI.SameLine();
-							UI.Space(-Engine.UISettings.padding);
-							if (UI.Button("X")) {
-								try {
-									WorldManager.FocusedWorld.Dispose();
-								}
-								catch { }
-							}
-							UI.PopTint();
-						}
-					}
-					var count = 2;
-					for (var i = 0; i < WorldManager.worlds.Count; i++) {
-						var item = WorldManager.worlds[i];
-						if (item.Focus == WorldObjects.World.FocusLevel.Background) {
-							if (count % 3 != 1) {
-								UI.SameLine();
-							}
-							UI.PushId(count);
-							if (UI.Button(" " + item.SessionName.Value)) {
-								item.Focus = WorldObjects.World.FocusLevel.Focused;
-							}
-							if (WorldManager.LocalWorld != item) {
-								UI.PushTint(new Color(0.8f, 0, 0));
-								UI.SameLine();
-								UI.Space(-Engine.UISettings.padding);
-								if (UI.Button("X")) {
-									try {
-										item.Dispose();
-									}
-									catch { }
-								}
-								UI.PopTint();
-							}
-							UI.PopId();
-							count++;
-						}
-					}
-				}
-			}
-			else {
-				if(UI.Button("Go Online")) {
-					try {
-						Engine.netApiManager.UpdateCheckForInternetConnection();	
-					}catch { }
-				}
-			}
-			UI.WindowEnd();
-		}
+//					if (item.OnLogin is null) {
+//						var _open = item.IsOpen;
+//						UI.Toggle(item.Name, ref _open);
+//						if (_open != item.IsOpen) {
+//							item.IsOpen = _open;
+//						}
+//						UI.SameLine();
+//					}
+//					else if (item.OnLogin.Value == Engine.netApiManager.IsLoggedIn) {
+//						var _open = item.IsOpen;
+//						UI.Toggle(item.Name, ref _open);
+//						if(_open != item.IsOpen) {
+//							item.IsOpen = _open;
+//						}
+//						UI.SameLine();
+//					}
+//					else if (item.IsOpen) {
+//						item.IsOpen = false;
+//					}
+//				}
+//				if (Engine.netApiManager.IsLoggedIn) {
+//					UI.Label("Hello " + Engine.netApiManager.User?.UserName ?? "null");
+//					UI.SameLine();
+//					if (UI.Button("FilePicker")) {
+//						try {
+//							Platform.FilePicker(PickerMode.Open, (open, path) => { if (open) { WorldManager.FocusedWorld.ImportString(path.CleanPath()); } });
+//						}
+//						catch { }
+//					}
+//					UI.SameLine();
+//					if (UI.Button("Logout")) {
+//						Engine.netApiManager.Logout();
+//					}
+//					UI.Text("World switcher");
+//					if (WorldManager.FocusedWorld is not null) {
+//						UI.PushEnabled(false);
+//						var e = true;
+//						UI.Toggle(" " + WorldManager.FocusedWorld.SessionName.Value, ref e);
+//						UI.PopEnabled();
+//						if (WorldManager.LocalWorld != WorldManager.FocusedWorld) {
+//							UI.PushTint(new Color(0.8f, 0, 0));
+//							UI.SameLine();
+//							UI.Space(-Engine.UISettings.padding);
+//							if (UI.Button("X")) {
+//								try {
+//									WorldManager.FocusedWorld.Dispose();
+//								}
+//								catch { }
+//							}
+//							UI.PopTint();
+//						}
+//					}
+//					var count = 2;
+//					for (var i = 0; i < WorldManager.worlds.Count; i++) {
+//						var item = WorldManager.worlds[i];
+//						if (item.Focus == WorldObjects.World.FocusLevel.Background) {
+//							if (count % 3 != 1) {
+//								UI.SameLine();
+//							}
+//							UI.PushId(count);
+//							if (UI.Button(" " + item.SessionName.Value)) {
+//								item.Focus = WorldObjects.World.FocusLevel.Focused;
+//							}
+//							if (WorldManager.LocalWorld != item) {
+//								UI.PushTint(new Color(0.8f, 0, 0));
+//								UI.SameLine();
+//								UI.Space(-Engine.UISettings.padding);
+//								if (UI.Button("X")) {
+//									try {
+//										item.Dispose();
+//									}
+//									catch { }
+//								}
+//								UI.PopTint();
+//							}
+//							UI.PopId();
+//							count++;
+//						}
+//					}
+//				}
+//			}
+//			else {
+//				if(UI.Button("Go Online")) {
+//					try {
+//						Engine.netApiManager.UpdateCheckForInternetConnection();	
+//					}catch { }
+//				}
+//			}
+//			UI.WindowEnd();
+//		}
 
 
-		public override void OnLoaded() {
-			base.OnLoaded();
-			windows = new Window[] { new SettingsWindow(Engine, WorldManager, World), new DebugWindow(Engine,WorldManager,World),new ConsoleWindow(Engine,WorldManager, World), new AssetTasksWindow(Engine,WorldManager,World) ,new SessionWindow(Engine, WorldManager, World), new LoginWindow(Engine,WorldManager, World) };
-			privatePose = new(-.2f, 0.2f, -0.2f, Quat.LookDir(1, 0, 1));
-			Engine.netApiManager.HasGoneOfline += NetApiManager_HasGoneOfline;
-		}
+//		public override void OnLoaded() {
+//			base.OnLoaded();
+//			windows = new Window[] { new SettingsWindow(Engine, WorldManager, World), new DebugWindow(Engine,WorldManager,World),new ConsoleWindow(Engine,WorldManager, World), new AssetTasksWindow(Engine,WorldManager,World) ,new SessionWindow(Engine, WorldManager, World), new LoginWindow(Engine,WorldManager, World) };
+//			privatePose = new(-.2f, 0.2f, -0.2f, Quat.LookDir(1, 0, 1));
+//			Engine.netApiManager.HasGoneOfline += NetApiManager_HasGoneOfline;
+//		}
 
-		private void NetApiManager_HasGoneOfline() {
-			foreach (var item in windows) {
-				item.IsOpen = false;
-			}
-		}
+//		private void NetApiManager_HasGoneOfline() {
+//			foreach (var item in windows) {
+//				item.IsOpen = false;
+//			}
+//		}
 
-		readonly bool _uIOpen = true;
+//		readonly bool _uIOpen = true;
 
-		public override void Render() {
-			Hierarchy.Push(Renderer.CameraRoot);
-			foreach (var item in windows) {
-				if (item.IsOpen) {
-					item.Update();
-				}
-			}
-			Hierarchy.Push(Matrix.S(0.75f));
-			if (_uIOpen) {
-				RenderPrivateWindow();
-			}
-			Hierarchy.Pop();
-			Hierarchy.Pop();
-		}
-	}
-}
+//		public override void Render() {
+//			Hierarchy.Push(Renderer.CameraRoot);
+//			foreach (var item in windows) {
+//				if (item.IsOpen) {
+//					item.Update();
+//				}
+//			}
+//			Hierarchy.Push(Matrix.S(0.75f));
+//			if (_uIOpen) {
+//				RenderPrivateWindow();
+//			}
+//			Hierarchy.Pop();
+//			Hierarchy.Pop();
+//		}
+//	}
+//}

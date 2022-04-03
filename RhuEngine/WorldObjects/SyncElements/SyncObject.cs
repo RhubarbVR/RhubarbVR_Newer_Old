@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
+using RhuEngine.Linker;
 using RhuEngine.Managers;
 
-using StereoKit;
 
 namespace RhuEngine.WorldObjects
 {
@@ -83,7 +83,7 @@ namespace RhuEngine.WorldObjects
 					Dispose();
 				}
 				catch (Exception e) {
-					Log.Err($"Error When Destroying {Name} {Pointer} type:{GetType().GetFormattedName()} Error:{e}");
+					RLog.Err($"Error When Destroying {Name} {Pointer} type:{GetType().GetFormattedName()} Error:{e}");
 				}
 			});
 		}
@@ -169,7 +169,7 @@ namespace RhuEngine.WorldObjects
 						if (startValue != null) {
 							var method = GetType().GetMethod(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 							if (method is null) {
-								Log.Err($"Method {startValue.Data} not found");
+								RLog.Err($"Method {startValue.Data} not found");
 							}
 							else {
 								var prams = method.GetParameters();
@@ -180,7 +180,7 @@ namespace RhuEngine.WorldObjects
 									((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[1] { obj });
 								}
 								else {
-									Log.Err($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
+									RLog.Err($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
 								}
 							}
 						}

@@ -2,8 +2,8 @@
 
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-
-using StereoKit;
+using RhuEngine.Linker;
+using RNumerics;
 
 namespace RhuEngine
 {
@@ -26,15 +26,15 @@ namespace RhuEngine
 			Srgb = srgb;
 		}
 
-		public Tex CreateTexture() {
-			var colors = new Color32[Height * Width];
+		public RTexture2D CreateTexture() {
+			var colors = new Colorb[Height * Width];
 			for (var h = 0; h < Height; h++) {
 				for (var w = 0; w < Width; w++) {
 					var color = Image[w, h];
-					colors[w + (h * Width)] = new Color32(color.R, color.G, color.B, color.A);
+					colors[w + (h * Width)] = new Colorb(color.R, color.G, color.B, color.A);
 				}
 			}
-			var newtex = Tex.FromColors(colors, Width, Height, Srgb);
+			var newtex = RTexture2D.FromColors(colors, Width, Height, Srgb);
 			return newtex;
 		}
 	}

@@ -4,9 +4,9 @@ using System.Reflection;
 
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
+using RhuEngine.Linker;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
 
 namespace RhuEngine.WorldObjects
 {
@@ -24,7 +24,7 @@ namespace RhuEngine.WorldObjects
 		public void BindPointer(DataNodeGroup data, IWorldObject @object) {
 			if (hasNewRefIDs) {
 				if (newRefIDs == null) {
-					Log.Warn($"Problem with {@object.GetType().FullName}");
+					RLog.Warn($"Problem with {@object.GetType().FullName}");
 				}
 				newRefIDs.Add(((DataNode<NetPointer>)data.GetValue("Pointer")).Value.GetID(), @object.Pointer.GetID());
 				if (toReassignLater.ContainsKey(((DataNode<NetPointer>)data.GetValue("Pointer")).Value.GetID())) {
@@ -36,7 +36,7 @@ namespace RhuEngine.WorldObjects
 			else {
 				@object.Pointer = ((DataNode<NetPointer>)data.GetValue("Pointer")).Value;
 				if (@object.Pointer.id == new NetPointer(0).id) {
-					Log.Warn($"RefID of {@object.GetType().FullName} is null");
+					RLog.Warn($"RefID of {@object.GetType().FullName} is null");
 				}
 				else {
 					@object.World.RegisterWorldObject(@object);
@@ -110,7 +110,7 @@ namespace RhuEngine.WorldObjects
 				if (ty == typeof(MissingComponent)) {
 					ty = Type.GetType(((DataNode<string>)((DataNodeGroup)val.GetValue("Value")).GetValue("type")).Value, false);
 					if (ty == null) {
-						Log.Warn("Component still not found " + ((DataNode<string>)val.GetValue("Type")).Value);
+						RLog.Warn("Component still not found " + ((DataNode<string>)val.GetValue("Type")).Value);
 						@object.Add(typeof(MissingComponent), !hasNewRefIDs, true).Deserialize((DataNodeGroup)val.GetValue("Value"), this);
 					}
 					else if (ty != typeof(MissingComponent)) {
@@ -118,7 +118,7 @@ namespace RhuEngine.WorldObjects
 							@object.Add(ty, !hasNewRefIDs, true).Deserialize((DataNodeGroup)((DataNodeGroup)val.GetValue("Value")).GetValue("Data"), this);
 						}
 						else {
-							Log.Err("Something is broken or someone is messing with things", true);
+							RLog.Err("Something is broken or someone is messing with things");
 						}
 					}
 					else {
@@ -127,7 +127,7 @@ namespace RhuEngine.WorldObjects
 				}
 				else {
 					if (ty == null) {
-						Log.Warn($"Type {((DataNode<string>)val.GetValue("Type")).Value} not found", true);
+						RLog.Warn($"Type {((DataNode<string>)val.GetValue("Type")).Value} not found");
 						if (typeof(T) == typeof(Component)) {
 							@object.Add(typeof(MissingComponent), !hasNewRefIDs, true).Deserialize((DataNodeGroup)val.GetValue("Value"), this);
 						}

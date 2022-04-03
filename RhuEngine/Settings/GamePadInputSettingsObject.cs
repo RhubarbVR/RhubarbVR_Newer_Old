@@ -4,7 +4,6 @@ using System.Text;
 
 using RhuSettings;
 
-using StereoKit;
 
 namespace RhuEngine.Settings
 {

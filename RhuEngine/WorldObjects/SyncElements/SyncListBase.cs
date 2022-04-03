@@ -5,8 +5,7 @@ using System.Linq;
 
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
-
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
@@ -174,7 +173,7 @@ namespace RhuEngine.WorldObjects
 					break;
 				case 2:
 					var objecte = this[(DataNode<NetPointer>)nodeGroup["ref"]];
-					Log.Info("Removed net");
+					RLog.Info("Removed net");
 					RemoveInternal(objecte);
 					objecte.Destroy();
 					break;

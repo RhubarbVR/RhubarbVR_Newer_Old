@@ -7,13 +7,13 @@ using System.Threading;
 using RhuEngine.Managers;
 using RhuEngine.WorldObjects.ECS;
 using RhuEngine.AssetSystem;
-using StereoKit;
 using RhuEngine.AssetSystem.RequestStructs;
 using LiteNetLib;
 using System.Threading.Tasks;
 using SharedModels;
 using System.Collections.Generic;
 using SharedModels.GameSpecific;
+using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
@@ -55,11 +55,11 @@ namespace RhuEngine.WorldObjects
 				var userID = path.Substring(0, path.IndexOf('/'));
 				var user = _world.GetUserFromID(userID);
 				if (user == null) {
-					Log.Err($"User was null when loadeding LocalAsset UserID: {userID} Path {path}");
+					RLog.Err($"User was null when loadeding LocalAsset UserID: {userID} Path {path}");
 					return null;
 				}
 				if (user.CurrentPeer == null) {
-					Log.Err("User Peer was null when loadeding LocalAsset");
+					RLog.Err("User Peer was null when loadeding LocalAsset");
 					return null;
 				}
 				user.CurrentPeer.Send(Serializer.Save<IAssetRequest>(new RequestAsset { URL = path }), ASSET_DELIVERY_METHOD);
@@ -102,7 +102,7 @@ namespace RhuEngine.WorldObjects
 				}
 				var chunksize = (uint)devis;
 				var chunkAmount = asset.LongLength/chunksize;
-				Log.Info($"Sending asset with chunkSize:{chunksize} ChunkAmount:{chunkAmount} assetSize{asset.LongLength}");
+				RLog.Info($"Sending asset with chunkSize:{chunksize} ChunkAmount:{chunkAmount} assetSize{asset.LongLength}");
 				if (asset != null) {
 					Requester.Send(Serializer.Save<IAssetRequest>(new AssetResponse { URL = Url,ChunkAmount = chunkAmount,ChunkSizeBytes = chunksize}), ASSET_DELIVERY_METHOD);
 					var chunkBuffer = new byte[chunksize];
@@ -113,7 +113,7 @@ namespace RhuEngine.WorldObjects
 						remainingChunks--;
 						Thread.Sleep(10);
 					}
-					Log.Info("Sent all Chunks");
+					RLog.Info("Sent all Chunks");
 				}
 			}
 
@@ -123,14 +123,14 @@ namespace RhuEngine.WorldObjects
 
 		private void AssetResponses(IAssetRequest assetRequest,Peer peer, DeliveryMethod deliveryMethod) {
 			if (assetRequest is RequestAsset request) {
-				Log.Info("User Wants LocalAsset" + request.URL);
+				RLog.Info("User Wants LocalAsset" + request.URL);
 				new LocalAssetSendTask(this, request.URL, peer);
 			}
 			else if (assetRequest is AssetChunk assetChunk) {
 
 			}
 			else if (assetRequest is AssetResponse response) {
-				Log.Info($"Asset Resived with chunkSize:{response.ChunkSizeBytes} ChunkAmount:{response.ChunkAmount} assetSize{response.ChunkAmount * response.ChunkSizeBytes}");
+				RLog.Info($"Asset Resived with chunkSize:{response.ChunkSizeBytes} ChunkAmount:{response.ChunkAmount} assetSize{response.ChunkAmount * response.ChunkSizeBytes}");
 			}
 		}
 
@@ -146,14 +146,14 @@ namespace RhuEngine.WorldObjects
 					return loadTask.WaitForByteArray();
 				}
 				else {
-					Log.Err("Asset Load Task Not found");
+					RLog.Err("Asset Load Task Not found");
 					return null;
 				}
 			}
 		}
 
 		public Uri LoadLocalAsset(byte[] data,string fileExs) {
-			Log.Info("Loadeding localAsset " + fileExs);
+			RLog.Info("Loadeding localAsset " + fileExs);
 			var addedEnd = "";
 			var indexofpoint = fileExs.IndexOf('.');
 			if (indexofpoint > -1) {

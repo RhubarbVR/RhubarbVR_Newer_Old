@@ -114,6 +114,10 @@
       <Project>{ba137c65-0c37-4bae-a892-437c0a24df63}</Project>
       <Name>RhuEngine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\RStereoKit\RStereoKit.csproj">
+      <Project>{7371625b-2753-4082-9191-f38d39acd942}</Project>
+      <Name>RStereoKit</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '16.0' ">
     <VisualStudioVersion>16.0</VisualStudioVersion>

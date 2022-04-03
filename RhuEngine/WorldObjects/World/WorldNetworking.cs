@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using RhuEngine.AssetSystem.RequestStructs;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
+using RhuEngine.Linker;
 using RhuEngine.Managers;
 
 using SharedModels;
@@ -22,7 +23,6 @@ using SharedModels.GameSpecific;
 using SharedModels.Session;
 using SharedModels.UserSession;
 
-using StereoKit;
 
 namespace RhuEngine.WorldObjects
 {
@@ -169,7 +169,7 @@ namespace RhuEngine.WorldObjects
 
 		private void LoadNatManager() {
 			_natPunchListener.NatIntroductionSuccess += (point, addrType, token) => {
-				Log.Info($"NatIntroductionSuccess {point}  {addrType}  {token}");
+				RLog.Info($"NatIntroductionSuccess {point}  {addrType}  {token}");
 				NatIntroductionSuccessIsGood[token] = true;
 				var peer = _netManager.Connect(point, token + '~' + KEY);
 				peer.Tag = NatUserIDS[token];
@@ -177,7 +177,7 @@ namespace RhuEngine.WorldObjects
 			};
 
 			_natPunchListener.NatIntroductionRequest += (point, addrType, token) => {
-				Log.Info($"NatIntroductionRequest {point}  {addrType}  {token}");
+				RLog.Info($"NatIntroductionRequest {point}  {addrType}  {token}");
 				NatIntroductionSuccessIsGood.TryAdd(token, false);
 			};
 
@@ -186,18 +186,18 @@ namespace RhuEngine.WorldObjects
 			_clientListener.ConnectionRequestEvent += request => {
 				try {
 					var key = request.Data.GetString();
-					Log.Info($"ConnectionRequestEvent Key: {key}");
+					RLog.Info($"ConnectionRequestEvent Key: {key}");
 					if (key.Contains('~')) {
 						var e = key.Split('~');
 						if (e[1] == KEY) {
-							Log.Info($"ConnectionRequestEvent Accepted");
+							RLog.Info($"ConnectionRequestEvent Accepted");
 							var peer = request.Accept();
 							peer.Tag = NatUserIDS[e[0]];
 							NatIntroductionSuccessIsGood.TryAdd(e[0], true);
 							NatConnection.TryAdd(e[0], peer);
 						}
 						else {
-							Log.Info($"ConnectionRequestEvent Reject Key invalied");
+							RLog.Info($"ConnectionRequestEvent Reject Key invalied");
 							request.Reject();
 						}
 					}
@@ -277,7 +277,7 @@ namespace RhuEngine.WorldObjects
 							foreach (var item in deserializer.onLoaded) {
 								item?.Invoke();
 							}
-							Log.Info(LoadMsg = "World state loaded");
+							RLog.Info(LoadMsg = "World state loaded");
 							foreach (var peer1 in _netManager.ConnectedPeerList) {
 								if (peer1.Tag is Peer contpeer) {
 									LoadUserIn(contpeer);
@@ -289,7 +289,7 @@ namespace RhuEngine.WorldObjects
 							FindNewMaster();
 						}
 						catch (Exception ex) {
-							Log.Err("Failed to load world state" + ex);
+							RLog.Err("Failed to load world state" + ex);
 							LoadMsg = "Failed to load world state" + ex;
 						}
 					});
@@ -308,7 +308,7 @@ namespace RhuEngine.WorldObjects
 					catch (Exception ex) {
 #if DEBUG
 						if (deliveryMethod == DeliveryMethod.ReliableOrdered && peer.User is not null) {
-							Log.Err($"Failed to Process NetData target:{target.Value.HexString()} Error:{ex}");
+							RLog.Err($"Failed to Process NetData target:{target.Value.HexString()} Error:{ex}");
 						}
 #endif
 					}
@@ -371,23 +371,23 @@ namespace RhuEngine.WorldObjects
 					//Still loading peer
 				}
 				else {
-					Log.Err("Peer is not known");
+					RLog.Err("Peer is not known");
 				}
 			}
 			catch (Exception ex) {
-				Log.Err($"Failed to proccess packed Error {ex}");
+				RLog.Err($"Failed to proccess packed Error {ex}");
 			}
 			reader.Recycle();
 		}
 
 		public void ProcessUserConnection(Peer peer) {
-			Log.Info("User connected");
+			RLog.Info("User connected");
 			peers.Add(peer);
 			if (IsLoading) {
 				return;
 			}
 			if (LocalUserID == MasterUser) {
-				Log.Info("Sending initial world state to a new user");
+				RLog.Info("Sending initial world state to a new user");
 				var dataGroup = new DataNodeGroup();
 				dataGroup.SetValue("WorldData", Serialize(new SyncObjectSerializerObject(true)));
 				peer.Send(dataGroup.GetByteArray(), DeliveryMethod.ReliableOrdered);
@@ -397,23 +397,23 @@ namespace RhuEngine.WorldObjects
 		}
 
 		private void PeerConnected(NetPeer peer) {
-			Log.Info("Peer connected");
+			RLog.Info("Peer connected");
 			if (peer.EndPoint.Address.ToString().Contains("127.0.0.1") && peer.Tag is not RelayPeer) {  // this is to make debuging essayer
 				return;
 			}
 			if (peer.Tag is RelayPeer relayPeer) {
-				Log.Info("Peer was relay server");
+				RLog.Info("Peer was relay server");
 				relayServers.Add(relayPeer);
 				relayPeer.OnConnect();
 			}
 			else if (peer.Tag is string @string) {
-				Log.Info("Normal Peer Loaded");
+				RLog.Info("Normal Peer Loaded");
 				var newpeer = new Peer(peer, @string);
 				peer.Tag = newpeer;
 				ProcessUserConnection(newpeer);
 			}
 			else {
-				Log.Err("Peer had no tag noidea what to do");
+				RLog.Err("Peer had no tag noidea what to do");
 			}
 		}
 
@@ -427,7 +427,7 @@ namespace RhuEngine.WorldObjects
 				if (user is null) {
 					return;
 				}
-				Log.Info("Connecting to user " + user.ConnectionType.ToString() + " Token:" + user.Data + " UserID:" + user.UserID);
+				RLog.Info("Connecting to user " + user.ConnectionType.ToString() + " Token:" + user.Data + " UserID:" + user.UserID);
 				LoadMsg = "Connecting to user";
 				switch (user.ConnectionType) {
 					case ConnectionType.Direct:
@@ -443,7 +443,7 @@ namespace RhuEngine.WorldObjects
 						try {
 							LoadMsg = "Trying to HolePunch to User";
 							var peerCount = _netManager.ConnectedPeersCount;
-							Log.Info("Server: " + worldManager.Engine.netApiManager.BaseAddress.Host);
+							RLog.Info("Server: " + worldManager.Engine.netApiManager.BaseAddress.Host);
 							NatUserIDS.TryAdd(user.Data, user.UserID);
 							var eidUri = new Uri(user.Server);
 							_netManager.NatPunchModule.SendNatIntroduceRequest(eidUri.Host,eidUri.Port, user.Data);
@@ -470,21 +470,21 @@ namespace RhuEngine.WorldObjects
 										catch {
 											return;
 										}
-										Log.Info(LoadMsg = "Failed To Hole Punch now using relay");
+										RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
 										RelayConnect(user);
 										lock (ActiveConnections) {
 											ActiveConnections.Remove(user);
 										}
 									}
 									else {
-										Log.Info(LoadMsg = "HolePunch succeeded");
+										RLog.Info(LoadMsg = "HolePunch succeeded");
 										lock (ActiveConnections) {
 											ActiveConnections.Remove(user);
 										}
 									}
 								}
 								else {
-									Log.Info(LoadMsg = "Failed To Hole Punch now using relay");
+									RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
 									RelayConnect(user);
 									lock (ActiveConnections) {
 										ActiveConnections.Remove(user);
@@ -492,7 +492,7 @@ namespace RhuEngine.WorldObjects
 								}
 							}
 							else {
-								Log.Info(LoadMsg = "Failed To Hole Punch now using relay");
+								RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
 								RelayConnect(user);
 								lock (ActiveConnections) {
 									ActiveConnections.Remove(user);
@@ -503,7 +503,7 @@ namespace RhuEngine.WorldObjects
 							NatUserIDS.TryRemove(user.Data, out _);
 						}
 						catch (Exception e) {
-							Log.Err($"Excerption when trying to hole punch {e}");
+							RLog.Err($"Excerption when trying to hole punch {e}");
 							return;
 						}
 						break;
@@ -523,23 +523,23 @@ namespace RhuEngine.WorldObjects
 		}
 
 		private void RelayConnect(ConnectToUser user) {
-			Log.Info("Relay Connect Client");
+			RLog.Info("Relay Connect Client");
 			try {
 				var eidUri = new Uri(user.Server);
 				var peer = _netManager.Connect(eidUri.Host, eidUri.Port + 1, user.Data);
 				if (peer.Tag is not null) {
-					Log.Info(LoadMsg = "Adding another Relay Client");
+					RLog.Info(LoadMsg = "Adding another Relay Client");
 					var relay = peer.Tag as RelayPeer;
 					relay.LoadNewPeer(user);
 				}
 				else {
-					Log.Info(LoadMsg = "Start New Relay Server");
+					RLog.Info(LoadMsg = "Start New Relay Server");
 					var relay = new RelayPeer(peer, this, user.UserID);
 					peer.Tag = relay;
 				}
 			}
 			catch (Exception e) {
-				Log.Err(LoadMsg = "Relay Connect Error:" + e.ToString());
+				RLog.Err(LoadMsg = "Relay Connect Error:" + e.ToString());
 				throw new Exception("Failed to use relay");
 			}
 		}
@@ -589,19 +589,24 @@ namespace RhuEngine.WorldObjects
 			LoadMsg = "Adding LocalUser";
 			var Olduser = GetUserFromID(Engine.netApiManager.User?.Id ?? "Null");
 			if (Olduser is null) {
+				LoadMsg = "Building new LocalUser";
 				ItemIndex = 176;
 				LocalUserID = (ushort)(Users.Count + 1);
-				Log.Info($"Loaded local User with id{LocalUserID}");
+				RLog.Info($"Built local User with id{LocalUserID}");
 				var user = Users.Add();
 				user.userID.Value = worldManager.Engine.netApiManager.User?.Id ?? "null";
 			}
 			else {
+				LoadMsg = "using old LocalUser";
 				LocalUserID = (ushort)(Users.IndexOf(Olduser) + 1);
+				RLog.Info($"using old LocalUser with id{LocalUserID}");
 				var e = from objec in _worldObjects
 						where objec.Key.GetOwnerID() == LocalUserID
 						orderby objec.Key.id descending
 						select objec.Key;
 				ItemIndex = e.First().ItemIndex() + 10;
+				RLog.Info($"Last index is {ItemIndex}");
+
 			}
 		}
 	}

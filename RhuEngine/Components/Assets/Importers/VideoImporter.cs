@@ -4,7 +4,8 @@ using System.IO;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
+using RhuEngine.Linker;
+using RNumerics;
 
 namespace RhuEngine.Components
 {
@@ -88,24 +89,24 @@ namespace RhuEngine.Components
 
 		public override void Import(string data, bool wasUri, byte[] rawdata) {
 			if (wasUri) {
-				Log.Info("Building video");
-				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<PlaneMesh, UnlitClipShader>();
+				RLog.Info("Building video");
+				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<RectangleMesh, UnlitClipShader>();
 				var scaler = Entity.AttachComponent<TextureScaler>();
-				scaler.scale.SetLinkerTarget(pmesh.dimensions);
+				scaler.scale.SetLinkerTarget(pmesh.Dimensions);
 				scaler.scaleMultiplier.Value = 0.5f;
 				var textur = Entity.AttachComponent<VideoTexture>();
 				textur.url.Value = data;
 				var left = Entity.AddChild("left");
 				var rignt = Entity.AddChild("rignt");
-				left.position.Value = Vec3.Right * -0.5f;
-				rignt.position.Value = Vec3.Right * 0.5f;
-				left.position.Value += Vec3.Forward * 0.2f;
-				rignt.position.Value += Vec3.Forward * 0.2f;
-				left.scale.Value = new Vec3(0.1f);
-				rignt.scale.Value = new Vec3(0.1f);
+				left.position.Value = Vector3f.Right * -0.5f;
+				rignt.position.Value = Vector3f.Right * 0.5f;
+				left.position.Value += Vector3f.Forward * 0.2f;
+				rignt.position.Value += Vector3f.Forward * 0.2f;
+				left.scale.Value = new Vector3f(0.1f);
+				rignt.scale.Value = new Vector3f(0.1f);
 				textur.AudioChannels.Add();
-				left.AttachMesh<SphereMesh, UnlitShader>();
-				rignt.AttachMesh<SphereMesh, UnlitShader>();
+				left.AttachMesh<Sphere3NormalizedCubeMesh, UnlitShader>();
+				rignt.AttachMesh<Sphere3NormalizedCubeMesh, UnlitShader>();
 				left.AttachComponent<SoundSource>().sound.Target = textur.AudioChannels[0];
 				rignt.AttachComponent<SoundSource>().sound.Target = textur.AudioChannels[1];
 				scaler.texture.Target = textur;
@@ -113,24 +114,25 @@ namespace RhuEngine.Components
 				mit.SetPram("diffuse", textur);
 				Destroy();
 				var WinEntit = Entity.AddChild("Window");
-				var window = WinEntit.AttachComponent<UIWindow>();
-				WinEntit.rotation.Value *= Quat.FromAngles(90, 0, 180);
-				WinEntit.position.Value = Vec3.Forward * 0.1f;
-				window.Text.Value = "Media Controls";
-				window.WindowType.Value = UIWin.Normal;
-				var UIE = WinEntit.AddChild("UI");
-				var Play = UIE.AttachComponent<UIButton>();
-				Play.Text.Value = "Play";
-				Play.onClick.Target = textur.Playback.Play;
-				var Stop = UIE.AttachComponent<UIButton>();
-				Stop.Text.Value = "Stop";
-				Stop.onClick.Target = textur.Playback.Stop;
-				var Pause = UIE.AttachComponent<UIButton>();
-				Pause.Text.Value = "Pause";
-				Pause.onClick.Target = textur.Playback.Pause;
-				var Resume = UIE.AttachComponent<UIButton>();
-				Resume.Text.Value = "Resume";
-				Resume.onClick.Target = textur.Playback.Resume;
+				// TODO
+				//var window = WinEntit.AttachComponent<UIWindow>();
+				//WinEntit.rotation.Value *= Quaternionf.CreateFromYawPitchRoll(90, 0, 180);
+				//WinEntit.position.Value = Vector3f.Forward * 0.1f;
+				//window.Text.Value = "Media Controls";
+				//window.WindowType.Value = UIWin.Normal;
+				//var UIE = WinEntit.AddChild("UI");
+				//var Play = UIE.AttachComponent<UIButton>();
+				//Play.Text.Value = "Play";
+				//Play.onClick.Target = textur.Playback.Play;
+				//var Stop = UIE.AttachComponent<UIButton>();
+				//Stop.Text.Value = "Stop";
+				//Stop.onClick.Target = textur.Playback.Stop;
+				//var Pause = UIE.AttachComponent<UIButton>();
+				//Pause.Text.Value = "Pause";
+				//Pause.onClick.Target = textur.Playback.Pause;
+				//var Resume = UIE.AttachComponent<UIButton>();
+				//Resume.Text.Value = "Resume";
+				//Resume.onClick.Target = textur.Playback.Resume;
 			}
 			else {
 				if (rawdata == null) {
@@ -139,7 +141,7 @@ namespace RhuEngine.Components
 						Import(newuri.ToString(), true,null);
 					}
 					else {
-						Log.Err("Video Load Uknown" + data);
+						RLog.Err("Video Load Uknown" + data);
 					}
 				}
 				else {

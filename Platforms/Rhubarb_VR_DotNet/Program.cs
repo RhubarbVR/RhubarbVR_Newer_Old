@@ -1,6 +1,7 @@
 ﻿using System;
 using StereoKit;
 using RhuEngine;
+using RStereoKit;
 
 class SKLoader
 {
@@ -10,13 +11,14 @@ class SKLoader
 		SK.PreLoadLibrary();
 
 		var cap = new OutputCapture();
-		var app = new Engine(args, cap, AppDomain.CurrentDomain.BaseDirectory);
+		var rhu = new RhuStereoKit();
+		var app = new Engine(rhu, args, cap, AppDomain.CurrentDomain.BaseDirectory);
 		if (app == null) {
 			throw new Exception("StereoKit loader couldn't construct an instance of the App!");
 		}
 
 		// Initialize StereoKit, and the app
-		if (!SK.Initialize(app.Settings)) {
+		if (!SK.Initialize(rhu.Settings)) {
 			Environment.Exit(1);
 		}
 

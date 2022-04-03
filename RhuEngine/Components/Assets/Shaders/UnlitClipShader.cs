@@ -1,15 +1,18 @@
 ﻿using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Shaders" })]
-	public class UnlitShader : AssetProvider<Shader>
+	public class UnlitShader : AssetProvider<RShader>
 	{
-		Shader _shader;
+		RShader _shader;
 		private void LoadShader() {
-			_shader = Shader.Unlit;
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
+			_shader = RShader.Unlit;
 			Load(_shader);
 		}
 		public override void OnLoaded() {

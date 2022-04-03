@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
+using RhuEngine.Linker;
 using RhuEngine.Managers;
 
 using RhuSettings;
 
-using StereoKit;
 
 namespace RhuEngine.Settings
 {
@@ -27,7 +27,7 @@ namespace RhuEngine.Settings
 		public Key DoubleKeyTwo = Key.None;
 
 		public bool GetInput() {
-			return Input.Key(SecondKey).IsActive() || Input.Key(MainKey).IsActive() || (Input.Key(DoubleKeyOne).IsActive() && Input.Key(DoubleKeyTwo).IsActive());
+			return RInput.Key(SecondKey).IsActive() || RInput.Key(MainKey).IsActive() || (RInput.Key(DoubleKeyOne).IsActive() && RInput.Key(DoubleKeyTwo).IsActive());
 		}
 
 		public KeyInput(Key mkey, Key dokey = Key.None, Key dtkey = Key.None, Key skey = Key.None) {

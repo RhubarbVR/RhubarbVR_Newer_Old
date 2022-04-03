@@ -1,7 +1,8 @@
-﻿using RhuEngine.WorldObjects;
+﻿using RhuEngine.Linker;
+using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
+using RNumerics;
 
 namespace RhuEngine.Components
 {
@@ -10,6 +11,9 @@ namespace RhuEngine.Components
 	public class SimpleSpawn : Component
 	{
 		public override void Step() {
+			if (!Engine.EngineLink.SpawnPlayer) {
+				return;
+			}
 			var user = World.GetLocalUser();
 			if (user is null) {
 				return;
@@ -18,31 +22,36 @@ namespace RhuEngine.Components
 				var userEntity = Entity.AddChild("User");
 				var userRoot = userEntity.AttachComponent<UserRoot>();
 				userEntity.AttachComponent<LocomotionManager>().user.Target = World.GetLocalUser();
-				if (!World.IsPersonalSpace) {
-					userEntity.AttachMesh<CubeMesh, UIShader>().Item1.dimensions.Value = new Vec3(0.1f, 0.1f, 0.1f);
-				}
 				var leftHand = userEntity.AddChild("LeftHand");
 				var leftComp = leftHand.AttachComponent<Hand>();
 				leftComp.hand.Value = Handed.Left;
 				leftComp.user.Target = World.GetLocalUser();
 				userRoot.leftHand.Target = leftHand;
 				if (!World.IsPersonalSpace) {
-					leftHand.AttachMesh<SphereMesh, UIShader>().Item1.diameter.Value = 0.06f;
+					var r = leftHand.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitShader>();
+					r.Item1.Diameter.Value = 0.06f;
+					r.Item3.colorLinear.Value = Colorf.RhubarbRed;
 				}
 				var rightHand = userEntity.AddChild("RightHand");
 				var rightComp = rightHand.AttachComponent<Hand>();
 				rightComp.hand.Value = Handed.Right;
 				rightComp.user.Target = World.GetLocalUser();
 				if (!World.IsPersonalSpace) {
-					rightHand.AttachMesh<SphereMesh, UIShader>().Item1.diameter.Value = 0.06f;
+					var l = rightHand.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitShader>();
+					l.Item1.Diameter.Value = 0.06f;
+					l.Item3.colorLinear.Value = Colorf.RhubarbGreen;
 				}
 				userRoot.rightHand.Target = rightHand;
 				var head = userEntity.AddChild("Head");
 				head.AttachComponent<Head>().user.Target = World.GetLocalUser();
 				if (!World.IsPersonalSpace) {
-					var mesh = head.AttachMesh<CylinderMesh, UIShader>().Item1;
-					mesh.depth.Value = 0.1f;
-					mesh.diameter.Value = 0.1f;
+					var thing = head.AddChild("Render").AttachMeshWithMeshRender<CappedCylinderMesh, UnlitShader>();
+					thing.Item3.colorLinear.Value = user.UserName.GetHashHue();
+					var mesh = thing.Item1;
+					mesh.Entity.rotation.Value = Quaternionf.Pitched;
+					mesh.Height.Value = 0.1f;
+					mesh.BaseRadius.Value = 0.05f;
+					mesh.TopRadius.Value = 0.05f;
 					var opus = user.FindOrCreateSyncStream<OpusStream>("MainOpusStream");
 					var audioPlayer = head.AttachComponent<SoundSource>();
 					audioPlayer.volume.Value = 0f;
@@ -53,7 +62,7 @@ namespace RhuEngine.Components
 				userRoot.head.Target = head;
 				userRoot.user.Target = World.GetLocalUser();
 				user.userRoot.Target = userRoot;
-				Log.Info("User Made");
+				RLog.Info("User Made");
 			}
 		}
 	}

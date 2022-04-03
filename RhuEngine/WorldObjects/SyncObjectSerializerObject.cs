@@ -4,8 +4,7 @@ using System.Reflection;
 
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
-
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
@@ -96,7 +95,7 @@ namespace RhuEngine.WorldObjects
 							castObject.OnSave();
 						}
 						catch (Exception e) {
-							Log.Warn($"Failed to save {@object.GetType().GetFormattedName()} Error: {e}");
+							RLog.Warn($"Failed to save {@object.GetType().GetFormattedName()} Error: {e}");
 						}
 					}
 				}

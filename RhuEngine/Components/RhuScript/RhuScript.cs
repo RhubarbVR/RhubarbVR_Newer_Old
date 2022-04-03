@@ -1,7 +1,6 @@
 ﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
 using RhuEngine.Components.ScriptNodes;
 using System;
 using RhuEngine.DataStructure;
@@ -10,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using SharedModels.GameSpecific;
+using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
@@ -17,13 +17,13 @@ namespace RhuEngine.Components
 	public class RhuScript : Component,IUpdatingComponent
 	{
 
-		[Exsposed]
-		public (Action, SafeCall) ClearErrorsSafe(SafeCall safeCall) {
-			return (() => ClearError(), SafeCall.MakeResponses(safeCall._number,Engine));
-		}
+		//[Exsposed]
+		//public (Action, SafeCall) ClearErrorsSafe(SafeCall safeCall) {
+		//	return (() => ClearError(), SafeCall.MakeResponses(safeCall._number,Engine));
+		//}
 
 		public void ClearError() {
-			Log.Info("RhuScript Errors Cleared");
+			RLog.Info("RhuScript Errors Cleared");
 			Error = null;
 			OnClearError.Target?.Invoke();
 		}
@@ -69,11 +69,11 @@ namespace RhuEngine.Components
 
 		[Exsposed]
 		public void InfoLog(string msg = "Hello World") {
-			Log.Info("[RhuScript] "+ msg);
+			RLog.Info("[RhuScript] "+ msg);
 		}
 		[Exsposed]
 		public void ErrorLog(string msg) {
-			Log.Err("[RhuScript] " + msg);
+			RLog.Err("[RhuScript] " + msg);
 		}
 		[Exsposed]
 		public void CallMainMethod() {
@@ -97,7 +97,7 @@ namespace RhuEngine.Components
 			catch (Exception e) 
 			{
 				Error = e;
-				Log.Err("Error in RhuScript Error: " + e.ToString());
+				RLog.Err("Error in RhuScript Error: " + e.ToString());
 				OnError.Target?.Invoke();
 			}
 			return null;

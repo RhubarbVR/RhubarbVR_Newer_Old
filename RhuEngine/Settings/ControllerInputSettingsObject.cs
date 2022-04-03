@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
+using RhuEngine.Linker;
 using RhuEngine.Managers;
 
 using RhuSettings;
 
-using StereoKit;
 
 namespace RhuEngine.Settings
 {
@@ -85,33 +85,33 @@ namespace RhuEngine.Settings
 		[SettingsField("Trigger")]
 		public ControllerAixSettingsObject Trigger = new(InputManager.InputTypes.Primary);
 
-		public float GetInputFloatFromController(InputManager.InputTypes inputType, Controller controller) {
+		public float GetInputFloatFromController(InputManager.InputTypes inputType, IRController controller) {
 			if (Trigger.positiveX == inputType) {
-				return controller.trigger;
+				return controller.Trigger;
 			}
 			if (Trigger.negevitveX == inputType) {
-				return -controller.trigger;
+				return -controller.Trigger;
 			}
 			if (Grip.positiveX == inputType) {
-				return controller.grip;
+				return controller.Grip;
 			}
 			if (Grip.negevitveX == inputType) {
-				return -controller.grip;
+				return -controller.Grip;
 			}
 			if (StickPress.Pressed == inputType) {
-				return controller.stickClick.IsJustActive()? 1:0;
+				return controller.StickClick.IsJustActive()? 1:0;
 			}
 			if (StickPress.Hold == inputType) {
 				//NotSetup;
 			}
 			if (X1.Pressed == inputType) {
-				return controller.x1.IsJustActive() ? 1 : 0;
+				return controller.X1.IsJustActive() ? 1 : 0;
 			}
 			if (X1.Hold == inputType) {
 				//NotSetup;
 			}
 			if (X2.Pressed == inputType) {
-				return controller.x2.IsJustActive() ? 1 : 0;
+				return controller.X2.IsJustActive() ? 1 : 0;
 			}
 			if (X1.Hold == inputType) {
 				//NotSetup;
@@ -119,16 +119,16 @@ namespace RhuEngine.Settings
 			if (InputManager.InputTypes.StickLocker != inputType) {
 				if (!StickLocker || GetInputFloatFromController(InputManager.InputTypes.StickLocker,controller) >= 0.9f) {
 					if (Stick.positiveX == inputType) {
-						return controller.stick.YX.x;
+						return controller.Stick.YX.x;
 					}
 					if (Stick.negevitveX == inputType) {
-						return -controller.stick.YX.x;
+						return -controller.Stick.YX.x;
 					}
 					if (Stick.positiveY == inputType) {
-						return controller.stick.YX.y;
+						return controller.Stick.YX.y;
 					}
 					if (Stick.negevitveY == inputType) {
-						return -controller.stick.YX.y;
+						return -controller.Stick.YX.y;
 					}
 				}
 			}

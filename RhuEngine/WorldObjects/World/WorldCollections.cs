@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 using RhuEngine.Datatypes;
+using RhuEngine.Linker;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
 
 namespace RhuEngine.WorldObjects
 {
@@ -58,24 +58,24 @@ namespace RhuEngine.WorldObjects
 
 		public void RegisterWorldObject(IWorldObject worldObject) {
 			if (!_worldObjects.TryAdd(worldObject.Pointer, worldObject)) {
-				Log.Warn($"World Object Failed To add {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
+				RLog.Warn($"World Object Failed To add {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
 			}
 			else {
 				if (typeof(INetworkedObject).IsAssignableFrom(worldObject.GetType())) {
 					if (!_networkedObjects.TryAdd(worldObject.Pointer, (INetworkedObject)worldObject)) {
-						Log.Warn($"INetworkedObject Failed To add {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
+						RLog.Warn($"INetworkedObject Failed To add {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
 					}
 				}
 			}
 		}
 		public void UnRegisterWorldObject(IWorldObject worldObject) {
 			if (!_worldObjects.TryRemove(worldObject.Pointer, out _)) {
-				Log.Warn($"World Object Failed To remove {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
+				RLog.Warn($"World Object Failed To remove {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
 			}
 			else {
 				if (typeof(INetworkedObject).IsAssignableFrom(worldObject.GetType())) {
 					if (!_networkedObjects.TryRemove(worldObject.Pointer, out _)) {
-						Log.Warn($"INetworkedObject Failed To remove {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
+						RLog.Warn($"INetworkedObject Failed To remove {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
 					}
 				}
 			}

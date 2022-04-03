@@ -1,6 +1,7 @@
 using System;
 using StereoKit;
 using RhuEngine;
+using RStereoKit;
 
 class SKLoader
 {
@@ -12,17 +13,15 @@ class SKLoader
 		// If the app has a constructor that takes a string array, then
 		// we'll use that, and pass the command line arguments into it on
 		// creation
-		var appType = typeof(Engine);
 		var cap = new OutputCapture();
-		var app = appType.GetConstructor(new Type[] { typeof(string[]), typeof(OutputCapture) }) != null
-			? (Engine)Activator.CreateInstance(appType, new object[] { args,cap })
-			: (Engine)Activator.CreateInstance(appType);
+		var rhu = new RhuStereoKit();
+		var app = new Engine(rhu, args, cap, AppDomain.CurrentDomain.BaseDirectory);
 		if (app == null) {
 			throw new Exception("StereoKit loader couldn't construct an instance of the App!");
 		}
 
 		// Initialize StereoKit, and the app
-		if (!SK.Initialize(app.Settings)) {
+		if (!SK.Initialize(rhu.Settings)) {
 			Environment.Exit(1);
 		}
 

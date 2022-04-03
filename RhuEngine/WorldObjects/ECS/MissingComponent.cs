@@ -2,8 +2,7 @@
 
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
-
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects.ECS
 {
@@ -36,7 +35,7 @@ namespace RhuEngine.WorldObjects.ECS
 			// TODO: refactor this. go to your corner. think REALLY hard about what you've done.
 			var data = (DataNodeGroup)notCastedData;
 			if (data == null) {
-				Log.Warn("Node did not exist when loading Node");
+				RLog.Warn("Node did not exist when loading Node");
 				return;
 			}
 			if (syncObjectDeserializer.hasNewRefIDs) {

@@ -1,7 +1,8 @@
 ﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
+using RhuEngine.Linker;
+using RNumerics;
 
 namespace RhuEngine.Components
 {
@@ -17,11 +18,11 @@ namespace RhuEngine.Components
 
 		public SyncRef<Entity> rightHand;
 
-		public Linker<Vec3> pos;
+		public Linker<Vector3f> pos;
 
-		public Linker<Quat> rot;
+		public Linker<Quaternionf> rot;
 
-		public Linker<Vec3> scale;
+		public Linker<Vector3f> scale;
 
 		public override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);
@@ -30,16 +31,19 @@ namespace RhuEngine.Components
 		}
 
 		public override void Step() {
+			if (!Engine.EngineLink.CanInput) {
+				return;
+			}
 			if (user.Target is null) {
 				return;
 			}
 			if (user.Target != World.GetLocalUser()) {
-				var userScale = user.Target.FindSyncStream<SyncValueStream<Vec3>>("UserScale");
-				var userPos = user.Target.FindSyncStream<SyncValueStream<Vec3>>("UserPos");
-				var userRot = user.Target.FindSyncStream<SyncValueStream<Quat>>("UserRot");
-				Entity.position.Value = userPos?.Value ?? Vec3.Zero;
-				Entity.scale.Value = userScale?.Value ?? Vec3.Zero;
-				Entity.rotation.Value = userRot?.Value ?? Quat.Identity;
+				var userScale = user.Target.FindSyncStream<SyncValueStream<Vector3f>>("UserScale");
+				var userPos = user.Target.FindSyncStream<SyncValueStream<Vector3f>>("UserPos");
+				var userRot = user.Target.FindSyncStream<SyncValueStream<Quaternionf>>("UserRot");
+				Entity.position.Value = userPos?.Value ?? Vector3f.Zero;
+				Entity.scale.Value = userScale?.Value ?? Vector3f.Zero;
+				Entity.rotation.Value = userRot?.Value ?? Quaternionf.Identity;
 				return;
 			}
 			if (World.IsPersonalSpace) {
@@ -47,12 +51,14 @@ namespace RhuEngine.Components
 					var focusUserRoot = WorldManager.FocusedWorld.GetLocalUser().userRoot.Target;
 					Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
 				}
-				Renderer.CameraRoot = (SK.ActiveDisplayMode == DisplayMode.Flatscreen & SK.Settings.disableFlatscreenMRSim) ? head.Target?.GlobalTrans ?? Matrix.S(1) : Entity.GlobalTrans;
+				if (Engine.EngineLink.CanRender) {
+					RRenderer.CameraRoot = Entity.GlobalTrans;
+				}
 			}
 			else {
-				user.Target.FindOrCreateSyncStream<SyncValueStream<Vec3>>("UserScale").Value = Entity.scale.Value;
-				user.Target.FindOrCreateSyncStream<SyncValueStream<Vec3>>("UserPos").Value = Entity.position.Value;
-				user.Target.FindOrCreateSyncStream<SyncValueStream<Quat>>("UserRot").Value = Entity.rotation.Value;
+				user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("UserScale").Value = Entity.scale.Value;
+				user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("UserPos").Value = Entity.position.Value;
+				user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>("UserRot").Value = Entity.rotation.Value;
 			}
 		}
 	}

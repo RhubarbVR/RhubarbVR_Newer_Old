@@ -5,8 +5,8 @@ using RhuEngine.WorldObjects.ECS;
 
 using OpusDotNet;
 
-using StereoKit;
 using System.Collections.Generic;
+using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
@@ -58,7 +58,7 @@ namespace RhuEngine.WorldObjects
 				_decoder = new OpusDecoder(48000, 1);
 			}
 			catch (Exception ex) {
-				Log.Err($"Exception when loading Opus {ex}");
+				RLog.Err($"Exception when loading Opus {ex}");
 			}
 		}
 

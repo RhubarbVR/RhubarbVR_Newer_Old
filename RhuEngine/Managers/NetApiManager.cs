@@ -17,12 +17,13 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
+using RhuEngine.Linker;
+
 using SharedModels;
 using SharedModels.Session;
 using SharedModels.UserInfo;
 using SharedModels.UserSession;
 
-using StereoKit;
 
 namespace RhuEngine.Managers
 {
@@ -42,7 +43,7 @@ namespace RhuEngine.Managers
 					httpDataResponse.Data = JsonConvert.DeserializeObject<T>(await httpResponseMessage.Content.ReadAsStringAsync());
 				}
 				catch (Exception ex) {
-					StereoKit.Log.Err(ex.ToString());
+					RLog.Err(ex.ToString());
 				}
 				return httpDataResponse;
 			}
@@ -52,13 +53,13 @@ namespace RhuEngine.Managers
 		private async Task<HttpDataResponse<R>> SendPost<R, T>(string path, T value) {
 			var httpContent = new StringContent(JsonConvert.SerializeObject(value), Encoding.UTF8, "application/json");
 			var request = await _httpClient.PostAsync(path, httpContent);
-			StereoKit.Log.Info($"Path {path}  data: {await request.Content.ReadAsStringAsync()}");
+			RLog.Info($"Path {path}  data: {await request.Content.ReadAsStringAsync()}");
 			return await HttpDataResponse<R>.Build(request);
 		}
 
 		private async Task<HttpDataResponse<R>> SendGet<R>(string path) {
 			var request = await _httpClient.GetAsync(path);
-			StereoKit.Log.Info($"Path {path}  data: {await request.Content.ReadAsStringAsync()}");
+			RLog.Info($"Path {path}  data: {await request.Content.ReadAsStringAsync()}");
 			return await HttpDataResponse<R>.Build(request);
 		}
 
@@ -224,13 +225,13 @@ namespace RhuEngine.Managers
 			}
 			using Stream stream = File.Create(file);
 			try {
-				Log.Info("Writing cookies to disk...");
+				RLog.Info("Writing cookies to disk...");
 				var formatter = new BinaryFormatter();
 				formatter.Serialize(stream, cookieJar);
-				Log.Info("Done.");
+				RLog.Info("Done.");
 			}
 			catch (Exception e) {
-				Log.Err("Problem writing cookies to disk: " + e.GetType());
+				RLog.Err("Problem writing cookies to disk: " + e.GetType());
 			}
 		}
 
@@ -238,12 +239,12 @@ namespace RhuEngine.Managers
 		private CookieContainer ReadCookiesFromDisk(string file) {
 			try {
 				using Stream stream = File.Open(file, FileMode.Open);
-				StereoKit.Log.Info("Reading cookies from disk...");
+				RLog.Info("Reading cookies from disk...");
 				var formatter = new BinaryFormatter();
 				return (CookieContainer)formatter.Deserialize(stream);
 			}
 			catch (Exception e) {
-				StereoKit.Log.Err("Problem reading cookies from disk: " + e.GetType());
+				RLog.Err("Problem reading cookies from disk: " + e.GetType());
 				return new CookieContainer();
 			}
 		}
@@ -275,7 +276,7 @@ namespace RhuEngine.Managers
 					}
 				}
 				catch (Exception ex) {
-					Log.Err($"Failed To Clear Cookies {ex}");
+					RLog.Err($"Failed To Clear Cookies {ex}");
 				}
 				WriteCookiesToDisk(_cookiePath, Cookies);
 				_client?.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None).Wait();
@@ -393,17 +394,17 @@ namespace RhuEngine.Managers
 
 		public void SendDataToSocked(SessionRequest sessionRequest) {
 			var sessionReqwest = JsonConvert.SerializeObject(sessionRequest);
-			Log.Info(sessionReqwest);
+			RLog.Info(sessionReqwest);
 			_client?.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(sessionReqwest)), WebSocketMessageType.Text, true, CancellationToken.None);
 		}
 
 		public void StartWebSocked() {
 			try {
 				if(User == null) {
-					Log.Err("Can not Start WebSocket Client not login");
+					RLog.Err("Can not Start WebSocket Client not login");
 					return;
 				}
-				Log.Info("Starting WebSocket Client");
+				RLog.Info("Starting WebSocket Client");
 				_client = new ClientWebSocket();
 				var cernts = new X509CertificateCollection();
 				foreach (var item in LetsEncrypt) {
@@ -422,10 +423,10 @@ namespace RhuEngine.Managers
 				}
 				_client.Options.Cookies = Cookies;
 				//Its for the quest users aaaaaaa
-				Log.Info($"Using {uri.Uri}");
+				RLog.Info($"Using {uri.Uri}");
 				var connection = _client.ConnectAsync(uri.Uri, CancellationToken.None);
 				connection.Wait();
-				Log.Info($"WebSocket Client {connection.Status}");
+				RLog.Info($"WebSocket Client {connection.Status}");
 				Task.Run(() => {
 					_client?.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("Start Conection")), WebSocketMessageType.Text, true, CancellationToken.None);
 					while ((_client?.State??WebSocketState.Closed) == WebSocketState.Open) {
@@ -435,7 +436,7 @@ namespace RhuEngine.Managers
 							task.Wait();
 						}
 						catch {
-							Log.Err("WebSockedLost");
+							RLog.Err("WebSockedLost");
 							IsGoneOfline();
 						}
 						try {
@@ -443,29 +444,29 @@ namespace RhuEngine.Managers
 							if (reqwest != null) {
 								switch (reqwest.RequestType) {
 									case RequestType.SessionError:
-										Log.Info($"SessionError res");
+										RLog.Info($"SessionError res");
 										var eworld = Engine.worldManager.GetWorldBySessionID(reqwest.ID);
 										if (eworld != null) {
-											Log.Err($"Error with session {reqwest.ID} error:{reqwest.RequestData}");
+											RLog.Err($"Error with session {reqwest.ID} error:{reqwest.RequestData}");
 											eworld.LoadMsg = reqwest.RequestData;
 											eworld.HasError = true;
 											eworld.Dispose();
 										}
 										break;
 									case RequestType.ConnectToUser:
-										Log.Info($"ConnectToUser res");
+										RLog.Info($"ConnectToUser res");
 										var cworld = Engine.worldManager.GetWorldBySessionID(reqwest.ID);
 										if (cworld != null) {
 											cworld.ConnectToUser(JsonConvert.DeserializeObject<ConnectToUser>(reqwest.RequestData));
 										}
 										break;
 									case RequestType.SessionID:
-										Log.Info($"SessionID res");
+										RLog.Info($"SessionID res");
 										var world = Engine.worldManager.GetWorldBySessionID(reqwest.ID);
 										if (world != null) {
 											if (world.SessionID.Value != reqwest.RequestData) {
 												world.SessionID.Value = reqwest.RequestData;
-												Log.Info(world.SessionID.Value);
+												RLog.Info(world.SessionID.Value);
 											}
 											else {
 												world.IsDeserializing = true;
@@ -474,7 +475,7 @@ namespace RhuEngine.Managers
 										}
 										break;
 									case RequestType.LoadStartingStatus:
-										Log.Info($"LoadStartingStatus res");
+										RLog.Info($"LoadStartingStatus res");
 										Task.Run(async () => {
 											var oldstatus = await GetUserStatus(User.Id);
 											if (oldstatus.Status == Status.Offline) {
@@ -501,7 +502,7 @@ namespace RhuEngine.Managers
 				});
 			}
 			catch (Exception e) {
-				Log.Err($"Faild to start WebSocket Client {e}");
+				RLog.Err($"Faild to start WebSocket Client {e}");
 			}
 		}
 		public void Step() {

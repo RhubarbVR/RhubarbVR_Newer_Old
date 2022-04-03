@@ -2,9 +2,9 @@
 using System.Reflection;
 
 using RhuEngine.DataStructure;
+using RhuEngine.Linker;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
 
 namespace RhuEngine.WorldObjects
 {
@@ -89,7 +89,7 @@ namespace RhuEngine.WorldObjects
 				_delegateTarget = _delegate as T;
 			}
 			catch (Exception e) {
-				Log.Err($"Failed To load Delegate Type {_type}  Method {_method} Error" + e.ToString());
+				RLog.Err($"Failed To load Delegate Type {_type}  Method {_method} Error" + e.ToString());
 				_type = null;
 				_method = "";
 				base.Target = null;

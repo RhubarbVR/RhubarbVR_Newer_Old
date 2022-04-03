@@ -6,7 +6,6 @@ using LiteNetLib;
 
 using RhuEngine.Components;
 
-using StereoKit;
 
 namespace RhuEngine.WorldObjects
 {

@@ -2,14 +2,14 @@
 
 using RhuEngine.DataStructure;
 using RhuEngine.WorldObjects.ECS;
-using StereoKit;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
-	public abstract class AudioStream : SyncStream, INetworkedObject, IAssetProvider<Sound>, IGlobalStepable
+	public abstract class AudioStream : SyncStream, INetworkedObject, IAssetProvider<RSound>, IGlobalStepable
 	{
 		public enum AudioFrameTime
 		{
@@ -26,7 +26,10 @@ namespace RhuEngine.WorldObjects
 		public Sync<AudioFrameTime> frameSize;
 
 		public virtual void UpdateFrameSize() {
-			_output = Sound.CreateStream(TimeInMs * 0.003f);
+			if (!Engine.EngineLink.CanAudio) {
+				return;
+			}
+			_output = RSound.CreateStream(TimeInMs * 0.003f);
 		}
 
 		public float TimeInMs
@@ -60,11 +63,11 @@ namespace RhuEngine.WorldObjects
 		public virtual bool IsRunning => true;
 		public int SampleCount => (int)(48000 / 1000 * TimeInMs);
 
-		public event Action<Sound> OnAssetLoaded;
+		public event Action<RSound> OnAssetLoaded;
 
-		public Sound Value { get; private set; }
+		public RSound Value { get; private set; }
 
-		public void Load(Sound data) {
+		public void Load(RSound data) {
 			Value = data;
 			Loaded = data != null;
 			OnAssetLoaded?.Invoke(data);
@@ -76,9 +79,9 @@ namespace RhuEngine.WorldObjects
 			Load(null);
 			base.Dispose();
 		}
-		private Sound _input;
+		private RSound _input;
 
-		private Sound _output;
+		private RSound _output;
 
 		private bool _loadedDevice = false;
 		
@@ -88,19 +91,22 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void LoadInput(string deviceName = null) {
+			if (!Engine.EngineLink.CanAudio) {
+				return;
+			}
 			if (RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) {
-				Log.Err("Android And mic is buggy");
+				RLog.Err("Android And mic is buggy");
 				return;
 			}
 			if (deviceName is null) {
 				deviceName = Engine.MainMic;
 				Engine.MicChanged += LoadInput;
 			}
-			if (!Microphone.Start(deviceName)) {
-				Log.Err($"Failed to load Mic {deviceName ?? "System Default"}");
+			if (!RMicrophone.Start(deviceName)) {
+				RLog.Err($"Failed to load Mic {deviceName ?? "System Default"}");
 				return;
 			}
-			_input = Microphone.Sound;
+			_input = RMicrophone.Sound;
 			Load(_input);
 			_output = null;
 			_loadedDevice = true;
@@ -161,6 +167,9 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void Step() {
+			if (!Engine.EngineLink.CanAudio) {
+				return;
+			}
 			if (NoSync) {
 				return;
 			}

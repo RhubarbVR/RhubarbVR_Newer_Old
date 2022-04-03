@@ -7,7 +7,7 @@ using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
-using StereoKit;
+using RhuEngine.Linker;
 using LibVLCSharp.Shared;
 
 namespace RhuEngine.VLC
@@ -15,7 +15,7 @@ namespace RhuEngine.VLC
 	public class VlcVideoSourceProvider : INotifyPropertyChanged, IDisposable
 	{
 		public VlcVideoSourceProvider() {
-			VideoSource = new Tex(TexType.Dynamic, TexFormat.Rgba32Linear);
+			VideoSource = new RTexture2D(TexType.Dynamic, TexFormat.Rgba32Linear);
 		}
 		/// <summary>
 		/// The memory mapped file that contains the picture data
@@ -34,9 +34,9 @@ namespace RhuEngine.VLC
 
 		public event Action RelaodTex;
 
-		public event Action<float[],int> LoadAudio;
+		public event Action<float[], int> LoadAudio;
 
-		public Tex VideoSource { get; private set; }
+		public RTexture2D VideoSource { get; private set; }
 
 		public int Pitches { get; private set; }
 
@@ -66,7 +66,7 @@ namespace RhuEngine.VLC
 			for (var c = 0; c < _loadedChannelCount; c++) {
 				var newbuff = new float[count];
 				for (var i = 0; i < count; i++) {
-					newbuff[i] = Marshal.ReadInt16(samples + (sizeof(short) * ((i  * (int)_loadedChannelCount) + c))) * (1 / 32768.0f);
+					newbuff[i] = Marshal.ReadInt16(samples + (sizeof(short) * ((i * (int)_loadedChannelCount) + c))) * (1 / 32768.0f);
 				}
 				LoadAudio?.Invoke(newbuff, c);
 			}
@@ -165,14 +165,11 @@ namespace RhuEngine.VLC
 				return;
 			}
 			if (VideoSource != null) {
-				lock (Engine.MainEngine.RenderLock) {
-					Convert(VideoSource.Width * VideoSource.Height, userdata);
-					if (rgbaData.Length < VideoSource.Width * VideoSource.Height) {
-						return;
-					}
-					//TODO: make rendedr only once on a current frame
-					SK.ExecuteOnMain(() => VideoSource.SetColors(VideoSource.Width, VideoSource.Height, rgbaData));
+				Convert(VideoSource.Width * VideoSource.Height, userdata);
+				if (rgbaData.Length < VideoSource.Width * VideoSource.Height) {
+					return;
 				}
+				RWorld.ExecuteOnMain(this, () => VideoSource.SetColors(VideoSource.Width, VideoSource.Height, rgbaData));
 			}
 		}
 		#endregion

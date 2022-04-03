@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
-using StereoKit;
 using System.IO;
+using RhuEngine.Linker;
 
 namespace RhuEngine
 {
@@ -17,23 +17,23 @@ namespace RhuEngine
 			return ms.ToArray();
 		}
 
-		public Tex LoadTexture(string name) {
-			return Tex.FromMemory(GetStaticResource(name));
+		public RTexture2D LoadTexture(string name) {
+			return RTexture2D.FromMemory(GetStaticResource(name));
 		}
-		private Tex _rhubarbLogoV1;
+		private RTexture2D _rhubarbLogoV1;
 
-		public Tex RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("RhuEngine.Res.RhubarbVR.png");
-		private Tex _rhubarbLogoV2;
+		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("RhuEngine.Res.RhubarbVR.png");
+		private RTexture2D _rhubarbLogoV2;
 
-		public Tex RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("RhuEngine.Res.RhubarbVR2.png");
+		public RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("RhuEngine.Res.RhubarbVR2.png");
 
-		private Tex _grip;
+		private RTexture2D _grip;
 
-		public Tex Grid => _grip ??= LoadTexture("RhuEngine.Res.Grid.jpg");
+		public RTexture2D Grid => _grip ??= LoadTexture("RhuEngine.Res.Grid.jpg");
 
-		private Tex _null;
+		private RTexture2D _null;
 
-		public Tex Null => _null ??= LoadTexture("RhuEngine.Res.nulltexture.jpg");
+		public RTexture2D Null => _null ??= LoadTexture("RhuEngine.Res.nulltexture.jpg");
 
 		//public Font LoadFont(string name) {
 		//	return Font.FromMemory(GetStaticResource(name));

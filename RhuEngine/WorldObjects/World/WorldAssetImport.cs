@@ -7,9 +7,10 @@ using System.Threading;
 using RhuEngine.Managers;
 using RhuEngine.WorldObjects.ECS;
 using RhuEngine.AssetSystem;
-using StereoKit;
 using RhuEngine.Components;
 using System.IO;
+using RNumerics;
+using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
@@ -54,13 +55,13 @@ namespace RhuEngine.WorldObjects
 
 		public void ImportString(string data) {
 			if (string.IsNullOrEmpty(data)) {
-				Log.Err("Import string was empty");
+				RLog.Err("Import string was empty");
 				return;
 			}
 			var spawnroot = GetLocalUser()?.userRoot.Target?.Entity?.parent.Target??RootEntity;
 			var assetEntity = spawnroot.AddChild("Asset Importer");
 			if(GetLocalUser() is not null) {
-				assetEntity.GlobalTrans = Matrix.TR(Vec3.Forward * 0.35f,Quat.LookDir(Vec3.Up)) * GetLocalUser().userRoot.Target?.head.Target?.GlobalTrans ?? Matrix.Identity;
+				assetEntity.GlobalTrans = Matrix.TR(Vector3f.Forward * 0.35f, Quaternionf.Pitched) * GetLocalUser().userRoot.Target?.head.Target?.GlobalTrans ?? Matrix.Identity;
 			}
 			switch (GetAssetTypeOfString(ref data, out var wasUri)) {
 				case AssetType.Unknown:

@@ -1,7 +1,8 @@
-﻿using RhuEngine.WorldObjects;
+﻿using RhuEngine.Linker;
+using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
+using RNumerics;
 
 namespace RhuEngine.Components
 {
@@ -25,25 +26,25 @@ namespace RhuEngine.Components
 		}
 
 		private void ProcessController(bool isMain) {
-			var speed = AllowMultiplier ? SKMath.Lerp(MovementSpeed, MaxSprintSpeed, MoveSpeed) : MovementSpeed;
-			var tempRight = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Right, isMain) * Time.Elapsedf;
-			var tempLeft = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Left, isMain) * Time.Elapsedf;
-			var tempFlyUp = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.FlyUp, isMain) * Time.Elapsedf;
-			var tempFlyDown = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.FlyDown, isMain) * Time.Elapsedf;
-			var tempForward = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Forward, isMain) * Time.Elapsedf;
-			var tempBack = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Back, isMain) * Time.Elapsedf;
-			var pos = new Vec3(tempRight - tempLeft, tempFlyUp - tempFlyDown, -tempForward + tempBack) * speed;
-			var Rotspeed = AllowMultiplier ? SKMath.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
-			var tempRotateRight = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateLeft, isMain) * Time.Elapsedf;
-			var tempRotateLeft = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateRight, isMain) * Time.Elapsedf;
-			var rot = Quat.FromAngles(0, (tempRotateRight - tempRotateLeft) * RotationSpeed, 0);
+			var speed = AllowMultiplier ? MathUtil.Lerp(MovementSpeed, MaxSprintSpeed, MoveSpeed) : MovementSpeed;
+			var tempRight = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Right, isMain) * RTime.Elapsedf;
+			var tempLeft = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Left, isMain) * RTime.Elapsedf;
+			var tempFlyUp = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.FlyUp, isMain) * RTime.Elapsedf;
+			var tempFlyDown = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.FlyDown, isMain) * RTime.Elapsedf;
+			var tempForward = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Forward, isMain) * RTime.Elapsedf;
+			var tempBack = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.Back, isMain) * RTime.Elapsedf;
+			var pos = new Vector3f(tempRight - tempLeft, tempFlyUp - tempFlyDown, -tempForward + tempBack) * speed;
+			var Rotspeed = AllowMultiplier ? MathUtil.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
+			var tempRotateRight = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateLeft, isMain) * RTime.Elapsedf;
+			var tempRotateLeft = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateRight, isMain) * RTime.Elapsedf;
+			var rot = Quaternionf.CreateFromEuler(0, (tempRotateRight - tempRotateLeft) * RotationSpeed, 0);
 			var AddToMatrix = Matrix.T(pos);
 			switch (Engine.inputManager.GetHand(isMain)) {
 				case Handed.Left:
-					ProcessGlobalRotToUserRootMovement(AddToMatrix,Matrix.R(Quat.FromAngles(180,0,90)) * LocalUser.userRoot.Target?.leftHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
+					ProcessGlobalRotToUserRootMovement(AddToMatrix,Matrix.R(Quaternionf.CreateFromEuler(180,0,90)) * LocalUser.userRoot.Target?.leftHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
 					break;
 				case Handed.Right:
-					ProcessGlobalRotToUserRootMovement(AddToMatrix, Matrix.R(Quat.FromAngles(0, 0, -90)) * LocalUser.userRoot.Target?.rightHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
+					ProcessGlobalRotToUserRootMovement(AddToMatrix, Matrix.R(Quaternionf.CreateFromEuler(0, 0, -90)) * LocalUser.userRoot.Target?.rightHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
 					break;
 				default:
 					break;
@@ -52,10 +53,10 @@ namespace RhuEngine.Components
 		}
 
 		private void ProcessHeadBased() {
-			var speed = AllowMultiplier ? SKMath.Lerp(MovementSpeed, MaxSprintSpeed, MoveSpeed) : MovementSpeed;
-			var pos = new Vec3(Right - Left, FlyUp - FlyDown, Back - Forward) * speed;
-			var Rotspeed = AllowMultiplier ? SKMath.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
-			var rot = Quat.FromAngles(0, (RotateRight - RotateLeft) * RotationSpeed, 0);
+			var speed = AllowMultiplier ? MathUtil.Lerp(MovementSpeed, MaxSprintSpeed, MoveSpeed) : MovementSpeed;
+			var pos = new Vector3f(Right - Left, FlyUp - FlyDown, Back - Forward) * speed;
+			var Rotspeed = AllowMultiplier ? MathUtil.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
+			var rot = Quaternionf.CreateFromEuler(0, (RotateRight - RotateLeft) * RotationSpeed, 0);
 			var AddToMatrix = Matrix.T(pos);
 			ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot?.Target.head.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
 			UserRootEnity.rotation.Value *= rot;
@@ -65,7 +66,7 @@ namespace RhuEngine.Components
 			if(UserRootEnity is null) {
 				return;
 			}
-			if(SK.ActiveDisplayMode == DisplayMode.Flatscreen) {
+			if(!RWorld.IsInVR) {
 				ProcessHeadBased();
 			}
 			else {
