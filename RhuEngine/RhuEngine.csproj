@@ -96,8 +96,4 @@
     <ProjectReference Include="..\RNumerics\RNumerics.csproj" />
     <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\UI\" />
-  </ItemGroup>
 </Project>

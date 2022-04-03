@@ -3,9 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using RNumerics;
 using RhuEngine.Linker;
+using RhuEngine.Components;
+
 namespace RhuEngine.WorldObjects.ECS
 {
-	public class Entity : SyncObject, IOffsetableElement {
+	public class Entity : SyncObject, IOffsetableElement
+	{
+		//[NoSave][NoShow][NoSync][NoLoad][NoSyncUpdate]
+		//public UIRect UIRect { get; set; }
+
 		public uint Depth => (_internalParent?.Depth + 1) ?? 0;
 
 		public uint CachedDepth { get; private set; }

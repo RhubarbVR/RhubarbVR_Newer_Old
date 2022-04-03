@@ -12,7 +12,7 @@ namespace Rhubarb_VR_HeadLess.Commads
 		public override string HelpMsg => "Logout user if there login";
 
 		public override void RunCommand() {
-			if (Program.app.netApiManager.IsLoggedIn) {
+			if (!Program.app.netApiManager.IsLoggedIn) {
 				Console.WriteLine("Need to be Loggedin to logout");
 				return;
 			}
@@ -43,7 +43,7 @@ namespace Rhubarb_VR_HeadLess.Commads
 			});
 		}
 
-		static string MaskPass() {
+		public static string MaskPass() {
 			var pass = "";
 			ConsoleKeyInfo key;
 			do {

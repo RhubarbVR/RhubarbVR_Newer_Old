@@ -223,7 +223,7 @@ namespace RhuEngine
 						_oldPlayerPos = playerPos;
 						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt((EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero), _loadingPos));
 						RText.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0, -0.07f, 0) * rootMatrix);
-						RMesh.Quad.Draw(LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
+						RMesh.Quad.Draw("LoadingUi",LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
 					}
 					catch (Exception ex) {
 						RLog.Err("Failed to update msg text Error: " + ex.ToString());

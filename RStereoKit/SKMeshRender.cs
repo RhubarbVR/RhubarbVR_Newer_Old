@@ -13,6 +13,25 @@ using RhuEngine.WorldObjects;
 
 namespace RStereoKit
 {
+	public class UIRender : RenderLinkBase<UICanvas>
+	{
+		public override void Init() {
+		}
+
+		public override void Remove() {
+		}
+
+		public override void Render() {
+			RenderingComponent?.RenderUI();
+		}
+
+		public override void Started() {
+		}
+
+		public override void Stopped() {
+		}
+	}
+
 	public class SKMeshRender : RenderLinkBase<MeshRender>
 	{
 		public override void Init() {

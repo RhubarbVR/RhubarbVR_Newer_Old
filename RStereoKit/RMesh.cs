@@ -16,7 +16,7 @@ namespace RStereoKit
 	{
 		public RMesh Quad => new RMesh(Mesh.Quad);
 
-		public void Draw(object mesh, RMaterial loadingLogo, RNumerics.Matrix p) {
+		public void Draw(string id,object mesh, RMaterial loadingLogo, RNumerics.Matrix p) {
 			((Mesh)mesh).Draw((Material)loadingLogo?.Target,new StereoKit.Matrix(p.m));
 		}
 
