@@ -42,8 +42,8 @@ namespace RhuEngine.Components
 			var texture = Vector2f.One;
 			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
 			if (KeepAspectRatio.Value) {
-				texture = new Vector2f(Texture.Asset?.Width ?? 1, Texture.Asset?.Height ?? 1) / (Texture.Asset?.Height ?? 1);
-				texture /= canvassize / Math.Min(canvassize.x, canvassize.y);
+				texture = new Vector2f(Texture.Asset?.Width ?? 1, Texture.Asset?.Height ?? 1) / Math.Max(Texture.Asset?.Width ?? 1, Texture.Asset?.Height ?? 1);
+				texture *= canvassize / Math.Max(canvassize.x, canvassize.y);
 			}
 			var max = Rect.Max;
 			var min = Rect.Min;

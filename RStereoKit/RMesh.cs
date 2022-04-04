@@ -26,8 +26,8 @@ namespace RStereoKit
 				((Mesh)meshtarget.mesh).KeepData = false;
 			}
 			if (mesh is null) {
-				((Mesh)meshtarget.mesh).SetVerts(Array.Empty<Vertex>());
-				((Mesh)meshtarget.mesh).SetInds(Array.Empty<uint>());
+				((Mesh)meshtarget.mesh).SetVerts(new Vertex[1]);
+				((Mesh)meshtarget.mesh).SetInds(new uint[3]);
 				return;
 			}
 			var loadedMesh = new Vertex[mesh.VertexCount];
