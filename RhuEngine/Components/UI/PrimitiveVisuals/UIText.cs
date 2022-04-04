@@ -4,13 +4,14 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/PrimitiveVisuals" })]
 	public class UIText : UIComponent
 	{
-		[Default("<color=red>Hello<size5><color=blue> World<size10><color=red>!!!")]
+		[Default("<color=red>Hell>o<size5><color=blue> W<>orld<size10><color=red>!!<!</color></color></color></color></color>")]
 		public Sync<string> Text;
 
 		public AssetRef<RFont> Font;
@@ -31,13 +32,15 @@ namespace RhuEngine.Components
 			}
 			var rootmat = Matrix.T(new Vector3f(0,0,Rect.StartPoint+0.01f)) * matrix;
 			var size = 0f;
-			var fontSize = StatingSize.Value;
-			var color = StartingColor.Value;
+			var fontSize = new Stack<float>();
+			fontSize.Push(StatingSize.Value);
+			var color = new Stack<Colorf>();
+			color.Push(StartingColor.Value);
 			void RenderText(string text) {
 				foreach (var item in text) {
 					var textsize = RText.Size(Font.Asset, item);
-					RText.Add(Pointer.ToString(), item, Matrix.TRS(new Vector3f(size, 0, 0), Quaternionf.Yawed180, fontSize/100) * rootmat, color, Font.Asset, textsize);
-					size += (textsize.x + 0.01f) * (fontSize / 100);
+					RText.Add(Pointer.ToString(), item, Matrix.TRS(new Vector3f(size, 0, 0), Quaternionf.Yawed180, fontSize.Peek()/100) * rootmat, color.Peek(), Font.Asset, textsize);
+					size += (textsize.x + 0.01f) * (fontSize.Peek() / 100);
 				}
 			}
 			void Loop(string segment) {
@@ -46,24 +49,48 @@ namespace RhuEngine.Components
 					RenderText(segment);
 					return;
 				}
+				var check = segment.IndexOf('<',first + 1);
 				var last = segment.IndexOf('>',first);
 				if (last <= -1) {
 					RenderText(segment);
 					return;
 				}
-				var command = segment.Substring(first, last).ToLower();
+				if(last > check) {
+					RenderText(segment.Substring(first,check - first));
+					return;
+				}
+				var command = segment.Substring(first, last - first).ToLower();
 				var smartCommand = new string(command.ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToArray());
 				var haseq = smartCommand.Contains('=');
 				if (smartCommand.StartsWith("<color")) {
 					var data = smartCommand.Substring(6 + (haseq ? 1 : 0));
-					color = Colorf.Parse(data);
+					color.Push(Colorf.Parse(data));
 				}
-				if (smartCommand.StartsWith("<size")) {
+				else if (smartCommand.StartsWith("<size")) {
 					var data = smartCommand.Substring(5 + (haseq ? 1 : 0));
 					try {
-						fontSize = float.Parse(data);
+						fontSize.Push(float.Parse(data));
 					}
 					catch { }
+				}
+				else if (smartCommand.StartsWith("</color") || smartCommand.StartsWith("<\\color")) {
+					try {
+						if (color.Count != 1) {
+							color.Pop();
+						}
+					}
+					catch { }
+				}
+				else if (smartCommand.StartsWith("</size") || smartCommand.StartsWith("<\\size")) {
+					try {
+						if (fontSize.Count != 1) {
+							fontSize.Pop();
+						}
+					}
+					catch { }
+				}
+				else {
+					RenderText(command + segment.Substring(last,1));
 				}
 				var end = segment.IndexOf('<',last);
 				if (end <= -1) {
