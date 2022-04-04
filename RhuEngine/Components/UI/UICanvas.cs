@@ -24,6 +24,9 @@ namespace RhuEngine.Components
 		}
 
 		private void Entity_UIRectUpdate(UIRect last, UIRect uIRect) {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			if (last is not null) {
 				var comp = last.Entity.GetFirstComponent<UICanvas>();
 				last.BoundCanvas = comp == this ? null : comp;

@@ -40,6 +40,9 @@ namespace RhuEngine.Components
 		}
 
 		private void UpdateUIMeshes() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.ProcessBaseMesh();
@@ -93,6 +96,9 @@ namespace RhuEngine.Components
 		private readonly SafeList<UIRect> _childRects = new();
 
 		public void UpdateMeshes() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			_meshes.SafeOperation((meshList) => {
 				_uiRenderComponents.SafeOperation((list) => {
 					if (meshList.Count < list.Count) {
@@ -157,6 +163,9 @@ namespace RhuEngine.Components
 
 
 		private void Children_Changed(IChangeable obj) {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			_boundTo.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.components.Changed -= Children_Changed;
@@ -174,6 +183,9 @@ namespace RhuEngine.Components
 		}
 
 		private void RegisterUIList(IChangeable obj) {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			_uiComponents.SafeOperation((list) => list.Clear());
 			_uiComponents.SafeOperation((list) => {
 				foreach (var item in Entity.GetAllComponents<UIComponent>()) {
