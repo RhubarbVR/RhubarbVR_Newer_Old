@@ -47,8 +47,10 @@ namespace RhuEngine.Components
 			}
 			var max = Rect.Max;
 			var min = Rect.Min;
-			var maxoffset = ((max - min) * texture) + min;
-			var minoffset = Vector2f.One - (((Vector2f.One - min - max) * texture) + max);
+			var maxmin = (max - min) * texture;
+			var maxoffset = maxmin + min;
+			var minoffset = min;
+
 			if (Center) {
 				var offset = (max - min - ((max - min) * texture)) / 2;
 				maxoffset += offset;
