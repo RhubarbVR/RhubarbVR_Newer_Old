@@ -51,7 +51,6 @@ namespace RhuEngine
 			img.Material.Target = mit;
 			var texture = pannel.AttachComponent<StaticTexture>();
 			texture.url.Value = "https://cataas.com/cat/says/Base%20Url%20For%20RhubarbVR";
-			texture.url.Value = "https://media.discordapp.net/attachments/693079209236627476/949840335037673523/unknown.png";
 			////pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Blue)
 			////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red)
 			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Yellow)
