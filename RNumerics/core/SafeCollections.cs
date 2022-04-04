@@ -6,6 +6,57 @@ using System.Threading;
 
 namespace RNumerics
 {
+	/// <summary>
+	/// A simple wrapper
+	/// </summary>
+	public class SafeCall<T>
+	{
+		public T data;
+		private readonly Semaphore _semaphore = new(1, 1);
+
+		public SafeCall(T val) {
+			data = val;
+		}
+
+		public void SafeOperation(Action<T> opF) {
+			_semaphore.WaitOne();
+
+			opF(data);
+
+			_semaphore.Release();
+		}
+	}
+
+	/// <summary>
+	/// A simple wrapper around a List<T> that supports multi-threaded
+	/// </summary>
+	public class SafeList<T>
+	{
+		public List<T> List;
+		private readonly Semaphore _semaphore = new(1, 1);
+
+		public SafeList() {
+			List = new List<T>();
+		}
+
+		public void SafeAdd(T value) {
+			_semaphore.WaitOne();
+
+			List.Add(value);
+
+			_semaphore.Release();
+		}
+
+
+		public void SafeOperation(Action<List<T>> opF) {
+			_semaphore.WaitOne();
+
+			opF(List);
+
+			_semaphore.Release();
+		}
+	}
+
 
 	/// <summary>
 	/// A simple wrapper around a List<T> that supports multi-threaded construction.

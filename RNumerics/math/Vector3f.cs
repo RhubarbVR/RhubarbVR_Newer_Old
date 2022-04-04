@@ -47,6 +47,14 @@ namespace RNumerics
 		static public readonly Vector3f AxisY = new(0.0f, 1.0f, 0.0f);
 		[IgnoreMember]
 		static public readonly Vector3f AxisZ = new(0.0f, 0.0f, 1.0f);
+
+		[IgnoreMember]
+		static public readonly Vector3f AxisXY = new(1.0f, 1.0f, 0.0f);
+		[IgnoreMember]
+		static public readonly Vector3f AxisYZ = new(0.0f, 1.0f, 1.0f);
+		[IgnoreMember]
+		static public readonly Vector3f AxisZX = new(1.0f, 0.0f, 1.0f);
+
 		[IgnoreMember]
 		static public readonly Vector3f MaxValue = new(float.MaxValue, float.MaxValue, float.MaxValue);
 		[IgnoreMember]

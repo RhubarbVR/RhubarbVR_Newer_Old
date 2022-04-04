@@ -9,9 +9,6 @@ namespace RhuEngine.WorldObjects.ECS
 {
 	public class Entity : SyncObject, IOffsetableElement
 	{
-		//[NoSave][NoShow][NoSync][NoLoad][NoSyncUpdate]
-		//public UIRect UIRect { get; set; }
-
 		public uint Depth => (_internalParent?.Depth + 1) ?? 0;
 
 		public uint CachedDepth { get; private set; }
@@ -87,7 +84,7 @@ namespace RhuEngine.WorldObjects.ECS
 		[Exsposed]
 		public T GetFirstComponentOrAttach<T>() where T : Component, new() {
 			foreach (var item in components) {
-				if (item.GetType() == typeof(T)) {
+				if (typeof(T).IsAssignableFrom(item.GetType())) {
 					return (T)item;
 				}
 			}
@@ -96,7 +93,7 @@ namespace RhuEngine.WorldObjects.ECS
 		[Exsposed]
 		public T GetFirstComponent<T>() where T : Component {
 			foreach (var item in components) {
-				if (item.GetType() == typeof(T)) {
+				if (typeof(T).IsAssignableFrom(item.GetType())) {
 					return (T)item;
 				}
 			}
@@ -157,10 +154,23 @@ namespace RhuEngine.WorldObjects.ECS
 			return newPos;
 		}
 
+		private Entity _internalParent;
+
 		[NoShow]
 		[NoSave]
 		[NoSync]
-		private Entity _internalParent;
+		[NoLoad]
+		public UIRect UIRect { get; private set; }
+
+		public void SetUIRect(UIRect newrect) {
+			var oldrec = UIRect;
+			UIRect = newrect;
+			UIRectUpdate?.Invoke(oldrec, UIRect);
+		}
+
+
+		public event Action<UIRect, UIRect> UIRectUpdate;
+
 
 		private Matrix _cachedGlobalMatrix = Matrix.S(1);
 

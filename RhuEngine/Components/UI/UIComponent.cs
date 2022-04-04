@@ -1,48 +1,31 @@
-﻿//using RhuEngine.WorldObjects;
-//using RhuEngine.WorldObjects.ECS;
+﻿using RhuEngine.WorldObjects;
+using RhuEngine.WorldObjects.ECS;
 
-//using RNumerics;
-//using RhuEngine.Linker;
+using RNumerics;
+using RhuEngine.Linker;
 
-//namespace RhuEngine.Components
-//{
-//	[Category(new string[] { "UI" })]
-//	public abstract class UIComponent : Component
-//	{
-//		public NTMesh3 MainMesh { get; set; }
-//		NTMesh3 CachedCut { get; set; }
-//		NTMesh3 CachedDeform { get; set; }
+namespace RhuEngine.Components
+{
+	[Category(new string[] { "UI" })]
+	public abstract class UIComponent : Component
+	{
+		public SimpleMesh MainMesh { get; set; }
 
-//		bool WillRender { get; set; }
-//		[NoSave]
-//		[NoShow]
-//		[NoSync]
-//		[NoLoad]
-//		[NoSyncUpdate]
-//		public UIRect Rect => Entity.UIRect;
+		public abstract RMaterial RenderMaterial { get; }
+		public abstract Colorf RenderTint { get; }
 
-//		public abstract void ProcessBaseMesh();
+		[NoShow]
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		public UIRect Rect => Entity.UIRect;
 
-//		public void ProcessCut() {
-//			CachedCut = new NTMesh3();
-//			CachedCut.Copy(MainMesh);
-//			//Run cut here
-//		}
+		public abstract void ProcessBaseMesh();
 
-//		public void ProcessDeform() {
-//			CachedDeform = new NTMesh3();
-//			CachedDeform.Copy(CachedCut);
-//			//Run Deform here
-//		}
+		public void ProcessMesh() {
+			ProcessBaseMesh();
+			Entity.UIRect?.UpdateMeshes();
+		}
 
-//		public void ProcessHole() {
-
-//		}
-
-//		public void RenderUI() {
-//			if (!WillRender) {
-//				return;
-//			}
-//		}
-//	}
-//}
+	}
+}
