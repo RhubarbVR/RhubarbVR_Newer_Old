@@ -5,6 +5,7 @@ using StereoKit;
 using RhuEngine.Linker;
 using RNumerics;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace RStereoKit
 {
@@ -47,7 +48,12 @@ namespace RStereoKit
 		}
 
 		public object MakeFromMemory(byte[] data) {
-			return Tex.FromMemory(data);
+			var tex = Tex.FromMemory(data);
+			//Is only used on startup logo
+			while (tex.AssetState != AssetState.Loaded) {
+				Thread.Sleep(1);
+			}
+			return tex;
 		}
 
 		public void SetAddressMode(object target, RhuEngine.Linker.TexAddress value) {

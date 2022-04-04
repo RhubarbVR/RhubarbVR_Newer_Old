@@ -18,7 +18,7 @@ namespace RhuEngine
 			var rectTwo = child.AttachComponent<UIRect>();
 			rectTwo.AnchorMin.Value = min;
 			rectTwo.AnchorMax.Value = max;
-			var img = child.AttachComponent<Image>();
+			var img = child.AttachComponent<UIImage>();
 			img.Tint.Value = color;
 			var mit = child.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;
@@ -27,12 +27,23 @@ namespace RhuEngine
 			img.Texture.Target = assetProvider;
 			return child;
 		}
+
+		private static Entity AttachText(this Entity parrent, Vector2f min, Vector2f max, Colorf color) {
+			var child = parrent.AddChild("childEliment");
+			var rectTwo = child.AttachComponent<UIRect>();
+			rectTwo.AnchorMin.Value = min;
+			rectTwo.AnchorMax.Value = max;
+			var img = child.AttachComponent<UIText>();
+			img.StartingColor.Value = color;
+			return child;
+		}
+
 		private static Entity AttachRectangle(this Entity parrent, DynamicMaterial mit,Vector2f min, Vector2f max, Colorf color) {
 			var child = parrent.AddChild("childEliment");
 			var rectTwo = child.AttachComponent<UIRect>();
 			rectTwo.AnchorMin.Value = min;
 			rectTwo.AnchorMax.Value = max;
-			var img = child.AttachComponent<Rectangle>();
+			var img = child.AttachComponent<UIRectangle>();
 			img.Tint.Value = color;
 			img.Material.Target = mit;
 			return child;
@@ -46,7 +57,7 @@ namespace RhuEngine
 			var rectone = pannel.AttachComponent<UIRect>();
 			var canvas = pannel.AttachComponent<UICanvas>();
 			var rectTwo = pannel.AttachComponent<UIRect>();
-			var img = pannel.AttachComponent<Rectangle>();
+			var img = pannel.AttachComponent<UIRectangle>();
 			img.Tint.Value = Colorf.Black;
 			img.Material.Target = mit;
 			var texture = pannel.AttachComponent<StaticTexture>();
@@ -60,7 +71,8 @@ namespace RhuEngine
 			////.AttachImage(shader, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.White, texture);
 			var e = pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Blue)
 				.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red);
-			e.AttachImage(shader, new Vector2f(0), new Vector2f(0.5f,1), Colorf.White, texture);
+			//e.AttachImage(shader, new Vector2f(0), new Vector2f(0.5f,1), Colorf.White, texture);
+			e.AttachText(new Vector2f(0), new Vector2f(0.5f,1), Colorf.White);
 			e.AttachImage(shader, new Vector2f(0.5,0), new Vector2f(1f), Colorf.White, texture);
 			//pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red);
 			//// TODO add back with ui

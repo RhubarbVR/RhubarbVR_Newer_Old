@@ -40,7 +40,7 @@ namespace RhuEngine.Components
 		}
 
 		private void UpdateUIMeshes() {
-			_uiComponents.SafeOperation((list) => {
+			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.ProcessBaseMesh();
 				}
@@ -88,11 +88,13 @@ namespace RhuEngine.Components
 
 		private readonly SafeList<UIComponent> _uiComponents = new();
 
+		private readonly SafeList<RenderUIComponent> _uiRenderComponents = new();
+
 		private readonly SafeList<UIRect> _childRects = new();
 
 		public void UpdateMeshes() {
 			_meshes.SafeOperation((meshList) => {
-				_uiComponents.SafeOperation((list) => {
+				_uiRenderComponents.SafeOperation((list) => {
 					if (meshList.Count < list.Count) {
 						for (var i = 0; i < list.Count - meshList.Count; i++) {
 							meshList.Add(new RMesh(null));
@@ -103,7 +105,7 @@ namespace RhuEngine.Components
 							meshList.Remove(new RMesh(null));
 						}
 					}
-					for (var i = 0; i < _uiComponents.List.Count; i++) {
+					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
 						if(list[i].MainMesh is null) {
 							list[i].ProcessBaseMesh();
 						}
@@ -115,11 +117,16 @@ namespace RhuEngine.Components
 
 		public void Render(Matrix matrix) {
 			_meshes.SafeOperation((meshList) => {
-				_uiComponents.SafeOperation((list) => {
-					for (var i = 0; i < _uiComponents.List.Count; i++) {
+				_uiRenderComponents.SafeOperation((list) => {
+					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
 						meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, matrix,list[i].RenderTint);
 					}
 				});
+			});
+			_uiComponents.SafeOperation((list) => {
+				foreach (var item in list) {
+					item.Render(matrix);
+				}
 			});
 			_childRects.SafeOperation((list) => {
 				foreach (var item in list) {
@@ -170,6 +177,12 @@ namespace RhuEngine.Components
 			_uiComponents.SafeOperation((list) => list.Clear());
 			_uiComponents.SafeOperation((list) => {
 				foreach (var item in Entity.GetAllComponents<UIComponent>()) {
+					list.Add(item);
+				}
+			});
+			_uiRenderComponents.SafeOperation((list) => list.Clear());
+			_uiRenderComponents.SafeOperation((list) => {
+				foreach (var item in Entity.GetAllComponents<RenderUIComponent>()) {
 					list.Add(item);
 				}
 			});

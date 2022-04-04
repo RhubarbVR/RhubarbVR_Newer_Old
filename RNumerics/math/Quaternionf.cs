@@ -67,9 +67,15 @@ namespace RNumerics
 		[IgnoreMember]
 		static public readonly Quaternionf Pitched = CreateFromEuler(0,90,0);
 		[IgnoreMember]
+		static public readonly Quaternionf Pitched180 = CreateFromEuler(0, 180, 0);
+		[IgnoreMember]
 		static public readonly Quaternionf Yawed = CreateFromEuler(90, 0, 0);
 		[IgnoreMember]
+		static public readonly Quaternionf Yawed180 = CreateFromEuler(180, 0, 0);
+		[IgnoreMember]
 		static public readonly Quaternionf Rolled = CreateFromEuler(0, 0, 90);
+		[IgnoreMember]
+		static public readonly Quaternionf Rolled180 = CreateFromEuler(0, 0, 180);
 		[IgnoreMember]
 		public float this[int key]
 		{

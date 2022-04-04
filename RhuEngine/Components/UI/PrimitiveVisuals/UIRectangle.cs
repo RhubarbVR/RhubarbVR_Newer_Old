@@ -7,7 +7,7 @@ using RhuEngine.Linker;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/PrimitiveVisuals" })]
-	public class Rectangle : UIComponent
+	public class UIRectangle : RenderUIComponent
 	{
 		public AssetRef<RMaterial> Material;
 

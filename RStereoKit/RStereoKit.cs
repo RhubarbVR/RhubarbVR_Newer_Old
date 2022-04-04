@@ -71,6 +71,7 @@ namespace RStereoKit
 			RSound.Instance = new SKSound();
 			RSoundInst.Instance = new SKSoundInst();
 			RMicrophone.Instance = new SKMic();
+			RFont.Instance = new SKFont();
 		}
 
 		public void Start() {

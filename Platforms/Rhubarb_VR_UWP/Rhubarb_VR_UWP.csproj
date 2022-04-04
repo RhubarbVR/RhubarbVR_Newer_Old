@@ -98,10 +98,10 @@
   <!-- Copy assets, and build the app's shaders into the final app folder -->
   <ItemGroup>
     <PackageReference Include="LibVLCSharp">
-      <Version>3.6.5</Version>
+      <Version>3.6.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.13" />
-    <PackageReference Include="StereoKit" Version="0.3.6-preview.3" />
+    <PackageReference Include="StereoKit" Version="0.3.6-preview.4" />
     <PackageReference Include="VideoLAN.LibVLC.UWP">
       <Version>3.3.2</Version>
     </PackageReference>

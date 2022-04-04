@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Linq;
 using RhuEngine.Linker;
 
-namespace RhuEngine.Components
+namespace RhuEngine
 {
 	public class RawAudioClip : SyncObject, IAssetProvider<RSound>
 	{

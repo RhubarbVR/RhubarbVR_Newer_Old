@@ -7,7 +7,7 @@ using System.Text;
 namespace RNumerics
 {
 	[MessagePackObject]
-	public struct Colorf : IComparable<Colorf>, IEquatable<Colorf>, IConvertible
+	public struct Colorf : IComparable<Colorf>, IEquatable<Colorf>
 	{
 		[Key(0)]
 		public float r;
@@ -29,6 +29,146 @@ namespace RNumerics
 		public Colorf(float[] v2) { r = v2[0]; g = v2[1]; b = v2[2]; a = v2[3]; }
 		public Colorf(Colorf copy) { r = copy.r; g = copy.g; b = copy.b; a = copy.a; }
 		public Colorf(Colorf copy, float newAlpha) { r = copy.r; g = copy.g; b = copy.b; a = newAlpha; }
+
+		public static Colorf Parse(string colorString) {
+			if (colorString.Length == 0) {
+				return White;
+			}
+			try {
+				if (colorString[0] == '#') {
+					if (colorString.Length == 7) {
+						var color = Convert.ToInt32(colorString.Substring(1), 16);
+						var r = (color & 0xff0000) >> 16;
+						var g = (color & 0xff00) >> 8;
+						var b = color & 0xff;
+						return new Colorf(r, g, b);
+					}
+					else if (colorString.Length == 9) {
+						var color = Convert.ToInt32(colorString.Substring(1), 16);
+						var r = (color & 0xff000000) >> 24;
+						var g = (color & 0xff0000) >> 16;
+						var b = (color & 0xff00) >> 8;
+						var a = color & 0xff00;
+						return new Colorf(r, g, b, a);
+					}
+				}
+				if (colorString.Contains("(") && colorString.Contains(")")) {
+					var lowerText = colorString.ToLower();
+					if (lowerText.Contains("rgba")) {
+						var first = lowerText.IndexOf('(');
+						var last = lowerText.IndexOf(',', first);
+						var r = lowerText.Substring(first, last - first);
+						first = last;
+						last = lowerText.IndexOf(',', last);
+						var g = lowerText.Substring(first, last - first);
+						first = last;
+						last = lowerText.IndexOf(',', last);
+						var b = lowerText.Substring(first, last - first);
+						first = last;
+						last = lowerText.IndexOf(')', last);
+						var a = lowerText.Substring(first, last - first);
+						var fr = float.Parse(r);
+						var fb = float.Parse(b);
+						var fg = float.Parse(g);
+						var fa = float.Parse(a);
+						return new Colorf(fr, fg, fb, fa);
+					}
+					else if (lowerText.Contains("rgb")) {
+						var first = lowerText.IndexOf('(');
+						var last = lowerText.IndexOf(',', first);
+						var r = lowerText.Substring(first, last - first);
+						first = last;
+						last = lowerText.IndexOf(',', last);
+						var g = lowerText.Substring(first, last - first);
+						first = last;
+						last = lowerText.IndexOf(')', last);
+						var b = lowerText.Substring(first, last - first);
+						var fr = float.Parse(r);
+						var fb = float.Parse(b);
+						var fg = float.Parse(g);
+						return new Colorf(fr, fg, fb);
+					}
+
+					if (lowerText.Contains("hsv")) {
+						var first = lowerText.IndexOf('(');
+						var last = lowerText.IndexOf(',', first);
+						var r = lowerText.Substring(first, last - first);
+						first = last;
+						last = lowerText.IndexOf(',', last);
+						var g = lowerText.Substring(first, last - first);
+						first = last;
+						last = lowerText.IndexOf(')', last);
+						var b = lowerText.Substring(first, last - first);
+						var fr = float.Parse(r);
+						var fb = float.Parse(b);
+						var fg = float.Parse(g);
+						return new ColorHSV(fr, fb, fg);
+					}
+				}
+				return GetStaticColor((Colors)Enum.Parse(typeof(Colors), colorString, true));
+			}
+			catch {
+				return White;
+			}
+		}
+
+		public static Colorf GetStaticColor(Colors colors) {
+			return colors switch {
+				Colors.TransparentWhite => TransparentWhite,
+				Colors.TransparentBlack => TransparentBlack,
+				Colors.White => White,
+				Colors.Black => Black,
+				Colors.Blue => Blue,
+				Colors.Green => Green,
+				Colors.Red => Red,
+				Colors.Yellow => Yellow,
+				Colors.Cyan => Cyan,
+				Colors.Magenta => Magenta,
+				Colors.VideoWhite => VideoWhite,
+				Colors.VideoBlack => VideoBlack,
+				Colors.VideoBlue => VideoBlue,
+				Colors.VideoGreen => VideoGreen,
+				Colors.VideoRed => VideoRed,
+				Colors.VideoYellow => VideoYellow,
+				Colors.VideoCyan => VideoCyan,
+				Colors.VideoMagenta => VideoMagenta,
+				Colors.RhubarbGreen => RhubarbGreen,
+				Colors.RhubarbRed => RhubarbRed,
+				Colors.Purple => Purple,
+				Colors.DarkRed => DarkRed,
+				Colors.FireBrick => FireBrick,
+				Colors.HotPink => HotPink,
+				Colors.LightPink => LightPink,
+				Colors.DarkBlue => DarkBlue,
+				Colors.BlueMetal => BlueMetal,
+				Colors.Navy => Navy,
+				Colors.CornflowerBlue => CornflowerBlue,
+				Colors.LightSteelBlue => LightSteelBlue,
+				Colors.DarkSlateBlue => DarkSlateBlue,
+				Colors.Teal => Teal,
+				Colors.ForestGreen => ForestGreen,
+				Colors.LightGreen => LightGreen,
+				Colors.Orange => Orange,
+				Colors.Gold => Gold,
+				Colors.DarkYellow => DarkYellow,
+				Colors.SiennaBrown => SiennaBrown,
+				Colors.SaddleBrown => SaddleBrown,
+				Colors.Goldenrod => Goldenrod,
+				Colors.Wheat => Wheat,
+				Colors.LightGrey => LightGrey,
+				Colors.Silver => Silver,
+				Colors.LightSlateGrey => LightSlateGrey,
+				Colors.Grey => Grey,
+				Colors.DarkGrey => DarkGrey,
+				Colors.SlateGrey => SlateGrey,
+				Colors.DimGrey => DimGrey,
+				Colors.DarkSlateGrey => DarkSlateGrey,
+				Colors.StandardBeige => StandardBeige,
+				Colors.SelectionGold => SelectionGold,
+				Colors.PivotYellow => PivotYellow,
+				_ => White,
+			};
+		}
 
 		public Colorf Clone(float fAlphaMultiply = 1.0f) {
 			return new Colorf(r, g, b, a * fAlphaMultiply);
@@ -150,76 +290,28 @@ namespace RNumerics
 			return string.Format("{0} {1} {2} {3}", r.ToString(fmt), g.ToString(fmt), b.ToString(fmt), a.ToString(fmt));
 		}
 
-		public TypeCode GetTypeCode() {
-			return TypeCode.Object;
-		}
 
-		public bool ToBoolean(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public byte ToByte(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public char ToChar(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public DateTime ToDateTime(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public decimal ToDecimal(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public double ToDouble(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public short ToInt16(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public int ToInt32(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public long ToInt64(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public sbyte ToSByte(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public float ToSingle(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public string ToString(IFormatProvider provider) {
-			return ToString();
-		}
-
-		public object ToType(Type conversionType, IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public ushort ToUInt16(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public uint ToUInt32(IFormatProvider provider = null) {
-			var bytes = ToBytes();
-			return bytes.r
-				+ ((uint)bytes.g << 8)
-				+ ((uint)bytes.b << 16)
-				+ ((uint)bytes.a << 24);
-		}
-
-		public ulong ToUInt64(IFormatProvider provider) {
-			throw new NotImplementedException();
+		public enum Colors
+		{
+			TransparentWhite, TransparentBlack, White, Black, Blue, Green,
+			Red, Yellow, Cyan, Magenta, VideoWhite, VideoBlack,
+			VideoBlue, VideoGreen,
+			VideoRed, VideoYellow,
+			VideoCyan, VideoMagenta,
+			RhubarbGreen, RhubarbRed,
+			Purple, DarkRed, FireBrick,
+			HotPink, LightPink,
+			DarkBlue, BlueMetal, Navy, CornflowerBlue,
+			LightSteelBlue, DarkSlateBlue,
+			Teal, ForestGreen, LightGreen,
+			Orange, Gold, DarkYellow,
+			SiennaBrown, SaddleBrown,
+			Goldenrod, Wheat, LightGrey,
+			Silver, LightSlateGrey, Grey,
+			DarkGrey, SlateGrey,
+			DimGrey, DarkSlateGrey,
+			StandardBeige, SelectionGold,
+			PivotYellow
 		}
 
 		[IgnoreMember]
