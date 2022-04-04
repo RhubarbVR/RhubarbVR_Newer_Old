@@ -58,7 +58,7 @@ namespace RhuEngine.Components
 
 		public void SetPram(string name, object data) {
 			try {
-				GetParam(name).Item1.SetValue(data);
+				GetParam(name).Item1?.SetValue(data);
 			}
 			catch { }
 		}
