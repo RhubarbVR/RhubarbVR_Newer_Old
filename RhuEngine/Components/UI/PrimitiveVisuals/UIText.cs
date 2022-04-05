@@ -5,18 +5,22 @@ using RNumerics;
 using RhuEngine.Linker;
 using System.Linq;
 using System.Collections.Generic;
+using System;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/PrimitiveVisuals" })]
 	public class UIText : UIComponent
 	{
-		[Default("<color=red>Hell>o<size5><color=blue> W<>orld<size10><color=red>!!<!</color></color></color></color></color>")]
+		[Default("<style=regular><color=red>Hell>o<size5><color=blue> W<>orld<size10><color=red>!!<!</color></color></color></color></color>")]
 		public Sync<string> Text;
 
 		public AssetRef<RFont> Font;
 
 		public Sync<Colorf> StartingColor;
+
+		[Default(FontStyle.Regular)]
+		public Sync<FontStyle> StartingStyle;
 
 		[Default(10f)]
 		public Sync<float> StatingSize;
@@ -32,14 +36,16 @@ namespace RhuEngine.Components
 			}
 			var rootmat = Matrix.T(new Vector3f(0,0,Rect.StartPoint+0.01f)) * matrix;
 			var size = 0f;
+			var style = new Stack<FontStyle>();
+			style.Push(StartingStyle);
 			var fontSize = new Stack<float>();
 			fontSize.Push(StatingSize.Value);
 			var color = new Stack<Colorf>();
 			color.Push(StartingColor.Value);
 			void RenderText(string text) {
 				foreach (var item in text) {
-					var textsize = RText.Size(Font.Asset, item);
-					RText.Add(Pointer.ToString(), item, Matrix.TRS(new Vector3f(size, 0, 0), Quaternionf.Yawed180, fontSize.Peek()/100) * rootmat, color.Peek(), Font.Asset, textsize);
+					var textsize = RText.Size(Font.Asset, item,style.Peek());
+					RText.Add(Pointer.ToString(), item, Matrix.TRS(new Vector3f(size, 0, 0), Quaternionf.Yawed180, fontSize.Peek()/100) * rootmat, color.Peek(), Font.Asset, style.Peek(), textsize);
 					size += (textsize.x + 0.01f) * (fontSize.Peek() / 100);
 				}
 			}
@@ -66,6 +72,12 @@ namespace RhuEngine.Components
 					var data = smartCommand.Substring(6 + (haseq ? 1 : 0));
 					color.Push(Colorf.Parse(data));
 				}
+				else if (smartCommand.StartsWith("<style")) {
+					var data = smartCommand.Substring(6 + (haseq ? 1 : 0));
+					if(Enum.TryParse(data,true,out FontStyle fontStyle)) {
+						style.Push(fontStyle);
+					}
+				}
 				else if (smartCommand.StartsWith("<size")) {
 					var data = smartCommand.Substring(5 + (haseq ? 1 : 0));
 					try {
@@ -85,6 +97,14 @@ namespace RhuEngine.Components
 					try {
 						if (fontSize.Count != 1) {
 							fontSize.Pop();
+						}
+					}
+					catch { }
+				}
+				else if (smartCommand.StartsWith("</style") || smartCommand.StartsWith("<\\style")) {
+					try {
+						if (style.Count != 1) {
+							style.Pop();
 						}
 					}
 					catch { }

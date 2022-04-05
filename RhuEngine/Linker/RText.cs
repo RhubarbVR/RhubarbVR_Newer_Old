@@ -7,10 +7,10 @@ namespace RhuEngine.Linker
 {
 	public interface IRText
 	{
-		public Vector2f Size(RFont rFont,char c);
+		public Vector2f Size(RFont rFont,char c, FontStyle fontStyle);
 
 		public void Add(string id,string v, Matrix p);
-		public void Add(string id,char c, Matrix p,Colorf color,RFont rFont, Vector2f textCut);
+		public void Add(string id,char c, Matrix p,Colorf color,RFont rFont,FontStyle fontStyle, Vector2f textCut);
 
 	}
 	public interface IRFont
@@ -34,15 +34,15 @@ namespace RhuEngine.Linker
 	{
 		public static IRText Instance { get; set; }
 
-		public static Vector2f Size(RFont rFont,char c) {
-			return Instance.Size(rFont,c);
+		public static Vector2f Size(RFont rFont,char c, FontStyle fontStyle) {
+			return Instance.Size(rFont,c, fontStyle);
 		}
 
 		public static void Add(string v, Matrix p, string id = "loading") {
 			Instance.Add(id,v, p);
 		}
-		public static void Add(string id, char c, Matrix p, Colorf color, RFont rFont, Vector2f textCut) {
-			Instance.Add(id, c, p,color,rFont,textCut);
+		public static void Add(string id, char c, Matrix p, Colorf color, RFont rFont, FontStyle fontStyle, Vector2f textCut) {
+			Instance.Add(id, c, p,color,rFont, fontStyle, textCut);
 		}
 	}
 }
