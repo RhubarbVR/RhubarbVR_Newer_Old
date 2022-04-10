@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI/PrimitiveVisuals" })]
 	public class UIText : UIComponent
 	{
-		[Default("<style=regular><color=red>Hell>o<size5><color=blue> W<>or\nld<size10><color=red>!!<!</color></color></color></color></color>")]
+		[Default("<style=regular><color=red>H\nell>o<size5><color=blue> W<>or\nld<size10><color=red>!!!Sthe\n<size7>size willbreak\n this</color></color></color></color></color>")]
 		[OnChanged(nameof(UpdateText))]
 		public Sync<string> Text;
 		[OnChanged(nameof(UpdateText))]

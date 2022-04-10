@@ -196,7 +196,7 @@ namespace RhuEngine
 					catch (Exception ex) {
 						RLog.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
 						IntMsg = $"Failed to start {item.GetType().GetFormattedName()} Error:{ex}";
-						throw new Exception("LockLoad");
+						throw ex;
 					}
 				}
 				if (EngineLink.CanRender) {
@@ -206,7 +206,7 @@ namespace RhuEngine
 				}
 				RLog.Info("Engine Started");
 				OnEngineStarted?.Invoke();
-			});
+		});
 		}
 
 		private Vector3f _oldPlayerPos = Vector3f.Zero;
@@ -227,6 +227,7 @@ namespace RhuEngine
 					}
 					catch (Exception ex) {
 						RLog.Err("Failed to update msg text Error: " + ex.ToString());
+						throw ex;
 					}
 				}
 				return;
@@ -237,6 +238,7 @@ namespace RhuEngine
 				}
 				catch (Exception ex) {
 					RLog.Err($"Failed to step {item.GetType().GetFormattedName()} Error: {ex}");
+					throw ex;
 				}
 			}
 			RWorld.RunOnMain();

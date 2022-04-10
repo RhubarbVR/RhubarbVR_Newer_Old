@@ -14,6 +14,8 @@ namespace RhuEngine.Components
 
 		public SafeList<TextChar> Chars = new();
 
+		public AxisAlignedBox3f axisAlignedBox3F = AxisAlignedBox3f.Zero;
+
 		public class TextChar
 		{
 			public string id;
@@ -51,8 +53,11 @@ namespace RhuEngine.Components
 			if(Font is null) {
 				return;
 			}
+			var bounds = new List<Vector3f>();
 			Chars.SafeOperation((list) => list.Clear());
-			var size = 0f;
+			var textXpos = 0f;
+			var textsizeY = 0f;
+			var textYpos = 0f;
 			var style = new Stack<FontStyle>();
 			style.Push(StartingStyle);
 			var fontSize = new Stack<float>();
@@ -63,8 +68,23 @@ namespace RhuEngine.Components
 			void RenderText(string text) {
 				foreach (var item in text) {
 					var textsize = RText.Size(Font, item,style.Peek());
-					Chars.SafeAdd(new TextChar(Id + item + index.ToString(), item, Matrix.TRS(new Vector3f(size, 0, 0), Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), textsize));
-					size += (textsize.x + 0.01f) * (fontSize.Peek() / 100);
+					if(item == '\n') {
+						if(textsizeY == 0) {
+							textsizeY = 1 * (fontSize.Peek() / 100);
+						}
+						textYpos -= textsizeY;
+						textXpos = 0;
+						continue;
+					}
+					textsizeY = Math.Max(textsize.y * (fontSize.Peek() / 100), textsizeY);
+					var textpos = new Vector3f(textXpos, textYpos, 0);
+					Chars.SafeAdd(new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), textsize));
+					bounds.Add(textpos);
+					var ew = new Vector2f((textsize.x + 0.01f) * (fontSize.Peek() / 100),textsize.y * (fontSize.Peek() / 100));
+					bounds.Add(textpos + ew.X__);
+					bounds.Add(textpos + ew.XY_);
+					bounds.Add(textpos + ew._Y_);
+					textXpos += (textsize.x + 0.01f) * (fontSize.Peek() / 100);
 					index++;
 				}
 			}
@@ -75,10 +95,13 @@ namespace RhuEngine.Components
 					return;
 				}
 				var check = segment.IndexOf('<',first + 1);
-				var last = segment.IndexOf('>',first);
+				var last = segment.IndexOf('>',first );
 				if (last <= -1) {
 					RenderText(segment);
 					return;
+				}
+				if (check == -1) {
+					check = int.MaxValue;
 				}
 				if(last > check) {
 					RenderText(segment.Substring(first,check - first));
@@ -140,6 +163,7 @@ namespace RhuEngine.Components
 				Loop(segment.Substring(end));
 			}
 			Loop(Text);
+			axisAlignedBox3F = BoundsUtil.Bounds(bounds);
 		}
 	}
 }
