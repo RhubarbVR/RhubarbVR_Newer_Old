@@ -9,12 +9,24 @@ using System;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "UI/PrimitiveVisuals" })]
-	public class UIText : UIComponent
+	public enum EVerticalAlien
 	{
-		[Default("<style=regular><color=red>H\nell>o<size5><color=blue> W<>or\nld<size10><color=red>!!!Sthe\n<size7>size willbreak\n this<size25><colorgreen>No <size10><colorblack>it does not\nI\nlike\nnew\n\nlines</color></color></color></color></color>")]
+		Bottom,
+		Center,
+		Top,
+	}
+	public enum EHorizontalAlien
+	{
+		Left,
+		Middle,
+		Right,
+	}
+
+	[Category(new string[] { "UI/PrimitiveVisuals" })]
+	public class UIText : UIComponent {
+		//[Default("<style=regular><color=red>H\nell>o<size5><color=blue> W<>or\nld<size10><color=red>!!!Sthe\n<size7>size willbreak\n this<size25><colorgreen>No <size10><colorblack>it does not\nI\nlike\nnew\n\nlines</color></color></color></color></color>")]
 		//[Default("Hello THIS IS A STRING THAT IS BIG THE MORE I TYPE THE LESS ROOM")]
-		//[Default("Hello")]
+		[Default("Hello\nnew\nline\ntrains\nea\nsports\nee\nefef")]
 		[OnChanged(nameof(UpdateText))]
 		public Sync<string> Text;
 		[OnChanged(nameof(UpdateText))]
@@ -32,14 +44,13 @@ namespace RhuEngine.Components
 
 		public UITextRender textRender = new();
 
-		[Default(true)]
-		public Sync<bool> CenterX;
-		
-		[Default(true)]
-		public Sync<bool> CenterY;
+		[Default(EVerticalAlien.Center)]
+		[OnChanged(nameof(UpdateText))]
+		public Sync<EVerticalAlien> VerticalAlien;
 
-		[Default(true)]
-		public Sync<bool> KeepAspectRatio;
+		[Default(EHorizontalAlien.Right)]
+		[OnChanged(nameof(UpdateText))]
+		public Sync<EHorizontalAlien> HorizontalAlien;
 
 		public Matrix textOffset = Matrix.S(1);
 
@@ -60,7 +71,7 @@ namespace RhuEngine.Components
 			boxsize /= Math.Max(boxsize.x, boxsize.y);
 			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
 			var texture = Vector2f.One;
-			if (KeepAspectRatio.Value) {
+			if (VerticalAlien == EVerticalAlien.Center || VerticalAlien == EVerticalAlien.Bottom) {
 				texture = new Vector2f(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
 				texture /= canvassize;
 				texture /= boxsize;
@@ -70,16 +81,21 @@ namespace RhuEngine.Components
 			var maxoffset = maxmin + min;
 			var minoffset = min;
 			var offset = (max - min - maxmin) / 2;
-			if (CenterX) {
+			if (HorizontalAlien == EHorizontalAlien.Middle) {
 				maxoffset = new Vector2f(maxoffset.x + offset.x, maxoffset.y);
 				minoffset = new Vector2f(minoffset.x + offset.x, minoffset.y);
 			}
-			if (CenterY) {
+			if (VerticalAlien == EVerticalAlien.Center) {
 				maxoffset = new Vector2f(maxoffset.x, maxoffset.y + offset.y);
 				minoffset = new Vector2f(minoffset.x, minoffset.y + offset.y);
 			}
 			var textscale = (max - min).XY_ / Math.Max(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
-			textOffset = Matrix.TS(new Vector3f(minoffset.x, maxoffset.y, Rect.StartPoint + 0.01f), textscale);
+			var x = minoffset.x;
+			if(HorizontalAlien == EHorizontalAlien.Right) {
+				x = minoffset.x + (maxoffset.x - minoffset.x);
+			}
+			var y = maxoffset.y;
+			textOffset = Matrix.TS(new Vector3f(x, y, Rect.StartPoint + 0.01f), textscale);
 		}
 
 		public override void RenderTargetChange() {

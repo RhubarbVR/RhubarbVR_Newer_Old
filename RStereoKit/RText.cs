@@ -71,7 +71,33 @@ namespace RStereoKit
 		}
 
 		public void Add(string id, char c, RNumerics.Matrix p, Colorf color, RFont rFont,FontStyle fontStyle, Vector2f textCut) {
-			Text.Add(c.ToString(), p.m, (Vec2)(Vector2)textCut, StereoKit.TextFit.Clip, ((SkFontLoader)rFont.Instances).GetTextStyle(color, fontStyle),StereoKit.TextAlign.BottomLeft, StereoKit.TextAlign.BottomLeft);
+			var textsize = (Vec2)(Vector2)Size(rFont, c, fontStyle);
+			var textAlien = TextAlign.TopLeft;
+			var offsetX = 0f;
+			var offsetY = 0f;
+			if (textCut != Vector2f.Zero) {
+				if (textCut.x > 0) {
+					textsize.v.X -= textCut.x;
+				}
+				else {
+					textsize.v.X += textCut.x;
+					textAlien = TextAlign.TopRight;
+				}
+				if (textCut.y > 0) {
+					offsetY = textCut.y;
+					textsize.v.Y -= textCut.y;
+				}
+				else {
+					textsize.v.Y += textCut.y;
+					if(textAlien == TextAlign.TopRight) {
+						textAlien = TextAlign.BottomRight;
+					}
+					if (textAlien == TextAlign.TopLeft) {
+						textAlien = TextAlign.BottomLeft;
+					}
+				}
+			}
+			Text.Add(c.ToString(), p.m, textsize, StereoKit.TextFit.Clip, ((SkFontLoader)rFont.Instances).GetTextStyle(color, fontStyle), TextAlign.BottomLeft, textAlien, offsetX, offsetY);
 		}
 
 		public Vector2f Size(RFont rFont, char c,FontStyle fontStyle) {

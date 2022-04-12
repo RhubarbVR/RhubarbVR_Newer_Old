@@ -89,7 +89,7 @@ namespace RhuEngine.Components
 						}
 					}
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
-					var chare = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), textsize);
+					var chare = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero);
 					Chars.SafeAdd(chare);
 					thisrow.Push(chare);
 					bounds.Add(textpos);
