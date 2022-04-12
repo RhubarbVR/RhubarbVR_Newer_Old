@@ -57,6 +57,10 @@ namespace RNumerics
 
 		[IgnoreMember]
 		public Vector3f X__ => new(x,0,0);
+
+		[IgnoreMember]
+		public Vector2f YX => new(y, x);
+
 		[IgnoreMember]
 		public float LengthSquared => (x * x) + (y * y);
 		[IgnoreMember]

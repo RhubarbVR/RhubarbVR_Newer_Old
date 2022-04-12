@@ -45,7 +45,10 @@ namespace RhuEngine.Components
 		}
 
 		public override void Render(Matrix matrix) {
-			var rootmat = Matrix.T(new Vector3f(0, 0, Rect.StartPoint + 0.01f)) * matrix;
+			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
+			var sizetext = new Vector2f(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
+			sizetext /= canvassize / Math.Max(canvassize.x, canvassize.y);
+			var rootmat = Matrix.TS(new Vector3f(0, 0, Rect.StartPoint + 0.01f), sizetext.XY_) * matrix;
 			textRender.Render(rootmat);
 		}
 	}

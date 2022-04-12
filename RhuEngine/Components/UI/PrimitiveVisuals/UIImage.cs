@@ -40,13 +40,17 @@ namespace RhuEngine.Components
 			var depthStart = startDepth + depth;
 			Vector3f upleft , upright , downleft , downright = upleft = upright = downleft = depthStart;
 			var texture = Vector2f.One;
-			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
-			if (KeepAspectRatio.Value) {
-				texture = new Vector2f(Texture.Asset?.Width ?? 1, Texture.Asset?.Height ?? 1) / Math.Max(Texture.Asset?.Width ?? 1, Texture.Asset?.Height ?? 1);
-				texture *= canvassize / Math.Max(canvassize.x, canvassize.y);
-			}
 			var max = Rect.Max;
 			var min = Rect.Min;
+			var boxsize = max - min;
+			boxsize /= Math.Max(boxsize.x, boxsize.y);
+			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
+			if (KeepAspectRatio.Value) {
+				texture = new Vector2f(Texture.Asset?.Width ?? 1, Texture.Asset?.Height ?? 1);
+				texture /= canvassize;
+				texture /= boxsize;
+				texture /= Math.Max(texture.x, texture.y);
+			}
 			var maxmin = (max - min) * texture;
 			var maxoffset = maxmin + min;
 			var minoffset = min;
