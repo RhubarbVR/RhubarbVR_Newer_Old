@@ -19,7 +19,11 @@ namespace RhuEngine.Components
 
 		[Default(true)]
 		[OnChanged(nameof(ProcessMesh))]
-		public Sync<bool> Center;
+		public Sync<bool> CenterX;
+
+		[Default(true)]
+		[OnChanged(nameof(ProcessMesh))]
+		public Sync<bool> CenterY;
 
 		[Default(true)]
 		[OnChanged(nameof(ProcessMesh))]
@@ -55,10 +59,14 @@ namespace RhuEngine.Components
 			var maxoffset = maxmin + min;
 			var minoffset = min;
 
-			if (Center) {
-				var offset = (max - min - ((max - min) * texture)) / 2;
-				maxoffset += offset;
-				minoffset += offset;
+			var offset = (max - min - maxmin) / 2;
+			if (CenterX) {
+				maxoffset = new Vector2f(maxoffset.x + offset.x, maxoffset.y);
+				minoffset = new Vector2f(minoffset.x + offset.x, minoffset.y);
+			}
+			if (CenterY) {
+				maxoffset = new Vector2f(maxoffset.x, maxoffset.y + offset.y);
+				minoffset = new Vector2f(minoffset.x, minoffset.y + offset.y);
 			}
 			upleft += new Vector3f(minoffset.x, maxoffset.y);
 			upright += maxoffset.XY_;

@@ -70,7 +70,7 @@ namespace RhuEngine
 			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Grey)
 			////.AttachImage(shader, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.White, texture);
 			var e = pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Blue)
-				.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red);
+				.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Yellow);
 			//e.AttachImage(shader, new Vector2f(0), new Vector2f(0.5f,1), Colorf.White, texture);
 			e.AttachText(new Vector2f(0), new Vector2f(0.5f,1), Colorf.White);
 			e.AttachImage(shader, new Vector2f(0.5,0), new Vector2f(1f), Colorf.White, texture);

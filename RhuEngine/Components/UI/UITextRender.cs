@@ -48,6 +48,8 @@ namespace RhuEngine.Components
 				}
 			});
 		}
+		
+		public float yoffset = 0f;
 
 		public void LoadText(string Id ,string Text, RFont Font, Colorf StartingColor, FontStyle StartingStyle = FontStyle.Regular,float StatingSize = 10f) {
 			if(Font is null) {
@@ -68,7 +70,10 @@ namespace RhuEngine.Components
 			void RenderText(string text) {
 				foreach (var item in text) {
 					var textsize = RText.Size(Font, item,style.Peek());
-					if(item == '\n') {
+					if (textsizeY == 0) {
+						yoffset = Math.Max(1 * (fontSize.Peek() / 100),yoffset);
+					}
+					if (item == '\n') {
 						if(textsizeY == 0) {
 							textsizeY = 1 * (fontSize.Peek() / 100);
 						}

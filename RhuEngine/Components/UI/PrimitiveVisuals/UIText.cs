@@ -12,7 +12,9 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI/PrimitiveVisuals" })]
 	public class UIText : UIComponent
 	{
-		[Default("<style=regular><color=red>H\nell>o<size5><color=blue> W<>or\nld<size10><color=red>!!!Sthe\n<size7>size willbreak\n this</color></color></color></color></color>")]
+		//[Default("<style=regular><color=red>H\nell>o<size5><color=blue> W<>or\nld<size10><color=red>!!!Sthe\n<size7>size willbreak\n this\nI\nlike\nnew\n\nlines</color></color></color></color></color>")]
+		//[Default("Hello THIS IS A STRING THAT IS BIG THE MORE I TYPE THE LESS ROOM")]
+		[Default("Hello")]
 		[OnChanged(nameof(UpdateText))]
 		public Sync<string> Text;
 		[OnChanged(nameof(UpdateText))]
@@ -30,6 +32,15 @@ namespace RhuEngine.Components
 
 		public UITextRender textRender = new();
 
+		[Default(true)]
+		public Sync<bool> CenterX;
+		
+		[Default(true)]
+		public Sync<bool> CenterY;
+
+		[Default(true)]
+		public Sync<bool> KeepAspectRatio;
+
 		private void UpdateText() {
 			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, StartingColor, StartingStyle, StatingSize);
 		}
@@ -45,10 +56,32 @@ namespace RhuEngine.Components
 		}
 
 		public override void Render(Matrix matrix) {
+			var max = Rect.Max;
+			var min = Rect.Min;
+			var boxsize = max - min;
+			boxsize /= Math.Max(boxsize.x, boxsize.y);
 			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
-			var sizetext = new Vector2f(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
-			sizetext /= canvassize / Math.Max(canvassize.x, canvassize.y);
-			var rootmat = Matrix.TS(new Vector3f(0, 0, Rect.StartPoint + 0.01f), sizetext.XY_) * matrix;
+			var texture = Vector2f.One;
+			if (KeepAspectRatio.Value) {
+				texture = new Vector2f(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
+				texture /= canvassize;
+				texture /= boxsize;
+				texture /= Math.Max(texture.x, texture.y);
+			}
+			var maxmin = (max - min) * texture;
+			var maxoffset = maxmin + min;
+			var minoffset = min;
+			var offset = (max - min - maxmin) / 2;
+			if (CenterX) {
+				maxoffset = new Vector2f(maxoffset.x + offset.x, maxoffset.y);
+				minoffset = new Vector2f(minoffset.x + offset.x, minoffset.y);
+			}
+			if (CenterY) {
+				maxoffset = new Vector2f(maxoffset.x, maxoffset.y + offset.y);
+				minoffset = new Vector2f(minoffset.x, minoffset.y + offset.y);
+			}
+			var textscale = (max - min).XY_ / Math.Max(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
+			var rootmat = Matrix.TS(new Vector3f(minoffset.x, maxoffset.y - (textRender.yoffset * textscale.y), Rect.StartPoint + 0.01f), textscale) * matrix;
 			textRender.Render(rootmat);
 		}
 	}
