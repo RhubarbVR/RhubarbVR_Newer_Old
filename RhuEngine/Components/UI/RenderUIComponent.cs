@@ -19,6 +19,10 @@ namespace RhuEngine.Components
 			ProcessBaseMesh();
 			Entity.UIRect?.UpdateMeshes();
 		}
+
+		public override void RenderTargetChange() {
+			ProcessBaseMesh();
+		}
 		public override void Render(Matrix matrix) {
 			//Not needed becase meshLoader
 		}

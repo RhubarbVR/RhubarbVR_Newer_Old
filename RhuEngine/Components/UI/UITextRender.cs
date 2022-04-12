@@ -48,9 +48,7 @@ namespace RhuEngine.Components
 				}
 			});
 		}
-		
-		public float yoffset = 0f;
-
+	
 		public void LoadText(string Id ,string Text, RFont Font, Colorf StartingColor, FontStyle StartingStyle = FontStyle.Regular,float StatingSize = 10f) {
 			if(Font is null) {
 				return;
@@ -65,25 +63,35 @@ namespace RhuEngine.Components
 			var fontSize = new Stack<float>();
 			fontSize.Push(StatingSize);
 			var color = new Stack<Colorf>();
+			var thisrow = new Stack<TextChar>();
 			color.Push(StartingColor);
 			var index = 0;
 			void RenderText(string text) {
 				foreach (var item in text) {
 					var textsize = RText.Size(Font, item,style.Peek());
-					if (textsizeY == 0) {
-						yoffset = Math.Max(1 * (fontSize.Peek() / 100),yoffset);
-					}
 					if (item == '\n') {
 						if(textsizeY == 0) {
 							textsizeY = 1 * (fontSize.Peek() / 100);
 						}
 						textYpos -= textsizeY;
 						textXpos = 0;
+						thisrow.Clear();
 						continue;
 					}
-					textsizeY = Math.Max(textsize.y * (fontSize.Peek() / 100), textsizeY);
-					var textpos = new Vector3f(textXpos, textYpos, 0);
-					Chars.SafeAdd(new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), textsize));
+					var newsize = Math.Max(textsize.y * (fontSize.Peek() / 100), textsizeY);
+					if (newsize != textsizeY) {
+						var def = (textsize.y * (fontSize.Peek() / 100)) - textsizeY;
+						textsizeY = newsize;
+						foreach (var charitem in thisrow) {
+							bounds.Remove(charitem.p.Translation);
+							charitem.p.Translation -= new Vector3f(0, def, 0);
+							bounds.Add(charitem.p.Translation);
+						}
+					}
+					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
+					var chare = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), textsize);
+					Chars.SafeAdd(chare);
+					thisrow.Push(chare);
 					bounds.Add(textpos);
 					var ew = new Vector2f((textsize.x + 0.01f) * (fontSize.Peek() / 100),textsize.y * (fontSize.Peek() / 100));
 					bounds.Add(textpos + ew.X__);

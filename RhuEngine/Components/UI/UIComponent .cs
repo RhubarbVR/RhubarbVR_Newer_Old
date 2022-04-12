@@ -15,5 +15,7 @@ namespace RhuEngine.Components
 		public UIRect Rect => Entity.UIRect;
 
 		public abstract void Render(Matrix matrix);
+
+		public abstract void RenderTargetChange();
 	}
 }

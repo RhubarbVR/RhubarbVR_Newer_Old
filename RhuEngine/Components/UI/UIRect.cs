@@ -113,11 +113,16 @@ namespace RhuEngine.Components
 					}
 					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
 						if(list[i].MainMesh is null) {
-							list[i].ProcessBaseMesh();
+							list[i].RenderTargetChange();
 						}
 						meshList[i].LoadMesh(list[i].MainMesh);
 					}
 				});
+			});
+			_uiComponents.SafeOperation((list) => {
+				for (var i = 0; i < _uiComponents.List.Count; i++) {
+					list[i].RenderTargetChange();
+				}
 			});
 		}
 
@@ -189,7 +194,9 @@ namespace RhuEngine.Components
 			_uiComponents.SafeOperation((list) => list.Clear());
 			_uiComponents.SafeOperation((list) => {
 				foreach (var item in Entity.GetAllComponents<UIComponent>()) {
-					list.Add(item);
+					if (!typeof(RenderUIComponent).IsAssignableFrom(item.GetType())) {
+						list.Add(item);
+					}
 				}
 			});
 			_uiRenderComponents.SafeOperation((list) => list.Clear());

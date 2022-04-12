@@ -164,7 +164,9 @@ namespace RhuEngine.Managers
 			Engine.IntMsg = "Loading Local World Data";
 			LocalWorld.SessionName.Value = "Local World";
 			LocalWorld.WorldName.Value = "Local World";
+			Engine.IntMsg = "Building Local World";
 			LocalWorld.BuildLocalWorld();
+			Engine.IntMsg = "Local World Made";
 			while (LocalWorld.IsLoading) {
 				Engine.IntMsg = LocalWorld.LoadMsg;
 				Thread.Sleep(10);

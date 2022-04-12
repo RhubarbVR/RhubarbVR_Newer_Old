@@ -12,9 +12,9 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI/PrimitiveVisuals" })]
 	public class UIText : UIComponent
 	{
-		//[Default("<style=regular><color=red>H\nell>o<size5><color=blue> W<>or\nld<size10><color=red>!!!Sthe\n<size7>size willbreak\n this\nI\nlike\nnew\n\nlines</color></color></color></color></color>")]
+		[Default("<style=regular><color=red>H\nell>o<size5><color=blue> W<>or\nld<size10><color=red>!!!Sthe\n<size7>size willbreak\n this<size25><colorgreen>No <size10><colorblack>it does not\nI\nlike\nnew\n\nlines</color></color></color></color></color>")]
 		//[Default("Hello THIS IS A STRING THAT IS BIG THE MORE I TYPE THE LESS ROOM")]
-		[Default("Hello")]
+		//[Default("Hello")]
 		[OnChanged(nameof(UpdateText))]
 		public Sync<string> Text;
 		[OnChanged(nameof(UpdateText))]
@@ -41,8 +41,11 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public Sync<bool> KeepAspectRatio;
 
+		public Matrix textOffset = Matrix.S(1);
+
 		private void UpdateText() {
 			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, StartingColor, StartingStyle, StatingSize);
+			UpdateTextOffset();
 		}
 
 		public override void OnLoaded() {
@@ -50,12 +53,7 @@ namespace RhuEngine.Components
 			UpdateText();
 		}
 
-		public override void OnAttach() {
-			base.OnAttach();
-			Font.Target = World.RootEntity.GetFirstComponentOrAttach<DefaultFont>();
-		}
-
-		public override void Render(Matrix matrix) {
+		public void UpdateTextOffset() {
 			var max = Rect.Max;
 			var min = Rect.Min;
 			var boxsize = max - min;
@@ -81,8 +79,20 @@ namespace RhuEngine.Components
 				minoffset = new Vector2f(minoffset.x, minoffset.y + offset.y);
 			}
 			var textscale = (max - min).XY_ / Math.Max(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
-			var rootmat = Matrix.TS(new Vector3f(minoffset.x, maxoffset.y - (textRender.yoffset * textscale.y), Rect.StartPoint + 0.01f), textscale) * matrix;
-			textRender.Render(rootmat);
+			textOffset = Matrix.TS(new Vector3f(minoffset.x, maxoffset.y, Rect.StartPoint + 0.01f), textscale);
+		}
+
+		public override void RenderTargetChange() {
+			UpdateTextOffset();
+		}
+
+		public override void OnAttach() {
+			base.OnAttach();
+			Font.Target = World.RootEntity.GetFirstComponentOrAttach<DefaultFont>();
+		}
+
+		public override void Render(Matrix matrix) {
+			textRender.Render(textOffset * matrix);
 		}
 	}
 }
