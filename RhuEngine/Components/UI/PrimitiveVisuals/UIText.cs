@@ -47,11 +47,11 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(UpdateText))]
 		public Sync<EVerticalAlien> VerticalAlien;
 
-		[Default(EHorizontalAlien.Left)]
+		[Default(EHorizontalAlien.Middle)]
 		[OnChanged(nameof(UpdateText))]
 		public Sync<EHorizontalAlien> HorizontalAlien;
 
-		[Default(false)]
+		[Default(true)]
 		[OnChanged(nameof(UpdateText))]
 		public Sync<bool> MiddleLines;
 
@@ -78,7 +78,6 @@ namespace RhuEngine.Components
 			boxsize /= Math.Max(boxsize.x, boxsize.y);
 			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
 			var texture = new Vector2f(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height) * 10;
-			Console.WriteLine("Text size is " + texture);
 			texture /= canvassize;
 			texture /= boxsize;
 			texture /= Math.Max(texture.x, texture.y);
