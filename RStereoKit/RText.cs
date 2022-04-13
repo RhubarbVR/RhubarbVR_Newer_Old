@@ -72,7 +72,7 @@ namespace RStereoKit
 
 		public void Add(string id, char c, RNumerics.Matrix p, Colorf color, RFont rFont,FontStyle fontStyle, Vector2f textCut) {
 			var textsize = (Vec2)(Vector2)Size(rFont, c, fontStyle);
-			var textAlien = TextAlign.TopLeft;
+			var textAlien = TextAlign.BottomLeft;
 			var offsetX = 0f;
 			var offsetY = 0f;
 			if (textCut != Vector2f.Zero) {

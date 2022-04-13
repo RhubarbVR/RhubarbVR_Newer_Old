@@ -61,7 +61,7 @@ namespace RhuEngine
 			img.Tint.Value = Colorf.Black;
 			img.Material.Target = mit;
 			var texture = pannel.AttachComponent<StaticTexture>();
-			texture.url.Value = "https://cataas.com/cat/says/Base%20Url%20For%20RhubarbVR";
+			texture.url.Value = "https://cdn.discordapp.com/attachments/222386596236886026/963193866645831680/Screenshot_20220411-234823_Reddit.jpg";
 			////pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Blue)
 			////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red)
 			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Yellow)
@@ -69,11 +69,11 @@ namespace RhuEngine
 			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Green)
 			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Grey)
 			////.AttachImage(shader, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.White, texture);
-			var e = pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Blue)
-				.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Yellow);
+			var e = pannel.AttachRectangle(mit, new Vector2f(0f), new Vector2f(0.25f,1f), Colorf.Blue)
+				.AttachRectangle(mit, new Vector2f(0f,0f), new Vector2f(1f,0.1f), Colorf.Yellow);
 			//e.AttachImage(shader, new Vector2f(0), new Vector2f(0.5f,1), Colorf.White, texture);
-			e.AttachText(new Vector2f(0), new Vector2f(0.5f,1), Colorf.White);
 			e.AttachImage(shader, new Vector2f(0.5,0), new Vector2f(1f), Colorf.White, texture);
+			e.AttachText(new Vector2f(0), new Vector2f(0.5f, 1), Colorf.White);
 			//pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red);
 			//// TODO add back with ui
 			////pannel.AttachComponent<UIWindow>();

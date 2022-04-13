@@ -18,6 +18,7 @@ namespace RhuEngine.Components
 
 		public class TextChar
 		{
+			public Vector2f textsize = Vector2f.Zero;
 			public string id;
 			public char c;
 			public Matrix p;
@@ -26,7 +27,7 @@ namespace RhuEngine.Components
 			public FontStyle fontStyle;
 			public Vector2f textCut;
 			
-			public TextChar(string id, char c, Matrix p, Colorf color, RFont rFont, FontStyle fontStyle, Vector2f textCut) {
+			public TextChar(string id, char c, Matrix p, Colorf color, RFont rFont, FontStyle fontStyle, Vector2f textCut, Vector2f textsize) {
 				this.id = id;
 				this.c = c;
 				this.p = p;
@@ -34,6 +35,7 @@ namespace RhuEngine.Components
 				this.rFont = rFont;
 				this.fontStyle = fontStyle;
 				this.textCut = textCut;
+				this.textsize = textsize;
 			}
 
 			public void Render(Matrix root) {
@@ -49,8 +51,13 @@ namespace RhuEngine.Components
 			});
 		}
 	
-		public void LoadText(string Id ,string Text, RFont Font, Colorf StartingColor, FontStyle StartingStyle = FontStyle.Regular,float StatingSize = 10f) {
+		public void LoadText(string Id ,string Text, RFont Font, Colorf StartingColor, FontStyle StartingStyle = FontStyle.Regular,float StatingSize = 10f, EVerticalAlien verticalAlien = EVerticalAlien.Center,EHorizontalAlien horizontalAlien= EHorizontalAlien.Middle,bool middleLines = true) {
 			if(Font is null) {
+				return;
+			}
+			if (string.IsNullOrEmpty(Text)) {
+				Chars.SafeOperation((list) => list.Clear());
+				axisAlignedBox3F = AxisAlignedBox3f.Zero;
 				return;
 			}
 			var bounds = new List<Vector3f>();
@@ -76,6 +83,8 @@ namespace RhuEngine.Components
 						textYpos -= textsizeY;
 						textXpos = 0;
 						thisrow.Clear();
+						var charee = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(new Vector3f(textXpos, textYpos - textsizeY, 0), Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero,Vector2f.Zero);
+						Chars.SafeAdd(charee);
 						continue;
 					}
 					var newsize = Math.Max(textsize.y * (fontSize.Peek() / 100), textsizeY);
@@ -83,17 +92,25 @@ namespace RhuEngine.Components
 						var def = (textsize.y * (fontSize.Peek() / 100)) - textsizeY;
 						textsizeY = newsize;
 						foreach (var charitem in thisrow) {
+							var ewe = charitem.textsize;
 							bounds.Remove(charitem.p.Translation);
-							charitem.p.Translation -= new Vector3f(0, def, 0);
+							bounds.Remove(charitem.p.Translation + ewe.X__);
+							bounds.Remove(charitem.p.Translation + ewe.XY_);
+							bounds.Remove(charitem.p.Translation + ewe._Y_);
+							var old = charitem.p.Translation;
+							charitem.p.Translation = new Vector3f(old.x, old.y - def, old.z);
 							bounds.Add(charitem.p.Translation);
+							bounds.Add(charitem.p.Translation + ewe.X__);
+							bounds.Add(charitem.p.Translation + ewe.XY_);
+							bounds.Add(charitem.p.Translation + ewe._Y_);
 						}
 					}
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
-					var chare = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero);
+					var ew = new Vector2f((textsize.x + 0.01f) * (fontSize.Peek() / 100), textsize.y * (fontSize.Peek() / 100));
+					var chare = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero,ew);
 					Chars.SafeAdd(chare);
 					thisrow.Push(chare);
 					bounds.Add(textpos);
-					var ew = new Vector2f((textsize.x + 0.01f) * (fontSize.Peek() / 100),textsize.y * (fontSize.Peek() / 100));
 					bounds.Add(textpos + ew.X__);
 					bounds.Add(textpos + ew.XY_);
 					bounds.Add(textpos + ew._Y_);
@@ -177,6 +194,38 @@ namespace RhuEngine.Components
 			}
 			Loop(Text);
 			axisAlignedBox3F = BoundsUtil.Bounds(bounds);
+			if (horizontalAlien == EHorizontalAlien.Right || middleLines) {
+				Chars.SafeOperation((list) => {
+					var thisrow = new Stack<TextChar>();
+					if (list.Count == 0) {
+						return;
+					}
+					var offset = 0f;
+					foreach (var item in list) {
+						if (item.c == '\n') {
+							if (thisrow.Count != 0) {
+								foreach (var element in thisrow) {
+									var old = element.p.Translation;
+									element.p.Translation = !middleLines ? new Vector3f(old.x + offset, old.y, old.z) : new Vector3f(old.x + (offset / 2), old.y, old.z);
+								}
+							}
+							thisrow.Clear();
+							offset = 0f;
+							continue;
+						}
+						offset = axisAlignedBox3F.Width - item.p.Translation.x;
+						thisrow.Push(item);
+					}
+					if (thisrow.Count != 0) {
+						foreach (var element in thisrow) {
+							var old = element.p.Translation;
+							element.p.Translation = !middleLines ? new Vector3f(old.x + offset, old.y, old.z) : new Vector3f(old.x + (offset / 2), old.y, old.z);
+						}
+					}
+					thisrow.Clear();
+					offset = 0f;
+				});
+			}
 		}
 	}
 }

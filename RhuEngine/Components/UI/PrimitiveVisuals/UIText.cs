@@ -23,10 +23,9 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "UI/PrimitiveVisuals" })]
-	public class UIText : UIComponent {
-		//[Default("<style=regular><color=red>H\nell>o<size5><color=blue> W<>or\nld<size10><color=red>!!!Sthe\n<size7>size willbreak\n this<size25><colorgreen>No <size10><colorblack>it does not\nI\nlike\nnew\n\nlines</color></color></color></color></color>")]
-		//[Default("Hello THIS IS A STRING THAT IS BIG THE MORE I TYPE THE LESS ROOM")]
-		[Default("Hello\nnew\nline\ntrains\nea\nsports\nee\nefef")]
+	public class UIText : UIComponent
+	{
+		[Default("Hello World")]
 		[OnChanged(nameof(UpdateText))]
 		public Sync<string> Text;
 		[OnChanged(nameof(UpdateText))]
@@ -48,14 +47,18 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(UpdateText))]
 		public Sync<EVerticalAlien> VerticalAlien;
 
-		[Default(EHorizontalAlien.Right)]
+		[Default(EHorizontalAlien.Left)]
 		[OnChanged(nameof(UpdateText))]
 		public Sync<EHorizontalAlien> HorizontalAlien;
+
+		[Default(false)]
+		[OnChanged(nameof(UpdateText))]
+		public Sync<bool> MiddleLines;
 
 		public Matrix textOffset = Matrix.S(1);
 
 		private void UpdateText() {
-			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, StartingColor, StartingStyle, StatingSize);
+			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien,MiddleLines);
 			UpdateTextOffset();
 		}
 
@@ -65,21 +68,24 @@ namespace RhuEngine.Components
 		}
 
 		public void UpdateTextOffset() {
+			var startDepth = new Vector3f(0, 0, Entity.UIRect.StartPoint);
+			var depth = new Vector3f(0, 0, Entity.UIRect.Depth.Value);
+			var depthStart = startDepth + depth;
+			var upleft = depthStart;
 			var max = Rect.Max;
 			var min = Rect.Min;
 			var boxsize = max - min;
 			boxsize /= Math.Max(boxsize.x, boxsize.y);
 			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
-			var texture = Vector2f.One;
-			if (VerticalAlien == EVerticalAlien.Center || VerticalAlien == EVerticalAlien.Bottom) {
-				texture = new Vector2f(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
-				texture /= canvassize;
-				texture /= boxsize;
-				texture /= Math.Max(texture.x, texture.y);
-			}
+			var texture = new Vector2f(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height) * 10;
+			Console.WriteLine("Text size is " + texture);
+			texture /= canvassize;
+			texture /= boxsize;
+			texture /= Math.Max(texture.x, texture.y);
 			var maxmin = (max - min) * texture;
 			var maxoffset = maxmin + min;
 			var minoffset = min;
+
 			var offset = (max - min - maxmin) / 2;
 			if (HorizontalAlien == EHorizontalAlien.Middle) {
 				maxoffset = new Vector2f(maxoffset.x + offset.x, maxoffset.y);
@@ -89,13 +95,21 @@ namespace RhuEngine.Components
 				maxoffset = new Vector2f(maxoffset.x, maxoffset.y + offset.y);
 				minoffset = new Vector2f(minoffset.x, minoffset.y + offset.y);
 			}
-			var textscale = (max - min).XY_ / Math.Max(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
-			var x = minoffset.x;
-			if(HorizontalAlien == EHorizontalAlien.Right) {
-				x = minoffset.x + (maxoffset.x - minoffset.x);
+			if (HorizontalAlien == EHorizontalAlien.Right) {
+				maxoffset = new Vector2f(max.x, maxoffset.y);
+				minoffset = new Vector2f(max.x - maxmin.x, minoffset.y);
 			}
-			var y = maxoffset.y;
-			textOffset = Matrix.TS(new Vector3f(x, y, Rect.StartPoint + 0.01f), textscale);
+			if (VerticalAlien == EVerticalAlien.Top) {
+				maxoffset = new Vector2f(maxoffset.x, max.y);
+				minoffset = new Vector2f(minoffset.x, max.y - maxmin.y);
+			}
+			upleft += new Vector3f(minoffset.x, maxoffset.y);
+			var textscale = Vector2f.One;
+			textscale /= canvassize;
+			textscale /= boxsize;
+			textscale /= Math.Max(textscale.x, textscale.y);
+			textscale /= Math.Max(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height * 2) * 5;
+			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), textscale.XY_);
 		}
 
 		public override void RenderTargetChange() {

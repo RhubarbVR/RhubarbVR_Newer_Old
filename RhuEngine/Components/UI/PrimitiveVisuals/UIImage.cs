@@ -17,13 +17,13 @@ namespace RhuEngine.Components
 
 		public Sync<Colorf> Tint;
 
-		[Default(true)]
+		[Default(EVerticalAlien.Center)]
 		[OnChanged(nameof(ProcessMesh))]
-		public Sync<bool> CenterX;
+		public Sync<EVerticalAlien> VerticalAlien;
 
-		[Default(true)]
+		[Default(EHorizontalAlien.Middle)]
 		[OnChanged(nameof(ProcessMesh))]
-		public Sync<bool> CenterY;
+		public Sync<EHorizontalAlien> HorizontalAlien;
 
 		[Default(true)]
 		[OnChanged(nameof(ProcessMesh))]
@@ -43,30 +43,39 @@ namespace RhuEngine.Components
 			var depth = new Vector3f(0, 0, Entity.UIRect.Depth.Value);
 			var depthStart = startDepth + depth;
 			Vector3f upleft , upright , downleft , downright = upleft = upright = downleft = depthStart;
-			var texture = Vector2f.One;
 			var max = Rect.Max;
 			var min = Rect.Min;
 			var boxsize = max - min;
 			boxsize /= Math.Max(boxsize.x, boxsize.y);
 			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
+			var maxoffset = max;
+			var minoffset = min;
 			if (KeepAspectRatio.Value) {
-				texture = new Vector2f(Texture.Asset?.Width ?? 1, Texture.Asset?.Height ?? 1);
+				var texture = new Vector2f(Texture.Asset?.Width ?? 1, Texture.Asset?.Height ?? 1);
 				texture /= canvassize;
 				texture /= boxsize;
 				texture /= Math.Max(texture.x, texture.y);
-			}
-			var maxmin = (max - min) * texture;
-			var maxoffset = maxmin + min;
-			var minoffset = min;
+				var maxmin = (max - min) * texture;
+				maxoffset = maxmin + min;
+				minoffset = min;
 
-			var offset = (max - min - maxmin) / 2;
-			if (CenterX) {
-				maxoffset = new Vector2f(maxoffset.x + offset.x, maxoffset.y);
-				minoffset = new Vector2f(minoffset.x + offset.x, minoffset.y);
-			}
-			if (CenterY) {
-				maxoffset = new Vector2f(maxoffset.x, maxoffset.y + offset.y);
-				minoffset = new Vector2f(minoffset.x, minoffset.y + offset.y);
+				var offset = (max - min - maxmin) / 2;
+				if (HorizontalAlien == EHorizontalAlien.Middle) {
+					maxoffset = new Vector2f(maxoffset.x + offset.x, maxoffset.y);
+					minoffset = new Vector2f(minoffset.x + offset.x, minoffset.y);
+				}
+				if (VerticalAlien == EVerticalAlien.Center) {
+					maxoffset = new Vector2f(maxoffset.x, maxoffset.y + offset.y);
+					minoffset = new Vector2f(minoffset.x, minoffset.y + offset.y);
+				}
+				if (HorizontalAlien == EHorizontalAlien.Right) {
+					maxoffset = new Vector2f(max.x, maxoffset.y);
+					minoffset = new Vector2f(max.x - maxmin.x, minoffset.y);
+				}
+				if (VerticalAlien == EVerticalAlien.Top) {
+					maxoffset = new Vector2f(maxoffset.x, max.y);
+					minoffset = new Vector2f(minoffset.x, max.y - maxmin.y);
+				}
 			}
 			upleft += new Vector3f(minoffset.x, maxoffset.y);
 			upright += maxoffset.XY_;
