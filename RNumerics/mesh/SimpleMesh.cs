@@ -34,12 +34,10 @@ namespace RNumerics
 		//    mTo.FaceGroups = Util.BufferCopy(this.FaceGroups, mTo.FaceGroups);
 		//}
 
-		//public object Clone()
-		//{
-		//    SimpleMesh mTo = new SimpleMesh();
-		//    this.CopyTo(mTo);
-		//    return mTo;
-		//}
+		public SimpleMesh Copy()
+		{
+		    return new SimpleMesh(this);
+		}
 
 		public SimpleMesh(IMesh copy) {
 			Initialize(copy.HasVertexNormals, copy.HasVertexColors, copy.HasVertexUVs, copy.HasTriangleGroups);
@@ -191,6 +189,13 @@ namespace RNumerics
 			Vertices.Add(info.v[2]);
 			UpdateTimeStamp();
 			return i;
+		}
+
+		public int AppendTriangle(NewVertexInfo a, NewVertexInfo b, NewVertexInfo c) {
+			var va = AppendVertex(a);
+			var vb = AppendVertex(b);
+			var vc = AppendVertex(c);
+			return AppendTriangle(va, vb, vc);
 		}
 
 		public void AppendVertices(VectorArray3d v, VectorArray3f n = null, VectorArray3f c = null, VectorArray2f uv = null) {

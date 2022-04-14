@@ -39,14 +39,17 @@ namespace RhuEngine
 			return child;
 		}
 		private static Entity AttachList(this Entity parrent, DynamicMaterial mit, Vector2f min, Vector2f max, Colorf color) {
-			var child = parrent.AddChild("childEliment");
-			var rectTwo = child.AttachComponent<VerticalList>();
+			var child = parrent.AddChild("Cut");
+			var rectTwo = child.AttachComponent<CuttingUIRect>();
 			rectTwo.AnchorMin.Value = min;
 			rectTwo.AnchorMax.Value = max;
 			var img = child.AttachComponent<UIRectangle>();
 			img.Tint.Value = color;
 			img.Material.Target = mit;
-			return child;
+			var list = child.AddChild("List");
+			var rectthrere = list.AttachComponent<VerticalList>();
+			rectthrere.Depth.Value = 0f;
+			return list;
 		}
 		private static Entity AttachRectangle(this Entity parrent, DynamicMaterial mit,Vector2f min, Vector2f max, Colorf color) {
 			var child = parrent.AddChild("childEliment");

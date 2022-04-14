@@ -28,9 +28,14 @@ namespace RhuEngine.Components
 		internal void ScrollPosChange() {
 			_childRects.SafeOperation((list) => {
 				foreach (var item in list) {
-					item.Scroll(ScrollPos);
+					item.Scroll(ScrollPos.Value.XY_ + ParentRect.ScrollOffset);
 				}
 			});
+		}
+
+		public override void OnLoaded() {
+			base.OnLoaded();
+			ScrollPosChange();
 		}
 
 		public override void Step() {

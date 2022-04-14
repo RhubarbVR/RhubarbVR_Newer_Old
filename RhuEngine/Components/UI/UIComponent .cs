@@ -17,5 +17,7 @@ namespace RhuEngine.Components
 		public abstract void Render(Matrix matrix);
 
 		public abstract void RenderTargetChange();
+
+		public abstract void CutElement(bool cut);
 	}
 }

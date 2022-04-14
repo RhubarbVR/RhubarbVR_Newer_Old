@@ -61,6 +61,11 @@ namespace RNumerics
 		public static Vector2f Clamp(Vector2f f, Vector2f low, Vector2f high) {
 			return new Vector2f(Clamp(f.x, low.x, high.x), Clamp(f.y,low.y, high.y));
 		}
+
+		public static Vector2d Abs(Vector2d vector2d) {
+			return new Vector2d(Math.Abs(vector2d.x),Math.Abs(vector2d.y));
+		}
+
 		public static int ModuloClamp(int f, int N) {
 			while (f < 0) {
 				f += N;
@@ -170,6 +175,12 @@ namespace RNumerics
 			return theta + c;
 		}
 
+		public static Vector3d Max(Vector3d item, Vector3d max) {
+			return new Vector3d(Math.Max(item.x, max.x), Math.Max(item.y, max.y), Math.Max(item.z, max.z));
+		}
+		public static Vector3d Min(Vector3d item, Vector3d max) {
+			return new Vector3d(Math.Min(item.x, max.x), Math.Min(item.y, max.y), Math.Min(item.z, max.z));
+		}
 
 
 		// for ((i++) % N)-type loops, but where we might be using (i--)

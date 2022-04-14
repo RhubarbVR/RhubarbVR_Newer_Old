@@ -7,7 +7,8 @@ using System.Collections.Generic;
 
 namespace RhuEngine.Components
 {
-	public interface IRectData {
+	public interface IRectData
+	{
 		public UICanvas Canvas { get; }
 
 		public Vector2f Min { get; }
@@ -39,7 +40,7 @@ namespace RhuEngine.Components
 		public Vector2f AnchorMin { get; set; }
 
 		public Vector2f AnchorMax { get; set; }
-		
+
 		public Vector2f AnchorMinValue => AnchorMin;
 
 
@@ -61,7 +62,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "UI" })]
-	public class UIRect : Component , IRectData
+	public class UIRect : Component, IRectData
 	{
 		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public Sync<Vector2f> OffsetMin;
@@ -74,12 +75,17 @@ namespace RhuEngine.Components
 		public Vector2f AnchorMinValue => AnchorMin;
 
 
-		public Vector2f AnchorMaxValue => AnchorMax; 
-		
+		public Vector2f AnchorMaxValue => AnchorMax;
+
 		[Default(0.1f)]
 		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public Sync<float> Depth;
 		public float DepthValue => Depth;
+
+		public virtual Vector2f CutZonesMax => Entity.parent.Target?.UIRect?.CutZonesMax ?? Vector2f.Inf;
+
+		public virtual Vector2f CutZonesMin => Entity.parent.Target?.UIRect?.CutZonesMin ?? Vector2f.NInf;
+
 		public Vector2f Min => TrueMin + OffsetMin.Value;
 
 		public Vector2f Max => TrueMax + OffsetMax.Value;
@@ -95,7 +101,7 @@ namespace RhuEngine.Components
 		private IRectData _rectDataOverride;
 		public virtual bool RemoveFakeRecs => true;
 
-		public Vector2f ScrollOffset { get; set; }
+		public Vector3f ScrollOffset { get; set; }
 
 		public void SetOverride(IRectData rectDataOverride) {
 			if (rectDataOverride != _rectDataOverride) {
@@ -163,7 +169,7 @@ namespace RhuEngine.Components
 		[NoSave]
 		[NoSync]
 		[NoLoad]
-		public IRectData ParentRect => Entity.parent.Target?.UIRect;
+		public UIRect ParentRect => Entity.parent.Target?.UIRect;
 
 		public readonly SafeList<RMesh> _meshes = new();
 
@@ -190,10 +196,10 @@ namespace RhuEngine.Components
 						}
 					}
 					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
-						if (list[i].ScrollMesh is null) {
-							list[i].RenderScrollMesh(false);
+						if(list[i].CutMesh is null) {
+							list[i].RenderCutMesh(false);
 						}
-						meshList[i].LoadMesh(list[i].ScrollMesh);
+						meshList[i].LoadMesh(list[i].CutMesh);
 					}
 				});
 			});
@@ -204,11 +210,34 @@ namespace RhuEngine.Components
 			});
 		}
 
+		private bool _cull = false;
+		private void ProcessCutting() {
+			var min = Min + ScrollOffset.Xy;
+			var max = Max + ScrollOffset.Xy;
+			var cutmin = CutZonesMin;
+			var cutmax = CutZonesMax;
+			_cull = max.y < cutmin.y || min.y > cutmax.y || max.x < cutmin.x || min.x > cutmax.x;
+			var cut = !_cull && (max.y > cutmax.y || min.y < cutmin.y || max.x > cutmax.x || min.x < cutmin.x);
+			_uiComponents.SafeOperation((list) => {
+				foreach (var item in list) {
+					item.CutElement(cut);
+				}
+			});
+			_uiRenderComponents.SafeOperation((list) => {
+				foreach (var item in list) {
+					item.CutElement(cut);
+				}
+			});
+		}
+
 		public virtual void Render(Matrix matrix) {
+			if (_cull) {
+				return;
+			}
 			_meshes.SafeOperation((meshList) => {
 				_uiRenderComponents.SafeOperation((list) => {
 					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
-						meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, matrix,list[i].RenderTint);
+						meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, matrix, list[i].RenderTint);
 					}
 				});
 			});
@@ -234,7 +263,7 @@ namespace RhuEngine.Components
 
 		public override void OnLoaded() {
 			base.OnLoaded();
-			Entity.SetUIRect(Entity.GetFirstComponent<UIRect>()??this);
+			Entity.SetUIRect(Entity.GetFirstComponent<UIRect>() ?? this);
 			Entity.components.Changed += RegisterUIList;
 			Entity.children.Changed += Children_Changed;
 			Children_Changed(null);
@@ -301,6 +330,7 @@ namespace RhuEngine.Components
 					list.Add(item);
 				}
 			});
+			ProcessCutting();
 			UpdateMeshes();
 		}
 
@@ -319,18 +349,21 @@ namespace RhuEngine.Components
 			});
 		}
 
-		public void Scroll(Vector2f value) {
+		public void Scroll(Vector3f value) {
 			ScrollOffset = value;
 			_childRects.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.Scroll(value);
 				}
 			});
+			ProcessCutting();
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
-					item.RenderScrollMesh();
+					item.RenderScrollMesh(false);
+					item.RenderCutMesh(false);
 				}
 			});
+			UpdateUIMeshes();
 		}
 	}
 }

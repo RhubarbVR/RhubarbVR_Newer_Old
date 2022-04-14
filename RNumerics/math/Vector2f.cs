@@ -40,6 +40,12 @@ namespace RNumerics
 		static public readonly Vector2f MaxValue = new(float.MaxValue, float.MaxValue);
 		[IgnoreMember]
 		static public readonly Vector2f MinValue = new(float.MinValue, float.MinValue);
+		public bool IsInBox(Vector2f min,Vector2f check) {
+			return check.y >= min.y && check.y <= y && check.x >= min.x && check.x <= x;
+		}
+		public bool IsInBox(Vector2f min, Vector2d check) {
+			return check.y >= min.y && check.y <= y && check.x >= min.x && check.x <= x;
+		}
 		[IgnoreMember]
 		public float this[int key]
 		{
@@ -153,7 +159,9 @@ namespace RNumerics
 			float dx = v2.x - x, dy = v2.y - y;
 			return (float)Math.Sqrt((dx * dx) + (dy * dy));
 		}
-
+		public float Distance(Vector2d v2) {
+			return Distance((Vector2f)v2);
+		}
 
 		public void Set(Vector2f o) {
 			x = o.x;
@@ -171,8 +179,47 @@ namespace RNumerics
 			x -= o.x;
 			y -= o.y;
 		}
+		public static Vector2f MinMaxIntersect(Vector2d point, Vector2f min, Vector2f max) {
+			return MinMaxIntersect((Vector2f)point, min, max);
+		}
+		public static Vector2f MinMaxIntersect(Vector2f point, Vector2f min, Vector2f max) {
+			return new Vector2f(Math.Max(Math.Min(point.x,max.x),min.x), Math.Max(Math.Min(point.y, max.y), min.y));
+		}
 
-
+		public static Vector2f? Intersect(Vector2d line1V1, Vector2d line1V2, Vector2f line2V1, Vector2f line2V2) {
+			var A1 = line1V2.y - line1V1.y;
+			var B1 = line1V1.x - line1V2.x;
+			var C1 = (A1 * line1V1.x) + (B1 * line1V1.y);
+			var A2 = line2V2.y - line2V1.y;
+			var B2 = line2V1.x - line2V2.x;
+			var C2 = (A2 * line2V1.x) + (B2 * line2V1.y);
+			var det = (A1 * B2) - (A2 * B1);
+			if (det == 0) {
+				return null;
+			}
+			else {
+				var x = ((B2 * C1) - (B1 * C2)) / det;
+				var y = ((A1 * C2) - (A2 * C1)) / det;
+				return new Vector2f(x, y);
+			}
+		}
+		public static Vector2f? Intersect(Vector2f line1V1, Vector2f line1V2, Vector2f line2V1, Vector2f line2V2) {
+			var A1 = line1V2.y - line1V1.y;
+			var B1 = line1V1.x - line1V2.x;
+			var C1 = (A1 * line1V1.x) + (B1 * line1V1.y);
+			var A2 = line2V2.y - line2V1.y;
+			var B2 = line2V1.x - line2V2.x;
+			var C2 = (A2 * line2V1.x) + (B2 * line2V1.y);
+			var det = (A1 * B2) - (A2 * B1);
+			if (det == 0) {
+				return Zero;
+			}
+			else {
+				var x = ((B2 * C1) - (B1 * C2)) / det;
+				var y = ((A1 * C2) - (A2 * C1)) / det;
+				return new Vector2f(x, y);
+			}
+		}
 		public static Vector2f operator -(Vector2f v) => new(-v.x, -v.y);
 
 		public static Vector2f operator +(Vector2f a, Vector2f o) => new(a.x + o.x, a.y + o.y);
