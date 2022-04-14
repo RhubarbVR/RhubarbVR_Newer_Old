@@ -28,16 +28,26 @@ namespace RhuEngine
 			return child;
 		}
 
-		private static Entity AttachText(this Entity parrent, Vector2f min, Vector2f max, Colorf color) {
+		private static Entity AttachText(this Entity parrent, Vector2f min, Vector2f max, Colorf color,string text) {
 			var child = parrent.AddChild("childEliment");
 			var rectTwo = child.AttachComponent<UIRect>();
 			rectTwo.AnchorMin.Value = min;
 			rectTwo.AnchorMax.Value = max;
 			var img = child.AttachComponent<UIText>();
+			img.Text.Value = text;
 			img.StartingColor.Value = color;
 			return child;
 		}
-
+		private static Entity AttachList(this Entity parrent, DynamicMaterial mit, Vector2f min, Vector2f max, Colorf color) {
+			var child = parrent.AddChild("childEliment");
+			var rectTwo = child.AttachComponent<VerticalList>();
+			rectTwo.AnchorMin.Value = min;
+			rectTwo.AnchorMax.Value = max;
+			var img = child.AttachComponent<UIRectangle>();
+			img.Tint.Value = color;
+			img.Material.Target = mit;
+			return child;
+		}
 		private static Entity AttachRectangle(this Entity parrent, DynamicMaterial mit,Vector2f min, Vector2f max, Colorf color) {
 			var child = parrent.AddChild("childEliment");
 			var rectTwo = child.AttachComponent<UIRect>();
@@ -69,11 +79,16 @@ namespace RhuEngine
 			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Green)
 			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Grey)
 			////.AttachImage(shader, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.White, texture);
-			var e = pannel.AttachRectangle(mit, new Vector2f(0f), new Vector2f(0.25f,1f), Colorf.Blue)
-				.AttachRectangle(mit, new Vector2f(0f,0f), new Vector2f(1f,0.1f), Colorf.Yellow);
-			//e.AttachImage(shader, new Vector2f(0), new Vector2f(0.5f,1), Colorf.White, texture);
-			e.AttachImage(shader, new Vector2f(0.5,0), new Vector2f(1f), Colorf.White, texture);
-			e.AttachText(new Vector2f(0), new Vector2f(0.5f, 1), Colorf.White);
+			var listRoot = pannel.AttachList(mit, new Vector2f(0f), new Vector2f(0.25f, 1f), Colorf.Blue);
+			void AttachListElement(Entity root,string text) {
+				var e = root.AttachRectangle(mit, new Vector2f(0f, 0f), new Vector2f(1f, 0.2f), Colorf.Yellow);
+				e.AttachImage(shader, new Vector2f(0.5, 0), new Vector2f(1f), Colorf.White, texture);
+				e.AttachText(new Vector2f(0), new Vector2f(0.5f, 1), Colorf.White,text);
+			}
+			for (var i = 0; i < 10; i++) {
+				AttachListElement(listRoot,$"Element{i}");
+			}
+			listRoot.GetFirstComponent<UIRect>().RegUpdateUIMeshes();
 			//pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red);
 			//// TODO add back with ui
 			////pannel.AttachComponent<UIWindow>();

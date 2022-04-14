@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace RhuEngine.Linker
@@ -25,7 +26,7 @@ namespace RhuEngine.Linker
 
 		public static void RunOnMain() {
 			lock (MainExecute) {
-				foreach (var item in MainExecute) {
+				foreach (var item in MainExecute.ToArray()) {
 					item.Value.Invoke();
 				}
 				MainExecute.Clear();

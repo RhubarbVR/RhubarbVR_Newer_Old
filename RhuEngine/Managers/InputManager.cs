@@ -71,10 +71,10 @@ namespace RhuEngine.Managers
 				_ => 0,
 			};
 			if (keyboard.MousePositive == inputType) {
-				keyboardInput = RInput.Mouse.ScrollChange;
+				keyboardInput =  RInput.Mouse.ScrollChange.y;
 			}
 			if (keyboard.MouseNegevitve == inputType) {
-				keyboardInput = -RInput.Mouse.ScrollChange;
+				keyboardInput = -RInput.Mouse.ScrollChange.y;
 			}
 			return keyboardInput;
 		}

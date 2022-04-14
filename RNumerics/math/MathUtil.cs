@@ -58,7 +58,9 @@ namespace RNumerics
 		public static int Clamp(int f, int low, int high) {
 			return (f < low) ? low : (f > high) ? high : f;
 		}
-
+		public static Vector2f Clamp(Vector2f f, Vector2f low, Vector2f high) {
+			return new Vector2f(Clamp(f.x, low.x, high.x), Clamp(f.y,low.y, high.y));
+		}
 		public static int ModuloClamp(int f, int N) {
 			while (f < 0) {
 				f += N;

@@ -27,6 +27,10 @@ namespace RNumerics
 		[IgnoreMember]
 		static public readonly Vector2f Zero = new(0.0f, 0.0f);
 		[IgnoreMember]
+		static public readonly Vector2f Inf = new(float.PositiveInfinity, float.PositiveInfinity);
+		[IgnoreMember]
+		static public readonly Vector2f NInf = new(float.NegativeInfinity, float.NegativeInfinity);
+		[IgnoreMember]
 		static public readonly Vector2f One = new(1.0f, 1.0f);
 		[IgnoreMember]
 		static public readonly Vector2f AxisX = new(1.0f, 0.0f);

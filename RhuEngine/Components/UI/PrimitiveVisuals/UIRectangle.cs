@@ -29,7 +29,6 @@ namespace RhuEngine.Components
 			Vector3f upleft , upright , downleft , downright = upleft = upright = downleft = depthStart;
 			var max = Rect.Max;
 			var min = Rect.Min;
-			RLog.Info($"Min {min} Max{max} Color{Tint.Value} StartPoint{Rect.StartPoint}");
 			upleft += new Vector3f(min.x, max.y);
 			upright += max.XY_;
 			downright += new Vector3f(max.x, min.y);

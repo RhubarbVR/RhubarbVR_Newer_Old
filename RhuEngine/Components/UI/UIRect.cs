@@ -7,39 +7,108 @@ using System.Collections.Generic;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "UI" })]
-	public class UIRect : Component
+	public interface IRectData {
+		public UICanvas Canvas { get; }
+
+		public Vector2f Min { get; }
+
+		public Vector2f Max { get; }
+		public Vector2f AnchorMinValue { get; }
+
+
+		public Vector2f AnchorMaxValue { get; }
+		public Vector2f BadMin { get; }
+
+		public Vector2f TrueMin { get; }
+
+		public Vector2f TrueMax { get; }
+
+		public float StartPoint { get; }
+
+		public float DepthValue { get; }
+
+	}
+
+	public class BasicRectOvride : IRectData
 	{
-		[OnChanged(nameof(UpdateUIMeshes))]
+		public IRectData Child { get; set; }
+		public IRectData ParentRect { get; set; }
+
+		public UICanvas Canvas { get; set; }
+
+		public Vector2f AnchorMin { get; set; }
+
+		public Vector2f AnchorMax { get; set; }
+		
+		public Vector2f AnchorMinValue => AnchorMin;
+
+
+		public Vector2f AnchorMaxValue => AnchorMax;
+
+		public Vector2f Min => TrueMin;
+
+		public Vector2f Max => TrueMax;
+
+		public Vector2f BadMin => (((ParentRect?.BadMin ?? Vector2f.One) - (Vector2f.One - (ParentRect?.TrueMax ?? Vector2f.One))) * (Vector2f.One - AnchorMin)) + (Vector2f.One - (ParentRect?.TrueMax ?? Vector2f.One));
+
+		public Vector2f TrueMin => Vector2f.One - BadMin;
+
+		public Vector2f TrueMax => (((ParentRect?.TrueMax ?? Vector2f.One) - (ParentRect?.TrueMin ?? Vector2f.Zero)) * AnchorMax) + (ParentRect?.TrueMin ?? Vector2f.Zero);
+
+		public float StartPoint => (ParentRect?.StartPoint ?? 0) + (ParentRect?.DepthValue ?? 0);
+
+		public float DepthValue { get; set; }
+	}
+
+	[Category(new string[] { "UI" })]
+	public class UIRect : Component , IRectData
+	{
+		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public Sync<Vector2f> OffsetMin;
-		[OnChanged(nameof(UpdateUIMeshes))]
+		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public Sync<Vector2f> OffsetMax;
-		[OnChanged(nameof(UpdateUIMeshes))]
+		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public Sync<Vector2f> AnchorMin;
-		[OnChanged(nameof(UpdateUIMeshes))]
+		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public Sync<Vector2f> AnchorMax;
+		public Vector2f AnchorMinValue => AnchorMin;
 
+
+		public Vector2f AnchorMaxValue => AnchorMax; 
+		
 		[Default(0.1f)]
-		[OnChanged(nameof(DepthChange))]
+		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public Sync<float> Depth;
-
+		public float DepthValue => Depth;
 		public Vector2f Min => TrueMin + OffsetMin.Value;
 
 		public Vector2f Max => TrueMax + OffsetMax.Value;
 
-		public Vector2f BadMin => (((ParentRect?.BadMin ?? Vector2f.One) - (Vector2f.One - (ParentRect?.TrueMax ?? Vector2f.One))) * (Vector2f.One - AnchorMin.Value)) + (Vector2f.One - (ParentRect?.TrueMax ?? Vector2f.One));
+		public Vector2f BadMin => ((((_rectDataOverride ?? ParentRect)?.BadMin ?? Vector2f.One) - (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One))) * (Vector2f.One - AnchorMin.Value)) + (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One));
 
 		public Vector2f TrueMin => Vector2f.One - BadMin;
 
-		public Vector2f TrueMax => (((ParentRect?.TrueMax ?? Vector2f.One) - (ParentRect?.TrueMin ?? Vector2f.Zero)) * AnchorMax.Value) + (ParentRect?.TrueMin ?? Vector2f.Zero);
+		public Vector2f TrueMax => ((((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One) - ((_rectDataOverride ?? ParentRect)?.TrueMin ?? Vector2f.Zero)) * AnchorMax.Value) + ((_rectDataOverride ?? ParentRect)?.TrueMin ?? Vector2f.Zero);
 
-		public float StartPoint => (ParentRect?.StartPoint ?? 0) + (ParentRect?.Depth.Value ?? 0);
+		public float StartPoint => ((_rectDataOverride ?? ParentRect)?.StartPoint ?? 0) + ((_rectDataOverride ?? ParentRect)?.DepthValue ?? 0);
 
-		private void DepthChange() {
-			UpdateUIMeshes();
+		private IRectData _rectDataOverride;
+		public virtual bool RemoveFakeRecs => true;
+
+		public Vector2f ScrollOffset { get; set; }
+
+		public void SetOverride(IRectData rectDataOverride) {
+			if (rectDataOverride != _rectDataOverride) {
+				_rectDataOverride = rectDataOverride;
+				RegUpdateUIMeshes();
+			}
 		}
 
-		private void UpdateUIMeshes() {
+		public void RegUpdateUIMeshes() {
+			RWorld.ExecuteOnMain(this, UpdateUIMeshes);
+		}
+
+		public virtual void UpdateUIMeshes() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
@@ -50,9 +119,18 @@ namespace RhuEngine.Components
 			});
 			_childRects.SafeOperation((list) => {
 				foreach (var item in list) {
-					item.UpdateUIMeshes();
+					if (RemoveFakeRecs) {
+						item?.SetOverride(null);
+					}
+					item?.RegUpdateUIMeshes();
 				}
 			});
+			_uiComponents.SafeOperation((list) => {
+				for (var i = 0; i < _uiComponents.List.Count; i++) {
+					list[i].RenderTargetChange();
+				}
+			});
+			UpdateMeshes();
 		}
 
 		[NoShow]
@@ -64,9 +142,9 @@ namespace RhuEngine.Components
 		public void RegisterCanvas() {
 			RegisteredCanvas = Canvas;
 			foreach (Entity item in Entity.children) {
-				item.UIRect?.RegisterCanvas();
+				item?.UIRect?.RegisterCanvas();
 			}
-			UpdateUIMeshes();
+			RegUpdateUIMeshes();
 		}
 
 		[NoShow]
@@ -85,17 +163,17 @@ namespace RhuEngine.Components
 		[NoSave]
 		[NoSync]
 		[NoLoad]
-		public UIRect ParentRect => Entity.parent.Target?.UIRect;
+		public IRectData ParentRect => Entity.parent.Target?.UIRect;
 
-		private readonly SafeList<RMesh> _meshes = new();
+		public readonly SafeList<RMesh> _meshes = new();
 
-		private readonly SafeList<UIComponent> _uiComponents = new();
+		public readonly SafeList<UIComponent> _uiComponents = new();
 
-		private readonly SafeList<RenderUIComponent> _uiRenderComponents = new();
+		public readonly SafeList<RenderUIComponent> _uiRenderComponents = new();
 
-		private readonly SafeList<UIRect> _childRects = new();
+		public readonly SafeList<UIRect> _childRects = new();
 
-		public void UpdateMeshes() {
+		public virtual void UpdateMeshes() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
@@ -112,10 +190,10 @@ namespace RhuEngine.Components
 						}
 					}
 					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
-						if(list[i].MainMesh is null) {
-							list[i].RenderTargetChange();
+						if (list[i].ScrollMesh is null) {
+							list[i].RenderScrollMesh(false);
 						}
-						meshList[i].LoadMesh(list[i].MainMesh);
+						meshList[i].LoadMesh(list[i].ScrollMesh);
 					}
 				});
 			});
@@ -126,7 +204,7 @@ namespace RhuEngine.Components
 			});
 		}
 
-		public void Render(Matrix matrix) {
+		public virtual void Render(Matrix matrix) {
 			_meshes.SafeOperation((meshList) => {
 				_uiRenderComponents.SafeOperation((list) => {
 					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
@@ -141,7 +219,7 @@ namespace RhuEngine.Components
 			});
 			_childRects.SafeOperation((list) => {
 				foreach (var item in list) {
-					item.Render(matrix);
+					item?.Render(matrix);
 				}
 			});
 		}
@@ -166,6 +244,9 @@ namespace RhuEngine.Components
 
 		private readonly SafeList<Entity> _boundTo = new();
 
+		public virtual void ChildAdded(UIRect child) {
+			child?.SetOverride(null);
+		}
 
 		private void Children_Changed(IChangeable obj) {
 			if (!Engine.EngineLink.CanRender) {
@@ -178,14 +259,29 @@ namespace RhuEngine.Components
 				list.Clear();
 			});
 			_childRects.SafeOperation((list) => list.Clear());
+			var added = false;
 			_childRects.SafeOperation((list) => {
 				foreach (Entity item in Entity.children) {
 					_boundTo.SafeAdd(item);
 					item.components.Changed += Children_Changed;
-					list.Add(item.GetFirstComponent<UIRect>());
+					var childadded = item.GetFirstComponent<UIRect>();
+					if (childadded != null) {
+						ChildAdded(childadded);
+						list.Add(childadded);
+						childadded.RegUpdateUIMeshes();
+						added = true;
+					}
 				}
 			});
+			if (added) {
+				ChildRectAdded();
+			}
 		}
+
+		public virtual void ChildRectAdded() {
+
+		}
+
 
 		private void RegisterUIList(IChangeable obj) {
 			if (!Engine.EngineLink.CanRender) {
@@ -220,6 +316,20 @@ namespace RhuEngine.Components
 					item.components.Changed -= Children_Changed;
 				}
 				list.Clear();
+			});
+		}
+
+		public void Scroll(Vector2f value) {
+			ScrollOffset = value;
+			_childRects.SafeOperation((list) => {
+				foreach (var item in list) {
+					item.Scroll(value);
+				}
+			});
+			_uiRenderComponents.SafeOperation((list) => {
+				foreach (var item in list) {
+					item.RenderScrollMesh();
+				}
 			});
 		}
 	}

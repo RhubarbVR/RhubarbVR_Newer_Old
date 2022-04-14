@@ -275,6 +275,11 @@ namespace RNumerics
 			}
 			UpdateTimeStamp();
 		}
+
+		public void Translate(Vector3d vector3D) {
+			Translate(vector3D.x, vector3D.y, vector3D.z);
+		}
+
 		public void Scale(double sx, double sy, double sz) {
 			var c = VertexCount;
 			for (var i = 0; i < c; ++i) {

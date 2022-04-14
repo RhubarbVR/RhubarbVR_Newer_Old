@@ -121,7 +121,7 @@ namespace RhuEngine.Components
 		}
 
 		public override void Render(Matrix matrix) {
-			textRender.Render(textOffset * matrix);
+			textRender.Render(textOffset * Matrix.T(Rect.ScrollOffset.x, Rect.ScrollOffset.y, 0) * matrix);
 		}
 	}
 }
