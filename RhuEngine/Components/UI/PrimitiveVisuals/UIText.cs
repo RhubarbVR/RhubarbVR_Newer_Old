@@ -121,11 +121,63 @@ namespace RhuEngine.Components
 		}
 
 		public override void Render(Matrix matrix) {
-			textRender.Render(textOffset * Matrix.T(Rect.ScrollOffset.x, Rect.ScrollOffset.y, 0) * matrix);
+			textRender.Render(textOffset * Matrix.T(Rect.ScrollOffset) * matrix);
 		}
 
 		public override void CutElement(bool cut) {
-
+			var min = Rect.CutZonesMin;
+			var max = Rect.CutZonesMax;
+			Console.WriteLine($"min {min} max {max}");
+			if (cut) {
+				textRender.Chars.SafeOperation((list) => {
+					foreach (var chare in list) {
+						var charbottomleft = (chare.p * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
+						var charbottomright = (Matrix.T(new Vector3f(chare.textsize.x,0,0) + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
+						var chartopleft = (Matrix.T(new Vector3f(0,chare.textsize.y,0) + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
+						var chartopright = (Matrix.T(chare.textsize.XY_ + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
+						var bottomleft = max.IsInBox(min, charbottomleft);
+						var bottomright = max.IsInBox(min, charbottomright);
+						var topleft = max.IsInBox(min, chartopleft);
+						var topright = max.IsInBox(min, chartopright);
+						if (!(bottomleft || bottomright || topleft || topright)) {
+							chare.Cull = true;
+							continue;
+						}
+						chare.Cull = false;
+						if (bottomleft && bottomright && topleft && topright) {
+							chare.textCut = Vector2f.Zero;
+							continue;
+						}
+						var ycut = 0f;
+						var xcut = 0f;
+						if (topleft && topright) {
+							var newpos = Vector2f.MinMaxIntersect(charbottomleft, min, max).y;
+							ycut = -((charbottomleft.y - newpos) / (chartopleft.y - charbottomleft.y));
+						}
+						if (bottomleft && bottomright) {
+							var newpos = Vector2f.MinMaxIntersect(chartopright, min, max).y;
+							ycut = -(chartopright.y - newpos) / (chartopleft.y - charbottomleft.y);
+						}
+						if (bottomleft && topleft) {
+							var newpos = Vector2f.MinMaxIntersect(chartopright, min, max).x;
+							xcut = -((chartopright.x - newpos) / (chartopright.x - chartopleft.x));
+						}
+						if (bottomright && topright) {
+							var newpos = Vector2f.MinMaxIntersect(charbottomleft, min, max).x;
+							xcut = -((charbottomleft.x - newpos) / (chartopright.x - chartopleft.x));
+						}
+						chare.textCut = new Vector2f(xcut, ycut);
+					}
+				});
+			}
+			else {
+				textRender.Chars.SafeOperation((list) => {
+					foreach (var chare in list) {
+						chare.textCut = Vector2f.Zero;
+						chare.Cull = false;
+					}
+				});
+			}
 		}
 	}
 }

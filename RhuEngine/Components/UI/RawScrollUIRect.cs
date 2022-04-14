@@ -14,6 +14,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ScrollPosChange))]	
 		public Sync<Vector2f> ScrollPos;
 
+		public Sync<Vector2f> ScrollSpeed;
 		public virtual Vector2f MaxScroll => Vector2f.Inf;
 
 
@@ -24,6 +25,11 @@ namespace RhuEngine.Components
 
 		[Default(true)]
 		public Sync<bool> TouchScroll;
+
+		public override void OnAttach() {
+			base.OnAttach();
+			ScrollSpeed.Value = Vector2f.One;
+		}
 
 		internal void ScrollPosChange() {
 			_childRects.SafeOperation((list) => {
@@ -39,9 +45,12 @@ namespace RhuEngine.Components
 		}
 
 		public override void Step() {
+			if (!Engine.EngineLink.CanInput) {
+				return;
+			}
 			if (LaserScroll) {
 				//Todo: if hover do this
-				var scroll = RInput.Mouse.ScrollChange;
+				var scroll = RInput.Mouse.ScrollChange * ScrollSpeed.Value / Canvas.scale.Value.Xy;
 				if (!(scroll.x == 0 && scroll.y == 0)) {
 					var newvalue = ScrollPos.Value + scroll;
 					ScrollPos.Value = MathUtil.Clamp(newvalue, MinScroll, MaxScroll);

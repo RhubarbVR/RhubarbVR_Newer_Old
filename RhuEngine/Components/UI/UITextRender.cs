@@ -26,7 +26,7 @@ namespace RhuEngine.Components
 			public RFont rFont;
 			public FontStyle fontStyle;
 			public Vector2f textCut;
-			
+			public bool Cull = false;
 			public TextChar(string id, char c, Matrix p, Colorf color, RFont rFont, FontStyle fontStyle, Vector2f textCut, Vector2f textsize) {
 				this.id = id;
 				this.c = c;
@@ -39,7 +39,9 @@ namespace RhuEngine.Components
 			}
 
 			public void Render(Matrix root) {
-				RText.Add(id, c, p * root, color, rFont, fontStyle, textCut);
+				if (!Cull) {
+					RText.Add(id, c, p * root, color, rFont, fontStyle, textCut);
+				}
 			}
 		}
 

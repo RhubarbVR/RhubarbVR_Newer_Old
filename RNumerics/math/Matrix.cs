@@ -79,6 +79,15 @@ namespace RNumerics
 		/// <returns>An inverse matrix of the current one.</returns>
 		public Matrix Inverse { get { Matrix4x4.Invert(m, out var result); return result; } }
 
+		public Matrix InvScale
+		{
+			get {
+				Decompose(out var pos,out var rot , out var scale);
+				scale = 1 / scale;
+				return Matrix.TRS(pos,rot,scale);
+			}
+		}
+
 		/// <summary>Inverts this Matrix! If the matrix takes a point from a
 		/// -> b, then its inverse takes the point from b -> a.</summary>
 		public void Invert() {
