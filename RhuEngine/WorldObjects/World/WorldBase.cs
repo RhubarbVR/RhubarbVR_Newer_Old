@@ -11,10 +11,12 @@ using RhuEngine.Components;
 using SharedModels.Session;
 using SharedModels.UserSession;
 using RhuEngine.Linker;
+using RhuEngine.Physics;
 
 namespace RhuEngine.WorldObjects
 {
 	public partial class World : IWorldObject {
+		public PhysicsSim PhysicsSim { get; set; }
 
 		public bool IsLoading => IsDeserializing || IsLoadingNet;
 
@@ -25,6 +27,7 @@ namespace RhuEngine.WorldObjects
 		public Engine Engine => worldManager.Engine;
 
 		public World(WorldManager worldManager) {
+			PhysicsSim = new PhysicsSim();
 			this.worldManager = worldManager;
 			assetSession = new AssetSession(worldManager.Engine.assetManager, this);
 		}
@@ -218,6 +221,7 @@ namespace RhuEngine.WorldObjects
 			catch (Exception e) {
 				RLog.Err($"Failed to update global stepables for session {WorldDebugName}. Error: {e}");
 			}
+			PhysicsSim.UpdateSim(RTime.Elapsedf);
 			try {
 				var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
 											 group ent by ent.CachedDepth;
