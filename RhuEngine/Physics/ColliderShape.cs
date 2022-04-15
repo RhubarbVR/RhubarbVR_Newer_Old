@@ -21,8 +21,6 @@ namespace RhuEngine.Physics
 
 		public object obj;
 
-		public object CustomObject { get; set; }
-
 		public RigidBodyCollider GetCollider(PhysicsSim physicsSim) {
 			var col =  Manager?.GetCollider(this, physicsSim);
 			return col;
