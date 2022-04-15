@@ -23,6 +23,31 @@ namespace RBullet
 		public object GetCapsuleShapeZ(double radius, double height) {
 			return new CapsuleShapeZ(radius, height);
 		}
+		public object GetBox3D(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ) {
+			return new BoxShape(boxHalfExtentX,boxHalfExtentY,boxHalfExtentZ);
+		}
+		public object GetCone(double radius, double height) {
+			return new ConeShape(radius, height);
+		}
+		public object GetConeX(double radius, double height) {
+			return new ConeShapeX(radius, height);
+		}
+		public object GetConeZ(double radius, double height) {
+			return new ConeShapeZ(radius, height);
+		}
+		public object GetCylinderShape(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ) {
+			return new CylinderShape(boxHalfExtentX, boxHalfExtentY, boxHalfExtentZ);
+		}
+		public object GetCylinderShapeX(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ) {
+			return new CylinderShapeX(boxHalfExtentX, boxHalfExtentY, boxHalfExtentZ);
+		}
+
+		public object GetCylinderShapeZ(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ) {
+			return new CylinderShapeZ(boxHalfExtentX, boxHalfExtentY, boxHalfExtentZ);
+		}
+		public object GetSphereShape(double radus) {
+			return new SphereShape(radus);
+		}
 
 		public RigidBodyCollider GetCollider(ColliderShape obj, PhysicsSim physicsSim) {
 			var collider = new RigidBodyCollider {

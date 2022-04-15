@@ -45,7 +45,12 @@ namespace RBullet
 			};
 			((BPhysicsSim)sem)._physicsWorld.RayTestRef(ref frome,ref toe,callback);
 			try {
-				rigidBodyCollider = ((BRigidBodyCollider)callback.CollisionObject.UserObject).Collider;
+				rigidBodyCollider = null;
+				if (callback.CollisionObject != null) {
+					if (callback.CollisionObject.UserObject != null) {
+						rigidBodyCollider = ((BRigidBodyCollider)callback.CollisionObject.UserObject).Collider;
+					}
+				}
 			}
 			catch {
 				rigidBodyCollider = null;
