@@ -34,6 +34,7 @@ namespace RhuEngine.Physics
 	public class RigidBodyCollider
 	{
 		public object obj;
+		public object CustomObject { get; set; }
 
 		public bool Active
 		{

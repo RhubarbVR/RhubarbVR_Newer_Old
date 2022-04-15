@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using RNumerics;
+
 namespace RhuEngine.Physics
 {
 	[Flags]
@@ -27,6 +29,8 @@ namespace RhuEngine.Physics
 	{
 		public object NewSim();
 		public void UpdateSim(object obj,float DeltaSeconds);
+
+		public bool RayTest(object sem,ref Vector3f rayFromWorld, ref Vector3f rayToWorld, out RigidBodyCollider rigidBodyCollider, out Vector3f HitNormalWorld, out Vector3f HitPointWorld, ECollisionFilterGroups mask, ECollisionFilterGroups group);
 	}
 	public class PhysicsSim
 	{
@@ -36,6 +40,10 @@ namespace RhuEngine.Physics
 
 		public void UpdateSim(float DeltaSeconds) {
 			Manager?.UpdateSim(obj, DeltaSeconds);
+		}
+
+		public bool RayTest(ref Vector3f rayFromWorld, ref Vector3f rayToWorld,out RigidBodyCollider rigidBodyCollider,out Vector3f hitNormalWorld,out Vector3f hitPointWorld, ECollisionFilterGroups mask = ECollisionFilterGroups.AllFilter, ECollisionFilterGroups group = ECollisionFilterGroups.AllFilter) {
+			return Manager.RayTest(obj, ref rayFromWorld, ref rayToWorld, out rigidBodyCollider,  out hitNormalWorld, out hitPointWorld, mask, group);
 		}
 
 		public PhysicsSim() {

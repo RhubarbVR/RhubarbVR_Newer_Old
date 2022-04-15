@@ -2,6 +2,9 @@
 
 using RhuEngine.Physics;
 using BulletSharp;
+using RNumerics;
+using BulletSharp.Math;
+
 namespace RBullet
 {
 	public class BPhysicsSim
@@ -30,6 +33,26 @@ namespace RBullet
 	{
 		public object NewSim() {
 			return new BPhysicsSim();
+		}
+
+		public bool RayTest(object sem, ref Vector3f rayFromWorld, ref Vector3f rayToWorld, out RigidBodyCollider rigidBodyCollider, out Vector3f HitNormalWorld, out Vector3f HitPointWorld, ECollisionFilterGroups mask, ECollisionFilterGroups group) {
+			var frome = new Vector3(rayFromWorld.x, rayFromWorld.y, rayFromWorld.z);
+			var toe = new Vector3(rayToWorld.x, rayToWorld.y, rayToWorld.z);
+
+			var callback = new ClosestRayResultCallback(ref frome, ref toe) {
+				CollisionFilterGroup = (int)group,
+				CollisionFilterMask = (int)group
+			};
+			((BPhysicsSim)sem)._physicsWorld.RayTestRef(ref frome,ref toe,callback);
+			try {
+				rigidBodyCollider = ((BRigidBodyCollider)callback.CollisionObject.UserObject).Collider;
+			}
+			catch {
+				rigidBodyCollider = null;
+			}
+			HitPointWorld = new Vector3f(callback.HitPointWorld.X, callback.HitPointWorld.Y, callback.HitPointWorld.Z);
+			HitNormalWorld = new Vector3f(callback.HitNormalWorld.X, callback.HitNormalWorld.Y, callback.HitNormalWorld.Z);
+			return callback.HasHit;
 		}
 
 		public void UpdateSim(object obj,float DeltaSeconds) {
