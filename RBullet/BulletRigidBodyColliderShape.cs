@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Linq;
 
 using BulletSharp;
 
 using RhuEngine.Physics;
+
+using RNumerics;
 
 namespace RBullet
 {
@@ -58,5 +61,13 @@ namespace RBullet
 			return collider;
 		}
 
+		public object GetMesh(IMesh mesh) {
+			if(mesh == null) {
+				return new EmptyShape();
+			}
+			var indexVertexArray2 = new TriangleIndexVertexArray(mesh.TriangleIndices().ToArray(), mesh.VertexPos().Select((val)=>new BulletSharp.Math.Vector3(val.x, val.y, val.z)).ToArray());
+			var trys = new ConvexTriangleMeshShape(indexVertexArray2, true);
+			return trys;
+		}
 	}
 }

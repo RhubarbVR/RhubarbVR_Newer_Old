@@ -41,7 +41,8 @@ namespace RNumerics
 
 		public static Matrix operator *(Matrix a, Matrix b) => a.m * b.m;
 		public static Vector3f operator *(Matrix a, Vector3f b) => Vector3.Transform(b, a.m);
-
+		public static bool operator ==(Matrix a, Matrix b) => a.m == b.m;
+		public static bool operator !=(Matrix a, Matrix b) => a.m != b.m;
 
 		/// <summary>An identity Matrix is the matrix equivalent of '1'! 
 		/// Transforming anything by this will leave it at the exact same

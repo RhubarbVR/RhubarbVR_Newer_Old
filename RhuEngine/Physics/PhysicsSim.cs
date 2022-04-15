@@ -10,6 +10,7 @@ namespace RhuEngine.Physics
 	public enum ECollisionFilterGroups
 	{
 		AllFilter = -1,
+		AllNormal = (int)((uint)DefaultFilter | (uint)StaticFilter | (uint)KinematicFilter | (uint)DebrisFilter | (uint)SensorTrigger | (uint)CharacterFilter | (uint)UI),
 		None = 0,
 		DefaultFilter = 1,
 		StaticFilter = 2,

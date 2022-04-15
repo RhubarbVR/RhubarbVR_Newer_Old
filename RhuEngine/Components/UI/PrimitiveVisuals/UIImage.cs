@@ -17,6 +17,8 @@ namespace RhuEngine.Components
 
 		public Sync<Colorf> Tint;
 
+		public override bool HasPhysics => true;
+
 		[Default(EVerticalAlien.Center)]
 		[OnChanged(nameof(ProcessMesh))]
 		public Sync<EVerticalAlien> VerticalAlien;

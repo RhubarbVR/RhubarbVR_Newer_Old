@@ -5,6 +5,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using System;
 using System.Collections.Generic;
+using RhuEngine.Physics;
 
 namespace RhuEngine.Components
 {
@@ -18,6 +19,10 @@ namespace RhuEngine.Components
 		public abstract RMaterial RenderMaterial { get; }
 		public abstract Colorf RenderTint { get; }
 
+		public abstract bool HasPhysics { get; }
+
+		public RigidBodyCollider PhysicsCollider;
+
 		public abstract void ProcessBaseMesh();
 
 		public void ProcessMesh() {
@@ -29,7 +34,7 @@ namespace RhuEngine.Components
 			ProcessBaseMesh();
 		}
 		public override void Render(Matrix matrix) {
-			//Not needed becase meshLoader
+			//Never Runs
 		}
 
 		public void RenderScrollMesh(bool updateMesh = true) {
@@ -54,6 +59,17 @@ namespace RhuEngine.Components
 		public override void CutElement(bool cut) {
 			_isCut = cut;
 			RenderCutMesh();
+		}
+
+
+		public void LoadPhysicsMesh() {
+			PhysicsCollider?.Remove();
+			PhysicsCollider = null;
+			PhysicsCollider = new RMeshShape(CutMesh).GetCollider(World.PhysicsSim);
+			PhysicsCollider.CustomObject = this;
+			PhysicsCollider.Group = ECollisionFilterGroups.UI;
+			PhysicsCollider.Mask = ECollisionFilterGroups.UI;
+			PhysicsCollider.Active = true;
 		}
 
 		public void RenderCutMesh(bool updateMesh = true) {
@@ -166,6 +182,7 @@ namespace RhuEngine.Components
 			else {
 				cutMesh = ScrollMesh;
 			}
+			LoadPhysicsMesh();
 			CutMesh = cutMesh;
 			if (updateMesh) {
 				RWorld.ExecuteOnMain(this, Rect.UpdateMeshes);

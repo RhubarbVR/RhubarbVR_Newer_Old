@@ -22,6 +22,7 @@ namespace RhuEngine.Physics
 		public ECollisionFilterGroups MaskGet(object obj);
 		public void MaskSet(object obj, ECollisionFilterGroups val);
 
+		public void Remove(object obj);
 
 		public bool NoneStaticBodyGet(object obj);
 		public void NoneStaticBodySet(object obj, bool val);
@@ -69,6 +70,10 @@ namespace RhuEngine.Physics
 		{
 			get => Manager.MatrixGet(obj);
 			set => Manager.MatrixSet(obj,value);
+		}
+
+		public void Remove() {
+			Manager.Remove(obj);
 		}
 
 		public ColliderShape CollisionShape { get; set; }

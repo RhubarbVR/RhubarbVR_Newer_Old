@@ -211,7 +211,7 @@ namespace RhuEngine.Components
 		}
 
 		private bool _cull = false;
-		private void ProcessCutting() {
+		public void ProcessCutting() {
 			var min = Min + ScrollOffset.Xy;
 			var max = Max + ScrollOffset.Xy;
 			var cutmin = CutZonesMin;
@@ -237,6 +237,9 @@ namespace RhuEngine.Components
 			_meshes.SafeOperation((meshList) => {
 				_uiRenderComponents.SafeOperation((list) => {
 					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
+						if (list[i].PhysicsCollider is not null) {
+							list[i].PhysicsCollider.Matrix = matrix;
+						}
 						meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, matrix, list[i].RenderTint);
 					}
 				});
@@ -302,6 +305,8 @@ namespace RhuEngine.Components
 					}
 				}
 			});
+			ProcessCutting();
+			UpdateMeshes();
 			if (added) {
 				ChildRectAdded();
 			}

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using RNumerics;
+
 namespace RhuEngine.Physics
 {
 	public interface ILinkedColliderShape
@@ -20,6 +22,8 @@ namespace RhuEngine.Physics
 		public object GetCylinderShape(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ);
 		public object GetCylinderShapeX(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ);
 
+		public object GetMesh(IMesh mesh);
+
 		public object GetCylinderShapeZ(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ);
 		public object GetSphereShape(double radus);
 	}
@@ -35,6 +39,14 @@ namespace RhuEngine.Physics
 			return col;
 		}
 	}
+
+	public class RMeshShape : ColliderShape
+	{
+		public RMeshShape(IMesh mesh) {
+			obj = Manager?.GetMesh(mesh);
+		}
+	}
+
 	public class RConeShape : ColliderShape
 	{
 		public RConeShape(double radius, double height) {

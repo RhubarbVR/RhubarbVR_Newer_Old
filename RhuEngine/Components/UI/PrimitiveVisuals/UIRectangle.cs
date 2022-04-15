@@ -16,6 +16,8 @@ namespace RhuEngine.Components
 		public override RMaterial RenderMaterial => Material.Asset;
 		public override Colorf RenderTint => Tint.Value;
 
+		public override bool HasPhysics => true;
+
 		public override void OnAttach() {
 			base.OnAttach();
 			Tint.Value = Colorf.White;

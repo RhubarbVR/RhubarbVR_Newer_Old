@@ -107,8 +107,9 @@ namespace RhuEngine.Components
 			textscale /= canvassize;
 			textscale /= boxsize;
 			textscale /= Math.Max(textscale.x, textscale.y);
-			textscale /= Math.Max(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height * 2) * 5;
-			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), textscale.XY_);
+			textscale /= Math.Max(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
+			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), textscale.XY_/10);
+			CutElement(true);
 		}
 
 		public override void RenderTargetChange() {

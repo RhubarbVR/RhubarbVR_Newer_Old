@@ -100,10 +100,19 @@ namespace RBullet
 			collisionObject = newCol;
 		}
 
+		private Matrix _matrix;
+
 		public void ReloadTrans() {
 			if (collisionObject != null) {
-				collisionObject.WorldTransform = CastMet(Matrix);
+				if (Matrix != _matrix) {
+					_matrix = Matrix; 
+					collisionObject.WorldTransform = CastMet(Matrix);
+				}
 			}
+		}
+
+		public void Remove() {
+			BuildCollissionObject(null);
 		}
 	}
 	public class BulletRigidBodyCollider : ILinkedRigidBodyCollider
@@ -160,6 +169,10 @@ namespace RBullet
 		public void NoneStaticBodySet(object obj, bool val) {
 			((BRigidBodyCollider)obj).NoneStaticBody = val;
 			((BRigidBodyCollider)obj).ReloadCollission();
+		}
+
+		public void Remove(object obj) {
+			((BRigidBodyCollider)obj).Remove();
 		}
 	}
 }
