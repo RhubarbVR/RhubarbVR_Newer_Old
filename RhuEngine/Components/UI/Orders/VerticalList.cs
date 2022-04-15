@@ -27,7 +27,6 @@ namespace RhuEngine.Components
 
 		public override Vector2f MinScroll => _minScroll;
 
-
 		public override void ChildRectAdded() {
 			RegUpdateUIMeshes();
 		}
@@ -69,18 +68,19 @@ namespace RhuEngine.Components
 			else {
 				fakeRects.SafeOperation((list) => {
 					var ypos = 0f;
+					var ysize = 0f;
 					var maxXpos = 0f;
 					foreach (var item in list) {
 						item.Canvas = Canvas;
 						var targetSize = item.Child.AnchorMaxValue - item.Child.AnchorMinValue;
 						maxXpos = Math.Max(targetSize.x, maxXpos);
 						ypos += targetSize.y;
-						item.AnchorMax = new Vector2f(1,1-ypos);
-						item.AnchorMin = new Vector2f(0,0-ypos);
+						item.AnchorMax = new Vector2f(1,ypos);
+						item.AnchorMin = new Vector2f(0,ypos - 1);
 					}
-					_maxScroll = new Vector2f(1, ypos + 0.9f);
-					_minScroll = new Vector2f(1 - maxXpos,2.1f -ypos);
-					RLog.Info("Updated Face Rects");
+					_maxScroll = new Vector2f(1, 1 - ((ypos - 1)/10));
+					_minScroll = new Vector2f(1 - maxXpos,-1 - ((ypos - 1) / 10));
+					RLog.Info($"Updated Face Rects {ypos}");
 				});
 			}
 			base.UpdateUIMeshes();

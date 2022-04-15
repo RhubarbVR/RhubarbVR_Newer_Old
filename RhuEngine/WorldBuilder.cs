@@ -88,7 +88,7 @@ namespace RhuEngine
 				e.AttachImage(shader, new Vector2f(0.5, 0), new Vector2f(1f), Colorf.White, texture);
 				e.AttachText(new Vector2f(0), new Vector2f(0.5f, 1), Colorf.White,text);
 			}
-			for (var i = 0; i < 10; i++) {
+			for (var i = 0; i < 15; i++) {
 				AttachListElement(listRoot,$"Element{i}");
 			}
 			listRoot.GetFirstComponent<UIRect>().RegUpdateUIMeshes();

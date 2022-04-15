@@ -127,7 +127,6 @@ namespace RhuEngine.Components
 		public override void CutElement(bool cut) {
 			var min = Rect.CutZonesMin;
 			var max = Rect.CutZonesMax;
-			Console.WriteLine($"min {min} max {max}");
 			if (cut) {
 				textRender.Chars.SafeOperation((list) => {
 					foreach (var chare in list) {
