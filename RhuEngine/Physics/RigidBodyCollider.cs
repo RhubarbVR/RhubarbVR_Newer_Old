@@ -30,10 +30,17 @@ namespace RhuEngine.Physics
 		public Matrix MatrixGet(object obj);
 		public void MatrixSet(object obj,Matrix val);
 
+		public void AddOverlapCallback(object obj, RigidBodyCollider.OverlapCallback overlapCallback);
+		public void RemoveOverlapCallback(object obj, RigidBodyCollider.OverlapCallback overlapCallback);
+
 	}
 
 	public class RigidBodyCollider
 	{
+		public delegate void OverlapCallback(Vector3f PositionWorldOnA, Vector3f PositionWorldOnB, Vector3f NormalWorldOnB, double Distance, double Distance1, RigidBodyCollider hit);
+
+		public event OverlapCallback Overlap { add { Manager.AddOverlapCallback(obj, value); } remove { Manager.RemoveOverlapCallback(obj, value); } }
+
 		public object obj;
 		public object CustomObject { get; set; }
 

@@ -78,7 +78,7 @@ namespace RBullet
 				if (_added) {
 					_added = false;
 					((BPhysicsSim)Collider.PhysicsSim.obj)._physicsWorld.RemoveCollisionObject(collisionObject);
-					((BPhysicsSim)Collider.PhysicsSim.obj)._physicsWorld.RemoveCollisionObject(collisionObject);
+					((BPhysicsSim)Collider.PhysicsSim.obj)._physicsWorld.RemoveRigidBody(collisionObject);
 				}
 				collisionObject = null;
 			}
@@ -111,6 +111,30 @@ namespace RBullet
 			}
 		}
 
+		event RigidBodyCollider.OverlapCallback Action;
+
+		public void AddOverlapCallBack(RigidBodyCollider.OverlapCallback action) {
+			Action += action;
+			if(Action != null) {
+				((BPhysicsSim)Collider.PhysicsSim.obj).AddPhysicsCallBack(this);
+			}
+			else {
+				((BPhysicsSim)Collider.PhysicsSim.obj).RemovePhysicsCallBack(this);
+			}
+		}
+		public void RemoveOverlapCallBack(RigidBodyCollider.OverlapCallback action) {
+			Action -= action;
+			if (Action != null) {
+				((BPhysicsSim)Collider.PhysicsSim.obj).AddPhysicsCallBack(this);
+			}
+			else {
+				((BPhysicsSim)Collider.PhysicsSim.obj).RemovePhysicsCallBack(this);
+			}
+		}
+		public void Call(Vector3f PositionWorldOnA, Vector3f PositionWorldOnB, Vector3f NormalWorldOnB, double Distance, double Distance1, RigidBodyCollider hit) {
+			Action?.Invoke(PositionWorldOnA, PositionWorldOnB, NormalWorldOnB, Distance, Distance1, hit);
+		}
+
 		public void Remove() {
 			BuildCollissionObject(null);
 		}
@@ -125,6 +149,7 @@ namespace RBullet
 			((BRigidBodyCollider)obj).Enabled = val;
 			((BRigidBodyCollider)obj).ReloadCollission();
 		}
+
 
 		public ECollisionFilterGroups GroupGet(object obj) {
 			return ((BRigidBodyCollider)obj).Group;
@@ -173,6 +198,14 @@ namespace RBullet
 
 		public void Remove(object obj) {
 			((BRigidBodyCollider)obj).Remove();
+		}
+
+		public void AddOverlapCallback(object obj, RigidBodyCollider.OverlapCallback overlapCallback) {
+			((BRigidBodyCollider)obj).AddOverlapCallBack(overlapCallback);       
+		}
+
+		public void RemoveOverlapCallback(object obj, RigidBodyCollider.OverlapCallback overlapCallback) {
+			((BRigidBodyCollider)obj).RemoveOverlapCallBack(overlapCallback);
 		}
 	}
 }

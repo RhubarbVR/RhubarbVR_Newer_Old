@@ -55,6 +55,14 @@ namespace RNumerics
 
 			_semaphore.Release();
 		}
+
+		public void SafeRemove(T value) {
+			_semaphore.WaitOne();
+
+			List.Remove(value);
+
+			_semaphore.Release();
+		}
 	}
 
 

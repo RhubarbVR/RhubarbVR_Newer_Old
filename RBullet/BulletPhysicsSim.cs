@@ -26,6 +26,52 @@ namespace RBullet
 			_constraintSolver = new ConstraintSolverPoolMultiThreaded(Environment.ProcessorCount);
 			_physicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _constraintSolver, _collisionConfiguration);
 		}
+
+		public SafeList<BRigidBodyCollider> Updates = new SafeList<BRigidBodyCollider>();
+
+		public void AddPhysicsCallBack(BRigidBodyCollider bRigidBodyCollider) {
+			Updates.SafeOperation((list) => {
+				if (!list.Contains(bRigidBodyCollider)) {
+					list.Add(bRigidBodyCollider);
+				}
+			});
+		}
+		public void RemovePhysicsCallBack(BRigidBodyCollider bRigidBodyCollider) {
+			Updates.SafeOperation((list) => {
+				if (list.Contains(bRigidBodyCollider)) {
+					list.Remove(bRigidBodyCollider);
+				}
+			});
+		}
+
+		public delegate void BOverlapCallback(Vector3 PositionWorldOnA, Vector3 PositionWorldOnB, Vector3 NormalWorldOnB, double Distance, double Distance1,BRigidBodyCollider hit);
+
+		public class Tester : ContactResultCallback
+		{
+			public BOverlapCallback callback1;
+			public Tester(BOverlapCallback bOverlapCallback) {
+				callback1 = bOverlapCallback;
+			}
+
+			public override double AddSingleResult(ManifoldPoint cp, CollisionObjectWrapper colObj0Wrap, int partId0, int index0, CollisionObjectWrapper colObj1Wrap, int partId1, int index1) {
+				callback1.Invoke(cp.PositionWorldOnA, cp.PositionWorldOnB, cp.NormalWorldOnB, cp.Distance, cp.Distance1, (BRigidBodyCollider)colObj0Wrap.CollisionObject.UserObject);
+				return 0;
+			}
+		}
+
+		public void RunCallBacks() {
+			Updates.SafeOperation((list) => {
+				foreach (var item in list) {
+					if (item.collisionObject != null) {
+						_physicsWorld.ContactTest(item.collisionObject, new Tester((Vector3 PositionWorldOnA, Vector3 PositionWorldOnB, Vector3 NormalWorldOnB, double Distance, double Distance1, BRigidBodyCollider hit) => {
+							item.Call(new Vector3f((float)PositionWorldOnA.X, (float)PositionWorldOnA.Y, (float)PositionWorldOnA.Z),
+								new Vector3f((float)PositionWorldOnB.X, (float)PositionWorldOnB.Y, (float)PositionWorldOnB.Z),
+								new Vector3f((float)NormalWorldOnB.X, (float)NormalWorldOnB.Y, (float)NormalWorldOnB.Z), Distance, Distance1, hit.Collider);
+						}));
+					}
+				}
+			});
+		}
 	}
 
 
@@ -63,6 +109,7 @@ namespace RBullet
 		public void UpdateSim(object obj,float DeltaSeconds) {
 			((BPhysicsSim)obj)._physicsWorld.StepSimulation(DeltaSeconds);
 			((BPhysicsSim)obj)._physicsWorld.ComputeOverlappingPairs();
+			((BPhysicsSim)obj).RunCallBacks();
 		}
 	}
 }

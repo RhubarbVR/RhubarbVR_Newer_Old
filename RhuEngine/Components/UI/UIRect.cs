@@ -86,9 +86,9 @@ namespace RhuEngine.Components
 
 		public virtual Vector2f CutZonesMin => Entity.parent.Target?.UIRect?.CutZonesMin ?? Vector2f.NInf;
 
-		public Vector2f Min => TrueMin + OffsetMin.Value;
+		public Vector2f Min => TrueMin + (OffsetMin.Value/(Canvas?.scale.Value.Xy??Vector2f.One));
 
-		public Vector2f Max => TrueMax + OffsetMax.Value;
+		public Vector2f Max => TrueMax + (OffsetMax.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 
 		public Vector2f BadMin => ((((_rectDataOverride ?? ParentRect)?.BadMin ?? Vector2f.One) - (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One))) * (Vector2f.One - AnchorMin.Value)) + (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One));
 
