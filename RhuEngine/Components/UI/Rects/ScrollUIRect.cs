@@ -7,8 +7,7 @@ using System.Collections.Generic;
 
 namespace RhuEngine.Components
 {
-	[UpdateLevel(UpdateEnum.Normal)]
-	[Category(new string[] { "UI" })]
+	[Category(new string[] { "UI\\Rects" })]
 	public class ScrollUIRect : RawScrollUIRect
 	{
 		public Sync<Vector2f> Max_Scroll;

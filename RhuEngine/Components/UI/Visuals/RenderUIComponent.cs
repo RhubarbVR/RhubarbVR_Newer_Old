@@ -50,22 +50,21 @@ namespace RhuEngine.Components
 				ScrollMesh = scrollMesh;
 			}
 			if (updateMesh) {
-				RWorld.ExecuteOnMain(this, Rect.UpdateMeshes);
+				Rect.UpdateMeshes();
 			}
 		}
 
 		private bool _isCut;
 
-		public override void CutElement(bool cut) {
+		public override void CutElement(bool cut,bool update = true) {
 			_isCut = cut;
-			RenderCutMesh();
+			RenderCutMesh(update);
 		}
-
 
 		public void LoadPhysicsMesh() {
 			PhysicsCollider?.Remove();
 			PhysicsCollider = null;
-			PhysicsCollider = new RMeshShape(CutMesh).GetCollider(World.PhysicsSim);
+			PhysicsCollider = new RConvexMeshShape(CutMesh).GetCollider(World.PhysicsSim);
 			PhysicsCollider.CustomObject = this;
 			PhysicsCollider.Group = ECollisionFilterGroups.UI;
 			PhysicsCollider.Mask = ECollisionFilterGroups.UI;
@@ -182,10 +181,10 @@ namespace RhuEngine.Components
 			else {
 				cutMesh = ScrollMesh;
 			}
-			LoadPhysicsMesh();
 			CutMesh = cutMesh;
+			RWorld.ExecuteOnEndOfFrame(this,LoadPhysicsMesh);
 			if (updateMesh) {
-				RWorld.ExecuteOnMain(this, Rect.UpdateMeshes);
+				Rect.UpdateMeshes();
 			}
 		}
 	}

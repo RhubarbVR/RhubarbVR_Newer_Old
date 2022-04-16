@@ -47,8 +47,10 @@ namespace RhuEngine
 			img.Tint.Value = color;
 			img.Material.Target = mit;
 			var list = child.AddChild("List");
+			var scroll = list.AttachComponent<ScrollInteraction>();
 			var rectthrere = list.AttachComponent<VerticalList>();
 			rectthrere.Depth.Value = 0f;
+			scroll.OnScroll.Target = rectthrere.Scroll;
 			return list;
 		}
 		private static Entity AttachRectangle(this Entity parrent, DynamicMaterial mit,Vector2f min, Vector2f max, Colorf color) {

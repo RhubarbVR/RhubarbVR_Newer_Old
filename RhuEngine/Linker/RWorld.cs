@@ -7,30 +7,76 @@ namespace RhuEngine.Linker
 {
 	public static class RWorld
 	{
-
-		public static Dictionary<object,Action> MainExecute = new();
-
 		public static bool IsInVR { get; internal set; } = false;
 
-		public static void ExecuteOnMain(object target,Action p) {
-			lock (MainExecute) {
-				if (!MainExecute.ContainsKey(target)) {
-					MainExecute.Add(target, p);
+		public static Dictionary<object,Action> StartOfFrameExecute = new();
+		public static List<Action> StartOfFrameList = new();
+
+		public static void ExecuteOnStartOfFrame(Action p) {
+			lock (StartOfFrameExecute) {
+				StartOfFrameList.Add(p);
+			}
+		}
+
+		public static void ExecuteOnStartOfFrame(object target,Action p) {
+			lock (StartOfFrameExecute) {
+				if (!StartOfFrameExecute.ContainsKey(target)) {
+					StartOfFrameExecute.Add(target, p);
 				}
 				else {
-					MainExecute.Remove(target);
-					MainExecute.Add(target,p);
+					StartOfFrameExecute.Remove(target);
+					StartOfFrameExecute.Add(target,p);
 				}
 			}
 		}
 
-		public static void RunOnMain() {
-			lock (MainExecute) {
-				foreach (var item in MainExecute.ToArray()) {
+		public static void RunOnStartOfFrame() {
+			lock (StartOfFrameExecute) {
+				foreach (var item in StartOfFrameExecute.ToArray()) {
 					item.Value.Invoke();
 				}
-				MainExecute.Clear();
+				foreach (var item in StartOfFrameList.ToArray()) {
+					item.Invoke();
+				}
+				StartOfFrameList.Clear();
+				StartOfFrameExecute.Clear();
 			}
 		}
+
+
+		public static Dictionary<object, Action> EndOfFrameExecute = new();
+		public static List<Action> EndOfFrameList = new();
+
+		public static void ExecuteOnEndOfFrame(Action p) {
+			lock (EndOfFrameExecute) {
+				EndOfFrameList.Add(p);
+			}
+		}
+
+		public static void ExecuteOnEndOfFrame(object target, Action p) {
+			lock (EndOfFrameExecute) {
+				if (!EndOfFrameExecute.ContainsKey(target)) {
+					EndOfFrameExecute.Add(target, p);
+				}
+				else {
+					EndOfFrameExecute.Remove(target);
+					EndOfFrameExecute.Add(target, p);
+				}
+			}
+		}
+
+		public static void RunOnEndOfFrame() {
+			lock (EndOfFrameExecute) {
+				foreach (var item in EndOfFrameExecute.ToArray()) {
+					item.Value.Invoke();
+				}
+				foreach (var item in EndOfFrameList.ToArray()) {
+					item.Invoke();
+				}
+				EndOfFrameList.Clear();
+				EndOfFrameExecute.Clear();
+			}
+		}
+
 	}
 }

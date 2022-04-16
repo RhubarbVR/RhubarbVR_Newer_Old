@@ -22,7 +22,7 @@ namespace RhuEngine.Physics
 		public object GetCylinderShape(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ);
 		public object GetCylinderShapeX(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ);
 
-		public object GetMesh(IMesh mesh);
+		public object GetConvexMeshShape(IMesh mesh);
 
 		public object GetCylinderShapeZ(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ);
 		public object GetSphereShape(double radus);
@@ -40,10 +40,10 @@ namespace RhuEngine.Physics
 		}
 	}
 
-	public class RMeshShape : ColliderShape
+	public class RConvexMeshShape : ColliderShape
 	{
-		public RMeshShape(IMesh mesh) {
-			obj = Manager?.GetMesh(mesh);
+		public RConvexMeshShape(IMesh mesh) {
+			obj = Manager?.GetConvexMeshShape(mesh);
 		}
 	}
 

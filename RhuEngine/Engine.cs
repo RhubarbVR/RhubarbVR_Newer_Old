@@ -232,6 +232,7 @@ namespace RhuEngine
 				}
 				return;
 			}
+			RWorld.RunOnStartOfFrame();
 			foreach (var item in _managers) {
 				try {
 					item.Step();
@@ -241,7 +242,7 @@ namespace RhuEngine
 					throw ex;
 				}
 			}
-			RWorld.RunOnMain();
+			RWorld.RunOnEndOfFrame();
 		}
 
 		public void Dispose() {

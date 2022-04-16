@@ -4,6 +4,8 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
 using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace RhuEngine.Components
 {
@@ -61,9 +63,132 @@ namespace RhuEngine.Components
 		public float DepthValue { get; set; }
 	}
 
-	[Category(new string[] { "UI" })]
+	public struct HitData
+	{
+		public Vector3f HitPosNoScale;
+		public Vector3f HitPosWorld;
+		public Vector3f HitPos;
+		public Vector3f HitNormalWorld;
+		public Vector3f HitNormal;
+		public uint Fingerindex;
+		public bool Laser;
+		public bool CustomFinger;
+		public float PressForce;
+
+		public void Clean(Matrix parrent,Vector3f canvasScale) {
+			var pointNoScale = Matrix.T(HitPosWorld) * (Matrix.S(1/canvasScale) * parrent).Inverse;
+			HitPosNoScale = pointNoScale.Translation;
+			var point = Matrix.T(HitPosWorld) * parrent.Inverse;
+			HitPos = point.Translation;
+			HitNormal = point.Rotation.AxisZ;
+		}
+	}
+
+	[Category(new string[] { "UI\\Rects" })]
 	public class UIRect : Component, IRectData
 	{
+		private readonly List<HitData> _rayHitPoses = new();
+		private readonly List<HitData> _lastRayHitPoses = new();
+
+		public void AddHitPoses(HitData hitData) {
+			hitData.Clean(LastRenderPos,Canvas.scale.Value/10);
+			_rayHitPoses.Add(hitData);
+			if (_rayHitPoses.Count == 1) {
+				RWorld.ExecuteOnEndOfFrame(this, () => {
+					_lastRayHitPoses.Clear();
+					_lastRayHitPoses.AddRange(_rayHitPoses);
+					_rayHitPoses.Clear();
+					RWorld.ExecuteOnStartOfFrame(() => {
+						RWorld.ExecuteOnEndOfFrame(() => {
+							if (_rayHitPoses.Count == 0) {
+								_lastRayHitPoses.Clear();
+								_rayHitPoses.Clear();
+							}
+						});
+					});
+				});
+			}
+		}
+
+		public IEnumerable<Vector3f> FingerChange(bool ignoreOtherInputZones = false) {
+			var lastpoint = LastHitPoses(ignoreOtherInputZones).GetEnumerator();
+			var newHitpoin = HitPoses(ignoreOtherInputZones).GetEnumerator();
+			var hasData1 = newHitpoin.MoveNext();
+			var hasData2 = lastpoint.MoveNext();
+			while (hasData1 && hasData2) {
+				var currentIndex = Math.Min(lastpoint.Current.Fingerindex, newHitpoin.Current.Fingerindex);
+				if (lastpoint.Current.Fingerindex == newHitpoin.Current.Fingerindex) {
+					yield return lastpoint.Current.HitPos - newHitpoin.Current.HitPos;
+				}
+				if (lastpoint.Current.Fingerindex <= currentIndex) {
+					hasData2 = lastpoint.MoveNext();
+				}
+				if (newHitpoin.Current.Fingerindex <= currentIndex) {
+					hasData1 = newHitpoin.MoveNext();
+				}
+			}
+		}
+
+		public IEnumerable<Vector3f> ClickFingerChange(float threshold, bool ignoreOtherInputZones = false) {
+			var lastpoint = LastHitPosesByFingerID(ignoreOtherInputZones).GetEnumerator();
+			var newHitpoin = HitPosesByFingerID(ignoreOtherInputZones).GetEnumerator();
+			var hasData1 = newHitpoin.MoveNext();
+			var hasData2 = lastpoint.MoveNext();
+			while (hasData1 && hasData2) {
+				var currentIndex = Math.Min(lastpoint.Current.Fingerindex, newHitpoin.Current.Fingerindex);
+				if(lastpoint.Current.Fingerindex == newHitpoin.Current.Fingerindex) {
+					if (lastpoint.Current.PressForce >= threshold && newHitpoin.Current.PressForce >= threshold) {
+						yield return lastpoint.Current.HitPos - newHitpoin.Current.HitPos;
+					}
+				}
+				if (lastpoint.Current.Fingerindex <= currentIndex) {
+					hasData2 = lastpoint.MoveNext();
+				}
+				if (newHitpoin.Current.Fingerindex <= currentIndex) {
+					hasData1 = newHitpoin.MoveNext();
+				}
+			}
+		}
+		public IEnumerable<HitData> LastHitPosesByFingerID(bool ignoreOtherInputZones = false) {
+			return from hitPoses in LastHitPoses(ignoreOtherInputZones)
+				   orderby hitPoses.Fingerindex ascending
+				   select hitPoses;
+		}
+
+		public IEnumerable<HitData> LastHitPoses(bool ignoreOtherInputZones = false) {
+			foreach (var item in _lastRayHitPoses) {
+				yield return item;
+			}
+			foreach (var item in _childRects.List) {
+				if (!(item._hasInteraction && ignoreOtherInputZones)) {
+					foreach (var hitpoits in item.LastHitPoses(ignoreOtherInputZones)) {
+						yield return hitpoits;
+					}
+				}
+			}
+		}
+
+		private bool _hasInteraction;
+
+		public IEnumerable<HitData> HitPosesByFingerID(bool ignoreOtherInputZones = false) {
+			return from hitPoses in HitPoses(ignoreOtherInputZones)
+				   orderby hitPoses.Fingerindex ascending
+				   select hitPoses;
+		}
+
+		public IEnumerable<HitData> HitPoses(bool ignoreOtherInputZones = false) {
+			foreach (var item in _rayHitPoses) {
+				yield return item;
+			}
+			foreach (var item in _childRects.List) {
+				if (!(item._hasInteraction && ignoreOtherInputZones)) {
+					foreach (var hitpoits in item.HitPoses(ignoreOtherInputZones)) {
+						yield return hitpoits;
+					}
+				}
+			}
+		}
+
 		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public Sync<Vector2f> OffsetMin;
 		[OnChanged(nameof(RegUpdateUIMeshes))]
@@ -111,7 +236,7 @@ namespace RhuEngine.Components
 		}
 
 		public void RegUpdateUIMeshes() {
-			RWorld.ExecuteOnMain(this, UpdateUIMeshes);
+			RWorld.ExecuteOnStartOfFrame(this, UpdateUIMeshes);
 		}
 
 		public virtual void UpdateUIMeshes() {
@@ -211,7 +336,7 @@ namespace RhuEngine.Components
 		}
 
 		private bool _cull = false;
-		public void ProcessCutting() {
+		public void ProcessCutting(bool update = true) {
 			var min = Min + ScrollOffset.Xy;
 			var max = Max + ScrollOffset.Xy;
 			var cutmin = CutZonesMin;
@@ -220,17 +345,20 @@ namespace RhuEngine.Components
 			var cut = !_cull && (max.y > cutmax.y || min.y < cutmin.y || max.x > cutmax.x || min.x < cutmin.x);
 			_uiComponents.SafeOperation((list) => {
 				foreach (var item in list) {
-					item.CutElement(cut);
+					item.CutElement(cut,update);
 				}
 			});
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
-					item.CutElement(cut);
+					item.CutElement(cut,update);
 				}
 			});
 		}
 
+		public Matrix LastRenderPos { get; private set; }
+
 		public virtual void Render(Matrix matrix) {
+			LastRenderPos = matrix;
 			if (_cull) {
 				return;
 			}
@@ -272,6 +400,7 @@ namespace RhuEngine.Components
 			Children_Changed(null);
 			RegisterUIList(null);
 			RegisterCanvas();
+			ProcessCutting();
 		}
 
 		private readonly SafeList<Entity> _boundTo = new();
@@ -305,8 +434,8 @@ namespace RhuEngine.Components
 					}
 				}
 			});
-			ProcessCutting();
-			UpdateMeshes();
+			ProcessCutting(false);
+			UpdateUIMeshes();
 			if (added) {
 				ChildRectAdded();
 			}
@@ -329,14 +458,15 @@ namespace RhuEngine.Components
 					}
 				}
 			});
+			_hasInteraction = Entity.GetFirstComponent<UIInteractionComponent>() != null;
 			_uiRenderComponents.SafeOperation((list) => list.Clear());
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in Entity.GetAllComponents<RenderUIComponent>()) {
 					list.Add(item);
 				}
 			});
-			ProcessCutting();
-			UpdateMeshes();
+			ProcessCutting(false);
+			UpdateUIMeshes();
 		}
 
 
@@ -361,7 +491,7 @@ namespace RhuEngine.Components
 					item.Scroll(value);
 				}
 			});
-			ProcessCutting();
+			ProcessCutting(false);
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.RenderScrollMesh(false);

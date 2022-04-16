@@ -6,7 +6,8 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
-	public abstract class UIComponent : Component
+	[UpdateLevel(UpdateEnum.PlayerInput)]
+	public abstract class UIInteractionComponent : Component
 	{
 		[NoShow]
 		[NoSave]
@@ -14,10 +15,5 @@ namespace RhuEngine.Components
 		[NoLoad]
 		public UIRect Rect => Entity.UIRect;
 
-		public abstract void Render(Matrix matrix);
-
-		public abstract void RenderTargetChange();
-
-		public abstract void CutElement(bool cut);
 	}
 }

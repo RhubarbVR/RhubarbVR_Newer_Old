@@ -105,12 +105,16 @@ namespace RNumerics
 		}
 
 		[IgnoreMember]
+		public Vector2f Clean => new (float.IsNaN(x)?0f:x, float.IsNaN(y) ? 0f : y);
+
+		[IgnoreMember]
 		public bool IsNormalized => Math.Abs((x * x) + (y * y) - 1) < MathUtil.ZERO_TOLERANCEF;
 		[IgnoreMember]
 		public bool IsFinite
 		{
 			get { var f = x + y; return float.IsNaN(f) == false && float.IsInfinity(f) == false; }
 		}
+
 		public void Round(int nDecimals) {
 			x = (float)Math.Round(x, nDecimals);
 			y = (float)Math.Round(y, nDecimals);

@@ -3,20 +3,36 @@ using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 using RhuEngine.Linker;
+using System;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "UI/PrimitiveVisuals" })]
-	public class UIRectangle : RenderUIComponent
+	[Category(new string[] { "UI/Visuals" })]
+	public class UIImage : RenderUIComponent
 	{
+		[OnAssetLoaded(nameof(ProcessMesh))]
+		public AssetRef<RTexture2D> Texture;
+
 		public AssetRef<RMaterial> Material;
 
 		public Sync<Colorf> Tint;
 
+		public override bool HasPhysics => true;
+
+		[Default(EVerticalAlien.Center)]
+		[OnChanged(nameof(ProcessMesh))]
+		public Sync<EVerticalAlien> VerticalAlien;
+
+		[Default(EHorizontalAlien.Middle)]
+		[OnChanged(nameof(ProcessMesh))]
+		public Sync<EHorizontalAlien> HorizontalAlien;
+
+		[Default(true)]
+		[OnChanged(nameof(ProcessMesh))]
+		public Sync<bool> KeepAspectRatio;
+
 		public override RMaterial RenderMaterial => Material.Asset;
 		public override Colorf RenderTint => Tint.Value;
-
-		public override bool HasPhysics => true;
 
 		public override void OnAttach() {
 			base.OnAttach();
@@ -31,10 +47,43 @@ namespace RhuEngine.Components
 			Vector3f upleft , upright , downleft , downright = upleft = upright = downleft = depthStart;
 			var max = Rect.Max;
 			var min = Rect.Min;
-			upleft += new Vector3f(min.x, max.y);
-			upright += max.XY_;
-			downright += new Vector3f(max.x, min.y);
-			downleft += min.XY_;
+			var boxsize = max - min;
+			boxsize /= Math.Max(boxsize.x, boxsize.y);
+			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
+			var maxoffset = max;
+			var minoffset = min;
+			if (KeepAspectRatio.Value) {
+				var texture = new Vector2f(Texture.Asset?.Width ?? 1, Texture.Asset?.Height ?? 1);
+				texture /= canvassize;
+				texture /= boxsize;
+				texture /= Math.Max(texture.x, texture.y);
+				var maxmin = (max - min) * texture;
+				maxoffset = maxmin + min;
+				minoffset = min;
+
+				var offset = (max - min - maxmin) / 2;
+				if (HorizontalAlien == EHorizontalAlien.Middle) {
+					maxoffset = new Vector2f(maxoffset.x + offset.x, maxoffset.y);
+					minoffset = new Vector2f(minoffset.x + offset.x, minoffset.y);
+				}
+				if (VerticalAlien == EVerticalAlien.Center) {
+					maxoffset = new Vector2f(maxoffset.x, maxoffset.y + offset.y);
+					minoffset = new Vector2f(minoffset.x, minoffset.y + offset.y);
+				}
+				if (HorizontalAlien == EHorizontalAlien.Right) {
+					maxoffset = new Vector2f(max.x, maxoffset.y);
+					minoffset = new Vector2f(max.x - maxmin.x, minoffset.y);
+				}
+				if (VerticalAlien == EVerticalAlien.Top) {
+					maxoffset = new Vector2f(maxoffset.x, max.y);
+					minoffset = new Vector2f(minoffset.x, max.y - maxmin.y);
+				}
+			}
+			upleft += new Vector3f(minoffset.x, maxoffset.y);
+			upright += maxoffset.XY_;
+			downright += new Vector3f(maxoffset.x, minoffset.y);
+			downleft += minoffset.XY_;
+
 			mesh.AppendVertex(new NewVertexInfo { bHaveN = true,n = Vector3f.AxisY, bHaveUV = true,uv = new Vector2f[] { Vector2f.AxisY },bHaveC = false,v = downleft });
 			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.One },  bHaveC = false, v = downright });
 			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = upleft });

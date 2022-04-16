@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "UI" })]
+	[Category(new string[] { "UI\\Rects" })]
 	public class CuttingUIRect : UIRect
 	{
 		public override Vector2f CutZonesMax => Max + ScrollOffset.Xy;

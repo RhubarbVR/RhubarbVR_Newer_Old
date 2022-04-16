@@ -22,7 +22,7 @@ namespace RhuEngine.Components
 		Right,
 	}
 
-	[Category(new string[] { "UI/PrimitiveVisuals" })]
+	[Category(new string[] { "UI/Visuals" })]
 	public class UIText : UIComponent
 	{
 		[Default("Hello World")]
@@ -41,7 +41,7 @@ namespace RhuEngine.Components
 		[Default(10f)]
 		public Sync<float> StatingSize;
 
-		public UITextRender textRender = new();
+		public DynamicTextRender textRender = new();
 
 		[Default(EVerticalAlien.Center)]
 		[OnChanged(nameof(UpdateText))]
@@ -109,7 +109,7 @@ namespace RhuEngine.Components
 			textscale /= Math.Max(textscale.x, textscale.y);
 			textscale /= Math.Max(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
 			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), textscale.XY_/10);
-			CutElement(true);
+			CutElement(true,false);
 		}
 
 		public override void RenderTargetChange() {
@@ -125,7 +125,7 @@ namespace RhuEngine.Components
 			textRender.Render(textOffset * Matrix.T(Rect.ScrollOffset) * matrix);
 		}
 
-		public override void CutElement(bool cut) {
+		public override void CutElement(bool cut,bool update) {
 			var min = Rect.CutZonesMin;
 			var max = Rect.CutZonesMax;
 			if (cut) {

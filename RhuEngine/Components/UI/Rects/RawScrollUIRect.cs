@@ -7,8 +7,6 @@ using System.Collections.Generic;
 
 namespace RhuEngine.Components
 {
-	[UpdateLevel(UpdateEnum.Normal)]
-	[Category(new string[] { "UI" })]
 	public abstract class RawScrollUIRect : UIRect
 	{
 		[OnChanged(nameof(ScrollPosChange))]	
@@ -19,12 +17,6 @@ namespace RhuEngine.Components
 
 
 		public virtual Vector2f MinScroll => Vector2f.NInf;
-
-		[Default(true)]
-		public Sync<bool> LaserScroll;
-
-		[Default(true)]
-		public Sync<bool> TouchScroll;
 
 		public override void OnAttach() {
 			base.OnAttach();
@@ -44,18 +36,12 @@ namespace RhuEngine.Components
 			ScrollPosChange();
 		}
 
-		public override void Step() {
-			if (!Engine.EngineLink.CanInput) {
-				return;
-			}
-			if (LaserScroll) {
-				//Todo: if hover do this
-				var scroll = RInput.Mouse.ScrollChange * ScrollSpeed.Value / Canvas.scale.Value.Xy;
-				if (!(scroll.x == 0 && scroll.y == 0)) {
-					var newvalue = ScrollPos.Value + scroll;
-					ScrollPos.Value = MathUtil.Clamp(newvalue, MinScroll, MaxScroll);
-				}
-				
+		[Exsposed]
+		public void Scroll(Vector2f scroll) {
+			scroll = scroll * ScrollSpeed.Value / Canvas.scale.Value.Xy;
+			if (!(scroll.x == 0 && scroll.y == 0)) {
+				var newvalue = ScrollPos.Value + scroll;
+				ScrollPos.Value = MathUtil.Clamp(newvalue, MinScroll, MaxScroll);
 			}
 		}
 	}

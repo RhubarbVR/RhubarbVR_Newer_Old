@@ -9,7 +9,7 @@ using System;
 
 namespace RhuEngine.Components
 {
-	public class UITextRender
+	public class DynamicTextRender
 	{
 
 		public SafeList<TextChar> Chars = new();

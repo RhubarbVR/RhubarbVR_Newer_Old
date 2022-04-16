@@ -61,7 +61,7 @@ namespace RBullet
 			return collider;
 		}
 
-		public object GetMesh(IMesh mesh) {
+		public object GetConvexMeshShape(IMesh mesh) {
 			if(mesh == null) {
 				return new EmptyShape();
 			}

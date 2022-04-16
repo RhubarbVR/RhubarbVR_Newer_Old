@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 
-	[Category(new string[] { "UI" })]
+	[Category(new string[] { "UI\\Rects" })]
 	public class VerticalList : RawScrollUIRect
 	{
 		[Default(false)]
@@ -78,8 +78,8 @@ namespace RhuEngine.Components
 						item.AnchorMax = new Vector2f(1,ypos);
 						item.AnchorMin = new Vector2f(0,ypos - 1);
 					}
-					_maxScroll = new Vector2f(1, 1 - ((ypos - 1)/10));
-					_minScroll = new Vector2f(1 - maxXpos,-1 - ((ypos - 1) / 10));
+					_maxScroll = new Vector2f(0, 1 - ((ypos - 1)/10));
+					_minScroll = new Vector2f(0,-1 - ((ypos - 1) / 10));
 					RLog.Info($"Updated Face Rects {ypos}");
 				});
 			}
