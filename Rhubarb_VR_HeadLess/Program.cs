@@ -68,7 +68,7 @@ namespace Rhubarb_VR_HeadLess
 
 		public void LoadStatics() {
 			RLog.Instance = this;
-			RTime.Inst = this;
+			RTime.Instance = this;
 			PhysicsHelper.RegisterPhysics<RBullet.BulletPhsyicsLink>();
 		}
 

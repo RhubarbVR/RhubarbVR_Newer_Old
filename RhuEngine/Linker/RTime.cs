@@ -10,7 +10,7 @@ namespace RhuEngine.Linker
 	}
 	public class RTime
 	{
-		public static IRTime Inst { get; set; }
-		public static float Elapsedf => Inst.Elapsedf;
+		public static IRTime Instance { get; set; }
+		public static float Elapsedf => Instance.Elapsedf;
 	}
 }

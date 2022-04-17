@@ -76,6 +76,7 @@ namespace RStereoKit
 			var offsetX = 0f;
 			var offsetY = 0f;
 			if (textCut != Vector2f.Zero) {
+				textAlien = TextAlign.BottomLeft;
 				if (textCut.x > 0) {
 					textsize.v.X -= textCut.x;
 				}
@@ -97,7 +98,11 @@ namespace RStereoKit
 					}
 				}
 			}
-			Text.Add(c.ToString(), p.m, textsize, StereoKit.TextFit.Clip, ((SkFontLoader)rFont.Instances).GetTextStyle(color, fontStyle), TextAlign.BottomLeft, textAlien, offsetX, offsetY);
+			else {
+				textAlien = TextAlign.TopLeft;
+				textsize += new Vec2(1);
+			}
+			Text.Add(c.ToString(), StereoKit.Matrix.T((textCut == Vector2f.Zero)?new Vec3(0, - (textsize.y - 1), 0): Vec3.Zero) * (StereoKit.Matrix)p.m, textsize, StereoKit.TextFit.Clip, ((SkFontLoader)rFont.Instances).GetTextStyle(color, fontStyle), TextAlign.BottomLeft, textAlien, offsetX, offsetY);
 		}
 
 		public Vector2f Size(RFont rFont, char c,FontStyle fontStyle) {

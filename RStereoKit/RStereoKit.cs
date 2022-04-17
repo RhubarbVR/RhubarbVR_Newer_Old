@@ -66,7 +66,7 @@ namespace RStereoKit
 			RShader.Instance = new SKShader();
 			RText.Instance = new SkRText();
 			RMesh.Instance = new SKRMesh();
-			RTime.Inst = new SKTime();
+			RTime.Instance = new SKTime();
 			RRenderer.Instance = new SKRRenderer();
 			RInput.Instance = new SKInput();
 			RSound.Instance = new SKSound();

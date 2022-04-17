@@ -70,9 +70,9 @@ namespace RhuEngine.Components
 		public Vector3f HitPos;
 		public Vector3f HitNormalWorld;
 		public Vector3f HitNormal;
-		public uint Fingerindex;
+		public uint Touchindex;
 		public bool Laser;
-		public bool CustomFinger;
+		public bool CustomTouch;
 		public float PressForce;
 
 		public void Clean(Matrix parrent,Vector3f canvasScale) {
@@ -116,14 +116,14 @@ namespace RhuEngine.Components
 			var hasData1 = newHitpoin.MoveNext();
 			var hasData2 = lastpoint.MoveNext();
 			while (hasData1 && hasData2) {
-				var currentIndex = Math.Min(lastpoint.Current.Fingerindex, newHitpoin.Current.Fingerindex);
-				if (lastpoint.Current.Fingerindex == newHitpoin.Current.Fingerindex) {
+				var currentIndex = Math.Min(lastpoint.Current.Touchindex, newHitpoin.Current.Touchindex);
+				if (lastpoint.Current.Touchindex == newHitpoin.Current.Touchindex) {
 					yield return lastpoint.Current.HitPos - newHitpoin.Current.HitPos;
 				}
-				if (lastpoint.Current.Fingerindex <= currentIndex) {
+				if (lastpoint.Current.Touchindex <= currentIndex) {
 					hasData2 = lastpoint.MoveNext();
 				}
-				if (newHitpoin.Current.Fingerindex <= currentIndex) {
+				if (newHitpoin.Current.Touchindex <= currentIndex) {
 					hasData1 = newHitpoin.MoveNext();
 				}
 			}
@@ -135,23 +135,23 @@ namespace RhuEngine.Components
 			var hasData1 = newHitpoin.MoveNext();
 			var hasData2 = lastpoint.MoveNext();
 			while (hasData1 && hasData2) {
-				var currentIndex = Math.Min(lastpoint.Current.Fingerindex, newHitpoin.Current.Fingerindex);
-				if(lastpoint.Current.Fingerindex == newHitpoin.Current.Fingerindex) {
+				var currentIndex = Math.Min(lastpoint.Current.Touchindex, newHitpoin.Current.Touchindex);
+				if(lastpoint.Current.Touchindex == newHitpoin.Current.Touchindex) {
 					if (lastpoint.Current.PressForce >= threshold && newHitpoin.Current.PressForce >= threshold) {
 						yield return lastpoint.Current.HitPos - newHitpoin.Current.HitPos;
 					}
 				}
-				if (lastpoint.Current.Fingerindex <= currentIndex) {
+				if (lastpoint.Current.Touchindex <= currentIndex) {
 					hasData2 = lastpoint.MoveNext();
 				}
-				if (newHitpoin.Current.Fingerindex <= currentIndex) {
+				if (newHitpoin.Current.Touchindex <= currentIndex) {
 					hasData1 = newHitpoin.MoveNext();
 				}
 			}
 		}
 		public IEnumerable<HitData> LastHitPosesByFingerID(bool ignoreOtherInputZones = false) {
 			return from hitPoses in LastHitPoses(ignoreOtherInputZones)
-				   orderby hitPoses.Fingerindex ascending
+				   orderby hitPoses.Touchindex ascending
 				   select hitPoses;
 		}
 
@@ -172,7 +172,7 @@ namespace RhuEngine.Components
 
 		public IEnumerable<HitData> HitPosesByFingerID(bool ignoreOtherInputZones = false) {
 			return from hitPoses in HitPoses(ignoreOtherInputZones)
-				   orderby hitPoses.Fingerindex ascending
+				   orderby hitPoses.Touchindex ascending
 				   select hitPoses;
 		}
 
@@ -413,32 +413,34 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			_boundTo.SafeOperation((list) => {
-				foreach (var item in list) {
-					item.components.Changed -= Children_Changed;
-				}
-				list.Clear();
-			});
-			_childRects.SafeOperation((list) => list.Clear());
-			var added = false;
-			_childRects.SafeOperation((list) => {
-				foreach (Entity item in Entity.children) {
-					_boundTo.SafeAdd(item);
-					item.components.Changed += Children_Changed;
-					var childadded = item.GetFirstComponent<UIRect>();
-					if (childadded != null) {
-						ChildAdded(childadded);
-						list.Add(childadded);
-						childadded.RegUpdateUIMeshes();
-						added = true;
+			RWorld.ExecuteOnStartOfFrame(() => {
+				_boundTo.SafeOperation((list) => {
+					foreach (var item in list) {
+						item.components.Changed -= Children_Changed;
 					}
+					list.Clear();
+				});
+				_childRects.SafeOperation((list) => list.Clear());
+				var added = false;
+				_childRects.SafeOperation((list) => {
+					foreach (Entity item in Entity.children) {
+						_boundTo.SafeAdd(item);
+						item.components.Changed += Children_Changed;
+						var childadded = item.GetFirstComponent<UIRect>();
+						if (childadded != null) {
+							ChildAdded(childadded);
+							list.Add(childadded);
+							childadded.RegUpdateUIMeshes();
+							added = true;
+						}
+					}
+				});
+				ProcessCutting(false);
+				UpdateUIMeshes();
+				if (added) {
+					ChildRectAdded();
 				}
 			});
-			ProcessCutting(false);
-			UpdateUIMeshes();
-			if (added) {
-				ChildRectAdded();
-			}
 		}
 
 		public virtual void ChildRectAdded() {
@@ -450,23 +452,25 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			_uiComponents.SafeOperation((list) => list.Clear());
-			_uiComponents.SafeOperation((list) => {
-				foreach (var item in Entity.GetAllComponents<UIComponent>()) {
-					if (!typeof(RenderUIComponent).IsAssignableFrom(item.GetType())) {
+			RWorld.ExecuteOnStartOfFrame(() => {
+				_uiComponents.SafeOperation((list) => list.Clear());
+				_uiComponents.SafeOperation((list) => {
+					foreach (var item in Entity.GetAllComponents<UIComponent>()) {
+						if (!typeof(RenderUIComponent).IsAssignableFrom(item.GetType())) {
+							list.Add(item);
+						}
+					}
+				});
+				_hasInteraction = Entity.GetFirstComponent<UIInteractionComponent>() != null;
+				_uiRenderComponents.SafeOperation((list) => list.Clear());
+				_uiRenderComponents.SafeOperation((list) => {
+					foreach (var item in Entity.GetAllComponents<RenderUIComponent>()) {
 						list.Add(item);
 					}
-				}
+				});
+				ProcessCutting(false);
+				UpdateUIMeshes();
 			});
-			_hasInteraction = Entity.GetFirstComponent<UIInteractionComponent>() != null;
-			_uiRenderComponents.SafeOperation((list) => list.Clear());
-			_uiRenderComponents.SafeOperation((list) => {
-				foreach (var item in Entity.GetAllComponents<RenderUIComponent>()) {
-					list.Add(item);
-				}
-			});
-			ProcessCutting(false);
-			UpdateUIMeshes();
 		}
 
 

@@ -2,10 +2,30 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace RNumerics
 {
+
+	public static class StringHelper
+	{
+		public static IEnumerable<string> GetStrings(this string str) {
+			var section = "";
+			foreach (var item in str) {
+				if (item == ',') {
+					yield return section;
+					section = "";
+				}
+				else {
+					if (item != '(') {
+						section += item;
+					}
+				}
+			}
+		}
+	}
+
 	[MessagePackObject]
 	public struct Colorf : IComparable<Colorf>, IEquatable<Colorf>
 	{
@@ -29,6 +49,7 @@ namespace RNumerics
 		public Colorf(float[] v2) { r = v2[0]; g = v2[1]; b = v2[2]; a = v2[3]; }
 		public Colorf(Colorf copy) { r = copy.r; g = copy.g; b = copy.b; a = copy.a; }
 		public Colorf(Colorf copy, float newAlpha) { r = copy.r; g = copy.g; b = copy.b; a = newAlpha; }
+
 
 		public static Colorf Parse(string colorString) {
 			if (colorString.Length == 0) {
@@ -54,60 +75,41 @@ namespace RNumerics
 				}
 				if (colorString.Contains("(") && colorString.Contains(")")) {
 					var lowerText = colorString.ToLower();
+					var waStrings = lowerText.Substring(lowerText.IndexOf('(')).GetStrings().GetEnumerator();
 					if (lowerText.Contains("rgba")) {
-						var first = lowerText.IndexOf('(');
-						var last = lowerText.IndexOf(',', first);
-						var r = lowerText.Substring(first, last - first);
-						first = last;
-						last = lowerText.IndexOf(',', last);
-						var g = lowerText.Substring(first, last - first);
-						first = last;
-						last = lowerText.IndexOf(',', last);
-						var b = lowerText.Substring(first, last - first);
-						first = last;
-						last = lowerText.IndexOf(')', last);
-						var a = lowerText.Substring(first, last - first);
-						var fr = float.Parse(r);
-						var fb = float.Parse(b);
-						var fg = float.Parse(g);
-						var fa = float.Parse(a);
-						return new Colorf(fr, fg, fb, fa);
+						waStrings.MoveNext();
+						var fr = float.Parse(waStrings.Current);
+						waStrings.MoveNext();
+						var fb = float.Parse(waStrings.Current);
+						waStrings.MoveNext();
+						var fg = float.Parse(waStrings.Current);
+						waStrings.MoveNext();
+						var fa = float.Parse(waStrings.Current);
+						return new Colorf(fr, fb, fg, fa);
 					}
 					else if (lowerText.Contains("rgb")) {
-						var first = lowerText.IndexOf('(');
-						var last = lowerText.IndexOf(',', first);
-						var r = lowerText.Substring(first, last - first);
-						first = last;
-						last = lowerText.IndexOf(',', last);
-						var g = lowerText.Substring(first, last - first);
-						first = last;
-						last = lowerText.IndexOf(')', last);
-						var b = lowerText.Substring(first, last - first);
-						var fr = float.Parse(r);
-						var fb = float.Parse(b);
-						var fg = float.Parse(g);
-						return new Colorf(fr, fg, fb);
+						waStrings.MoveNext();
+						Console.WriteLine(waStrings.Current);
+						var fr = float.Parse(waStrings.Current);
+						waStrings.MoveNext();
+						var fb = float.Parse(waStrings.Current);
+						waStrings.MoveNext();
+						var fg = float.Parse(waStrings.Current);
+						return new Colorf(fr, fb, fg);
 					}
-
-					if (lowerText.Contains("hsv")) {
-						var first = lowerText.IndexOf('(');
-						var last = lowerText.IndexOf(',', first);
-						var r = lowerText.Substring(first, last - first);
-						first = last;
-						last = lowerText.IndexOf(',', last);
-						var g = lowerText.Substring(first, last - first);
-						first = last;
-						last = lowerText.IndexOf(')', last);
-						var b = lowerText.Substring(first, last - first);
-						var fr = float.Parse(r);
-						var fb = float.Parse(b);
-						var fg = float.Parse(g);
+					else if (lowerText.Contains("hsv")) {
+						waStrings.MoveNext();
+						var fr = float.Parse(waStrings.Current);
+						waStrings.MoveNext();
+						var fb = float.Parse(waStrings.Current);
+						waStrings.MoveNext();
+						var fg = float.Parse(waStrings.Current);
 						return new ColorHSV(fr, fb, fg);
 					}
 				}
 				return GetStaticColor((Colors)Enum.Parse(typeof(Colors), colorString, true));
 			}
-			catch {
+			catch (Exception e) {
 				return White;
 			}
 		}

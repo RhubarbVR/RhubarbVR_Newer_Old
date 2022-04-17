@@ -62,7 +62,6 @@ namespace RhuEngine.Components
 					}
 					_maxScroll = Vector2f.Zero;
 					_minScroll = Vector2f.Zero;
-					RLog.Info("Updated Face Rects");
 				});
 			}
 			else {
@@ -80,7 +79,6 @@ namespace RhuEngine.Components
 					}
 					_maxScroll = new Vector2f(0, 1 - ((ypos - 1)/10));
 					_minScroll = new Vector2f(0,-1 - ((ypos - 1) / 10));
-					RLog.Info($"Updated Face Rects {ypos}");
 				});
 			}
 			base.UpdateUIMeshes();

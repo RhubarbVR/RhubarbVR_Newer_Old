@@ -25,14 +25,16 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI/Visuals" })]
 	public class UIText : UIComponent
 	{
-		[Default("Hello World")]
+		[Default("<color=hsv(240,100,100)>Hello<color=blue><size14>World \n <size5>Trains \n are cool man<size10>\nHello ")]
 		[OnChanged(nameof(UpdateText))]
 		public Sync<string> Text;
-		[OnChanged(nameof(UpdateText))]
+		[OnAssetLoaded(nameof(UpdateText))]
 		public AssetRef<RFont> Font;
 		[OnChanged(nameof(UpdateText))]
 		public Sync<Colorf> StartingColor;
-
+		[Default(0f)]
+		[OnChanged(nameof(UpdateText))]
+		public Sync<float> Leading;
 		[OnChanged(nameof(UpdateText))]
 		[Default(FontStyle.Regular)]
 		public Sync<FontStyle> StartingStyle;
@@ -58,7 +60,7 @@ namespace RhuEngine.Components
 		public Matrix textOffset = Matrix.S(1);
 
 		private void UpdateText() {
-			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien,MiddleLines);
+			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien,MiddleLines);
 			UpdateTextOffset();
 		}
 
@@ -84,7 +86,6 @@ namespace RhuEngine.Components
 			var maxmin = (max - min) * texture;
 			var maxoffset = maxmin + min;
 			var minoffset = min;
-
 			var offset = (max - min - maxmin) / 2;
 			if (HorizontalAlien == EHorizontalAlien.Middle) {
 				maxoffset = new Vector2f(maxoffset.x + offset.x, maxoffset.y);
@@ -103,12 +104,7 @@ namespace RhuEngine.Components
 				minoffset = new Vector2f(minoffset.x, max.y - maxmin.y);
 			}
 			upleft += new Vector3f(minoffset.x, maxoffset.y);
-			var textscale = Vector2f.One;
-			textscale /= canvassize;
-			textscale /= boxsize;
-			textscale /= Math.Max(textscale.x, textscale.y);
-			textscale /= Math.Max(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
-			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), textscale.XY_/10);
+			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), (maxmin * Math.Min(boxsize.x, boxsize.y)).Clean.XY_ + new Vector3f(0,0,0.01f));
 			CutElement(true,false);
 		}
 

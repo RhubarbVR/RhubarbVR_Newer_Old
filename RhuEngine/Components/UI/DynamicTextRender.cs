@@ -53,7 +53,7 @@ namespace RhuEngine.Components
 			});
 		}
 	
-		public void LoadText(string Id ,string Text, RFont Font, Colorf StartingColor, FontStyle StartingStyle = FontStyle.Regular,float StatingSize = 10f, EVerticalAlien verticalAlien = EVerticalAlien.Center,EHorizontalAlien horizontalAlien= EHorizontalAlien.Middle,bool middleLines = true) {
+		public void LoadText(string Id ,string Text, RFont Font,float leading, Colorf StartingColor, FontStyle StartingStyle = FontStyle.Regular,float StatingSize = 10f, EVerticalAlien verticalAlien = EVerticalAlien.Center,EHorizontalAlien horizontalAlien= EHorizontalAlien.Middle,bool middleLines = true) {
 			if(Font is null) {
 				return;
 			}
@@ -67,8 +67,11 @@ namespace RhuEngine.Components
 			var textXpos = 0f;
 			var textsizeY = 0f;
 			var textYpos = 0f;
+			var textPosZ = 0;
 			var style = new Stack<FontStyle>();
 			style.Push(StartingStyle);
+			var leaded = new Stack<float>();
+			leaded.Push(leading);
 			var fontSize = new Stack<float>();
 			fontSize.Push(StatingSize);
 			var color = new Stack<Colorf>();
@@ -80,9 +83,10 @@ namespace RhuEngine.Components
 					var textsize = RText.Size(Font, item,style.Peek());
 					if (item == '\n') {
 						if(textsizeY == 0) {
-							textsizeY = 1 * (fontSize.Peek() / 100);
+							textsizeY = (1 * (fontSize.Peek() / 100));
 						}
-						textYpos -= textsizeY;
+						textPosZ++;
+						textYpos -= (textsizeY + (leaded.Peek() / 10));
 						textXpos = 0;
 						thisrow.Clear();
 						var charee = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(new Vector3f(textXpos, textYpos - textsizeY, 0), Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero,Vector2f.Zero);
@@ -107,7 +111,7 @@ namespace RhuEngine.Components
 							bounds.Add(charitem.p.Translation + ewe._Y_);
 						}
 					}
-					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
+					var textpos = new Vector3f(textXpos, textYpos - textsizeY, textPosZ);
 					var ew = new Vector2f((textsize.x + 0.01f) * (fontSize.Peek() / 100), textsize.y * (fontSize.Peek() / 100));
 					var chare = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero,ew);
 					Chars.SafeAdd(chare);
@@ -159,6 +163,13 @@ namespace RhuEngine.Components
 					}
 					catch { }
 				}
+				else if (smartCommand.StartsWith("<leading")) {
+					var data = smartCommand.Substring(8 + (haseq ? 1 : 0));
+					try {
+						leaded.Push(float.Parse(data));
+					}
+					catch { }
+				}
 				else if (smartCommand.StartsWith("</color") || smartCommand.StartsWith("<\\color")) {
 					try {
 						if (color.Count != 1) {
@@ -171,6 +182,14 @@ namespace RhuEngine.Components
 					try {
 						if (fontSize.Count != 1) {
 							fontSize.Pop();
+						}
+					}
+					catch { }
+				}
+				else if (smartCommand.StartsWith("</leading") || smartCommand.StartsWith("<\\size")) {
+					try {
+						if (leaded.Count != 1) {
+							leaded.Pop();
 						}
 					}
 					catch { }

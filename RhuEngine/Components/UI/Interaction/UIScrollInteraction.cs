@@ -9,8 +9,9 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI\\Rects" })]
-	public class ScrollInteraction : UIInteractionComponent
+	public class UIScrollInteraction : UIInteractionComponent
 	{
+
 		public Sync<bool> AllowOtherZones;
 
 		public Sync<Vector2f> TouchOverShot;
