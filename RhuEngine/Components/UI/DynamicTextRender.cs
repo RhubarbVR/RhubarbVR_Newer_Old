@@ -83,10 +83,10 @@ namespace RhuEngine.Components
 					var textsize = RText.Size(Font, item,style.Peek());
 					if (item == '\n') {
 						if(textsizeY == 0) {
-							textsizeY = (1 * (fontSize.Peek() / 100));
+							textsizeY = 1 * (fontSize.Peek() / 100);
 						}
 						textPosZ++;
-						textYpos -= (textsizeY + (leaded.Peek() / 10));
+						textYpos -= textsizeY + (leaded.Peek() / 10);
 						textXpos = 0;
 						thisrow.Clear();
 						var charee = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(new Vector3f(textXpos, textYpos - textsizeY, 0), Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero,Vector2f.Zero);

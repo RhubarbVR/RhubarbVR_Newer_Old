@@ -87,7 +87,7 @@ namespace RhuEngine
 			///
 			var rect = pannel.AttachRectangle(mit, new Vector2f(0.25f, 0f), new Vector2f(1f), Colorf.RhubarbGreen);
 			var button = rect.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.RhubarbRed);
-			button.AttachText(Vector2f.Zero, Vector2f.One, Colorf.White, "Button Can go clicky clicky\n\n So Click");
+			button.AttachText(Vector2f.Zero, Vector2f.One, Colorf.White, "<colorred>Button<color=blue><size=20> Can go clicky<color=yellow> clicky<size5> So Click");
 			button.AttachComponent<UIButtonInteraction>();
 			var listRoot = pannel.AttachList(mit, new Vector2f(0f), new Vector2f(0.25f, 1f), Colorf.Blue);
 			void AttachListElement(Entity root,string text) {

@@ -73,6 +73,10 @@ namespace RhuEngine.Physics
 		public RBoxShape(double boxHalfExtentXYZ) {
 			obj = Manager?.GetBox3D(boxHalfExtentXYZ, boxHalfExtentXYZ, boxHalfExtentXYZ);
 		}
+
+		public RBoxShape(Vector3d collidersize) {
+			obj = Manager?.GetBox3D(collidersize.x, collidersize.y, collidersize.z);
+		}
 	}
 
 	public class RCylinderShape : ColliderShape

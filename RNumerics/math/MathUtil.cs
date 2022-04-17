@@ -174,12 +174,30 @@ namespace RNumerics
 			// shift back
 			return theta + c;
 		}
+		public static Vector2f Max(Vector2f item, Vector2f max) {
+			return new Vector2f(Math.Max(item.x, max.x), Math.Max(item.y, max.y));
+		}
+		public static Vector2f Min(Vector2f item, Vector2f max) {
+			return new Vector2f(Math.Min(item.x, max.x), Math.Min(item.y, max.y));
+		}
 
+		public static Vector2d Max(Vector2d item, Vector2d max) {
+			return new Vector2d(Math.Max(item.x, max.x), Math.Max(item.y, max.y));
+		}
+		public static Vector2d Min(Vector2d item, Vector2d max) {
+			return new Vector2d(Math.Min(item.x, max.x), Math.Min(item.y, max.y));
+		}
 		public static Vector3d Max(Vector3d item, Vector3d max) {
 			return new Vector3d(Math.Max(item.x, max.x), Math.Max(item.y, max.y), Math.Max(item.z, max.z));
 		}
 		public static Vector3d Min(Vector3d item, Vector3d max) {
 			return new Vector3d(Math.Min(item.x, max.x), Math.Min(item.y, max.y), Math.Min(item.z, max.z));
+		}
+		public static Vector3f Max(Vector3f item, Vector3f max) {
+			return new Vector3f(Math.Max(item.x, max.x), Math.Max(item.y, max.y), Math.Max(item.z, max.z));
+		}
+		public static Vector3f Min(Vector3f item, Vector3f max) {
+			return new Vector3f(Math.Min(item.x, max.x), Math.Min(item.y, max.y), Math.Min(item.z, max.z));
 		}
 
 

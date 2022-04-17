@@ -104,9 +104,8 @@ namespace RhuEngine.Components
 				minoffset = new Vector2f(minoffset.x, max.y - maxmin.y);
 			}
 			upleft += new Vector3f(minoffset.x, maxoffset.y);
-			//Todo: fix Size
-			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), new Vector2f(Math.Max(maxmin.x, maxmin.y)).Clean.XY_ + new Vector3f(0,0,0.01f));
-			
+			maxmin /= Math.Min(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
+			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), Math.Min(maxmin.x, maxmin.y)/2);
 			CutElement(true,false);
 		}
 
