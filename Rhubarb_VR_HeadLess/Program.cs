@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using RhuEngine;
 using RhuEngine.Linker;
+using RhuEngine.Physics;
+
 namespace Rhubarb_VR_HeadLess
 {
 	public class NullLinker : IEngineLink,IRLog,IRTime
@@ -66,7 +68,8 @@ namespace Rhubarb_VR_HeadLess
 
 		public void LoadStatics() {
 			RLog.Instance = this;
-			RTime.Inst = this;
+			RTime.Instance = this;
+			PhysicsHelper.RegisterPhysics<RBullet.BulletPhsyicsLink>();
 		}
 
 		public void Start() {

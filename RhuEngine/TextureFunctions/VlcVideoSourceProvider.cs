@@ -169,7 +169,7 @@ namespace RhuEngine.VLC
 				if (rgbaData.Length < VideoSource.Width * VideoSource.Height) {
 					return;
 				}
-				RWorld.ExecuteOnMain(this, () => VideoSource.SetColors(VideoSource.Width, VideoSource.Height, rgbaData));
+				RWorld.ExecuteOnStartOfFrame(this, () => VideoSource.SetColors(VideoSource.Width, VideoSource.Height, rgbaData));
 			}
 		}
 		#endregion

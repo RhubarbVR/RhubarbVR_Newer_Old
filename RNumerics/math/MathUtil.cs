@@ -58,6 +58,13 @@ namespace RNumerics
 		public static int Clamp(int f, int low, int high) {
 			return (f < low) ? low : (f > high) ? high : f;
 		}
+		public static Vector2f Clamp(Vector2f f, Vector2f low, Vector2f high) {
+			return new Vector2f(Clamp(f.x, low.x, high.x), Clamp(f.y,low.y, high.y));
+		}
+
+		public static Vector2d Abs(Vector2d vector2d) {
+			return new Vector2d(Math.Abs(vector2d.x),Math.Abs(vector2d.y));
+		}
 
 		public static int ModuloClamp(int f, int N) {
 			while (f < 0) {
@@ -167,7 +174,31 @@ namespace RNumerics
 			// shift back
 			return theta + c;
 		}
+		public static Vector2f Max(Vector2f item, Vector2f max) {
+			return new Vector2f(Math.Max(item.x, max.x), Math.Max(item.y, max.y));
+		}
+		public static Vector2f Min(Vector2f item, Vector2f max) {
+			return new Vector2f(Math.Min(item.x, max.x), Math.Min(item.y, max.y));
+		}
 
+		public static Vector2d Max(Vector2d item, Vector2d max) {
+			return new Vector2d(Math.Max(item.x, max.x), Math.Max(item.y, max.y));
+		}
+		public static Vector2d Min(Vector2d item, Vector2d max) {
+			return new Vector2d(Math.Min(item.x, max.x), Math.Min(item.y, max.y));
+		}
+		public static Vector3d Max(Vector3d item, Vector3d max) {
+			return new Vector3d(Math.Max(item.x, max.x), Math.Max(item.y, max.y), Math.Max(item.z, max.z));
+		}
+		public static Vector3d Min(Vector3d item, Vector3d max) {
+			return new Vector3d(Math.Min(item.x, max.x), Math.Min(item.y, max.y), Math.Min(item.z, max.z));
+		}
+		public static Vector3f Max(Vector3f item, Vector3f max) {
+			return new Vector3f(Math.Max(item.x, max.x), Math.Max(item.y, max.y), Math.Max(item.z, max.z));
+		}
+		public static Vector3f Min(Vector3f item, Vector3f max) {
+			return new Vector3f(Math.Min(item.x, max.x), Math.Min(item.y, max.y), Math.Min(item.z, max.z));
+		}
 
 
 		// for ((i++) % N)-type loops, but where we might be using (i--)

@@ -24,10 +24,6 @@ namespace RhuEngine.AssetSystem
 			return uri.Scheme.ToLower()=="local" ? GetLocalAsset(uri, useCache, ProgressUpdate) : Manager.GetAsset(uri, useCache, ProgressUpdate);
 		}
 
-		public async Task<byte[]> GetAssetAsync(Uri uri, bool useCache,Action<float> ProgressUpdate = null) {
-			return await Task.Run(()=>GetAsset(uri,useCache, ProgressUpdate));
-		}
-
 		private byte[] GetLocalAsset(Uri uri, bool useCache,Action<float> ProgressUpdate = null) {
 			byte[] asset = null;
 			if (useCache) {

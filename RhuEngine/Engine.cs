@@ -196,7 +196,7 @@ namespace RhuEngine
 					catch (Exception ex) {
 						RLog.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
 						IntMsg = $"Failed to start {item.GetType().GetFormattedName()} Error:{ex}";
-						throw new Exception("LockLoad");
+						throw ex;
 					}
 				}
 				if (EngineLink.CanRender) {
@@ -206,7 +206,7 @@ namespace RhuEngine
 				}
 				RLog.Info("Engine Started");
 				OnEngineStarted?.Invoke();
-			});
+		});
 		}
 
 		private Vector3f _oldPlayerPos = Vector3f.Zero;
@@ -223,23 +223,26 @@ namespace RhuEngine
 						_oldPlayerPos = playerPos;
 						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt((EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero), _loadingPos));
 						RText.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0, -0.07f, 0) * rootMatrix);
-						RMesh.Quad.Draw(LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
+						RMesh.Quad.Draw("LoadingUi",LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
 					}
 					catch (Exception ex) {
 						RLog.Err("Failed to update msg text Error: " + ex.ToString());
+						throw ex;
 					}
 				}
 				return;
 			}
+			RWorld.RunOnStartOfFrame();
 			foreach (var item in _managers) {
 				try {
 					item.Step();
 				}
 				catch (Exception ex) {
 					RLog.Err($"Failed to step {item.GetType().GetFormattedName()} Error: {ex}");
+					throw ex;
 				}
 			}
-			RWorld.RunOnMain();
+			RWorld.RunOnEndOfFrame();
 		}
 
 		public void Dispose() {

@@ -21,7 +21,7 @@ namespace RhuEngine.Linker
 	}
 	public interface IRMouse
 	{
-		public float ScrollChange { get; }
+		public Vector2f ScrollChange { get; }
 		public Vector2f PosChange { get; }
 	}
 

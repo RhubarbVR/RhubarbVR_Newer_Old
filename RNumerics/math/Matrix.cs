@@ -41,7 +41,8 @@ namespace RNumerics
 
 		public static Matrix operator *(Matrix a, Matrix b) => a.m * b.m;
 		public static Vector3f operator *(Matrix a, Vector3f b) => Vector3.Transform(b, a.m);
-
+		public static bool operator ==(Matrix a, Matrix b) => a.m == b.m;
+		public static bool operator !=(Matrix a, Matrix b) => a.m != b.m;
 
 		/// <summary>An identity Matrix is the matrix equivalent of '1'! 
 		/// Transforming anything by this will leave it at the exact same
@@ -78,6 +79,15 @@ namespace RNumerics
 		/// </summary>
 		/// <returns>An inverse matrix of the current one.</returns>
 		public Matrix Inverse { get { Matrix4x4.Invert(m, out var result); return result; } }
+
+		public Matrix InvScale
+		{
+			get {
+				Decompose(out var pos,out var rot , out var scale);
+				scale = 1 / scale;
+				return Matrix.TRS(pos,rot,scale);
+			}
+		}
 
 		/// <summary>Inverts this Matrix! If the matrix takes a point from a
 		/// -> b, then its inverse takes the point from b -> a.</summary>
