@@ -10,7 +10,7 @@ namespace RhuEngine.Linker
 		bool CanRender { get; }
 		bool CanAudio { get; }
 		bool CanInput { get; }
-
+		string BackendID { get; }
 
 		void BindEngine(Engine engine);
 		void Start();
