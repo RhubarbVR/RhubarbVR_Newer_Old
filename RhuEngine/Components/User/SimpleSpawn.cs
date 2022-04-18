@@ -45,7 +45,7 @@ namespace RhuEngine.Components
 				var head = userEntity.AddChild("Head");
 				head.AttachComponent<Head>().user.Target = World.GetLocalUser();
 				if (!World.IsPersonalSpace) {
-					var thing = head.AddChild("Render").AttachMeshWithMeshRender<CappedCylinderMesh, UnlitShader>();
+					var thing = head.AddChild("Render").AttachMeshWithMeshRender<CylinderMesh, UnlitShader>();
 					thing.Item3.colorLinear.Value = user.UserName.GetHashHue();
 					var mesh = thing.Item1;
 					mesh.Entity.rotation.Value = Quaternionf.Pitched;

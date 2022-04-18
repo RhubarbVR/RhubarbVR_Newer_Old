@@ -1,51 +1,51 @@
 ﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
-using RhuEngine.Linker;
 using RNumerics;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class Sphere3NormalizedCubeMesh : ProceduralMesh
+	public class ArrowMesh : ProceduralMesh
 	{
-		[Default(1f)]
+		[Default(0.5f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> Diameter;
+		public Sync<float> StickRadius;
 
-		[Default(Sphere3Generator_NormalizedCube.NormalizationTypes.CubeMapping)]
+		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sphere3Generator_NormalizedCube.NormalizationTypes NormalizeType;
+		public Sync<float> StickLength;
 
-
-		[Default(true)]
+		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> NoSharedVertices;
+		public Sync<float> HeadBaseRadius;
 
-
-		[Default(true)]
+		[Default(0.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantUVs;
+		public Sync<float> TipRadius;
 
-
-		[Default(true)]
+		[Default(0.5f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantNormals;
+		public Sync<float> HeadLength;
+
+		[Default(false)]
+		[OnChanged(nameof(LoadMesh))]
+		public Sync<bool> DoubleSided;
 
 		public override void FirstCreation() {
 			base.FirstCreation();
-
 		}
 
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			var mesh = new Sphere3Generator_NormalizedCube {
-				Radius = Diameter/2,
-				NormalizeType = NormalizeType,
-				NoSharedVertices = NoSharedVertices.Value,
-				WantUVs = WantUVs,
-				WantNormals = WantNormals,
+			var mesh = new Radial3DArrowGenerator {
+				StickRadius = StickRadius,
+				StickLength = StickLength,
+				HeadBaseRadius = HeadBaseRadius,
+				TipRadius = TipRadius,
+				HeadLength = HeadLength,
+				DoubleSided = DoubleSided,
 			};
 			mesh.Generate();
 			GenMesh(mesh.MakeSimpleMesh());

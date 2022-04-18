@@ -1,6 +1,7 @@
 ﻿using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
+using System;
 
 namespace RhuEngine.Components
 {
@@ -16,5 +17,22 @@ namespace RhuEngine.Components
 				loadedMesh.LoadMesh(mesh);
 			}
 		}
+
+		public void LoadMesh() 
+		{
+			// TODO Add the funny UI start/end methods here. -dfg
+			try {
+				ComputeMesh();
+			}
+			catch (Exception e) {
+				#if DEBUG
+				RLog.Err(e.ToString());
+				#endif
+				// Optional: Hide the mesh if data is invalid
+				// Load(null);
+			}
+		}
+
+		public abstract void ComputeMesh();
 	}
 }

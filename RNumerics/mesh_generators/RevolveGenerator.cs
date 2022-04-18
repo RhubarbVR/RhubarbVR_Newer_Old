@@ -157,10 +157,6 @@ namespace RNumerics
 		}
 	}
 
-
-
-
-
 	public class Curve3Curve3RevolveGenerator : MeshGenerator
 	{
 		public Vector3d[] Curve;

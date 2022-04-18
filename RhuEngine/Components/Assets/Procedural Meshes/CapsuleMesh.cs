@@ -42,7 +42,7 @@ namespace RhuEngine.Components
 
 		}
 
-		private void LoadMesh() {
+		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
