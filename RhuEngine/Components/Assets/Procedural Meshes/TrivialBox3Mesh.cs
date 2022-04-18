@@ -58,10 +58,5 @@ namespace RhuEngine.Components
 			box.Generate();
 			GenMesh(box.MakeSimpleMesh());
 		}
-
-		public override void OnLoaded() {
-			base.OnLoaded();
-			LoadMesh();
-		}
 	}
 }

@@ -117,15 +117,15 @@ namespace RNumerics
 			var ti = 0;
 			for (var k = 0; k < nRingSize - 1; ++k) {
 				groups[ti] = 1;
-				triangles.Set(ti++, k, k + 1, nRingSize + k + 1, Clockwise);
+				triangles.Set(ti++, k, k + 1, nRingSize + k + 1, !Clockwise);
 				groups[ti] = 1;
-				triangles.Set(ti++, k, nRingSize + k + 1, nRingSize + k, Clockwise);
+				triangles.Set(ti++, k, nRingSize + k + 1, nRingSize + k, !Clockwise);
 			}
 			if (bClosed && NoSharedVertices == false) {      // close disc if we went all the way
 				groups[ti] = 1;
-				triangles.Set(ti++, nRingSize - 1, 0, nRingSize, Clockwise);
+				triangles.Set(ti++, nRingSize - 1, 0, nRingSize, !Clockwise);
 				groups[ti] = 1;
-				triangles.Set(ti++, nRingSize - 1, nRingSize, (2 * nRingSize) - 1, Clockwise);
+				triangles.Set(ti++, nRingSize - 1, nRingSize, (2 * nRingSize) - 1, !Clockwise);
 			}
 
 			var nBottomC = 2 * nRingSize;
@@ -147,7 +147,7 @@ namespace RNumerics
 					uv[nStartB + k] = new Vector2f(0.5f * (1.0f + cosa), 0.5f * (1 + sina));
 					normals[nStartB + k] = -Vector3f.AxisY;
 				}
-				Append_disc(Slices, nBottomC, nStartB, bClosed, Clockwise, ref ti, 2);
+				Append_disc(Slices, nBottomC, nStartB, bClosed, !Clockwise, ref ti, 2);
 
 				var nStartT = (2 * nRingSize) + 2 + Slices;
 				for (var k = 0; k < Slices; ++k) {
@@ -157,7 +157,7 @@ namespace RNumerics
 					uv[nStartT + k] = new Vector2f(0.5f * (1.0f + cosa), 0.5f * (1 + sina));
 					normals[nStartT + k] = Vector3f.AxisY;
 				}
-				Append_disc(Slices, nTopC, nStartT, bClosed, !Clockwise, ref ti, 3);
+				Append_disc(Slices, nTopC, nStartT, bClosed, Clockwise, ref ti, 3);
 
 				// ugh this is very ugly but hard to see the pattern...
 				if (bClosed == false) {
@@ -178,17 +178,17 @@ namespace RNumerics
 					uv[nStartF + 2] = uv[nStartF + 7] = new Vector2f(1, 1);
 					uv[nStartF + 3] = uv[nStartF + 6] = new Vector2f(1, 0);
 
-					Append_rectangle(nStartF + 0, nStartF + 1, nStartF + 2, nStartF + 3, !Clockwise, ref ti, 4);
-					Append_rectangle(nStartF + 4, nStartF + 5, nStartF + 6, nStartF + 7, !Clockwise, ref ti, 5);
+					Append_rectangle(nStartF + 0, nStartF + 1, nStartF + 2, nStartF + 3, Clockwise, ref ti, 4);
+					Append_rectangle(nStartF + 4, nStartF + 5, nStartF + 6, nStartF + 7, Clockwise, ref ti, 5);
 				}
 
 			}
 			else {
-				Append_disc(Slices, nBottomC, 0, bClosed, Clockwise, ref ti, 2);
-				Append_disc(Slices, nTopC, nRingSize, bClosed, !Clockwise, ref ti, 3);
+				Append_disc(Slices, nBottomC, 0, bClosed, !Clockwise, ref ti, 2);
+				Append_disc(Slices, nTopC, nRingSize, bClosed, Clockwise, ref ti, 3);
 				if (bClosed == false) {
-					Append_rectangle(nBottomC, 0, nRingSize, nTopC, Clockwise, ref ti, 4);
-					Append_rectangle(nRingSize - 1, nBottomC, nTopC, (2 * nRingSize) - 1, Clockwise, ref ti, 5);
+					Append_rectangle(nBottomC, 0, nRingSize, nTopC, !Clockwise, ref ti, 4);
+					Append_rectangle(nRingSize - 1, nBottomC, nTopC, (2 * nRingSize) - 1, !Clockwise, ref ti, 5);
 				}
 			}
 
