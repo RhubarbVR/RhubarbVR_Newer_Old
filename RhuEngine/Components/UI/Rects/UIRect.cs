@@ -91,23 +91,25 @@ namespace RhuEngine.Components
 		private readonly List<HitData> _lastRayHitPoses = new();
 
 		public void AddHitPoses(HitData hitData) {
-			hitData.Clean(LastRenderPos,Canvas.scale.Value/10);
-			_rayHitPoses.Add(hitData);
-			if (_rayHitPoses.Count == 1) {
-				RWorld.ExecuteOnEndOfFrame(this, () => {
-					_lastRayHitPoses.Clear();
-					_lastRayHitPoses.AddRange(_rayHitPoses);
-					_rayHitPoses.Clear();
-					RWorld.ExecuteOnStartOfFrame(() => {
-						RWorld.ExecuteOnEndOfFrame(() => {
-							if (_rayHitPoses.Count == 0) {
-								_lastRayHitPoses.Clear();
-								_rayHitPoses.Clear();
-							}
+			RWorld.ExecuteOnStartOfFrame(() => {
+				hitData.Clean(LastRenderPos, Canvas.scale.Value / 10);
+				_rayHitPoses.Add(hitData);
+				if (_rayHitPoses.Count == 1) {
+					RWorld.ExecuteOnEndOfFrame(this, () => {
+						_lastRayHitPoses.Clear();
+						_lastRayHitPoses.AddRange(_rayHitPoses);
+						_rayHitPoses.Clear();
+						RWorld.ExecuteOnStartOfFrame(() => {
+							RWorld.ExecuteOnEndOfFrame(() => {
+								if (_rayHitPoses.Count == 0) {
+									_lastRayHitPoses.Clear();
+									_rayHitPoses.Clear();
+								}
+							});
 						});
 					});
-				});
-			}
+				}
+			});
 		}
 
 		public IEnumerable<Vector3f> FingerChange(bool ignoreOtherInputZones = false) {
@@ -335,14 +337,15 @@ namespace RhuEngine.Components
 			});
 		}
 
-		private bool _cull = false;
+		public bool Culling { get; private set; } = false;
+
 		public void ProcessCutting(bool update = true) {
 			var min = Min + ScrollOffset.Xy;
 			var max = Max + ScrollOffset.Xy;
 			var cutmin = CutZonesMin;
 			var cutmax = CutZonesMax;
-			_cull = max.y < cutmin.y || min.y > cutmax.y || max.x < cutmin.x || min.x > cutmax.x;
-			var cut = !_cull && (max.y > cutmax.y || min.y < cutmin.y || max.x > cutmax.x || min.x < cutmin.x);
+			Culling = max.y < cutmin.y || min.y > cutmax.y || max.x < cutmin.x || min.x > cutmax.x;
+			var cut = !Culling && (max.y > cutmax.y || min.y < cutmin.y || max.x > cutmax.x || min.x < cutmin.x);
 			_uiComponents.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.CutElement(cut,update);
@@ -359,7 +362,7 @@ namespace RhuEngine.Components
 
 		public virtual void Render(Matrix matrix) {
 			LastRenderPos = matrix;
-			if (_cull) {
+			if (Culling) {
 				return;
 			}
 			_meshes.SafeOperation((meshList) => {

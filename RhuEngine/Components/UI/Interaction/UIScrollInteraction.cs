@@ -11,10 +11,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI\\Rects" })]
 	public class UIScrollInteraction : UIInteractionComponent
 	{
-
 		public Sync<bool> AllowOtherZones;
-
-		public Sync<Vector2f> TouchOverShot;
 
 		public Sync<Vector2f> MouseScrollSpeed;
 
@@ -22,17 +19,14 @@ namespace RhuEngine.Components
 
 		public override void OnAttach() {
 			base.OnAttach();
-			TouchOverShot.Value = new Vector2f(0.5f);
 			MouseScrollSpeed.Value = Vector2f.One;
 		}
 
 		private void Scroll(Vector2f vector) {
-			RWorld.ExecuteOnStartOfFrame(() => OnScroll.Target?.Invoke(vector));
+			OnScroll.Target?.Invoke(vector);
 		}
 
 		public bool Hover = false;
-
-		private Vector2f _lastVol;
 
 		public override void Step() {
 			base.Step();
@@ -41,7 +35,8 @@ namespace RhuEngine.Components
 			}
 			var HasFirst = false;
 			var firstLazer = true;
-			foreach (var item in Rect.HitPoses(!AllowOtherZones.Value)) {
+			var hitposes = Rect.HitPoses(!AllowOtherZones.Value);
+			foreach (var item in hitposes) {
 				HasFirst = true;
 				if (firstLazer && item.Laser) {
 					if (RInput.Mouse.ScrollChange != Vector2f.Zero) {
@@ -49,10 +44,6 @@ namespace RhuEngine.Components
 					}
 					firstLazer = false;
 				}
-			}
-			if (!HasFirst && _lastVol != Vector2f.Zero) {
-				Scroll(_lastVol * TouchOverShot);
-				_lastVol = Vector2f.Zero;
 			}
 			if (HasFirst) {
 				//DragScroll 
@@ -65,8 +56,7 @@ namespace RhuEngine.Components
 				}
 
 				if (scrollavrage != Vector2f.Zero) {
-					_lastVol = scrollavrage * Rect.Canvas.scale.Value.Xy * -5;
-					Scroll(_lastVol);
+					Scroll(scrollavrage * Rect.Canvas.scale.Value.Xy * -5);
 				}
 			}
 		}

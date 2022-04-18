@@ -30,6 +30,7 @@ namespace RhuEngine.Physics
 	{
 		public object NewSim();
 		public void UpdateSim(object obj,float DeltaSeconds);
+		public bool ConvexRayTest(object sem,ColliderShape colliderShape, ref Matrix from, ref Matrix to, out RigidBodyCollider rigidBodyCollider, out Vector3f HitNormalWorld, out Vector3f HitPointWorld, ECollisionFilterGroups mask, ECollisionFilterGroups group);
 
 		public bool RayTest(object sem,ref Vector3f rayFromWorld, ref Vector3f rayToWorld, out RigidBodyCollider rigidBodyCollider, out Vector3f HitNormalWorld, out Vector3f HitPointWorld, ECollisionFilterGroups mask, ECollisionFilterGroups group);
 	}
@@ -41,6 +42,9 @@ namespace RhuEngine.Physics
 
 		public void UpdateSim(float DeltaSeconds) {
 			Manager?.UpdateSim(obj, DeltaSeconds);
+		}
+		public bool ConvexRayTest(ColliderShape colliderShaperef,ref Matrix from, ref Matrix to, out RigidBodyCollider rigidBodyCollider, out Vector3f hitNormalWorld, out Vector3f hitPointWorld, ECollisionFilterGroups mask = ECollisionFilterGroups.AllFilter, ECollisionFilterGroups group = ECollisionFilterGroups.AllFilter) {
+			return Manager.ConvexRayTest(obj, colliderShaperef, ref from, ref to, out rigidBodyCollider, out hitNormalWorld, out hitPointWorld, mask, group);
 		}
 
 		public bool RayTest(ref Vector3f rayFromWorld, ref Vector3f rayToWorld,out RigidBodyCollider rigidBodyCollider,out Vector3f hitNormalWorld,out Vector3f hitPointWorld, ECollisionFilterGroups mask = ECollisionFilterGroups.AllFilter, ECollisionFilterGroups group = ECollisionFilterGroups.AllFilter) {

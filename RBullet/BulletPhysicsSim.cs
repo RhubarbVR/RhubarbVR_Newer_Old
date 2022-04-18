@@ -77,6 +77,32 @@ namespace RBullet
 
 	public class BulletPhysicsSim : ILinkedPhysicsSim
 	{
+		public bool ConvexRayTest(object sem, ColliderShape colliderShape, ref RNumerics.Matrix from, ref RNumerics.Matrix to, out RigidBodyCollider rigidBodyCollider, out Vector3f HitNormalWorld, out Vector3f HitPointWorld, ECollisionFilterGroups mask, ECollisionFilterGroups group) {
+			var frome = new Vector3(from.Translation.x, from.Translation.y, from.Translation.z);
+			var toe = new Vector3(to.Translation.x, to.Translation.y, to.Translation.z);
+			var fromm = BRigidBodyCollider.CastMet(from);
+			var tom = BRigidBodyCollider.CastMet(to);
+			var callback = new ClosestConvexResultCallback(ref frome, ref toe) {
+				CollisionFilterGroup = (int)group,
+				CollisionFilterMask = (int)group
+			};
+			((BPhysicsSim)sem)._physicsWorld.ConvexSweepTestRef((ConvexShape)colliderShape.obj,ref fromm, ref tom, callback);
+			try {
+				rigidBodyCollider = null;
+				if (callback.HitCollisionObject != null) {
+					if (callback.HitCollisionObject.UserObject != null) {
+						rigidBodyCollider = ((BRigidBodyCollider)callback.HitCollisionObject.UserObject).Collider;
+					}
+				}
+			}
+			catch {
+				rigidBodyCollider = null;
+			}
+			HitPointWorld = new Vector3f(callback.HitPointWorld.X, callback.HitPointWorld.Y, callback.HitPointWorld.Z);
+			HitNormalWorld = new Vector3f(callback.HitNormalWorld.X, callback.HitNormalWorld.Y, callback.HitNormalWorld.Z);
+			return callback.HasHit;
+		}
+
 		public object NewSim() {
 			return new BPhysicsSim();
 		}

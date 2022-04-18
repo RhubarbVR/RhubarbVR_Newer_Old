@@ -65,13 +65,19 @@ namespace RhuEngine.Components
 		private void RunLoadPhysicsBox() {
 			PhysicsCollider?.Remove();
 			PhysicsCollider = null;
-			var min = MathUtil.Max(Rect.CutZonesMin, Rect.Min);
-			var max = MathUtil.Min(Rect.CutZonesMax, Rect.Max);
+			if (Rect.Culling) {
+				return;
+			}
+			var truemin = Rect.Min + Rect.ScrollOffset.Xy;
+			var truemax = Rect.Max + Rect.ScrollOffset.Xy;
+			var min = MathUtil.Max(Rect.CutZonesMin, truemin);
+			var max = MathUtil.Min(Rect.CutZonesMax,truemax);
 			var size = max - min;
 			var collidersize = new Vector3d(size.x, size.y, Rect.Depth.Value) / 2;
 			var pos = min + collidersize.Xy;
-			PhysicsPose = new Vector3f((float)pos.x, (float)pos.y, Rect.StartPoint + (float)collidersize.z);
+			PhysicsPose = new Vector3f((float)pos.x, (float)pos.y, Rect.StartPoint + (float)collidersize.z + Rect.ScrollOffset.z);
 			PhysicsCollider = new RBoxShape(collidersize).GetCollider(World.PhysicsSim);
+			// World.DrawDebugCube(Rect.LastRenderPos,PhysicsPose, collidersize,new Colorf(0,1,1,0.2f)); //For testing collider
 			PhysicsCollider.CustomObject = this;
 			PhysicsCollider.Group = ECollisionFilterGroups.UI;
 			PhysicsCollider.Mask = ECollisionFilterGroups.UI;

@@ -46,7 +46,7 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public Sync<bool> AllowOtherZones;
 
-		[Default(0.6f)]
+		[Default(0.3f)]
 		public Sync<float> PressForce;
 
 		public SyncDelegate<Action<ButtonEvent>> ButtonEvent;
@@ -100,6 +100,7 @@ namespace RhuEngine.Components
 		private void RunButtonReleaseEvent(HitData hitData) {
 			_lastHitData = hitData;
 			IsClicking = false;
+			_startPos = Vector3f.Zero;
 			RLog.Info("Release");
 			SendEvent(new ButtonEvent {
 				IsPressing = false,
@@ -136,7 +137,7 @@ namespace RhuEngine.Components
 						}
 					}
 					else {
-						if (((_startPos.z - item.HitPos.z) * (1 / Rect.Depth.Value)) >= PressForce) {
+						if (item.PressForce >= PressForce) {
 							if (IsClicking) {
 								RunButtonPressingEvent(item);
 							}
