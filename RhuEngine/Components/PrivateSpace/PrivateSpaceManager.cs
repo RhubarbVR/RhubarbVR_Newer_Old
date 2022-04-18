@@ -34,8 +34,8 @@ namespace RhuEngine.Components
 
 		public void UpdateTouch(Handed handed) {
 			var pos = RInput.Hand(handed).Wrist;
-			var Frompos = Matrix.T(Vector3f.AxisY * -0.05f) * pos;
-			var ToPos = Matrix.T(Vector3f.AxisY * 0.05f) * pos;
+			var Frompos = Matrix.T(Vector3f.AxisY * -0.07f) * pos;
+			var ToPos = Matrix.T(Vector3f.AxisY * 0.03f) * pos;
 			World.DrawDebugSphere(Frompos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
 			World.DrawDebugSphere(ToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
 			if (World.PhysicsSim.ConvexRayTest(_shape, ref Frompos, ref ToPos, out var collider, out var hitnormal, out var hitpointworld)) {

@@ -482,9 +482,9 @@ namespace RhuEngine.Managers
 												oldstatus.Status = Status.Invisible;
 											}
 #if DEBUG
-											oldstatus.ClientVersion = $"Milksnake {Engine.version.Major}{Engine.version.Minor}";
+											oldstatus.ClientVersion = $"Milksnake {Engine.EngineLink.BackendID} {Engine.version.Major}{Engine.version.Minor} PlatformInfo:{Environment.OSVersion.Platform}_{Environment.OSVersion.Version}";
 #else
-											oldstatus.ClientVersion =  $"RhubarbVR {Engine.version.Major}{Engine.version.Minor}";
+											oldstatus.ClientVersion =  $"RhubarbVR {Engine.EngineLink.BackendID} {Engine.version.Major}{Engine.version.Minor} PlatformInfo:{Environment.OSVersion.Platform}_{Environment.OSVersion.Version}";
 #endif
 											oldstatus.Devices = Environment.OSVersion.Platform.ToString() + " on " + RuntimeInformation.FrameworkDescription;
 											UserStatus = oldstatus;
