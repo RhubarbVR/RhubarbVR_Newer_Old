@@ -16,10 +16,10 @@ namespace RhuEngine.Components
 	[UpdateLevel(UpdateEnum.Normal)]
 	public class PrivateSpaceManager : Component
 	{
-		ColliderShape _shape;
+		RSphereShape _shape;
 		public override void OnLoaded() {
 			base.OnLoaded();
-			_shape = new RSphereShape(0.1f);
+			_shape = new RSphereShape(0.01f);
 		}
 		public override void Step() {
 			var head = LocalUser.userRoot.Target?.head.Target;
@@ -35,12 +35,12 @@ namespace RhuEngine.Components
 		public void UpdateTouch(Handed handed) {
 			var pos = RInput.Hand(handed).Wrist;
 			var Frompos = pos;
-			var FromoPos = Matrix.T(Vector3f.AxisZ * 0.01f) * pos;
-			if (World.PhysicsSim.ConvexRayTest(_shape, ref Frompos, ref FromoPos, out var collider, out var hitnormal, out var hitpointworld)) {
-				RLog.Info($"Hit Tocuh Local {Frompos} {FromoPos} pos {hitpointworld}");
+			var ToPos = Matrix.T(Vector3f.AxisY * 0.1f) * pos;
+			if (World.PhysicsSim.ConvexRayTest(_shape, ref Frompos, ref ToPos, out var collider, out var hitnormal, out var hitpointworld)) {
+				RLog.Info($"Hit Tocuh Local {Frompos} {ToPos} pos {hitpointworld}");
 			}
 			else {
-				if (WorldManager.FocusedWorld?.PhysicsSim.ConvexRayTest(_shape,ref Frompos, ref FromoPos, out collider, out hitnormal, out hitpointworld) ?? false) {
+				if (WorldManager.FocusedWorld?.PhysicsSim.ConvexRayTest(_shape,ref Frompos, ref ToPos, out collider, out hitnormal, out hitpointworld) ?? false) {
 					if (collider.CustomObject is RenderUIComponent uIComponent) {
 						if (Vector3f.Zero == poses[(int)handed]) {
 							poses[(int)handed] = Frompos.Translation;
