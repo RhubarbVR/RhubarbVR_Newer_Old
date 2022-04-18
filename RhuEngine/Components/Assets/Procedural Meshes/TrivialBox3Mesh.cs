@@ -45,7 +45,7 @@ namespace RhuEngine.Components
 			AxisZ.Value = Vector3f.AxisZ;
 		}
 
-		private void LoadMesh() {
+		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}

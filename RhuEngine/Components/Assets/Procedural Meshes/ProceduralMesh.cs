@@ -16,5 +16,12 @@ namespace RhuEngine.Components
 				loadedMesh.LoadMesh(mesh);
 			}
 		}
+
+		public void LoadMesh() 
+		{
+			ComputeMesh();
+		}
+
+		public abstract void ComputeMesh();
 	}
 }

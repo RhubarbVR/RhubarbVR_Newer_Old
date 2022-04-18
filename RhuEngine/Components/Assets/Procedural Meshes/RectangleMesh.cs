@@ -40,7 +40,7 @@ namespace RhuEngine.Components
 			Normal.Value = Vector3f.AxisY;
 		}
 
-		private void LoadMesh() {
+		public override void ComputeMesh() {
 			try {
 				if (!Engine.EngineLink.CanRender) {
 					return;
