@@ -37,7 +37,6 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.0" />
     <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
-    <PackageReference Include="TextCopy" Version="6.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -95,5 +94,9 @@
     <ProjectReference Include="..\OpusDotNet\OpusDotNet.csproj" />
     <ProjectReference Include="..\RNumerics\RNumerics.csproj" />
     <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClipBoard\" />
   </ItemGroup>
 </Project>
