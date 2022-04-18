@@ -28,7 +28,8 @@ namespace RhuEngine.Components
 				#if DEBUG
 				RLog.Err(e.ToString());
 				#endif
-				Load(null);
+				// Optional: Hide the mesh if data is invalid
+				// Load(null);
 			}
 		}
 

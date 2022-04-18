@@ -6,8 +6,9 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class CappedCylinderMesh : ProceduralMesh
+	public class CylinderMesh : ProceduralMesh
 	{
+
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
 		public Sync<float> BaseRadius;
@@ -26,17 +27,16 @@ namespace RhuEngine.Components
 		[Default(16)]
 		[OnChanged(nameof(LoadMesh))]
 		public Sync<int> Slices;
+		[Default(true)]
+		[OnChanged(nameof(LoadMesh))]
+		public Sync<bool> HasCaps;
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
 		public Sync<bool> NoSharedVertices;
-
-
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
 		public Sync<bool> WantUVs;
-
-
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
 		public Sync<bool> WantNormals;
@@ -50,19 +50,38 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			var mesh = new CappedCylinderGenerator {
-				BaseRadius = BaseRadius,
-				Height = Height,
-				StartAngleDeg = StartAngleDeg,
-				EndAngleDeg = EndAngleDeg,
-				TopRadius = TopRadius,
-				Slices = Slices,
-				NoSharedVertices = NoSharedVertices.Value,
-				WantUVs = WantUVs,
-				WantNormals = WantNormals,
-			};
-			mesh.Generate();
-			GenMesh(mesh.MakeSimpleMesh());
+			if (HasCaps.Value) 
+			{
+				var mesh = new CappedCylinderGenerator {
+					BaseRadius = BaseRadius,
+					Height = Height,
+					StartAngleDeg = StartAngleDeg,
+					EndAngleDeg = EndAngleDeg,
+					TopRadius = TopRadius,
+					Slices = Slices,
+					NoSharedVertices = NoSharedVertices.Value,
+					WantUVs = WantUVs,
+					WantNormals = WantNormals,
+				};
+				mesh.Generate();
+				GenMesh(mesh.MakeSimpleMesh());
+			}
+			else 
+			{
+				var mesh = new OpenCylinderGenerator {
+					BaseRadius = BaseRadius,
+					Height = Height,
+					StartAngleDeg = StartAngleDeg,
+					EndAngleDeg = EndAngleDeg,
+					TopRadius = TopRadius,
+					Slices = Slices,
+					NoSharedVertices = NoSharedVertices.Value,
+					WantUVs = WantUVs,
+					WantNormals = WantNormals,
+				};
+				mesh.Generate();
+				GenMesh(mesh.MakeSimpleMesh());
+			}
 		}
 
 		public override void OnLoaded() {
