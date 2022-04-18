@@ -42,7 +42,7 @@ namespace RhuEngine.WorldObjects
 				var e = await Engine.netApiManager.GetUserInfo(userID);
 				UserName = e?.UserName;
 				NormalizedUserName = e?.NormalizedUserName;
-				Roles = e?.Roles.ToArray();
+				Roles = e?.Roles?.ToArray()??Array.Empty<string>();
 			});
 		}
 
