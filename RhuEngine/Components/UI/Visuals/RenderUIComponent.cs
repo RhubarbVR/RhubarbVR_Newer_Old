@@ -77,7 +77,7 @@ namespace RhuEngine.Components
 			var pos = min + collidersize.Xy;
 			PhysicsPose = new Vector3f((float)pos.x, (float)pos.y, Rect.StartPoint + (float)collidersize.z + Rect.ScrollOffset.z);
 			PhysicsCollider = new RBoxShape(collidersize).GetCollider(World.PhysicsSim);
-			// World.DrawDebugCube(Rect.LastRenderPos,PhysicsPose, collidersize,new Colorf(0,1,1,0.2f)); //For testing collider
+			World.DrawDebugCube(Rect.LastRenderPos,PhysicsPose, collidersize,new Colorf(0,1,1,0.2f),3); //For testing collider
 			PhysicsCollider.CustomObject = this;
 			PhysicsCollider.Group = ECollisionFilterGroups.UI;
 			PhysicsCollider.Mask = ECollisionFilterGroups.UI;

@@ -34,8 +34,10 @@ namespace RhuEngine.Components
 
 		public void UpdateTouch(Handed handed) {
 			var pos = RInput.Hand(handed).Wrist;
-			var Frompos = pos;
-			var ToPos = Matrix.T(Vector3f.AxisY * 0.1f) * pos;
+			var Frompos = Matrix.T(Vector3f.AxisY * -0.05f) * pos;
+			var ToPos = Matrix.T(Vector3f.AxisY * 0.05f) * pos;
+			World.DrawDebugSphere(Frompos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
+			World.DrawDebugSphere(ToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
 			if (World.PhysicsSim.ConvexRayTest(_shape, ref Frompos, ref ToPos, out var collider, out var hitnormal, out var hitpointworld)) {
 				RLog.Info($"Hit Tocuh Local {Frompos} {ToPos} pos {hitpointworld}");
 			}
@@ -46,6 +48,7 @@ namespace RhuEngine.Components
 							poses[(int)handed] = Frompos.Translation;
 						}
 						var pressForce = poses[(int)handed] - Frompos.Translation;
+						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
 						uIComponent.Rect.AddHitPoses(new HitData { Laser = false, HitPosWorld = hitpointworld, HitNormalWorld = hitnormal, PressForce = 1, Touchindex = (uint)handed });
 					}
 				}
@@ -58,13 +61,15 @@ namespace RhuEngine.Components
 		public void UpdateHeadLazer(Entity head) {
 			var headPos = head.GlobalTrans;
 			var headFrompos = headPos;
-			var headToPos = Matrix.T(Vector3f.AxisZ * -10f) * headPos;
+			var headToPos = Matrix.T(Vector3f.AxisZ * -7) * headPos;
+			World.DrawDebugSphere(headToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
 			if (World.PhysicsSim.ConvexRayTest(_shape, ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
 				RLog.Info($"Hit Local pos {hitpointworld}");
 			}
 			else {
 				if (WorldManager.FocusedWorld?.PhysicsSim.ConvexRayTest(_shape, ref headFrompos, ref headToPos, out collider, out hitnormal, out hitpointworld) ?? false) {
 					if (collider.CustomObject is RenderUIComponent uIComponent) {
+						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
 						uIComponent.Rect.AddHitPoses(new HitData {Touchindex = 10, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = RInput.Key(Key.MouseLeft).IsActive() ? 1f : 0f });
 					}
 				}
