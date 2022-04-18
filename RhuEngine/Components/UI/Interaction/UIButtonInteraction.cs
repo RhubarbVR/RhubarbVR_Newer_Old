@@ -55,8 +55,6 @@ namespace RhuEngine.Components
 		[NoWriteExsposed]
 		public bool IsClicking { get; private set; }
 
-		private Vector3f _startPos;
-
 		private HitData _lastHitData;
 
 		private void SendEvent(ButtonEvent buttonEvent) {
@@ -65,7 +63,6 @@ namespace RhuEngine.Components
 
 		private void RunButtonClickEvent(HitData hitData) {
 			_lastHitData = hitData;
-			_startPos = hitData.HitPos;
 			RLog.Info("Click");
 			SendEvent(new ButtonEvent {
 					IsPressing = false,
@@ -100,7 +97,6 @@ namespace RhuEngine.Components
 		private void RunButtonReleaseEvent(HitData hitData) {
 			_lastHitData = hitData;
 			IsClicking = false;
-			_startPos = Vector3f.Zero;
 			RLog.Info("Release");
 			SendEvent(new ButtonEvent {
 				IsPressing = false,
@@ -124,29 +120,15 @@ namespace RhuEngine.Components
 			var StillClicking = false;
 			foreach (var item in Rect.HitPoses(!AllowOtherZones.Value)) {
 				void Touch() {
-					if (item.Laser) {
-						if (item.PressForce >= PressForce) {
-							if (IsClicking) {
-								RunButtonPressingEvent(item);
-							}
-							else {
-								IsClicking = true;
-								RunButtonClickEvent(item);
-							}
-							StillClicking = true;
+					if (item.PressForce >= PressForce) {
+						if (IsClicking) {
+							RunButtonPressingEvent(item);
 						}
-					}
-					else {
-						if (item.PressForce >= PressForce) {
-							if (IsClicking) {
-								RunButtonPressingEvent(item);
-							}
-							else {
-								IsClicking = true;
-								RunButtonClickEvent(item);
-							}
-							StillClicking = true;
+						else {
+							IsClicking = true;
+							RunButtonClickEvent(item);
 						}
+						StillClicking = true;
 					}
 				}
 				if (item.Laser) {

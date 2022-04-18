@@ -25,15 +25,14 @@ namespace RhuEngine.Components
 			var head = LocalUser.userRoot.Target?.head.Target;
 			if (head != null) {
 				UpdateHeadLazer(head);
-				UpdateTouch(Handed.Right);
-				UpdateTouch(Handed.Left);
+				UpdateTouch(RInput.Hand(Handed.Right).Wrist,2);
+				UpdateTouch(RInput.Hand(Handed.Left).Wrist,1);
 			}
 		}
 
 		public Vector3f[] poses = new Vector3f[2];
 
-		public void UpdateTouch(Handed handed) {
-			var pos = RInput.Hand(handed).Wrist;
+		public void UpdateTouch(Matrix pos, uint handed) {
 			var Frompos = Matrix.T(Vector3f.AxisY * -0.07f) * pos;
 			var ToPos = Matrix.T(Vector3f.AxisY * 0.03f) * pos;
 			World.DrawDebugSphere(Frompos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
@@ -47,12 +46,15 @@ namespace RhuEngine.Components
 						if (Vector3f.Zero == poses[(int)handed]) {
 							poses[(int)handed] = Frompos.Translation;
 						}
-						var pressForce = poses[(int)handed] - Frompos.Translation;
+						var pressForce = (poses[(int)handed] - Frompos.Translation) * 15f;
 						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-						uIComponent.Rect.AddHitPoses(new HitData { Laser = false, HitPosWorld = hitpointworld, HitNormalWorld = hitnormal, PressForce = 1, Touchindex = (uint)handed });
+						uIComponent.Rect.AddHitPoses(new HitData { Laser = false, HitPosWorld = hitpointworld, HitNormalWorld = hitnormal, PressForce = pressForce.z, Touchindex = handed });
 					}
 				}
 				else {
+					if(poses.Length <= (int)handed) {
+						Array.Resize(ref poses, (int)handed + 1);
+					}
 					poses[(int)handed] = Vector3f.Zero;
 				}
 			}
