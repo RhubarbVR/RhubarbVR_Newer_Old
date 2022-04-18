@@ -165,8 +165,15 @@ namespace RNumerics
 			this.uv = new Vector2f[] { uv };
 			bHaveN = bHaveC = bHaveUV = true;
 		}
-	}
 
+		public NewVertexInfo(Vector3d v, Vector3f n, Vector3f c, Vector2f [] uv) {
+			this.v = v;
+			this.n = n;
+			this.c = c;
+			this.uv = uv.Length == 0 ? new Vector2f[1] : uv;
+			bHaveN = bHaveC = bHaveUV = true;
+		}
+	}
 
 	public interface IMeshBuilder
 	{

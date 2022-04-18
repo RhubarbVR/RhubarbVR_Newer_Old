@@ -60,10 +60,5 @@ namespace RhuEngine.Components
 				RLog.Err("Error Loading rec mesh " + e);
 			}
 		}
-
-		public override void OnLoaded() {
-			base.OnLoaded();
-			LoadMesh();
-		}
 	}
 }

@@ -30,6 +30,9 @@ namespace RhuEngine.Components
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
 		public Sync<bool> HasCaps;
+		[Default(false)]
+		[OnChanged(nameof(LoadMesh))]
+		public Sync<bool> Clockwise;
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
@@ -62,6 +65,7 @@ namespace RhuEngine.Components
 					NoSharedVertices = NoSharedVertices.Value,
 					WantUVs = WantUVs,
 					WantNormals = WantNormals,
+					Clockwise = Clockwise,
 				};
 				mesh.Generate();
 				GenMesh(mesh.MakeSimpleMesh());
@@ -78,15 +82,11 @@ namespace RhuEngine.Components
 					NoSharedVertices = NoSharedVertices.Value,
 					WantUVs = WantUVs,
 					WantNormals = WantNormals,
+					Clockwise = Clockwise,
 				};
 				mesh.Generate();
 				GenMesh(mesh.MakeSimpleMesh());
 			}
-		}
-
-		public override void OnLoaded() {
-			base.OnLoaded();
-			LoadMesh();
 		}
 	}
 }

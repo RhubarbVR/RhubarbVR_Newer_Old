@@ -33,6 +33,11 @@ namespace RhuEngine.Components
 			}
 		}
 
+		public override void OnLoaded() {
+			base.OnLoaded();
+			LoadMesh();
+		}
+
 		public abstract void ComputeMesh();
 	}
 }
