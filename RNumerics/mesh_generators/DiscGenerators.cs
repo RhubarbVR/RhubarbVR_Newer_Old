@@ -61,10 +61,8 @@ namespace RNumerics
 		}
 	}
 
-
-
-
 	// generate a triangle fan, no subdvisions
+	// it has NO HOLE in the middle -dfg
 	public class TrivialDiscGenerator : MeshGenerator
 	{
 		public float Radius = 1.0f;
@@ -113,13 +111,8 @@ namespace RNumerics
 		}
 	}
 
-
-
-
-
-
-
 	// generate a triangle fan, no subdvisions
+	// it has a HOLE in the middle -dfg
 	public class PuncturedDiscGenerator : MeshGenerator
 	{
 		public float OuterRadius = 1.0f;
