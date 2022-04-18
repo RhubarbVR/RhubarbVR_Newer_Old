@@ -108,7 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="StereoKit">
-      <Version>0.3.6-preview.3</Version>
+      <Version>0.3.6-preview.4</Version>
     </PackageReference>
     <PackageReference Include="VideoLAN.LibVLC.Android">
       <Version>3.2.0.1</Version>

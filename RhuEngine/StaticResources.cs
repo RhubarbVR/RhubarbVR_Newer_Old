@@ -8,10 +8,10 @@ using RhuEngine.Linker;
 namespace RhuEngine
 {
 	public class StaticResources {
-		public Stream GetStaticResourceStream(string name) {
+		public static Stream GetStaticResourceStream(string name) {
 			return Assembly.GetCallingAssembly().GetManifestResourceStream(name);
 		}
-		public byte[] GetStaticResource(string name) {
+		public static byte[] GetStaticResource(string name) {
 			var ms = new MemoryStream();
 			GetStaticResourceStream(name).CopyTo(ms);
 			return ms.ToArray();

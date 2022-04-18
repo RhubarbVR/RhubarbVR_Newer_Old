@@ -85,7 +85,7 @@ namespace RhuEngine.WorldObjects
 			return obj;
 		}
 		public DataNodeGroup CommonWorkerSerialize(IWorldObject @object) {
-			var fields = @object.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+			var fields = @object.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
 			DataNodeGroup obj = null;
 			if (@object.Persistence || NetSync) {
 				if (!NetSync) {

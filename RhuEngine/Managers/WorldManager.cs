@@ -157,14 +157,15 @@ namespace RhuEngine.Managers
 			Engine.IntMsg = "Creating Personal Space";
 			PrivateOverlay = CreateNewWorld(World.FocusLevel.PrivateOverlay);
 			Engine.IntMsg = "Done Creating Personal Space";
-			//TODO Add Back
-			//PrivateOverlay.RootEntity.AddChild("PrivateSpace").AttachComponent<PrivateSpaceManager>();
+			PrivateOverlay.RootEntity.AddChild("PrivateSpace").AttachComponent<PrivateSpaceManager>();
 			Engine.IntMsg = "Creating Local World";
 			LocalWorld = CreateNewWorld(World.FocusLevel.Focused, true);
 			Engine.IntMsg = "Loading Local World Data";
 			LocalWorld.SessionName.Value = "Local World";
 			LocalWorld.WorldName.Value = "Local World";
+			Engine.IntMsg = "Building Local World";
 			LocalWorld.BuildLocalWorld();
+			Engine.IntMsg = "Local World Made";
 			while (LocalWorld.IsLoading) {
 				Engine.IntMsg = LocalWorld.LoadMsg;
 				Thread.Sleep(10);

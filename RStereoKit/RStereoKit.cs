@@ -3,6 +3,7 @@
 using StereoKit;
 using RhuEngine;
 using RhuEngine.Linker;
+using RhuEngine.Physics;
 
 namespace RStereoKit
 {
@@ -65,12 +66,14 @@ namespace RStereoKit
 			RShader.Instance = new SKShader();
 			RText.Instance = new SkRText();
 			RMesh.Instance = new SKRMesh();
-			RTime.Inst = new SKTime();
+			RTime.Instance = new SKTime();
 			RRenderer.Instance = new SKRRenderer();
 			RInput.Instance = new SKInput();
 			RSound.Instance = new SKSound();
 			RSoundInst.Instance = new SKSoundInst();
 			RMicrophone.Instance = new SKMic();
+			RFont.Instance = new SKFont();
+			PhysicsHelper.RegisterPhysics<RBullet.BulletPhsyicsLink>();
 		}
 
 		public void Start() {

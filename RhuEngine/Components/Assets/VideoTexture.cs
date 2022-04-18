@@ -136,8 +136,9 @@ namespace RhuEngine.Components
 			var uri = new Uri(url);
 			if ((useCache || uri.Scheme.ToLower() == "local") && !VideoImporter.IsVideoStreaming(uri)) {
 				RLog.Info("Loading static video");
-				CurrentTask?.Stop();
+				var lastTask = CurrentTask;
 				CurrentTask = World.assetSession.AssetLoadingTask((data) => {
+					lastTask?.Stop();
 					if (data != null) {
 						var media = new Media(_libVLC, Engine.assetManager.GetAssetFile(uri));
 						while (media.State == VLCState.Buffering) {

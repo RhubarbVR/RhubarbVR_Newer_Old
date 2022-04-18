@@ -1,151 +1,75 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading;
-//using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
-//using RhuEngine.Components.PrivateSpace.Windows;
-//using RhuEngine.WorldObjects.ECS;
+using RhuEngine.WorldObjects.ECS;
 
-//using SharedModels;
+using SharedModels;
 
-//using RNumerics;
-//using RhuEngine.Linker;
+using RNumerics;
+using RhuEngine.Linker;
+using RhuEngine.Physics;
+namespace RhuEngine.Components
+{
+	[UpdateLevel(UpdateEnum.Normal)]
+	public class PrivateSpaceManager : Component
+	{
+		RSphereShape _shape;
+		public override void OnLoaded() {
+			base.OnLoaded();
+			_shape = new RSphereShape(0.01f);
+		}
+		public override void Step() {
+			var head = LocalUser.userRoot.Target?.head.Target;
+			if (head != null) {
+				UpdateHeadLazer(head);
+				UpdateTouch(Handed.Right);
+				UpdateTouch(Handed.Left);
+			}
+		}
 
-//namespace RhuEngine.Components
-//{
-//	[UpdateLevel(UpdateEnum.Rendering)]
-//	public class PrivateSpaceManager : RenderingComponent
-//	{
-//		public Pose privatePose;
+		public Vector3f[] poses = new Vector3f[2];
 
-//		public Window[] windows;
+		public void UpdateTouch(Handed handed) {
+			var pos = RInput.Hand(handed).Wrist;
+			var Frompos = pos;
+			var ToPos = Matrix.T(Vector3f.AxisY * 0.1f) * pos;
+			if (World.PhysicsSim.ConvexRayTest(_shape, ref Frompos, ref ToPos, out var collider, out var hitnormal, out var hitpointworld)) {
+				RLog.Info($"Hit Tocuh Local {Frompos} {ToPos} pos {hitpointworld}");
+			}
+			else {
+				if (WorldManager.FocusedWorld?.PhysicsSim.ConvexRayTest(_shape,ref Frompos, ref ToPos, out collider, out hitnormal, out hitpointworld) ?? false) {
+					if (collider.CustomObject is RenderUIComponent uIComponent) {
+						if (Vector3f.Zero == poses[(int)handed]) {
+							poses[(int)handed] = Frompos.Translation;
+						}
+						var pressForce = poses[(int)handed] - Frompos.Translation;
+						uIComponent.Rect.AddHitPoses(new HitData { Laser = false, HitPosWorld = hitpointworld, HitNormalWorld = hitnormal, PressForce = 1, Touchindex = (uint)handed });
+					}
+				}
+				else {
+					poses[(int)handed] = Vector3f.Zero;
+				}
+			}
+		}
 
-//		private void RenderPrivateWindow() {
-//			UI.WindowBegin("PriveWindow", ref privatePose,UIWin.Body);
-//			if (Engine.netApiManager.IsOnline) {
-//				foreach (var item in windows) {
+		public void UpdateHeadLazer(Entity head) {
+			var headPos = head.GlobalTrans;
+			var headFrompos = headPos;
+			var headToPos = Matrix.T(Vector3f.AxisZ * -10f) * headPos;
+			if (World.PhysicsSim.ConvexRayTest(_shape, ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
+				RLog.Info($"Hit Local pos {hitpointworld}");
+			}
+			else {
+				if (WorldManager.FocusedWorld?.PhysicsSim.ConvexRayTest(_shape, ref headFrompos, ref headToPos, out collider, out hitnormal, out hitpointworld) ?? false) {
+					if (collider.CustomObject is RenderUIComponent uIComponent) {
+						uIComponent.Rect.AddHitPoses(new HitData {Touchindex = 10, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = RInput.Key(Key.MouseLeft).IsActive() ? 1f : 0f });
+					}
+				}
+			}
+		}
 
-//					if (item.OnLogin is null) {
-//						var _open = item.IsOpen;
-//						UI.Toggle(item.Name, ref _open);
-//						if (_open != item.IsOpen) {
-//							item.IsOpen = _open;
-//						}
-//						UI.SameLine();
-//					}
-//					else if (item.OnLogin.Value == Engine.netApiManager.IsLoggedIn) {
-//						var _open = item.IsOpen;
-//						UI.Toggle(item.Name, ref _open);
-//						if(_open != item.IsOpen) {
-//							item.IsOpen = _open;
-//						}
-//						UI.SameLine();
-//					}
-//					else if (item.IsOpen) {
-//						item.IsOpen = false;
-//					}
-//				}
-//				if (Engine.netApiManager.IsLoggedIn) {
-//					UI.Label("Hello " + Engine.netApiManager.User?.UserName ?? "null");
-//					UI.SameLine();
-//					if (UI.Button("FilePicker")) {
-//						try {
-//							Platform.FilePicker(PickerMode.Open, (open, path) => { if (open) { WorldManager.FocusedWorld.ImportString(path.CleanPath()); } });
-//						}
-//						catch { }
-//					}
-//					UI.SameLine();
-//					if (UI.Button("Logout")) {
-//						Engine.netApiManager.Logout();
-//					}
-//					UI.Text("World switcher");
-//					if (WorldManager.FocusedWorld is not null) {
-//						UI.PushEnabled(false);
-//						var e = true;
-//						UI.Toggle(" " + WorldManager.FocusedWorld.SessionName.Value, ref e);
-//						UI.PopEnabled();
-//						if (WorldManager.LocalWorld != WorldManager.FocusedWorld) {
-//							UI.PushTint(new Color(0.8f, 0, 0));
-//							UI.SameLine();
-//							UI.Space(-Engine.UISettings.padding);
-//							if (UI.Button("X")) {
-//								try {
-//									WorldManager.FocusedWorld.Dispose();
-//								}
-//								catch { }
-//							}
-//							UI.PopTint();
-//						}
-//					}
-//					var count = 2;
-//					for (var i = 0; i < WorldManager.worlds.Count; i++) {
-//						var item = WorldManager.worlds[i];
-//						if (item.Focus == WorldObjects.World.FocusLevel.Background) {
-//							if (count % 3 != 1) {
-//								UI.SameLine();
-//							}
-//							UI.PushId(count);
-//							if (UI.Button(" " + item.SessionName.Value)) {
-//								item.Focus = WorldObjects.World.FocusLevel.Focused;
-//							}
-//							if (WorldManager.LocalWorld != item) {
-//								UI.PushTint(new Color(0.8f, 0, 0));
-//								UI.SameLine();
-//								UI.Space(-Engine.UISettings.padding);
-//								if (UI.Button("X")) {
-//									try {
-//										item.Dispose();
-//									}
-//									catch { }
-//								}
-//								UI.PopTint();
-//							}
-//							UI.PopId();
-//							count++;
-//						}
-//					}
-//				}
-//			}
-//			else {
-//				if(UI.Button("Go Online")) {
-//					try {
-//						Engine.netApiManager.UpdateCheckForInternetConnection();	
-//					}catch { }
-//				}
-//			}
-//			UI.WindowEnd();
-//		}
-
-
-//		public override void OnLoaded() {
-//			base.OnLoaded();
-//			windows = new Window[] { new SettingsWindow(Engine, WorldManager, World), new DebugWindow(Engine,WorldManager,World),new ConsoleWindow(Engine,WorldManager, World), new AssetTasksWindow(Engine,WorldManager,World) ,new SessionWindow(Engine, WorldManager, World), new LoginWindow(Engine,WorldManager, World) };
-//			privatePose = new(-.2f, 0.2f, -0.2f, Quat.LookDir(1, 0, 1));
-//			Engine.netApiManager.HasGoneOfline += NetApiManager_HasGoneOfline;
-//		}
-
-//		private void NetApiManager_HasGoneOfline() {
-//			foreach (var item in windows) {
-//				item.IsOpen = false;
-//			}
-//		}
-
-//		readonly bool _uIOpen = true;
-
-//		public override void Render() {
-//			Hierarchy.Push(Renderer.CameraRoot);
-//			foreach (var item in windows) {
-//				if (item.IsOpen) {
-//					item.Update();
-//				}
-//			}
-//			Hierarchy.Push(Matrix.S(0.75f));
-//			if (_uIOpen) {
-//				RenderPrivateWindow();
-//			}
-//			Hierarchy.Pop();
-//			Hierarchy.Pop();
-//		}
-//	}
-//}
+	}
+}

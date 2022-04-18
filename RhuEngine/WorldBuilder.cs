@@ -7,62 +7,147 @@ using RhuEngine.Components.ScriptNodes;
 using System.Collections.Generic;
 using RNumerics;
 using RhuEngine.Linker;
+using System.Threading;
 
 namespace RhuEngine
 {
 	public static class WorldBuilder
 	{
+		private static Entity AttachImage(this Entity parrent, IAssetProvider<RShader> shader, Vector2f min, Vector2f max, Colorf color,IAssetProvider<RTexture2D> assetProvider) {
+			var child = parrent.AddChild("childEliment");
+			var rectTwo = child.AttachComponent<UIRect>();
+			rectTwo.AnchorMin.Value = min;
+			rectTwo.AnchorMax.Value = max;
+			var img = child.AttachComponent<UIImage>();
+			img.Tint.Value = color;
+			var mit = child.AttachComponent<DynamicMaterial>();
+			mit.shader.Target = shader;
+			mit.SetPram("diffuse", assetProvider);
+			img.Material.Target = mit;
+			img.Texture.Target = assetProvider;
+			return child;
+		}
+
+		private static Entity AttachText(this Entity parrent, Vector2f min, Vector2f max, Colorf color,string text) {
+			var child = parrent.AddChild("childEliment");
+			var rectTwo = child.AttachComponent<UIRect>();
+			rectTwo.AnchorMin.Value = min;
+			rectTwo.AnchorMax.Value = max;
+			var img = child.AttachComponent<UIText>();
+			img.Text.Value = text;
+			img.StartingColor.Value = color;
+			return child;
+		}
+		private static Entity AttachList(this Entity parrent, DynamicMaterial mit, Vector2f min, Vector2f max, Colorf color) {
+			var child = parrent.AddChild("Cut");
+			var rectTwo = child.AttachComponent<CuttingUIRect>();
+			rectTwo.AnchorMin.Value = min;
+			rectTwo.AnchorMax.Value = max;
+			var img = child.AttachComponent<UIRectangle>();
+			img.Tint.Value = color;
+			img.Material.Target = mit;
+			var list = child.AddChild("List");
+			var scroll = list.AttachComponent<UIScrollInteraction>();
+			var rectthrere = list.AttachComponent<VerticalList>();
+			rectthrere.Depth.Value = 0f;
+			scroll.OnScroll.Target = rectthrere.Scroll;
+			return list;
+		}
+		private static Entity AttachRectangle(this Entity parrent, DynamicMaterial mit,Vector2f min, Vector2f max, Colorf color) {
+			var child = parrent.AddChild("childEliment");
+			var rectTwo = child.AttachComponent<UIRect>();
+			rectTwo.AnchorMin.Value = min;
+			rectTwo.AnchorMax.Value = max;
+			var img = child.AttachComponent<UIRectangle>();
+			img.Tint.Value = color;
+			img.Material.Target = mit;
+			return child;
+		}
 		public static void BuildUITest(Entity entity) {
 			entity.position.Value = new Vector3f(0, 1, 0);
 			var pannel = entity.AddChild("PannelRoot");
-			// TODO add back with ui
-			//pannel.AttachComponent<UIWindow>();
-			//var button = pannel.AddChild("Button").AttachComponent<UIButton>();
-			var script = pannel.AttachComponent<RhuScript>();
-			//button.onClick.Target = script.CallMainMethod;
-			//Hello World with number
+			var shader = entity.World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
+			var mit = pannel.AttachComponent<DynamicMaterial>();
+			mit.shader.Target = shader;
+			var rectone = pannel.AttachComponent<UIRect>();
+			var canvas = pannel.AttachComponent<UICanvas>();
+			var rectTwo = pannel.AttachComponent<UIRect>();
+			var img = pannel.AttachComponent<UIRectangle>();
+			img.Tint.Value = Colorf.Black;
+			img.Material.Target = mit;
+			var texture = pannel.AttachComponent<StaticTexture>();
+			texture.url.Value = "https://cdn.discordapp.com/attachments/222386596236886026/963193866645831680/Screenshot_20220411-234823_Reddit.jpg";
+			////pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Blue)
+			////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red)
+			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Yellow)
+			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Gold)
+			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Green)
+			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Grey)
+			////.AttachImage(shader, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.White, texture);
+			///
+			var rect = pannel.AttachRectangle(mit, new Vector2f(0.25f, 0f), new Vector2f(1f), Colorf.RhubarbGreen);
+			var button = rect.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.RhubarbRed);
+			button.AttachText(Vector2f.Zero, Vector2f.One, Colorf.White, "<colorred>Button<color=blue><size=20> Can go clicky<color=yellow> clicky<size5> So Click");
+			button.AttachComponent<UIButtonInteraction>();
+			var listRoot = pannel.AttachList(mit, new Vector2f(0f), new Vector2f(0.25f, 1f), Colorf.Blue);
+			void AttachListElement(Entity root,string text) {
+				var e = root.AttachRectangle(mit, new Vector2f(0f, 0f), new Vector2f(1f, 0.2f), Colorf.RhubarbRed);
+				e.AttachImage(shader, new Vector2f(0.5, 0), new Vector2f(1f), Colorf.White, texture);
+				e.AttachText(new Vector2f(0), new Vector2f(0.5f, 1), Colorf.White,text);
+			}
+			for (var i = 0; i < 15; i++) {
+				AttachListElement(listRoot,$"Element{i}");
+			}
+			listRoot.GetFirstComponent<UIRect>().RegUpdateUIMeshes();
+			//pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red);
+			//// TODO add back with ui
+			////pannel.AttachComponent<UIWindow>();
+			////var button = pannel.AddChild("Button").AttachComponent<UIButton>();
+			//var script = pannel.AttachComponent<RhuScript>();
+			////button.onClick.Target = script.CallMainMethod;
+			////Hello World with number
+			////var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
+			////var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
+			////method.Prams[0] = tostring;
+			////tostring.Prams[0] = new ScriptNodeConst(10);
+			////normal hello world
 			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			//var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
-			//method.Prams[0] = tostring;
-			//tostring.Prams[0] = new ScriptNodeConst(10);
-			//normal hello world
-			var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			method.Prams[0] = new ScriptNodeConst("Hi there is has been changed");
-			//Hello Word
-			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			//Test for stack overflow
-			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("CallMainMethod")[0];
-			//Test for fields
-			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			//var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
-			//method.Prams[0] = tostring;
-			//tostring.Prams[0] = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeFieldsRead()[0];
-			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			//var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
-			//method.Prams[0] = tostring;
-			//var inc = 2;
-			//var add = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "Add")[0];
-			//inc++;
-			//var e = AddNodeSpawn(new ScriptNodeMethod[1] {add},ref inc);
-			//var length = 8;
-			//for (var i = 0; i < length; i++) {
-			//	e = AddNodeSpawn(e, ref inc);
-			//}
-			//Console.WriteLine("Nodes" + e.Length);
-			//foreach (var item in e) {
-			//	item.Prams[0] = new ScriptNodeConst(1);
-			//	inc++;
-			//	item.Prams[1] = new ScriptNodeConst(1);
-			//	inc++;
-			//}
-			//Console.WriteLine($"Nodes are {inc}");
-			//tostring.Prams[0] = add;
-			script.MainMethod = method;
-			var ScripEditor = entity.AddChild("ScripEditor");
-			ScripEditor.position.Value = new Vector3f(0, -0.1f, 0);
-			// TODO add back with ui
-			//var VisualScriptBuilder = ScripEditor.AttachComponent<VisualScriptBuilder>();
-			//VisualScriptBuilder.script.Target = script;
+			//method.Prams[0] = new ScriptNodeConst("Hi there is has been changed");
+			////Hello Word
+			////var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
+			////Test for stack overflow
+			////var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("CallMainMethod")[0];
+			////Test for fields
+			////var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
+			////var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
+			////method.Prams[0] = tostring;
+			////tostring.Prams[0] = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeFieldsRead()[0];
+			////var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
+			////var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
+			////method.Prams[0] = tostring;
+			////var inc = 2;
+			////var add = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "Add")[0];
+			////inc++;
+			////var e = AddNodeSpawn(new ScriptNodeMethod[1] {add},ref inc);
+			////var length = 8;
+			////for (var i = 0; i < length; i++) {
+			////	e = AddNodeSpawn(e, ref inc);
+			////}
+			////Console.WriteLine("Nodes" + e.Length);
+			////foreach (var item in e) {
+			////	item.Prams[0] = new ScriptNodeConst(1);
+			////	inc++;
+			////	item.Prams[1] = new ScriptNodeConst(1);
+			////	inc++;
+			////}
+			////Console.WriteLine($"Nodes are {inc}");
+			////tostring.Prams[0] = add;
+			//script.MainMethod = method;
+			//var ScripEditor = entity.AddChild("ScripEditor");
+			//ScripEditor.position.Value = new Vector3f(0, -0.1f, 0);
+			//// TODO add back with ui
+			////var VisualScriptBuilder = ScripEditor.AttachComponent<VisualScriptBuilder>();
+			////VisualScriptBuilder.script.Target = script;
 		}
 
 		public static ScriptNodeMethod[] AddNodeSpawn(ScriptNodeMethod[] scriptNodeMethod,ref int inc) {

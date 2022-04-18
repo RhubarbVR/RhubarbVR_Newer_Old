@@ -19,7 +19,7 @@ namespace RStereoKit
 
 	public class SKMouse : IRMouse
 	{
-		public float ScrollChange => Input.Mouse.scrollChange;
+		public Vector2f ScrollChange => new Vector2f(0,Input.Mouse.scrollChange/1000);
 
 		public Vector2f PosChange => (Vector2f)(Vector2)Input.Mouse.posChange;
 	}
