@@ -46,7 +46,7 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public Sync<bool> AllowOtherZones;
 
-		[Default(0.3f)]
+		[Default(0.5f)]
 		public Sync<float> PressForce;
 
 		public SyncDelegate<Action<ButtonEvent>> ButtonEvent;
@@ -98,6 +98,7 @@ namespace RhuEngine.Components
 			_lastHitData = hitData;
 			IsClicking = false;
 			RLog.Info("Release");
+			Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, 0));
 			SendEvent(new ButtonEvent {
 				IsPressing = false,
 				IsClicked = false,
@@ -118,9 +119,11 @@ namespace RhuEngine.Components
 				return;
 			}
 			var StillClicking = false;
+			var minPress = 1f;
 			foreach (var item in Rect.HitPoses(!AllowOtherZones.Value)) {
 				void Touch() {
 					if (item.PressForce >= PressForce) {
+						minPress = Math.Min(minPress, item.PressForce);
 						if (IsClicking) {
 							RunButtonPressingEvent(item);
 						}
@@ -146,6 +149,9 @@ namespace RhuEngine.Components
 						Touch();
 					}
 				}
+			}
+			if (IsClicking) {
+				Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, (-(Rect.Depth.Value*0.999f * minPress))));
 			}
 			if (IsClicking && !StillClicking) {
 				RunButtonReleaseEvent(_lastHitData);

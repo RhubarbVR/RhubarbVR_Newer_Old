@@ -395,7 +395,7 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		public void Step() {
-			foreach (var item in components.ToArray()) {
+			foreach (var item in components) {
 				var comp = (Component)item;
 				comp.AlwaysStep();
 				if (comp.Enabled.Value) {

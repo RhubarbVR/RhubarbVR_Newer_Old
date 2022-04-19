@@ -30,7 +30,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public Vector3f[] poses = new Vector3f[2];
+		public Matrix[] poses = new Matrix[2];
 
 		public void UpdateTouch(Matrix pos, uint handed) {
 			var Frompos = Matrix.T(Vector3f.AxisY * -0.07f) * pos;
@@ -43,19 +43,19 @@ namespace RhuEngine.Components
 			else {
 				if (WorldManager.FocusedWorld?.PhysicsSim.ConvexRayTest(_shape,ref Frompos, ref ToPos, out collider, out hitnormal, out hitpointworld) ?? false) {
 					if (collider.CustomObject is RenderUIComponent uIComponent) {
-						if (Vector3f.Zero == poses[(int)handed]) {
-							poses[(int)handed] = Frompos.Translation;
+						if (Matrix.Identity == poses[(int)handed]) {
+							poses[(int)handed] = pos;
 						}
-						var pressForce = (poses[(int)handed] - Frompos.Translation) * 15f;
+						var pressForce = (poses[(int)handed] * pos.Inverse).Translation.z * 20;
 						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-						uIComponent.Rect.AddHitPoses(new HitData { Laser = false, HitPosWorld = hitpointworld, HitNormalWorld = hitnormal, PressForce = pressForce.z, Touchindex = handed });
+						uIComponent.Rect.AddHitPoses(new HitData { Laser = false, HitPosWorld = hitpointworld, HitNormalWorld = hitnormal, PressForce = pressForce, Touchindex = handed });
 					}
 				}
 				else {
 					if(poses.Length <= (int)handed) {
 						Array.Resize(ref poses, (int)handed + 1);
 					}
-					poses[(int)handed] = Vector3f.Zero;
+					poses[(int)handed] = Matrix.Identity;
 				}
 			}
 		}

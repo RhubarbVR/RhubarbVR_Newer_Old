@@ -339,7 +339,7 @@ namespace RhuEngine.Components
 
 		public bool Culling { get; private set; } = false;
 
-		public void ProcessCutting(bool update = true) {
+		public void ProcessCutting(bool update = true,bool updatePhysicsMesh = true) {
 			var min = Min + ScrollOffset.Xy;
 			var max = Max + ScrollOffset.Xy;
 			var cutmin = CutZonesMin;
@@ -354,6 +354,9 @@ namespace RhuEngine.Components
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.CutElement(cut,update);
+					if (updatePhysicsMesh) {
+						item.LoadPhysicsMesh();
+					}
 				}
 			});
 		}
@@ -492,17 +495,22 @@ namespace RhuEngine.Components
 		}
 
 		public void Scroll(Vector3f value) {
+			if(value == ScrollOffset) {
+				return;
+			}
+			var phsicsupdate = value.x == ScrollOffset.x && value.y == ScrollOffset.y;
 			ScrollOffset = value;
+
 			_childRects.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.Scroll(value);
 				}
 			});
-			ProcessCutting(false);
+			ProcessCutting(false,false);
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.RenderScrollMesh(false);
-					item.RenderCutMesh(false);
+					item.RenderCutMesh(false, !phsicsupdate);
 				}
 			});
 			UpdateUIMeshes();
