@@ -15,13 +15,26 @@ namespace RhuEngine.WorldObjects
 
 		public SyncAbstractObjList<SyncStream> syncStreams;
 		[Exsposed]
+		[NoWriteExsposed]
 		public string NormalizedUserName { get; private set; }
 		[Exsposed]
+		[NoWriteExsposed]
 		public string UserName { get;private set; }
+		[Exsposed]
+		[NoWriteExsposed]
+		public string[] Roles { get; private set; }
 
 		[NoSyncUpdate]
 		[OnChanged(nameof(UserIDLoad))]
 		public Sync<string> userID;
+		[NoSyncUpdate]
+		public Sync<PlatformID> Platform;
+
+		[NoSyncUpdate]
+		public Sync<string> PlatformVersion;
+
+		[NoSyncUpdate]
+		public Sync<string> BackendID;
 
 		public void UserIDLoad() {
 			Task.Run(async () => {
@@ -29,6 +42,7 @@ namespace RhuEngine.WorldObjects
 				var e = await Engine.netApiManager.GetUserInfo(userID);
 				UserName = e?.UserName;
 				NormalizedUserName = e?.NormalizedUserName;
+				Roles = e?.Roles?.ToArray()??Array.Empty<string>();
 			});
 		}
 

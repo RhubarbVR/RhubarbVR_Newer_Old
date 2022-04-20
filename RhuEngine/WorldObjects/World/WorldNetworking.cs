@@ -595,6 +595,9 @@ namespace RhuEngine.WorldObjects
 				RLog.Info($"Built local User with id{LocalUserID}");
 				var user = Users.Add();
 				user.userID.Value = worldManager.Engine.netApiManager.User?.Id ?? "null";
+				user.Platform.Value = Environment.OSVersion.Platform;
+				user.PlatformVersion.Value = Environment.OSVersion.Version.ToString();
+				user.BackendID.Value = Engine.EngineLink.BackendID;
 			}
 			else {
 				LoadMsg = "using old LocalUser";

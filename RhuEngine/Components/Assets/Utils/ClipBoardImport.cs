@@ -18,8 +18,10 @@ namespace RhuEngine.Components
 				return;
 			}
 			if(RInput.Key(Key.V).IsJustActive() && RInput.Key(Key.Ctrl).IsActive()) {
-				RLog.Info("ClipBoard");
-				World.ImportString(ClipboardService.GetText());
+				//ToDO inprove to have imgs and also have render bindings
+				var data = ClipboardService.GetText();
+				RLog.Info($"ClipBoard {data}");
+				World.ImportString(data);
 			}
 		}
 	}
