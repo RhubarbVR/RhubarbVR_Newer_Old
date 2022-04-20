@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 	{
 		public RMesh loadedMesh = null;
 		public void GenMesh(IMesh mesh) {
-			if(loadedMesh == null) {
+			if (loadedMesh == null) {
 				loadedMesh = new RMesh(mesh);
 				Load(loadedMesh);
 			}
@@ -18,19 +18,17 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public void LoadMesh() 
-		{
-			// TODO Add the funny UI start/end methods here. -dfg
-			try {
-				ComputeMesh();
-			}
-			catch (Exception e) {
-				#if DEBUG
-				RLog.Err(e.ToString());
-				#endif
-				// Optional: Hide the mesh if data is invalid
-				// Load(null);
-			}
+		public void LoadMesh() {
+			RWorld.ExecuteOnEndOfFrame(this, () => {
+				try {
+					ComputeMesh();
+				}
+				catch (Exception e) {
+#if DEBUG
+					RLog.Err(e.ToString());
+#endif
+				}
+			});
 		}
 
 		public override void OnLoaded() {

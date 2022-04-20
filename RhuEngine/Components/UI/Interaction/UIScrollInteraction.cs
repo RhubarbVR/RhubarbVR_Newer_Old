@@ -17,6 +17,9 @@ namespace RhuEngine.Components
 
 		public SyncDelegate<Action<Vector2f>> OnScroll;
 
+		[Default(0.5f)]
+		public Sync<float> FingerPressForce;
+
 		public override void OnAttach() {
 			base.OnAttach();
 			MouseScrollSpeed.Value = Vector2f.One;
@@ -47,7 +50,7 @@ namespace RhuEngine.Components
 			}
 			if (HasFirst) {
 				//DragScroll 
-				var scroll = Rect.ClickFingerChange(0.7f, !AllowOtherZones.Value);
+				var scroll = Rect.ClickFingerChange(FingerPressForce.Value, !AllowOtherZones.Value);
 				var scrollavrage = Vector2f.Zero;
 				foreach (var item in scroll) {
 					if (scrollavrage == Vector2f.Zero) {

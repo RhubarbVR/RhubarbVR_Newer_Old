@@ -12,6 +12,8 @@ namespace Rhubarb_VR_HeadLess
 {
 	public class NullLinker : IEngineLink,IRLog,IRTime
 	{
+		public string BackendID => "HeadLess";
+
 		public bool SpawnPlayer => false;
 
 		private string TimeStamp => DateTime.Now.ToLongTimeString();

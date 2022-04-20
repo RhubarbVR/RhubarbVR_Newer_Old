@@ -46,7 +46,7 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public Sync<bool> AllowOtherZones;
 
-		[Default(0.3f)]
+		[Default(0.5f)]
 		public Sync<float> PressForce;
 
 		public SyncDelegate<Action<ButtonEvent>> ButtonEvent;
@@ -54,8 +54,6 @@ namespace RhuEngine.Components
 		[Exsposed]
 		[NoWriteExsposed]
 		public bool IsClicking { get; private set; }
-
-		private Vector3f _startPos;
 
 		private HitData _lastHitData;
 
@@ -65,7 +63,6 @@ namespace RhuEngine.Components
 
 		private void RunButtonClickEvent(HitData hitData) {
 			_lastHitData = hitData;
-			_startPos = hitData.HitPos;
 			RLog.Info("Click");
 			SendEvent(new ButtonEvent {
 					IsPressing = false,
@@ -100,8 +97,8 @@ namespace RhuEngine.Components
 		private void RunButtonReleaseEvent(HitData hitData) {
 			_lastHitData = hitData;
 			IsClicking = false;
-			_startPos = Vector3f.Zero;
 			RLog.Info("Release");
+			Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, 0));
 			SendEvent(new ButtonEvent {
 				IsPressing = false,
 				IsClicked = false,
@@ -122,31 +119,19 @@ namespace RhuEngine.Components
 				return;
 			}
 			var StillClicking = false;
+			var minPress = 1f;
 			foreach (var item in Rect.HitPoses(!AllowOtherZones.Value)) {
 				void Touch() {
-					if (item.Laser) {
-						if (item.PressForce >= PressForce) {
-							if (IsClicking) {
-								RunButtonPressingEvent(item);
-							}
-							else {
-								IsClicking = true;
-								RunButtonClickEvent(item);
-							}
-							StillClicking = true;
+					if (item.PressForce >= PressForce) {
+						minPress = Math.Min(minPress, item.PressForce);
+						if (IsClicking) {
+							RunButtonPressingEvent(item);
 						}
-					}
-					else {
-						if (item.PressForce >= PressForce) {
-							if (IsClicking) {
-								RunButtonPressingEvent(item);
-							}
-							else {
-								IsClicking = true;
-								RunButtonClickEvent(item);
-							}
-							StillClicking = true;
+						else {
+							IsClicking = true;
+							RunButtonClickEvent(item);
 						}
+						StillClicking = true;
 					}
 				}
 				if (item.Laser) {
@@ -164,6 +149,9 @@ namespace RhuEngine.Components
 						Touch();
 					}
 				}
+			}
+			if (IsClicking) {
+				Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, (-(Rect.Depth.Value*0.999f * minPress))));
 			}
 			if (IsClicking && !StillClicking) {
 				RunButtonReleaseEvent(_lastHitData);

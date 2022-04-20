@@ -9,7 +9,6 @@ class SKLoader
 		// This will allow the App constructor to call a few SK methods
 		// before Initialize is called.
 		SK.PreLoadLibrary();
-
 		var cap = new OutputCapture();
 		var rhu = new RhuStereoKit();
 		var app = new Engine(rhu, args, cap, AppDomain.CurrentDomain.BaseDirectory);
