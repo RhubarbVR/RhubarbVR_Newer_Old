@@ -9,27 +9,30 @@ namespace RNumerics
 	public class MobiusStripGenerator : MeshGenerator
 	{
 		public int planeResolution = 100;
-		private List<int> triangles = new List<int>();
+
+		// TODO Make this in-place with base.triangles
+		// No, do not make this readonly. It will only result in suffering
+		private List<int> tris = new List<int>();
 
 		override public MeshGenerator Generate() {
 			base.vertices = new VectorArray3d(planeResolution * planeResolution);
 			base.uv = new VectorArray2f(planeResolution * planeResolution);
 			float u = 0;
 			float v = -1;
-			float uStepSize = MathUtil.TWO_P_IF / planeResolution;
-			float vStepSize = 2.0f / planeResolution;
+			var uStepSize = MathUtil.TWO_P_IF / planeResolution;
+			var vStepSize = 2.0f / planeResolution;
 			v += vStepSize;
 			float currX = 0;
-			int vertexCounter = 0;
+			var vertexCounter = 0;
 			while (u <= MathUtil.TWO_P_IF) {
 				float currY = 0;
 
 				while (v <= 1) {
 					base.uv[vertexCounter] = new Vector2f(currX / (planeResolution - 1), currY / (planeResolution - 1));
-					float x = (float)((float) (1 + ((v / 2.0f) * Math.Cos(u / 2.0f))) * Math.Cos(u));
-					float y = (float)((1 + ((v / 2.0f) * Math.Cos(u / 2.0f))) * Math.Sin(u));
-					float z = (float)((v / 2.0f) * Math.Sin((u) / 2.0f));
-					Vector3f position = new Vector3f(x, y, z);
+					var x = (float)((float) (1 + (v / 2.0f * Math.Cos(u / 2.0f))) * Math.Cos(u));
+					var y = (float)((1 + (v / 2.0f * Math.Cos(u / 2.0f))) * Math.Sin(u));
+					var z = (float)(v / 2.0f * Math.Sin(u / 2.0f));
+					var position = new Vector3f(x, y, z);
 					base.vertices[vertexCounter] = position;
 					v += vStepSize;
 					vertexCounter++;
@@ -40,11 +43,11 @@ namespace RNumerics
 				u += uStepSize;
 			}
 
-			for (int i = 0; i < vertices.Count; i++) {
+			for (var i = 0; i < vertices.Count; i++) {
 				if (!((i + 1) % planeResolution == 0)) {
-					int index1 = i + 1;
-					int index2 = i + planeResolution;
-					int index3 = i + planeResolution + 1;
+					var index1 = i + 1;
+					var index2 = i + planeResolution;
+					var index3 = i + planeResolution + 1;
 					if (index1 % vertices.Count != index1) {
 						index1 %= vertices.Count;
 						index1 = planeResolution - index1 - 1;
@@ -58,28 +61,27 @@ namespace RNumerics
 						index3 = planeResolution - index3 - 1;
 					}
 
-					triangles.Add(i);
-					triangles.Add(index1);
-					triangles.Add(index2);
+					tris.Add(i);
+					tris.Add(index1);
+					tris.Add(index2);
 
-					triangles.Add(index2);
-					triangles.Add(index1);
-					triangles.Add(index3);
+					tris.Add(index2);
+					tris.Add(index1);
+					tris.Add(index3);
 				}
 			}
 
-			base.triangles = new IndexArray3i(triangles.Count);
-			for (int i = 0; i < triangles.Count; i += 3) {
+			base.triangles = new IndexArray3i(tris.Count);
+			for (var i = 0; i < tris.Count; i += 3) {
 				base.triangles[i] = new Index3i(
-					triangles[i],
-					triangles[i + 1],
-					triangles[i + 2]
+					tris[i],
+					tris[i + 1],
+					tris[i + 2]
 				);
 			}
 
-			// Wonky? PBR shader goes pitch-black with this
 			base.normals = new VectorArray3f(vertices.Count);
-			for (int i = 0; i < vertices.Count; i++) {
+			for (var i = 0; i < vertices.Count; i++) {
 				base.normals[i] = new Vector3f(Estimate_normal(
 					base.triangles[i].a,
 					base.triangles[i].b,

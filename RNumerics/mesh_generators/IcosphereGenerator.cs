@@ -5,18 +5,19 @@ using System.Text;
 
 namespace RNumerics
 {
+	// TODO Make the vertx, norm, tris, uv's be in-place
 	public class IcosphereGenerator : MeshGenerator
 	{
 		public int iterations = 1;
 		public float radius = 1f;
 		public override MeshGenerator Generate() {
-			int nn = iterations * 4;
-			int vertexNum = nn * nn / 16 * 24;
-			Vector3d[] verts = new Vector3d[vertexNum];
-			int[] tris = new int[vertexNum];
-			Vector2d[] uvs = new Vector2d[vertexNum];
+			var nn = iterations * 4;
+			var vertexNum = nn * nn / 16 * 24;
+			var verts = new Vector3d[vertexNum];
+			var tris = new int[vertexNum];
+			var uvs = new Vector2d[vertexNum];
+			var init_vectors = new Quaternion[24];
 
-			Quaternion[] init_vectors = new Quaternion[24];
 			// 0
 			init_vectors[0] = new Quaternion(0, 1, 0, 0);   //the triangle vertical to (1,1,1)
 			init_vectors[1] = new Quaternion(0, 0, 1, 0);
@@ -50,9 +51,9 @@ namespace RNumerics
 			init_vectors[22] = new Quaternion(0, 0, -1, 0);
 			init_vectors[23] = new Quaternion(1, 0, 0, 0);
 
-			int j = 0;  //index on vectors[]
+			var j = 0;  //index on vectors[]
 
-			for (int i = 0; i < 24; i += 3) {
+			for (var i = 0; i < 24; i += 3) {
 				/*
 				 *                   c _________d
 				 *    ^ /\           /\        /
@@ -62,17 +63,17 @@ namespace RNumerics
 				 *  /________\   /________\/
 				 *     q->       a         b
 				 */
-				for (int p = 0; p < iterations; p++) {
+				for (var p = 0; p < iterations; p++) {
 					//edge index 1
-					Quaternion edge_p1 = Quaternion.Lerp(init_vectors[i], init_vectors[i + 2], (float)p / iterations);
-					Quaternion edge_p2 = Quaternion.Lerp(init_vectors[i + 1], init_vectors[i + 2], (float)p / iterations);
-					Quaternion edge_p3 = Quaternion.Lerp(init_vectors[i], init_vectors[i + 2], (float)(p + 1) / iterations);
-					Quaternion edge_p4 = Quaternion.Lerp(init_vectors[i + 1], init_vectors[i + 2], (float)(p + 1) / iterations);
+					var edge_p1 = Quaternion.Lerp(init_vectors[i], init_vectors[i + 2], (float)p / iterations);
+					var edge_p2 = Quaternion.Lerp(init_vectors[i + 1], init_vectors[i + 2], (float)p / iterations);
+					var edge_p3 = Quaternion.Lerp(init_vectors[i], init_vectors[i + 2], (float)(p + 1) / iterations);
+					var edge_p4 = Quaternion.Lerp(init_vectors[i + 1], init_vectors[i + 2], (float)(p + 1) / iterations);
 
-					for (int q = 0; q < (iterations - p); q++) {
+					for (var q = 0; q < (iterations - p); q++) {
 						//edge index 2
-						Quaternion a = Quaternion.Lerp(edge_p1, edge_p2, (float)q / (iterations - p));
-						Quaternion b = Quaternion.Lerp(edge_p1, edge_p2, (float)(q + 1) / (iterations - p));
+						var a = Quaternion.Lerp(edge_p1, edge_p2, (float)q / (iterations - p));
+						var b = Quaternion.Lerp(edge_p1, edge_p2, (float)(q + 1) / (iterations - p));
 						Quaternion c, d;
 						if (edge_p3 == edge_p4) {
 							c = edge_p3;
@@ -102,17 +103,17 @@ namespace RNumerics
 			}
 
 			CreateUV(iterations, verts, uvs);
-			for (int i = 0; i < vertexNum; i++) {
+			for (var i = 0; i < vertexNum; i++) {
 				verts[i] *= radius;
 			}
 
 			vertices = new VectorArray3d(verts.Length);
-			for (int i = 0; i < verts.Length; i++) {
+			for (var i = 0; i < verts.Length; i++) {
 				vertices[i] = verts[i];
 			}
 
 			triangles = new IndexArray3i(tris.Length);
-			for (int i = 0; i < tris.Length; i += 3) {
+			for (var i = 0; i < tris.Length; i += 3) {
 				triangles[i] = new Index3i(
 					tris[i],
 					tris[i + 1],
@@ -121,7 +122,7 @@ namespace RNumerics
 			}
 
 			uv = new VectorArray2f(uvs.Length);
-			for (int i = 0; i < uvs.Length; i++) {
+			for (var i = 0; i < uvs.Length; i++) {
 				uv[i] = new Vector2f(
 					uvs[i]
 				);
@@ -129,7 +130,7 @@ namespace RNumerics
 
 			// Wonky? PBR shader goes pitch-black with this
 			normals = new VectorArray3f(vertices.Count);
-			for (int i = 0; i < vertices.Count; i++) {
+			for (var i = 0; i < vertices.Count; i++) {
 				normals[i] = new Vector3f(Estimate_normal(
 					triangles[i].a,
 					triangles[i].b,
@@ -149,11 +150,11 @@ namespace RNumerics
 			return this;
 		}
 		private static void CreateUV(int iterations, Vector3d[] vertices, Vector2d[] uv) {
-			int tri = iterations * iterations;        // devided triangle count (1,4,9...)
-			int uvLimit = tri * 6;  // range of wrap UV.x 
+			var tri = iterations * iterations;        // devided triangle count (1,4,9...)
+			var uvLimit = tri * 6;  // range of wrap UV.x 
 
-			for (int i = 0; i < vertices.Length; i++) {
-				Vector3d v = vertices[i];
+			for (var i = 0; i < vertices.Length; i++) {
+				var v = vertices[i];
 
 				Vector2d textureCoordinates;
 				if ((v.x == 0f) && (i < uvLimit)) {
@@ -167,20 +168,19 @@ namespace RNumerics
 					textureCoordinates.x += 1f;
 				}
 
-				textureCoordinates.y = (float) (Math.Asin(v.y) / Math.PI + 0.5f);
+				textureCoordinates.y = (float) ((Math.Asin(v.y) / Math.PI) + 0.5f);
 				uv[i] = textureCoordinates;
 			}
 
-			int tt = tri * 3;
-			uv[0 * tt + 0].x = 0.875f;
-			uv[1 * tt + 0].x = 0.875f;
-			uv[2 * tt + 0].x = 0.125f;
-			uv[3 * tt + 0].x = 0.125f;
-			uv[4 * tt + 0].x = 0.625f;
-			uv[5 * tt + 0].x = 0.375f;
-			uv[6 * tt + 0].x = 0.375f;
-			uv[7 * tt + 0].x = 0.625f;
-
+			var tt = tri * 3;
+			uv[(0 * tt) + 0].x = 0.875f;
+			uv[(1 * tt) + 0].x = 0.875f;
+			uv[(2 * tt) + 0].x = 0.125f;
+			uv[(3 * tt) + 0].x = 0.125f;
+			uv[(4 * tt) + 0].x = 0.625f;
+			uv[(5 * tt) + 0].x = 0.375f;
+			uv[(6 * tt) + 0].x = 0.375f;
+			uv[(7 * tt) + 0].x = 0.625f;
 		}
 	}
 }
