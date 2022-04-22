@@ -13,7 +13,7 @@ namespace RhuEngine.Components
 	{
 		[Default(100)]
 		[OnChanged(nameof(LoadMesh))]
-		public int planeResolution = 10;
+		public int planeResolution = 100;
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
