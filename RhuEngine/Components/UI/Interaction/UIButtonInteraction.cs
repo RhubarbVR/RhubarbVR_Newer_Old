@@ -98,7 +98,7 @@ namespace RhuEngine.Components
 			_lastHitData = hitData;
 			IsClicking = false;
 			RLog.Info("Release");
-			Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, 0));
+			Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, Rect.ParentRect.ScrollOffset.z));
 			SendEvent(new ButtonEvent {
 				IsPressing = false,
 				IsClicked = false,
@@ -151,7 +151,7 @@ namespace RhuEngine.Components
 				}
 			}
 			if (IsClicking) {
-				Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, (-(Rect.Depth.Value*0.999f * minPress))));
+				Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, 0.035f + (-(Rect.Depth.Value*0.999f * minPress))));
 			}
 			if (IsClicking && !StillClicking) {
 				RunButtonReleaseEvent(_lastHitData);

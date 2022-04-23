@@ -12,9 +12,9 @@ namespace RhuEngine.Components
 	public abstract class RenderUIComponent : UIComponent
 	{
 		public SimpleMesh MainMesh { get; set; }
-
 		public SimpleMesh ScrollMesh { get; set; }
 		public SimpleMesh CutMesh { get; set; }
+		public SimpleMesh RenderMesh { get; set; }
 
 		public abstract RMaterial RenderMaterial { get; }
 		public abstract Colorf RenderTint { get; }
@@ -99,24 +99,31 @@ namespace RhuEngine.Components
 
 		public virtual bool BoxBased => true;
 
-		public void RenderCutMesh(bool updateMesh = true,bool PhysicsMesh = true) {
-			if (ScrollMesh is null) {
-				RenderScrollMesh(false);
+		public void RenderMainMesh(bool updateMesh = true, bool PhysicsMesh = true) {
+			var returnMesh = CutMesh;
+			if (Rect.Canvas.TopOffset.Value) {
+				returnMesh = returnMesh.Copy();
+				returnMesh.OffsetTop(Rect.Canvas.TopOffsetValue.Value);
 			}
-			SimpleMesh cutMesh;
-			if (_isCut) {
-				cutMesh = ScrollMesh.Cut(Rect.CutZonesMax, Rect.CutZonesMin);
+			if (Rect.Canvas.FrontBind.Value) {
+				returnMesh = returnMesh.UIBind(Rect.Canvas.FrontBindDist.Value, Rect.Canvas.FrontBindSegments.Value);
 			}
-			else {
-				cutMesh = ScrollMesh;
-			}
-			CutMesh = cutMesh;
+			RenderMesh = returnMesh;
 			if (PhysicsMesh) {
 				LoadPhysicsMesh();
 			}
 			if (updateMesh) {
 				Rect.UpdateMeshes();
 			}
+		}
+
+		public void RenderCutMesh(bool updateMesh = true,bool PhysicsMesh = true) {
+			if (ScrollMesh is null) {
+				RenderScrollMesh(false);
+			}
+			var cutMesh = _isCut ? ScrollMesh.Cut(Rect.CutZonesMax, Rect.CutZonesMin) : ScrollMesh;
+			CutMesh = cutMesh;
+			RenderMainMesh(updateMesh,PhysicsMesh);
 		}
 	}
 }

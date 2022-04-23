@@ -35,6 +35,7 @@ namespace RNumerics
 
 			Capped = true;
 			NoSharedVertices = true;
+			Clockwise = true;
 			base.Generate();
 
 			return this;
