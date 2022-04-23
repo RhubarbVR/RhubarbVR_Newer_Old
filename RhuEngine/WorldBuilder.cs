@@ -175,13 +175,6 @@ namespace RhuEngine
 			spinningCubes.position.Value = new Vector3f(0, 0.5f, 0);
 			AttachSpiningCubes(spinningCubes);
 			RLog.Info("Built Local World");
-			var moved = world.RootEntity.AddChild("Move");
-			moved.position.Value = new Vector3f(-1, 2, 2);
-			var (cutmesh,mit,rend ) = moved.AttachMeshWithMeshRender<MeshCutter, UnlitShader>();
-			cutmesh.TargetMesh.Target = moved.AttachComponent<IcosphereMesh>();
-			cutmesh.CutPlane.Value = new Plane3d(Vector3d.AxisX,0.25f);
-			mit.wireframe.Value = true;
-			cutmesh.RemoveSide.Value = false;
 		}
 
 
