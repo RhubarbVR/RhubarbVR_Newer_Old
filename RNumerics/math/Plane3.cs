@@ -50,7 +50,17 @@ namespace RNumerics
 			var distance = DistanceTo(p);
 			return distance < 0 ? -1 : distance > 0 ? +1 : 0;
 		}
+		public Vector3d ClosestPointOnPlane(Vector3d point) {
+			var num = Vector3d.Dot(Normal, point) + Constant;
+			return point - (Normal * num);
+		}
 
+		public Vector3d IntersectLine(Vector3d a, Vector3d b) {
+			var ba = b - a;
+			var nDotA = Normal.Dot(a);
+			var nDotBA = Normal.Dot(ba);
+			return a + ((Constant - nDotA) / nDotBA * ba);
+		}
 	}
 
 
@@ -101,7 +111,17 @@ namespace RNumerics
 			var distance = DistanceTo(p);
 			return distance < 0 ? -1 : distance > 0 ? +1 : 0;
 		}
+		public Vector3f ClosestPointOnPlane(Vector3f point) {
+			var num = Vector3f.Dot(Normal, point) + Constant;
+			return point - (Normal * num);
+		}
 
+		public Vector3f IntersectLine(Vector3f a, Vector3f b) {
+			var ba = b - a;
+			var nDotA = Normal.Dot(a);
+			var nDotBA = Normal.Dot(ba);
+			return a + ((Constant - nDotA) / nDotBA * ba);
+		}
 	}
 
 

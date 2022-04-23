@@ -25,6 +25,8 @@ namespace RhuEngine.Linker
 
 		public object mesh;
 
+		public IMesh LoadedMesh { get; private set; }
+
 		public RMesh(object e) {
 			mesh = e;
 		}
@@ -34,6 +36,7 @@ namespace RhuEngine.Linker
 		}
 
 		public void LoadMesh(IMesh mesh) {
+			LoadedMesh = mesh;
 			Instance.LoadMesh(this,mesh);
 		}
 

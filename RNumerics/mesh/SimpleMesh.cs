@@ -40,30 +40,19 @@ namespace RNumerics
 		    return new SimpleMesh(this);
 		}
 
-		public float DistFromPlane(Vector3f planeNormal,Vector3d point) {
-			var dot = point.Dot(planeNormal.Normalized);
-			return (float)dot - planeNormal.Length;
-		}
-		public Vector3d IntersectionLinePlane(Vector3f planeNormal, Vector3d pointa, Vector3d pointb) {
-			var planea = planeNormal.Normalized;
-			var planed = planeNormal.Length;
-			var checkLineVec = (pointa - pointb).Normalized;
-			var offset = pointa - planeNormal;
-			return pointa - (checkLineVec * offset.Dot(planea) / checkLineVec.Dot(planea));
-		}
-		public SimpleMesh CutOnPlane(Vector3f planeNormal,bool switchSide,bool removeOtherSide = false) {
+		public SimpleMesh CutOnPlane(Plane3d plane,bool switchSide,bool removeOtherSide = false) {
 			var cutMesh = new SimpleMesh();
 			foreach (var item in Triangles) {
 				var tryangle = GetTriangle(item);
 				var v1 = GetVertexAll(tryangle.a);
 				var v2 = GetVertexAll(tryangle.b);
 				var v3 = GetVertexAll(tryangle.c);
-				var v1PastPlane = (DistFromPlane(planeNormal,v1.v) > 0) == switchSide;
-				var v1isOnPlane = DistFromPlane(planeNormal, v1.v) == 0;
-				var v2PastPlane = (DistFromPlane(planeNormal, v2.v) > 0) == switchSide;
-				var v2isOnPlane = DistFromPlane(planeNormal, v1.v) == 0;
-				var v3PastPlane = (DistFromPlane(planeNormal, v3.v) > 0) == switchSide;
-				var v3isOnPlane = DistFromPlane(planeNormal, v3.v) == 0;
+				var v1PastPlane = (plane.DistanceTo(v1.v) > 0) == switchSide;
+				var v1isOnPlane = plane.DistanceTo(v1.v) == 0;
+				var v2PastPlane = (plane.DistanceTo(v2.v) > 0) == switchSide;
+				var v2isOnPlane = plane.DistanceTo(v1.v) == 0;
+				var v3PastPlane = (plane.DistanceTo(v3.v) > 0) == switchSide;
+				var v3isOnPlane = plane.DistanceTo(v3.v) == 0;
 				if (!(v1PastPlane || v2PastPlane || v3PastPlane)) {
 					cutMesh.AppendTriangle(v1,v2,v3);
 					continue;
@@ -77,58 +66,82 @@ namespace RNumerics
 						continue;
 					}
 				}
-				if (v1isOnPlane) {
-					var intersect = IntersectionLinePlane(planeNormal, v2.v, v3.v);
-					var newvert = new NewVertexInfo { v = intersect };
-					cutMesh.AppendTriangle(v2, v1, newvert);
-					cutMesh.AppendTriangle(newvert, v1, v3);
+				if(v1PastPlane && !v2PastPlane && !v3PastPlane) {
+					var newtry1 = plane.IntersectLine(v1.v, v2.v);
+					var newtry2 = plane.IntersectLine(v1.v, v3.v);
+					var newvert1 = new NewVertexInfo { v = newtry1 };
+					var newvert2 = new NewVertexInfo { v = newtry2 };
+					cutMesh.AppendTriangle(v3, newvert2, newvert1);
+					cutMesh.AppendTriangle(newvert1, v2, v3);
+					if (!removeOtherSide) {
+						cutMesh.AppendTriangle(newvert1, newvert2, v1);
+					}
 					continue;
 				}
-				if (v2isOnPlane) {
-					var intersect = IntersectionLinePlane(planeNormal, v3.v, v1.v);
-					var newvert = new NewVertexInfo { v = intersect };
-					cutMesh.AppendTriangle(v1, v2, newvert);
-					cutMesh.AppendTriangle(newvert, v2, v3);
-					continue;
-				}
-				if (v3isOnPlane) {
-					var intersect = IntersectionLinePlane(planeNormal, v2.v, v1.v);
-					var newvert = new NewVertexInfo { v = intersect };
-					cutMesh.AppendTriangle(v2, v3, newvert);
-					cutMesh.AppendTriangle(newvert, v3, v1);
+				if (!v1PastPlane && v2PastPlane && v3PastPlane) {
+					var newtry1 = plane.IntersectLine(v1.v, v2.v);
+					var newtry2 = plane.IntersectLine(v1.v, v3.v);
+					var newvert1 = new NewVertexInfo { v = newtry1 };
+					var newvert2 = new NewVertexInfo { v = newtry2 };
+					cutMesh.AppendTriangle(newvert1, newvert2, v1);
+					if (!removeOtherSide) {
+						cutMesh.AppendTriangle(v3, newvert2, newvert1);
+						cutMesh.AppendTriangle(newvert1, v2, v3);
+					}
 					continue;
 				}
 
-				if (v1PastPlane) {
-					var intersect1 = IntersectionLinePlane(planeNormal, v1.v, v2.v);
-					var intersect2 = IntersectionLinePlane(planeNormal, v1.v, v3.v);
-					var newvert1 = new NewVertexInfo { v = intersect1 };
-					var newvert2 = new NewVertexInfo { v = intersect2 };
-					cutMesh.AppendTriangle(v1, newvert1, newvert2);
-					cutMesh.AppendTriangle(v3, newvert1, v2);
-					cutMesh.AppendTriangle(newvert2, newvert1, v2);
-					continue;
-				}
-				if (v2PastPlane) {
-					var intersect1 = IntersectionLinePlane(planeNormal, v2.v, v3.v);
-					var intersect2 = IntersectionLinePlane(planeNormal, v2.v, v1.v);
-					var newvert1 = new NewVertexInfo { v = intersect1 };
-					var newvert2 = new NewVertexInfo { v = intersect2 };
-					cutMesh.AppendTriangle(v2, newvert1, newvert2);
-					cutMesh.AppendTriangle(v1, newvert1, v3);
+				if (v2PastPlane && !v3PastPlane && !v1PastPlane) {
+					var newtry1 = plane.IntersectLine(v2.v, v3.v);
+					var newtry2 = plane.IntersectLine(v2.v, v1.v);
+					var newvert1 = new NewVertexInfo { v = newtry1 };
+					var newvert2 = new NewVertexInfo { v = newtry2 };
 					cutMesh.AppendTriangle(newvert2, newvert1, v3);
+					cutMesh.AppendTriangle(v1, newvert2, v3);
+					if (!removeOtherSide) {
+						cutMesh.AppendTriangle(v2, newvert1, newvert2);
+					}
 					continue;
 				}
-				if (v3PastPlane) {
-					var intersect1 = IntersectionLinePlane(planeNormal, v3.v, v2.v);
-					var intersect2 = IntersectionLinePlane(planeNormal, v3.v, v1.v);
-					var newvert1 = new NewVertexInfo { v = intersect1 };
-					var newvert2 = new NewVertexInfo { v = intersect2 };
-					cutMesh.AppendTriangle(v3, newvert1, newvert2);
-					cutMesh.AppendTriangle(v1, newvert1, v2);
-					cutMesh.AppendTriangle(newvert2, newvert1, v2);
+				if (!v2PastPlane && v3PastPlane && v1PastPlane) {
+					var newtry1 = plane.IntersectLine(v2.v, v3.v);
+					var newtry2 = plane.IntersectLine(v2.v, v1.v);
+					var newvert1 = new NewVertexInfo { v = newtry1 };
+					var newvert2 = new NewVertexInfo { v = newtry2 };
+					cutMesh.AppendTriangle(v2, newvert1, newvert2 );
+					if (!removeOtherSide) {
+						cutMesh.AppendTriangle(newvert2, newvert1, v3 );
+						cutMesh.AppendTriangle(v1, newvert2, v3 );
+					}
 					continue;
 				}
+				if (v3PastPlane && !v1PastPlane && !v2PastPlane) {
+					var newtry1 = plane.IntersectLine(v3.v, v1.v);
+					var newtry2 = plane.IntersectLine(v3.v, v2.v);
+					var newvert1 = new NewVertexInfo { v = newtry1 };
+					var newvert2 = new NewVertexInfo { v = newtry2 };
+					cutMesh.AppendTriangle(v2, newvert2, newvert1);
+					cutMesh.AppendTriangle(v2, newvert1, v1);
+					if (!removeOtherSide) {
+						cutMesh.AppendTriangle(v3, newvert1, newvert2);
+					}
+					continue;
+				}
+				if (!v3PastPlane && v1PastPlane && v2PastPlane) {
+					var newtry1 = plane.IntersectLine(v3.v, v1.v);
+					var newtry2 = plane.IntersectLine(v3.v, v2.v);
+					var newvert1 = new NewVertexInfo { v = newtry1 };
+					var newvert2 = new NewVertexInfo { v = newtry2 };
+					cutMesh.AppendTriangle(newvert2, newvert1, v3 );
+					if (!removeOtherSide) {
+						cutMesh.AppendTriangle(newvert1, newvert2, v2);
+						cutMesh.AppendTriangle(v1, newvert1, v2);
+					}
+					continue;
+				}
+
+				Console.WriteLine("Not supposed to be here");
+				throw new Exception();
 			}
 			return cutMesh;
 		}
