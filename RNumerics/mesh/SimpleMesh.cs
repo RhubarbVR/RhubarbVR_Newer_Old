@@ -115,6 +115,7 @@ namespace RNumerics
 					}
 					continue;
 				}
+
 				if (v3PastPlane && !v1PastPlane && !v2PastPlane) {
 					var newtry1 = plane.IntersectLine(v3.v, v1.v);
 					var newtry2 = plane.IntersectLine(v3.v, v2.v);
@@ -132,10 +133,10 @@ namespace RNumerics
 					var newtry2 = plane.IntersectLine(v3.v, v2.v);
 					var newvert1 = new NewVertexInfo { v = newtry1 };
 					var newvert2 = new NewVertexInfo { v = newtry2 };
-					cutMesh.AppendTriangle(newvert2, newvert1, v3 );
+					cutMesh.AppendTriangle(v3, newvert1, newvert2);
 					if (!removeOtherSide) {
-						cutMesh.AppendTriangle(newvert1, newvert2, v2);
-						cutMesh.AppendTriangle(v1, newvert1, v2);
+						cutMesh.AppendTriangle(v2, newvert2, newvert1);
+						cutMesh.AppendTriangle(v2, newvert1, v1);
 					}
 					continue;
 				}
