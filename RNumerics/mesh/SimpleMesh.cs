@@ -59,11 +59,8 @@ namespace RNumerics
 				var v2 = GetVertexAll(tryangle.b);
 				var v3 = GetVertexAll(tryangle.c);
 				var v1PastPlane = (plane.DistanceTo(v1.v) > 0) == switchSide;
-				var v1isOnPlane = plane.DistanceTo(v1.v) == 0;
 				var v2PastPlane = (plane.DistanceTo(v2.v) > 0) == switchSide;
-				var v2isOnPlane = plane.DistanceTo(v1.v) == 0;
 				var v3PastPlane = (plane.DistanceTo(v3.v) > 0) == switchSide;
-				var v3isOnPlane = plane.DistanceTo(v3.v) == 0;
 				if (!(v1PastPlane || v2PastPlane || v3PastPlane)) {
 					cutMesh.AppendTriangle(v1,v2,v3);
 					continue;
@@ -169,6 +166,23 @@ namespace RNumerics
 				cutMesh.AttachCap(capverts);
 			}
 			return cutMesh;
+		}
+		private void BindVerterts(float bind) {
+			var c = VertexCount;
+			for (var i = 0; i < c; ++i) {
+				var x = (Vertices[3 * i] - 0.5) * 2;
+				Vertices[(3 * i) + 2] -=  (1 - (x * x))* bind;
+			}
+			UpdateTimeStamp();
+		}
+		public SimpleMesh UIBind(float bind, int segments) {
+			SimpleMesh lastmesh = null;
+			for (var i = 0; i < segments; i++) {
+				var pos = i % 2 == 0 ? (double)(1f / segments * i) : (double)(1f / segments * (segments - i));
+				lastmesh = (lastmesh?? this).CutOnPlane(new Plane3d(Vector3d.AxisX, pos), false);
+			}
+			lastmesh.BindVerterts(bind);
+			return lastmesh;
 		}
 
 		public void AttachCap(List<Vector3d> points) {
@@ -434,6 +448,14 @@ namespace RNumerics
 				Vertices[3 * i] += tx;
 				Vertices[(3 * i) + 1] += ty;
 				Vertices[(3 * i) + 2] += tz;
+			}
+			UpdateTimeStamp();
+		}
+
+		public void OffsetTop(double offset) {
+			var c = VertexCount;
+			for (var i = 0; i < c; ++i) {
+				Vertices[(3 * i) + 2] -= Vertices[(3 * i) + 1] * offset;
 			}
 			UpdateTimeStamp();
 		}

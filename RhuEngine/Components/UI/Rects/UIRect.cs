@@ -326,7 +326,7 @@ namespace RhuEngine.Components
 						if(list[i].CutMesh is null) {
 							list[i].RenderCutMesh(false);
 						}
-						meshList[i].LoadMesh(list[i].CutMesh);
+						meshList[i].LoadMesh(list[i].RenderMesh);
 					}
 				});
 			});
@@ -500,19 +500,17 @@ namespace RhuEngine.Components
 			}
 			var phsicsupdate = value.x == ScrollOffset.x && value.y == ScrollOffset.y;
 			ScrollOffset = value;
-
 			_childRects.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.Scroll(value);
 				}
 			});
-			ProcessCutting(false,false);
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.RenderScrollMesh(false);
-					item.RenderCutMesh(false, !phsicsupdate);
 				}
 			});
+			ProcessCutting(false, false);
 			UpdateUIMeshes();
 		}
 	}
