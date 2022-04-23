@@ -16,7 +16,8 @@ namespace RhuEngine.Components
 		public Sync<bool> SwitchSide;
 		[OnChanged(nameof(LoadMesh))]
 		public Sync<bool> RemoveSide;
-
+		[OnChanged(nameof(LoadMesh))]
+		public Sync<bool> Cap;
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
@@ -24,7 +25,7 @@ namespace RhuEngine.Components
 			if(TargetMesh.Asset is null) {
 				return;
 			}
-			GenMesh(new SimpleMesh(TargetMesh.Asset.LoadedMesh).CutOnPlane(CutPlane.Value,SwitchSide,RemoveSide));
+			GenMesh(new SimpleMesh(TargetMesh.Asset.LoadedMesh).CutOnPlane(CutPlane.Value,SwitchSide,RemoveSide, Cap));
 		}
 	}
 }

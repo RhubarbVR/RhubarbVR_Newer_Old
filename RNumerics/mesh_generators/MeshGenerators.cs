@@ -15,7 +15,6 @@ namespace RNumerics
 		public bool WantNormals = true;
 		public bool WantGroups = true;
 
-		// "normal" meshes are counter-clockwise. Unity is CW though...
 		public bool Clockwise = false;
 
 
