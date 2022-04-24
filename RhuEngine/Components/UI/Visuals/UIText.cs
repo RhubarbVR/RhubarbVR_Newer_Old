@@ -60,6 +60,9 @@ namespace RhuEngine.Components
 		public Matrix textOffset = Matrix.S(1);
 
 		private void UpdateText() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien,MiddleLines);
 			UpdateTextOffset();
 		}
@@ -179,7 +182,7 @@ namespace RhuEngine.Components
 				foreach (var chare in list) {
 					var newMat = Rect.MatrixMove(chare.p * textOffset * Matrix.T(Rect.ScrollOffset));
 					chare.Offset = Matrix.T(newMat.Translation);
-					chare.Offset2 = Matrix.R(newMat.Rotation * Quaternionf.Yawed.Inverse);
+					chare.Offset2 = Matrix.R(newMat.Rotation);
 				}
 			});
 		}

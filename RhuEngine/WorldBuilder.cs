@@ -96,7 +96,7 @@ namespace RhuEngine
 				e.AttachText(new Vector2f(0), new Vector2f(0.5f, 1), Colorf.White,text);
 			}
 			for (var i = 0; i < 15; i++) {
-				AttachListElement(listRoot,$"Element{i}");
+				AttachListElement(listRoot,$"Element {i}");
 			}
 			listRoot.GetFirstComponent<UIRect>().RegUpdateUIMeshes();
 			//pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red);

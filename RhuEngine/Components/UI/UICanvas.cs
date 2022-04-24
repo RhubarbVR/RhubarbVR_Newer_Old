@@ -12,12 +12,12 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(UpdateMeshes))]
 		public Sync<Vector3f> scale;
 
-		[Default(true)]
+		[Default(false)]
 		public Sync<bool> TopOffset;
 		[Default(3f)]
 		public Sync<float> TopOffsetValue;
 
-		[Default(true)]
+		[Default(false)]
 		public Sync<bool> FrontBind;
 		[Default(8)]
 		public Sync<int> FrontBindSegments;
