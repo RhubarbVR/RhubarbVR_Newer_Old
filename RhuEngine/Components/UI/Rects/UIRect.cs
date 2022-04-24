@@ -197,6 +197,32 @@ namespace RhuEngine.Components
 		public Sync<Vector2f> OffsetMax;
 		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public Sync<Vector2f> AnchorMin;
+
+		public Matrix MatrixMove(Matrix matrix) {
+			var firstpos = VertMove(matrix.Translation);
+			var least = 0f;
+			var quaternionf = Quaternionf.Identity;
+			for (var i = 0; i < Canvas.FrontBindSegments; i++) {
+				var max = i + (1 / Canvas.FrontBindSegments);
+				if (max >= firstpos.x && least <= firstpos.x) {
+					quaternionf = Quaternionf.Identity;
+					break;
+				}
+				least = max;
+			}
+			return Matrix.TR(firstpos - matrix.Translation, quaternionf);
+		}
+		public Vector3f VertMove(Vector3f point) {
+			var npoint = point;
+			if (Canvas.TopOffset.Value) {
+				npoint.z -= point.y * Canvas.TopOffsetValue.Value;
+			}
+			if (Canvas.FrontBind.Value) {
+				var x = (point.x - 0.5) * 2;
+				npoint.z -= (float)((1 - (x * x)) * Canvas.FrontBindDist.Value) - Canvas.FrontBindDist.Value;
+			}
+			return npoint;
+		}
 		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public Sync<Vector2f> AnchorMax;
 		public Vector2f AnchorMinValue => AnchorMin;

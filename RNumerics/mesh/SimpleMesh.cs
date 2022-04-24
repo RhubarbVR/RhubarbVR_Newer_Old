@@ -168,10 +168,9 @@ namespace RNumerics
 			return cutMesh;
 		}
 		private void BindVerterts(float bind) {
-			var c = VertexCount;
-			for (var i = 0; i < c; ++i) {
+			for (var i = 0; i < VertexCount; ++i) {
 				var x = (Vertices[3 * i] - 0.5) * 2;
-				Vertices[(3 * i) + 2] -=  (1 - (x * x))* bind;
+				Vertices[(3 * i) + 2] -= ( (1 - (x * x))* bind ) - bind;
 			}
 			UpdateTimeStamp();
 		}

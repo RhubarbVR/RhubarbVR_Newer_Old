@@ -21,6 +21,8 @@ namespace RhuEngine.Components
 			public Vector2f textsize = Vector2f.Zero;
 			public string id;
 			public char c;
+			public Matrix Offset = Matrix.Identity;
+			public Matrix Offset2 = Matrix.Identity;
 			public Matrix p;
 			public Colorf color;
 			public RFont rFont;
@@ -40,15 +42,15 @@ namespace RhuEngine.Components
 
 			public void Render(Matrix root) {
 				if (!Cull) {
-					RText.Add(id, c, p * root, color, rFont, fontStyle, textCut);
+					RText.Add(id, c, Offset2 * p * root, color, rFont, fontStyle, textCut);
 				}
 			}
 		}
 
-		public void Render(Matrix root) {
+		public void Render(Matrix offset,Matrix root) {
 			Chars.SafeOperation((list) => {
 				foreach (var item in list) {
-					item.Render(root);
+					item.Render(offset * item.Offset * root);
 				}
 			});
 		}
@@ -120,7 +122,7 @@ namespace RhuEngine.Components
 					bounds.Add(textpos + ew.X__);
 					bounds.Add(textpos + ew.XY_);
 					bounds.Add(textpos + ew._Y_);
-					textXpos += (textsize.x + 0.01f) * (fontSize.Peek() / 100);
+					textXpos += (textsize.x + 0.05f) * (fontSize.Peek() / 100);
 					index++;
 				}
 			}

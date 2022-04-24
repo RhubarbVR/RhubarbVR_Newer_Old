@@ -105,7 +105,7 @@ namespace RhuEngine.Components
 			}
 			upleft += new Vector3f(minoffset.x, maxoffset.y);
 			maxmin /= Math.Min(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
-			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), Math.Min(maxmin.x, maxmin.y)/2);
+			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), new Vector3f(Math.Min(maxmin.x, maxmin.y)/2) + new Vector3f(0,0,Rect.Canvas.scale.Value.z));
 			CutElement(true,false);
 		}
 
@@ -119,7 +119,7 @@ namespace RhuEngine.Components
 		}
 
 		public override void Render(Matrix matrix) {
-			textRender.Render(textOffset * Matrix.T(Rect.ScrollOffset) * matrix);
+			textRender.Render(textOffset, Matrix.T(Rect.ScrollOffset) * matrix);
 		}
 
 		public override void CutElement(bool cut,bool update) {
@@ -175,6 +175,13 @@ namespace RhuEngine.Components
 					}
 				});
 			}
+			textRender.Chars.SafeOperation((list) => {
+				foreach (var chare in list) {
+					var newMat = Rect.MatrixMove(chare.p * textOffset * Matrix.T(Rect.ScrollOffset));
+					chare.Offset = Matrix.T(newMat.Translation);
+					chare.Offset2 = Matrix.R(newMat.Rotation * Quaternionf.Yawed.Inverse);
+				}
+			});
 		}
 	}
 }
