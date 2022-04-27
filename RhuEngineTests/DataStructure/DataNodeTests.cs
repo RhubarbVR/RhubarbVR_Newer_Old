@@ -3,9 +3,10 @@ using RhuEngine.DataStructure;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using StereoKit;
 using MessagePack;
 using MessagePack.Resolvers;
+using RNumerics;
+using SharedModels.GameSpecific;
 
 namespace RhuEngine.DataStructure.Tests
 {
@@ -21,18 +22,16 @@ namespace RhuEngine.DataStructure.Tests
 			var dataNodeGroup = new DataNodeGroup();
 			dataNodeGroup.SetValue("RenderLayer", new DataNode<int>(1));
 			dataNodeGroup.SetValue("Name", new DataNode<string>("Trains"));
-			dataNodeGroup.SetValue("Pos", new DataNode<Vec3>(Vec3.Forward));
-			dataNodeGroup.SetValue("Rot", new DataNode<Quat>(Quat.Identity));
-			dataNodeGroup.SetValue("scale", new DataNode<Vec3>(Vec3.Forward));
-			dataNodeGroup.SetValue("pose", new DataNode<Pose>(new Pose(Vec3.Forward, Quat.Identity)));
+			dataNodeGroup.SetValue("Pos", new DataNode<Vector3f>(Vector3f.Forward));
+			dataNodeGroup.SetValue("Rot", new DataNode<Quaternionf>(Quaternionf.Identity));
+			dataNodeGroup.SetValue("scale", new DataNode<Vector3f>(Vector3f.Forward));
 
 			var dataNodeGroupw = new DataNodeGroup();
 			dataNodeGroupw.SetValue("RenderLayer", new DataNode<int>(1));
 			dataNodeGroupw.SetValue("Name", new DataNode<string>("Trains"));
-			dataNodeGroupw.SetValue("Pos", new DataNode<Vec3>(Vec3.Forward));
-			dataNodeGroupw.SetValue("Rot", new DataNode<Quat>(Quat.Identity));
-			dataNodeGroupw.SetValue("scale", new DataNode<Vec3>(Vec3.Forward));
-			dataNodeGroupw.SetValue("pose", new DataNode<Pose>(new Pose(Vec3.Forward, Quat.Identity)));
+			dataNodeGroupw.SetValue("Pos", new DataNode<Vector3f>(Vector3f.Forward));
+			dataNodeGroupw.SetValue("Rot", new DataNode<Quaternionf>(Quaternionf.Identity));
+			dataNodeGroupw.SetValue("scale", new DataNode<Vector3f>(Vector3f.Forward));
 			dataNodeGroup.SetValue("ew", dataNodeGroupw);
 			var list = new DataNodeList();
 			list.Add(dataNodeGroupw);
@@ -40,9 +39,9 @@ namespace RhuEngine.DataStructure.Tests
 			dataNodeGroup.SetValue("testlist", list);
 
 			var data = dataNodeGroup.GetByteArray();
-			var jsonstring = MessagePackSerializer.ConvertToJson(data);
+			var jsonstring = MessagePackSerializer.ConvertToJson(data, Serializer.Options);
 			Console.WriteLine(jsonstring);
-			var datanode = new DataNodeGroup(MessagePackSerializer.ConvertFromJson(jsonstring));
+			var datanode = new DataNodeGroup(MessagePackSerializer.ConvertFromJson(jsonstring, Serializer.Options));
 			Console.WriteLine(((DataNode<string>)datanode.GetValue("Name")).Value);
 			Console.WriteLine(((DataNode<string>)((DataNodeGroup)datanode.GetValue("ew")).GetValue("Name")).Value);
 		}
