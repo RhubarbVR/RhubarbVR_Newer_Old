@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using RhuEngine.Linker;
 using RNumerics;
+using System.Threading;
 
 namespace RhuEngine
 {
@@ -184,7 +185,7 @@ namespace RhuEngine
 				LoadingLogo = new RMaterial(RShader.UnlitClip);
 				LoadingLogo["diffuse"] = staticResources.RhubarbLogoV2;
 			}
-			Task.Run(() => {
+			var startingthread = new Thread(() => {
 				IntMsg = "Building NetApiManager";
 				netApiManager = new NetApiManager(_userDataPathOverRide);
 				IntMsg = "Building AssetManager";
@@ -207,8 +208,12 @@ namespace RhuEngine
 					RRenderer.EnableSky = true;
 				}
 				RLog.Info("Engine Started");
+				IntMsg = $"Engine Started\nRunning First Step...";
 				OnEngineStarted?.Invoke();
-		});
+			}) {
+				Priority = ThreadPriority.AboveNormal
+			};
+			startingthread.Start();
 		}
 
 		private Vector3f _oldPlayerPos = Vector3f.Zero;

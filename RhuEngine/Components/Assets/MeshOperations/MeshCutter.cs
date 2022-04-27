@@ -25,7 +25,7 @@ namespace RhuEngine.Components
 			if(TargetMesh.Asset is null) {
 				return;
 			}
-			GenMesh(new SimpleMesh(TargetMesh.Asset.LoadedMesh).CutOnPlane(CutPlane.Value,SwitchSide,RemoveSide, Cap));
+			GenMesh(new SimpleMesh(TargetMesh.Asset.LoadedMesh).CutOnPlane(new SimpleMesh.PlaneSetting(CutPlane.Value,SwitchSide,RemoveSide, Cap)));
 		}
 	}
 }

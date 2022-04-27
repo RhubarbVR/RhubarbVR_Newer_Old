@@ -50,120 +50,181 @@ namespace RNumerics
 			}
 			return newUvs;
 		}
-		public SimpleMesh CutOnPlane(Plane3d plane,bool switchSide,bool removeOtherSide = false,bool Cap = false) {
-			var cutMesh = new SimpleMesh();
-			var capverts = new List<Vector3d>();
-			for (var i = 0; i < TriangleCount; i++) {
-				var tryangle = GetTriangle(i);
-				var v1 = GetVertexAll(tryangle.a);
-				var v2 = GetVertexAll(tryangle.b);
-				var v3 = GetVertexAll(tryangle.c);
-				var v1PastPlane = (plane.DistanceTo(v1.v) > 0) == switchSide;
-				var v2PastPlane = (plane.DistanceTo(v2.v) > 0) == switchSide;
-				var v3PastPlane = (plane.DistanceTo(v3.v) > 0) == switchSide;
+
+		public struct PlaneSetting
+		{
+			public Plane3d plane;
+			public bool switchSide;
+			public bool removeOtherSide;
+			public bool Cap;
+
+			public PlaneSetting(Plane3d plane, bool switchSide, bool removeOtherSide, bool cap) {
+				this.plane = plane;
+				this.switchSide = switchSide;
+				this.removeOtherSide = removeOtherSide;
+				Cap = cap;
+			}
+
+		}
+
+		public List<NewVertexInfo> MakeCutTriangles(List<NewVertexInfo> trys, PlaneSetting planeSetting) {
+			var savedCount = trys.Count;
+			for (var i = 0; i < savedCount; i+=3) {
+				var v1 = trys[0];
+				trys.RemoveAt(0);
+				var v2 = trys[0];
+				trys.RemoveAt(0);
+				var v3 = trys[0];
+				trys.RemoveAt(0);
+				var v1PastPlane = (planeSetting.plane.DistanceTo(v1.v) > 0) == planeSetting.switchSide;
+				var v2PastPlane = (planeSetting.plane.DistanceTo(v2.v) > 0) == planeSetting.switchSide;
+				var v3PastPlane = (planeSetting.plane.DistanceTo(v3.v) > 0) == planeSetting.switchSide;
 				if (!(v1PastPlane || v2PastPlane || v3PastPlane)) {
-					cutMesh.AppendTriangle(v1,v2,v3);
+					trys.Add(v1);
+					trys.Add(v2);
+					trys.Add(v3);
 					continue;
 				}
-				if(v1PastPlane && v2PastPlane && v3PastPlane) {
-					if (removeOtherSide) {
+				if (v1PastPlane && v2PastPlane && v3PastPlane) {
+					if (planeSetting.removeOtherSide) {
 						continue;
 					}
 					else {
-						cutMesh.AppendTriangle(v1, v2, v3);
+						trys.Add(v1);
+						trys.Add(v2);
+						trys.Add(v3);
 						continue;
 					}
 				}
-				if(v1PastPlane && !v2PastPlane && !v3PastPlane) {
-					var newtry1 = plane.IntersectLine(v1.v, v2.v);
-					var newtry2 = plane.IntersectLine(v1.v, v3.v);
-					var newvert1 = new NewVertexInfo { v = newtry1,uv = CalcNewUV(newtry1, v1.v, v2.v, v1.uv, v2.uv), bHaveUV = true };
+				if (v1PastPlane && !v2PastPlane && !v3PastPlane) {
+					var newtry1 = planeSetting.plane.IntersectLine(v1.v, v2.v);
+					var newtry2 = planeSetting.plane.IntersectLine(v1.v, v3.v);
+					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v1.v, v2.v, v1.uv, v2.uv), bHaveUV = true };
 					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v1.v, v3.v, v1.uv, v3.uv), bHaveUV = true };
-					capverts.Add(newtry1);
-					capverts.Add(newtry2);
-					cutMesh.AppendTriangle(v3, newvert2, newvert1);
-					cutMesh.AppendTriangle(newvert1, v2, v3);
-					if (!removeOtherSide) {
-						cutMesh.AppendTriangle(newvert1, newvert2, v1);
+					trys.Add(v3);
+					trys.Add(newvert2);
+					trys.Add(newvert1);
+					trys.Add(newvert1);
+					trys.Add(v2);
+					trys.Add(v3);
+					if (!planeSetting.removeOtherSide) {
+						trys.Add(newvert1);
+						trys.Add(newvert2);
+						trys.Add(v1);
 					}
 					continue;
 				}
 				if (!v1PastPlane && v2PastPlane && v3PastPlane) {
-					var newtry1 = plane.IntersectLine(v1.v, v2.v);
-					var newtry2 = plane.IntersectLine(v1.v, v3.v);
+					var newtry1 = planeSetting.plane.IntersectLine(v1.v, v2.v);
+					var newtry2 = planeSetting.plane.IntersectLine(v1.v, v3.v);
 					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v1.v, v2.v, v1.uv, v2.uv), bHaveUV = true };
 					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v1.v, v3.v, v1.uv, v3.uv), bHaveUV = true };
-					capverts.Add(newtry1);
-					capverts.Add(newtry2);
-					cutMesh.AppendTriangle(newvert1, newvert2, v1);
-					if (!removeOtherSide) {
-						cutMesh.AppendTriangle(v3, newvert2, newvert1);
-						cutMesh.AppendTriangle(newvert1, v2, v3);
+					trys.Add(newvert1);
+					trys.Add(newvert2);
+					trys.Add(v1);
+					if (!planeSetting.removeOtherSide) {
+						trys.Add(v3);
+						trys.Add(newvert2);
+						trys.Add(newvert1);
+						trys.Add(newvert1);
+						trys.Add(v2);
+						trys.Add(v3);
 					}
 					continue;
 				}
 
 				if (v2PastPlane && !v3PastPlane && !v1PastPlane) {
-					var newtry1 = plane.IntersectLine(v2.v, v3.v);
-					var newtry2 = plane.IntersectLine(v2.v, v1.v);
+					var newtry1 = planeSetting.plane.IntersectLine(v2.v, v3.v);
+					var newtry2 = planeSetting.plane.IntersectLine(v2.v, v1.v);
 					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v2.v, v3.v, v2.uv, v3.uv), bHaveUV = true };
 					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v2.v, v1.v, v2.uv, v1.uv), bHaveUV = true };
-					capverts.Add(newtry1);
-					capverts.Add(newtry2);
-					cutMesh.AppendTriangle(newvert2, newvert1, v3);
-					cutMesh.AppendTriangle(v1, newvert2, v3);
-					if (!removeOtherSide) {
-						cutMesh.AppendTriangle(v2, newvert1, newvert2);
+					trys.Add(newvert2);
+					trys.Add(newvert1);
+					trys.Add(v3);
+					trys.Add(v1);
+					trys.Add(newvert2);
+					trys.Add(v3);
+					if (!planeSetting.removeOtherSide) {
+						trys.Add(v2);
+						trys.Add(newvert1);
+						trys.Add(newvert2);
 					}
 					continue;
 				}
 				if (!v2PastPlane && v3PastPlane && v1PastPlane) {
-					var newtry1 = plane.IntersectLine(v2.v, v3.v);
-					var newtry2 = plane.IntersectLine(v2.v, v1.v);
+					var newtry1 = planeSetting.plane.IntersectLine(v2.v, v3.v);
+					var newtry2 = planeSetting.plane.IntersectLine(v2.v, v1.v);
 					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v2.v, v3.v, v2.uv, v3.uv), bHaveUV = true };
 					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v2.v, v1.v, v2.uv, v1.uv), bHaveUV = true };
-					capverts.Add(newtry1);
-					capverts.Add(newtry2);
-					cutMesh.AppendTriangle(v2, newvert1, newvert2 );
-					if (!removeOtherSide) {
-						cutMesh.AppendTriangle(newvert2, newvert1, v3 );
-						cutMesh.AppendTriangle(v1, newvert2, v3 );
+					trys.Add(v2);
+					trys.Add(newvert1);
+					trys.Add(newvert2);
+					if (!planeSetting.removeOtherSide) {
+						trys.Add(newvert2);
+						trys.Add(newvert1);
+						trys.Add(v3);
+						trys.Add(v1);
+						trys.Add(newvert2);
+						trys.Add(v3);
 					}
 					continue;
 				}
 
 				if (v3PastPlane && !v1PastPlane && !v2PastPlane) {
-					var newtry1 = plane.IntersectLine(v3.v, v1.v);
-					var newtry2 = plane.IntersectLine(v3.v, v2.v);
+					var newtry1 = planeSetting.plane.IntersectLine(v3.v, v1.v);
+					var newtry2 = planeSetting.plane.IntersectLine(v3.v, v2.v);
 					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v3.v, v1.v, v3.uv, v1.uv), bHaveUV = true };
 					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v3.v, v2.v, v3.uv, v2.uv), bHaveUV = true };
-					capverts.Add(newtry1);
-					capverts.Add(newtry2);
-					cutMesh.AppendTriangle(v2, newvert2, newvert1);
-					cutMesh.AppendTriangle(v2, newvert1, v1);
-					if (!removeOtherSide) {
-						cutMesh.AppendTriangle(v3, newvert1, newvert2);
+					trys.Add(v2);
+					trys.Add(newvert2);
+					trys.Add(newvert1);
+					trys.Add(v2);
+					trys.Add(newvert1);
+					trys.Add(v1);
+					if (!planeSetting.removeOtherSide) {
+						trys.Add(v3);
+						trys.Add(newvert1);
+						trys.Add(newvert2);
 					}
 					continue;
 				}
 				if (!v3PastPlane && v1PastPlane && v2PastPlane) {
-					var newtry1 = plane.IntersectLine(v3.v, v1.v);
-					var newtry2 = plane.IntersectLine(v3.v, v2.v);
+					var newtry1 = planeSetting.plane.IntersectLine(v3.v, v1.v);
+					var newtry2 = planeSetting.plane.IntersectLine(v3.v, v2.v);
 					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v3.v, v1.v, v3.uv, v1.uv), bHaveUV = true };
 					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v3.v, v2.v, v3.uv, v2.uv), bHaveUV = true };
-					capverts.Add(newtry1);
-					capverts.Add(newtry2);
-					cutMesh.AppendTriangle(v3, newvert1, newvert2);
-					if (!removeOtherSide) {
-						cutMesh.AppendTriangle(v2, newvert2, newvert1);
-						cutMesh.AppendTriangle(v2, newvert1, v1);
+					trys.Add(v3);
+					trys.Add(newvert1);
+					trys.Add(newvert2);
+					if (!planeSetting.removeOtherSide) {
+						trys.Add(v2);
+						trys.Add(newvert2);
+						trys.Add(newvert1);
+						trys.Add(v2);
+						trys.Add(newvert1);
+						trys.Add(v1);
 					}
 					continue;
 				}
 				throw new Exception("Not supposed to be here");
 			}
-			if (Cap) {
-				cutMesh.AttachCap(capverts);
+			return trys;
+		}
+
+		public SimpleMesh CutOnPlane(params PlaneSetting[] planeSetting) {
+			var cutMesh = new SimpleMesh();
+			var vertexInfos = new List<NewVertexInfo>(TriangleCount * 3);
+			for (var i = 0; i < TriangleCount; i++) {
+				var tryangle = GetTriangle(i);
+				vertexInfos.Add(GetVertexAll(tryangle.a));
+				vertexInfos.Add(GetVertexAll(tryangle.b));
+				vertexInfos.Add(GetVertexAll(tryangle.c));
+			}
+			for (var pla = 0; pla < planeSetting.Length; pla++) {
+				vertexInfos = MakeCutTriangles(vertexInfos, planeSetting[pla]);
+			}
+			for (var vert = 0; vert < vertexInfos.Count; vert += 3) {
+				cutMesh.AppendTriangle(vertexInfos[vert], vertexInfos[vert + 1], vertexInfos[vert + 2]);
 			}
 			return cutMesh;
 		}
@@ -178,11 +239,15 @@ namespace RNumerics
 			UpdateTimeStamp();
 		}
 		public SimpleMesh UIBind(float angle, float radus, int segments,Vector3f scale) {
-			SimpleMesh lastmesh = null;
+			
+			var settings = new PlaneSetting[segments];
 			for (var i = 0; i < segments; i++) {
 				var pos = i % 2 == 0 ? (double)(1f / segments * i) : (double)(1f / segments * (segments - i));
-				lastmesh = (lastmesh?? this).CutOnPlane(new Plane3d(Vector3d.AxisX, pos), false);
+				settings[i] = new PlaneSetting{
+					plane = new Plane3d(Vector3d.AxisX, pos)
+				};
 			}
+			var lastmesh = CutOnPlane(settings);
 			lastmesh.BindVerterts(angle, radus,scale);
 			return lastmesh;
 		}
@@ -208,8 +273,8 @@ namespace RNumerics
 		}
 
 		public SimpleMesh Cut(Vector2f cutmax,Vector2f cutmin) {
-			return CutOnPlane(new Plane3d(Vector3d.AxisY, cutmin.y - 0.00001f), false, true).CutOnPlane(new Plane3d(Vector3d.AxisY, cutmax.y + 0.00001f), true, true,true)
-				.CutOnPlane(new Plane3d(Vector3d.AxisX, cutmin.x-0.00001f), false, true).CutOnPlane(new Plane3d(Vector3d.AxisX, cutmax.x + 0.00001f), true, true,true);
+			return CutOnPlane(new PlaneSetting(new Plane3d(Vector3d.AxisY, cutmin.y - 0.00001f), false, true,true),new PlaneSetting(new Plane3d(Vector3d.AxisY, cutmax.y + 0.00001f), true, true,true)
+				,new PlaneSetting(new Plane3d(Vector3d.AxisX, cutmin.x-0.00001f), false, true, true),new PlaneSetting(new Plane3d(Vector3d.AxisX, cutmax.x + 0.00001f), true, true,true));
 		}
 
 		public SimpleMesh(IMesh copy) {
