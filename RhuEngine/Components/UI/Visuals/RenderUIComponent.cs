@@ -106,7 +106,7 @@ namespace RhuEngine.Components
 				returnMesh.OffsetTop(Rect.Canvas.TopOffsetValue.Value);
 			}
 			if (Rect.Canvas.FrontBind.Value) {
-				returnMesh = returnMesh.UIBind(Rect.Canvas.FrontBindDist.Value, Rect.Canvas.FrontBindSegments.Value);
+				returnMesh = returnMesh.UIBind(Rect.Canvas.FrontBindAngle.Value, Rect.Canvas.FrontBindRadus.Value, Rect.Canvas.FrontBindSegments.Value,Rect.Canvas.scale);
 			}
 			RenderMesh = returnMesh;
 			if (PhysicsMesh) {

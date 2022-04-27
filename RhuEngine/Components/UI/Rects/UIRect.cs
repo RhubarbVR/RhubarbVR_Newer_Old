@@ -218,8 +218,9 @@ namespace RhuEngine.Components
 				npoint.z -= point.y * Canvas.TopOffsetValue.Value;
 			}
 			if (Canvas.FrontBind.Value) {
-				var x = (point.x - 0.5) * 2;
-				npoint.z -= (float)((1 - (x * x)) * Canvas.FrontBindDist.Value) - Canvas.FrontBindDist.Value;
+				var data = (Vector3d)npoint;
+				data.Bind(Canvas.FrontBindAngle, Canvas.FrontBindRadus,Canvas.scale.Value);
+				npoint = (Vector3f)data;
 			}
 			return npoint;
 		}

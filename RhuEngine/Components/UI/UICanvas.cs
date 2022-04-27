@@ -17,13 +17,14 @@ namespace RhuEngine.Components
 		[Default(3f)]
 		public Sync<float> TopOffsetValue;
 
-		[Default(false)]
+		[Default(true)]
 		public Sync<bool> FrontBind;
-		[Default(8)]
+		[Default(20)]
 		public Sync<int> FrontBindSegments;
-		[Default(5f)]
-		public Sync<float> FrontBindDist;
-
+		[Default(180f)]
+		public Sync<float> FrontBindAngle;
+		[Default(7.5f)]
+		public Sync<float> FrontBindRadus;
 		public override void OnAttach() {
 			base.OnAttach();
 			scale.Value = new Vector3f(16, 9,1);

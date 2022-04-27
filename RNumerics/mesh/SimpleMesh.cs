@@ -167,20 +167,23 @@ namespace RNumerics
 			}
 			return cutMesh;
 		}
-		private void BindVerterts(float bind) {
+		private void BindVerterts(float angle,float radus,Vector3f scale) {
 			for (var i = 0; i < VertexCount; ++i) {
-				var x = (Vertices[3 * i] - 0.5) * 2;
-				Vertices[(3 * i) + 2] -= ( (1 - (x * x))* bind ) - bind;
+				var v = new Vector3d(Vertices[3 * i], Vertices[(3 * i) + 1], Vertices[(3 * i) + 2]);
+				v.Bind(angle, radus,scale);
+				Vertices[3 * i] = v.x;
+				Vertices[(3 * i) + 1] = v.y;
+				Vertices[(3 * i) + 2] = v.z;
 			}
 			UpdateTimeStamp();
 		}
-		public SimpleMesh UIBind(float bind, int segments) {
+		public SimpleMesh UIBind(float angle, float radus, int segments,Vector3f scale) {
 			SimpleMesh lastmesh = null;
 			for (var i = 0; i < segments; i++) {
 				var pos = i % 2 == 0 ? (double)(1f / segments * i) : (double)(1f / segments * (segments - i));
 				lastmesh = (lastmesh?? this).CutOnPlane(new Plane3d(Vector3d.AxisX, pos), false);
 			}
-			lastmesh.BindVerterts(bind);
+			lastmesh.BindVerterts(angle, radus,scale);
 			return lastmesh;
 		}
 

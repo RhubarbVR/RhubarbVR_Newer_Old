@@ -241,6 +241,16 @@ namespace RNumerics
 		public static Vector3d operator /(double f, Vector3d v) => new(f / v.x, f / v.y, f / v.z);
 
 		public static Vector3d operator *(Vector3d a, Vector3d b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
+
+		public void Bind(float angle, float radus,Vector3f scale) {
+			var anglecalc = angle * x;
+			this *= scale;
+			x = (-radus + z) * Math.Cos(anglecalc * Math.PI / 180);
+			x += radus;
+			z = (-radus + z) * Math.Sin(anglecalc * Math.PI / 180);
+			this /= scale;
+		}
+
 		public static Vector3d operator /(Vector3d a, Vector3d b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
 
 
