@@ -504,8 +504,7 @@ namespace RhuEngine.Components
 						list.Add(item);
 					}
 				});
-				ProcessCutting(false);
-				UpdateUIMeshes();
+				Scroll(ScrollOffset,true);
 			});
 		}
 
@@ -524,8 +523,8 @@ namespace RhuEngine.Components
 			});
 		}
 
-		public void Scroll(Vector3f value) {
-			if(value == ScrollOffset) {
+		public void Scroll(Vector3f value, bool forceUpdate = false) {
+			if(value == ScrollOffset && !forceUpdate) {
 				return;
 			}
 			var phsicsupdate = value.x == ScrollOffset.x && value.y == ScrollOffset.y;

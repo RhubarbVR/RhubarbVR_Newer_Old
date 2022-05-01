@@ -48,7 +48,7 @@ namespace RhuEngine
 			img.Material.Target = mit;
 			var list = child.AddChild("List");
 			var scroll = list.AttachComponent<UIScrollInteraction>();
-			var rectthrere = list.AttachComponent<VerticalList>();
+			var rectthrere = list.AttachComponent<HorizontalList>();
 			rectthrere.Depth.Value = 0f;
 			scroll.OnScroll.Target = rectthrere.Scroll;
 			return list;
@@ -91,7 +91,7 @@ namespace RhuEngine
 			button.AttachComponent<UIButtonInteraction>();
 			var listRoot = pannel.AttachList(mit, new Vector2f(0f), new Vector2f(0.25f, 1f), Colorf.Blue);
 			void AttachListElement(Entity root,string text) {
-				var e = root.AttachRectangle(mit, new Vector2f(0f, 0f), new Vector2f(1f, 0.2f), Colorf.RhubarbRed);
+				var e = root.AttachRectangle(mit, new Vector2f(0f, 0f), new Vector2f(0.2f,1f), Colorf.RhubarbRed);
 				e.AttachImage(shader, new Vector2f(0.5, 0), new Vector2f(1f), Colorf.White, texture);
 				e.AttachText(new Vector2f(0), new Vector2f(0.5f, 1), Colorf.White,text);
 			}

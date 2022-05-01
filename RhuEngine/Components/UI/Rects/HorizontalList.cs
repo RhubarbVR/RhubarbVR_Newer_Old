@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 {
 
 	[Category(new string[] { "UI\\Rects" })]
-	public class VerticalList : RawScrollUIRect
+	public class HorizontalList : RawScrollUIRect
 	{
 		[Default(false)]
 		[OnChanged(nameof(RegUpdateUIMeshes))]
@@ -56,8 +56,8 @@ namespace RhuEngine.Components
 					var currentpos = 0f;
 					foreach (var item in list) {
 						item.Canvas = Canvas;
-						item.AnchorMax = new Vector2f(1f,currentpos + inc);
-						item.AnchorMin = new Vector2f(0f, currentpos);
+						item.AnchorMax = new Vector2f(currentpos + inc,1f);
+						item.AnchorMin = new Vector2f(currentpos,0f);
 						currentpos += inc;
 					}
 					_maxScroll = Vector2f.Zero;
@@ -66,18 +66,18 @@ namespace RhuEngine.Components
 			}
 			else {
 				fakeRects.SafeOperation((list) => {
-					var ypos = 0f;
-					var maxXpos = 0f;
+					var xpos = 0f;
+					var maxypos = 0f;
 					foreach (var item in list) {
 						item.Canvas = Canvas;
 						var targetSize = item.Child.AnchorMaxValue - item.Child.AnchorMinValue;
-						maxXpos = Math.Max(targetSize.x, maxXpos);
-						ypos += targetSize.y;
-						item.AnchorMax = new Vector2f(1,ypos);
-						item.AnchorMin = new Vector2f(0,ypos - 1);
+						maxypos = Math.Max(targetSize.y, maxypos);
+						xpos += targetSize.x;
+						item.AnchorMax = new Vector2f(xpos,1);
+						item.AnchorMin = new Vector2f(xpos - 1, 0);
 					}
-					_maxScroll = new Vector2f(0, 1 - ((ypos - 1)/10));
-					_minScroll = new Vector2f(0,-1 - ((ypos - 1) / 10));
+					_maxScroll = new Vector2f(1 - ((xpos - 1)/10),0);
+					_minScroll = new Vector2f(-1 - ((xpos - 1) / 10),0);
 				});
 			}
 			base.UpdateUIMeshes();
