@@ -89,7 +89,42 @@ namespace RhuEngine.WorldObjects
 				return (T)(object)Type.GetType(((DataNode<string>)data.GetValue("Value")).Value, false, false);
 			}
 			else {
-				return typeof(T).IsEnum ? (T)(object)((DataNode<int>)data.GetValue("Value")).Value : ((DataNode<T>)data.GetValue("Value")).Value; 
+				if (typeof(T).IsEnum) {
+					var unType = typeof(T).GetEnumUnderlyingType();
+					if (unType == typeof(int)) {
+						return (T)(object)((DataNode<int>)data.GetValue("Value")).Value;
+					}
+					else if (unType == typeof(uint)) {
+						return (T)(object)((DataNode<uint>)data.GetValue("Value")).Value;
+					}
+					else if (unType == typeof(bool)) {
+						return (T)(object)((DataNode<bool>)data.GetValue("Value")).Value;
+					}
+					else if (unType == typeof(byte)) {
+						return (T)(object)((DataNode<byte>)data.GetValue("Value")).Value;
+					}
+					else if (unType == typeof(sbyte)) {
+						return (T)(object)((DataNode<sbyte>)data.GetValue("Value")).Value;
+					}
+					else if (unType == typeof(short)) {
+						return (T)(object)((DataNode<short>)data.GetValue("Value")).Value;
+					}
+					else if (unType == typeof(ushort)) {
+						return (T)(object)((DataNode<ushort>)data.GetValue("Value")).Value;
+					}
+					else if (unType == typeof(long)) {
+						return (T)(object)((DataNode<long>)data.GetValue("Value")).Value;
+					}
+					else if (unType == typeof(ulong)) {
+						return (T)(object)((DataNode<ulong>)data.GetValue("Value")).Value;
+					}
+					else {
+						throw new NotSupportedException();
+					}
+				}
+				else {
+					return ((DataNode<T>)data.GetValue("Value")).Value;
+				}
 			}
 		}
 

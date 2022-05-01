@@ -79,8 +79,42 @@ namespace RhuEngine.WorldObjects
 				Value = new DataNode<string>(((Type)(object)value)?.FullName);
 			}
 			else {
-				Value = inputType.IsEnum ? new DataNode<int>((int)(object)value) : new DataNode<T>(value);
-			}
+				if (inputType.IsEnum) {
+					var unType = inputType.GetEnumUnderlyingType();
+					if(unType == typeof(int)) {
+						Value = new DataNode<int>((int)(object)value);
+					}
+					else if (unType == typeof(uint)) {
+						Value = new DataNode<uint>((uint)(object)value);
+					}
+					else if (unType == typeof(bool)) {
+						Value = new DataNode<bool>((bool)(object)value);
+					}
+					else if (unType == typeof(byte)) {
+						Value = new DataNode<byte>((byte)(object)value);
+					}
+					else if (unType == typeof(sbyte)) {
+						Value = new DataNode<sbyte>((sbyte)(object)value);
+					}
+					else if (unType == typeof(short)) {
+						Value = new DataNode<short>((short)(object)value);
+					}
+					else if (unType == typeof(ushort)) {
+						Value = new DataNode<ushort>((ushort)(object)value);
+					}
+					else if (unType == typeof(long)) {
+						Value = new DataNode<short>((short)(object)value);
+					}
+					else if (unType == typeof(ulong)) {
+						Value = new DataNode<ushort>((ushort)(object)value);
+					}
+					else {
+						throw new NotSupportedException();
+					}
+				}
+				else {
+					Value = new DataNode<T>(value);
+				}			}
 			obj.SetValue("Value", Value);
 			return obj;
 		}

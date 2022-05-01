@@ -14,6 +14,9 @@ namespace RhuEngine.Components
 {
 	public class ECMAScript : Component
 	{
+		[Exsposed]
+		public bool ScriptLoaded => _ecma is not null;
+
 		public SyncObjList<SyncRef<IWorldObject>> Targets;
 
 		[Default(@"
@@ -37,10 +40,13 @@ namespace RhuEngine.Components
 				WorldThreadSafty.MethodCalls--;
 			}
 			catch (StackOverflowException) {
+				WorldThreadSafty.MethodCalls = 0;
 				_ecma = null;
+				RLog.Err("Script Err " + "StackOverflowException");
 			}
 			catch (Exception ex) {
 #if DEBUG
+				WorldThreadSafty.MethodCalls = 0;
 				RLog.Err("Script Err " + ex.ToString());
 #endif
 			}
@@ -57,12 +63,18 @@ namespace RhuEngine.Components
 			}
 			catch (StackOverflowException) {
 				_ecma = null;
+				WorldThreadSafty.MethodCalls = 0;
 			}
 			catch (Exception ex) {
 #if DEBUG
+				WorldThreadSafty.MethodCalls = 0;
 				RLog.Err("Script Err " + ex.ToString());
 #endif
 			}
+		}
+		[Exsposed]
+		public IWorldObject GetTarget(int index) {
+			return Targets.GetValue(index).Target;
 		}
 
 		private void InitECMA() {
@@ -87,9 +99,8 @@ namespace RhuEngine.Components
 			}
 			catch (Exception ex) {
 				_ecma = null;
-#if DEBUG
+				WorldThreadSafty.MethodCalls = 0;
 				RLog.Err("Script Err " + ex.ToString());
-#endif
 			}
 		}
 
