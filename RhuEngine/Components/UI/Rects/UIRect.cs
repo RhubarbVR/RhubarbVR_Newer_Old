@@ -540,7 +540,7 @@ namespace RhuEngine.Components
 					item.RenderScrollMesh(false);
 				}
 			});
-			ProcessCutting(false, false);
+			ProcessCutting(false, !phsicsupdate);
 			UpdateUIMeshes();
 		}
 	}
