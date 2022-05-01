@@ -175,6 +175,15 @@ namespace RhuEngine
 			spinningCubes.position.Value = new Vector3f(0, 0.5f, 0);
 			AttachSpiningCubes(spinningCubes);
 			RLog.Info("Built Local World");
+
+
+
+
+			RLog.Info("\n\n\n\n\n\n");
+			var a = floor.AttachComponent<ECMAScript>();
+			a.script.Value = "log(\"test is this thing on? \"+entity.name);";
+			RLog.Info("\n\n\n\n\n\n");
+
 		}
 
 
