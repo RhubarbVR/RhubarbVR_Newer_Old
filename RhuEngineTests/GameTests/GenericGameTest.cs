@@ -99,6 +99,7 @@ namespace RhuEngine.GameTests.Tests
 					types.Add(typeof(Vector4d));
 					types.Add(typeof(RTexture2D));
 					types.Add(typeof(Type));
+					types.Add(typeof(EditLevel));
 				}
 				else {
 					var rnd = new Random();
