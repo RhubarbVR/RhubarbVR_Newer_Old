@@ -43,7 +43,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public override void Deserialize(IDataNode data, SyncObjectDeserializerObject syncObjectSerializerObject) {
-			syncObjectSerializerObject.Deserialize((DataNodeGroup)data, this);
+			syncObjectSerializerObject.BindPointer((DataNodeGroup)data, this);
 		}
 
 		public bool IsLinkedTo { get; private set; }

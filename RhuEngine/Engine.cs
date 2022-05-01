@@ -19,6 +19,7 @@ namespace RhuEngine
 {
 	public class Engine : IDisposable
 	{
+		public bool PassErrors { get; private set; }
 		public IEngineLink EngineLink { get; private set; }
 
 		public readonly object RenderLock = new();
@@ -46,7 +47,8 @@ namespace RhuEngine
 
 		public Action OnEngineStarted;
 
-		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null) : base() {
+		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null,bool PassErrors = false) : base() {
+			this.PassErrors = PassErrors;
 			EngineLink = _EngineLink;
 			_EngineLink.BindEngine(this);
 			EngineLink.LoadStatics();
@@ -260,6 +262,9 @@ namespace RhuEngine
 				}
 				catch (Exception ex) {
 					RLog.Err($"Failed to Disposed {item.GetType().GetFormattedName()} Error: {ex}");
+					if (PassErrors) {
+						throw ex;
+					}
 				}
 			}
 		}

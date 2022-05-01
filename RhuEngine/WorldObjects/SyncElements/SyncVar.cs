@@ -28,8 +28,12 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 		}
-
-		public INetworkedObject Target { get; private set; }
+		[UnExsposed]
+		[NoShow]
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		public INetworkedObject Target;
 		public bool NoSync { get; set; }
 
 		public T GetTarget<T>(out bool Failed) where T : class, INetworkedObject {
@@ -81,20 +85,22 @@ namespace RhuEngine.WorldObjects
 			var typeName = nodeGroup.GetValue<string>("fieldType");
 			var type = Type.GetType(typeName);
 			if (type is not null) {
-				if (!typeof(INetworkedObject).IsAssignableFrom(type)) {
-					throw new Exception($"Unable to add unassignable type {type.FullName} to Sync Var");
+				try {
+					if (!typeof(INetworkedObject).IsAssignableFrom(type)) {
+						throw new Exception($"Unable to add unassignable type {type.FullName} to Sync Var");
+					}
+					var value = nodeGroup.GetValue("ElementData");
+					if (value is null) {
+						return;
+					}
+					var objrc = (INetworkedObject)Activator.CreateInstance(type);
+					objrc.Initialize(World, this, "Sync Var Element", true, false);
+					objrc.Deserialize(value, syncObjectSerializerObject);
+					Target = objrc;
 				}
-				var value = nodeGroup.GetValue("ElementData");
-				if(value is null) {
-					return;
+				catch(Exception e) {
+					throw new Exception($"Failed to load type {typeName} ",e);
 				}
-				var objrc = (INetworkedObject)Activator.CreateInstance(type);
-				objrc.Initialize(World, this, "Sync Var Element", true, false);
-				objrc.Deserialize(value, syncObjectSerializerObject);
-				Target = objrc;
-			}
-			else {
-				throw new Exception($"Failed to load type {typeName}");
 			}
 		}
 	}

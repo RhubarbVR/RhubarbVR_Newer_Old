@@ -23,7 +23,7 @@ namespace RhuEngine.WorldObjects.ECS
 			var obj = new DataNodeGroup();
 			if (Persistence) {
 				var Refid = new DataNode<NetPointer>(Pointer);
-				obj.SetValue("referenceID", Refid);
+				obj.SetValue("Pointer", Refid);
 				obj.SetValue("Data", tempData);
 				var typeValue = new DataNode<string>(type.Value);
 				obj.SetValue("type", typeValue);

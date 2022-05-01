@@ -47,6 +47,16 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 
+		[Exsposed]
+		public Entity GetChildByName(string v) {
+			foreach (var child in children) {
+				if(((Entity)child).name.Value == v) {
+					return (Entity)child;
+				}
+			}
+			return null;
+		}
+
 		private void OnComponentChange() {
 			if (_hasUpdatingComponentSave != HasUpdatingComponent) {
 				_hasUpdatingComponentSave = !_hasUpdatingComponentSave;
@@ -154,13 +164,19 @@ namespace RhuEngine.WorldObjects.ECS
 			return newPos;
 		}
 
+
+
+		[NoShow]
+		[NoSave]
+		[NoSync]
+		[NoLoad]
 		private Entity _internalParent;
 
 		[NoShow]
 		[NoSave]
 		[NoSync]
 		[NoLoad]
-		public UIRect UIRect { get; private set; }
+		public UIRect UIRect;
 
 		public void SetUIRect(UIRect newrect) {
 			var oldrec = UIRect;

@@ -40,7 +40,7 @@ namespace RhuEngine.Components
 			get => _MainMethod;
 			set {
 				_MainMethod = value;
-				_MainMethod.LoadIntoWorld(World, this);
+				_MainMethod?.LoadIntoWorld(World, this);
 				LoadLocalValues();
 			}
 		}
@@ -50,6 +50,9 @@ namespace RhuEngine.Components
 		public ScriptNodeWrite[] LocalValueNode = new ScriptNodeWrite[0];
 
 		public void LoadLocalValues() {
+			if(_MainMethod is null) {
+				return;
+			}
 			LocalValueNode = new ScriptNodeWrite[0];
 			var nodeList = new List<IScriptNode>();
 			_MainMethod.GetChildrenAll(nodeList);

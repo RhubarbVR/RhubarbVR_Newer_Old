@@ -12,7 +12,7 @@ using RhuEngine.Managers;
 
 namespace RhuEngine.WorldObjects
 {
-	public class SyncObject : ISyncObject
+	public abstract class SyncObject : ISyncObject
 	{
 		private readonly HashSet<IDisposable> _disposables = new();
 

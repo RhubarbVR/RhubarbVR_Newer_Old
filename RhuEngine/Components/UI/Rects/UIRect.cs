@@ -295,12 +295,13 @@ namespace RhuEngine.Components
 			});
 			UpdateMeshes();
 		}
-
+		[UnExsposed]
 		[NoShow]
 		[NoSave]
 		[NoSync]
 		[NoLoad]
-		public UICanvas RegisteredCanvas { get; internal set; }
+		[NoSyncUpdate]
+		public UICanvas RegisteredCanvas;
 
 		public void RegisterCanvas() {
 			RegisteredCanvas = Canvas;
@@ -309,12 +310,12 @@ namespace RhuEngine.Components
 			}
 			RegUpdateUIMeshes();
 		}
-
+		[UnExsposed]
 		[NoShow]
 		[NoSave]
 		[NoSync]
 		[NoLoad]
-		public UICanvas BoundCanvas { get; internal set; }
+		public UICanvas BoundCanvas;
 
 		[NoShow]
 		[NoSave]
