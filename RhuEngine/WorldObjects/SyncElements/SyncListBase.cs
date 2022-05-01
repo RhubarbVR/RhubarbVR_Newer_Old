@@ -14,7 +14,7 @@ namespace RhuEngine.WorldObjects
 		private readonly SynchronizedCollection<T> _syncObjects = new(5);
 
 		public event Action<IChangeable> Changed;
-
+		[Exsposed]
 		public int IndexOf(T value) {
 			return _syncObjects.IndexOf(value);
 		}
@@ -22,10 +22,11 @@ namespace RhuEngine.WorldObjects
 		public void ChildElementOnChanged(IChangeable changeable) {
 			Changed?.Invoke(changeable);
 		}
-
+		[Exsposed]
 		public T GetValue(int index) {
 			return _syncObjects[index];
 		}
+		[Exsposed]
 		public void Clear() {
 			var sendData = new DataNodeGroup();
 			sendData.SetValue("type", new DataNode<int>(3));
@@ -35,6 +36,7 @@ namespace RhuEngine.WorldObjects
 			}
 			_syncObjects.Clear();
 		}
+		[Exsposed]
 		public T this[int i] => _syncObjects[i];
 
 		public T this[NetPointer pointer] => _syncObjects.Where((val)=> val.Pointer == pointer).First();

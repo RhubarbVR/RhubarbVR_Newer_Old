@@ -5,6 +5,8 @@ using System.IO;
 using RhuEngine.WorldObjects;
 using RNumerics;
 using RhuEngine.Linker;
+using System.Reflection;
+
 namespace RhuEngine
 {
 	public static class Helper
@@ -73,8 +75,18 @@ namespace RhuEngine
 			var v = 0.5f + ((float)(int)(byte)(hashCode >> 24) / 255f * 0.5f);
 			return new ColorHSV(h, s, v).RGBA;
 		}
-
-		public static Colorf GetTypeColor(this Type type) {
+		public static Type MemberInnerType(this MemberInfo data) {
+			switch (data.MemberType) {
+				case MemberTypes.Field:
+					return ((FieldInfo)data).FieldType;
+				case MemberTypes.Property:
+					return ((PropertyInfo)data).PropertyType;
+				default:
+					break;
+			}
+			return null;
+		}
+			public static Colorf GetTypeColor(this Type type) {
 			if(type is null) {
 				return Colorf.Black;
 			}

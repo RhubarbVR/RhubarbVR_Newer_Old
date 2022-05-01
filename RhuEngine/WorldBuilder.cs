@@ -88,7 +88,24 @@ namespace RhuEngine
 			var rect = pannel.AttachRectangle(mit, new Vector2f(0.25f, 0f), new Vector2f(1f), Colorf.RhubarbGreen);
 			var button = rect.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.RhubarbRed);
 			button.AttachText(Vector2f.Zero, Vector2f.One, Colorf.White, "<colorred>Button<color=blue><size=20> Can go clicky<color=yellow> clicky<size5> So Click");
-			button.AttachComponent<UIButtonInteraction>();
+			var buttonint = button.AttachComponent<UIButtonInteraction>();
+			var buttonpramremove = button.AttachComponent<ButtonEventManager>();
+			var floatValue = button.AttachComponent<ValueField<float>>();
+			buttonpramremove.Force.Target = floatValue.Value;
+			buttonint.ButtonEvent.Target = buttonpramremove.Call;
+			var a = button.AttachComponent<ECMAScript>();
+			a.Targets.Add().Target = floatValue;
+			a.Script.Value = @"
+			let trains = 10
+			function Tains(pie,piw) {
+				return pie + piw;
+			}
+			function RunCode()	{
+				
+			}
+			";
+			buttonpramremove.Click.Target = a.RunCode;
+
 			var listRoot = pannel.AttachList(mit, new Vector2f(0f), new Vector2f(0.25f, 1f), Colorf.Blue);
 			void AttachListElement(Entity root,string text) {
 				var e = root.AttachRectangle(mit, new Vector2f(0f, 0f), new Vector2f(1f, 0.2f), Colorf.RhubarbRed);
@@ -179,10 +196,7 @@ namespace RhuEngine
 
 
 
-			RLog.Info("\n\n\n\n\n\n");
-			var a = floor.AttachComponent<ECMAScript>();
-			a.script.Value = "log(\"test is this thing on? \"+entity.name);";
-			RLog.Info("\n\n\n\n\n\n");
+
 
 		}
 

@@ -23,14 +23,26 @@ namespace RhuEngine.Linker
 		public static IRLog Instance { get; set; }
 
 		public static void Info(string value) {
+			if(value == null) {
+				Instance?.Info("Value was Null");
+				return;
+			}
 			Instance?.Info(value);
 		}
 
 		public static void Err(string value) {
+			if (value == null) {
+				Instance?.Err("Value was Null");
+				return;
+			}
 			Instance?.Err(value);
 		}
 
 		public static void Warn(string value) {
+			if (value == null) {
+				Instance?.Warn("Value was Null");
+				return;
+			}
 			Instance?.Warn(value);
 		}
 

@@ -16,6 +16,7 @@ namespace RhuEngine.WorldObjects
 
 	public class SyncValueList<T> : SyncObjList<Sync<T>>
 	{
+		[Exsposed]
 		public new T this[int index]
 		{
 			get => base[index].Value;
@@ -30,7 +31,7 @@ namespace RhuEngine.WorldObjects
 		public override void OnElementRemmoved(Sync<T> element) {
 			element.Changed -= ChildElementOnChanged;
 		}
-
+		[Exsposed]
 		public void Add(T value) {
 			Add().Value = value;
 		}
@@ -39,6 +40,10 @@ namespace RhuEngine.WorldObjects
 			foreach (var item in values) {
 				Add(item);
 			}
+		}
+		[Exsposed]
+		public T[] GetValues() {
+			return this;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -53,7 +58,10 @@ namespace RhuEngine.WorldObjects
 			AddInternal(newElement);
 			return newElement;
 		}
-
+		[Exsposed]
+		public T AddElement() {
+			return Add();
+		}
 		public T Add(bool networkedObject = false, bool deserialize = false) {
 			var newElement = new T();
 			newElement.Initialize(World, this, "List Elemenet", networkedObject, deserialize);

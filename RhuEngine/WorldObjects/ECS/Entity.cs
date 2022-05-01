@@ -57,7 +57,15 @@ namespace RhuEngine.WorldObjects.ECS
 		private void OnOrderOffsetChange() {
 			OffsetChanged?.Invoke();
 		}
-
+		[Exsposed]
+		public Component AttachComponent(Type type) {
+			if (!typeof(Component).IsAssignableFrom(type)) {
+				throw new ArgumentException($"Type {type.GetFormattedName()} is not assignable to {typeof(Component).GetFormattedName()}");
+			}
+			var comp = components.Add(type);
+			comp.OnAttach();
+			return comp;
+		}
 		[Exsposed]
 		public T AttachComponent<T>(Type type) where T : Component {
 			if(!typeof(T).IsAssignableFrom(type)) {
