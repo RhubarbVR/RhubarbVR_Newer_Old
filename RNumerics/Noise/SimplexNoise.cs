@@ -290,6 +290,29 @@ namespace RNumerics.Noise
 			return 32.0f * (n0 + n1 + n2 + n3); // TODO: The scale factor is preliminary!
 		}
 
+
+		/// Helper function to compute the SimplexNoise value based on time, speed, magnitude and seed.
+		public static Vector3f Generate3D(float time, Vector3f speed, Vector3f magnitude, Vector3f seed) {
+			return new Vector3f(
+				Generate((time * speed.x) + seed.x) * magnitude.x,
+				Generate((time * speed.y) + seed.y) * magnitude.y,
+				Generate((time * speed.z) + seed.z) * magnitude.z
+			);
+		}
+
+		/// Helper function to compute the SimplexNoise value based on time, speed, magnitude and seed.
+		public static Vector2f Generate2D(float time, Vector2f speed, Vector2f magnitude, Vector2f seed) {
+			return new Vector2f(
+				Generate((time * speed.x) + seed.x) * magnitude.x,
+				Generate((time * speed.y) + seed.y) * magnitude.y
+			);
+		}
+
+		/// Helper function to compute the SimplexNoise value based on time, speed, magnitude and seed.
+		public static float Generate1D(float time, float speed, float magnitude, float seed) {
+			return Generate((time * speed) + seed) * magnitude;
+		}
+
 		private static byte[] _perm;
 
 		private static readonly byte[] _permOriginal = {

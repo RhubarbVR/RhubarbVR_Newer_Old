@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using RhuEngine.WorldObjects;
+﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
-
 using RNumerics;
 using RNumerics.Noise;
 
@@ -29,16 +24,8 @@ namespace RhuEngine.Components.Transform
 		public override void Step() {
 			if (driver.Linked) {
 				var time = (float)World.WorldTime;
-
-				var noiseVector = new Vector3f(
-					SimplexNoise.Generate((time * speed.Value.x) + seed.Value.x) * magnitude.Value.x,
-					SimplexNoise.Generate((time * speed.Value.y) + seed.Value.y) * magnitude.Value.y,
-					SimplexNoise.Generate((time * speed.Value.z) + seed.Value.z) * magnitude.Value.z
-				);
-
-				var nextQ = offset * Quaternionf.CreateFromEuler(noiseVector);
-
-				driver.LinkedValue = nextQ;
+				var noiseValue = SimplexNoise.Generate3D(time, speed.Value, magnitude.Value, seed.Value);
+				driver.LinkedValue = offset * Quaternionf.CreateFromEuler(noiseValue);
 			}
 		}
 	}
