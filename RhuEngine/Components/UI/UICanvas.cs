@@ -19,7 +19,7 @@ namespace RhuEngine.Components
 
 		[Default(true)]
 		public Sync<bool> FrontBind;
-		[Default(15)]
+		[Default(10)]
 		public Sync<int> FrontBindSegments;
 		[Default(180f)]
 		public Sync<float> FrontBindAngle;

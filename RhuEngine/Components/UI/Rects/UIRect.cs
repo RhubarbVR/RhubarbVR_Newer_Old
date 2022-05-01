@@ -200,17 +200,20 @@ namespace RhuEngine.Components
 
 		public Matrix MatrixMove(Matrix matrix) {
 			var firstpos = VertMove(matrix.Translation);
-			var least = 0f;
-			var quaternionf = Quaternionf.Identity;
-			for (var i = 0; i < Canvas.FrontBindSegments; i++) {
-				var max = i + (1 / Canvas.FrontBindSegments);
-				if (max >= firstpos.x && least <= firstpos.x) {
-					quaternionf = Quaternionf.Identity;
-					break;
+			var anglecalfirst = 0f;
+			if (Canvas.FrontBind.Value) {
+				var adder = 1;
+				if(matrix.Translation.x < 0.5f) {
+					adder = 0;
 				}
-				least = max;
+				anglecalfirst = Canvas.FrontBindAngle.Value * (((float)Math.Floor(matrix.Translation.x * Canvas.FrontBindSegments.Value) + adder) / Canvas.FrontBindSegments.Value);
+				anglecalfirst = (anglecalfirst * -1) + 90;
 			}
-			return Matrix.TR(firstpos - matrix.Translation, quaternionf);
+			var rollangle = 0f;
+			if (Canvas.TopOffset.Value) {
+				rollangle = Canvas.TopOffsetValue.Value * matrix.Translation.y;
+			}
+			return Matrix.TR(firstpos - matrix.Translation, Quaternionf.CreateFromEuler(anglecalfirst, rollangle, 0));
 		}
 		public Vector3f VertMove(Vector3f point) {
 			var npoint = point;
@@ -219,7 +222,7 @@ namespace RhuEngine.Components
 			}
 			if (Canvas.FrontBind.Value) {
 				var data = (Vector3d)npoint;
-				data.Bind(Canvas.FrontBindAngle, Canvas.FrontBindRadus,Canvas.scale.Value);
+				data.Bind(Canvas.FrontBindAngle, Canvas.FrontBindRadus,Canvas.scale.Value,Canvas.FrontBindSegments.Value);
 				npoint = (Vector3f)data;
 			}
 			return npoint;

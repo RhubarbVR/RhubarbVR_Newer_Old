@@ -394,6 +394,9 @@ namespace RNumerics
 		public static Quaternionf FromTo(Vector3f vFrom, Vector3f vTo) {
 			return new Quaternionf(vFrom, vTo);
 		}
+		public static Quaternionf FromTo(Vector3f vFrom, Vector3f vTo,Vector3f vOffset) {
+			return new Quaternionf(vFrom- vOffset, vTo- vOffset);
+		}
 		public static Quaternionf FromToConstrained(Vector3f vFrom, Vector3f vTo, Vector3f vAround) {
 			var fAngle = MathUtil.PlaneAngleSignedD(vFrom, vTo, vAround);
 			return Quaternionf.AxisAngleD(vAround, fAngle);

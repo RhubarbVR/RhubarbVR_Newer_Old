@@ -256,6 +256,16 @@ namespace RNumerics
 				return hash;
 			}
 		}
+
+		public Vector2f ClosestPointOnLine(Vector2f first, Vector2f next) {
+			var thisfirst = this - first;
+			var nextfitst = next - first;
+			var magnextfitst = nextfitst.LengthSquared;
+			var nextfirstpro = thisfirst.Dot(nextfitst);
+			var dist = nextfirstpro / magnextfitst;
+			return first + (nextfitst * dist);
+		}
+
 		public int CompareTo(Vector2f other) {
 			if (x != other.x) {
 				return x < other.x ? -1 : 1;
