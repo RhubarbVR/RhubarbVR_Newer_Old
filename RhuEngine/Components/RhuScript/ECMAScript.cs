@@ -15,6 +15,29 @@ namespace RhuEngine.Components
 {
 	public class ECMAScript : Component
 	{
+		public class ECMAScriptFunction:SyncObject
+		{
+			[Default("RunCode")]
+			public readonly Sync<string> FunctionName;
+
+			[Exsposed]
+			public void Invoke() {
+				((ECMAScript)Parent.Parent).RunCode(FunctionName);
+			}
+
+			[Exsposed]
+			public void Invoke(params object[] prams) {
+				((ECMAScript)Parent.Parent).RunCode(FunctionName, prams);
+			}
+		}
+
+		public readonly SyncObjList<ECMAScriptFunction> Functions;
+
+		public override void OnAttach() {
+			base.OnAttach();
+			Functions.Add();
+		}
+
 		[Exsposed]
 		public bool ScriptLoaded => _ecma is not null;
 
@@ -29,37 +52,20 @@ namespace RhuEngine.Components
 		public readonly Sync<string> Script; 
 
 		private Jint.Engine _ecma;
+		
+		[Exsposed]
+		public void Invoke(string function, params object[] values) {
+			RunCode(function, values);
+		}
 
-		[Exsposed]
-		public void RunCode() {
+
+		private void RunCode(string function,params object[] values) {
 			try {
 				WorldThreadSafty.MethodCalls++;
 				if (WorldThreadSafty.MethodCalls > 3) {
 					throw new StackOverflowException();
 				}
-				_ecma?.Invoke("RunCode");
-				WorldThreadSafty.MethodCalls--;
-			}
-			catch (StackOverflowException) {
-				WorldThreadSafty.MethodCalls = 0;
-				_ecma = null;
-				RLog.Err("Script Err " + "StackOverflowException");
-			}
-			catch (Exception ex) {
-#if DEBUG
-				WorldThreadSafty.MethodCalls = 0;
-				RLog.Err("Script Err " + ex.ToString());
-#endif
-			}
-		}
-		[Exsposed]
-		public void RunCode(params object[] values) {
-			try {
-				WorldThreadSafty.MethodCalls++;
-				if (WorldThreadSafty.MethodCalls > 3) {
-					throw new StackOverflowException();
-				}
-				_ecma?.Invoke("RunCode", values);
+				_ecma?.Invoke(function, values);
 				WorldThreadSafty.MethodCalls--;
 			}
 			catch (StackOverflowException) {
@@ -73,6 +79,7 @@ namespace RhuEngine.Components
 #endif
 			}
 		}
+
 		[Exsposed]
 		public IWorldObject GetTarget(int index) {
 			return Targets.GetValue(index).Target;

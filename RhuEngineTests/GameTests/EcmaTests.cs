@@ -67,7 +67,7 @@ namespace RhuEngine.GameTests.Tests
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script not loaded");
 			}
-			script.RunCode();
+			script.Invoke("RunCode");
 			Assert.AreEqual(null, value.Value.Value);
 			tester.Dispose();
 		}
@@ -86,7 +86,7 @@ namespace RhuEngine.GameTests.Tests
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script not loaded");
 			}
-			script.RunCode();
+			script.Invoke("RunCode");
 			Assert.AreNotEqual(null, value.Value);
 			tester.Dispose();
 		}
@@ -105,7 +105,7 @@ namespace RhuEngine.GameTests.Tests
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script not loaded");
 			}
-			script.RunCode();
+			script.Invoke("RunCode");
 			Assert.AreEqual(typeof(CapsuleMesh), value.Value.Value);
 			tester.Dispose();
 		}
@@ -121,7 +121,7 @@ namespace RhuEngine.GameTests.Tests
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script not loaded");
 			}
-			script.RunCode();
+			script.Invoke("RunCode");
 			Assert.IsNotNull(script.Entity.GetFirstComponent<Spinner>());			
 			tester.Dispose();
 		}
@@ -139,7 +139,7 @@ namespace RhuEngine.GameTests.Tests
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script not loaded");
 			}
-			script.RunCode();
+			script.Invoke("RunCode");
 			Assert.AreEqual(4,script.Entity.children.Count);
 			tester.Dispose();
 		}
@@ -157,10 +157,26 @@ namespace RhuEngine.GameTests.Tests
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script not loaded");
 			}
-			script.RunCode();
+			script.Invoke("RunCode");
 			Assert.AreEqual(4, script.Entity.children.Count);
 			tester.Dispose();
 		}
+
+		[TestMethod()]
+		public void TestOverFlowStopTwo() {
+			var script = AttachTestScript();
+			script.Script.Value = @"
+				function RunCode()	{
+						self.RunCode();
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			tester.Dispose();
+		}
+
 		[TestMethod()]
 		public void TestOverFlowStop() {
 			var script = AttachTestScript();
@@ -174,7 +190,7 @@ namespace RhuEngine.GameTests.Tests
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script not loaded");
 			}
-			script.RunCode();
+			script.Invoke("RunCode");
 			tester.Dispose();
 		}
 
@@ -190,7 +206,7 @@ namespace RhuEngine.GameTests.Tests
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script not loaded");
 			}
-			script.RunCode();
+			script.Invoke("RunCode");
 			tester.Dispose();
 		}
 
@@ -213,7 +229,7 @@ namespace RhuEngine.GameTests.Tests
 				throw new Exception("Script not loaded");
 			}
 			tester.Step();
-			script.RunCode();
+			script.Invoke("RunCode");
 			Assert.AreEqual(testNumber, value.Value.Value);
 			tester.Dispose();
 		}
@@ -231,7 +247,7 @@ namespace RhuEngine.GameTests.Tests
 				throw new Exception("Script not loaded");
 			}
 			var testNumber = 10232;
-			script.RunCode(testNumber);
+			script.Invoke("RunCode", testNumber);
 			Assert.AreEqual(testNumber, value.Value.Value);
 			tester.Dispose();
 		}
@@ -244,7 +260,7 @@ namespace RhuEngine.GameTests.Tests
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script not loaded");
 			}
-			script.RunCode();
+			script.Invoke("RunCode");
 			tester.Dispose();
 		}
 
@@ -259,7 +275,38 @@ function dwad daw da
 			if (script.ScriptLoaded) {
 				throw new Exception("Script loaded");
 			}
-			script.RunCode();
+			script.Invoke("RunCode");
+			tester.Dispose();
+		}
+
+		[TestMethod()]
+		public void TestMultipleFunctions() {
+			var script = AttachTestScript();
+			var functionAmount = 25;
+			script.Functions.RemoveAtIndex(0);
+			var value = script.Entity.AttachComponent<ValueField<int>>();
+			script.Targets.Add().Target = value;
+			script.Script.Value = @"
+				
+			";
+			for (var i = 0; i < functionAmount; i++) {
+				var func = script.Functions.Add();
+				func.FunctionName.Value = $"FunctionNum{i}";
+				script.Script.Value += $"\nfunction FunctionNum{i}() {{ self.GetTarget(0).Value.Value = {i};  }}";
+			}
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script loaded");
+			}
+			
+			for (var i = 0; i < functionAmount; i++) {
+				script.Functions.GetValue(i).Invoke();
+				Assert.AreEqual(i, value.Value.Value);
+			}
+			for (var i = 0; i < functionAmount; i++) {
+				script.Invoke($"FunctionNum{i}");
+				Assert.AreEqual(i, value.Value.Value);
+			}
+			Assert.AreEqual(script.Functions.Count, functionAmount);
 			tester.Dispose();
 		}
 	}

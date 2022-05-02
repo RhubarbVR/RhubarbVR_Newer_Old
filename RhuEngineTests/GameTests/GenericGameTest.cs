@@ -158,7 +158,7 @@ namespace RhuEngine.GameTests.Tests
 		}
 
 		public class TestSyncObject<T>:Component, ITestSyncObject where T : SyncObject {
-			public T SyncObject;
+			public readonly T SyncObject;
 
 			public SyncObject GetObject() {
 				return SyncObject;
@@ -212,9 +212,14 @@ namespace RhuEngine.GameTests.Tests
 			tester.Dispose();
 		}
 
+		public static bool RunAcountLoginAndCreation = false;
+
 		[TestMethod()]
 		public async Task TestAcountLoginAndCreation() {
 			SetUpForNormalTest();
+			if (!RunAcountLoginAndCreation) {
+				return;
+			}
 			var userName = "AutoRemovedTestAcount"+Guid.NewGuid().ToString();
 			var email = $"{userName}@AutoRemovedTestAcount.rhubarbvr.net";
 			var password = "Password" + Guid.NewGuid().ToString();

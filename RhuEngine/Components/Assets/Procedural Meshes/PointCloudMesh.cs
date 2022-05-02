@@ -8,7 +8,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Assets/Procedural Meshes" })]
 	public class PointCloudMesh : ProceduralMesh {
 
-		public SyncValueList<int> iList;
+		public readonly SyncValueList<int> iList;
 
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
@@ -28,8 +28,8 @@ namespace RhuEngine.Components
 			GenMesh(mesh.MakeSimpleMesh());
 		}
 
-		public SyncDelegate<Func<int, Vector3d>> PointF;
-		public SyncDelegate<Func<int, Vector3d>> NormalF;
+		public readonly SyncDelegate<Func<int, Vector3d>> PointF;
+		public readonly SyncDelegate<Func<int, Vector3d>> NormalF;
 
 
 

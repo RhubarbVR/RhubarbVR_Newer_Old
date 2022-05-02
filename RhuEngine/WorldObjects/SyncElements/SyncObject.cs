@@ -140,6 +140,9 @@ namespace RhuEngine.WorldObjects
 			try {
 				var data = GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
 				foreach (var item in data) {
+					if((item.Attributes & FieldAttributes.InitOnly) == 0) {
+						continue;
+					}
 					if ((item.GetCustomAttribute<NoLoadAttribute>() == null) && typeof(SyncObject).IsAssignableFrom(item.FieldType) && !((item.GetCustomAttribute<NoSaveAttribute>() != null) && (item.GetCustomAttribute<NoSyncAttribute>() != null))) {
 						var instance = (SyncObject)Activator.CreateInstance(item.FieldType);
 						instance.Initialize(World, this, item.Name, networkedObject, deserialize, netPointer);

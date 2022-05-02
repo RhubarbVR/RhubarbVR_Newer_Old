@@ -104,7 +104,7 @@ namespace RhuEngine
 				
 			}
 			";
-			buttonpramremove.Click.Target = a.RunCode;
+			buttonpramremove.Click.Target = a.Functions.GetValue(0).Invoke;
 
 			var listRoot = pannel.AttachList(mit, new Vector2f(0f), new Vector2f(0.25f, 1f), Colorf.Blue);
 			void AttachListElement(Entity root,string text) {
