@@ -62,24 +62,25 @@ namespace RhuEngine.Components
 		private void RunCode(string function,params object[] values) {
 			try {
 				WorldThreadSafty.MethodCalls++;
-				if (WorldThreadSafty.MethodCalls > 3) {
+				if (WorldThreadSafty.MethodCalls > WorldThreadSafty.MaxCalls) {
 					throw new StackOverflowException();
 				}
 				if (values.Length == 0) {
 					_ecma.GetValue(function).Call();
 				}
 				else {
-					_ecma?.Invoke(function, values);
+					_ecma.Invoke(function, values);
 				}
 				WorldThreadSafty.MethodCalls--;
 			}
 			catch (StackOverflowException) {
 				_ecma = null;
-				WorldThreadSafty.MethodCalls = 0;
+				RLog.Err("Script Err StackOverflowException");
+				WorldThreadSafty.MethodCalls--;
 			}
 			catch (Exception ex) {
 #if DEBUG
-				WorldThreadSafty.MethodCalls = 0;
+				WorldThreadSafty.MethodCalls--;
 				RLog.Err("Script Err " + ex.ToString());
 #endif
 			}
@@ -100,7 +101,7 @@ namespace RhuEngine.Components
 					MemberFilter = member => Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()),
 				});
 			});
-			_ecma.SetValue("self", this);
+			_ecma.SetValue("script", this);
 			_ecma.SetValue("entity", Entity);
 			_ecma.SetValue("world", World);
 			_ecma.SetValue("localUser", LocalUser);
@@ -109,7 +110,7 @@ namespace RhuEngine.Components
 			_ecma.SetValue("typeOf", (object a) => a?.GetType());
 			_ecma.SetValue("toString", new Func<object,string>((object a) => (a.GetType() == typeof(Type))? ((Type)a).GetFormattedName():a?.ToString()));
 			try {
-				_ecma = _ecma.Execute(Script.Value);
+				 _ecma.Execute(Script.Value);
 				Console.WriteLine($"LoadedScript {Script.Value}");
 			}
 			catch (Exception ex) {

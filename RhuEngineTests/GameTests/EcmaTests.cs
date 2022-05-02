@@ -61,7 +61,7 @@ namespace RhuEngine.GameTests.Tests
 			script.Targets.Add().Target = value;
 			script.Script.Value = @"
 				function RunCode()	{
-					self.GetTarget(0).Value.Value = self.OnLoad;
+					script.GetTarget(0).Value.Value = script.OnLoad;
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -80,7 +80,7 @@ namespace RhuEngine.GameTests.Tests
 			script.Targets.Add().Target = value;
 			script.Script.Value = @"
 				function RunCode()	{
-					self.GetTarget(0).Value = null;
+					script.GetTarget(0).Value = null;
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -99,7 +99,7 @@ namespace RhuEngine.GameTests.Tests
 			script.Targets.Add().Target = value;
 			script.Script.Value = @"
 				function RunCode()	{
-					self.GetTarget(0).Value.Value = getType(""RhuEngine.Components.CapsuleMesh"")
+					script.GetTarget(0).Value.Value = getType(""RhuEngine.Components.CapsuleMesh"")
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -115,7 +115,7 @@ namespace RhuEngine.GameTests.Tests
 			var script = AttachTestScript();
 			script.Script.Value = @"
 				function RunCode()	{
-					self.Entity.AttachComponent(getType(""RhuEngine.Components.Spinner""));
+					script.Entity.AttachComponent(getType(""RhuEngine.Components.Spinner""));
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -130,10 +130,10 @@ namespace RhuEngine.GameTests.Tests
 			var script = AttachTestScript();
 			script.Script.Value = @"
 				function RunCode()	{
-					self.Entity.AddChild();
-					self.Entity.AddChild();
-					self.Entity.AddChild();
-					self.Entity.AddChild();
+					script.Entity.AddChild();
+					script.Entity.AddChild();
+					script.Entity.AddChild();
+					script.Entity.AddChild();
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -148,10 +148,10 @@ namespace RhuEngine.GameTests.Tests
 			var script = AttachTestScript();
 			script.Script.Value = @"
 				function RunCode()	{
-					self.Entity.AddChild(""IHaveAName"");
-					self.Entity.AddChild(""IHaveAName"");
-					self.Entity.AddChild(""IHaveAName"");
-					self.Entity.AddChild(""IHaveAName"");
+					script.Entity.AddChild(""IHaveAName"");
+					script.Entity.AddChild(""IHaveAName"");
+					script.Entity.AddChild(""IHaveAName"");
+					script.Entity.AddChild(""IHaveAName"");
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -167,7 +167,7 @@ namespace RhuEngine.GameTests.Tests
 			var script = AttachTestScript();
 			script.Script.Value = @"
 				function RunCode()	{
-						self.RunCode();
+						script.RunCode();
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -183,7 +183,7 @@ namespace RhuEngine.GameTests.Tests
 			script.Script.Value = @"
 				function RunCode()	{
 					while(true){
-						self.RunCode();
+						script.RunCode();
 					}
 				}
 			";
@@ -220,9 +220,9 @@ namespace RhuEngine.GameTests.Tests
 			tester.Step();
 			script.Script.Value = @"
 				function RunCode()	{
-					log(""StartingValue"" + self.GetTarget(0).Value.Value);
-					self.GetTarget(0).Value.Value = 10232;
-					log(""NewValue"" + self.GetTarget(0).Value.Value);
+					log(""StartingValue"" + script.GetTarget(0).Value.Value);
+					script.GetTarget(0).Value.Value = 10232;
+					log(""NewValue"" + script.GetTarget(0).Value.Value);
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -240,7 +240,7 @@ namespace RhuEngine.GameTests.Tests
 			script.Targets.Add().Target = value;
 			script.Script.Value = @"
 				function RunCode(arg1)	{
-					self.GetTarget(0).Value.Value = arg1;
+					script.GetTarget(0).Value.Value = arg1;
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -292,7 +292,7 @@ function dwad daw da
 			for (var i = 0; i < functionAmount; i++) {
 				var func = script.Functions.Add();
 				func.FunctionName.Value = $"FunctionNum{i}";
-				script.Script.Value += $"\nfunction FunctionNum{i}() {{ self.GetTarget(0).Value.Value = {i};  }}";
+				script.Script.Value += $"\nfunction FunctionNum{i}() {{ script.GetTarget(0).Value.Value = {i};  }}";
 			}
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script loaded");

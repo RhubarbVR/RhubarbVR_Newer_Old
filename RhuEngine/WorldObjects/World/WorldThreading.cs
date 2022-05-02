@@ -17,7 +17,7 @@ namespace RhuEngine.WorldObjects
 		[ThreadStatic]
 		public static uint MethodCalls = 0;
 
-		public static uint MaxCalls = 100;
+		public static uint MaxCalls = 25;
 	}
 
 	public partial class World
