@@ -37,3 +37,4 @@ jobs:
       run: dotnet build "RhuEngineTests" --no-restore
     - name: Test
       run: dotnet test "RhuEngineTests" --no-build --verbosity normal
+
