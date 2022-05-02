@@ -109,7 +109,7 @@ namespace RhuEngine.Components
 			_ecma.SetValue("typeOf", (object a) => a?.GetType());
 			_ecma.SetValue("toString", new Func<object,string>((object a) => (a.GetType() == typeof(Type))? ((Type)a).GetFormattedName():a?.ToString()));
 			try {
-				_ecma.Execute(Script.Value);
+				_ecma.Evaluate(Script.Value);
 			}
 			catch (Exception ex) {
 				_ecma = null;
