@@ -9,12 +9,12 @@ namespace RhuEngine.Components.Transform
 	[Category(new string[] { "Transform" })]
 	public class Wiggler: Component
 	{
-		public Linker<Quaternionf> driver;
+		public readonly Linker<Quaternionf> driver;
 
-		public Sync<Vector3f> speed;
-		public Sync<Vector3f> magnitude;
-		public Sync<Vector3f> seed;
-		public Sync<Quaternionf> offset;
+		public readonly Sync<Vector3f> speed;
+		public readonly Sync<Vector3f> magnitude;
+		public readonly Sync<Vector3f> seed;
+		public readonly Sync<Quaternionf> offset;
 
 		public override void OnInitialize() {
 			base.OnInitialize();

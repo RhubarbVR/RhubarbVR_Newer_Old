@@ -11,25 +11,25 @@ namespace RhuEngine.Components
 	public class UIImage : RenderUIComponent
 	{
 		[OnAssetLoaded(nameof(ProcessMesh))]
-		public AssetRef<RTexture2D> Texture;
+		public readonly AssetRef<RTexture2D> Texture;
 
-		public AssetRef<RMaterial> Material;
+		public readonly AssetRef<RMaterial> Material;
 
-		public Sync<Colorf> Tint;
+		public readonly Sync<Colorf> Tint;
 
 		public override bool HasPhysics => true;
 
 		[Default(EVerticalAlien.Center)]
 		[OnChanged(nameof(ProcessMesh))]
-		public Sync<EVerticalAlien> VerticalAlien;
+		public readonly Sync<EVerticalAlien> VerticalAlien;
 
 		[Default(EHorizontalAlien.Middle)]
 		[OnChanged(nameof(ProcessMesh))]
-		public Sync<EHorizontalAlien> HorizontalAlien;
+		public readonly Sync<EHorizontalAlien> HorizontalAlien;
 
 		[Default(true)]
 		[OnChanged(nameof(ProcessMesh))]
-		public Sync<bool> KeepAspectRatio;
+		public readonly Sync<bool> KeepAspectRatio;
 
 		public override RMaterial RenderMaterial => Material.Asset;
 		public override Colorf RenderTint => Tint.Value;

@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 	public abstract class ScriptBuilder : Component
 	{
 		[OnChanged(nameof(OnRhuScriptAddedInt))]
-		public SyncRef<RhuScript> script;
+		public readonly SyncRef<RhuScript> script;
 
 		public IScriptNode ScriptNode
 		{

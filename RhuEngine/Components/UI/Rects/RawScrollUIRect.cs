@@ -9,10 +9,10 @@ namespace RhuEngine.Components
 {
 	public abstract class RawScrollUIRect : UIRect
 	{
-		[OnChanged(nameof(ScrollPosChange))]	
-		public Sync<Vector2f> ScrollPos;
+		[OnChanged(nameof(ScrollPosChange))]
+		public readonly Sync<Vector2f> ScrollPos;
 
-		public Sync<Vector2f> ScrollSpeed;
+		public readonly Sync<Vector2f> ScrollSpeed;
 		public virtual Vector2f MaxScroll => Vector2f.Inf;
 
 

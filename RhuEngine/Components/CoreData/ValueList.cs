@@ -6,6 +6,6 @@ namespace RhuEngine.Components
 	[Category(new string[] { "CoreData" })]
 	public class ValueList<T> : Component
 	{
-		public SyncValueList<T> Value;
+		public readonly SyncValueList<T> Value;
 	}
 }

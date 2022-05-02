@@ -27,35 +27,35 @@ namespace RhuEngine.Components
 	{
 		[Default("<color=hsv(240,100,100)>Hello<color=blue><size14>World \n <size5>Trains \n are cool man<size10>\nHello ")]
 		[OnChanged(nameof(UpdateText))]
-		public Sync<string> Text;
+		public readonly Sync<string> Text;
 		[OnAssetLoaded(nameof(UpdateText))]
-		public AssetRef<RFont> Font;
+		public readonly AssetRef<RFont> Font;
 		[OnChanged(nameof(UpdateText))]
-		public Sync<Colorf> StartingColor;
+		public readonly Sync<Colorf> StartingColor;
 		[Default(0f)]
 		[OnChanged(nameof(UpdateText))]
-		public Sync<float> Leading;
+		public readonly Sync<float> Leading;
 		[OnChanged(nameof(UpdateText))]
 		[Default(FontStyle.Regular)]
-		public Sync<FontStyle> StartingStyle;
+		public readonly Sync<FontStyle> StartingStyle;
 
 		[OnChanged(nameof(UpdateText))]
 		[Default(10f)]
-		public Sync<float> StatingSize;
+		public readonly Sync<float> StatingSize;
 
 		public DynamicTextRender textRender = new();
 
 		[Default(EVerticalAlien.Center)]
 		[OnChanged(nameof(UpdateText))]
-		public Sync<EVerticalAlien> VerticalAlien;
+		public readonly Sync<EVerticalAlien> VerticalAlien;
 
 		[Default(EHorizontalAlien.Middle)]
 		[OnChanged(nameof(UpdateText))]
-		public Sync<EHorizontalAlien> HorizontalAlien;
+		public readonly Sync<EHorizontalAlien> HorizontalAlien;
 
 		[Default(true)]
 		[OnChanged(nameof(UpdateText))]
-		public Sync<bool> MiddleLines;
+		public readonly Sync<bool> MiddleLines;
 
 		public Matrix textOffset = Matrix.S(1);
 

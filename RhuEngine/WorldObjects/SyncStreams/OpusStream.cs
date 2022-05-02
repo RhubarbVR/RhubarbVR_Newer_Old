@@ -14,19 +14,19 @@ namespace RhuEngine.WorldObjects
 	{
 		[OnChanged(nameof(LoadOpus))]
 		[Default(Application.VoIP)]
-		public Sync<Application> typeOfStream;
+		public readonly Sync<Application> typeOfStream;
 
 		[OnChanged(nameof(LoadOpus))]
 		[Default(Bandwidth.MediumBand)]
-		public Sync<Bandwidth> MaxBandwidth;
+		public readonly Sync<Bandwidth> MaxBandwidth;
 
 		[OnChanged(nameof(LoadOpus))]
 		[Default(true)]
-		public Sync<bool> DTX;
+		public readonly Sync<bool> DTX;
 		[OnChanged(nameof(UpdateFrameSize))]
 
 		[Default(64000)]
-		public Sync<int> BitRate;
+		public readonly Sync<int> BitRate;
 		
 		private OpusDecoder _decoder;
 		private OpusEncoder _encoder;

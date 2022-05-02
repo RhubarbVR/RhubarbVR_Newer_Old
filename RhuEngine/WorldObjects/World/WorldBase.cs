@@ -139,58 +139,58 @@ namespace RhuEngine.WorldObjects
 		public ScriptBuilder FocusedScriptBuilder = null;
 
 		[NoShow]
-		public Entity RootEntity;
+		public readonly Entity RootEntity;
 
 		[NoSync]
 		[NoSave]
 		[NoSyncUpdate]
-		public Sync<string> SessionID;
+		public readonly Sync<string> SessionID;
 
 		[NoSave]
 		[Default("New Session")]
 		[OnChanged(nameof(SessionInfoChanged))]
-		public Sync<string> SessionName;
+		public readonly Sync<string> SessionName;
 
 		[NoSave]
 		[Default("https://rhubarbvr.net/images/RhubarbVR2.png")]
 		[OnChanged(nameof(SessionInfoChanged))]
-		public Sync<string> ThumNail;
+		public readonly Sync<string> ThumNail;
 
 		[NoSave]
 		[Default(false)]
 		[OnChanged(nameof(SessionInfoChanged))]
-		public Sync<bool> IsHidden;
+		public readonly Sync<bool> IsHidden;
 
 		[NoSave]
 		[Default(null)]
 		[OnChanged(nameof(SessionInfoChanged))]
-		public Sync<string> AssociatedGroup;
+		public readonly Sync<string> AssociatedGroup;
 
 		[NoSave]
 		[Default(SessionAccessLevel.Public)]
 		[OnChanged(nameof(SessionInfoChanged))]
-		public Sync<SessionAccessLevel> AccessLevel;
+		public readonly Sync<SessionAccessLevel> AccessLevel;
 
 		[NoSave]
 		[Default(30)]
 		[OnChanged(nameof(SessionInfoChanged))]
-		public Sync<int> MaxUserCount;
+		public readonly Sync<int> MaxUserCount;
 
 		[NoSave]
 		[OnChanged(nameof(SessionInfoChanged))]
-		public SyncValueList<string> SessionTags;
+		public readonly SyncValueList<string> SessionTags;
 
 		[NoSave]
 		[OnChanged(nameof(SessionInfoChanged))]
-		public SyncValueList<string> Admins;
+		public readonly SyncValueList<string> Admins;
 
 		[NoSave]
-		public Sync<DateTime> StartTime;
+		public readonly Sync<DateTime> StartTime;
 
 		public double WorldTime => (StartTime - DateTime.UtcNow).TotalSeconds;
 
 		[Default("New World")]
-		public Sync<string> WorldName;
+		public readonly Sync<string> WorldName;
 		[Exsposed]
 		public string WorldDebugName => $"{(IsPersonalSpace ? "P" : "")}{((worldManager.LocalWorld == this) ? "L" : "")} {SessionName.Value}";
 

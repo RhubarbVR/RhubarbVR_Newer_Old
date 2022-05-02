@@ -23,7 +23,7 @@ namespace RhuEngine.WorldObjects
 
 		[OnChanged(nameof(UpdateFrameSize))]
 		[Default(AudioFrameTime.ms40)]
-		public Sync<AudioFrameTime> frameSize;
+		public readonly Sync<AudioFrameTime> frameSize;
 
 		public virtual void UpdateFrameSize() {
 			if (!Engine.EngineLink.CanAudio) {

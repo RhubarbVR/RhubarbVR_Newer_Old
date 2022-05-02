@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<double> Radius;
+		public readonly Sync<double> Radius;
 
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {

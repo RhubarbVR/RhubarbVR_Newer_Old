@@ -9,9 +9,9 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI/Visuals" })]
 	public class UIRectangle : RenderUIComponent
 	{
-		public AssetRef<RMaterial> Material;
+		public readonly AssetRef<RMaterial> Material;
 
-		public Sync<Colorf> Tint;
+		public readonly Sync<Colorf> Tint;
 
 		public override RMaterial RenderMaterial => Material.Asset;
 		public override Colorf RenderTint => Tint.Value;

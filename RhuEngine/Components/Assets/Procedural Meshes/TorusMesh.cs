@@ -10,19 +10,19 @@ namespace RhuEngine.Components
 	{
 		[Default(2.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> MajorRadius;
+		public readonly Sync<float> MajorRadius;
 
 		[Default(0.5f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> MinorRadius;
+		public readonly Sync<float> MinorRadius;
 
 		[Default(48)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<int> MajorSegments;
+		public readonly Sync<int> MajorSegments;
 
 		[Default(12)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<int> MinorSegments;
+		public readonly Sync<int> MinorSegments;
 
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {

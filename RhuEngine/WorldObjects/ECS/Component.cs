@@ -23,10 +23,10 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		[Default(true)]
-		public Sync<bool> Enabled;
+		public readonly Sync<bool> Enabled;
 
 		[OnChanged(nameof(OnOrderOffsetChanged))]
-		public Sync<int> OrderOffset;
+		public readonly Sync<int> OrderOffset;
 
 		public void OnOrderOffsetChanged() {
 			OffsetChanged?.Invoke();

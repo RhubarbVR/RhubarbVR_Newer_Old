@@ -8,9 +8,9 @@ namespace RhuEngine.Components
 	[Category(new string[] { "CoreEvents" })]
 	public class AddSingleValuePram<T> : Component
 	{
-		public Sync<T> Value;
-		
-		public SyncDelegate<Action<T>> Target;
+		public readonly Sync<T> Value;
+
+		public readonly SyncDelegate<Action<T>> Target;
 
 		[Exsposed]
 		public void Call() {

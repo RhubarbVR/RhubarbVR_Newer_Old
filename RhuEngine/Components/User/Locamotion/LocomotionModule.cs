@@ -7,9 +7,9 @@ namespace RhuEngine.Components
 {
 	public abstract class LocomotionModule : Component
 	{
-		public AssetRef<RTexture2D> icon;
+		public readonly AssetRef<RTexture2D> icon;
 
-		public Sync<string> locmotionName;
+		public readonly Sync<string> locmotionName;
 
 		public abstract void ProcessMovement();
 

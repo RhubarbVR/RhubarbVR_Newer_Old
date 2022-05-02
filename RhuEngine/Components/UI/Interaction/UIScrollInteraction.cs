@@ -11,14 +11,14 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI\\Rects" })]
 	public class UIScrollInteraction : UIInteractionComponent
 	{
-		public Sync<bool> AllowOtherZones;
+		public readonly Sync<bool> AllowOtherZones;
 
-		public Sync<Vector2f> MouseScrollSpeed;
+		public readonly Sync<Vector2f> MouseScrollSpeed;
 
-		public SyncDelegate<Action<Vector2f>> OnScroll;
+		public readonly SyncDelegate<Action<Vector2f>> OnScroll;
 
 		[Default(0.5f)]
-		public Sync<float> FingerPressForce;
+		public readonly Sync<float> FingerPressForce;
 
 		public override void OnAttach() {
 			base.OnAttach();

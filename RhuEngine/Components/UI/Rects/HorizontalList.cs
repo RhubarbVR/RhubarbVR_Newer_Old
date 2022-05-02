@@ -13,11 +13,11 @@ namespace RhuEngine.Components
 	{
 		[Default(false)]
 		[OnChanged(nameof(RegUpdateUIMeshes))]
-		public Sync<bool> Fit;
+		public readonly Sync<bool> Fit;
 
 		public override bool RemoveFakeRecs => false;
 
-		public SafeList<BasicRectOvride> fakeRects = new();
+		public readonly SafeList<BasicRectOvride> fakeRects = new();
 
 		private Vector2f _maxScroll = Vector2f.Inf;
 

@@ -9,33 +9,33 @@ namespace RhuEngine.Components
 	public class TrivialBox3Mesh : ProceduralMesh
 	{
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vector3f> Extent;
+		public readonly Sync<Vector3f> Extent;
 
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vector3f> Center;
+		public readonly Sync<Vector3f> Center;
 
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vector3f> AxisX;
+		public readonly Sync<Vector3f> AxisX;
 
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vector3f> AxisY;
+		public readonly Sync<Vector3f> AxisY;
 
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vector3f> AxisZ;
+		public readonly Sync<Vector3f> AxisZ;
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> NoSharedVertices;
-
-
-		[Default(true)]
-		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantUVs;
+		public readonly Sync<bool> NoSharedVertices;
 
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantNormals;
+		public readonly Sync<bool> WantUVs;
+
+
+		[Default(true)]
+		[OnChanged(nameof(LoadMesh))]
+		public readonly Sync<bool> WantNormals;
 
 		public override void FirstCreation() {
 			base.FirstCreation();

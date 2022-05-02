@@ -67,6 +67,7 @@ namespace RhuEngine.WorldObjects
 		private T _target;
 
 		public IWorldObject TargetIWorldObject { get => Target; set { if (value != null) { Value = value.Pointer; } } }
+		
 		[Exsposed]
 		public virtual T Target
 		{

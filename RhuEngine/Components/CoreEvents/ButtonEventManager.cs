@@ -10,23 +10,23 @@ namespace RhuEngine.Components
 	[Category(new string[] { "CoreEvents" })]
 	public class ButtonEventManager : Component
 	{
-		public SyncDelegate Click;
-		public SyncDelegate Pressing;
-		public SyncDelegate Releases;
+		public readonly SyncDelegate Click;
+		public readonly SyncDelegate Pressing;
+		public readonly SyncDelegate Releases;
 
-		public Linker<Vector3f> WorldPos;
+		public readonly Linker<Vector3f> WorldPos;
 
-		public Linker<Vector3f> WindowPos;
+		public readonly Linker<Vector3f> WindowPos;
 
-		public Linker<uint> FingerIndex;
+		public readonly Linker<uint> FingerIndex;
 
-		public Linker<float> Force;
+		public readonly Linker<float> Force;
 
-		public Linker<bool> Lazer;
+		public readonly Linker<bool> Lazer;
 
-		public Linker<bool> Touch;
+		public readonly Linker<bool> Touch;
 
-		public Linker<bool> CustomTouch;
+		public readonly Linker<bool> CustomTouch;
 
 		[Exsposed]
 		public void Call(ButtonEvent value) {

@@ -10,32 +10,32 @@ namespace RhuEngine.Components
 	{
 		[Default(32)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<int> Longitudes;
+		public readonly Sync<int> Longitudes;
 		[Default(16)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<int> Latitudes;
+		public readonly Sync<int> Latitudes;
 		[Default(0)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<int> Rings;
+		public readonly Sync<int> Rings;
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> Depth;
+		public readonly Sync<float> Depth;
 		[Default(0.5f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> Radius;
+		public readonly Sync<float> Radius;
 		[Default(CapsuleGenerator.UvProfile.Aspect)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<CapsuleGenerator.UvProfile> Profile;
+		public readonly Sync<CapsuleGenerator.UvProfile> Profile;
 
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantUVs;
+		public readonly Sync<bool> WantUVs;
 
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantNormals;
+		public readonly Sync<bool> WantNormals;
 
 		public override void FirstCreation() {
 			base.FirstCreation();

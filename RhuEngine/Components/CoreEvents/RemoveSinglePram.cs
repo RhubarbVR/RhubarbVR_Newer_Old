@@ -8,9 +8,9 @@ namespace RhuEngine.Components
 	[Category(new string[] { "CoreEvents" })]
 	public class RemoveSinglePram<T> : Component
 	{
-		public Linker<T> Linker;
+		public readonly Linker<T> Linker;
 
-		public SyncDelegate Target;
+		public readonly SyncDelegate Target;
 
 		[Exsposed]
 		public void Call(T value) {

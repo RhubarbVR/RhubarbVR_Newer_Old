@@ -7,12 +7,12 @@ namespace RhuEngine.Components
 	public class ValueCopy<T> : Component
 	{
 		[OnChanged(nameof(OnChanged))]
-		public Linker<T> linkedLocation;
+		public readonly Linker<T> linkedLocation;
 
 		[OnChanged(nameof(OnChanged))]
-		public SyncRef<IValueSource<T>> source;
+		public readonly SyncRef<IValueSource<T>> source;
 
-		public Sync<bool> writeBack;
+		public readonly Sync<bool> writeBack;
 
 		private IChangeable _linkedSource;
 

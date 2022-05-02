@@ -13,30 +13,30 @@ namespace RhuEngine.WorldObjects.ECS
 
 		public uint CachedDepth { get; private set; }
 
-		public SyncObjList<Entity> children;
+		public readonly SyncObjList<Entity> children;
 		[OnChanged(nameof(ParentChanged))]
-		public SyncRef<Entity> parent;
+		public readonly SyncRef<Entity> parent;
 		[Default("Entity")]
-		public Sync<string> name;
+		public readonly Sync<string> name;
 		public override string Name => name.Value;
 
 		[OnChanged(nameof(TransValueChange))]
-		public Sync<Vector3f> position;
+		public readonly Sync<Vector3f> position;
 		[OnChanged(nameof(TransValueChange))]
-		public Sync<Quaternionf> rotation;
+		public readonly Sync<Quaternionf> rotation;
 		[OnChanged(nameof(TransValueChange))]
-		public Sync<Vector3f> scale;
+		public readonly Sync<Vector3f> scale;
 		[Default(true)]
 		[OnChanged(nameof(OnEnableChange))]
-		public Sync<bool> enabled;
+		public readonly Sync<bool> enabled;
 		[OnChanged(nameof(OnOrderOffsetChange))]
-		public Sync<int> orderOffset;
+		public readonly Sync<int> orderOffset;
 		public int Offset => orderOffset.Value;
 		[OnChanged(nameof(OnComponentChange))]
-		public SyncAbstractObjList<Component> components;
+		public readonly SyncAbstractObjList<Component> components;
 
 		[Default(true)]
-		public Sync<bool> persistence;
+		public readonly Sync<bool> persistence;
 
 		public override bool Persistence => persistence.Value;
 
@@ -178,12 +178,14 @@ namespace RhuEngine.WorldObjects.ECS
 		[NoSave]
 		[NoSync]
 		[NoLoad]
+		[UnExsposed]
 		private Entity _internalParent;
 
 		[NoShow]
 		[NoSave]
 		[NoSync]
 		[NoLoad]
+		[UnExsposed]
 		public UIRect UIRect;
 
 		public void SetUIRect(UIRect newrect) {

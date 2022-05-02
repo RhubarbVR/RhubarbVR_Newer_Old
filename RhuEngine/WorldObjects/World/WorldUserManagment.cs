@@ -14,7 +14,7 @@ namespace RhuEngine.WorldObjects
 
 		[NoSyncUpdate]
 		[NoSave]
-		public SyncObjList<User> Users;
+		public readonly SyncObjList<User> Users;
 		
 		public User GetUserFromID(string id) {
 			foreach (User item in Users) {

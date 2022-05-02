@@ -192,11 +192,11 @@ namespace RhuEngine.Components
 		}
 
 		[OnChanged(nameof(RegUpdateUIMeshes))]
-		public Sync<Vector2f> OffsetMin;
+		public readonly Sync<Vector2f> OffsetMin;
 		[OnChanged(nameof(RegUpdateUIMeshes))]
-		public Sync<Vector2f> OffsetMax;
+		public readonly Sync<Vector2f> OffsetMax;
 		[OnChanged(nameof(RegUpdateUIMeshes))]
-		public Sync<Vector2f> AnchorMin;
+		public readonly Sync<Vector2f> AnchorMin;
 
 		public Matrix MatrixMove(Matrix matrix) {
 			var firstpos = VertMove(matrix.Translation);
@@ -228,7 +228,7 @@ namespace RhuEngine.Components
 			return npoint;
 		}
 		[OnChanged(nameof(RegUpdateUIMeshes))]
-		public Sync<Vector2f> AnchorMax;
+		public readonly Sync<Vector2f> AnchorMax;
 		public Vector2f AnchorMinValue => AnchorMin;
 
 
@@ -236,7 +236,7 @@ namespace RhuEngine.Components
 
 		[Default(0.1f)]
 		[OnChanged(nameof(RegUpdateUIMeshes))]
-		public Sync<float> Depth;
+		public readonly Sync<float> Depth;
 		public float DepthValue => Depth;
 
 		public virtual Vector2f CutZonesMax => Entity.parent.Target?.UIRect?.CutZonesMax ?? Vector2f.Inf;

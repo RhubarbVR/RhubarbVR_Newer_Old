@@ -35,21 +35,21 @@ namespace RhuEngine.Components
 	public class UIButtonInteraction : UIInteractionComponent
 	{
 		[Default(true)]
-		public Sync<bool> Laserable;
+		public readonly Sync<bool> Laserable;
 
 		[Default(true)]
-		public Sync<bool> Touchable;
+		public readonly Sync<bool> Touchable;
 		
 		[Default(true)]
-		public Sync<bool> CustomTouchable;
+		public readonly Sync<bool> CustomTouchable;
 
 		[Default(true)]
-		public Sync<bool> AllowOtherZones;
+		public readonly Sync<bool> AllowOtherZones;
 
 		[Default(0.5f)]
-		public Sync<float> PressForce;
+		public readonly Sync<float> PressForce;
 
-		public SyncDelegate<Action<ButtonEvent>> ButtonEvent;
+		public readonly SyncDelegate<Action<ButtonEvent>> ButtonEvent;
 
 		[Exsposed]
 		[NoWriteExsposed]

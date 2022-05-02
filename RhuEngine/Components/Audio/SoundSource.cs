@@ -9,11 +9,11 @@ namespace RhuEngine.Components
 	public class SoundSource : Component
 	{
 		[OnAssetLoaded(nameof(LoadAudio))]
-		public AssetRef<RSound> sound;
+		public readonly AssetRef<RSound> sound;
 
 		[Default(1f)]
 		[OnChanged(nameof(ChangeVolume))]
-		public Sync<float> volume;
+		public readonly Sync<float> volume;
 
 		private RSoundInst _soundInst;
 

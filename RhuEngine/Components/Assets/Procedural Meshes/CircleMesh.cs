@@ -9,19 +9,19 @@ namespace RhuEngine.Components
 	{
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> Radius;
+		public readonly Sync<float> Radius;
 
 		[Default(0.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> StartAngleDeg;
+		public readonly Sync<float> StartAngleDeg;
 
 		[Default(360.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> EndAngleDeg;
+		public readonly Sync<float> EndAngleDeg;
 
 		[Default(32)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<int> Slices;
+		public readonly Sync<int> Slices;
 		public override void FirstCreation() {
 			base.FirstCreation();
 		}

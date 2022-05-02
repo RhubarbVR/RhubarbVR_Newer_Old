@@ -8,10 +8,10 @@ namespace RhuEngine.Components
 	[Category(new string[] { "CoreEvents" })]
 	public class AddTwoValuePram<T1,T2> : Component
 	{
-		public Sync<T1> FirstValue;
-		public Sync<T2> SecondValue;
+		public readonly Sync<T1> FirstValue;
+		public readonly Sync<T2> SecondValue;
 
-		public SyncDelegate<Action<T1,T2>> Target;
+		public readonly SyncDelegate<Action<T1,T2>> Target;
 
 		[Exsposed]
 		public void Call() {

@@ -5,7 +5,7 @@ namespace RhuEngine.WorldObjects
 {
 	public abstract class SyncStream : SyncObject, INetworkedObject
 	{
-		public Sync<string> name;
+		public readonly Sync<string> name;
 
 		public bool NoSync { get; set; }
 

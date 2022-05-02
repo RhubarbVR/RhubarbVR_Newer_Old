@@ -11,9 +11,9 @@ namespace RhuEngine.WorldObjects
 {
 	public class User : SyncObject
 	{
-		public SyncRef<UserRoot> userRoot;
+		public readonly SyncRef<UserRoot> userRoot;
 
-		public SyncAbstractObjList<SyncStream> syncStreams;
+		public readonly SyncAbstractObjList<SyncStream> syncStreams;
 		[Exsposed]
 		[NoWriteExsposed]
 		public string NormalizedUserName { get; private set; }
@@ -26,15 +26,15 @@ namespace RhuEngine.WorldObjects
 
 		[NoSyncUpdate]
 		[OnChanged(nameof(UserIDLoad))]
-		public Sync<string> userID;
+		public readonly Sync<string> userID;
 		[NoSyncUpdate]
-		public Sync<PlatformID> Platform;
+		public readonly Sync<PlatformID> Platform;
 
 		[NoSyncUpdate]
-		public Sync<string> PlatformVersion;
+		public readonly Sync<string> PlatformVersion;
 
 		[NoSyncUpdate]
-		public Sync<string> BackendID;
+		public readonly Sync<string> BackendID;
 
 		public void UserIDLoad() {
 			Task.Run(async () => {
@@ -48,7 +48,7 @@ namespace RhuEngine.WorldObjects
 
 		[Default(true)]
 		[OnChanged(nameof(PresentChange))]
-		public Sync<bool> isPresent;
+		public readonly Sync<bool> isPresent;
 		public void PresentChange() {
 			World.SessionInfoChanged();
 		}

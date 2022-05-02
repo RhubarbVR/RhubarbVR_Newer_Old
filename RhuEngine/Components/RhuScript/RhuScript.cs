@@ -27,9 +27,9 @@ namespace RhuEngine.Components
 			Error = null;
 			OnClearError.Target?.Invoke();
 		}
-		public SyncDelegate OnError;
-		
-		public SyncDelegate OnClearError;
+		public readonly SyncDelegate OnError;
+
+		public readonly SyncDelegate OnClearError;
 
 		public Exception Error;
 

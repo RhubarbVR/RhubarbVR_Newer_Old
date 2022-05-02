@@ -8,9 +8,9 @@ namespace RhuEngine.Components
 	[Category(new string[] { "CoreEvents" })]
 	public class AddSingleRefPram<T> : Component where T : class, IWorldObject
 	{
-		public SyncRef<T> Ref;
-		
-		public SyncDelegate<Action<T>> Target;
+		public readonly SyncRef<T> Ref;
+
+		public readonly SyncDelegate<Action<T>> Target;
 
 		[Exsposed]
 		public void Call() {

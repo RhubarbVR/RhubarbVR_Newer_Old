@@ -10,15 +10,15 @@ namespace RhuEngine.Components
 	[Category(new string[] { "User" })]
 	public class Hand : Component
 	{
-		public SyncRef<User> user;
+		public readonly SyncRef<User> user;
 
-		public Sync<Handed> hand;
+		public readonly Sync<Handed> hand;
 
-		public Linker<Vector3f> pos;
+		public readonly Linker<Vector3f> pos;
 
-		public Linker<Quaternionf> rot;
+		public readonly Linker<Quaternionf> rot;
 
-		public Linker<Vector3f> scale;
+		public readonly Linker<Vector3f> scale;
 
 		public override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);

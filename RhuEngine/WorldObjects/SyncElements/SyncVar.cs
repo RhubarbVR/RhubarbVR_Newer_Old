@@ -28,12 +28,11 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 		}
-		[UnExsposed]
+		[NoSync]
 		[NoShow]
 		[NoSave]
-		[NoSync]
 		[NoLoad]
-		public INetworkedObject Target;
+		public INetworkedObject Target { get; private set; }
 		public bool NoSync { get; set; }
 
 		public T GetTarget<T>(out bool Failed) where T : class, INetworkedObject {

@@ -10,8 +10,8 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI\\Rects" })]
 	public class ScrollUIRect : RawScrollUIRect
 	{
-		public Sync<Vector2f> Max_Scroll;
-		public Sync<Vector2f> Min_Scroll;
+		public readonly Sync<Vector2f> Max_Scroll;
+		public readonly Sync<Vector2f> Min_Scroll;
 		public override Vector2f MaxScroll => Max_Scroll;
 		public override Vector2f MinScroll => Min_Scroll;
 

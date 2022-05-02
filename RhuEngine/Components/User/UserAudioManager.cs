@@ -8,9 +8,9 @@ namespace RhuEngine.Components
 	[Category(new string[] { "User" })]
 	public class UserAudioManager : Component
 	{
-		public SyncRef<User> user;
+		public readonly SyncRef<User> user;
 
-		public Linker<float> audioVolume;
+		public readonly Linker<float> audioVolume;
 
 		public override void OnAttach() {
 			user.Target = World.GetLocalUser();

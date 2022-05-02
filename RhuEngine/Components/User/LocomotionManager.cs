@@ -11,11 +11,11 @@ namespace RhuEngine.Components
 	[Category(new string[] { "User" })]
 	public class LocomotionManager : Component
 	{
-		public SyncRef<User> user;
+		public readonly SyncRef<User> user;
 
-		public Sync<int> selectedModule;
+		public readonly Sync<int> selectedModule;
 
-		public SyncObjList<SyncRef<LocomotionModule>> modules;
+		public readonly SyncObjList<SyncRef<LocomotionModule>> modules;
 
 		public override void OnAttach() {
 			modules.Add().Target = Entity.AttachComponent<NoClipLocomotion>();

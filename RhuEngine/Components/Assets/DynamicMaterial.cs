@@ -12,31 +12,31 @@ namespace RhuEngine.Components
 	public class DynamicMaterial : AssetProvider<RMaterial>
 	{
 		[OnAssetLoaded(nameof(LoadMaterial))]
-		public AssetRef<RShader> shader;
+		public readonly AssetRef<RShader> shader;
 
 		[OnChanged(nameof(UpdateValues))]
 		[Default(DepthTest.Less)]
-		public Sync<DepthTest> depthTest;
+		public readonly Sync<DepthTest> depthTest;
 
 		[OnChanged(nameof(UpdateValues))]
 		[Default(true)]
-		public Sync<bool> depthWrite;
+		public readonly Sync<bool> depthWrite;
 
 		[OnChanged(nameof(UpdateValues))]
 		[Default(Cull.Back)]
-		public Sync<Cull> faceCull;
+		public readonly Sync<Cull> faceCull;
 
 		[OnChanged(nameof(UpdateValues))]
-		public Sync<int> queueOffset;
+		public readonly Sync<int> queueOffset;
 
 		[OnChanged(nameof(UpdateValues))]
 		[Default(Transparency.None)]
-		public Sync<Transparency> transparency;
+		public readonly Sync<Transparency> transparency;
 
 		[OnChanged(nameof(UpdateValues))]
-		public Sync<bool> wireframe;
+		public readonly Sync<bool> wireframe;
 
-		public SyncAbstractObjList<PramInfo> Prams;
+		public readonly SyncAbstractObjList<PramInfo> Prams;
 
 		public void UpdatePram(string pram, object data) {
 			if (_material is not null) {
@@ -65,7 +65,7 @@ namespace RhuEngine.Components
 
 		public abstract class PramInfo : SyncObject
 		{
-			public Sync<string> name;
+			public readonly Sync<string> name;
 			public abstract object GetData();
 
 			public void OnValueChangeed() {
@@ -86,7 +86,7 @@ namespace RhuEngine.Components
 		public class ValuePramInfo<T> : PramInfo
 		{
 			[OnChanged(nameof(OnValueChangeed))]
-			public Sync<T> value;
+			public readonly Sync<T> value;
 
 			public override void SetValue(object newValue) {
 				try {
@@ -104,7 +104,7 @@ namespace RhuEngine.Components
 		public class TexPramInfo : PramInfo
 		{
 			[OnAssetLoaded(nameof(OnValueChangeed))]
-			public AssetRef<RTexture2D> value;
+			public readonly AssetRef<RTexture2D> value;
 
 			public override void SetValue(object newValue) {
 				try {
@@ -117,6 +117,12 @@ namespace RhuEngine.Components
 				return value.Target is null ? RTexture2D.White : value.Asset ?? Engine.staticResources.Null;
 			}
 		}
+		[NoWriteExsposed]
+		[NoShow]
+		[NoSave]
+		[NoLoad]
+		[NoSync]
+		[NoSyncUpdate]
 		RMaterial _material;
 		private void LoadMaterial() {
 			if (!Engine.EngineLink.CanRender) {

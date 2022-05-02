@@ -10,26 +10,26 @@ namespace RhuEngine.Components
 	{
 		[Default(1f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> Diameter;
+		public readonly Sync<float> Diameter;
 
 		[Default(Sphere3Generator_NormalizedCube.NormalizationTypes.CubeMapping)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sphere3Generator_NormalizedCube.NormalizationTypes NormalizeType;
+		public readonly Sphere3Generator_NormalizedCube.NormalizationTypes NormalizeType;
 
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> NoSharedVertices;
+		public readonly Sync<bool> NoSharedVertices;
 
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantUVs;
+		public readonly Sync<bool> WantUVs;
 
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantNormals;
+		public readonly Sync<bool> WantNormals;
 
 		public override void FirstCreation() {
 			base.FirstCreation();

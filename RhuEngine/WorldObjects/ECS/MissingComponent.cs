@@ -9,7 +9,7 @@ namespace RhuEngine.WorldObjects.ECS
 	[Category(new string[] { "Internal" })]
 	public class MissingComponent : Component
 	{
-		public Sync<string> type;
+		public readonly Sync<string> type;
 
 		public string tempType;
 

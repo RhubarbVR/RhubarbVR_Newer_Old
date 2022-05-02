@@ -10,21 +10,21 @@ namespace RhuEngine.Components
 	public class UICanvas : RenderingComponent
 	{
 		[OnChanged(nameof(UpdateMeshes))]
-		public Sync<Vector3f> scale;
+		public readonly Sync<Vector3f> scale;
 
 		[Default(true)]
-		public Sync<bool> TopOffset;
+		public readonly Sync<bool> TopOffset;
 		[Default(3f)]
-		public Sync<float> TopOffsetValue;
+		public readonly Sync<float> TopOffsetValue;
 
 		[Default(true)]
-		public Sync<bool> FrontBind;
+		public readonly Sync<bool> FrontBind;
 		[Default(10)]
-		public Sync<int> FrontBindSegments;
+		public readonly Sync<int> FrontBindSegments;
 		[Default(180f)]
-		public Sync<float> FrontBindAngle;
+		public readonly Sync<float> FrontBindAngle;
 		[Default(7.5f)]
-		public Sync<float> FrontBindRadus;
+		public readonly Sync<float> FrontBindRadus;
 		public override void OnAttach() {
 			base.OnAttach();
 			scale.Value = new Vector3f(16, 9,1);

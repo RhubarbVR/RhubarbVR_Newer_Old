@@ -15,7 +15,7 @@ namespace RhuEngine.WorldObjects
 			byte8bits,
 		}
 		[Default(SampleBitSize.short16bits)]
-		public Sync<SampleBitSize> bitSize;
+		public readonly Sync<SampleBitSize> bitSize;
 
 		public override byte[] SendAudioSamples(float[] audio) {
 			return bitSize.Value switch {

@@ -10,15 +10,15 @@ namespace RhuEngine.Components
 	public class NoClipLocomotion : LocomotionModule
 	{
 		[Default(1f)]
-		public Sync<float> MovementSpeed;
+		public readonly Sync<float> MovementSpeed;
 		[Default(50f)]
-		public Sync<float> RotationSpeed;
+		public readonly Sync<float> RotationSpeed;
 		[Default(2f)]
-		public Sync<float> MaxSprintSpeed;
+		public readonly Sync<float> MaxSprintSpeed;
 		[Default(80f)]
-		public Sync<float> MaxSprintRotationSpeed;
+		public readonly Sync<float> MaxSprintRotationSpeed;
 		[Default(true)]
-		public Sync<bool> AllowMultiplier;
+		public readonly Sync<bool> AllowMultiplier;
 
 		public override void OnAttach() {
 			base.OnAttach();

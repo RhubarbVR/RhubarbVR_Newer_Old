@@ -8,11 +8,11 @@ namespace RhuEngine.Components.Transform
 	[Category(new string[] { "Transform" })]
 	public class Wobbler1D : Component
 	{
-		public Linker<float> driver;
-		public Sync<float> speed;
-		public Sync<float> magnitude;
-		public Sync<float> seed;
-		public Sync<float> offset;
+		public readonly Linker<float> driver;
+		public readonly Sync<float> speed;
+		public readonly Sync<float> magnitude;
+		public readonly Sync<float> seed;
+		public readonly Sync<float> offset;
 
 		public override void Step() {
 			if (driver.Linked) {

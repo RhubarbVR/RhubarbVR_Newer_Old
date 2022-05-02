@@ -10,19 +10,19 @@ namespace RhuEngine.Components
 	[Category(new string[] { "User" })]
 	public class UserRoot : Component
 	{
-		public SyncRef<User> user;
+		public readonly SyncRef<User> user;
 
-		public SyncRef<Entity> head;
+		public readonly SyncRef<Entity> head;
 
-		public SyncRef<Entity> leftHand;
+		public readonly SyncRef<Entity> leftHand;
 
-		public SyncRef<Entity> rightHand;
+		public readonly SyncRef<Entity> rightHand;
 
-		public Linker<Vector3f> pos;
+		public readonly Linker<Vector3f> pos;
 
-		public Linker<Quaternionf> rot;
+		public readonly Linker<Quaternionf> rot;
 
-		public Linker<Vector3f> scale;
+		public readonly Linker<Vector3f> scale;
 
 		public override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);

@@ -10,11 +10,11 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Transform" })]
 	public class Spinner : Component
 	{
-		public Linker<Quaternionf> driver;
+		public readonly Linker<Quaternionf> driver;
 
-		public Sync<Vector3f> speed;
+		public readonly Sync<Vector3f> speed;
 
-		public Sync<Quaternionf> offset;
+		public readonly Sync<Quaternionf> offset;
 
 		public override void OnAttach() {
 			base.OnAttach();

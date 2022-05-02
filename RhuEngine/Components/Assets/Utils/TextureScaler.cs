@@ -13,12 +13,12 @@ namespace RhuEngine.Components
 	public class TextureScaler : Component
 	{
 		[OnAssetLoaded(nameof(TextScale))]
-		public AssetRef<RTexture2D> texture;
+		public readonly AssetRef<RTexture2D> texture;
 
 		[OnChanged(nameof(TextScale))]
-		public Sync<float> scaleMultiplier;
+		public readonly Sync<float> scaleMultiplier;
 
-		public Linker<Vector2f> scale;
+		public readonly Linker<Vector2f> scale;
 
 		private void TextScale() {
 			if(texture.Asset is null) {

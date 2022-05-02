@@ -73,6 +73,26 @@ namespace RhuEngine.GameTests.Tests
 		}
 
 		[TestMethod()]
+		public void TestRemoveOfValue() {
+			var script = AttachTestScript();
+			var value = script.Entity.AttachComponent<ValueField<string>>();
+			value.Value.Value = "FirstValue";
+			script.Targets.Add().Target = value;
+			script.Script.Value = @"
+				function RunCode()	{
+					self.GetTarget(0).Value = null;
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.RunCode();
+			Assert.AreNotEqual(null, value.Value);
+			tester.Dispose();
+		}
+
+
+		[TestMethod()]
 		public void TestNormalRun() {
 			var script = AttachTestScript();
 			script.Script.Value = @"

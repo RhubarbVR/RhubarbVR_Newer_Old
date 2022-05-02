@@ -9,11 +9,11 @@ namespace RhuEngine.Components.Transform
 	[Category(new string[] { "Transform" })]
 	public class Wobbler2D : Component
 	{
-		public Linker<Vector2f> driver;
-		public Sync<Vector2f> speed;
-		public Sync<Vector2f> magnitude;
-		public Sync<Vector2f> seed;
-		public Sync<Vector2f> offset;
+		public readonly Linker<Vector2f> driver;
+		public readonly Sync<Vector2f> speed;
+		public readonly Sync<Vector2f> magnitude;
+		public readonly Sync<Vector2f> seed;
+		public readonly Sync<Vector2f> offset;
 
 		public override void Step() {
 			if (driver.Linked) {

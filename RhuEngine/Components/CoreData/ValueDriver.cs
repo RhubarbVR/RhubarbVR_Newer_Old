@@ -8,9 +8,9 @@ namespace RhuEngine.Components
 	[Category(new string[] { "CoreData" })]
 	public class ValueDriver<T> : Component, IUpdatingComponent
 	{
-		public Linker<T> driver;
+		public readonly Linker<T> driver;
 
-		public SyncRef<IValueSource<T>> source;
+		public readonly SyncRef<IValueSource<T>> source;
 
 		public override void Step() {
 			if (driver.Linked) {

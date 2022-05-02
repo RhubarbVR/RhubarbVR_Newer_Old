@@ -9,13 +9,13 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Rendering" })]
 	public class MeshRender : RenderingComponent
 	{
-		public AssetRef<RMesh> mesh;
-		public SyncObjList<AssetRef<RMaterial>> materials;
+		public readonly AssetRef<RMesh> mesh;
+		public readonly SyncObjList<AssetRef<RMaterial>> materials;
 
-		public Sync<Colorf> colorLinear;
+		public readonly Sync<Colorf> colorLinear;
 
 		[Default(RenderLayer.All)]
-		public Sync<RenderLayer> renderLayer;
+		public readonly Sync<RenderLayer> renderLayer;
 
 
 		public override void FirstCreation() {

@@ -16,15 +16,15 @@ namespace RhuEngine.Components
 
 		[Default(TexSample.Anisotropic)]
 		[OnChanged(nameof(TextValueChanged))]
-		public Sync<TexSample> sampleMode;
+		public readonly Sync<TexSample> sampleMode;
 
 		[Default(TexAddress.Wrap)]
 		[OnChanged(nameof(TextValueChanged))]
-		public Sync<TexAddress> addressMode;
+		public readonly Sync<TexAddress> addressMode;
 
 		[Default(3)]
 		[OnChanged(nameof(TextValueChanged))]
-		public Sync<int> anisoptropy;
+		public readonly Sync<int> anisoptropy;
 
 		private void TextValueChanged() {
 			if(Value is null) {

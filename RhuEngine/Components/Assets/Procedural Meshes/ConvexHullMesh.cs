@@ -11,11 +11,11 @@ namespace RhuEngine.Components
 	public class ConvexHullMesh : ProceduralMesh
 	{
 		[OnChanged(nameof(LoadMesh))]
-		public SyncValueList<Vector3f> points = new SyncValueList<Vector3f>();
+		public readonly SyncValueList<Vector3f> points = new SyncValueList<Vector3f>();
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> splitVerts;
+		public readonly Sync<bool> splitVerts;
 
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {

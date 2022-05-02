@@ -9,6 +9,7 @@ using Jint;
 using Jint.Runtime.Interop;
 using Jint.Native;
 using System.Reflection;
+using Jint.Native.Object;
 
 namespace RhuEngine.Components
 {
@@ -17,7 +18,7 @@ namespace RhuEngine.Components
 		[Exsposed]
 		public bool ScriptLoaded => _ecma is not null;
 
-		public SyncObjList<SyncRef<IWorldObject>> Targets;
+		public readonly SyncObjList<SyncRef<IWorldObject>> Targets;
 
 		[Default(@"
 		function RunCode()	{
@@ -25,7 +26,7 @@ namespace RhuEngine.Components
 		}
 		")]
 		[OnChanged(nameof(InitECMA))]
-		public Sync<string> Script; 
+		public readonly Sync<string> Script; 
 
 		private Jint.Engine _ecma;
 
@@ -77,6 +78,7 @@ namespace RhuEngine.Components
 			return Targets.GetValue(index).Target;
 		}
 
+
 		private void InitECMA() {
 			_ecma = new Jint.Engine(options => {
 				options.LimitMemory(1_000_000); // alocate 1 MB
@@ -85,6 +87,12 @@ namespace RhuEngine.Components
 				options.SetTypeResolver(new TypeResolver {
 					MemberFilter = member => Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()),
 				});
+				options.Interop.WrapObjectHandler = (engine, target) => {
+					var raper =  new ObjectWrapper(engine, target);
+					var props = raper.GetOwnProperties();
+
+					return raper;
+				};
 			});
 			_ecma.SetValue("self", this);
 			_ecma.SetValue("entity", Entity);

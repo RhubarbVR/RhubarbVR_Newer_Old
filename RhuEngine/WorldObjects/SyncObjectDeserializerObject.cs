@@ -188,9 +188,9 @@ namespace RhuEngine.WorldObjects
 				throw new Exception("Node did not exist when loading Node: " + @object.GetType().FullName);
 			}
 			BindPointer(data,@object);
-			var fields = @object.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+			var fields = @object.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
 			foreach (var field in fields) {
-				if (typeof(IWorldObject).IsAssignableFrom(field.FieldType) && ((field.GetCustomAttributes(typeof(NoSaveAttribute), false).Length <= 0) || (!hasNewRefIDs && (field.GetCustomAttributes(typeof(NoSyncAttribute), false).Length <= 0)))) {
+				if ((field.GetCustomAttribute<NoLoadAttribute>(true) is null) && typeof(IWorldObject).IsAssignableFrom(field.FieldType) && ((field.GetCustomAttributes(typeof(NoSaveAttribute), true).Length <= 0) || (!hasNewRefIDs && (field.GetCustomAttributes(typeof(NoSyncAttribute), true).Length <= 0)))) {
 					if (((IWorldObject)field.GetValue(@object)) == null) {
 						throw new Exception($"Sync not initialized on field {field.Name} of {@object.GetType().FullName}");
 					}

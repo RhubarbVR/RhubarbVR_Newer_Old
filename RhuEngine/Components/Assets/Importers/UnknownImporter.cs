@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 
 		//public SyncRef<UIWindow> Window;
 
-		public SyncRef<Entity> UI;
+		public readonly SyncRef<Entity> UI;
 
 		public override void Import(string path_url, bool isUrl, byte[] rawData) {
 			this.path_url = path_url;

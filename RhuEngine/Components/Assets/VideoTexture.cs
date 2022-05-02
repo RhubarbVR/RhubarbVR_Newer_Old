@@ -19,9 +19,9 @@ namespace RhuEngine.Components
 		public VlcVideoSourceProvider vlcVideoSourceProvider = null;
 
 		[OnChanged(nameof(UpdateVideo))]
-		public SyncObjList<AudioOutput> AudioChannels;
+		public readonly SyncObjList<AudioOutput> AudioChannels;
 		[OnChanged(nameof(PlayBackUpdate))]
-		public SyncPlayback Playback;
+		public readonly SyncPlayback Playback;
 
 		LibVLC _libVLC;
 		MediaPlayer _mediaPlayer;
