@@ -218,6 +218,8 @@ namespace RhuEngine.GameTests.Tests
 		public async Task TestAcountLoginAndCreation() {
 			SetUpForNormalTest();
 			if (!RunAcountLoginAndCreation) {
+				tester.RunForSteps();
+				tester.Dispose();
 				return;
 			}
 			var userName = "AutoRemovedTestAcount"+Guid.NewGuid().ToString();
