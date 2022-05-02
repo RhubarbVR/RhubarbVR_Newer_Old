@@ -10,6 +10,7 @@ using Jint.Runtime.Interop;
 using Jint.Native;
 using System.Reflection;
 using Jint.Native.Object;
+using System.Threading;
 
 namespace RhuEngine.Components
 {
@@ -65,12 +66,10 @@ namespace RhuEngine.Components
 				if (WorldThreadSafty.MethodCalls > WorldThreadSafty.MaxCalls) {
 					throw new StackOverflowException();
 				}
-				if (values.Length == 0) {
-					_ecma.GetValue(function).Call();
+				if (_ecma.GetValue(function) == JsValue.Undefined) {
+					throw new Exception("function " + function + " Not found");
 				}
-				else {
-					_ecma.Invoke(function, values);
-				}
+				_ecma.Invoke(function, values);
 				WorldThreadSafty.MethodCalls--;
 			}
 			catch (StackOverflowException) {
@@ -93,31 +92,37 @@ namespace RhuEngine.Components
 
 
 		private void InitECMA() {
-			_ecma = new Jint.Engine(options => {
-				options.LimitMemory(1_000_000); // alocate 1 MB
-				options.TimeoutInterval(TimeSpan.FromSeconds(1));
-				options.MaxStatements(1000);
-				options.SetTypeResolver(new TypeResolver {
-					MemberFilter = member => Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()),
+			var thread = new Thread(() => {
+				_ecma = new Jint.Engine(options => {
+					options.LimitMemory(1_000_000); // alocate 1 MB
+					options.TimeoutInterval(TimeSpan.FromSeconds(1));
+					options.MaxStatements(1000);
+					options.SetTypeResolver(new TypeResolver {
+						MemberFilter = member => Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()),
+					});
+					options.Strict = true;
 				});
+				_ecma.ResetCallStack();
+				_ecma.SetValue("script", this);
+				_ecma.SetValue("entity", Entity);
+				_ecma.SetValue("world", World);
+				_ecma.SetValue("localUser", LocalUser);
+				_ecma.SetValue("log", new Action<string>(RLog.Info));
+				_ecma.SetValue("getType", (string a) => Type.GetType(a, false, true));
+				_ecma.SetValue("typeOf", (object a) => a?.GetType());
+				_ecma.SetValue("toString", new Func<object, string>((object a) => (a.GetType() == typeof(Type)) ? ((Type)a).GetFormattedName() : a?.ToString()));
+				try {
+					_ecma.Execute(Script.Value);
+
+				}
+				catch (Exception ex) {
+					_ecma = null;
+					WorldThreadSafty.MethodCalls = 0;
+					RLog.Err("Script Err " + ex.ToString());
+				}
 			});
-			_ecma.SetValue("script", this);
-			_ecma.SetValue("entity", Entity);
-			_ecma.SetValue("world", World);
-			_ecma.SetValue("localUser", LocalUser);
-			_ecma.SetValue("log", new Action<string>(RLog.Info));
-			_ecma.SetValue("getType", (string a) => Type.GetType(a,false,true));
-			_ecma.SetValue("typeOf", (object a) => a?.GetType());
-			_ecma.SetValue("toString", new Func<object,string>((object a) => (a.GetType() == typeof(Type))? ((Type)a).GetFormattedName():a?.ToString()));
-			try {
-				 _ecma.Execute(Script.Value);
-				Console.WriteLine($"LoadedScript {Script.Value}");
-			}
-			catch (Exception ex) {
-				_ecma = null;
-				WorldThreadSafty.MethodCalls = 0;
-				RLog.Err("Script Err " + ex.ToString());
-			}
+			thread.Start();
+			thread.Join();
 		}
 
 		public override void OnLoaded() {
