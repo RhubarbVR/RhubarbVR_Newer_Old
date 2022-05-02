@@ -87,12 +87,6 @@ namespace RhuEngine.Components
 				options.SetTypeResolver(new TypeResolver {
 					MemberFilter = member => Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()),
 				});
-				options.Interop.WrapObjectHandler = (engine, target) => {
-					var raper =  new ObjectWrapper(engine, target);
-					var props = raper.GetOwnProperties();
-
-					return raper;
-				};
 			});
 			_ecma.SetValue("self", this);
 			_ecma.SetValue("entity", Entity);

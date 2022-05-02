@@ -93,20 +93,74 @@ namespace RhuEngine.GameTests.Tests
 
 
 		[TestMethod()]
-		public void TestNormalRun() {
+		public void TestNormalTypeValue() {
 			var script = AttachTestScript();
+			var value = script.Entity.AttachComponent<ValueField<Type>>();
+			script.Targets.Add().Target = value;
 			script.Script.Value = @"
 				function RunCode()	{
-			
+					self.GetTarget(0).Value.Value = getType(""RhuEngine.Components.CapsuleMesh"")
 				}
 			";
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script not loaded");
 			}
 			script.RunCode();
+			Assert.AreEqual(typeof(CapsuleMesh), value.Value.Value);
 			tester.Dispose();
 		}
 
+		[TestMethod()]
+		public void AttachComponentTest() {
+			var script = AttachTestScript();
+			script.Script.Value = @"
+				function RunCode()	{
+					self.Entity.AttachComponent(getType(""RhuEngine.Components.Spinner""));
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.RunCode();
+			Assert.IsNotNull(script.Entity.GetFirstComponent<Spinner>());			
+			tester.Dispose();
+		}
+		[TestMethod()]
+		public void AttachEntityTest() {
+			var script = AttachTestScript();
+			script.Script.Value = @"
+				function RunCode()	{
+					self.Entity.AddChild();
+					self.Entity.AddChild();
+					self.Entity.AddChild();
+					self.Entity.AddChild();
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.RunCode();
+			Assert.AreEqual(4,script.Entity.children.Count);
+			tester.Dispose();
+		}
+		[TestMethod()]
+		public void AttachEntityTest2() {
+			var script = AttachTestScript();
+			script.Script.Value = @"
+				function RunCode()	{
+					self.Entity.AddChild(""IHaveAName"");
+					self.Entity.AddChild(""IHaveAName"");
+					self.Entity.AddChild(""IHaveAName"");
+					self.Entity.AddChild(""IHaveAName"");
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.RunCode();
+			Assert.AreEqual(4, script.Entity.children.Count);
+			tester.Dispose();
+		}
 		[TestMethod()]
 		public void TestOverFlowStop() {
 			var script = AttachTestScript();
