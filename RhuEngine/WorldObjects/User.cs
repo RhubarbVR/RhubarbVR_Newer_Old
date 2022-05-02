@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 using LiteNetLib;
 
 using RhuEngine.Components;
+
 
 namespace RhuEngine.WorldObjects
 {
@@ -12,15 +14,49 @@ namespace RhuEngine.WorldObjects
 		public SyncRef<UserRoot> userRoot;
 
 		public SyncAbstractObjList<SyncStream> syncStreams;
-		
+		[Exsposed]
+		[NoWriteExsposed]
+		public string NormalizedUserName { get; private set; }
+		[Exsposed]
+		[NoWriteExsposed]
+		public string UserName { get;private set; }
+		[Exsposed]
+		[NoWriteExsposed]
+		public string[] Roles { get; private set; }
+
 		[NoSyncUpdate]
+		[OnChanged(nameof(UserIDLoad))]
 		public Sync<string> userID;
+		[NoSyncUpdate]
+		public Sync<PlatformID> Platform;
 
+		[NoSyncUpdate]
+		public Sync<string> PlatformVersion;
+
+		[NoSyncUpdate]
+		public Sync<string> BackendID;
+
+		public void UserIDLoad() {
+			Task.Run(async () => {
+				if (userID == null) { return; }
+				var e = await Engine.netApiManager.GetUserInfo(userID);
+				UserName = e?.UserName;
+				NormalizedUserName = e?.NormalizedUserName;
+				Roles = e?.Roles?.ToArray()??Array.Empty<string>();
+			});
+		}
+
+		[Default(true)]
+		[OnChanged(nameof(PresentChange))]
 		public Sync<bool> isPresent;
-
+		public void PresentChange() {
+			World.SessionInfoChanged();
+		}
 		public Peer CurrentPeer { get; set; }
 
-		public bool IsConnected  => (CurrentPeer?.NetPeer?.ConnectionState ?? ConnectionState.Disconnected) != ConnectionState.Connected;
+		public bool IsConnected  => (CurrentPeer?.NetPeer?.ConnectionState ?? LiteNetLib.ConnectionState.Disconnected) == LiteNetLib.ConnectionState.Connected;
+
+		public bool IsLocalUser => World.GetLocalUser() == this;
 
 		public override void OnLoaded() {
 			base.OnLoaded();
@@ -36,6 +72,7 @@ namespace RhuEngine.WorldObjects
 				}
 				catch { }
 			}
+			UserIDLoad();
 		}
 
 		public T FindSyncStream<T>(string name) where T : SyncStream {

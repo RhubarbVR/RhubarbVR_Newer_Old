@@ -4,8 +4,7 @@ using System.Reflection;
 
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
-
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
@@ -74,12 +73,53 @@ namespace RhuEngine.WorldObjects
 			var obj = new DataNodeGroup();
 			var refID = new DataNode<NetPointer>(@object.Pointer);
 			obj.SetValue("Pointer", refID);
-			var Value = typeof(T).IsEnum ? new DataNode<int>((int)(object)value) : (IDataNode)new DataNode<T>(value);
+			var inputType = typeof(T);
+			IDataNode Value;
+			if (inputType == typeof(Type)) {
+				Value = new DataNode<string>(((Type)(object)value)?.FullName);
+			}
+			else {
+				if (inputType.IsEnum) {
+					var unType = inputType.GetEnumUnderlyingType();
+					if(unType == typeof(int)) {
+						Value = new DataNode<int>((int)(object)value);
+					}
+					else if (unType == typeof(uint)) {
+						Value = new DataNode<uint>((uint)(object)value);
+					}
+					else if (unType == typeof(bool)) {
+						Value = new DataNode<bool>((bool)(object)value);
+					}
+					else if (unType == typeof(byte)) {
+						Value = new DataNode<byte>((byte)(object)value);
+					}
+					else if (unType == typeof(sbyte)) {
+						Value = new DataNode<sbyte>((sbyte)(object)value);
+					}
+					else if (unType == typeof(short)) {
+						Value = new DataNode<short>((short)(object)value);
+					}
+					else if (unType == typeof(ushort)) {
+						Value = new DataNode<ushort>((ushort)(object)value);
+					}
+					else if (unType == typeof(long)) {
+						Value = new DataNode<short>((short)(object)value);
+					}
+					else if (unType == typeof(ulong)) {
+						Value = new DataNode<ushort>((ushort)(object)value);
+					}
+					else {
+						throw new NotSupportedException();
+					}
+				}
+				else {
+					Value = new DataNode<T>(value);
+				}			}
 			obj.SetValue("Value", Value);
 			return obj;
 		}
 		public DataNodeGroup CommonWorkerSerialize(IWorldObject @object) {
-			var fields = @object.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+			var fields = @object.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
 			DataNodeGroup obj = null;
 			if (@object.Persistence || NetSync) {
 				if (!NetSync) {
@@ -89,7 +129,7 @@ namespace RhuEngine.WorldObjects
 							castObject.OnSave();
 						}
 						catch (Exception e) {
-							Log.Warn($"Failed to save {@object.GetType().GetFormattedName()} Error: {e}");
+							RLog.Warn($"Failed to save {@object.GetType().GetFormattedName()} Error: {e}");
 						}
 					}
 				}

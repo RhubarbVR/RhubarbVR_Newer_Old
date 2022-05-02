@@ -8,6 +8,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <!-- Hide platform project folders from the solution explorer -->
@@ -27,11 +28,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
+    <PackageReference Include="Jint" Version="3.0.0-beta-2038" />
+    <PackageReference Include="LibVLCSharp" Version="3.6.6" />
     <PackageReference Include="LiteNetLib" Version="0.9.5.2" />
     <PackageReference Include="MessagePack" Version="2.3.85" />
+    <PackageReference Include="NAudio.Core" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
-    <PackageReference Include="StereoKit" Version="0.3.5-preview.6" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.1" />
     <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
   </ItemGroup>
@@ -49,7 +53,51 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Res\Fonts\ArialCEBold.ttf" />
+    <None Remove="Res\Fonts\FifteenNarrow.ttf" />
+    <None Remove="Res\Fonts\Sacramento_Regular.ttf" />
+    <None Remove="Res\Fonts\Ubuntu_Bold.ttf" />
+    <None Remove="Res\Fonts\Ubuntu_BoldItalic.ttf" />
+    <None Remove="Res\Fonts\Ubuntu_Italic.ttf" />
+    <None Remove="Res\Fonts\Ubuntu_Light.ttf" />
+    <None Remove="Res\Fonts\Ubuntu_LightItalic.ttf" />
+    <None Remove="Res\Fonts\Ubuntu_Medium.ttf" />
+    <None Remove="Res\Fonts\Ubuntu_MediumItalic.ttf" />
+    <None Remove="Res\Fonts\Ubuntu_Regular.ttf" />
+    <None Remove="Res\Grid.jpg" />
+    <None Remove="Res\nulltexture.jpg" />
+    <None Remove="Res\RhubarbVR.png" />
+    <None Remove="Res\RhubarbVR2.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Res\Fonts\ArialCEBold.ttf" />
+    <EmbeddedResource Include="Res\Fonts\FifteenNarrow.ttf" />
+    <EmbeddedResource Include="Res\Fonts\Sacramento_Regular.ttf" />
+    <EmbeddedResource Include="Res\Fonts\Ubuntu_Bold.ttf" />
+    <EmbeddedResource Include="Res\Fonts\Ubuntu_BoldItalic.ttf" />
+    <EmbeddedResource Include="Res\Fonts\Ubuntu_Italic.ttf" />
+    <EmbeddedResource Include="Res\Fonts\Ubuntu_Light.ttf" />
+    <EmbeddedResource Include="Res\Fonts\Ubuntu_LightItalic.ttf" />
+    <EmbeddedResource Include="Res\Fonts\Ubuntu_Medium.ttf" />
+    <EmbeddedResource Include="Res\Fonts\Ubuntu_MediumItalic.ttf" />
+    <EmbeddedResource Include="Res\Fonts\Ubuntu_Regular.ttf" />
+    <EmbeddedResource Include="Res\Grid.jpg" />
+    <EmbeddedResource Include="Res\nulltexture.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Res\RhubarbVR.png" />
+    <EmbeddedResource Include="Res\RhubarbVR2.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OpusDotNet\OpusDotNet.csproj" />
+    <ProjectReference Include="..\RNumerics\RNumerics.csproj" />
     <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClipBoard\" />
   </ItemGroup>
 </Project>

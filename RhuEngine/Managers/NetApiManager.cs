@@ -1,18 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Security;
+using System.Net.Sockets;
+using System.Net.WebSockets;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
+using RhuEngine.Linker;
+
 using SharedModels;
+using SharedModels.Session;
+using SharedModels.UserInfo;
+using SharedModels.UserSession;
+
 
 namespace RhuEngine.Managers
 {
@@ -32,7 +43,7 @@ namespace RhuEngine.Managers
 					httpDataResponse.Data = JsonConvert.DeserializeObject<T>(await httpResponseMessage.Content.ReadAsStringAsync());
 				}
 				catch (Exception ex) {
-					StereoKit.Log.Err(ex.ToString());
+					RLog.Err(ex.ToString());
 				}
 				return httpDataResponse;
 			}
@@ -42,13 +53,13 @@ namespace RhuEngine.Managers
 		private async Task<HttpDataResponse<R>> SendPost<R, T>(string path, T value) {
 			var httpContent = new StringContent(JsonConvert.SerializeObject(value), Encoding.UTF8, "application/json");
 			var request = await _httpClient.PostAsync(path, httpContent);
-			StereoKit.Log.Info($"Path {path}  data: {await request.Content.ReadAsStringAsync()}");
+			RLog.Info($"Path {path}  data: {await request.Content.ReadAsStringAsync()}");
 			return await HttpDataResponse<R>.Build(request);
 		}
 
 		private async Task<HttpDataResponse<R>> SendGet<R>(string path) {
 			var request = await _httpClient.GetAsync(path);
-			StereoKit.Log.Info($"Path {path}  data: {await request.Content.ReadAsStringAsync()}");
+			RLog.Info($"Path {path}  data: {await request.Content.ReadAsStringAsync()}");
 			return await HttpDataResponse<R>.Build(request);
 		}
 
@@ -79,9 +90,13 @@ namespace RhuEngine.Managers
 		private HttpClientHandler HttpClientHandler { get; set; }
 		public CookieContainer Cookies => HttpClientHandler?.CookieContainer;
 		public async Task<AccountCreationResponse> SignUp(string username, string email, string password, DateTime dateOfBirth) {
-			var data = await SendPost<AccountCreationResponse, UserRegistration>("/api/authentication/Register", new UserRegistration { Username = username, Email = email, Password = password, DateOfBirth = dateOfBirth });
-			;
-			return data.Data;
+			try {
+				var data = await SendPost<AccountCreationResponse, UserRegistration>("/api/authentication/Register", new UserRegistration { Username = username, Email = email, Password = password, DateOfBirth = dateOfBirth });
+				return data.Data;
+			}
+			catch (HttpRequestException requestException) {
+				throw ProssesHttpRequestException(requestException);
+			}
 		}
 
 		private LoginResponse ProcessLoginResponse(HttpDataResponse<LoginResponse> data) {
@@ -91,40 +106,132 @@ namespace RhuEngine.Managers
 					User = data.Data.User;
 					IsLoggedIn = true;
 					login = true;
+					StartWebSocked();
 				}
 			}
 			if (!login) {
 				IsLoggedIn = false;
 				User = null;
+				_client?.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None).Wait();
+				_client?.Dispose();
+				_client = null;
 			}
 			return data.Data;
 		}
 
 		public async Task<LoginResponse> Login(string email, string password) {
-			var data = await SendPost<LoginResponse, UserLogin>("/api/authentication/Login", new UserLogin { Email = email, Password = password });
-			return ProcessLoginResponse(data);
+			try { 
+				var data = await SendPost<LoginResponse, UserLogin>("/api/authentication/Login", new UserLogin { Email = email, Password = password });
+				return ProcessLoginResponse(data);
+			}
+			catch (HttpRequestException requestException) {
+				throw ProssesHttpRequestException(requestException);
+			}
 		}
+
+		public async Task<PublicUser> GetUserInfo(string id) {
+			try {
+				var data = await SendGet<PublicUser>($"/api/userinfo/FromUserID?id={id}");
+				return data.Data;
+			}
+			catch (HttpRequestException requestException) {
+				throw ProssesHttpRequestException(requestException);
+			}
+		}
+
+		public async Task<UserStatus> GetUserStatus(string id) {
+			try {
+				var data = await SendGet<UserStatus>($"/api/userinfo/UserStatus?id={id}");
+				return data.Data;
+			}
+			catch (HttpRequestException requestException) {
+				throw ProssesHttpRequestException(requestException);
+			}
+		}
+
 
 		public async Task<LoginResponse> GetMe() {
-			var data = await SendGet<LoginResponse>("/api/authentication/GetMe");
-			return ProcessLoginResponse(data);
+			try {
+				var data = await SendGet<LoginResponse>("/api/authentication/GetMe");
+				return ProcessLoginResponse(data);
+			}
+			catch (HttpRequestException requestException) {
+				throw ProssesHttpRequestException(requestException);
+			}
 		}
 
-		public async Task<IEnumerable<SessionInfo>> GetSessions() {
-			var data = await SendGet<IEnumerable<SessionInfo>>("/api/SessionInfo/GetAllSessions");
-			return data.Data;
+		public async Task<IEnumerable<RelayHolePunchServer>> GetRelayHoleServers() {
+			try {
+				var data = await SendGet<IEnumerable<RelayHolePunchServer>>($"/RelayHoleServers");
+				return data.Data;
+			}
+			catch (HttpRequestException requestException) {
+				throw ProssesHttpRequestException(requestException);
+			}
+		}
+
+		public async Task<IEnumerable<SessionInfo>> GetSessions(uint StartPos = 0,uint Amount = 10) {
+			try {
+				var data = await SendGet<IEnumerable<SessionInfo>>($"/api/SessionInfo/GetSessions?start={StartPos}&amount={Amount}");
+				return data.Data;
+			}
+			catch (HttpRequestException requestException) {
+				throw ProssesHttpRequestException(requestException);
+			}
+		}
+
+		public Exception ProssesHttpRequestException(HttpRequestException requestException) {
+			if (requestException.InnerException is WebException webException && webException.Status == WebExceptionStatus.NameResolutionFailure) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is WebException webExceptione && webExceptione.Status == WebExceptionStatus.Timeout) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is WebException webExceptiond && webExceptiond.Status == WebExceptionStatus.ConnectFailure) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is SocketException socketException && socketException.SocketErrorCode == SocketError.HostDown) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is SocketException socketExceptione && socketExceptione.SocketErrorCode == SocketError.HostNotFound) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is SocketException socketExceptionee && socketExceptionee.SocketErrorCode == SocketError.HostUnreachable) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is SocketException socketExceptioneee && socketExceptioneee.SocketErrorCode == SocketError.TimedOut) {
+				return new ConnectToServerError(this);
+			}
+			else if (requestException.InnerException is IOException ioException) {
+				if (ioException.InnerException is SocketException socketException2 && socketException2.SocketErrorCode == SocketError.HostDown) {
+					return new ConnectToServerError(this);
+				}
+				else if (ioException.InnerException is SocketException socketExceptione2 && socketExceptione2.SocketErrorCode == SocketError.HostNotFound) {
+					return new ConnectToServerError(this);
+				}
+				else if (ioException.InnerException is SocketException socketExceptionee2 && socketExceptionee2.SocketErrorCode == SocketError.HostUnreachable) {
+					return new ConnectToServerError(this);
+				}
+				else if (ioException.InnerException is SocketException socketExceptioneee2 && socketExceptioneee2.SocketErrorCode == SocketError.TimedOut) {
+					return new ConnectToServerError(this);
+				}
+			}
+			return requestException;
 		}
 
 		private void WriteCookiesToDisk(string file, CookieContainer cookieJar) {
+			if (!Directory.Exists(Path.GetDirectoryName(file))) {
+				Directory.CreateDirectory(Path.GetDirectoryName(file));
+			}
 			using Stream stream = File.Create(file);
 			try {
-				StereoKit.Log.Info("Writing cookies to disk...");
+				RLog.Info("Writing cookies to disk...");
 				var formatter = new BinaryFormatter();
 				formatter.Serialize(stream, cookieJar);
-				StereoKit.Log.Info("Done.");
+				RLog.Info("Done.");
 			}
 			catch (Exception e) {
-				StereoKit.Log.Err("Problem writing cookies to disk: " + e.GetType());
+				RLog.Err("Problem writing cookies to disk: " + e.GetType());
 			}
 		}
 
@@ -132,12 +239,12 @@ namespace RhuEngine.Managers
 		private CookieContainer ReadCookiesFromDisk(string file) {
 			try {
 				using Stream stream = File.Open(file, FileMode.Open);
-				StereoKit.Log.Info("Reading cookies from disk...");
+				RLog.Info("Reading cookies from disk...");
 				var formatter = new BinaryFormatter();
 				return (CookieContainer)formatter.Deserialize(stream);
 			}
 			catch (Exception e) {
-				StereoKit.Log.Err("Problem reading cookies from disk: " + e.GetType());
+				RLog.Err("Problem reading cookies from disk: " + e.GetType());
 				return new CookieContainer();
 			}
 		}
@@ -151,37 +258,114 @@ namespace RhuEngine.Managers
 						item.Dispose();
 					}
 				}
+				//Reomve All Cookies
+				try {
+					var cookies = Cookies.GetCookies(BaseAddress);
+					foreach (Cookie co in cookies) {
+						co.Expires = DateTime.Now.Subtract(TimeSpan.FromDays(1));
+					}
+					var uri = new UriBuilder(BaseAddress) {
+						Scheme = ((BaseAddress.Scheme == Uri.UriSchemeHttps) && !RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) ? "wss" : "ws",
+						Port = RuntimeInformation.FrameworkDescription.StartsWith("Mono ") ? 80 : BaseAddress.Port
+					};
+					if (RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) {
+						var ucookies = Cookies.GetCookies(BaseAddress);
+						foreach (Cookie co in ucookies) {
+							co.Expires = DateTime.Now.Subtract(TimeSpan.FromDays(1));
+						}
+					}
+				}
+				catch (Exception ex) {
+					RLog.Err($"Failed To Clear Cookies {ex}");
+				}
+				WriteCookiesToDisk(_cookiePath, Cookies);
+				_client?.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None).Wait();
+				_client?.Dispose();
+				_client = null;
 			}
 		}
 
 		public void Dispose() {
-			WriteCookiesToDisk(COOKIEPATH, Cookies);
+			WriteCookiesToDisk(_cookiePath, Cookies);
 		}
 
 		public Uri BaseAddress =>
 				//_httpClient?.BaseAddress ?? new Uri("http://localhost:5000/"); 
-#if DEBUG
-				_httpClient?.BaseAddress ?? new Uri("https://unstable.family/");
-#else
-				_httpClient?.BaseAddress ?? new Uri("https://RhubarbVR.net/");
-#endif
-		private const string COOKIEPATH = "RhuCookies";
+				_httpClient?.BaseAddress ?? new Uri("https://rhubarbvr.net/");
+		public NetApiManager(string path) {
+			_cookiePath = path is null ? Engine.BaseDir + "\\RhuCookies" : path + "\\RhuCookies";
+		}
+		private readonly string _cookiePath;
 
 		private Engine Engine { get; set; }
+
+		public bool _isOnline = false;
+
+		public event Action HasGoneOfline;
+
+		public bool IsOnline { get => _isOnline; 
+			set {
+				if (!value) {
+					IsGoneOfline();
+					HasGoneOfline?.Invoke();
+				}
+				_isOnline = value;
+			}
+		}
 
 		public void Init(Engine engine) {
 			Engine = engine;
 			HttpClientHandler = new HttpClientHandler {
 				AllowAutoRedirect = true,
 				UseCookies = true,
-				CookieContainer = ReadCookiesFromDisk("RhuCookies")
+				CookieContainer = ReadCookiesFromDisk(_cookiePath)
 			};
 			HttpClientHandler.ServerCertificateCustomValidationCallback = ValidateRemoteCertificate;
 			_httpClient = new HttpClient(HttpClientHandler) {
 				BaseAddress = BaseAddress
 			};
-			if (Cookies.Count > 0) {
-				GetMe().ConfigureAwait(false);
+			UpdateCheckForInternetConnection();
+		}
+
+		public void UpdateCheckForInternetConnection() {
+			Task.Run(() =>{
+				IsOnline = CheckForInternetConnection();
+				if (IsOnline) {
+					if (Cookies.Count > 0) {
+						GetMe().ConfigureAwait(false);
+					}
+				}
+			});
+		}
+		
+		public void IsGoneOfline() {
+			User = null;
+			IsLoggedIn = false;
+			try {
+				_client?.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None).Wait();
+			}
+			catch { }
+			_client?.Dispose();
+			_client = null;
+		}
+
+		public static bool CheckForInternetConnection(int timeoutMs = 10000, string url = null) {
+			try {
+				url ??= CultureInfo.InstalledUICulture switch { { Name: var n } when n.StartsWith("fa") => // Iran
+																	"http://www.aparat.com", { Name: var n } when n.StartsWith("zh") => // China
+																								 "http://www.baidu.com",
+					_ =>
+						"http://www.gstatic.com/generate_204",
+				};
+
+				var request = (HttpWebRequest)WebRequest.Create(url);
+				request.KeepAlive = false;
+				request.Timeout = timeoutMs;
+				using var response = (HttpWebResponse)request.GetResponse();
+				return true;
+			}
+			catch {
+				return false;
 			}
 		}
 
@@ -190,10 +374,137 @@ namespace RhuEngine.Managers
 	X509Certificate cert,
 	X509Chain chain,
 	SslPolicyErrors policyErrors) {
+			if(policyErrors == SslPolicyErrors.None) {
+				return true;
+			}
 			var foundCert = chain.ChainElements[1].Certificate.RawData;
 			return LetsEncrypt.Any((val) => val.SequenceEqual(foundCert));
 		}
+		private UserStatus _status;
+		public UserStatus UserStatus
+		{
+			get => _status;
+			set {
+				_status = value;
+				SendDataToSocked(new SessionRequest { RequestType = RequestType.StatusUpdate, RequestData = JsonConvert.SerializeObject(value) });
+			}
+		}
 
+		private ClientWebSocket _client;
+
+		public void SendDataToSocked(SessionRequest sessionRequest) {
+			var sessionReqwest = JsonConvert.SerializeObject(sessionRequest);
+			RLog.Info(sessionReqwest);
+			_client?.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(sessionReqwest)), WebSocketMessageType.Text, true, CancellationToken.None);
+		}
+
+		public void StartWebSocked() {
+			try {
+				if(User == null) {
+					RLog.Err("Can not Start WebSocket Client not login");
+					return;
+				}
+				RLog.Info("Starting WebSocket Client");
+				_client = new ClientWebSocket();
+				var cernts = new X509CertificateCollection();
+				foreach (var item in LetsEncrypt) {
+					cernts.Add(new X509Certificate(item));
+				}
+				_client.Options.ClientCertificates = cernts;
+				var dist = new Uri(BaseAddress, "/ws/userSession");
+				var uri = new UriBuilder(dist) {
+					//Check if Android so it can be insecure 
+					Scheme = ((dist.Scheme == Uri.UriSchemeHttps) && !RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) ? "wss" : "ws",
+					Port = RuntimeInformation.FrameworkDescription.StartsWith("Mono ") ? 80 : dist.Port
+				};
+				//this disgusts me i needed the auth cookie if android
+				if (RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) {
+					Cookies.SetCookies(uri.Uri, Cookies.GetCookieHeader(BaseAddress));
+				}
+				_client.Options.Cookies = Cookies;
+				//Its for the quest users aaaaaaa
+				RLog.Info($"Using {uri.Uri}");
+				var connection = _client.ConnectAsync(uri.Uri, CancellationToken.None);
+				connection.Wait();
+				RLog.Info($"WebSocket Client {connection.Status}");
+				Task.Run(() => {
+					_client?.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("Start Conection")), WebSocketMessageType.Text, true, CancellationToken.None);
+					while ((_client?.State??WebSocketState.Closed) == WebSocketState.Open) {
+						var buffer = new ArraySegment<byte>(new byte[1024]);
+						var task = _client.ReceiveAsync(buffer, CancellationToken.None);
+						try {
+							task.Wait();
+						}
+						catch {
+							RLog.Err("WebSockedLost");
+							IsGoneOfline();
+						}
+						try {
+							var reqwest = JsonConvert.DeserializeObject<SessionRequest>(Encoding.UTF8.GetString(buffer.Array));
+							if (reqwest != null) {
+								switch (reqwest.RequestType) {
+									case RequestType.SessionError:
+										RLog.Info($"SessionError res");
+										var eworld = Engine.worldManager.GetWorldBySessionID(reqwest.ID);
+										if (eworld != null) {
+											RLog.Err($"Error with session {reqwest.ID} error:{reqwest.RequestData}");
+											eworld.LoadMsg = reqwest.RequestData;
+											eworld.HasError = true;
+											eworld.Dispose();
+										}
+										break;
+									case RequestType.ConnectToUser:
+										RLog.Info($"ConnectToUser res");
+										var cworld = Engine.worldManager.GetWorldBySessionID(reqwest.ID);
+										if (cworld != null) {
+											cworld.ConnectToUser(JsonConvert.DeserializeObject<ConnectToUser>(reqwest.RequestData));
+										}
+										break;
+									case RequestType.SessionID:
+										RLog.Info($"SessionID res");
+										var world = Engine.worldManager.GetWorldBySessionID(reqwest.ID);
+										if (world != null) {
+											if (world.SessionID.Value != reqwest.RequestData) {
+												world.SessionID.Value = reqwest.RequestData;
+												RLog.Info(world.SessionID.Value);
+											}
+											else {
+												world.IsDeserializing = true;
+												world.IsLoadingNet = false;
+											}
+										}
+										break;
+									case RequestType.LoadStartingStatus:
+										RLog.Info($"LoadStartingStatus res");
+										Task.Run(async () => {
+											var oldstatus = await GetUserStatus(User.Id);
+											if (oldstatus.Status == Status.Offline) {
+												oldstatus.Status = Status.Invisible;
+											}
+#if DEBUG
+											oldstatus.ClientVersion = $"Milksnake {Engine.EngineLink.BackendID} {Engine.version.Major}{Engine.version.Minor} PlatformInfo:{Environment.OSVersion.Platform}_{Environment.OSVersion.Version}";
+#else
+											oldstatus.ClientVersion =  $"RhubarbVR {Engine.EngineLink.BackendID} {Engine.version.Major}{Engine.version.Minor} PlatformInfo:{Environment.OSVersion.Platform}_{Environment.OSVersion.Version}";
+#endif
+											oldstatus.Devices = Environment.OSVersion.Platform.ToString() + " on " + RuntimeInformation.FrameworkDescription;
+											UserStatus = oldstatus;
+										});
+										break;
+									default:
+										break;
+								}
+							}
+						}
+						catch {
+
+						}
+					}
+				});
+			}
+			catch (Exception e) {
+				RLog.Err($"Faild to start WebSocket Client {e}");
+			}
+		}
 		public void Step() {
 		}
 	}

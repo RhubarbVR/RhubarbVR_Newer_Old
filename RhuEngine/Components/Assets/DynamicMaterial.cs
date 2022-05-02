@@ -3,28 +3,36 @@
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
+using RhuEngine.Linker;
+using RNumerics;
+
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets" })]
-	public class DynamicMaterial : AssetProvider<Material>
+	public class DynamicMaterial : AssetProvider<RMaterial>
 	{
 		[OnAssetLoaded(nameof(LoadMaterial))]
-		public AssetRef<Shader> shader;
+		public AssetRef<RShader> shader;
+
 		[OnChanged(nameof(UpdateValues))]
 		[Default(DepthTest.Less)]
 		public Sync<DepthTest> depthTest;
+
 		[OnChanged(nameof(UpdateValues))]
 		[Default(true)]
 		public Sync<bool> depthWrite;
+
 		[OnChanged(nameof(UpdateValues))]
 		[Default(Cull.Back)]
 		public Sync<Cull> faceCull;
+
 		[OnChanged(nameof(UpdateValues))]
 		public Sync<int> queueOffset;
+
 		[OnChanged(nameof(UpdateValues))]
 		[Default(Transparency.None)]
 		public Sync<Transparency> transparency;
+
 		[OnChanged(nameof(UpdateValues))]
 		public Sync<bool> wireframe;
 
@@ -50,7 +58,7 @@ namespace RhuEngine.Components
 
 		public void SetPram(string name, object data) {
 			try {
-				GetParam(name).Item1.SetValue(data);
+				GetParam(name).Item1?.SetValue(data);
 			}
 			catch { }
 		}
@@ -96,30 +104,27 @@ namespace RhuEngine.Components
 		public class TexPramInfo : PramInfo
 		{
 			[OnAssetLoaded(nameof(OnValueChangeed))]
-			public AssetRef<Tex> value;
+			public AssetRef<RTexture2D> value;
 
 			public override void SetValue(object newValue) {
 				try {
-					value.Target = (AssetProvider<Tex>)newValue;
+					value.Target = (AssetProvider<RTexture2D>)newValue;
 				}
 				catch { }
 			}
 
 			public override object GetData() {
-				if (value.Target is null) {
-					return Tex.White;
-				}
-				else {
-					//Need to change to loading texture
-					return value.Asset ?? Tex.Black;
-				}
+				return value.Target is null ? RTexture2D.White : value.Asset ?? Engine.staticResources.Null;
 			}
 		}
-		Material _material;
+		RMaterial _material;
 		private void LoadMaterial() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			Console.WriteLine("Load material");
 			if (shader.Asset is not null) {
-				_material = new Material(shader.Asset);
+				_material = new RMaterial(shader.Asset);
 				foreach (var item in _material.GetAllParamInfo()) {
 					if (item.name != "color") {
 						var (pram, index) = GetParam(item.name);
@@ -132,25 +137,25 @@ namespace RhuEngine.Components
 									}
 									break;
 								case MaterialParam.Color128:
-									if (pram.GetType() != typeof(ValuePramInfo<Color32>)) {
+									if (pram.GetType() != typeof(ValuePramInfo<Colorb>)) {
 										Prams.RemoveAtIndex(index);
 										pram = null;
 									}
 									break;
 								case MaterialParam.Vector4:
-									if (pram.GetType() != typeof(ValuePramInfo<Vec4>)) {
+									if (pram.GetType() != typeof(ValuePramInfo<Vector4f>)) {
 										Prams.RemoveAtIndex(index);
 										pram = null;
 									}
 									break;
 								case MaterialParam.Vector3:
-									if (pram.GetType() != typeof(ValuePramInfo<Vec3>)) {
+									if (pram.GetType() != typeof(ValuePramInfo<Vector3f>)) {
 										Prams.RemoveAtIndex(index);
 										pram = null;
 									}
 									break;
 								case MaterialParam.Vector2:
-									if (pram.GetType() != typeof(ValuePramInfo<Vec2>)) {
+									if (pram.GetType() != typeof(ValuePramInfo<Vector2f>)) {
 										Prams.RemoveAtIndex(index);
 										pram = null;
 									}
@@ -177,16 +182,16 @@ namespace RhuEngine.Components
 									Prams.Add<ValuePramInfo<float>>().name.Value = item.name;
 									break;
 								case MaterialParam.Color128:
-									Prams.Add<ValuePramInfo<Color32>>().name.Value = item.name;
+									Prams.Add<ValuePramInfo<Colorb>>().name.Value = item.name;
 									break;
 								case MaterialParam.Vector4:
-									Prams.Add<ValuePramInfo<Vec4>>().name.Value = item.name;
+									Prams.Add<ValuePramInfo<Vector4f>>().name.Value = item.name;
 									break;
 								case MaterialParam.Vector3:
-									Prams.Add<ValuePramInfo<Vec3>>().name.Value = item.name;
+									Prams.Add<ValuePramInfo<Vector3f>>().name.Value = item.name;
 									break;
 								case MaterialParam.Vector2:
-									Prams.Add<ValuePramInfo<Vec2>>().name.Value = item.name;
+									Prams.Add<ValuePramInfo<Vector2f>>().name.Value = item.name;
 									break;
 								case MaterialParam.Matrix:
 									Prams.Add<ValuePramInfo<Matrix>>().name.Value = item.name;
@@ -197,7 +202,7 @@ namespace RhuEngine.Components
 								default:
 									break;
 							}
-							Log.Info($"Material pram loaded. Name: {item.name} Type: {item.type}");
+							RLog.Info($"Material pram loaded. Name: {item.name} Type: {item.type}");
 						}
 					}
 				}
@@ -225,9 +230,13 @@ namespace RhuEngine.Components
 			_material.Wireframe = wireframe.Value;
 		}
 
+		public override void OnAttach() {
+			base.OnAttach();
+			LoadMaterial();
+		}
+
 		public override void OnLoaded() {
 			base.OnLoaded();
-			LoadMaterial();
 		}
 	}
 }

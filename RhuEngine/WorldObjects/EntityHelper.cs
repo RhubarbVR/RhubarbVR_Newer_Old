@@ -1,12 +1,13 @@
 ﻿using RhuEngine.Components;
 using RhuEngine.WorldObjects.ECS;
+using RhuEngine.Linker;
+using RNumerics;
 
-using StereoKit;
 namespace RhuEngine.WorldObjects
 {
 	public static class EntityHelper
 	{
-		public static (T, DynamicMaterial) AttachMesh<T, S>(this Entity entity) where T : AssetProvider<Mesh>, new() where S : AssetProvider<Shader>, new() {
+		public static (T, DynamicMaterial) AttachMesh<T, S>(this Entity entity) where T : AssetProvider<RMesh>, new() where S : AssetProvider<RShader>, new() {
 			var meshRender = entity.AttachComponent<MeshRender>();
 			var shader = entity.World.RootEntity.GetFirstComponentOrAttach<S>();
 			var material = entity.AttachComponent<DynamicMaterial>();
@@ -17,7 +18,7 @@ namespace RhuEngine.WorldObjects
 			return (mesh, material);
 		}
 
-		public static (T, DynamicMaterial, MeshRender) AttachMeshWithMeshRender<T, S>(this Entity entity) where T : AssetProvider<Mesh>, new() where S : AssetProvider<Shader>, new() {
+		public static (T, DynamicMaterial, MeshRender) AttachMeshWithMeshRender<T, S>(this Entity entity) where T : AssetProvider<RMesh>, new() where S : AssetProvider<RShader>, new() {
 			var meshRender = entity.AttachComponent<MeshRender>();
 			var shader = entity.World.RootEntity.GetFirstComponentOrAttach<S>();
 			var material = entity.AttachComponent<DynamicMaterial>();

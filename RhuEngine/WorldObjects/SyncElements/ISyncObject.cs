@@ -18,6 +18,6 @@ namespace RhuEngine.WorldObjects
 		public void OnLoaded();
 		public IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject);
 		public void Deserialize(IDataNode data, SyncObjectDeserializerObject syncObjectSerializerObject);
-
+		void FirstCreation();
 	}
 }

@@ -5,8 +5,7 @@ using System.Linq;
 
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
-
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
@@ -15,6 +14,29 @@ namespace RhuEngine.WorldObjects
 		private readonly SynchronizedCollection<T> _syncObjects = new(5);
 
 		public event Action<IChangeable> Changed;
+		[Exsposed]
+		public int IndexOf(T value) {
+			return _syncObjects.IndexOf(value);
+		}
+
+		public void ChildElementOnChanged(IChangeable changeable) {
+			Changed?.Invoke(changeable);
+		}
+		[Exsposed]
+		public T GetValue(int index) {
+			return _syncObjects[index];
+		}
+		[Exsposed]
+		public void Clear() {
+			var sendData = new DataNodeGroup();
+			sendData.SetValue("type", new DataNode<int>(3));
+			World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
+			foreach (var item in _syncObjects) {
+				item.Dispose();
+			}
+			_syncObjects.Clear();
+		}
+		[Exsposed]
 		public T this[int i] => _syncObjects[i];
 
 		public T this[NetPointer pointer] => _syncObjects.Where((val)=> val.Pointer == pointer).First();
@@ -28,7 +50,15 @@ namespace RhuEngine.WorldObjects
 			_syncObjects[index].Destroy();
 		}
 
+		public virtual void OnAddedElement(T element) {
+
+		}
+
+		public virtual void OnElementRemmoved(T element) {
+
+		}
 		public void AddInternal(T newElement) {
+			OnAddedElement(newElement);
 			newElement.OnDispose += NewElement_OnDispose;
 			var offsetindex = 0;
 			if (typeof(IOffsetableElement).IsAssignableFrom(newElement.GetType())) {
@@ -79,6 +109,7 @@ namespace RhuEngine.WorldObjects
 			if (IsRemoved) {
 				return;
 			}
+			OnElementRemmoved(value);
 			value.OnDispose -= NewElement_OnDispose;
 			lock (_locker) {
 				_syncObjects.Remove(value);
@@ -144,9 +175,15 @@ namespace RhuEngine.WorldObjects
 					break;
 				case 2:
 					var objecte = this[(DataNode<NetPointer>)nodeGroup["ref"]];
-					Log.Info("Removed net");
+					RLog.Info("Removed net");
 					RemoveInternal(objecte);
 					objecte.Destroy();
+					break;
+				case 3:
+					foreach (var item in _syncObjects) {
+						item.Dispose();
+					}
+					_syncObjects.Clear();
 					break;
 				default:
 					break;

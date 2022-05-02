@@ -57,5 +57,11 @@
 			Unlink();
 			base.Dispose();
 		}
+
+		public void SetValue(object value) {
+			if (Linked) {
+				LinkedValue = (T)value;
+			}
+		}
 	}
 }

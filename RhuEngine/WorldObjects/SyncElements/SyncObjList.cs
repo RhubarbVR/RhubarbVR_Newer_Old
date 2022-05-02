@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
@@ -12,6 +13,43 @@ namespace RhuEngine.WorldObjects
 	{
 		public T Add(bool networkedObject = false, bool deserialize = false);
 	}
+
+	public class SyncValueList<T> : SyncObjList<Sync<T>>
+	{
+		[Exsposed]
+		public new T this[int index]
+		{
+			get => base[index].Value;
+			set => base[index].Value = value;
+		}
+
+		public override void OnAddedElement(Sync<T> element) {
+			element.Changed += ChildElementOnChanged;
+		}
+
+
+		public override void OnElementRemmoved(Sync<T> element) {
+			element.Changed -= ChildElementOnChanged;
+		}
+		[Exsposed]
+		public void Add(T value) {
+			Add().Value = value;
+		}
+
+		public void Append(IEnumerable<T> values) {
+			foreach (var item in values) {
+				Add(item);
+			}
+		}
+		[Exsposed]
+		public T[] GetValues() {
+			return this;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static implicit operator T[](SyncValueList<T> data) => data.ToArray().Select((objec) => ((Sync<T>)objec).Value).ToArray();
+	}
+
 	public class SyncObjList<T> : SyncListBase<T>, ISyncObjectList<T>, INetworkedObject, IEnumerable<ISyncObject> where T : ISyncObject, new()
 	{
 		public T AddWithCustomRefIds(bool networkedObject = false, bool deserialize = false,Func<NetPointer> func = null) {
@@ -20,12 +58,18 @@ namespace RhuEngine.WorldObjects
 			AddInternal(newElement);
 			return newElement;
 		}
-
+		[Exsposed]
+		public T AddElement() {
+			return Add();
+		}
 		public T Add(bool networkedObject = false, bool deserialize = false) {
 			var newElement = new T();
 			newElement.Initialize(World, this, "List Elemenet", networkedObject, deserialize);
 			if (!networkedObject) {
 				BroadcastAdd(newElement);
+				if (!deserialize) {
+					newElement.FirstCreation();
+				}
 			}
 			AddInternal(newElement);
 			return newElement;

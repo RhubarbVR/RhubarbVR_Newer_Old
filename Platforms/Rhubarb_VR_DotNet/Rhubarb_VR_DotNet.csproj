@@ -17,7 +17,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="StereoKit" Version="0.3.5-preview.6" />
+		<PackageReference Include="LibVLCSharp" Version="3.6.6" />
+		<PackageReference Include="StereoKit" Version="0.3.6-preview.4" />
+		<PackageReference Include="VideoLAN.LibVLC.Mac" Version="3.1.3.1" />
+		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.16" />
 	</ItemGroup>
 
 	<!-- Copy assets, and build the app's shaders into the final app folder -->
@@ -35,6 +38,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\RhuEngine\RhuEngine.csproj" />
+	  <ProjectReference Include="..\..\RStereoKit\RStereoKit.csproj" />
 	</ItemGroup>
 
 </Project>

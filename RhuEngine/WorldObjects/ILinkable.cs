@@ -5,7 +5,11 @@ namespace RhuEngine.WorldObjects
 {
 	public interface ILinkable : IWorldObject
 	{
-		bool IsLinked { get; }
+		object Object { get; set; }
+		void Link(ILinker source);
+		void ForceLink(ILinker source);
+
+		bool IsLinkedTo { get; }
 		NetPointer LinkedFrom { get; }
 
 		void KillLink();

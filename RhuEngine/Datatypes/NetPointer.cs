@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
-
+using MessagePack;
 
 namespace RhuEngine.Datatypes
 {
+	[MessagePackObject]
 	public struct NetPointer : IEquatable<NetPointer>
 	{
+		[Key(0)]
 		public ulong id;
 
 		public NetPointer(ulong _id) {
@@ -15,13 +17,19 @@ namespace RhuEngine.Datatypes
 		public ulong GetID() {
 			return id;
 		}
-		public int GetOwnerID() {
+		public ushort GetOwnerID() {
 			return (ushort)(id & 0xFFFFuL);
 		}
+		public ulong ItemIndex() {
+			return id << 16;
+		}
+		[IgnoreMember]
+		public bool IsLocal => GetID() == 0;
+
 		public static NetPointer BuildID(ulong position, ushort user) {
 			return new NetPointer((position << 16) | (user & 0xFFFFuL));
 		}
-
+		[IgnoreMember]
 		public static NetPointer Blank = new();
 		public string HexString() {
 			try {

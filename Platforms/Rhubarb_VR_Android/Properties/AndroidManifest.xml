@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.RhubarbVR.Rhubarb_VR" android:installLocation="auto">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.RhubarbVR.Main" android:installLocation="auto">
 	<uses-sdk android:minSdkVersion="29" android:targetSdkVersion="29" />
 	<application android:allowBackup="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:roundIcon="@mipmap/ic_launcher_round" android:supportsRtl="true" android:theme="@style/AppTheme"></application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -19,6 +19,8 @@
 	<uses-permission android:name="android.permission.CAPTURE_SECURE_VIDEO_OUTPUT" />
 	<uses-permission android:name="com.oculus.permission.HAND_TRACKING" />
 	<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 	<uses-feature android:name="android.hardware.vr.headtracking" android:required="false" android:version="1" />
 	<uses-feature android:name="oculus.software.handtracking" android:required="false" />
 </manifest>

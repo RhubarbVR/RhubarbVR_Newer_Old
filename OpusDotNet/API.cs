@@ -5,6 +5,40 @@ using System.Reflection;
 
 namespace OpusDotNet
 {
+	/// <summary>
+	/// Android Test
+	/// </summary>
+	public static class AndroidTest
+	{
+		static bool? _isAndroid;
+		/// <summary>
+		/// Run Chech
+		/// </summary>
+		/// <returns>If it is anroid</returns>
+		public static bool Check() {
+			if (_isAndroid != null) {
+				return (bool)_isAndroid;
+			}
+			using (var process = new System.Diagnostics.Process()) {
+				process.StartInfo.FileName = "getprop";
+				process.StartInfo.Arguments = "ro.build.user";
+				process.StartInfo.RedirectStandardOutput = true;
+				process.StartInfo.UseShellExecute = false;
+				process.StartInfo.CreateNoWindow = true;
+				try {
+					process.Start();
+					var output = process.StandardOutput.ReadToEnd();
+					_isAndroid = string.IsNullOrEmpty(output) ? (bool?)false : (bool?)true;
+				}
+				catch {
+					_isAndroid = false;
+				}
+				return (bool)_isAndroid;
+			}
+		}
+	}
+
+
 	static class NativeLib
 	{
 		static bool _loaded = false;
@@ -13,8 +47,8 @@ namespace OpusDotNet
 				return true;
 			}
 
-			// Mono uses a different strategy for linking the DLL
-			if (RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) {
+			// Android uses a different strategy for linking the DLL
+			if (AndroidTest.Check()) {
 				return true;
 			}
 

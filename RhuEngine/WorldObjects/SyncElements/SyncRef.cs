@@ -13,6 +13,8 @@ namespace RhuEngine.WorldObjects
 
 	public class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, INetworkedObject, IChangeable where T : class, IWorldObject
 	{
+		public object Object { get => _targetPointer; set => _targetPointer = (NetPointer)value; }
+
 		private readonly object _syncRefLock = new();
 
 		private NetPointer _targetPointer;
@@ -39,7 +41,7 @@ namespace RhuEngine.WorldObjects
 		public override void OnLoaded() {
 			NetValue = _targetPointer;
 		}
-
+		[Exsposed]
 		public virtual NetPointer Value
 		{
 			get => _targetPointer;
@@ -65,7 +67,7 @@ namespace RhuEngine.WorldObjects
 		private T _target;
 
 		public IWorldObject TargetIWorldObject { get => Target; set { if (value != null) { Value = value.Pointer; } } }
-
+		[Exsposed]
 		public virtual T Target
 		{
 			get => _target == null || (_target?.IsRemoved ?? false) || _target?.World != World ? null : _target;
@@ -91,14 +93,14 @@ namespace RhuEngine.WorldObjects
 		}
 
 		private void BroadcastValue() {
-			if (IsLinked || NoSync) {
+			if (IsLinkedTo || NoSync) {
 				return;
 			}
 			World.BroadcastDataToAll(this, new DataNode<NetPointer>(_targetPointer), LiteNetLib.DeliveryMethod.ReliableOrdered);
 		}
 
 		public void Received(Peer sender, IDataNode data) {
-			if (IsLinked || NoSync) {
+			if (IsLinkedTo || NoSync) {
 				return;
 			}
 			NetValue = ((DataNode<NetPointer>)data).Value;
@@ -122,7 +124,7 @@ namespace RhuEngine.WorldObjects
 			syncObjectSerializerObject.RefDeserialize((DataNodeGroup)data, this);
 		}
 
-		public bool IsLinked { get; private set; }
+		public bool IsLinkedTo { get; private set; }
 
 		public ILinker drivenFromObj;
 
@@ -132,21 +134,21 @@ namespace RhuEngine.WorldObjects
 
 		public void KillLink() {
 			drivenFromObj.RemoveLinkLocation();
-			IsLinked = false;
+			IsLinkedTo = false;
 		}
 
 		public void Link(ILinker value) {
-			if (!IsLinked) {
+			if (!IsLinkedTo) {
 				ForceLink(value);
 			}
 		}
 		public void ForceLink(ILinker value) {
-			if (IsLinked) {
+			if (IsLinkedTo) {
 				KillLink();
 			}
 			value.SetLinkLocation(this);
 			drivenFromObj = value;
-			IsLinked = true;
+			IsLinkedTo = true;
 		}
 
 	}

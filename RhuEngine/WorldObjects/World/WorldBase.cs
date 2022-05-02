@@ -6,28 +6,38 @@ using System.Threading;
 
 using RhuEngine.Managers;
 using RhuEngine.WorldObjects.ECS;
-
-using StereoKit;
+using RhuEngine.AssetSystem;
+using RhuEngine.Components;
+using SharedModels.Session;
+using SharedModels.UserSession;
+using RhuEngine.Linker;
+using RhuEngine.Physics;
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World : IWorldObject
-	{
+	public partial class World : IWorldObject {
+		public PhysicsSim PhysicsSim { get; set; }
 
 		public bool IsLoading => IsDeserializing || IsLoadingNet;
 
 		public bool IsPersonalSpace { get; private set; }
 
+		public readonly AssetSession assetSession;
 		public readonly WorldManager worldManager;
+		public Engine Engine => worldManager.Engine;
+
 		public World(WorldManager worldManager) {
+			PhysicsSim = new PhysicsSim();
 			this.worldManager = worldManager;
+			assetSession = new AssetSession(worldManager.Engine.assetManager, this);
 		}
 
+		public string LoadMsg = "Starting to LoadWorld";
 
 		public void Initialize(bool networkedWorld, bool networkedObject, bool deserialize, bool isPersonalSpace) {
 			IsPersonalSpace = isPersonalSpace;
 			foreach (var item in GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)) {
-				if (typeof(SyncObject).IsAssignableFrom(item.FieldType)) {
+				if (typeof(SyncObject).IsAssignableFrom(item.FieldType) && item.GetCustomAttribute<NoLoadAttribute>() is null) {
 					var instance = (SyncObject)Activator.CreateInstance(item.FieldType);
 					instance.Initialize(this, this, item.Name, networkedObject, deserialize);
 					if (typeof(ISync).IsAssignableFrom(item.FieldType)) {
@@ -47,7 +57,7 @@ namespace RhuEngine.WorldObjects
 						if (startValue != null) {
 							var method = GetType().GetMethod(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 							if (method is null) {
-								Log.Err($"Method {startValue.Data} not found");
+								RLog.Err($"Method {startValue.Data} not found");
 							}
 							else {
 								var prams = method.GetParameters();
@@ -58,7 +68,7 @@ namespace RhuEngine.WorldObjects
 									((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[1] { obj });
 								}
 								else {
-									Log.Err($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
+									RLog.Err($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
 								}
 							}
 						}
@@ -72,16 +82,17 @@ namespace RhuEngine.WorldObjects
 					item.SetValue(this, instance);
 				}
 			}
+			StartTime.Value = DateTime.UtcNow;
 			if (isPersonalSpace | !networkedWorld) {
 				IsDeserializing = false;
-				IsLoadingNet = false;
 				AddLocalUser();
+				IsLoadingNet = false;
+				LoadMsg = "Done loading none networked world";
 			}
 		}
 
 
-		public enum FocusLevel
-		{
+		public enum FocusLevel {
 			Background,
 			Focused,
 			Overlay,
@@ -99,11 +110,15 @@ namespace RhuEngine.WorldObjects
 					_focus = value;
 					if (value == FocusLevel.Focused) {
 						if (worldManager.FocusedWorld != null) {
-							worldManager.FocusedWorld._focus = FocusLevel.Background;
+							worldManager.FocusedWorld.Focus = FocusLevel.Background;
 						}
 						worldManager.FocusedWorld = this;
 						if (GetLocalUser() is not null) {
 							GetLocalUser().isPresent.Value = true;
+						}
+						if (Engine.netApiManager.UserStatus is not null) {
+							Engine.netApiManager.UserStatus.CurrentSession = SessionID.Value;
+							Engine.netApiManager.UserStatus = Engine.netApiManager.UserStatus;
 						}
 					}
 					else {
@@ -116,26 +131,71 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 		}
-
+		[NoSync]
+		[NoSave]
+		[NoShow]
+		[UnExsposed]
+		[NoLoad]
+		public ScriptBuilder FocusedScriptBuilder = null;
 
 		[NoShow]
 		public Entity RootEntity;
 
 		[NoSync]
 		[NoSave]
+		[NoSyncUpdate]
 		public Sync<string> SessionID;
 
 		[NoSave]
 		[Default("New Session")]
-		[OnChanged(nameof(SessionNameChanged))]
+		[OnChanged(nameof(SessionInfoChanged))]
 		public Sync<string> SessionName;
+
+		[NoSave]
+		[Default("https://rhubarbvr.net/images/RhubarbVR2.png")]
+		[OnChanged(nameof(SessionInfoChanged))]
+		public Sync<string> ThumNail;
+
+		[NoSave]
+		[Default(false)]
+		[OnChanged(nameof(SessionInfoChanged))]
+		public Sync<bool> IsHidden;
+
+		[NoSave]
+		[Default(null)]
+		[OnChanged(nameof(SessionInfoChanged))]
+		public Sync<string> AssociatedGroup;
+
+		[NoSave]
+		[Default(SessionAccessLevel.Public)]
+		[OnChanged(nameof(SessionInfoChanged))]
+		public Sync<SessionAccessLevel> AccessLevel;
+
+		[NoSave]
+		[Default(30)]
+		[OnChanged(nameof(SessionInfoChanged))]
+		public Sync<int> MaxUserCount;
+
+		[NoSave]
+		[OnChanged(nameof(SessionInfoChanged))]
+		public SyncValueList<string> SessionTags;
+
+		[NoSave]
+		[OnChanged(nameof(SessionInfoChanged))]
+		public SyncValueList<string> Admins;
+
+		[NoSave]
+		public Sync<DateTime> StartTime;
+
+		public double WorldTime => (StartTime - DateTime.UtcNow).TotalSeconds;
 
 		[Default("New World")]
 		public Sync<string> WorldName;
-
+		[Exsposed]
 		public string WorldDebugName => $"{(IsPersonalSpace ? "P" : "")}{((worldManager.LocalWorld == this) ? "L" : "")} {SessionName.Value}";
 
 		private void UpdateFocus() {
+
 		}
 
 		/// <summary>
@@ -143,9 +203,13 @@ namespace RhuEngine.WorldObjects
 		/// </summary>
 		public float stepTime = 0f;
 
+		public object RenderLock = new();
+
 		public void Step() {
 			_netManager?.PollEvents();
 			_netManager?.NatPunchModule.PollEvents();
+			WorldThreadSafty.MethodCalls = 0;
+			UpdateCoroutine();
 			if (IsLoading | (_focus == FocusLevel.Background)) {
 				return;
 			}
@@ -155,8 +219,9 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			catch (Exception e) {
-				Log.Err($"Failed to update global stepables for session {WorldDebugName}. Error: {e}");
+				RLog.Err($"Failed to update global stepables for session {WorldDebugName}. Error: {e}");
 			}
+			PhysicsSim.UpdateSim(RTime.Elapsedf);
 			try {
 				var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
 											 group ent by ent.CachedDepth;
@@ -170,26 +235,32 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			catch (Exception e) {
-				Log.Err($"Failed to update entities for session {WorldDebugName}. Error: {e}");
+				RLog.Err($"Failed to update entities for session {WorldDebugName}. Error: {e}");
 			}
 
 			try {
-				foreach (var item in _renderingComponents) {
-					item.Render();
+				if (Engine.EngineLink.CanRender) {
+					lock (RenderLock) {
+						foreach (var item in _renderingComponents) {
+							item.Render();
+						}
+					}
 				}
 			}
 			catch (Exception e) {
-				Log.Err($"Failed to build render queue for session {WorldDebugName}. Error {e}");
+				RLog.Err($"Failed to build render queue for session {WorldDebugName}. Error {e}");
 			}
 		}
 
 		public bool IsDisposed { get; private set; }
+		public bool HasError { get; internal set; }
 
 		public void Dispose() {
 			if (IsDisposed) {
 				return;
 			}
 			IsDisposed = true;
+			assetSession.Dispose();
 			try {
 				worldManager.RemoveWorld(this);
 			}
@@ -206,14 +277,11 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			catch { }
-			try {
-				_client?.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None).Wait();
+			if (IsNetworked) {
+				if (!HasError) {
+					Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = SessionID.Value, RequestData = SessionID.Value, RequestType = RequestType.LeaveSession });
+				}
 			}
-			catch { }
-			try {
-				_client?.Dispose();
-			}
-			catch { }
 			try {
 				_netManager?.DisconnectAll();
 			}

@@ -1,7 +1,7 @@
 ﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using StereoKit;
+using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
@@ -9,16 +9,19 @@ namespace RhuEngine.Components
 	public class SoundSource : Component
 	{
 		[OnAssetLoaded(nameof(LoadAudio))]
-		public AssetRef<Sound> sound;
+		public AssetRef<RSound> sound;
 
 		[Default(1f)]
 		[OnChanged(nameof(ChangeVolume))]
 		public Sync<float> volume;
 
-		private SoundInst _soundInst;
+		private RSoundInst _soundInst;
 
 		public void LoadAudio() {
-			if (_soundInst.IsPlaying) {
+			if (!Engine.EngineLink.CanAudio) {
+				return;
+			}
+			if (_soundInst?.IsPlaying??false) {
 				_soundInst.Stop();
 			}
 			if (volume.Value > 0) {
@@ -29,7 +32,10 @@ namespace RhuEngine.Components
 		}
 
 		public void ChangeVolume() {
-			if (_soundInst.IsPlaying) {
+			if (!Engine.EngineLink.CanAudio) {
+				return;
+			}
+			if (_soundInst?.IsPlaying??false) {
 				_soundInst.Volume = volume.Value;
 				if (volume.Value <= 0) {
 					_soundInst.Stop();
@@ -44,12 +50,20 @@ namespace RhuEngine.Components
 			}
 		}
 
+		public override void Dispose() {
+			base.Dispose();
+			_soundInst?.Stop();
+		}
+
 		public override void OnLoaded() {
 			LoadAudio();
 		}
 
 		public override void Step() {
-			if (_soundInst.IsPlaying) {
+			if (!Engine.EngineLink.CanAudio) {
+				return;
+			}
+			if (_soundInst?.IsPlaying??false) {
 				_soundInst.Position = Entity.GlobalTrans.Translation;
 			}
 		}

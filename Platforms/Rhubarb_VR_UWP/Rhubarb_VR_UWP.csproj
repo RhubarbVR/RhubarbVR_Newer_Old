@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-		<AssemblyName>MilkSnake</AssemblyName>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-		<AssemblyName>RhubarbVR</AssemblyName>
-	</PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <AssemblyName>MilkSnake</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <AssemblyName>RhubarbVR</AssemblyName>
+  </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
@@ -97,8 +97,14 @@
   </ItemGroup>
   <!-- Copy assets, and build the app's shaders into the final app folder -->
   <ItemGroup>
+    <PackageReference Include="LibVLCSharp">
+      <Version>3.6.6</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.13" />
-    <PackageReference Include="StereoKit" Version="0.3.5-preview.6" />
+    <PackageReference Include="StereoKit" Version="0.3.6-preview.4" />
+    <PackageReference Include="VideoLAN.LibVLC.UWP">
+      <Version>3.3.2</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\" />
@@ -107,6 +113,10 @@
     <ProjectReference Include="..\..\RhuEngine\RhuEngine.csproj">
       <Project>{ba137c65-0c37-4bae-a892-437c0a24df63}</Project>
       <Name>RhuEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\RStereoKit\RStereoKit.csproj">
+      <Project>{7371625b-2753-4082-9191-f38d39acd942}</Project>
+      <Name>RStereoKit</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '16.0' ">

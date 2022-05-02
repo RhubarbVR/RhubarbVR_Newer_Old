@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Runtime;
 using Android.Views;
 using Android.Content;
@@ -8,11 +9,11 @@ using System;
 using Android.Graphics;
 using Java.Lang;
 using System.Threading.Tasks;
+using RhuEngine;
 using Android;
+using Android.Support.V4.Content;
 using Android.Support.V4.App;
-using AndroidX.AppCompat.App;
-using AndroidX.Core.Content;
-using AndroidX.Core.App;
+using RStereoKit;
 
 namespace RhuEngine
 {
@@ -54,34 +55,26 @@ namespace RhuEngine
 
 		static bool _running = false;
 		void Run(IntPtr activityHandle) {
-			if (_running) {
-				return;
-			}
+				if (_running) {
+					return;
+				}
 
-			_running = true;
-
-			Task.Run(() => {
-				// If the app has a constructor that takes a string array, then
-				// we'll use that, and pass the command line arguments into it on
-				// creation
-				var appType = typeof(Engine);
+				_running = true;
+			var runningtask = Task.Run(() => {
+				if ((ContextCompat.CheckSelfPermission(this, Manifest.Permission.RecordAudio) != Android.Content.PM.Permission.Granted) || (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != Android.Content.PM.Permission.Granted) || (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Android.Content.PM.Permission.Granted)) {
+					ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.RecordAudio, Manifest.Permission.WriteExternalStorage, Manifest.Permission.ReadExternalStorage }, 1);
+				}
 				var cap = new OutputCapture();
-				_app = appType.GetConstructor(new Type[] { typeof(string[]), typeof(OutputCapture) }) != null
-					? (Engine)Activator.CreateInstance(appType, new object[] { new string[0] { },cap })
-					: (Engine)Activator.CreateInstance(appType);
+				var skstereo = new RhuStereoKit();
+				_app = new Engine(skstereo,new string[] { "" }, cap, System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments));
 				if (_app == null) {
 					throw new System.Exception("StereoKit loader couldn't construct an instance of the App!");
 				}
 
 				// Initialize StereoKit, and the app
-				var settings = _app.Settings;
+				var settings = skstereo.Settings;
 				settings.androidActivity = activityHandle;
 				settings.assetsFolder = "";
-
-				// For requesting permission to use the Microphone
-				if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.RecordAudio) != Android.Content.PM.Permission.Granted) {
-					ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.RecordAudio }, 1);
-				}
 
 				if (!SK.Initialize(settings)) {
 					return;
@@ -92,6 +85,7 @@ namespace RhuEngine
 				// Now loop until finished, and then shut down
 				while (SK.Step(_app.Step)) { }
 				cap.DisableSingleString = true;
+				_app.IsCloseing = true;
 				_app.Dispose();
 				SK.Shutdown();
 

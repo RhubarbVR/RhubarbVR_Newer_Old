@@ -7,6 +7,8 @@ namespace RhuEngine.WorldObjects.ECS
 		[NoSave]
 		[NoShow]
 		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
 		public Entity Entity { get; private set; }
 
 		public override void OnInitialize() {
@@ -58,5 +60,9 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		public event Action OffsetChanged;
+
+		public void AddWorldCoroutine(Action action) {
+			World.AddCoroutine(action);
+		}
 	}
 }

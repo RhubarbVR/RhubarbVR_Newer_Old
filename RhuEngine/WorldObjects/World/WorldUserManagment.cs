@@ -1,6 +1,10 @@
-﻿using RhuEngine.Datatypes;
+﻿using System.Threading.Tasks;
 
-using StereoKit;
+using RhuEngine.Components;
+using RhuEngine.Datatypes;
+using RhuEngine.Linker;
+
+using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
@@ -23,31 +27,33 @@ namespace RhuEngine.WorldObjects
 		
 		private void LoadUserIn(Peer peer) {
 			if (peer.User is not null) {
-				Log.Info("Peer already has peer");
+				RLog.Info("Peer already has peer");
 			}
 			else {
 				var user = GetUserFromID(peer.UserID);
 				if (user == null) {
-					Log.Info("User built from peer");
+					RLog.Info($"User built from peer {Users.Count + 1}");
 					var userid = (ushort)(Users.Count + 1);
-					var pos = 176u;
+					var pos = 176u; 
 					user = Users.AddWithCustomRefIds(false, false, () => {
-						var netPointer = NetPointer.BuildID(pos, userid);
-						pos++;
-						return netPointer;
+						lock (_buildRefIDLock) {
+							var netPointer = NetPointer.BuildID(pos, userid);
+							pos++;
+							return netPointer;
+						}
 					});
 					user.userID.Value = peer.UserID;
 					user.CurrentPeer = peer;
 					peer.User = user;
 				}
 				else {
-					Log.Info("User found from peer");
+					RLog.Info($"User found from peer UserID:{peer.UserID}");
 					if (user.CurrentPeer == peer) {
-						Log.Info("Already bond to user");
+						RLog.Info("Already bond to user");
 						return;
 					}
 					if ((user.CurrentPeer?.NetPeer?.ConnectionState ?? LiteNetLib.ConnectionState.Disconnected) == LiteNetLib.ConnectionState.Connected) {
-						Log.Err("User already loaded can only join a world once");
+						RLog.Err("User already loaded can only join a world once");
 						peer.NetPeer.Disconnect();
 					}
 					else {
@@ -56,13 +62,72 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 		}
-
+		[Exsposed]
+		public User GetMasterUser() {
+			return Users[MasterUser];
+		}
+		[Exsposed]
 		public User GetHostUser() {
 			return Users[0];
 		}
-
+		[Exsposed]
 		public User GetLocalUser() {
-			return Users is null ? null : LocalUserID <= 0 ? null : (LocalUserID - 1) < Users.Count ? Users[Users.Count - LocalUserID] : null;
+			return Users is null ? null : LocalUserID <= 0 ? null : (LocalUserID - 1) < Users.Count ? Users[LocalUserID - 1] : null;
 		}
+		public void DrawDebugCube(Matrix matrix, Vector3f pos, Vector3d scale, Colorf colorf,float drawTime = 1) {
+			DrawDebugCube(matrix, pos, (Vector3f)scale, colorf, drawTime);
+		}
+		public void DrawDebugCube(Matrix matrix,Vector3f pos,Vector3f scale,Colorf colorf, float drawTime = 1) {
+			if (DebugVisuals) {
+				RWorld.ExecuteOnStartOfFrame(() => {
+					var mesh = RootEntity.GetFirstComponentOrAttach<TrivialBox3Mesh>();
+					var comp = RootEntity.GetFirstComponent<DynamicMaterial>();
+					if (comp is null) {
+						comp = RootEntity.AttachComponent<DynamicMaterial>();
+						comp.transparency.Value = Transparency.Blend;
+						comp.shader.Target = RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
+					}
+					var debugcube = RootEntity.AddChild("DebugCube");
+					var meshrender = debugcube.AttachComponent<MeshRender>();
+					meshrender.colorLinear.Value = colorf;
+					meshrender.materials.Add().Target = comp;
+					meshrender.mesh.Target = mesh;
+					meshrender.Entity.GlobalTrans = Matrix.TS(pos, scale * 2.01f) * matrix;
+					Task.Run(async () => {
+						await Task.Delay((int)(1000 * drawTime));
+						debugcube.Destroy();
+					});
+				});
+			}
+		}
+
+		public void DrawDebugSphere(Matrix matrix, Vector3f pos, Vector3d scale, Colorf colorf, float drawTime = 1) {
+			DrawDebugSphere(matrix, pos, (Vector3f)scale, colorf, drawTime);
+		}
+		private bool DebugVisuals => Engine.DebugVisuals;
+		public void DrawDebugSphere(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf, float drawTime = 1) {
+			if (DebugVisuals) {
+				RWorld.ExecuteOnStartOfFrame(() => {
+					var mesh = worldManager.PrivateOverlay.RootEntity.GetFirstComponentOrAttach<Sphere3NormalizedCubeMesh>();
+					var comp = worldManager.PrivateOverlay.RootEntity.GetFirstComponent<DynamicMaterial>();
+					if (comp is null) {
+						comp = worldManager.PrivateOverlay.RootEntity.AttachComponent<DynamicMaterial>();
+						comp.transparency.Value = Transparency.Blend;
+						comp.shader.Target = RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
+					}
+					var debugcube = worldManager.PrivateOverlay.RootEntity.AddChild("DebugCube");
+					var meshrender = debugcube.AttachComponent<MeshRender>();
+					meshrender.colorLinear.Value = colorf;
+					meshrender.materials.Add().Target = comp;
+					meshrender.mesh.Target = mesh;
+					meshrender.Entity.GlobalTrans = Matrix.TS(pos, scale * 2.01f) * matrix;
+					Task.Run(async () => {
+						await Task.Delay((int)(1000 * drawTime));
+						debugcube.Destroy();
+					});
+				});
+			}
+		}
+
 	}
 }

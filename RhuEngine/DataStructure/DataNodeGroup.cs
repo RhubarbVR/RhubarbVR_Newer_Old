@@ -3,6 +3,7 @@
 using MessagePack;
 
 using SharedModels;
+using SharedModels.GameSpecific;
 
 namespace RhuEngine.DataStructure
 {
@@ -23,7 +24,7 @@ namespace RhuEngine.DataStructure
 		}
 
 		public IDataNode GetValue(string key) {
-			return _nodeGroup.TryGetValue(key, out var value) ? value : default;
+			return _nodeGroup.TryGetValue(key, out var value) ? value : null;
 		}
 
 		public T GetValue<T>(string key) {
@@ -49,6 +50,10 @@ namespace RhuEngine.DataStructure
 				throw new System.Exception("Data is null");
 			}
 			SetByteArray(data);
+		}
+
+		public DataNodeGroup(Dictionary<string, IDataNode> data) {
+			_nodeGroup = data;
 		}
 	}
 }

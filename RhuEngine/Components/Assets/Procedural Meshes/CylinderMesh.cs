@@ -1,41 +1,92 @@
 ﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
-
-using StereoKit;
+using RhuEngine.Linker;
+using RNumerics;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
 	public class CylinderMesh : ProceduralMesh
 	{
-		[OnChanged(nameof(LoadMesh))]
-		[Default(1f)]
-		public Sync<float> depth;
 
+		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		[Default(1f)]
-		public Sync<float> diameter;
-
+		public Sync<float> BaseRadius;
+		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
+		public Sync<float> TopRadius;
+		[Default(1.0f)]
+		[OnChanged(nameof(LoadMesh))]
+		public Sync<float> Height;
+		[Default(0.0f)]
+		[OnChanged(nameof(LoadMesh))]
+		public Sync<float> StartAngleDeg;
+		[Default(360.0f)]
+		[OnChanged(nameof(LoadMesh))]
+		public Sync<float> EndAngleDeg;
 		[Default(16)]
-		public Sync<int> subdivisions;
-
-
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vec3> direction;
+		public Sync<int> Slices;
+		[Default(true)]
+		[OnChanged(nameof(LoadMesh))]
+		public Sync<bool> HasCaps;
+		[Default(false)]
+		[OnChanged(nameof(LoadMesh))]
+		public Sync<bool> Clockwise;
+
+		[Default(true)]
+		[OnChanged(nameof(LoadMesh))]
+		public Sync<bool> NoSharedVertices;
+		[Default(true)]
+		[OnChanged(nameof(LoadMesh))]
+		public Sync<bool> WantUVs;
+		[Default(true)]
+		[OnChanged(nameof(LoadMesh))]
+		public Sync<bool> WantNormals;
 
 		public override void FirstCreation() {
 			base.FirstCreation();
-			direction.Value = Vec3.Forward;
+
 		}
 
-		private void LoadMesh() {
-			Load(Mesh.GenerateCylinder(diameter.Value, depth.Value, direction.Value));
-		}
-
-		public override void OnLoaded() {
-			base.OnLoaded();
-			LoadMesh();
+		public override void ComputeMesh() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
+			if (HasCaps.Value) 
+			{
+				var mesh = new CappedCylinderGenerator {
+					BaseRadius = BaseRadius,
+					Height = Height,
+					StartAngleDeg = StartAngleDeg,
+					EndAngleDeg = EndAngleDeg,
+					TopRadius = TopRadius,
+					Slices = Slices,
+					NoSharedVertices = NoSharedVertices.Value,
+					WantUVs = WantUVs,
+					WantNormals = WantNormals,
+					Clockwise = Clockwise,
+				};
+				mesh.Generate();
+				GenMesh(mesh.MakeSimpleMesh());
+			}
+			else 
+			{
+				var mesh = new OpenCylinderGenerator {
+					BaseRadius = BaseRadius,
+					Height = Height,
+					StartAngleDeg = StartAngleDeg,
+					EndAngleDeg = EndAngleDeg,
+					TopRadius = TopRadius,
+					Slices = Slices,
+					NoSharedVertices = NoSharedVertices.Value,
+					WantUVs = WantUVs,
+					WantNormals = WantNormals,
+					Clockwise = Clockwise,
+				};
+				mesh.Generate();
+				GenMesh(mesh.MakeSimpleMesh());
+			}
 		}
 	}
 }
