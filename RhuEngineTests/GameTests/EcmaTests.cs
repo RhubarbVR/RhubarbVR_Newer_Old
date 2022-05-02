@@ -286,22 +286,25 @@ function dwad daw da
 			script.Functions.RemoveAtIndex(0);
 			var value = script.Entity.AttachComponent<ValueField<int>>();
 			script.Targets.Add().Target = value;
-			script.Script.Value = @"
-				
-			";
+			var scriptcode = "";
+			RLog.Info("adding functions");
 			for (var i = 0; i < functionAmount; i++) {
 				var func = script.Functions.Add();
 				func.FunctionName.Value = $"FunctionNum{i}";
-				script.Script.Value += $"\nfunction FunctionNum{i}() {{ script.GetTarget(0).Value.Value = {i};  }}";
+				scriptcode += $"\nfunction FunctionNum{i}() {{ script.GetTarget(0).Value.Value = {i};  }}";
 			}
+			RLog.Info("loading script");
+			script.Script.Value = scriptcode;
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script loaded");
 			}
-			
+			RLog.Info("Running function Invoke tests");
 			for (var i = 0; i < functionAmount; i++) {
-				script.Functions.GetValue(i).Invoke();
+				script.Functions.GetValue(i).Invoke();	
 				Assert.AreEqual(i, value.Value.Value);
 			}
+
+			RLog.Info("Running script Invoke tests");
 			for (var i = 0; i < functionAmount; i++) {
 				script.Invoke($"FunctionNum{i}");
 				Assert.AreEqual(i, value.Value.Value);

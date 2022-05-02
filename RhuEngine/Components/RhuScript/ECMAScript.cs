@@ -23,12 +23,12 @@ namespace RhuEngine.Components
 
 			[Exsposed]
 			public void Invoke() {
-				((ECMAScript)Parent.Parent).RunCode(FunctionName);
+				((ECMAScript)Parent.Parent).RunCode(FunctionName.Value);
 			}
 
 			[Exsposed]
 			public void Invoke(params object[] prams) {
-				((ECMAScript)Parent.Parent).RunCode(FunctionName, prams);
+				((ECMAScript)Parent.Parent).RunCode(FunctionName.Value, prams);
 			}
 		}
 
