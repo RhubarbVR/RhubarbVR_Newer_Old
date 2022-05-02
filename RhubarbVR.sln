@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Other", "Other", "{0CECEEEE
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		.github\workflows\BuildAndRunTests.yml = .github\workflows\BuildAndRunTests.yml
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
@@ -41,7 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Physics", "Physics", "{6C72
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RBullet", "RBullet\RBullet.csproj", "{25536488-D768-44B0-A9E0-2AF92400E291}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NullContext", "NullContext\NullContext.csproj", "{0C09F210-19E8-447B-9AA9-62543FF90324}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NullContext", "NullContext\NullContext.csproj", "{0C09F210-19E8-447B-9AA9-62543FF90324}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

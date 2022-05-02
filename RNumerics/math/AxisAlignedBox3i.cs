@@ -9,9 +9,9 @@ namespace RNumerics
 	public struct AxisAlignedBox3i : IComparable<AxisAlignedBox3i>, IEquatable<AxisAlignedBox3i>
 	{
 		[Key(0)]
-		public Vector3i Min;
+		public Vector3i Min = new Vector3i(int.MaxValue, int.MaxValue, int.MaxValue);
 		[Key(1)]
-		public Vector3i Max;
+		public Vector3i Max = new Vector3i(int.MinValue, int.MinValue, int.MinValue);
 
 		[IgnoreMember]
 		public static readonly AxisAlignedBox3i Empty = new();
@@ -23,11 +23,6 @@ namespace RNumerics
 		public static readonly AxisAlignedBox3i Infinite =
 			new(int.MinValue, int.MinValue, int.MinValue, int.MaxValue, int.MaxValue, int.MaxValue);
 
-
-		public AxisAlignedBox3i() {
-			Min = new Vector3i(int.MaxValue, int.MaxValue, int.MaxValue);
-			Max = new Vector3i(int.MinValue, int.MinValue, int.MinValue);
-		}
 
 		public AxisAlignedBox3i(int xmin, int ymin, int zmin, int xmax, int ymax, int zmax) {
 			Min = new Vector3i(xmin, ymin, zmin);

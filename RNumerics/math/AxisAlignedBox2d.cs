@@ -8,9 +8,9 @@ namespace RNumerics
 	public struct AxisAlignedBox2d
 	{
 		[Key(0)]
-		public Vector2d Min;
+		public Vector2d Min = new Vector2d(double.MaxValue, double.MaxValue);
 		[Key(1)]
-		public Vector2d Max;
+		public Vector2d Max = new Vector2d(double.MinValue, double.MinValue);
 		[IgnoreMember]
 		public static readonly AxisAlignedBox2d Empty = new();
 		[IgnoreMember]
@@ -19,12 +19,6 @@ namespace RNumerics
 		public static readonly AxisAlignedBox2d UnitPositive = new(1);
 		[IgnoreMember]
 		public static readonly AxisAlignedBox2d Infinite = new(double.MinValue, double.MinValue, double.MaxValue, double.MaxValue);
-
-
-		public AxisAlignedBox2d() {
-			Min = new Vector2d(double.MaxValue, double.MaxValue);
-			Max = new Vector2d(double.MinValue, double.MinValue);
-		}
 
 		public AxisAlignedBox2d(double xmin, double ymin, double xmax, double ymax) {
 			Min = new Vector2d(xmin, ymin);
