@@ -65,7 +65,12 @@ namespace RhuEngine.Components
 				if (WorldThreadSafty.MethodCalls > 3) {
 					throw new StackOverflowException();
 				}
-				_ecma?.Invoke(function, values);
+				if (values is null) {
+					_ecma.GetValue(function).Call();
+				}
+				else {
+					_ecma?.Invoke(function, values);
+				}
 				WorldThreadSafty.MethodCalls--;
 			}
 			catch (StackOverflowException) {
