@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 {
 	public class ECMAScript : Component
 	{
-		public class ECMAScriptFunction:SyncObject
+		public class ECMAScriptFunction : SyncObject
 		{
 			[Default("RunCode")]
 			public readonly Sync<string> FunctionName;
@@ -50,17 +50,17 @@ namespace RhuEngine.Components
 		}
 		")]
 		[OnChanged(nameof(InitECMA))]
-		public readonly Sync<string> Script; 
+		public readonly Sync<string> Script;
 
 		private Jint.Engine _ecma;
-		
+
 		[Exsposed]
 		public void Invoke(string function, params object[] values) {
 			RunCode(function, values);
 		}
 
 
-		private void RunCode(string function,params object[] values) {
+		private void RunCode(string function, params object[] values) {
 			try {
 				WorldThreadSafty.MethodCalls++;
 				if (WorldThreadSafty.MethodCalls > WorldThreadSafty.MaxCalls) {
@@ -92,37 +92,33 @@ namespace RhuEngine.Components
 
 
 		private void InitECMA() {
-			var thread = new Thread(() => {
-				_ecma = new Jint.Engine(options => {
-					options.LimitMemory(1_000_000); // alocate 1 MB
-					options.TimeoutInterval(TimeSpan.FromSeconds(1));
-					options.MaxStatements(1000);
-					options.SetTypeResolver(new TypeResolver {
-						MemberFilter = member => Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()),
-					});
-					options.Strict = true;
+			_ecma = new Jint.Engine(options => {
+				options.LimitMemory(1_000_000); // alocate 1 MB
+				options.TimeoutInterval(TimeSpan.FromSeconds(1));
+				options.MaxStatements(1000);
+				options.SetTypeResolver(new TypeResolver {
+					MemberFilter = member => Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()),
 				});
-				_ecma.ResetCallStack();
-				_ecma.SetValue("script", this);
-				_ecma.SetValue("entity", Entity);
-				_ecma.SetValue("world", World);
-				_ecma.SetValue("localUser", LocalUser);
-				_ecma.SetValue("log", new Action<string>(RLog.Info));
-				_ecma.SetValue("getType", (string a) => Type.GetType(a, false, true));
-				_ecma.SetValue("typeOf", (object a) => a?.GetType());
-				_ecma.SetValue("toString", new Func<object, string>((object a) => (a.GetType() == typeof(Type)) ? ((Type)a).GetFormattedName() : a?.ToString()));
-				try {
-					_ecma.Execute(Script.Value);
-
-				}
-				catch (Exception ex) {
-					_ecma = null;
-					WorldThreadSafty.MethodCalls = 0;
-					RLog.Err("Script Err " + ex.ToString());
-				}
+				options.Strict = true;
 			});
-			thread.Start();
-			thread.Join();
+			_ecma.ResetCallStack();
+			_ecma.SetValue("script", this);
+			_ecma.SetValue("entity", Entity);
+			_ecma.SetValue("world", World);
+			_ecma.SetValue("localUser", LocalUser);
+			_ecma.SetValue("log", new Action<string>(RLog.Info));
+			_ecma.SetValue("getType", (string a) => Type.GetType(a, false, true));
+			_ecma.SetValue("typeOf", (object a) => a?.GetType());
+			_ecma.SetValue("toString", new Func<object, string>((object a) => (a.GetType() == typeof(Type)) ? ((Type)a).GetFormattedName() : a?.ToString()));
+			try {
+				_ecma.Execute(Script.Value);
+
+			}
+			catch (Exception ex) {
+				_ecma = null;
+				WorldThreadSafty.MethodCalls = 0;
+				RLog.Err("Script Err " + ex.ToString());
+			}
 		}
 
 		public override void OnLoaded() {
