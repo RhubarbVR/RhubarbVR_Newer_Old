@@ -46,10 +46,12 @@ namespace RhuEngine.WorldObjects
 		public bool NoSync { get; set; }
 
 		private readonly object _locker = new();
-		public void RemoveAtIndex(int index) {
+		public void DisposeAtIndex(int index) {
+			_syncObjects[index].Dispose();
+		}
+		public void DestroyAtIndex(int index) {
 			_syncObjects[index].Destroy();
 		}
-
 		public virtual void OnAddedElement(T element) {
 
 		}

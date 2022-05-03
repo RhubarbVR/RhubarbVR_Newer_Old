@@ -138,43 +138,43 @@ namespace RhuEngine.Components
 							switch (item.type) {
 								case MaterialParam.Float:
 									if (pram.GetType() != typeof(ValuePramInfo<float>)) {
-										Prams.RemoveAtIndex(index);
+										Prams.DisposeAtIndex(index);
 										pram = null;
 									}
 									break;
 								case MaterialParam.Color128:
 									if (pram.GetType() != typeof(ValuePramInfo<Colorb>)) {
-										Prams.RemoveAtIndex(index);
+										Prams.DisposeAtIndex(index);
 										pram = null;
 									}
 									break;
 								case MaterialParam.Vector4:
 									if (pram.GetType() != typeof(ValuePramInfo<Vector4f>)) {
-										Prams.RemoveAtIndex(index);
+										Prams.DisposeAtIndex(index);
 										pram = null;
 									}
 									break;
 								case MaterialParam.Vector3:
 									if (pram.GetType() != typeof(ValuePramInfo<Vector3f>)) {
-										Prams.RemoveAtIndex(index);
+										Prams.DisposeAtIndex(index);
 										pram = null;
 									}
 									break;
 								case MaterialParam.Vector2:
 									if (pram.GetType() != typeof(ValuePramInfo<Vector2f>)) {
-										Prams.RemoveAtIndex(index);
+										Prams.DisposeAtIndex(index);
 										pram = null;
 									}
 									break;
 								case MaterialParam.Matrix:
 									if (pram.GetType() != typeof(ValuePramInfo<Matrix>)) {
-										Prams.RemoveAtIndex(index);
+										Prams.DisposeAtIndex(index);
 										pram = null;
 									}
 									break;
 								case MaterialParam.Texture:
 									if (pram.GetType() != typeof(TexPramInfo)) {
-										Prams.RemoveAtIndex(index);
+										Prams.DisposeAtIndex(index);
 										pram = null;
 									}
 									break;

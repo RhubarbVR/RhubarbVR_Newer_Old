@@ -77,9 +77,12 @@ namespace RhuEngine.WorldObjects
 		public event Action<object> OnDispose;
 
 		public virtual void Destroy() {
+			if (IsDestroying) {
+				return;
+			}
+			IsDestroying = true;
 			Task.Run(() => {
 				try {
-					IsDestroying = true;
 					Dispose();
 				}
 				catch (Exception e) {

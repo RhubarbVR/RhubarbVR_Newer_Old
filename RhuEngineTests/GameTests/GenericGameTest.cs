@@ -59,6 +59,7 @@ namespace RhuEngine.GameTests.Tests
 			StartNewTestWorld();
 			tester.Dispose();
 		}
+
 		[TestMethod()]
 		public void AttachEntityTest() {
 			AttachEntity();
@@ -186,6 +187,29 @@ namespace RhuEngine.GameTests.Tests
 			tester.RunForSteps();
 			tester.Dispose();
 		}
+
+		[TestMethod()]
+		public void TestSyncList() {
+			var testEntity = AttachEntity();
+			var synclist = testEntity.AttachComponent<TestSyncObject<SyncObjList<Sync<float>>>>();
+			synclist.SyncObject.Add();
+			synclist.SyncObject.Add();
+			synclist.SyncObject.Add();
+			synclist.SyncObject.Add();
+			synclist.SyncObject.Add();
+			synclist.SyncObject.Add();
+			synclist.SyncObject.Add();
+			synclist.SyncObject.Add();
+			synclist.SyncObject.Add();
+			synclist.SyncObject.Add();
+			synclist.SyncObject.DisposeAtIndex(0);
+			synclist.SyncObject.DisposeAtIndex(0);
+			synclist.SyncObject.DisposeAtIndex(0);
+			Assert.AreEqual(7, synclist.SyncObject.Count);
+			tester.RunForSteps();
+			tester.Dispose();
+		}
+
 
 		[TestMethod()]
 		public void TestAllComponents() {

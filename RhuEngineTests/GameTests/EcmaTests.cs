@@ -283,7 +283,7 @@ function dwad daw da
 		public void TestMultipleFunctions() {
 			var script = AttachTestScript();
 			var functionAmount = 25;
-			script.Functions.RemoveAtIndex(0);
+			script.Functions.DisposeAtIndex(0);
 			var value = script.Entity.AttachComponent<ValueField<int>>();
 			script.Targets.Add().Target = value;
 			var scriptcode = "";
