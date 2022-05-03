@@ -72,6 +72,24 @@ namespace RhuEngine.GameTests.Tests
 			Assert.AreEqual(null, value.Value.Value);
 			tester.Dispose();
 		}
+		[TestMethod()]
+		public void TestUnexposed() {
+			var script = AttachTestScript();
+			var value = script.Entity.AttachComponent<ValueField<string>>();
+			value.Value.Value = "FirstValue";
+			script.Targets.Add().Target = value;
+			script.Script.Value = @"
+				function RunCode()	{
+					script.GetTarget(0).Value.Value = world.FocusedScriptBuilder;
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(null, value.Value.Value);
+			tester.Dispose();
+		}
 
 		[TestMethod()]
 		public void TestRemoveOfValue() {
@@ -150,9 +168,9 @@ namespace RhuEngine.GameTests.Tests
 			script.Script.Value = @"
 				function RunCode()	{
 					script.Entity.AddChild(""IHaveAName"");
-					script.Entity.AddChild(""IHaveAName"");
-					script.Entity.AddChild(""IHaveAName"");
-					script.Entity.AddChild(""IHaveAName"");
+					script.Entity.AddChild(""IalsoHaveName"");
+					script.Entity.AddChild(""IHaveAnotherName"");
+					script.Entity.AddChild(""i like trains"");
 				}
 			";
 			if (!script.ScriptLoaded) {
