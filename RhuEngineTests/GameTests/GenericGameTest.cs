@@ -33,6 +33,7 @@ namespace RhuEngine.GameTests.Tests
 			tester = new GenericGameTester();
 			tester.Start(Array.Empty<string>());
 			tester.RunForSteps(20);
+			tester.app.startingthread.Join();
 			tester.Dispose();
 		}
 
@@ -40,6 +41,7 @@ namespace RhuEngine.GameTests.Tests
 			tester = new GenericGameTester();
 			tester.Start(Array.Empty<string>());
 			tester.RunForSteps(5);
+			tester.app.startingthread.Join();
 		}
 		public World StartNewTestWorld() {
 			SetUpForNormalTest();

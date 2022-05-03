@@ -177,7 +177,7 @@ namespace RhuEngine
 
 		public RMaterial LoadingLogo = null;
 
-
+		public Thread startingthread;
 		public void Init() {
 			EngineLink.Start();
 			IntMsg = $"Engine started Can Render {EngineLink.CanRender} Can Audio {EngineLink.CanAudio} Can input {EngineLink.CanInput}";
@@ -187,7 +187,7 @@ namespace RhuEngine
 				LoadingLogo = new RMaterial(RShader.UnlitClip);
 				LoadingLogo["diffuse"] = staticResources.RhubarbLogoV2;
 			}
-			var startingthread = new Thread(() => {
+			startingthread = new Thread(() => {
 				IntMsg = "Building NetApiManager";
 				netApiManager = new NetApiManager(_userDataPathOverRide);
 				IntMsg = "Building AssetManager";
