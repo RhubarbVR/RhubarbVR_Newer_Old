@@ -72,6 +72,82 @@ namespace RhuEngine.GameTests.Tests
 			Assert.AreEqual(null, value.Value.Value);
 			tester.Dispose();
 		}
+
+		public class TestComp : Component
+		{
+			public bool IShowFail = false;
+
+			public void IfIrunICrash() {
+				IShowFail = true;
+				RLog.Err("This should NeverHappen");
+				throw new Exception();
+			}
+			public World IfIrunIAlsoRunICrash() {
+				IShowFail = true;
+				RLog.Err("This should NeverHappen");
+				throw new Exception();
+			}
+
+			public bool IGoTrue = false;
+			[Exsposed]
+			public void IfIrunISetValueToTrue() {
+				RLog.Err("I Ran Value Change");
+				IGoTrue = true;
+			}
+		}
+		[TestMethod()]
+		public void TestNormalFunctionHiding() {
+			var script = AttachTestScript();
+			var value = script.Entity.AttachComponent<TestComp>();
+			script.Targets.Add().Target = value;
+			script.Script.Value = @"
+				function RunCode()	{
+					script.GetTarget(0).IfIrunICrash();
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(false, value.IShowFail);
+			tester.Dispose();
+		}
+
+		[TestMethod()]
+		public void TestSyncHideFunctionHiding() {
+			var script = AttachTestScript();
+			var value = script.Entity.AttachComponent<TestComp>();
+			script.Targets.Add().Target = value;
+			script.Script.Value = @"
+				function RunCode()	{
+					script.GetTarget(0).IfIrunIAlsoRunICrash();
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(false, value.IShowFail);
+			tester.Dispose();
+		}
+
+		[TestMethod()]
+		public void TestFunctionShowing() {
+			var script = AttachTestScript();
+			var value = script.Entity.AttachComponent<TestComp>();
+			script.Targets.Add().Target = value;
+			script.Script.Value = @"
+				function RunCode()	{
+					script.GetTarget(0).IfIrunISetValueToTrue();
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(true, value.IGoTrue);
+			tester.Dispose();
+		}
 #if DEBUG
 		[TestMethod()]
 		public void TestUnexposed() {
