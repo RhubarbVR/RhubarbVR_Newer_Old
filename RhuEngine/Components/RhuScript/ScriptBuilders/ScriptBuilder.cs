@@ -10,6 +10,32 @@ using System.Linq;
 
 namespace RhuEngine.Components
 {
+#if DEBUG
+	[Category(new string[] { "RhuScript\\ScriptBuilders" })]
+	public class NullScriptBuilder : ScriptBuilder
+	{
+		public override void Compile() {
+		}
+
+		public override void LoadFromScript() {
+		}
+
+		public override void OnClearError() {
+		}
+
+		public override void OnError() {
+		}
+
+		public override void OnGainFocus() {
+		}
+
+		public override void OnLostFocus() {
+		}
+
+		public override void OnRhuScriptAdded() {
+		}
+	}
+#endif
 	[Category(new string[] { "RhuScript\\ScriptBuilders" })]
 	public abstract class ScriptBuilder : Component
 	{

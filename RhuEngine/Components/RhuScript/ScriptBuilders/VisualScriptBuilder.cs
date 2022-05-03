@@ -37,7 +37,7 @@
 
 //		public override void OnError() {
 //			foreach (SyncRef<Node> item in nodes) {
-//				if(item.Target is not null) {
+//				if (item.Target is not null) {
 //					item.Target.OnErrorInt();
 //				}
 //			}
@@ -87,7 +87,7 @@
 //		}
 //		[Exsposed]
 //		public void SpawnNode(byte[] node) {
-//			if (!Serializer.TryToRead<IScriptNode>(node,out var scriptNode)) {
+//			if (!Serializer.TryToRead<IScriptNode>(node, out var scriptNode)) {
 //				RLog.Info("Failed to Spawned Node ");
 //				return;
 //			}
@@ -105,7 +105,7 @@
 //				nodes.AddRange(ScriptNodeBuidlers.GetNodeFieldsWrite(InputType.Value));
 //			}
 //			nodes.AddRange(ScriptNodeBuidlers.GetScriptNodes());
-//			if(OutPutType.Value is null) {
+//			if (OutPutType.Value is null) {
 //				LoadNodeListSelectList(nodes);
 //			}
 //			else {
@@ -117,7 +117,7 @@
 //		}
 
 //		public void LoadNodeListSelectList(IEnumerable<IScriptNode> scriptNodes) {
-//			if(NodesGroup.Target is null) {
+//			if (NodesGroup.Target is null) {
 //				return;
 //			}
 //			RLog.Info($"Loading node list with {scriptNodes.Count()} Nodes");
@@ -180,22 +180,22 @@
 //			public bool Flow = true;
 //		}
 
-//		private T SpawnNode<T>()where T : Node,new() {
+//		private T SpawnNode<T>() where T : Node, new() {
 //			var entity = Entity.AddChild(typeof(T).GetFormattedName());
-//			entity.GlobalTrans = Matrix.TS(new Vector3f(-0.05f, 0.05f, -0.035f),new Vector3f(1.5f)) * (EditWindow.Target?.Entity.GlobalTrans ?? Matrix.Identity);
+//			entity.GlobalTrans = Matrix.TS(new Vector3f(-0.05f, 0.05f, -0.035f), new Vector3f(1.5f)) * (EditWindow.Target?.Entity.GlobalTrans ?? Matrix.Identity);
 //			var ret = entity.AttachComponent<T>((node) => node.VScriptBuilder.Target = this);
 //			nodes.Add().Target = ret;
 //			return ret;
 //		}
 
-//		private void Poser(Entity target,NodeBuilder Builder,string text) {
+//		private void Poser(Entity target, NodeBuilder Builder, string text) {
 //			if (Builder.LastInputPoint is null) {
 //				Builder.pos -= new Vector3f(0.2f, 0, 0);
 //				var textsize = RText.Size(text).x;
 //				target.GlobalTrans = Matrix.T(Builder.pos - new Vector3f(textsize / 1.9f, 0, 0)) * Builder.RootPos;
 //			}
 //			else {
-//				if(!Builder.Flow) {
+//				if (!Builder.Flow) {
 //					Builder.pos += new Vector3f(0.2f, 0.15f, 0);
 //					var textsize = RText.Size(text).x;
 //					target.GlobalTrans = Matrix.T(Builder.pos + new Vector3f(textsize / 1.9f, 0, 0)) * Builder.RootPos;
@@ -212,7 +212,8 @@
 //			if (node is null) {
 //				return;
 //			}
-//			if(Builder is null) {;
+//			if (Builder is null) {
+//				;
 //				Builder = new NodeBuilder {
 //					node = SpawnNode<InitNode>(),
 //				};
@@ -221,7 +222,7 @@
 //			}
 //			Builder.LastNode = Builder.CurrentNode;
 //			Builder.CurrentNode = node;
-			
+
 //			if (node is ScriptNodeMethod scriptNodeMethod) {
 //				var spawnNode = SpawnNode<MethodNode>();
 //				Poser(spawnNode.Entity, Builder, scriptNodeMethod.Method);
@@ -235,7 +236,7 @@
 //				Builder.LastCompNode = spawnNode;
 //			}
 //			else if (node is ScriptNodeGroup scriptNodeGroup) {
-		
+
 //			}
 //			else if (node is ScriptNodeWorld scriptNodeWorld) {
 //				var spawnNode = SpawnNode<NodeWorld>();

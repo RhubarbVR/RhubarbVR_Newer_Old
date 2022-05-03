@@ -72,9 +72,11 @@ namespace RhuEngine.GameTests.Tests
 			Assert.AreEqual(null, value.Value.Value);
 			tester.Dispose();
 		}
+#if DEBUG
 		[TestMethod()]
 		public void TestUnexposed() {
 			var script = AttachTestScript();
+			script.World.FocusedScriptBuilder = script.Entity.AttachComponent<NullScriptBuilder>();
 			var value = script.Entity.AttachComponent<ValueField<string>>();
 			value.Value.Value = "FirstValue";
 			script.Targets.Add().Target = value;
@@ -90,7 +92,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.AreEqual(null, value.Value.Value);
 			tester.Dispose();
 		}
-
+#endif
 		[TestMethod()]
 		public void TestRemoveOfValue() {
 			var script = AttachTestScript();

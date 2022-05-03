@@ -97,7 +97,7 @@ namespace RhuEngine.Components
 				options.TimeoutInterval(TimeSpan.FromSeconds(1));
 				options.MaxStatements(1000);
 				options.SetTypeResolver(new TypeResolver {
-					MemberFilter = member => Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()),
+					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()))&& !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
 				});
 				options.Strict = true;
 			});
