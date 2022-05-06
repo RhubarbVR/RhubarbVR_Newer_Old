@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 
 using RhuEngine.Physics;
+using BulletSharp;
 
 namespace RBullet
 {   /// <summary>
@@ -43,7 +44,6 @@ namespace RBullet
 			if (_loaded) {
 				return true;
 			}
-
 			// Android uses a different strategy for linking the DLL
 			if (AndroidTest.Check()) {
 				return true;
@@ -55,6 +55,7 @@ namespace RBullet
 			_loaded = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
 				? LoadWindows(arch)
 				: LoadUnix(arch);
+
 			return _loaded;
 		}
 
@@ -78,7 +79,9 @@ namespace RBullet
 	public class BulletPhsyicsLink: PhysicsHelper.Physics<BulletRigidBodyCollider, BulletPhysicsSim, BulletColliderShape>
     {
 		public BulletPhsyicsLink() {
-			NativeLib.Load();
+			if (!NativeLib.Load()) {
+				throw new Exception("Failed level");
+			}
 		}
 
 	}

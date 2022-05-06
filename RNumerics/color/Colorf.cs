@@ -109,7 +109,7 @@ namespace RNumerics
 				}
 				return GetStaticColor((Colors)Enum.Parse(typeof(Colors), colorString, true));
 			}
-			catch (Exception e) {
+			catch {
 				return White;
 			}
 		}

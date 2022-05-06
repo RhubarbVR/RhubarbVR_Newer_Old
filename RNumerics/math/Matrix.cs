@@ -402,5 +402,13 @@ namespace RNumerics
 		public static Matrix Orthographic(float width, float height, float nearClip, float farClip) {
 			return Matrix4x4.CreateOrthographic(width, height, nearClip, farClip);
 		}
+
+		public override bool Equals(object obj) {
+			return obj is Matrix matrix && matrix == this;
+		}
+
+		public override int GetHashCode() {
+			return m.GetHashCode();
+		}
 	}
 }

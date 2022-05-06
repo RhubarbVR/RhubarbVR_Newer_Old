@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using RhuEngine.Physics;
 using MessagePack;
 using MessagePack.Resolvers;
 
@@ -208,6 +208,41 @@ namespace RhuEngine.GameTests.Tests
 			synclist.SyncObject.DisposeAtIndex(0);
 			synclist.SyncObject.DisposeAtIndex(0);
 			Assert.AreEqual(7, synclist.SyncObject.Count);
+			tester.RunForSteps();
+			tester.Dispose();
+		}
+		[TestMethod]
+		public void ConvexRayTest() {
+			var testWorld = StartNewTestWorld();
+			var box = new RBoxShape(0.5f);
+			var collider = box.GetCollider(testWorld.PhysicsSim);
+			collider.Matrix = Matrix.TS(Vector3f.Zero,1);
+			collider.CustomObject = "Trains";
+			var pointworld = Vector3f.AxisX * -5;
+			var OuterPoint = Vector3f.AxisX * 5;
+			tester.RunForSteps();
+			var outer = Matrix.T(OuterPoint);
+			var startpoint = Matrix.T(pointworld);
+			var hashit = testWorld.PhysicsSim.ConvexRayTest(box,ref startpoint, ref outer, out var hitcollider,out var hitnorm,out var worldhit);
+			Assert.IsTrue(hashit);
+			Assert.AreEqual("Trains", hitcollider.CustomObject);
+			tester.RunForSteps();
+			tester.Dispose();
+		}
+
+		[TestMethod]
+		public void RayTest() {
+			var testWorld = StartNewTestWorld();
+			var box = new RBoxShape(0.5f);
+			var collider = box.GetCollider(testWorld.PhysicsSim);
+			collider.Matrix = Matrix.TS(Vector3f.Zero, 1);
+			collider.CustomObject = "Trains";
+			var pointworld = Vector3f.AxisX * -5;
+			var OuterPoint = Vector3f.AxisX * 5;
+			tester.RunForSteps();
+			var hashit = testWorld.PhysicsSim.RayTest(ref pointworld, ref OuterPoint, out var hitcollider, out var hitnorm, out var worldhit);
+			Assert.IsTrue(hashit);
+			Assert.AreEqual("Trains", hitcollider.CustomObject);
 			tester.RunForSteps();
 			tester.Dispose();
 		}

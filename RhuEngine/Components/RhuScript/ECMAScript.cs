@@ -95,7 +95,7 @@ namespace RhuEngine.Components
 			_ecma = new Jint.Engine(options => {
 				options.LimitMemory(1_000_000); // alocate 1 MB
 				options.TimeoutInterval(TimeSpan.FromSeconds(1));
-				options.MaxStatements(1000);
+				options.MaxStatements(1580);
 				options.SetTypeResolver(new TypeResolver {
 					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()))&& !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
 				});
