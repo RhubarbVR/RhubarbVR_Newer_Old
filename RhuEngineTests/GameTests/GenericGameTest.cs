@@ -215,9 +215,7 @@ namespace RhuEngine.GameTests.Tests
 		public void ConvexRayTest() {
 			var testWorld = StartNewTestWorld();
 			var box = new RBoxShape(0.5f);
-			var collider = box.GetCollider(testWorld.PhysicsSim);
-			collider.Matrix = Matrix.TS(Vector3f.Zero,1);
-			collider.CustomObject = "Trains";
+			var collider = box.GetCollider(testWorld.PhysicsSim, Matrix.TS(Vector3f.Zero, 1), "Trains");
 			var pointworld = Vector3f.AxisX * -5;
 			var OuterPoint = Vector3f.AxisX * 5;
 			tester.RunForSteps();
@@ -234,9 +232,7 @@ namespace RhuEngine.GameTests.Tests
 		public void RayTest() {
 			var testWorld = StartNewTestWorld();
 			var box = new RBoxShape(0.5f);
-			var collider = box.GetCollider(testWorld.PhysicsSim);
-			collider.Matrix = Matrix.TS(Vector3f.Zero, 1);
-			collider.CustomObject = "Trains";
+			var collider = box.GetCollider(testWorld.PhysicsSim,  Matrix.TS(Vector3f.Zero, 1),"Trains");
 			var pointworld = Vector3f.AxisX * -5;
 			var OuterPoint = Vector3f.AxisX * 5;
 			tester.RunForSteps();
