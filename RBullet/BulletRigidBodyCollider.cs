@@ -2,6 +2,8 @@
 
 using BulletSharp;
 
+using Evergine.Mathematics;
+
 using RhuEngine.Physics;
 
 using RNumerics;
@@ -32,7 +34,7 @@ namespace RBullet
 			BuildCollissionObject(LocalCreateRigidBody(Mass, Matrix, (CollisionShape)Collider.CollisionShape.obj));
 		}
 
-		public static Matrix CastMet(BulletSharp.Math.Matrix matrix4X4) {
+		public static Matrix CastMet(Matrix4x4 matrix4X4) {
 			var t = new Matrix(
 				(float)matrix4X4.M11, (float)matrix4X4.M12, (float)matrix4X4.M13, (float)matrix4X4.M14,
 				(float)matrix4X4.M21, (float)matrix4X4.M22, (float)matrix4X4.M23, (float)matrix4X4.M24,
@@ -40,8 +42,8 @@ namespace RBullet
 				(float)matrix4X4.M41, (float)matrix4X4.M42, (float)matrix4X4.M43, (float)matrix4X4.M44);
 			return t;
 		}
-		public static BulletSharp.Math.Matrix CastMet(Matrix matrix4X4) {
-			var t = new BulletSharp.Math.Matrix(
+		public static Matrix4x4 CastMet(Matrix matrix4X4) {
+			var t = new Matrix4x4(
 				matrix4X4.m.M11, matrix4X4.m.M12, matrix4X4.m.M13, matrix4X4.m.M14,
 				matrix4X4.m.M21, matrix4X4.m.M22, matrix4X4.m.M23, matrix4X4.m.M24,
 				matrix4X4.m.M31, matrix4X4.m.M32, matrix4X4.m.M33, matrix4X4.m.M34,
@@ -51,7 +53,7 @@ namespace RBullet
 		public static RigidBody LocalCreateRigidBody(float mass, Matrix startTransform, CollisionShape shape) {
 			//rigidbody is dynamic if and only if mass is non zero, otherwise static
 			var isDynamic = mass != 0.0f;
-			var localInertia = isDynamic ? shape.CalculateLocalInertia(mass) : BulletSharp.Math.Vector3.Zero;
+			var localInertia = isDynamic ? shape.CalculateLocalInertia(mass) : Vector3.Zero;
 			var rbInfo = new RigidBodyConstructionInfo(mass, null, shape, localInertia);
 			var body = new RigidBody(rbInfo) {
 				ContactProcessingThreshold = 0.0f,

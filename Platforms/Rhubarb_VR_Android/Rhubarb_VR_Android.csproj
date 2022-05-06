@@ -73,6 +73,8 @@
   <ItemGroup>
     <AndroidNativeLibrary Abi="arm64-v8a" Include="arm64-v8a\libopus.so" />
     <AndroidNativeLibrary Abi="armeabi-v7a" Include="armeabi-v7a\libopus.so" />
+    <AndroidNativeLibrary Include="arm64-v8a\libbulletc.so" />
+    <AndroidNativeLibrary Include="armeabi-v7a\libbulletc.so" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Assets\AboutAssets.txt" />
