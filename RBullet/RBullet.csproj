@@ -5,21 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Evergine.Bullet" Version="2022.2.16.6" />
     <PackageReference Include="Evergine.BulletSharpPInvoke" Version="2022.2.16.6" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RhuEngine\RhuEngine.csproj" />
   </ItemGroup>
-
-	<Target Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'" Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="rm $(OutDir)libbulletc.dll&#xD;&#xA;rm $(OutDir)libbulletc-linux-x64.so&#xD;&#xA;rm $(OutDir)libbulletc-linux-x86.so&#xD;&#xA;rm $(OutDir)libbulletc-windows-x64.dll&#xD;&#xA;rm $(OutDir)libbulletc-windows-x86.dll" />
-	</Target>
-	<Target Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'" Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="rm $(OutDir)libbulletc.dll&#xD;&#xA;rm $(OutDir)libbulletc-linux-x64.so&#xD;&#xA;rm $(OutDir)libbulletc-linux-x86.so&#xD;&#xA;rm $(OutDir)libbulletc-windows-x64.dll&#xD;&#xA;rm $(OutDir)libbulletc-windows-x86.dll" />
-	</Target>
-	<Target Condition="'$(OS)' == 'Windows_NT'" Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="del $(OutDir)libbulletc.dll&#xD;&#xA;del $(OutDir)libbulletc-linux-x64.so&#xD;&#xA;del $(OutDir)libbulletc-linux-x86.so&#xD;&#xA;del $(OutDir)libbulletc-windows-x64.dll&#xD;&#xA;del $(OutDir)libbulletc-windows-x86.dll" />
-	</Target>
 
 </Project>
