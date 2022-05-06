@@ -35,6 +35,7 @@ namespace RhuEngine
 			JavaSystem.LoadLibrary("openxr_loader");
 			JavaSystem.LoadLibrary("StereoKitC");
 			JavaSystem.LoadLibrary("opus");
+			JavaSystem.LoadLibrary("libbulletc");
 
 			// Set up a surface for StereoKit to draw on
 			Window.TakeSurface(this);
