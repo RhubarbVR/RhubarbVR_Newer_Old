@@ -41,7 +41,7 @@ namespace RhuEngine.Physics
 		public object obj;
 
 		public void UpdateSim(float DeltaSeconds) {
-			Manager?.UpdateSim(obj, DeltaSeconds);
+			Manager.UpdateSim(obj, DeltaSeconds);
 		}
 		public bool ConvexRayTest(ColliderShape colliderShaperef,ref Matrix from, ref Matrix to, out RigidBodyCollider rigidBodyCollider, out Vector3f hitNormalWorld, out Vector3f hitPointWorld, ECollisionFilterGroups mask = ECollisionFilterGroups.AllFilter, ECollisionFilterGroups group = ECollisionFilterGroups.AllFilter) {
 			return Manager.ConvexRayTest(obj, colliderShaperef, ref from, ref to, out rigidBodyCollider, out hitNormalWorld, out hitPointWorld, mask, group);
@@ -52,7 +52,7 @@ namespace RhuEngine.Physics
 		}
 
 		public PhysicsSim() {
-			obj = Manager?.NewSim();
+			obj = Manager.NewSim();
 		}
 	}
 }
