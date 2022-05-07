@@ -2,41 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+	  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RhuBulletSharp" Version="1.0.1" />
+	  <PackageReference Include="RhuBulletSharp" Version="1.0.2" GeneratePathProperty="true">
+		
+	  </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RhuEngine\RhuEngine.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Update="C:\Users\Faolan\.nuget\packages\rhubulletsharp\1.0.1\contentFiles\any\netstandard2.0\runtimes\linux-arm64\native\liblibbulletc.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="C:\Users\Faolan\.nuget\packages\rhubulletsharp\1.0.1\contentFiles\any\netstandard2.0\runtimes\linux-x64\native\liblibbulletc.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="C:\Users\Faolan\.nuget\packages\rhubulletsharp\1.0.1\contentFiles\any\netstandard2.0\runtimes\win-x64\native\libbulletc.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="C:\Users\Faolan\.nuget\packages\rhubulletsharp\1.0.1\contentFiles\any\netstandard2.0\runtimes\win10-x64\native\libbulletc.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="C:\Users\lenovo\.nuget\packages\rhubulletsharp\1.0.1\contentFiles\any\netstandard2.0\runtimes\linux-arm64\native\liblibbulletc.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="C:\Users\lenovo\.nuget\packages\rhubulletsharp\1.0.1\contentFiles\any\netstandard2.0\runtimes\linux-x64\native\liblibbulletc.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="C:\Users\lenovo\.nuget\packages\rhubulletsharp\1.0.1\contentFiles\any\netstandard2.0\runtimes\win-x64\native\libbulletc.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="C:\Users\lenovo\.nuget\packages\rhubulletsharp\1.0.1\contentFiles\any\netstandard2.0\runtimes\win10-x64\native\libbulletc.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
+	
 </Project>
