@@ -14,7 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\RhuEngine\RhuEngine.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="runtimes\linux-arm64\native\liblibbulletc.so">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
