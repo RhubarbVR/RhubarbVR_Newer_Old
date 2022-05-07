@@ -64,7 +64,7 @@ namespace RBullet
 			[DllImport("kernel32", CharSet = CharSet.Unicode)]
 			static extern IntPtr LoadLibraryW(string fileName);
 			static bool LoadWindows(string arch) {
-				return LoadLibraryW("libbulletc.dll") != IntPtr.Zero || LoadLibraryW($"runtimes/win-{arch}/native/libbulletc.dll") != IntPtr.Zero;
+				return LoadLibraryW("libbulletc") != IntPtr.Zero || LoadLibraryW($"runtimes/win-{arch}/native/libbulletc.dll") != IntPtr.Zero;
 			}
 
 
@@ -72,9 +72,9 @@ namespace RBullet
 			static extern IntPtr dlopen(string fileName, int flags);
 			static bool LoadUnix(string arch) {
 				const int RTLD_NOW = 2;
-				return dlopen("libbulletc.dll", RTLD_NOW) != IntPtr.Zero
-					|| dlopen($"./runtimes/linux-{arch}/native/libbulletc.dll", RTLD_NOW) != IntPtr.Zero
-					|| dlopen($"{AppDomain.CurrentDomain.BaseDirectory}/runtimes/linux-{arch}/native/libbulletc.dll", RTLD_NOW) != IntPtr.Zero;
+				return dlopen("libbulletc.so", RTLD_NOW) != IntPtr.Zero
+					|| dlopen($"./runtimes/linux-{arch}/native/libbulletc.so", RTLD_NOW) != IntPtr.Zero
+					|| dlopen($"{AppDomain.CurrentDomain.BaseDirectory}/runtimes/linux-{arch}/native/libbulletc.so", RTLD_NOW) != IntPtr.Zero;
 			}
 		}
 
