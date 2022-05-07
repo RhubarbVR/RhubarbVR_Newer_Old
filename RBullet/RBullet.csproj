@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Evergine.BulletSharpPInvoke" Version="2022.2.16.6" />
+    <PackageReference Include="RhuBulletSharp" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -13,27 +13,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="runtimes\linux-arm64\native\libopus.so">
+    <Content Update="C:\Users\Faolan\.nuget\packages\rhubulletsharp\1.0.1\contentFiles\any\netstandard2.0\runtimes\linux-arm64\native\liblibbulletc.so">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="runtimes\linux-x64\native\libbulletc.so">
+    </Content>
+    <Content Update="C:\Users\Faolan\.nuget\packages\rhubulletsharp\1.0.1\contentFiles\any\netstandard2.0\runtimes\linux-x64\native\liblibbulletc.so">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="runtimes\linux-x64\native\libopus.so">
+    </Content>
+    <Content Update="C:\Users\Faolan\.nuget\packages\rhubulletsharp\1.0.1\contentFiles\any\netstandard2.0\runtimes\win-x64\native\libbulletc.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="runtimes\win-x64\native\libbulletc.dll">
+    </Content>
+    <Content Update="C:\Users\Faolan\.nuget\packages\rhubulletsharp\1.0.1\contentFiles\any\netstandard2.0\runtimes\win10-x64\native\libbulletc.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="runtimes\win-x64\native\opus.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="runtimes\win-x86\native\libbulletc.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="runtimes\win10-x64\native\opus.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
 
 </Project>

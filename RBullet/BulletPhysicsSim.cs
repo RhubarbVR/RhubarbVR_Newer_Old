@@ -3,9 +3,7 @@
 using RhuEngine.Physics;
 using BulletSharp;
 using RNumerics;
-using BulletSharp.Math;
-using Esprima;
-using Evergine.Mathematics;
+using System.Numerics;
 
 namespace RBullet
 {
@@ -25,7 +23,7 @@ namespace RBullet
 			_collisionConfiguration = new DefaultCollisionConfiguration();
 			_dispatcher = new CollisionDispatcher(_collisionConfiguration);
 			_broadphase = new DbvtBroadphase();
-			_constraintSolver = new MultiBodyConstraintSolver();
+			_constraintSolver = new ConstraintSolverPoolMultiThreaded(Math.Min(Environment.ProcessorCount - 1,1));
 			_physicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _constraintSolver, _collisionConfiguration);
 		}
 
