@@ -51,6 +51,7 @@ namespace RhuEngine
 			this.PassErrors = PassErrors;
 			EngineLink = _EngineLink;
 			_EngineLink.BindEngine(this);
+			RLog.Info($"Platform Information OSArc: {RuntimeInformation.OSArchitecture} Framework: {RuntimeInformation.FrameworkDescription} OS: {RuntimeInformation.OSDescription} ProcessArc: {RuntimeInformation.ProcessArchitecture}");
 			EngineLink.LoadStatics();
 			if (baseDir is null) {
 				baseDir = AppDomain.CurrentDomain.BaseDirectory;
@@ -59,7 +60,6 @@ namespace RhuEngine
 				BaseDir = baseDir;
 			}
 			MainEngine = this;
-			RLog.Info($"Platform Information OSArc: {RuntimeInformation.OSArchitecture} Framework: {RuntimeInformation.FrameworkDescription} OS: {RuntimeInformation.OSDescription} ProcessArc: {RuntimeInformation.ProcessArchitecture}");
 			string error = null;
 			_forceFlatscreen = arg.Any((v) => v.ToLower() == "--no-vr") | arg.Any((v) => v.ToLower() == "-no-vr") | arg.Any((v) => v.ToLower() == "-novr");
 			_noVRSim = arg.Any((v) => v.ToLower() == "--no-vr-sim") | arg.Any((v) => v.ToLower() == "-no-vr-sim") | arg.Any((v) => v.ToLower() == "-novrsim");

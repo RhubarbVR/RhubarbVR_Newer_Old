@@ -26,6 +26,7 @@ namespace NullContext
 		public float Elapsedf { get; set; }
 
 		public void BindEngine(Engine engine) {
+			RLog.Instance = this;
 		}
 
 		public void Err(string value) {
@@ -66,7 +67,6 @@ namespace NullContext
 		}
 
 		public void LoadStatics() {
-			RLog.Instance = this;
 			RTime.Instance = this;
 			PhysicsHelper.RegisterPhysics<RBullet.BulletPhsyicsLink>();
 		}

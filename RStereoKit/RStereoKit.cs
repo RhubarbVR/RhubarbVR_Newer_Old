@@ -41,6 +41,7 @@ namespace RStereoKit
 
 		public void BindEngine(Engine engine) {
 			this.engine = engine;
+			RLog.Instance = new Logger();
 		}
 
 		public void ColorizeFingers(StereoKit.Handed hand, int size, Gradient horizontal, Gradient vertical) {
@@ -62,7 +63,6 @@ namespace RStereoKit
 		}
 
 		public void LoadStatics() {
-			RLog.Instance = new Logger();
 			RTexture2D.Instance = new SKTexture2d();
 			RMaterial.Instance = new SKRMaterial();
 			RShader.Instance = new SKShader();
