@@ -229,6 +229,44 @@ namespace RhuEngine.GameTests.Tests
 		}
 
 		[TestMethod]
+		public void RayTestWithConvexMesh() {
+			var testWorld = StartNewTestWorld();
+			var gen = new TrivialBox3Generator {
+				Box = new Box3d(Vector3f.Zero, Vector3f.One)
+			};
+			gen.Generate();
+			var colider = new RConvexMeshShape(gen.MakeSimpleMesh());
+			var collider = colider.GetCollider(testWorld.PhysicsSim, Matrix.TS(Vector3f.Zero, 1), "Trains");
+			var pointworld = Vector3f.AxisX * -5;
+			var OuterPoint = Vector3f.AxisX * 5;
+			tester.RunForSteps();
+			var hashit = testWorld.PhysicsSim.RayTest(ref OuterPoint, ref pointworld, out var hitcollider, out var hitnorm, out var worldhit);
+			Assert.IsTrue(hashit);
+			Assert.AreEqual("Trains", hitcollider.CustomObject);
+			tester.RunForSteps();
+			tester.Dispose();
+		}
+		[TestMethod]
+		public void RayTestWithRawMesh() {
+			var testWorld = StartNewTestWorld();
+			var gen = new TrivialBox3Generator {
+				Box = new Box3d(Vector3f.Zero, Vector3f.One)
+			};
+			gen.Generate();
+			var colider = new RRawMeshShape(gen.MakeSimpleMesh());
+			var collider = colider.GetCollider(testWorld.PhysicsSim, Matrix.TS(Vector3f.Zero, 1), "Trains");
+			var pointworld = Vector3f.AxisX * -5;
+			var OuterPoint = Vector3f.AxisX * 5;
+			tester.RunForSteps();
+			var hashit = testWorld.PhysicsSim.RayTest(ref OuterPoint, ref pointworld, out var hitcollider, out var hitnorm, out var worldhit);
+			Assert.IsTrue(hashit);
+			Assert.AreEqual("Trains", hitcollider.CustomObject);
+			tester.RunForSteps();
+			tester.Dispose();
+		}
+
+
+		[TestMethod]
 		public void RayTest() {
 			var testWorld = StartNewTestWorld();
 			var box = new RBoxShape(0.5f);

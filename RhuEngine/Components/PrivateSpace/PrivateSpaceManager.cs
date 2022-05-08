@@ -19,7 +19,7 @@ namespace RhuEngine.Components
 		RSphereShape _shape;
 		public override void OnLoaded() {
 			base.OnLoaded();
-			_shape = new RSphereShape(0.01f);
+			_shape = new RSphereShape(0.02f);
 		}
 		public override void Step() {
 			var head = LocalUser.userRoot.Target?.head.Target;
@@ -63,7 +63,7 @@ namespace RhuEngine.Components
 		public void UpdateHeadLazer(Entity head) {
 			var headPos = head.GlobalTrans;
 			var headFrompos = headPos;
-			var headToPos = Matrix.T(Vector3f.AxisZ * -7) * headPos;
+			var headToPos = Matrix.T(Vector3f.AxisZ * -1) * headPos;
 			World.DrawDebugSphere(headToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
 			if (World.PhysicsSim.ConvexRayTest(_shape, ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
 				RLog.Info($"Hit Local pos {hitpointworld}");

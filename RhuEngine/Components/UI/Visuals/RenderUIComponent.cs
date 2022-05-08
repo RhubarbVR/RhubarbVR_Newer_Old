@@ -21,7 +21,7 @@ namespace RhuEngine.Components
 
 		public abstract bool HasPhysics { get; }
 
-		public Vector3f PhysicsPose;
+		public Matrix PhysicsPose;
 
 		public RigidBodyCollider PhysicsCollider;
 
@@ -62,6 +62,9 @@ namespace RhuEngine.Components
 			_isCut = cut;
 			RenderCutMesh(update, update);
 		}
+
+
+
 		private void RunLoadPhysicsBox() {
 			PhysicsCollider?.Remove();
 			PhysicsCollider = null;
@@ -71,13 +74,13 @@ namespace RhuEngine.Components
 			var truemin = Rect.Min + Rect.ScrollOffset.Xy;
 			var truemax = Rect.Max + Rect.ScrollOffset.Xy;
 			var min = MathUtil.Max(Rect.CutZonesMin, truemin);
-			var max = MathUtil.Min(Rect.CutZonesMax,truemax);
+			var max = MathUtil.Min(Rect.CutZonesMax, truemax);
 			var size = max - min;
 			var collidersize = new Vector3d(size.x, size.y, Rect.Depth.Value) / 2;
 			var pos = min + collidersize.Xy;
-			PhysicsPose = new Vector3f((float)pos.x, (float)pos.y, Rect.StartPoint + (float)collidersize.z);
+			PhysicsPose = Matrix.T(new Vector3f((float)pos.x, (float)pos.y, Rect.StartPoint + (float)collidersize.z));
 			PhysicsCollider = new RBoxShape(collidersize).GetCollider(World.PhysicsSim);
-			World.DrawDebugCube(Rect.LastRenderPos,PhysicsPose, collidersize,new Colorf(0,1,1,0.2f),3); //For testing collider
+			World.DrawDebugCube(PhysicsPose * Rect.LastRenderPos, Vector3f.Zero, collidersize, new Colorf(0, 1, 1, 0.2f), 5); //For testing collider
 			PhysicsCollider.CustomObject = this;
 			PhysicsCollider.Group = ECollisionFilterGroups.UI;
 			PhysicsCollider.Mask = ECollisionFilterGroups.UI;
@@ -86,8 +89,11 @@ namespace RhuEngine.Components
 		private void RunLoadPhysicsMesh() {
 			PhysicsCollider?.Remove();
 			PhysicsCollider = null;
-			PhysicsPose = Vector3f.Zero;
-			PhysicsCollider = new RConvexMeshShape(CutMesh).GetCollider(World.PhysicsSim);
+			if (Rect.Culling) {
+				return;
+			}
+			PhysicsPose = Matrix.T(Vector3f.Zero);
+			PhysicsCollider = new RRawMeshShape(RenderMesh).GetCollider(World.PhysicsSim);
 			PhysicsCollider.CustomObject = this;
 			PhysicsCollider.Group = ECollisionFilterGroups.UI;
 			PhysicsCollider.Mask = ECollisionFilterGroups.UI;
@@ -97,7 +103,7 @@ namespace RhuEngine.Components
 			RWorld.ExecuteOnEndOfFrame(BoxBased ? RunLoadPhysicsBox : RunLoadPhysicsMesh);
 		}
 
-		public virtual bool BoxBased => true;
+		public virtual bool BoxBased => !(Rect.Canvas.FrontBind.Value || Rect.Canvas.TopOffset.Value);
 
 		public void RenderMainMesh(bool updateMesh = true, bool PhysicsMesh = true) {
 			var returnMesh = CutMesh;

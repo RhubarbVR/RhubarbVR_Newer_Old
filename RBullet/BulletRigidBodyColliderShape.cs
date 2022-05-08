@@ -67,8 +67,21 @@ namespace RBullet
 			if(mesh == null) {
 				return new EmptyShape();
 			}
-			var indexVertexArray2 = new TriangleIndexVertexArray(mesh.TriangleIndices().ToArray(), mesh.VertexPos().Select((val)=>new Vector3(val.x, val.y, val.z)).ToArray());
-			var trys = new ConvexTriangleMeshShape(indexVertexArray2, true);
+			var verts = mesh.VertexPos().Select((val) => new Vector3(val.x, val.y, val.z)).ToArray();
+			var trys = new ConvexHullShape(verts);
+			return trys;
+		}
+
+		public object GetRawMeshShape(IMesh mesh) {
+			if (mesh == null) {
+				return new EmptyShape();
+			}
+			var indces = mesh.RenderIndices().ToArray();
+			var verts = mesh.VertexPos().Select((val) => new Vector3(val.x, val.y, val.z)).ToArray();
+			var indexVertexArray2 = new TriangleIndexVertexArray(indces, verts);
+			var trys = new GImpactMeshShape(indexVertexArray2);
+			trys.UpdateBound();
+			trys.PostUpdate();
 			return trys;
 		}
 	}
