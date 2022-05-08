@@ -17,7 +17,7 @@ namespace RhuEngine.Components
 		[Default(3f)]
 		public readonly Sync<float> TopOffsetValue;
 
-		[Default(true)]
+		[Default(false)]
 		public readonly Sync<bool> FrontBind;
 		[Default(10)]
 		public readonly Sync<int> FrontBindSegments;

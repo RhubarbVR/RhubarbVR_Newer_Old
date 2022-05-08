@@ -3,6 +3,7 @@
 using RhuEngine.Components;
 using RhuEngine.Datatypes;
 using RhuEngine.Linker;
+using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 
@@ -74,6 +75,40 @@ namespace RhuEngine.WorldObjects
 		public User GetLocalUser() {
 			return Users is null ? null : LocalUserID <= 0 ? null : (LocalUserID - 1) < Users.Count ? Users[LocalUserID - 1] : null;
 		}
+		[PrivateSpaceOnly]
+		public class RawMeshAsset : ProceduralMesh
+		{
+
+			public override void ComputeMesh() {
+			}
+		}
+
+		public void DrawDebugMesh(IMesh mesha,Matrix matrix,Colorf colorf, float drawTime = 1) {
+			if (DebugVisuals) {
+				RWorld.ExecuteOnStartOfFrame(() => {
+					var mesh = RootEntity.GetFirstComponentOrAttach<RawMeshAsset>();
+					var comp = RootEntity.GetFirstComponent<DynamicMaterial>();
+					if (comp is null) {
+						comp = RootEntity.AttachComponent<DynamicMaterial>();
+						comp.transparency.Value = Transparency.Blend;
+						comp.shader.Target = RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
+					}
+					var debugcube = RootEntity.AddChild("DebugCube");
+					var meshrender = debugcube.AttachComponent<MeshRender>();
+					meshrender.colorLinear.Value = colorf;
+					meshrender.materials.Add().Target = comp;
+					meshrender.mesh.Target = mesh;
+					mesh.GenMesh(mesha);
+					meshrender.Entity.GlobalTrans = matrix;
+					Task.Run(async () => {
+						await Task.Delay((int)(1000 * drawTime));
+						debugcube.Destroy();
+					});
+				});
+			}
+		}
+
+
 		public void DrawDebugCube(Matrix matrix, Vector3f pos, Vector3d scale, Colorf colorf,float drawTime = 1) {
 			DrawDebugCube(matrix, pos, (Vector3f)scale, colorf, drawTime);
 		}

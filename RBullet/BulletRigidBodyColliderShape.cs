@@ -78,10 +78,15 @@ namespace RBullet
 			}
 			var indces = mesh.RenderIndices().ToArray();
 			var verts = mesh.VertexPos().Select((val) => new Vector3(val.x, val.y, val.z)).ToArray();
-			var indexVertexArray2 = new TriangleIndexVertexArray(indces, verts);
+			var indexVertexArray2 = new TriangleIndexVertexArray();
+			var _initialMesh = new IndexedMesh();
+			_initialMesh.Allocate(indces.Length/3, verts.Length);
+			_initialMesh.SetData(indces, verts);
+			indexVertexArray2.AddIndexedMesh(_initialMesh);
 			var trys = new GImpactMeshShape(indexVertexArray2);
-			trys.UpdateBound();
+			trys.LockChildShapes();
 			trys.PostUpdate();
+			trys.UpdateBound();
 			return trys;
 		}
 	}

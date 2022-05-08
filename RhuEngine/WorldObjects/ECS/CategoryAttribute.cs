@@ -4,6 +4,12 @@ using System.Linq;
 
 namespace RhuEngine.WorldObjects.ECS
 {
+	public class PrivateSpaceOnlyAttribute : Attribute
+	{
+
+	}
+
+
 	public class CategoryAttribute : Attribute
 	{
 		public readonly string[] Paths;

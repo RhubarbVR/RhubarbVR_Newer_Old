@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Reflection;
 namespace RhuEngine.WorldObjects.ECS
 {
 	public abstract class Component : SyncObject, IOffsetableElement
@@ -12,6 +12,9 @@ namespace RhuEngine.WorldObjects.ECS
 		public Entity Entity { get; private set; }
 
 		public override void OnInitialize() {
+			if(GetType().GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && !World.IsPersonalSpace) {
+				throw new InvalidOperationException("This Component is PrivateSpaceOnly");
+			}
 			base.OnInitialize();
 			Entity = (Entity)Parent.Parent;
 			if (Entity.IsEnabled) {

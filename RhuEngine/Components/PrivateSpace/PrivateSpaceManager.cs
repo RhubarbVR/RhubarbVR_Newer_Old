@@ -13,6 +13,7 @@ using RhuEngine.Linker;
 using RhuEngine.Physics;
 namespace RhuEngine.Components
 {
+	[PrivateSpaceOnly]
 	[UpdateLevel(UpdateEnum.Normal)]
 	public class PrivateSpaceManager : Component
 	{
