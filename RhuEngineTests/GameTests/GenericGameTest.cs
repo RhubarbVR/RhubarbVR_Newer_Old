@@ -20,6 +20,7 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 
 using SharedModels.GameSpecific;
+using System.Reflection;
 
 namespace RhuEngine.GameTests.Tests
 {
@@ -176,13 +177,35 @@ namespace RhuEngine.GameTests.Tests
 				if (item.IsGenericType) {
 					foreach (var testType in MakeTestGenerics(item)) {
 						Console.WriteLine("Testing SyncObjects " + testType.GetFormattedName());
-						var e = (ITestSyncObject)testEntity.AttachComponent<Component>(typeof(TestSyncObject<>).MakeGenericType(testType));
+						ITestSyncObject e = null;
+						try {
+							e = (ITestSyncObject)testEntity.AttachComponent<Component>(typeof(TestSyncObject<>).MakeGenericType(testType));
+						}
+						catch {
+							if (testType.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) {
+								throw;
+							}
+						}
+						if (testType.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && e != null) {
+							throw new Exception("Loaded PrivateSpaceOnly object");
+						}
 						RunSyncObjectTest(e.GetObject());
 					}
 				}
 				else {
 					Console.WriteLine("Testing SyncObjects " + item.GetFormattedName());
-					var e = (ITestSyncObject)testEntity.AttachComponent<Component>(typeof(TestSyncObject<>).MakeGenericType(item));
+					ITestSyncObject e = null;
+					try {
+						e = (ITestSyncObject)testEntity.AttachComponent<Component>(typeof(TestSyncObject<>).MakeGenericType(item));
+					}
+					catch {
+						if (item.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) {
+							throw;
+						}
+					}
+					if (item.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && e != null) {
+						throw new Exception("Loaded PrivateSpaceOnly object");
+					}
 					RunSyncObjectTest(e.GetObject());
 				}
 			}
@@ -288,19 +311,41 @@ namespace RhuEngine.GameTests.Tests
 			var components = GetAllTypes((type) => !type.IsAbstract && !type.IsInterface && typeof(Component).IsAssignableFrom(type));
 			foreach (var item in components) {
 				if (typeof(ITestSyncObject).IsAssignableFrom(item)) {
-
+					continue;	
 				}
-				else if (item.IsGenericType) {
+				if (item.IsGenericType) {
 					foreach (var testes in MakeTestGenerics(item)) {
 						Console.WriteLine("Testing Component " + testes.GetFormattedName());
-						var comp = testEntity.AttachComponent<Component>(testes);
-						RunComponentTest(comp);
+						Component comp = null;
+						try {
+							comp = testEntity.AttachComponent<Component>(testes);
+							RunComponentTest(comp);
+						}
+						catch {
+							if(testes.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) {
+								throw;
+							}
+						}
+						if (testes.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && comp != null) {
+							throw new Exception("Loaded PrivateSpaceOnly object");
+						}
 					}
 				}
 				else {
 					Console.WriteLine("Testing Component " + item.GetFormattedName());
-					var comp = testEntity.AttachComponent<Component>(item);
-					RunComponentTest(comp);
+					Component comp = null;
+					try {
+						comp = testEntity.AttachComponent<Component>(item);
+						RunComponentTest(comp);
+					}
+					catch {
+						if (item.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) {
+							throw;
+						}
+					}
+					if (item.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && comp != null) {
+						throw new Exception("Loaded PrivateSpaceOnly object");
+					}
 				}
 			}
 			tester.RunForSteps();

@@ -8,7 +8,7 @@ using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 using RhuEngine.Linker;
 using RhuEngine.Managers;
-
+using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.WorldObjects
 {
@@ -118,6 +118,9 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize,Func<NetPointer> netPointer = null) {
+			if (GetType().GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && !world.IsPersonalSpace) {
+				throw new InvalidOperationException("This SyncObject is PrivateSpaceOnly");
+			}
 			Name = name;
 			World = world;
 			Parent = parent;
