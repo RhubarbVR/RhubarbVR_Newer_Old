@@ -13,17 +13,23 @@ namespace RhuEngine.Components
 		public readonly Sync<Vector3f> scale;
 
 		[Default(true)]
+		[OnChanged(nameof(UpdateMeshes))]
 		public readonly Sync<bool> TopOffset;
 		[Default(3f)]
+		[OnChanged(nameof(UpdateMeshes))]
 		public readonly Sync<float> TopOffsetValue;
 
 		[Default(true)]
+		[OnChanged(nameof(UpdateMeshes))]
 		public readonly Sync<bool> FrontBind;
 		[Default(10)]
+		[OnChanged(nameof(UpdateMeshes))]
 		public readonly Sync<int> FrontBindSegments;
-		[Default(180f)]
+		[Default(135f)]
+		[OnChanged(nameof(UpdateMeshes))]
 		public readonly Sync<float> FrontBindAngle;
 		[Default(7.5f)]
+		[OnChanged(nameof(UpdateMeshes))]
 		public readonly Sync<float> FrontBindRadus;
 		public override void OnAttach() {
 			base.OnAttach();

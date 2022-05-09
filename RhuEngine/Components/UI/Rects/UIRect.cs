@@ -275,6 +275,9 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
+			if (Canvas is null) {
+				return;
+			}
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.ProcessBaseMesh();
@@ -341,6 +344,9 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
+			if (Canvas is null) {
+				return;
+			}
 			_meshes.SafeOperation((meshList) => {
 				_uiRenderComponents.SafeOperation((list) => {
 					if (meshList.Count < list.Count) {
@@ -371,6 +377,9 @@ namespace RhuEngine.Components
 		public bool Culling { get; private set; } = false;
 
 		public void ProcessCutting(bool update = true,bool updatePhysicsMesh = true) {
+			if (Canvas is null) {
+				return;
+			}
 			var min = Min + ScrollOffset.Xy;
 			var max = Max + ScrollOffset.Xy;
 			var cutmin = CutZonesMin;

@@ -29,6 +29,9 @@ namespace RhuEngine.Components
 
 		public void ProcessMesh() {
 			ProcessBaseMesh();
+			ScrollMesh = null;
+			CutMesh = null;
+			RenderMesh = null;
 			Entity.UIRect?.UpdateMeshes();
 		}
 
