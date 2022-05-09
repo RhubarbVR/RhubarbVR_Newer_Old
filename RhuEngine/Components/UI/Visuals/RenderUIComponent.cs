@@ -115,6 +115,7 @@ namespace RhuEngine.Components
 			if (Rect.Canvas.FrontBind.Value) {
 				returnMesh = returnMesh.UIBind(Rect.Canvas.FrontBindAngle.Value, Rect.Canvas.FrontBindRadus.Value, Rect.Canvas.FrontBindSegments.Value,Rect.Canvas.scale);
 			}
+			returnMesh.Scale(Rect.Canvas.scale.Value.x / 10, Rect.Canvas.scale.Value.y / 10, Rect.Canvas.scale.Value.z / 10);
 			RenderMesh = returnMesh;
 			if (PhysicsMesh) {
 				LoadPhysicsMesh();

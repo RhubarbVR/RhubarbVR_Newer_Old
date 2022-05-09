@@ -17,7 +17,7 @@ namespace RhuEngine.Components
 		[Default(3f)]
 		public readonly Sync<float> TopOffsetValue;
 
-		[Default(false)]
+		[Default(true)]
 		public readonly Sync<bool> FrontBind;
 		[Default(10)]
 		public readonly Sync<int> FrontBindSegments;
@@ -60,7 +60,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			var uiRect = Entity.UIRect;
-			uiRect.Render(Matrix.S(scale.Value/10) * Entity.GlobalTrans);
+			uiRect.Render(Entity.GlobalTrans);
 		}
 
 		public override void Dispose() {
