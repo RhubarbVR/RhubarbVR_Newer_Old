@@ -83,7 +83,7 @@ namespace RhuEngine.Components
 			var pos = min + collidersize.Xy;
 			PhysicsPose = Matrix.T(new Vector3f((float)pos.x, (float)pos.y, Rect.StartPoint + (float)collidersize.z));
 			PhysicsCollider = new RBoxShape(collidersize).GetCollider(World.PhysicsSim);
-			Engine.worldManager.PrivateOverlay?.DrawDebugCube(PhysicsPose * Rect.LastRenderPos, Vector3f.Zero, collidersize, new Colorf(0, 1, 1, 0.2f), 5); //For testing collider
+			Engine.worldManager.PrivateOverlay?.DrawDebugCube(PhysicsPose * Matrix.S(Rect.Canvas.scale.Value / 10) * Rect.LastRenderPos, Vector3f.Zero, collidersize, new Colorf(0, 1, 1, 0.2f), 5); //For testing collider
 			PhysicsCollider.CustomObject = this;
 			PhysicsCollider.Group = ECollisionFilterGroups.UI;
 			PhysicsCollider.Mask = ECollisionFilterGroups.UI;
@@ -118,7 +118,9 @@ namespace RhuEngine.Components
 			if (Rect.Canvas.FrontBind.Value) {
 				returnMesh = returnMesh.UIBind(Rect.Canvas.FrontBindAngle.Value, Rect.Canvas.FrontBindRadus.Value, Rect.Canvas.FrontBindSegments.Value,Rect.Canvas.scale);
 			}
-			returnMesh.Scale(Rect.Canvas.scale.Value.x / 10, Rect.Canvas.scale.Value.y / 10, Rect.Canvas.scale.Value.z / 10);
+			if (!BoxBased) {
+				returnMesh.Scale(Rect.Canvas.scale.Value.x / 10, Rect.Canvas.scale.Value.y / 10, Rect.Canvas.scale.Value.z / 10);
+			}
 			RenderMesh = returnMesh;
 			if (PhysicsMesh) {
 				LoadPhysicsMesh();

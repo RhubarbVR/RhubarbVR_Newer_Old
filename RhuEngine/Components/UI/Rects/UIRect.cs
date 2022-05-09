@@ -75,8 +75,8 @@ namespace RhuEngine.Components
 		public bool CustomTouch;
 		public float PressForce;
 
-		public void Clean(Matrix parrent,Vector3f canvasScale) {
-			var pointNoScale = Matrix.T(HitPosWorld) * (Matrix.S(1/canvasScale) * parrent).Inverse;
+		public void Clean(Matrix parrent, Vector3f canvasScale) {
+			var pointNoScale = Matrix.T(HitPosWorld) * (Matrix.S(1 / canvasScale) * parrent).Inverse;
 			HitPosNoScale = pointNoScale.Translation;
 			var point = Matrix.T(HitPosWorld) * parrent.Inverse;
 			HitPos = point.Translation;
@@ -138,7 +138,7 @@ namespace RhuEngine.Components
 			var hasData2 = lastpoint.MoveNext();
 			while (hasData1 && hasData2) {
 				var currentIndex = Math.Min(lastpoint.Current.Touchindex, newHitpoin.Current.Touchindex);
-				if(lastpoint.Current.Touchindex == newHitpoin.Current.Touchindex) {
+				if (lastpoint.Current.Touchindex == newHitpoin.Current.Touchindex) {
 					if (lastpoint.Current.PressForce >= threshold && newHitpoin.Current.PressForce >= threshold) {
 						yield return lastpoint.Current.HitPos - newHitpoin.Current.HitPos;
 					}
@@ -203,7 +203,7 @@ namespace RhuEngine.Components
 			var anglecalfirst = 0f;
 			if (Canvas.FrontBind.Value) {
 				var adder = 1;
-				if(matrix.Translation.x < 0.5f) {
+				if (matrix.Translation.x < 0.5f) {
 					adder = 0;
 				}
 				anglecalfirst = Canvas.FrontBindAngle.Value * (((float)Math.Floor(matrix.Translation.x * Canvas.FrontBindSegments.Value) + adder) / Canvas.FrontBindSegments.Value);
@@ -222,7 +222,7 @@ namespace RhuEngine.Components
 			}
 			if (Canvas.FrontBind.Value) {
 				var data = (Vector3d)npoint;
-				data.Bind(Canvas.FrontBindAngle, Canvas.FrontBindRadus,Canvas.scale.Value,Canvas.FrontBindSegments.Value);
+				data.Bind(Canvas.FrontBindAngle, Canvas.FrontBindRadus, Canvas.scale.Value, Canvas.FrontBindSegments.Value);
 				npoint = (Vector3f)data;
 			}
 			return npoint;
@@ -243,7 +243,7 @@ namespace RhuEngine.Components
 
 		public virtual Vector2f CutZonesMin => Entity.parent.Target?.UIRect?.CutZonesMin ?? Vector2f.NInf;
 
-		public Vector2f Min => TrueMin + (OffsetMin.Value/(Canvas?.scale.Value.Xy??Vector2f.One));
+		public Vector2f Min => TrueMin + (OffsetMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 
 		public Vector2f Max => TrueMax + (OffsetMax.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 
@@ -360,7 +360,7 @@ namespace RhuEngine.Components
 						}
 					}
 					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
-						if(list[i].CutMesh is null) {
+						if (list[i].CutMesh is null) {
 							list[i].RenderCutMesh(false);
 						}
 						meshList[i].LoadMesh(list[i].RenderMesh);
@@ -376,7 +376,7 @@ namespace RhuEngine.Components
 
 		public bool Culling { get; private set; } = false;
 
-		public void ProcessCutting(bool update = true,bool updatePhysicsMesh = true) {
+		public void ProcessCutting(bool update = true, bool updatePhysicsMesh = true) {
 			if (Canvas is null) {
 				return;
 			}
@@ -388,12 +388,12 @@ namespace RhuEngine.Components
 			var cut = !Culling && (max.y > cutmax.y || min.y < cutmin.y || max.x > cutmax.x || min.x < cutmin.x);
 			_uiComponents.SafeOperation((list) => {
 				foreach (var item in list) {
-					item.CutElement(cut,update);
+					item.CutElement(cut, update);
 				}
 			});
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
-					item.CutElement(cut,update);
+					item.CutElement(cut, update);
 					if (updatePhysicsMesh) {
 						item.LoadPhysicsMesh();
 					}
@@ -411,10 +411,11 @@ namespace RhuEngine.Components
 			_meshes.SafeOperation((meshList) => {
 				_uiRenderComponents.SafeOperation((list) => {
 					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
+						var mataddon = list[i].BoxBased ? Matrix.S(Canvas.scale.Value / 10) : Matrix.Identity;
 						if (list[i].PhysicsCollider is not null) {
-							list[i].PhysicsCollider.Matrix = list[i].PhysicsPose * matrix;
+							list[i].PhysicsCollider.Matrix = list[i].PhysicsPose * mataddon * matrix;
 						}
-						meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, matrix, list[i].RenderTint);
+						meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, mataddon * matrix, list[i].RenderTint);
 					}
 				});
 			});
@@ -514,7 +515,7 @@ namespace RhuEngine.Components
 						list.Add(item);
 					}
 				});
-				Scroll(ScrollOffset,true);
+				Scroll(ScrollOffset, true);
 			});
 		}
 
@@ -534,7 +535,7 @@ namespace RhuEngine.Components
 		}
 
 		public void Scroll(Vector3f value, bool forceUpdate = false) {
-			if(value == ScrollOffset && !forceUpdate) {
+			if (value == ScrollOffset && !forceUpdate) {
 				return;
 			}
 			var phsicsupdate = value.x == ScrollOffset.x && value.y == ScrollOffset.y;
