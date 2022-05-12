@@ -31,7 +31,9 @@ namespace RhuEngine.Components
 		public Entity TaskBarHolder;
 		public override void OnAttach() {
 			base.OnAttach();
-			TaskBarHolder = World.RootEntity.AddChild("TaskBarHolder");
+			var TaskBarHoldermover = World.RootEntity.AddChild("TaskBarMover");
+			TaskBarHoldermover.AttachComponent<UserInterfacePositioner>();
+			TaskBarHolder = TaskBarHoldermover.AddChild("TaskBarHolder");
 			taskBar = TaskBarHolder.AddChild("TaskBar").AttachComponent<TaskBar>();
 		}
 

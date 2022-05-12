@@ -63,7 +63,9 @@ namespace RhuEngine.Components
 
 		private void RunButtonClickEvent(HitData hitData) {
 			_lastHitData = hitData;
+#if DEBUG
 			RLog.Info("Click");
+#endif
 			SendEvent(new ButtonEvent {
 					IsPressing = false,
 					IsClicked = true,
@@ -97,7 +99,9 @@ namespace RhuEngine.Components
 		private void RunButtonReleaseEvent(HitData hitData) {
 			_lastHitData = hitData;
 			IsClicking = false;
+#if DEBUG
 			RLog.Info("Release");
+#endif
 			Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, Rect.ParentRect.ScrollOffset.z));
 			SendEvent(new ButtonEvent {
 				IsPressing = false,

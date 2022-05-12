@@ -24,17 +24,16 @@ namespace RhuEngine.Components
 		[NoLoad]
 		[NoSyncUpdate]
 		public UICanvas uICanvas;
+
 		public override void OnAttach() {
-			base.OnAttach();
-			Entity.position.Value = new Vector3f(-0.7f, 0.1f, 0);
-			Entity.rotation.Value = Quaternionf.CreateFromEuler(-22.5f, 0, 0);
 			uICanvas = Entity.AttachComponent<UICanvas>();
+			Engine.SettingsUpdate += Engine_SettingsUpdate;
 			uICanvas.scale.Value = new Vector3f(16, 2, 1);
-			uICanvas.FrontBind.Value = true;
-			uICanvas.TopOffset.Value = true;
+			Engine_SettingsUpdate();
 			var shader = World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
 			var mit = Entity.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;
+			mit.wireframe.Value = true;
 			mit.transparency.Value = Transparency.Blend;
 			var rectTwo = Entity.AttachComponent<UIRect>();
 			rectTwo.AnchorMin.Value = Vector2f.Zero;
@@ -53,6 +52,7 @@ namespace RhuEngine.Components
 				var img = child.AttachComponent<UIRectangle>();
 				img.Tint.Value = new Colorf(0.2f, 0.2f, 0.2f, 0.9f);
 				img.Material.Target = mit;
+				img.AddRoundingSettings();
 				child.AttachComponent<UIButtonInteraction>();
 			}
 			AddButton();
@@ -65,6 +65,22 @@ namespace RhuEngine.Components
 
 		}
 
+		private void Engine_SettingsUpdate() {
+
+			//Ui 
+			uICanvas.FrontBindSegments.Value = Engine.MainSettings.UISettings.DashRoundingSteps;
+			uICanvas.TopOffset.Value = Engine.MainSettings.UISettings.TopOffset != 0;
+			uICanvas.TopOffsetValue.Value = Engine.MainSettings.UISettings.TopOffset;
+			uICanvas.FrontBind.Value = Engine.MainSettings.UISettings.FrontBindAngle > 0;
+			uICanvas.FrontBindAngle.Value = Engine.MainSettings.UISettings.FrontBindAngle;
+			uICanvas.FrontBindRadus.Value = Engine.MainSettings.UISettings.FrontBindRadus;
+
+			Entity.position.Value = new Vector3f(-0.7f, 0.1f, 0);
+			Entity.rotation.Value = Quaternionf.CreateFromEuler(-22.5f, 0, 0);
+
+			Entity.parent.Target.position.Value = new Vector3f(0, -0.4f - Engine.MainSettings.UISettings.DashOffsetDown, -(Engine.MainSettings.UISettings.FrontBindRadus/100) - Engine.MainSettings.UISettings.DashOffsetForward);
+
+		}
 
 		public override void Step() {
 			

@@ -10,5 +10,7 @@ namespace RhuEngine.Settings
 	{
 		[SettingsField("Input Settings")]
 		public InputSettingsObject InputSettings = new();
+		[SettingsField("UI Settings")]
+		public UISettingsObject UISettings = new();
 	}
 }

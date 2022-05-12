@@ -130,6 +130,13 @@ namespace RhuEngine
 			var data = SettingsManager.GetDataListFromSettingsObject(MainSettings, new DataList());
 			File.WriteAllText(SettingsFile, SettingsManager.GetJsonFromDataList(data).ToString());
 		}
+
+		public event Action SettingsUpdate;
+
+		public void UpdateSettings() {
+			SettingsUpdate?.Invoke();
+		}
+
 		public void ReloadSettings() {
 			var lists = new List<DataList>();
 			if (File.Exists(SettingsFile)) {
@@ -138,6 +145,7 @@ namespace RhuEngine
 				lists.Add(liet);
 			}
 			MainSettings = lists.Count == 0 ? new MainSettingsObject() : SettingsManager.LoadSettingsObject<MainSettingsObject>(lists.ToArray());
+			UpdateSettings();
 		}
 
 		private string _mainMic;
@@ -257,6 +265,7 @@ namespace RhuEngine
 
 		public void Dispose() {
 			RLog.Info("Engine Disposed");
+			SaveSettings();
 			foreach (var item in _managers) {
 				try {
 					item.Dispose();
