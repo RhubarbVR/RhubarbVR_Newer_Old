@@ -16,14 +16,17 @@
     <Compile Remove="ImguiVeldrid\**" />
     <Compile Remove="Operation RhubarbVRTests\**" />
     <Compile Remove="Platforms\**" />
+    <Compile Remove="Res\Fonts\**" />
     <Compile Remove="SharedModels\**" />
     <EmbeddedResource Remove="ImguiVeldrid\**" />
     <EmbeddedResource Remove="Operation RhubarbVRTests\**" />
     <EmbeddedResource Remove="Platforms\**" />
+    <EmbeddedResource Remove="Res\Fonts\**" />
     <EmbeddedResource Remove="SharedModels\**" />
     <None Remove="ImguiVeldrid\**" />
     <None Remove="Operation RhubarbVRTests\**" />
     <None Remove="Platforms\**" />
+    <None Remove="Res\Fonts\**" />
     <None Remove="SharedModels\**" />
   </ItemGroup>
 
@@ -53,17 +56,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Res\Fonts\ArialCEBold.ttf" />
-    <None Remove="Res\Fonts\FifteenNarrow.ttf" />
-    <None Remove="Res\Fonts\Sacramento_Regular.ttf" />
-    <None Remove="Res\Fonts\Ubuntu_Bold.ttf" />
-    <None Remove="Res\Fonts\Ubuntu_BoldItalic.ttf" />
-    <None Remove="Res\Fonts\Ubuntu_Italic.ttf" />
-    <None Remove="Res\Fonts\Ubuntu_Light.ttf" />
-    <None Remove="Res\Fonts\Ubuntu_LightItalic.ttf" />
-    <None Remove="Res\Fonts\Ubuntu_Medium.ttf" />
-    <None Remove="Res\Fonts\Ubuntu_MediumItalic.ttf" />
-    <None Remove="Res\Fonts\Ubuntu_Regular.ttf" />
     <None Remove="Res\Grid.jpg" />
     <None Remove="Res\nulltexture.jpg" />
     <None Remove="Res\RhubarbVR.png" />
@@ -71,17 +63,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Res\Fonts\ArialCEBold.ttf" />
-    <EmbeddedResource Include="Res\Fonts\FifteenNarrow.ttf" />
-    <EmbeddedResource Include="Res\Fonts\Sacramento_Regular.ttf" />
-    <EmbeddedResource Include="Res\Fonts\Ubuntu_Bold.ttf" />
-    <EmbeddedResource Include="Res\Fonts\Ubuntu_BoldItalic.ttf" />
-    <EmbeddedResource Include="Res\Fonts\Ubuntu_Italic.ttf" />
-    <EmbeddedResource Include="Res\Fonts\Ubuntu_Light.ttf" />
-    <EmbeddedResource Include="Res\Fonts\Ubuntu_LightItalic.ttf" />
-    <EmbeddedResource Include="Res\Fonts\Ubuntu_Medium.ttf" />
-    <EmbeddedResource Include="Res\Fonts\Ubuntu_MediumItalic.ttf" />
-    <EmbeddedResource Include="Res\Fonts\Ubuntu_Regular.ttf" />
     <EmbeddedResource Include="Res\Grid.jpg" />
     <EmbeddedResource Include="Res\nulltexture.jpg" />
   </ItemGroup>
