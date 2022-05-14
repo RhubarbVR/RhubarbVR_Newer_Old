@@ -24,7 +24,16 @@ namespace RhuEngine.Components
 		[NoLoad]
 		[NoSyncUpdate]
 		public UICanvas uICanvas;
-
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public DynamicMaterial iconMit;
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public SpriteProvder sprite;
 		public override void OnAttach() {
 			uICanvas = Entity.AttachComponent<UICanvas>();
 			Engine.SettingsUpdate += Engine_SettingsUpdate;
@@ -33,7 +42,13 @@ namespace RhuEngine.Components
 			var shader = World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
 			var mit = Entity.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;
-			mit.wireframe.Value = true;
+			var iconMit = Entity.AttachComponent<DynamicMaterial>();
+			iconMit.shader.Target = shader;
+			var icontex = Entity.AttachComponent<IconsTex>();
+			iconMit.SetPram("diffuses",icontex);
+			sprite = Entity.AttachComponent<SpriteProvder>();
+			sprite.Texture.Target = icontex;
+			sprite.GridSize.Value = new Vector2i(26,7);
 			mit.transparency.Value = Transparency.Blend;
 			var rectTwo = Entity.AttachComponent<UIRect>();
 			rectTwo.AnchorMin.Value = Vector2f.Zero;

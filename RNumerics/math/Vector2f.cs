@@ -24,6 +24,8 @@ namespace RNumerics
 		public Vector2f(Vector2f copy) { x = copy[0]; y = copy[1]; }
 		public Vector2f(Vector2d copy) { x = (float)copy[0]; y = (float)copy[1]; }
 
+		public static explicit operator Vector2f(Vector2i v) => new(v.x, v.y);
+
 		[IgnoreMember]
 		static public readonly Vector2f Zero = new(0.0f, 0.0f);
 		[IgnoreMember]

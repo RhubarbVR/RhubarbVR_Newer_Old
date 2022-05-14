@@ -16,17 +16,14 @@
     <Compile Remove="ImguiVeldrid\**" />
     <Compile Remove="Operation RhubarbVRTests\**" />
     <Compile Remove="Platforms\**" />
-    <Compile Remove="Res\Fonts\**" />
     <Compile Remove="SharedModels\**" />
     <EmbeddedResource Remove="ImguiVeldrid\**" />
     <EmbeddedResource Remove="Operation RhubarbVRTests\**" />
     <EmbeddedResource Remove="Platforms\**" />
-    <EmbeddedResource Remove="Res\Fonts\**" />
     <EmbeddedResource Remove="SharedModels\**" />
     <None Remove="ImguiVeldrid\**" />
     <None Remove="Operation RhubarbVRTests\**" />
     <None Remove="Platforms\**" />
-    <None Remove="Res\Fonts\**" />
     <None Remove="SharedModels\**" />
   </ItemGroup>
 
@@ -57,6 +54,8 @@
 
   <ItemGroup>
     <None Remove="Res\Grid.jpg" />
+    <None Remove="Res\Icons.ai" />
+    <None Remove="Res\Icons.png" />
     <None Remove="Res\nulltexture.jpg" />
     <None Remove="Res\RhubarbVR.png" />
     <None Remove="Res\RhubarbVR2.png" />
@@ -80,5 +79,9 @@
 
   <ItemGroup>
     <Folder Include="ClipBoard\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Res\Icons.png" />
   </ItemGroup>
 </Project>
