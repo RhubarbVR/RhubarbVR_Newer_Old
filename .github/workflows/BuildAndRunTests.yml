@@ -17,24 +17,24 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build "RhuEngineTests" --no-restore
+      run: dotnet build "RhuEngineTests" --configuration Debug --no-restore
     - name: Test
-      run: dotnet test "RhuEngineTests" --no-build --verbosity normal
+      run: dotnet test "RhuEngineTests" --configuration Debug --no-build --verbosity normal
 
   UbuntuTest:
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build "RhuEngineTests" --no-restore
+      run: dotnet build "RhuEngineTests" --configuration Debug --no-restore
     - name: Test
-      run: dotnet test "RhuEngineTests" --no-build --verbosity normal
+      run: dotnet test "RhuEngineTests" --configuration Debug --no-build --verbosity normal
 
