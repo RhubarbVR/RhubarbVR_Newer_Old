@@ -45,7 +45,8 @@ namespace RhuEngine.Components
 			var iconMit = Entity.AttachComponent<DynamicMaterial>();
 			iconMit.shader.Target = shader;
 			var icontex = Entity.AttachComponent<IconsTex>();
-			iconMit.SetPram("diffuses",icontex);
+			iconMit.SetPram("diffuse", icontex);
+			iconMit.transparency.Value = Transparency.Blend;
 			sprite = Entity.AttachComponent<SpriteProvder>();
 			sprite.Texture.Target = icontex;
 			sprite.GridSize.Value = new Vector2i(26,7);
@@ -59,6 +60,7 @@ namespace RhuEngine.Components
 			var listentit = Entity.AddChild("list");
 			var list = listentit.AttachComponent<HorizontalList>();
 			list.Fit.Value = true;
+			var index = 0;
 			void AddButton() {
 				var child = listentit.AddChild("childEliment");
 				var rectTwo = child.AttachComponent<UIRect>();
@@ -68,7 +70,15 @@ namespace RhuEngine.Components
 				img.Tint.Value = new Colorf(0.2f, 0.2f, 0.2f, 0.9f);
 				img.Material.Target = mit;
 				img.AddRoundingSettings();
+				var icon = child.AddChild("Icon");
+				icon.AttachComponent<UIRect>();
+				var spriterender = icon.AttachComponent<UISprite>();
+				spriterender.Sprite.Target = sprite;
+				spriterender.Material.Target = iconMit;
+				spriterender.PosMin.Value = new Vector2i(index, 0);
+				spriterender.PosMax.Value = new Vector2i(index, 0);
 				child.AttachComponent<UIButtonInteraction>();
+				index++;
 			}
 			AddButton();
 			AddButton();

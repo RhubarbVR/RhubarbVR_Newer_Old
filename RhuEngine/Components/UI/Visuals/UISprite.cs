@@ -73,8 +73,9 @@ namespace RhuEngine.Components
 			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
 			var maxoffset = max;
 			var minoffset = min;
+			var spriteSize = Sprite.Target.GetSizeOfSprite(PosMin, PosMax);
 			if (KeepAspectRatio.Value) {
-				var texture = new Vector2f(Texture.Asset?.Width ?? 1, Texture.Asset?.Height ?? 1);
+				var texture = new Vector2f(spriteSize.x, spriteSize.y);
 				texture /= canvassize;
 				texture /= boxsize;
 				texture /= Math.Max(texture.x, texture.y);
@@ -105,10 +106,11 @@ namespace RhuEngine.Components
 			downright += new Vector3f(maxoffset.x, minoffset.y);
 			downleft += minoffset.XY_;
 
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.AxisY }, bHaveC = false, v = downleft });
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.One }, bHaveC = false, v = downright });
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = upleft });
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.AxisX }, bHaveC = false, v = upright });
+			var (pos, size) = Sprite.Target.GetSpriteSizePoints(PosMin, PosMax);
+			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { pos + new Vector2f(0, size.y) }, bHaveC = false, v = downleft });
+			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { pos + size }, bHaveC = false, v = downright });
+			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { pos }, bHaveC = false, v = upleft });
+			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { pos + new Vector2f(size.x,0) }, bHaveC = false, v = upright });
 			mesh.AppendTriangle(0, 1, 2);
 			mesh.AppendTriangle(1, 3, 2);
 

@@ -18,6 +18,7 @@ namespace RhuEngine.Components
 		
 		[Exsposed]
 		public Vector2i GetSizeOfSprite(Vector2i min, Vector2i max) {
+			max += Vector2i.One;
 			var size = max - min;
 			var x = Texture.Asset.Width / GridSize.Value.x;
 			var y = Texture.Asset.Height / GridSize.Value.y;
@@ -26,6 +27,7 @@ namespace RhuEngine.Components
 
 		[Exsposed]
 		public (Vector2f, Vector2f) GetSpriteSizePoints(Vector2i min, Vector2i max) {
+			max += Vector2i.One;
 			var size = (Vector2f)(max - min) / (Vector2f)GridSize.Value;
 			var bottomleft = (Vector2f)min / (Vector2f)GridSize.Value;
 			return (bottomleft, size);

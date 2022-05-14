@@ -415,7 +415,9 @@ namespace RhuEngine.Components
 						if (list[i].PhysicsCollider is not null) {
 							list[i].PhysicsCollider.Matrix = list[i].PhysicsPose * mataddon * matrix;
 						}
-						meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, mataddon * matrix, list[i].RenderTint);
+						if (list[i].RenderMaterial is not null) {
+							meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, mataddon * matrix, list[i].RenderTint);
+						}
 					}
 				});
 			});
