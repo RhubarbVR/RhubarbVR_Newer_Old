@@ -234,6 +234,17 @@ namespace RhuEngine.GameTests.Tests
 			tester.RunForSteps();
 			tester.Dispose();
 		}
+
+		[TestMethod]
+		public void ConvexRayTest10() {
+			for (var i = 0; i < 10; i++) {
+				tester = new GenericGameTester();
+				ConvexRayTest();
+				tester = null;
+			}
+		}
+
+
 		[TestMethod]
 		public void ConvexRayTest() {
 			var testWorld = StartNewTestWorld();
@@ -241,13 +252,13 @@ namespace RhuEngine.GameTests.Tests
 			var collider = box.GetCollider(testWorld.PhysicsSim, Matrix.TS(Vector3f.Zero, 1), "Trains");
 			var pointworld = Vector3f.AxisX * -5;
 			var OuterPoint = Vector3f.AxisX * 5;
-			tester.RunForSteps();
+			tester.RunForSteps(2);
 			var outer = Matrix.T(OuterPoint);
 			var startpoint = Matrix.T(pointworld);
 			var hashit = testWorld.PhysicsSim.ConvexRayTest(box,ref startpoint, ref outer, out var hitcollider,out var hitnorm,out var worldhit);
 			Assert.IsTrue(hashit);
 			Assert.AreEqual("Trains", hitcollider.CustomObject);
-			tester.RunForSteps();
+			tester.RunForSteps(2);
 			tester.Dispose();
 		}
 

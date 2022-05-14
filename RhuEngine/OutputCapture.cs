@@ -73,8 +73,10 @@ namespace RhuEngine
 		public new void Dispose() 
 		{
 			RLog.Unsubscribe(LogCall);
-			base.Dispose();
+			_writer.Close();
 			_writer.Dispose();
+			_writer = null;
+			base.Dispose();
 		}
 
 		override public void Write(string output) {
