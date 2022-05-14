@@ -40,5 +40,10 @@
 	  <ProjectReference Include="..\..\RhuEngine\RhuEngine.csproj" />
 	  <ProjectReference Include="..\..\RStereoKit\RStereoKit.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Content Update="C:\Projects\RhubarbVR\RhubarbVR\Assets\RhubarbVR.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
 
 </Project>

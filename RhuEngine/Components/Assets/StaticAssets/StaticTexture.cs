@@ -41,8 +41,11 @@ namespace RhuEngine.Components
 					return;
 				}
 				Load(null);
-				Load(new ImageSharpTexture(new MemoryStream(data), true).CreateTexture());
+				var imgsharp = new ImageSharpTexture(new MemoryStream(data), true);
+				Load(imgsharp.CreateTexture());
 				TextValueChanged();
+				imgsharp.Image?.Dispose();
+				imgsharp = null;
 			}
 			catch(Exception err) {
 				RLog.Err($"Failed to load Static Texture Error {err}");

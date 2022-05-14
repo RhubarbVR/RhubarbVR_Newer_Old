@@ -61,7 +61,7 @@ namespace RhuEngine.Components
 			var list = listentit.AttachComponent<HorizontalList>();
 			list.Fit.Value = true;
 			var index = 0;
-			void AddButton() {
+			void AddButton(Vector2i iconindex) {
 				var child = listentit.AddChild("childEliment");
 				var rectTwo = child.AttachComponent<UIRect>();
 				rectTwo.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
@@ -75,19 +75,12 @@ namespace RhuEngine.Components
 				var spriterender = icon.AttachComponent<UISprite>();
 				spriterender.Sprite.Target = sprite;
 				spriterender.Material.Target = iconMit;
-				spriterender.PosMin.Value = new Vector2i(index, 0);
-				spriterender.PosMax.Value = new Vector2i(index, 0);
+				spriterender.PosMin.Value = iconindex;
+				spriterender.PosMax.Value = iconindex;
 				child.AttachComponent<UIButtonInteraction>();
 				index++;
 			}
-			AddButton();
-			AddButton();
-			AddButton();
-			AddButton();
-			AddButton();
-			AddButton();
-			AddButton();
-
+			AddButton(Vector2i.Zero);
 		}
 
 		private void Engine_SettingsUpdate() {
