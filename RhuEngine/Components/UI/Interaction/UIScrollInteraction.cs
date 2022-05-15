@@ -11,6 +11,9 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI\\Rects" })]
 	public class UIScrollInteraction : UIInteractionComponent
 	{
+		[Default(true)]
+		public readonly Sync<bool> AllowAltSwitch;
+
 		public readonly Sync<bool> AllowOtherZones;
 
 		public readonly Sync<Vector2f> MouseScrollSpeed;
@@ -43,7 +46,13 @@ namespace RhuEngine.Components
 				HasFirst = true;
 				if (firstLazer && item.Laser) {
 					if (RInput.Mouse.ScrollChange != Vector2f.Zero) {
-						Scroll(RInput.Mouse.ScrollChange * MouseScrollSpeed * 5);
+						if(AllowAltSwitch && RInput.Key(Key.Alt).IsActive()) {
+							Scroll(new Vector2f(RInput.Mouse.ScrollChange.y, RInput.Mouse.ScrollChange.x) * MouseScrollSpeed * 5);
+						}
+						else {
+							Scroll(RInput.Mouse.ScrollChange * MouseScrollSpeed * 5);
+						}
+
 					}
 					firstLazer = false;
 				}
