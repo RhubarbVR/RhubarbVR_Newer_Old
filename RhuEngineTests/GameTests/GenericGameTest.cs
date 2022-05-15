@@ -236,16 +236,6 @@ namespace RhuEngine.GameTests.Tests
 		}
 
 		[TestMethod]
-		public void ConvexRayTest10() {
-			for (var i = 0; i < 10; i++) {
-				tester = new GenericGameTester();
-				ConvexRayTest();
-				tester = null;
-			}
-		}
-
-
-		[TestMethod]
 		public void ConvexRayTest() {
 			var testWorld = StartNewTestWorld();
 			var box = new RBoxShape(0.5f);

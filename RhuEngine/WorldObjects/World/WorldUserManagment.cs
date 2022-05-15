@@ -136,6 +136,22 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
+		public void DrawDebugText(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf,string text, float drawTime = 1) {
+			if (DebugVisuals) {
+				RWorld.ExecuteOnStartOfFrame(() => {
+					var debugcube = RootEntity.AddChild("DebugText");
+					var meshrender = debugcube.AttachComponent<WorldText>();
+					meshrender.StartingColor.Value = colorf;
+					meshrender.Text.Value = text;
+					meshrender.Entity.GlobalTrans = Matrix.TS(pos, scale) * matrix;
+					Task.Run(async () => {
+						await Task.Delay((int)(1000 * drawTime));
+						debugcube.Destroy();
+					});
+				});
+			}
+		}
+
 		public void DrawDebugSphere(Matrix matrix, Vector3f pos, Vector3d scale, Colorf colorf, float drawTime = 1) {
 			DrawDebugSphere(matrix, pos, (Vector3f)scale, colorf, drawTime);
 		}

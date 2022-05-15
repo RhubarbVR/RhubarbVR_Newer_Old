@@ -53,7 +53,7 @@ namespace RhuEngine.Components
 			if (Fit) {
 				fakeRects.SafeOperation((list) => {
 					var inc = 1f / list.Count;
-					var currentpos = 0f;
+					var currentpos = Min.x;
 					foreach (var item in list) {
 						item.Canvas = Canvas;
 						item.AnchorMax = new Vector2f(currentpos + inc,1f);
@@ -70,14 +70,17 @@ namespace RhuEngine.Components
 					var maxypos = 0f;
 					foreach (var item in list) {
 						item.Canvas = Canvas;
+						item.ParentRect = this;
 						var targetSize = item.Child.AnchorMaxValue - item.Child.AnchorMinValue;
 						maxypos = Math.Max(targetSize.y, maxypos);
+						item.AnchorMin = new Vector2f(xpos, 0);
 						xpos += targetSize.x;
-						item.AnchorMax = new Vector2f(xpos,1);
-						item.AnchorMin = new Vector2f(xpos - 1, 0);
+						item.AnchorMax = new Vector2f(xpos+1f,1);
 					}
-					_maxScroll = new Vector2f(1 - ((xpos - 1)/10),0);
-					_minScroll = new Vector2f(-1 - ((xpos - 1) / 10),0);
+					var scroll = xpos;
+
+					_maxScroll = new Vector2f((scroll + 2) / 10,0);
+					_minScroll = new Vector2f(scroll / 10, 0);
 				});
 			}
 			base.UpdateUIMeshes();

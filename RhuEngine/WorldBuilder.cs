@@ -87,7 +87,7 @@ namespace RhuEngine
 			///
 			var rect = pannel.AttachRectangle(mit, new Vector2f(0.25f, 0f), new Vector2f(1f), Colorf.RhubarbGreen);
 			var button = rect.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.RhubarbRed);
-			button.AttachText(Vector2f.Zero, Vector2f.One, Colorf.White, "<colorred>Button<color=blue><size=20> Can go clicky<color=yellow> clicky<size5> So Click");
+			button.AttachText(Vector2f.Zero, Vector2f.One, Colorf.White, "<colorred>Button<color=blue><size=20> Can go clicky<color=yellow> clicky<size5> So Click\n New Line <size10>Test");
 			var buttonint = button.AttachComponent<UIButtonInteraction>();
 			var buttonpramremove = button.AttachComponent<ButtonEventManager>();
 			var floatValue = button.AttachComponent<ValueField<float>>();

@@ -79,6 +79,7 @@
 
   <ItemGroup>
     <Folder Include="ClipBoard\" />
+    <Folder Include="Components\Math\" />
   </ItemGroup>
 
   <ItemGroup>

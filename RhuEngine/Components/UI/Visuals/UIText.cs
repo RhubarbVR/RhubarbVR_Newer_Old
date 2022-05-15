@@ -32,7 +32,7 @@ namespace RhuEngine.Components
 		public readonly AssetRef<RFont> Font;
 		[OnChanged(nameof(UpdateText))]
 		public readonly Sync<Colorf> StartingColor;
-		[Default(0f)]
+		[Default(0.1f)]
 		[OnChanged(nameof(UpdateText))]
 		public readonly Sync<float> Leading;
 		[OnChanged(nameof(UpdateText))]
@@ -73,6 +73,9 @@ namespace RhuEngine.Components
 		}
 
 		public void UpdateTextOffset() {
+			if(Rect.Canvas is null) {
+				return;
+			}
 			var startDepth = new Vector3f(0, 0, Entity.UIRect.StartPoint);
 			var depth = new Vector3f(0, 0, Entity.UIRect.Depth.Value);
 			var depthStart = startDepth + depth;
@@ -107,8 +110,17 @@ namespace RhuEngine.Components
 				minoffset = new Vector2f(minoffset.x, max.y - maxmin.y);
 			}
 			upleft += new Vector3f(minoffset.x, maxoffset.y);
-			maxmin /= Math.Min(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
-			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), new Vector3f(Math.Min(maxmin.x, maxmin.y)/2) + new Vector3f(0,0,Rect.Canvas.scale.Value.z));
+			var size = max - min;
+			var largestscaleside = Math.Max(size.x, size.y);
+			var largestestside = Math.Max(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
+			var small = largestscaleside == size.y
+				? largestestside == textRender.axisAlignedBox3F.Height
+					? textRender.axisAlignedBox3F.Height / size.y
+					: textRender.axisAlignedBox3F.Width / size.x
+				: largestestside == textRender.axisAlignedBox3F.Width
+					? textRender.axisAlignedBox3F.Width / size.x
+					: textRender.axisAlignedBox3F.Height / size.y;
+			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), Vector3f.One / Rect.Canvas.scale.Value / small * 15);
 			CutElement(true,false);
 		}
 
@@ -119,6 +131,7 @@ namespace RhuEngine.Components
 		public override void OnAttach() {
 			base.OnAttach();
 			Font.Target = World.RootEntity.GetFirstComponentOrAttach<DefaultFont>();
+			StartingColor.Value = Colorf.White;
 		}
 
 		public override void Render(Matrix matrix) {

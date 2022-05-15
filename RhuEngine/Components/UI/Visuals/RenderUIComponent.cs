@@ -107,7 +107,7 @@ namespace RhuEngine.Components
 			RWorld.ExecuteOnEndOfFrame(BoxBased ? RunLoadPhysicsBox : RunLoadPhysicsMesh);
 		}
 
-		public virtual bool BoxBased => !(Rect.Canvas.FrontBind.Value || Rect.Canvas.TopOffset.Value);
+		public virtual bool BoxBased => !((Rect.Canvas?.FrontBind.Value??false) || (Rect.Canvas?.TopOffset.Value??false));
 
 		public void RenderMainMesh(bool updateMesh = true, bool PhysicsMesh = true) {
 			var returnMesh = CutMesh;

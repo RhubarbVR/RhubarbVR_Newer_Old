@@ -113,7 +113,7 @@ namespace RhuEngine.Components
 							bounds.Add(charitem.p.Translation + ewe._Y_);
 						}
 					}
-					var textpos = new Vector3f(textXpos, textYpos - textsizeY, textPosZ);
+					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
 					var ew = new Vector2f((textsize.x + 0.01f) * (fontSize.Peek() / 100), textsize.y * (fontSize.Peek() / 100));
 					var chare = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero,ew);
 					Chars.SafeAdd(chare);

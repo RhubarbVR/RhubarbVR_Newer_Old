@@ -22,13 +22,13 @@ namespace RhuEngine.Settings
 		public int DashRoundingSteps = 10;
 
 		[SettingsField("Dash Top Offset")]
-		public float TopOffset = 3;
+		public float TopOffset = 2;
 
 		[SettingsField("Front Bind Angle")]
 		public float FrontBindAngle = 135f;
 
 		[SettingsField("Front Bind Radus")]
-		public float FrontBindRadus = 7.5f;
+		public float FrontBindRadus = 7f;
 		[SettingsField("Dash Offset Forward")]
 		public float DashOffsetForward = 0.1f;
 		[SettingsField("Dash Offset Down")]

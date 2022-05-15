@@ -36,6 +36,9 @@ namespace RhuEngine.Components
 		}
 
 		public override void ProcessBaseMesh() {
+			if(Rect.Canvas is null) {
+				return;
+			}
 			var mesh = new SimpleMesh();
 			var startDepth = new Vector3f(0, 0, Entity.UIRect.StartPoint);
 			var depth = new Vector3f(0, 0, Entity.UIRect.Depth.Value);

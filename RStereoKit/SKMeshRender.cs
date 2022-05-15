@@ -32,6 +32,29 @@ namespace RStereoKit
 		}
 	}
 
+	public class SKTextRender : RenderLinkBase<WorldText>
+	{
+		public override void Init() {
+			//Not needed for StereoKit
+		}
+
+		public override void Remove() {
+			//Not needed for StereoKit
+		}
+
+		public override void Render() {
+			RenderingComponent.textRender.Render(RNumerics.Matrix.Identity, RenderingComponent.Entity.GlobalTrans);
+		}
+
+		public override void Started() {
+			//Not needed for StereoKit
+		}
+
+		public override void Stopped() {
+			//Not needed for StereoKit
+		}
+	}
+
 	public class SKMeshRender : RenderLinkBase<MeshRender>
 	{
 		public override void Init() {

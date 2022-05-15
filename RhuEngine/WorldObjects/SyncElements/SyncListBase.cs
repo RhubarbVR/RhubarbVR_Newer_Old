@@ -31,7 +31,7 @@ namespace RhuEngine.WorldObjects
 			var sendData = new DataNodeGroup();
 			sendData.SetValue("type", new DataNode<int>(3));
 			World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
-			foreach (var item in _syncObjects) {
+			foreach (var item in _syncObjects.ToArray()) {
 				item.Dispose();
 			}
 			_syncObjects.Clear();

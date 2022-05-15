@@ -92,7 +92,7 @@ namespace RhuEngine.Components
 
 		public void AddHitPoses(HitData hitData) {
 			RWorld.ExecuteOnStartOfFrame(() => {
-				hitData.Clean(LastRenderPos, Canvas.scale.Value / 10);
+				hitData.Clean(LastRenderPos, (Canvas?.scale.Value??Vector3f.One) / 10);
 				_rayHitPoses.Add(hitData);
 				if (_rayHitPoses.Count == 1) {
 					RWorld.ExecuteOnEndOfFrame(this, () => {
@@ -210,10 +210,12 @@ namespace RhuEngine.Components
 				anglecalfirst = (anglecalfirst * -1) + 90;
 			}
 			var rollangle = 0f;
+			var transform = firstpos - matrix.Translation;
 			if (Canvas.TopOffset.Value) {
-				rollangle = Canvas.TopOffsetValue.Value * matrix.Translation.y;
+				rollangle = Canvas.TopOffsetValue.Value * matrix.Translation.y * 45;
+				transform += new Vector3f(0, Canvas.TopOffsetValue.Value * 0.03f, 0);
 			}
-			return Matrix.TR(firstpos - matrix.Translation, Quaternionf.CreateFromEuler(anglecalfirst, rollangle, 0));
+			return Matrix.TR(transform, Quaternionf.CreateFromEuler(anglecalfirst, rollangle, 0));
 		}
 		public Vector3f VertMove(Vector3f point) {
 			var npoint = point;
@@ -411,7 +413,7 @@ namespace RhuEngine.Components
 			_meshes.SafeOperation((meshList) => {
 				_uiRenderComponents.SafeOperation((list) => {
 					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
-						var mataddon = list[i].BoxBased ? Matrix.S(Canvas.scale.Value / 10) : Matrix.Identity;
+						var mataddon = list[i].BoxBased ? Matrix.S((Canvas?.scale.Value??Vector3f.One) / 10) : Matrix.Identity;
 						if (list[i].PhysicsCollider is not null) {
 							list[i].PhysicsCollider.Matrix = list[i].PhysicsPose * mataddon * matrix;
 						}
@@ -443,12 +445,12 @@ namespace RhuEngine.Components
 
 		public override void OnLoaded() {
 			base.OnLoaded();
+			RegisterCanvas();
 			Entity.SetUIRect(Entity.GetFirstComponent<UIRect>() ?? this);
 			Entity.components.Changed += RegisterUIList;
 			Entity.children.Changed += Children_Changed;
 			Children_Changed(null);
 			RegisterUIList(null);
-			RegisterCanvas();
 			ProcessCutting();
 		}
 
