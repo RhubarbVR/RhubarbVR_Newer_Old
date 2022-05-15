@@ -108,11 +108,12 @@ namespace RhuEngine
 
 			var listRoot = pannel.AttachList(mit, new Vector2f(0f), new Vector2f(0.25f, 1f), Colorf.Blue);
 			void AttachListElement(Entity root,string text) {
-				var e = root.AttachRectangle(mit, new Vector2f(0f, 0f), new Vector2f(0.2f,1f), Colorf.RhubarbRed);
+				var e = root.AttachRectangle(mit, new Vector2f(0f, 0f), new Vector2f(0.2f, 1f), Colorf.RhubarbRed);
 				e.AttachImage(shader, new Vector2f(0.5, 0), new Vector2f(1f), Colorf.White, texture);
 				e.AttachText(new Vector2f(0), new Vector2f(0.5f, 1), Colorf.White,text);
 			}
-			for (var i = 0; i < 15; i++) {
+			var random = new Random();
+			for (var i = 0; i < random.Next(8, 25); i++) {
 				AttachListElement(listRoot,$"Element {i}");
 			}
 			listRoot.GetFirstComponent<UIRect>().RegUpdateUIMeshes();

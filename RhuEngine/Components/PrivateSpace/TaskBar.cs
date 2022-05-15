@@ -229,7 +229,7 @@ namespace RhuEngine.Components
 			AddButton(leftSide, new Vector2i(8,3), OpenSoundOptions);
 		
 			var listentitHolder = Entity.AddChild("listentitHolder");
-			var listentitHolderrect = listentitHolder.AttachComponent<UIRect>();
+			var listentitHolderrect = listentitHolder.AttachComponent<CuttingUIRect>();
 			listentitHolderrect.AnchorMin.Value = new Vector2f(0.20f, 0.1f);
 			listentitHolderrect.AnchorMax.Value = new Vector2f(0.8f, 0.9f);
 			

@@ -67,17 +67,28 @@ namespace RhuEngine.Components
 			else {
 				fakeRects.SafeOperation((list) => {
 					var ypos = 0f;
-					var maxXpos = 0f;
+					Vector2f? min = null;
+					var max = Vector2f.Zero;
 					foreach (var item in list) {
 						item.Canvas = Canvas;
+						item.ParentRect = this;
 						var targetSize = item.Child.AnchorMaxValue - item.Child.AnchorMinValue;
-						maxXpos = Math.Max(targetSize.x, maxXpos);
+						item.AnchorMin = new Vector2f(0, ypos);
+						item.AnchorMax = new Vector2f(1, ypos + 1f);
 						ypos += targetSize.y;
-						item.AnchorMax = new Vector2f(1,ypos);
-						item.AnchorMin = new Vector2f(0,ypos - 1);
+						min ??= item.Child.Min;
+						max = item.Child.Max;
 					}
-					_maxScroll = new Vector2f(0, 1 - ((ypos - 1)/10));
-					_minScroll = new Vector2f(0,-1 - ((ypos - 1) / 10));
+					var scollmax = max - (min ?? Vector2f.Zero);
+					var scale = Max - Min;
+					if (scale.y >= scollmax.y) {
+						_maxScroll = Vector2f.Zero;
+						_minScroll = Vector2f.Zero;
+					}
+					else {
+						_maxScroll = new Vector2f(0, 0);
+						_minScroll = new Vector2f(-(scollmax.x - scale.x), -scollmax.y + scale.y);
+					}
 				});
 			}
 			base.UpdateUIMeshes();
