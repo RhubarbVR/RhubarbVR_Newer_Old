@@ -203,11 +203,11 @@ namespace RhuEngine.Components
 			mit.shader.Target = shader;
 			iconMit = Entity.AttachComponent<DynamicMaterial>();
 			iconMit.shader.Target = shader;
-			var icontex = Entity.AttachComponent<IconsTex>();
-			iconMit.SetPram("diffuse", icontex);
+			var icons = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
+			iconMit.SetPram("diffuse", icons);
 			iconMit.transparency.Value = Transparency.Blend;
 			sprite = Entity.AttachComponent<SpriteProvder>();
-			sprite.Texture.Target = icontex;
+			sprite.Texture.Target = icons;
 			sprite.GridSize.Value = new Vector2i(26,7);
 			mit.transparency.Value = Transparency.Blend;
 

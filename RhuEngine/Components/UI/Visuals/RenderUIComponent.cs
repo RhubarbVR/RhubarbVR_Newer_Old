@@ -28,6 +28,7 @@ namespace RhuEngine.Components
 		public abstract void ProcessBaseMesh();
 
 		public void ProcessMesh() {
+			MainMesh = null;
 			ProcessBaseMesh();
 			ScrollMesh = null;
 			CutMesh = null;

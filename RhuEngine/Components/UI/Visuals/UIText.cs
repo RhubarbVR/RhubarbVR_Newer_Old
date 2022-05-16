@@ -73,7 +73,7 @@ namespace RhuEngine.Components
 		}
 
 		public void UpdateTextOffset() {
-			if(Rect.Canvas is null) {
+			if(Rect?.Canvas is null) {
 				return;
 			}
 			var startDepth = new Vector3f(0, 0, Entity.UIRect.StartPoint);
@@ -135,7 +135,7 @@ namespace RhuEngine.Components
 		}
 
 		public override void Render(Matrix matrix) {
-			textRender.Render(textOffset, Matrix.T(Rect.ScrollOffset) * Matrix.S(Rect.Canvas.scale.Value / 10) * matrix);
+			textRender.Render(textOffset, Matrix.T(Rect.ScrollOffset) * Matrix.S((Rect.Canvas?.scale.Value??Vector3f.One) / 10) * matrix);
 		}
 
 		public override void CutElement(bool cut,bool update) {

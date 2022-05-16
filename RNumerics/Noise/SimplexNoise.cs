@@ -91,8 +91,8 @@ namespace RNumerics.Noise
 		/// </summary>
 		/// <param name="x"></param>
 		/// <returns></returns>
-		public static float Generate(float x) {
-			var i0 = FastFloor(x);
+		public static T Generate<T>(T x) {
+			var i0 = FastFloor((dynamic)x);
 			var i1 = i0 + 1;
 			var x0 = x - i0;
 			var x1 = x0 - 1.0f;
@@ -311,6 +311,10 @@ namespace RNumerics.Noise
 		/// Helper function to compute the SimplexNoise value based on time, speed, magnitude and seed.
 		public static float Generate1D(float time, float speed, float magnitude, float seed) {
 			return Generate((time * speed) + seed) * magnitude;
+		}
+
+		public static T Generate<T>(float time, T speed, T magnitude, T seed) {
+			return Generate(((dynamic)speed * time) + seed) * magnitude;
 		}
 
 		private static byte[] _perm;

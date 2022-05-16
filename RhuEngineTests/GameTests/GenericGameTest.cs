@@ -21,6 +21,7 @@ using RNumerics;
 
 using SharedModels.GameSpecific;
 using System.Reflection;
+using RhuEngine.Datatypes;
 
 namespace RhuEngine.GameTests.Tests
 {
@@ -305,6 +306,116 @@ namespace RhuEngine.GameTests.Tests
 			tester.Dispose();
 		}
 
+		[TestMethod()]
+		public void TestMultiOperatorsComponentNetPointer() {
+			var testEntity = AttachEntity();
+			var inttest = testEntity.AttachComponent<Components.MultiOperators<NetPointer, NetPointer>>();
+			var output = testEntity.AttachComponent<Components.ValueField<NetPointer>>();
+			inttest.Output.Target = output.Value;
+			var random = new Random();
+			var inputs = testEntity.AttachComponent<Components.ValueList<NetPointer>>();
+			var one = inputs.Value.Add();
+			var valueone = one.Value = new NetPointer((ulong)random.Next(0, 1000000));
+			inttest.Inputs.Add().Target = one;
+
+			var two = inputs.Value.Add();
+			var valuetwo = two.Value = new NetPointer((ulong)random.Next(0, 1000000));
+			inttest.Inputs.Add().Target = two;
+
+			var three = inputs.Value.Add();
+			var valueThree = three.Value = new NetPointer((ulong)random.Next(0, 1000000));
+			inttest.Inputs.Add().Target = three;
+
+			inttest.Operators.Value = Components.MultiOperators.Addition;
+			Assert.AreNotEqual(output.Value, new NetPointer(valueone.id + valuetwo.id + valueThree.id));
+
+			tester.RunForSteps();
+			tester.Dispose();
+		}
+
+		[TestMethod()]
+		public void TestMultiOperatorsComponentVector() {
+			var testEntity = AttachEntity();
+			var inttest = testEntity.AttachComponent<Components.MultiOperators<Vector3f, Vector3f>>();
+			var output = testEntity.AttachComponent<Components.ValueField<Vector3f>>();
+			inttest.Output.Target = output.Value;
+			var random = new Random();
+			var inputs = testEntity.AttachComponent<Components.ValueList<Vector3f>>();
+			var one = inputs.Value.Add();
+			var valueone = one.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
+			inttest.Inputs.Add().Target = one;
+
+			var two = inputs.Value.Add();
+			var valuetwo = two.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
+			inttest.Inputs.Add().Target = two;
+
+			var three = inputs.Value.Add();
+			var valueThree = three.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
+			inttest.Inputs.Add().Target = three;
+
+			inttest.Operators.Value = Components.MultiOperators.Addition;
+			Assert.AreEqual(output.Value, valueone + valuetwo + valueThree);
+
+			inttest.Operators.Value = Components.MultiOperators.Subtraction;
+			Assert.AreEqual(output.Value, valueone - valuetwo - valueThree);
+
+			inttest.Operators.Value = Components.MultiOperators.Multiplication;
+			Assert.AreEqual(output.Value, valueone * valuetwo * valueThree);
+
+			inttest.Operators.Value = Components.MultiOperators.Division;
+			Assert.AreEqual(output.Value, valueone / valuetwo / valueThree);
+
+			tester.RunForSteps();
+			tester.Dispose();
+		}
+
+		[TestMethod()]
+		public void TestMultiOperatorsComponentInt() {
+			var testEntity = AttachEntity();
+			var inttest = testEntity.AttachComponent<Components.MultiOperators<int, int>>();
+			var output = testEntity.AttachComponent<Components.ValueField<int>>();
+			inttest.Output.Target = output.Value;
+			var random = new Random();
+			var inputs = testEntity.AttachComponent<Components.ValueList<int>>();
+			var one = inputs.Value.Add();
+			var valueone = one.Value = random.Next(-100,100);
+			inttest.Inputs.Add().Target = one;
+
+			var two = inputs.Value.Add();
+			var valuetwo = two.Value = random.Next(-100, 100);
+			inttest.Inputs.Add().Target = two;
+
+			var three = inputs.Value.Add();
+			var valueThree = three.Value = random.Next(-100, 100);
+			inttest.Inputs.Add().Target = three;
+
+			inttest.Operators.Value = Components.MultiOperators.Addition;
+			Assert.AreEqual(output.Value, valueone + valuetwo + valueThree);
+
+			inttest.Operators.Value = Components.MultiOperators.Subtraction;
+			Assert.AreEqual(output.Value, valueone - valuetwo - valueThree);
+
+			inttest.Operators.Value = Components.MultiOperators.Multiplication;
+			Assert.AreEqual(output.Value, valueone * valuetwo * valueThree);
+
+			inttest.Operators.Value = Components.MultiOperators.Division;
+			Assert.AreEqual(output.Value, valueone / valuetwo / valueThree);
+
+			inttest.Operators.Value = Components.MultiOperators.Modulus;
+			Assert.AreEqual(output.Value, valueone % valuetwo % valueThree);
+
+			inttest.Operators.Value = Components.MultiOperators.LogicalOR;
+			Assert.AreEqual(output.Value, valueone | valuetwo | valueThree);
+
+			inttest.Operators.Value = Components.MultiOperators.LogicalExclusiveOR;
+			Assert.AreEqual(output.Value, valueone ^ valuetwo ^ valueThree);
+
+			inttest.Operators.Value = Components.MultiOperators.LogicalAND;
+			Assert.AreEqual(output.Value, valueone & valuetwo & valueThree);
+
+			tester.RunForSteps();
+			tester.Dispose();
+		}
 
 		[TestMethod()]
 		public void TestAllComponents() {

@@ -13,6 +13,12 @@ namespace RhuEngine.WorldObjects
 	{
 		private readonly SynchronizedCollection<T> _syncObjects = new(5);
 
+		public event Action<IChangeable> ChildChanged;
+
+		private void UpdateChildChanged(IChangeable changeable) {
+			ChildChanged?.Invoke(changeable);
+		}
+
 		public event Action<IChangeable> Changed;
 		[Exsposed]
 		public int IndexOf(T value) {
@@ -68,6 +74,10 @@ namespace RhuEngine.WorldObjects
 				offset.OffsetChanged += ReorderList;
 				offsetindex = offset.Offset;
 			}
+			if (typeof(IChangeable).IsAssignableFrom(newElement.GetType())) {
+				var offset = (IChangeable)newElement;
+				offset.Changed += UpdateChildChanged;
+			}
 			lock (_locker) {
 				var hasAdded = false;
 				for (var i = 0; i < _syncObjects.Count; i++) {
@@ -113,6 +123,10 @@ namespace RhuEngine.WorldObjects
 			}
 			OnElementRemmoved(value);
 			value.OnDispose -= NewElement_OnDispose;
+			if (typeof(IChangeable).IsAssignableFrom(value.GetType())) {
+				var offset = (IChangeable)value;
+				offset.Changed -= UpdateChildChanged;
+			}
 			lock (_locker) {
 				_syncObjects.Remove(value);
 				FixAllNames();

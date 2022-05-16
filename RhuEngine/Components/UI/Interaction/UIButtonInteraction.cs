@@ -31,7 +31,7 @@ namespace RhuEngine.Components
 		public bool CustomTouch;
 	}
 
-	[Category(new string[] { "UI\\Rects" })]
+	[Category(new string[] { "UI\\Interaction" })]
 	public class UIButtonInteraction : UIInteractionComponent
 	{
 		[Default(true)]
@@ -58,7 +58,7 @@ namespace RhuEngine.Components
 		private HitData _lastHitData;
 
 		private void SendEvent(ButtonEvent buttonEvent) {
-			RWorld.ExecuteOnEndOfFrame(() => ButtonEvent.Target?.Invoke(buttonEvent));
+			RWorld.ExecuteOnStartOfFrame(this,() => ButtonEvent.Target?.Invoke(buttonEvent));
 		}
 
 		private void RunButtonClickEvent(HitData hitData) {

@@ -67,6 +67,7 @@ namespace RhuEngine
 			entity.position.Value = new Vector3f(0, 1, 0);
 			var pannel = entity.AddChild("PannelRoot");
 			var shader = entity.World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
+			
 			var mit = pannel.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;
 			var rectone = pannel.AttachComponent<UIRect>();

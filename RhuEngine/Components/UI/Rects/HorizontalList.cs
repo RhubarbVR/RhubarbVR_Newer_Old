@@ -56,9 +56,9 @@ namespace RhuEngine.Components
 					var currentpos = Min.x;
 					foreach (var item in list) {
 						item.Canvas = Canvas;
-						item.AnchorMax = new Vector2f(currentpos + inc,1f);
 						item.AnchorMin = new Vector2f(currentpos,0f);
 						currentpos += inc;
+						item.AnchorMax = new Vector2f(currentpos, 1f);
 					}
 					_maxScroll = Vector2f.Zero;
 					_minScroll = Vector2f.Zero;

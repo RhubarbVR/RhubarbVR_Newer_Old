@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using RhuEngine.Linker;
+using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 
@@ -17,5 +18,9 @@ namespace RhuEngine.Components.PrivateSpace
 		public override RTexture2D Texture => null;
 
 		public override string ProgramName => "Login";
+
+		public override void LoadUI(Entity uiRoot) {
+
+		}
 	}
 }

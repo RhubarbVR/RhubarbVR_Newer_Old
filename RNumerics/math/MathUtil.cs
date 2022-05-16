@@ -45,9 +45,8 @@ namespace RNumerics
 			return (float)Math.Abs(a - b) <= epsilon;
 		}
 
-		// ugh C# generics so limiting...
-		public static T Clamp<T>(T f, T low, T high) where T : IComparable {
-			return f.CompareTo(low) < 0 ? low : f.CompareTo(high) > 0 ? high : f;
+		public static T Clamp<T>(T f, T low, T high) {
+			return ((dynamic)f < low) ? low : ((dynamic)f > high) ? high : f;
 		}
 		public static float Clamp(float f, float low, float high) {
 			return (f < low) ? low : (f > high) ? high : f;

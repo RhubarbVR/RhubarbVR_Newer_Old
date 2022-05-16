@@ -40,28 +40,28 @@ namespace RNumerics
 		}
 
 		public void SafeAdd(T value) {
-			_semaphore.WaitOne();
+			//_semaphore.WaitOne();
 
 			List.Add(value);
 
-			_semaphore.Release();
+			//_semaphore.Release();
 		}
 
 
 		public void SafeOperation(Action<List<T>> opF) {
-			_semaphore.WaitOne();
+			//_semaphore.WaitOne();
 
 			opF(List);
 
-			_semaphore.Release();
+			//_semaphore.Release();
 		}
 
 		public void SafeRemove(T value) {
-			_semaphore.WaitOne();
+			//_semaphore.WaitOne();
 
 			List.Remove(value);
 
-			_semaphore.Release();
+			//_semaphore.Release();
 		}
 	}
 

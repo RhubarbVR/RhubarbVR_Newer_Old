@@ -92,7 +92,7 @@ namespace RhuEngine.Components
 
 		public void AddHitPoses(HitData hitData) {
 			RWorld.ExecuteOnStartOfFrame(() => {
-				hitData.Clean(LastRenderPos, (Canvas?.scale.Value??Vector3f.One) / 10);
+				hitData.Clean(LastRenderPos, (Canvas?.scale.Value ?? Vector3f.One) / 10);
 				_rayHitPoses.Add(hitData);
 				if (_rayHitPoses.Count == 1) {
 					RWorld.ExecuteOnEndOfFrame(this, () => {
@@ -190,7 +190,10 @@ namespace RhuEngine.Components
 				}
 			}
 		}
-
+		[OnChanged(nameof(RegUpdateUIMeshes))]
+		public readonly Sync<Vector2f> OffsetLocalMin;
+		[OnChanged(nameof(RegUpdateUIMeshes))]
+		public readonly Sync<Vector2f> OffsetLocalMax;
 		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public readonly Sync<Vector2f> OffsetMin;
 		[OnChanged(nameof(RegUpdateUIMeshes))]
@@ -245,15 +248,15 @@ namespace RhuEngine.Components
 
 		public virtual Vector2f CutZonesMin => Entity.parent.Target?.UIRect?.CutZonesMin ?? Vector2f.NInf;
 
-		public Vector2f Min => TrueMin + (OffsetMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
+		public Vector2f Min => TrueMin + (OffsetLocalMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 
-		public Vector2f Max => TrueMax + (OffsetMax.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
+		public Vector2f Max => TrueMax + (OffsetLocalMax.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 
-		public Vector2f BadMin => ((((_rectDataOverride ?? ParentRect)?.BadMin ?? Vector2f.One) - (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One))) * (Vector2f.One - AnchorMin.Value)) + (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One));
+		public Vector2f BadMin => ((((_rectDataOverride ?? ParentRect)?.BadMin ?? Vector2f.One) - (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One))) * (Vector2f.One - AnchorMin.Value)) + (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One)) - (OffsetMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 
 		public Vector2f TrueMin => Vector2f.One - BadMin;
 
-		public Vector2f TrueMax => ((((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One) - ((_rectDataOverride ?? ParentRect)?.TrueMin ?? Vector2f.Zero)) * AnchorMax.Value) + ((_rectDataOverride ?? ParentRect)?.TrueMin ?? Vector2f.Zero);
+		public Vector2f TrueMax => ((((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One) - ((_rectDataOverride ?? ParentRect)?.TrueMin ?? Vector2f.Zero)) * AnchorMax.Value) + ((_rectDataOverride ?? ParentRect)?.TrueMin ?? Vector2f.Zero) + (OffsetMax.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 
 		public float StartPoint => ((_rectDataOverride ?? ParentRect)?.StartPoint ?? 0) + ((_rectDataOverride ?? ParentRect)?.DepthValue ?? 0);
 
@@ -413,7 +416,7 @@ namespace RhuEngine.Components
 			_meshes.SafeOperation((meshList) => {
 				_uiRenderComponents.SafeOperation((list) => {
 					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
-						var mataddon = list[i].BoxBased ? Matrix.S((Canvas?.scale.Value??Vector3f.One) / 10) : Matrix.Identity;
+						var mataddon = list[i].BoxBased ? Matrix.S((Canvas?.scale.Value ?? Vector3f.One) / 10) : Matrix.Identity;
 						if (list[i].PhysicsCollider is not null) {
 							list[i].PhysicsCollider.Matrix = list[i].PhysicsPose * mataddon * matrix;
 						}
@@ -430,7 +433,9 @@ namespace RhuEngine.Components
 			});
 			_childRects.SafeOperation((list) => {
 				foreach (var item in list) {
-					item?.Render(matrix);
+					if (item.Entity.IsEnabled) {
+						item?.Render(matrix);
+					}
 				}
 			});
 		}
@@ -459,38 +464,37 @@ namespace RhuEngine.Components
 		public virtual void ChildAdded(UIRect child) {
 			child?.SetOverride(null);
 		}
-
 		private void Children_Changed(IChangeable obj) {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
 			RWorld.ExecuteOnStartOfFrame(() => {
-				_boundTo.SafeOperation((list) => {
-					foreach (var item in list) {
+				_boundTo.SafeOperation((alist) => {
+					var added = false;
+					foreach (var item in alist) {
 						item.components.Changed -= Children_Changed;
 					}
-					list.Clear();
-				});
-				_childRects.SafeOperation((list) => list.Clear());
-				var added = false;
-				_childRects.SafeOperation((list) => {
-					foreach (Entity item in Entity.children) {
-						_boundTo.SafeAdd(item);
-						item.components.Changed += Children_Changed;
-						var childadded = item.GetFirstComponent<UIRect>();
-						if (childadded != null) {
-							ChildAdded(childadded);
-							list.Add(childadded);
-							childadded.RegUpdateUIMeshes();
-							added = true;
+					alist.Clear();
+					_childRects.SafeOperation((list) => {
+						list.Clear();
+						foreach (Entity item in Entity.children) {
+							item.components.Changed += Children_Changed;
+							alist.Add(item);
+							var childadded = item.GetFirstComponent<UIRect>();
+							if (childadded != null) {
+								ChildAdded(childadded);
+								list.Add(childadded);
+								childadded.RegUpdateUIMeshes();
+								added = true;
+							}
 						}
+					});
+					ProcessCutting(false);
+					UpdateUIMeshes();
+					if (added) {
+						ChildRectAdded();
 					}
 				});
-				ProcessCutting(false);
-				UpdateUIMeshes();
-				if (added) {
-					ChildRectAdded();
-				}
 			});
 		}
 

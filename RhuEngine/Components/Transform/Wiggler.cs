@@ -3,7 +3,7 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RNumerics.Noise;
 
-namespace RhuEngine.Components.Transform
+namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Transform" })]

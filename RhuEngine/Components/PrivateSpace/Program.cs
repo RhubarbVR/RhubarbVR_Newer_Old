@@ -37,7 +37,12 @@ namespace RhuEngine.Components
 
 		public void IntProgram() {
 			World.DrawDebugText(taskBar.Entity.GlobalTrans, new Vector3f(0,1,-1), Vector3f.One, Colorf.Green,"Program Loaded", 5);
+			var newWindow = Entity.AttachComponent<Window>();
+			newWindow.NameValue.Value = ProgramName;
+			LoadUI(newWindow.PannelRoot.Target);
 		}
+
+		public abstract void LoadUI(Entity uiRoot);
 
 		public void ClickedButton() {
 			RLog.Info("Clicked button");
