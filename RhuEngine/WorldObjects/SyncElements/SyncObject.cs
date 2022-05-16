@@ -179,7 +179,7 @@ namespace RhuEngine.WorldObjects
 							if (startValue != null) {
 								var method = GetType().GetMethod(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 								if (method is null) {
-									RLog.Err($"Method {startValue.Data} not found");
+									throw new Exception($"Method {startValue.Data} not found");
 								}
 								else {
 									var prams = method.GetParameters();
@@ -190,7 +190,7 @@ namespace RhuEngine.WorldObjects
 										((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[1] { obj });
 									}
 									else {
-										RLog.Err($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
+										throw new Exception($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
 									}
 								}
 							}

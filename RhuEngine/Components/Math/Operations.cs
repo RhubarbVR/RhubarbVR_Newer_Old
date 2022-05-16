@@ -48,7 +48,7 @@ namespace RhuEngine.Components
 			Inputs.ChildChanged += Inputs_ChildChanged;
 		}
 
-		private void Inputs_ChildChanged(IChangeable obj) {
+		internal void Inputs_ChildChanged(IChangeable obj) {
 			ComputeOutput();
 		}
 
@@ -78,7 +78,7 @@ namespace RhuEngine.Components
 		IValueSource<In> _lastInputOne;
 		IValueSource<In> _lastInputTwo;
 
-		private void BindOne() {
+		internal void BindOne() {
 			if (_lastInputOne is not null) {
 				_lastInputOne.Changed -= Compute;
 			}
@@ -89,7 +89,7 @@ namespace RhuEngine.Components
 			_lastInputOne = InputOne.Target;
 		}
 
-		private void BindTwo() {
+		internal void BindTwo() {
 			if (_lastInputTwo is not null) {
 				_lastInputTwo.Changed -= Compute;
 			}
@@ -104,7 +104,7 @@ namespace RhuEngine.Components
 			Compute(null);
 		}
 
-		private void Compute(IChangeable changeable) {
+		internal void Compute(IChangeable changeable) {
 			if (Output.Linked) {
 				var a = InputOne.Target?.Value ?? default;
 				var b = InputTwo.Target?.Value ?? default;
@@ -131,7 +131,7 @@ namespace RhuEngine.Components
 		IValueSource<In> _lastInputTwo;
 		IValueSource<In> _lastInputThree;
 
-		private void BindOne() {
+		internal void BindOne() {
 			if (_lastInputOne is not null) {
 				_lastInputOne.Changed -= Compute;
 			}
@@ -142,7 +142,7 @@ namespace RhuEngine.Components
 			_lastInputOne = InputOne.Target;
 		}
 
-		private void BindTwo() {
+		internal void BindTwo() {
 			if (_lastInputTwo is not null) {
 				_lastInputTwo.Changed -= Compute;
 			}
@@ -153,7 +153,7 @@ namespace RhuEngine.Components
 			_lastInputTwo = InputTwo.Target;
 		}
 
-		private void BindThree() {
+		internal void BindThree() {
 			if (_lastInputThree is not null) {
 				_lastInputThree.Changed -= Compute;
 			}
@@ -167,7 +167,7 @@ namespace RhuEngine.Components
 			Compute(null);
 		}
 
-		private void Compute(IChangeable changeable) {
+		internal void Compute(IChangeable changeable) {
 			if (Output.Linked) {
 				var a = InputOne.Target?.Value ?? default;
 				var b = InputTwo.Target?.Value ?? default;
@@ -189,7 +189,7 @@ namespace RhuEngine.Components
 
 		IValueSource<In> _lastInput;
 
-		private void Bind() {
+		internal void Bind() {
 			if (_lastInput is not null) {
 				_lastInput.Changed -= Compute;
 			}
@@ -202,7 +202,7 @@ namespace RhuEngine.Components
 		public void ComputeOutput() {
 			Compute(null);
 		}
-		private void Compute(IChangeable changeable) {
+		internal void Compute(IChangeable changeable) {
 			if (Output.Linked) {
 				if(Input.Target is not null) {
 					Output.LinkedValue = Compute(Input.Target.Value);
