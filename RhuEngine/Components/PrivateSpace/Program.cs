@@ -49,6 +49,11 @@ namespace RhuEngine.Components
 			window.OnClose.Target = Close;
 			window.NameValue.Value = ProgramName;
 			LoadUI(window.PannelRoot.Target);
+			BringToMe();
+		}
+
+		public void BringToMe() {
+			Entity.GlobalTrans = Matrix.TR(new Vector3f(0,0.15f,-0.85f),Quaternionf.CreateFromEuler(22.5f,0,0)) * taskBar.Entity.GlobalTrans;
 		}
 
 		public abstract void LoadUI(Entity uiRoot);
@@ -70,9 +75,17 @@ namespace RhuEngine.Components
 			base.Dispose();
 		}
 
+		private DateTime _lastClick = DateTime.UtcNow;
+
 		public void ClickedButton() {
 			if (Minimized) {
 				Minimize();
+			}
+			else {
+				if((DateTime.UtcNow - _lastClick).Seconds <= 1) {
+					BringToMe();
+				}
+				_lastClick = DateTime.UtcNow;
 			}
 		}
 	}

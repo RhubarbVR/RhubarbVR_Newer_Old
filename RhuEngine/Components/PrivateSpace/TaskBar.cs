@@ -59,7 +59,7 @@ namespace RhuEngine.Components
 		public void AddTaskBarItemToList(ITaskBarItem taskBarItem) {
 			var remove = new List<ITaskBarItem>();
 			for (var i = 0; i < taskBarItems.Count; i++) {
-				if(taskBarItem.ProgramID == taskBarItems[i].ProgramID) {
+				if(taskBarItem.ID == taskBarItems[i].ID) {
 					remove.Add(taskBarItems[i]);
 				}
 			}
@@ -276,8 +276,6 @@ namespace RhuEngine.Components
 			var child3 = RightSide.AddChild("childEliment");
 			var rectTwo2 = child3.AttachComponent<UIRect>();
 			rectTwo2.AnchorMin.Value = new Vector2f(0.5f, 0);
-			rectTwo2.AnchorMax.Value = new Vector2f(0.9f,1f);
-			child3 = child3.AddChild("childEliment");
 			var rectTwom = child3.AttachComponent<UIRect>();
 			var text = child3.AttachComponent<UIText>();
 			TimeText.SetLinkerTarget(text.Text);
@@ -332,7 +330,7 @@ namespace RhuEngine.Components
 			var date = DateTime.Now;
 			var sysFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
 			var sysFormatTime = CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern;
-			var newTimeText = $"{date.ToString($"{sysFormatTime} \n {sysFormat}",CultureInfo.InvariantCulture)} ";
+			var newTimeText = $"<size13>{date.ToString(sysFormatTime,CultureInfo.InvariantCulture)} \n<size10>{date.ToString(sysFormat, CultureInfo.InvariantCulture)}";
 			if (TimeText.Linked) {
 				if(TimeText.LinkedValue != newTimeText) {
 					TimeText.LinkedValue = newTimeText;

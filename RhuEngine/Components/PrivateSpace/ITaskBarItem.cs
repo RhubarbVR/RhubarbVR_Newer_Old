@@ -22,7 +22,7 @@ namespace RhuEngine.Components.PrivateSpace
 			if (program != null) {
 				ProgramType = program.GetType();
 				ShowOpenFlag = true;
-				ProgramID = program.ProgramID;
+				ID = program.ProgramID;
 				Icon = program.Icon;
 				Texture = program.Texture;
 				Name = program.ProgramName;
@@ -33,7 +33,7 @@ namespace RhuEngine.Components.PrivateSpace
 			if (typeof(Program).IsAssignableFrom(programLink)) {
 				var program = (Program)Activator.CreateInstance(programLink);
 				ShowOpenFlag = false;
-				ProgramID = program.ProgramID;
+				ID = program.ProgramID;
 				Icon = program.Icon;
 				Texture = program.Texture;
 				Name = program.ProgramName;
@@ -45,7 +45,7 @@ namespace RhuEngine.Components.PrivateSpace
 		}
 		public bool ShowOpenFlag { get; set; }
 
-		public string ProgramID { get; set; }
+		public string ID { get; set; }
 
 		public Vector2i? Icon { get; set; }
 
@@ -55,7 +55,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 		public void Clicked() {
 			if(Program is null) {
-				TaskBar.OpenProgram(ProgramID,ProgramType);
+				TaskBar.OpenProgram(ID,ProgramType);
 			}
 			else {
 				Program.ClickedButton();
@@ -67,7 +67,7 @@ namespace RhuEngine.Components.PrivateSpace
 	{
 		public bool ShowOpenFlag { get; }
 		
-		public string ProgramID { get; }
+		public string ID { get; }
 
 		public Vector2i? Icon { get; }
 
