@@ -25,6 +25,13 @@ namespace RhuEngine.Components
 		[NoSyncUpdate]
 		public TaskBar taskBar;
 
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Window window;
+
 		public ProgramTaskBarItem taskBarItem;
 
 		public abstract string ProgramID { get; }
@@ -37,15 +44,36 @@ namespace RhuEngine.Components
 
 		public void IntProgram() {
 			World.DrawDebugText(taskBar.Entity.GlobalTrans, new Vector3f(0,1,-1), Vector3f.One, Colorf.Green,"Program Loaded", 5);
-			var newWindow = Entity.AttachComponent<Window>();
-			newWindow.NameValue.Value = ProgramName;
-			LoadUI(newWindow.PannelRoot.Target);
+			window = Entity.AttachComponent<Window>();
+			window.OnMinimize.Target = Minimize;
+			window.OnClose.Target = Close;
+			window.NameValue.Value = ProgramName;
+			LoadUI(window.PannelRoot.Target);
 		}
 
 		public abstract void LoadUI(Entity uiRoot);
 
+		public bool Minimized = false;
+		[Exsposed]
+		public void Minimize() {
+			window.Entity.enabled.Value = Minimized;
+			Minimized = !Minimized;
+		}
+
+		[Exsposed]
+		public void Close() {
+			Entity.Destroy();
+		}
+
+		public override void Dispose() {
+			taskBar.ProgramClose(this);
+			base.Dispose();
+		}
+
 		public void ClickedButton() {
-			RLog.Info("Clicked button");
+			if (Minimized) {
+				Minimize();
+			}
 		}
 	}
 }

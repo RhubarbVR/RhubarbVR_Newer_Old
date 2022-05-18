@@ -70,6 +70,10 @@ namespace RhuEngine.Components
 			TaskBarItemsUpdate();
 		}
 
+		public void RemoveTaskBarItemToList(ITaskBarItem taskBarItem) {
+			taskBarItems.Remove(taskBarItem);
+			TaskBarItemsUpdate();
+		}
 
 		public List<Program> programs = new();
 
@@ -291,6 +295,11 @@ namespace RhuEngine.Components
 			programcomp.IntProgram();
 			programs.Add(programcomp);
 			AddTaskBarItemToList(programcomp.taskBarItem);
+		}
+
+		public void ProgramClose(Program program) {
+			programs.Remove(program);
+			RemoveTaskBarItemToList(program.taskBarItem);
 		}
 
 		private void Engine_SettingsUpdate() {

@@ -84,7 +84,7 @@ namespace RhuEngine.Components
 			IconMit.Target.transparency.Value = Transparency.Blend;
 			IconMit.Target.shader.Target = shader;
 			IconMit.Target.SetPram("diffuse", icons);
-
+			IconMit.Target.queueOffset.Value = 1;
 			var mit = Entity.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;
 			mit.transparency.Value = Transparency.Blend;
