@@ -113,7 +113,7 @@ namespace RhuEngine.Components
 			}
 
 			Canvas.Target = Entity.AttachComponent<UICanvas>();
-			Canvas.Target.scale.Value = new Vector3f(8, 6, 1.5f);
+			Canvas.Target.scale.Value = new Vector3f(10, 8, 1.5f);
 			var rect = Entity.AttachComponent<UIRect>();
 			MainUIMax.Target = rect.AnchorMax;
 			var windowRoot = Entity.AddChild("WindowRoot");
@@ -127,21 +127,26 @@ namespace RhuEngine.Components
 			HeaderRectOffsetMax.Target = headerrect.OffsetMax;
 			var headerTextSide = header.AddChild("HeaderTextSide");
 			var headerTextSiderect = headerTextSide.AttachComponent<UIRect>();
-			headerTextSiderect.OffsetLocalMax.Value -= new Vector2f(HeaderHeight.Value * 3, 0);
-
+			headerTextSiderect.OffsetMax.Value -= new Vector2f(HeaderHeight.Value * 3, 0);
+			
 			var text = headerTextSide.AttachComponent<UIText>();
 			NameLink.Target = text.Text;
+			text.VerticalAlien.Value = EVerticalAlien.Bottom;
+
 			var headerButtonSide = header.AddChild("ButtonGroup");
-			var headerButtonSiderect = headerButtonSide.AttachComponent<HorizontalList>();
-			headerButtonSiderect.OffsetMin.Value = new Vector2f(HeaderHeight.Value *3, 0);
-			headerButtonSiderect.Fit.Value = true;
-			var min = AddButton(headerButtonSide, 0f, new Vector2i(18, 0), MinimizeAction);
+			var headerButtonSiderect = headerButtonSide.AttachComponent<UIRect>();
+			headerButtonSiderect.OffsetMin.Value -= new Vector2f(HeaderHeight.Value * 3, 1);
+			headerButtonSiderect.AnchorMin.Value = Vector2f.One;
+			var headerButtonSideh = headerButtonSide.AddChild("ButtonGroup");
+			var headerButtonSiderecth = headerButtonSideh.AttachComponent<HorizontalList>();
+			headerButtonSiderecth.Fit.Value = true;
+			var min = AddButton(headerButtonSideh, 0f, new Vector2i(18, 0), MinimizeAction);
 			MinimizeButtonEnable.Target = min.Item1.enabled;
-			var calps = AddButton(headerButtonSide, 0f, new Vector2i(0, 1), CollapseAction);
+			var calps = AddButton(headerButtonSideh, 0f, new Vector2i(0, 1), CollapseAction);
 			CollapseButtonEnable.Target = calps.Item1.enabled;
 			CollapseButtonIconTwo.Target = calps.Item2.PosMin;
 			CollapseButtonIconOne.Target = calps.Item2.PosMax;
-			var close = AddButton(headerButtonSide, 0f, new Vector2i(20, 0), CloseAction);
+			var close = AddButton(headerButtonSideh, 0f, new Vector2i(20, 0), CloseAction);
 			CloseButtonEnable.Target = close.Item1.enabled;
 			OnCollapse.Target = CollapseUI;
 			UpdateButtons();

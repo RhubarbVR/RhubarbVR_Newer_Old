@@ -151,13 +151,13 @@ namespace RhuEngine.Components
 
 			var text = child.AddChild("Text");
 			var textrect = text.AttachComponent<UIRect>();
-			textrect.AnchorMin.Value = new Vector2f(0f, 0f);
-			textrect.AnchorMax.Value = new Vector2f(1f, 0.8f);
+			textrect.AnchorMin.Value = new Vector2f(0.1f, 0f);
+			textrect.AnchorMax.Value = new Vector2f(0.9f, 0.5f);
 			textrect.Depth.Value += 0.02f;
 			
 			var uitext = text.AttachComponent<UIText>();
-			uitext.Text.Value = $" <size5>{taskBarItem.Name}<size10> ";
-			uitext.VerticalAlien.Value = EVerticalAlien.Top;
+			uitext.Text.Value = taskBarItem.Name;
+			uitext.VerticalAlien.Value = EVerticalAlien.Center;
 			uitext.HorizontalAlien.Value = EHorizontalAlien.Middle;
 			if (taskBarItem.ShowOpenFlag) {
 				var openoverlay = child.AddChild("IsOpenOverlay");

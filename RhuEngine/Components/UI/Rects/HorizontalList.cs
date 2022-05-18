@@ -53,7 +53,7 @@ namespace RhuEngine.Components
 			if (Fit) {
 				fakeRects.SafeOperation((list) => {
 					var inc = 1f / list.Count;
-					var currentpos = Min.x;
+					var currentpos = 0f;
 					foreach (var item in list) {
 						item.Canvas = Canvas;
 						item.AnchorMin = new Vector2f(currentpos,0f);

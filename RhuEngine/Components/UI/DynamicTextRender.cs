@@ -14,6 +14,10 @@ namespace RhuEngine.Components
 
 		public SafeList<TextChar> Chars = new();
 
+		public float Width => axisAlignedBox3F.Width + 0.05f;
+
+		public float Height => axisAlignedBox3F.Height + 0.05f;
+
 		public AxisAlignedBox3f axisAlignedBox3F = AxisAlignedBox3f.Zero;
 
 		public class TextChar
@@ -29,7 +33,8 @@ namespace RhuEngine.Components
 			public FontStyle fontStyle;
 			public Vector2f textCut;
 			public bool Cull = false;
-			public TextChar(string id, char c, Matrix p, Colorf color, RFont rFont, FontStyle fontStyle, Vector2f textCut, Vector2f textsize) {
+			public float Leading = 0f;
+			public TextChar(string id, char c, Matrix p, Colorf color, RFont rFont, FontStyle fontStyle, Vector2f textCut, Vector2f textsize,float Leading) {
 				this.id = id;
 				this.c = c;
 				this.p = p;
@@ -38,6 +43,7 @@ namespace RhuEngine.Components
 				this.fontStyle = fontStyle;
 				this.textCut = textCut;
 				this.textsize = textsize;
+				this.Leading = Leading;
 			}
 
 			public void Render(Matrix root) {
@@ -91,7 +97,7 @@ namespace RhuEngine.Components
 						textYpos -= textsizeY + (leaded.Peek() / 10);
 						textXpos = 0;
 						thisrow.Clear();
-						var charee = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(new Vector3f(textXpos, textYpos - textsizeY, 0), Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero,Vector2f.Zero);
+						var charee = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(new Vector3f(textXpos, textYpos - textsizeY, 0), Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero,Vector2f.Zero,leaded.Peek()/10);
 						Chars.SafeAdd(charee);
 						continue;
 					}
@@ -101,25 +107,25 @@ namespace RhuEngine.Components
 						textsizeY = newsize;
 						foreach (var charitem in thisrow) {
 							var ewe = charitem.textsize;
-							bounds.Remove(charitem.p.Translation);
-							bounds.Remove(charitem.p.Translation + ewe.X__);
+							bounds.Remove(charitem.p.Translation - new Vector3f(0, charitem.Leading, 0));
+							bounds.Remove(charitem.p.Translation + ewe.X__ - new Vector3f(0, charitem.Leading, 0));
 							bounds.Remove(charitem.p.Translation + ewe.XY_);
 							bounds.Remove(charitem.p.Translation + ewe._Y_);
 							var old = charitem.p.Translation;
 							charitem.p.Translation = new Vector3f(old.x, old.y - def, old.z);
-							bounds.Add(charitem.p.Translation);
-							bounds.Add(charitem.p.Translation + ewe.X__);
+							bounds.Add(charitem.p.Translation - new Vector3f(0, charitem.Leading, 0));
+							bounds.Add(charitem.p.Translation + ewe.X__ - new Vector3f(0, charitem.Leading, 0));
 							bounds.Add(charitem.p.Translation + ewe.XY_);
 							bounds.Add(charitem.p.Translation + ewe._Y_);
 						}
 					}
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
 					var ew = new Vector2f((textsize.x + 0.01f) * (fontSize.Peek() / 100), textsize.y * (fontSize.Peek() / 100));
-					var chare = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero,ew);
+					var chare = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero,ew, leaded.Peek() / 10);
 					Chars.SafeAdd(chare);
 					thisrow.Push(chare);
-					bounds.Add(textpos);
-					bounds.Add(textpos + ew.X__);
+					bounds.Add(textpos - new Vector3f(0,chare.Leading,0));
+					bounds.Add(textpos + ew.X__ - new Vector3f(0, chare.Leading, 0));
 					bounds.Add(textpos + ew.XY_);
 					bounds.Add(textpos + ew._Y_);
 					textXpos += (textsize.x + 0.05f) * (fontSize.Peek() / 100);

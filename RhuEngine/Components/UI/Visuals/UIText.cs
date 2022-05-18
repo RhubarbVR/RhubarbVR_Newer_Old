@@ -63,7 +63,7 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien,MiddleLines);
+			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien, MiddleLines);
 			UpdateTextOffset();
 		}
 
@@ -73,7 +73,7 @@ namespace RhuEngine.Components
 		}
 
 		public void UpdateTextOffset() {
-			if(Rect?.Canvas is null) {
+			if (Rect?.Canvas is null) {
 				return;
 			}
 			var startDepth = new Vector3f(0, 0, Entity.UIRect.StartPoint);
@@ -85,7 +85,7 @@ namespace RhuEngine.Components
 			var boxsize = max - min;
 			boxsize /= Math.Max(boxsize.x, boxsize.y);
 			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
-			var texture = new Vector2f(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height) * 10;
+			var texture = new Vector2f(textRender.Width, textRender.Height) * 10;
 			texture /= canvassize;
 			texture /= boxsize;
 			texture /= Math.Max(texture.x, texture.y);
@@ -110,18 +110,12 @@ namespace RhuEngine.Components
 				minoffset = new Vector2f(minoffset.x, max.y - maxmin.y);
 			}
 			upleft += new Vector3f(minoffset.x, maxoffset.y);
-			var size = max - min;
+			var size = (max * canvassize) - (min * canvassize);
 			var largestscaleside = Math.Max(size.x, size.y);
-			var largestestside = Math.Max(textRender.axisAlignedBox3F.Width, textRender.axisAlignedBox3F.Height);
-			var small = largestscaleside == size.y
-				? largestestside == textRender.axisAlignedBox3F.Height
-					? textRender.axisAlignedBox3F.Height / size.y
-					: textRender.axisAlignedBox3F.Width / size.x
-				: largestestside == textRender.axisAlignedBox3F.Width
-					? textRender.axisAlignedBox3F.Width / size.x
-					: textRender.axisAlignedBox3F.Height / size.y;
-			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), Vector3f.One / Rect.Canvas.scale.Value / small * 15);
-			CutElement(true,false);
+			var largestestside = Math.Max(textRender.Width, textRender.Height);
+			var small = Math.Min(size.y / textRender.Height, size.x / textRender.Width);
+			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), new Vector3f(small) / Rect.Canvas.scale.Value);
+			CutElement(true, false);
 		}
 
 		public override void RenderTargetChange() {
@@ -135,18 +129,18 @@ namespace RhuEngine.Components
 		}
 
 		public override void Render(Matrix matrix) {
-			textRender.Render(textOffset, Matrix.T(Rect.ScrollOffset) * Matrix.S((Rect.Canvas?.scale.Value??Vector3f.One) / 10) * matrix);
+			textRender.Render(textOffset, Matrix.T(Rect.ScrollOffset) * Matrix.S((Rect.Canvas?.scale.Value ?? Vector3f.One) / 10) * matrix);
 		}
 
-		public override void CutElement(bool cut,bool update) {
+		public override void CutElement(bool cut, bool update) {
 			var min = Rect.CutZonesMin;
 			var max = Rect.CutZonesMax;
 			if (cut) {
 				textRender.Chars.SafeOperation((list) => {
 					foreach (var chare in list) {
 						var charbottomleft = (chare.p * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
-						var charbottomright = (Matrix.T(new Vector3f(chare.textsize.x,0,0) + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
-						var chartopleft = (Matrix.T(new Vector3f(0,chare.textsize.y,0) + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
+						var charbottomright = (Matrix.T(new Vector3f(chare.textsize.x, 0, 0) + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
+						var chartopleft = (Matrix.T(new Vector3f(0, chare.textsize.y, 0) + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
 						var chartopright = (Matrix.T(chare.textsize.XY_ + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
 						var bottomleft = max.IsInBox(min, charbottomleft);
 						var bottomright = max.IsInBox(min, charbottomright);
