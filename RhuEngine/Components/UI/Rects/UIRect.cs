@@ -200,6 +200,8 @@ namespace RhuEngine.Components
 		public readonly Sync<Vector2f> OffsetMax;
 		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public readonly Sync<Vector2f> AnchorMin;
+		[OnChanged(nameof(RegUpdateUIMeshes))]
+		public readonly Sync<Vector2f> AnchorMax;
 
 		public Matrix MatrixMove(Matrix matrix) {
 			var firstpos = VertMove(matrix.Translation);
@@ -232,8 +234,7 @@ namespace RhuEngine.Components
 			}
 			return npoint;
 		}
-		[OnChanged(nameof(RegUpdateUIMeshes))]
-		public readonly Sync<Vector2f> AnchorMax;
+
 		public Vector2f AnchorMinValue => AnchorMin;
 
 
