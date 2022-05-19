@@ -54,12 +54,31 @@ namespace RhuEngine.Components
 		[NoSyncUpdate]
 		public Entity TaskBarItems;
 
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public ScrollUIRect scrollRect;
+
 		public List<ITaskBarItem> taskBarItems = new();
+
+		public bool _open = true;
+
+		public float _openTarget;
+
+		public bool Open
+		{
+			get => _open;
+			set {
+				_open = value;
+				_openTarget = value ? 0f : 1f;
+			}
+		}
 
 		public void AddTaskBarItemToList(ITaskBarItem taskBarItem) {
 			var remove = new List<ITaskBarItem>();
 			for (var i = 0; i < taskBarItems.Count; i++) {
-				if(taskBarItem.ID == taskBarItems[i].ID) {
+				if (taskBarItem.ID == taskBarItems[i].ID) {
 					remove.Add(taskBarItems[i]);
 				}
 			}
@@ -158,7 +177,7 @@ namespace RhuEngine.Components
 			textrect.AnchorMin.Value = new Vector2f(0.1f, 0f);
 			textrect.AnchorMax.Value = new Vector2f(0.9f, 0.5f);
 			textrect.Depth.Value += 0.02f;
-			
+
 			var uitext = text.AttachComponent<UIText>();
 			uitext.Text.Value = taskBarItem.Name;
 			uitext.VerticalAlien.Value = EVerticalAlien.Center;
@@ -198,7 +217,7 @@ namespace RhuEngine.Components
 
 		public override void OnAttach() {
 			ProgramsHolder = World.RootEntity.AddChild("Programms");
-			uICanvas = Entity.AttachComponent<UICanvas>();
+			uICanvas = Entity.AddChild("Canvas").AttachComponent<UICanvas>();
 			Engine.SettingsUpdate += Engine_SettingsUpdate;
 			uICanvas.scale.Value = new Vector3f(16, 1.25f, 1);
 			Engine_SettingsUpdate();
@@ -212,31 +231,35 @@ namespace RhuEngine.Components
 			iconMit.transparency.Value = Transparency.Blend;
 			sprite = Entity.AttachComponent<SpriteProvder>();
 			sprite.Texture.Target = icons;
-			sprite.GridSize.Value = new Vector2i(26,7);
+			sprite.GridSize.Value = new Vector2i(26, 7);
 			mit.transparency.Value = Transparency.Blend;
 
 			//BackGround
-			var rectTwo = Entity.AttachComponent<UIRect>();
+			var rectTwo = uICanvas.Entity.AttachComponent<CuttingUIRect>();
 			rectTwo.AnchorMin.Value = Vector2f.Zero;
 			rectTwo.AnchorMax.Value = Vector2f.One;
-			var img = Entity.AttachComponent<UIRectangle>();
-			img.Tint.Value = new Colorf(0,0,0,0.9f);
+
+			var mainentity = uICanvas.Entity.AddChild("scroll");
+			scrollRect = mainentity.AttachComponent<ScrollUIRect>();
+
+			var img = mainentity.AttachComponent<UIRectangle>();
+			img.Tint.Value = new Colorf(0, 0, 0, 0.9f);
 			img.Material.Target = mit;
 			
-			var leftSide = Entity.AddChild("leftSide");
+			var leftSide = mainentity.AddChild("leftSide");
 			var leftSideList = leftSide.AttachComponent<HorizontalList>();
 			leftSideList.AnchorMin.Value = Vector2f.Zero;
-			leftSideList.AnchorMax.Value = new Vector2f(0.20f,1);
+			leftSideList.AnchorMax.Value = new Vector2f(0.20f, 1);
 			leftSideList.Depth.Value = 0;
 			leftSideList.Fit.Value = true;
-			AddButton(leftSide, new Vector2i(16,0), OpenStart);
-			AddButton(leftSide, new Vector2i(8,3), OpenSoundOptions);
-		
-			var listentitHolder = Entity.AddChild("listentitHolder");
+			AddButton(leftSide, new Vector2i(16, 0), OpenStart);
+			AddButton(leftSide, new Vector2i(8, 3), OpenSoundOptions);
+
+			var listentitHolder = mainentity.AddChild("listentitHolder");
 			var listentitHolderrect = listentitHolder.AttachComponent<CuttingUIRect>();
 			listentitHolderrect.AnchorMin.Value = new Vector2f(0.20f, 0.1f);
 			listentitHolderrect.AnchorMax.Value = new Vector2f(0.8f, 0.9f);
-			
+
 			var listentit = listentitHolder.AddChild("list");
 			var list = listentit.AttachComponent<HorizontalList>();
 			var interaction = listentit.AttachComponent<UIScrollInteraction>();
@@ -247,15 +270,15 @@ namespace RhuEngine.Components
 			list.Fit.Value = false;
 			TaskBarItems = listentit;
 
-			var RightSide = Entity.AddChild("RightSide");
+			var RightSide = mainentity.AddChild("RightSide");
 			var RightSideList = RightSide.AttachComponent<UIRect>();
 			RightSideList.AnchorMin.Value = new Vector2f(0.81f, 0.1f);
 			RightSideList.AnchorMax.Value = new Vector2f(0.99f, 0.9f);
 
 			var child = RightSide.AddChild("childEliment");
-			rectTwo = child.AttachComponent<UIRect>();
-			rectTwo.AnchorMin.Value = new Vector2f(0f);
-			rectTwo.AnchorMax.Value = new Vector2f(0.4f, 1f);
+			var rectTwo2 = child.AttachComponent<UIRect>();
+			rectTwo2.AnchorMin.Value = new Vector2f(0f);
+			rectTwo2.AnchorMax.Value = new Vector2f(0.4f, 1f);
 			img = child.AttachComponent<UIRectangle>();
 			img.Tint.Value = new Colorf(0.1f, 0.1f, 0.1f, 0.5f);
 			img.Material.Target = mit;
@@ -274,7 +297,7 @@ namespace RhuEngine.Components
 
 
 			var child3 = RightSide.AddChild("childEliment");
-			var rectTwo2 = child3.AttachComponent<UIRect>();
+			rectTwo2 = child3.AttachComponent<UIRect>();
 			rectTwo2.AnchorMin.Value = new Vector2f(0.5f, 0);
 			var rectTwom = child3.AttachComponent<UIRect>();
 			var text = child3.AttachComponent<UIText>();
@@ -284,7 +307,7 @@ namespace RhuEngine.Components
 			AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(Login)));
 		}
 
-		public void OpenProgram(string name,Type programType) {
+		public void OpenProgram(string name, Type programType) {
 			RLog.Info($"Open program {name} Type: {programType.GetFormattedName()}");
 			var programentity = ProgramsHolder.AddChild(name);
 			var programcomp = programentity.AttachComponent<Program>(programType);
@@ -309,8 +332,8 @@ namespace RhuEngine.Components
 			uICanvas.FrontBind.Value = Engine.MainSettings.UISettings.FrontBindAngle > 0;
 			uICanvas.FrontBindAngle.Value = Engine.MainSettings.UISettings.FrontBindAngle;
 			uICanvas.FrontBindRadus.Value = Engine.MainSettings.UISettings.FrontBindRadus;
-			
-			
+
+
 
 			Entity.position.Value = new Vector3f(-0.7f, 0.1f, -0.1f);
 
@@ -320,19 +343,34 @@ namespace RhuEngine.Components
 
 			Entity.rotation.Value = Quaternionf.CreateFromEuler(-22.5f, 0, 0);
 
-			Entity.parent.Target.position.Value = new Vector3f(0, -0.4f - Engine.MainSettings.UISettings.DashOffsetDown, -(Engine.MainSettings.UISettings.FrontBindRadus/100) - Engine.MainSettings.UISettings.DashOffsetForward);
+			Entity.parent.Target.position.Value = new Vector3f(0, -0.4f - Engine.MainSettings.UISettings.DashOffsetDown, -(Engine.MainSettings.UISettings.FrontBindRadus / 100) - Engine.MainSettings.UISettings.DashOffsetForward);
 
 		}
-
+		private float _newvalue = 0;
 		public override void Step() {
-
+			if (RInput.Key(Key.Ctrl).IsActive() && RInput.Key(Key.Space).IsJustActive()) {
+				Open = !Open;
+			}
+			_newvalue = MathUtil.Lerp(_newvalue, _openTarget, RTime.Elapsedf * 2);
+			if (_newvalue is > 0.01f and < 0.95f) {
+				if (!uICanvas.Entity.enabled.Value) {
+					uICanvas.Entity.enabled.Value = true;
+				}
+				scrollRect.ScrollPos.Value = new Vector2f(0, -_newvalue);
+			}
+			else if (_newvalue > 0.95f) {
+				if (uICanvas.Entity.enabled.Value) {
+					uICanvas.Entity.enabled.Value = false;
+				}
+			}
+			//MathUtil.Lerp()
 			//System Time
 			var date = DateTime.Now;
 			var sysFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
 			var sysFormatTime = CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern;
-			var newTimeText = $"<size13>{date.ToString(sysFormatTime,CultureInfo.InvariantCulture)} \n<size10>{date.ToString(sysFormat, CultureInfo.InvariantCulture)}";
+			var newTimeText = $"<size13>{date.ToString(sysFormatTime, CultureInfo.InvariantCulture)} \n<size10>{date.ToString(sysFormat, CultureInfo.InvariantCulture)}";
 			if (TimeText.Linked) {
-				if(TimeText.LinkedValue != newTimeText) {
+				if (TimeText.LinkedValue != newTimeText) {
 					TimeText.LinkedValue = newTimeText;
 				}
 			}
