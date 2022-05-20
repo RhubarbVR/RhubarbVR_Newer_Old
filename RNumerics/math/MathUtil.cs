@@ -366,7 +366,12 @@ namespace RNumerics
 		}
 
 		public static T DynamicLerp<T>(T a, T b, double t) {
-			return ((1.0 - t) * (dynamic)a) + ((dynamic)t * b);
+			try {
+				return ((dynamic)a * (1.0 - t)) + ((dynamic)t * b);
+			}
+			catch {
+				return ((dynamic)a * (float)(1.0 - t)) + ((float)t * (dynamic)b);
+			}
 		}
 
 

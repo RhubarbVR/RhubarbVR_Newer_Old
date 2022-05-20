@@ -14,7 +14,6 @@ namespace RhuEngine.Components
 		public readonly Sync<T> from;
 		public readonly Sync<T> to;
 		public readonly SyncPlayback playback;
-		[OnChanged(nameof(LoadClipSize))]
 		public readonly Sync<double> time;
 		public readonly Sync<bool> removeOnDone;
 		
@@ -25,16 +24,17 @@ namespace RhuEngine.Components
 			to.Value = targetpos;
 			time.Value = timef;
 			removeOnDone.Value = removeondone;
+			playback.Looping = false;
 			playback.Play();
 		}
 
 		public override void OnLoaded() {
 			base.OnLoaded();
-			LoadClipSize();
+			playback.StateChange += Playback_StateChange;
 		}
 
-		public void LoadClipSize() {
-			playback.ClipLength = time.Value;
+		private double Playback_StateChange() {
+			return time.Value;
 		}
 
 		public override void Step() {
@@ -43,7 +43,8 @@ namespace RhuEngine.Components
 					var pos = playback.Position / playback.ClipLength;
 					if (pos != 1f) {
 						driver.LinkedValue = MathUtil.DynamicLerp(from.Value, to.Value, pos);
-					}else if (removeOnDone) {
+					}
+					else if (removeOnDone) {
 						Destroy();
 					}
 				}

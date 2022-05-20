@@ -181,7 +181,7 @@ namespace RhuEngine
 		}
 
 		public static Entity GetClosedEntityOrRoot(this IWorldObject worldObject) {
-			return worldObject.GetClosedEntityOrRoot() ?? worldObject.World.RootEntity;
+			return worldObject.GetClosedEntity() ?? worldObject.World.RootEntity;
 		}
 
 
@@ -228,12 +228,9 @@ namespace RhuEngine
 
 		public static string GetExtendedNameString(this IWorldObject worldObject) {
 			var comp = worldObject.GetClosedComponent();
-			if (comp is null || comp == worldObject) {
-				return worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null";
-			}
-			else {
-				return $"{comp.GetType().GetFormattedName()} attached to " + (worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null");
-			}
+			return comp is null || comp == worldObject
+				? worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null"
+				: $"{comp.GetType().GetFormattedName()} attached to " + (worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null");
 		}
 	}
 }

@@ -71,7 +71,7 @@ namespace RhuEngine.WorldObjects
 		public override void InitializeMembers(bool networkedObject, bool deserializeFunc, Func<NetPointer> func) {
 		}
 
-		public void Lerp(T targetpos,double time,bool removeOnDone = true) {
+		public void Lerp(T targetpos,double time = 5f,bool removeOnDone = true) {
 			var lerp = this.GetClosedEntityOrRoot().AttachComponent<Lerp<T>>();
 			lerp.StartLerp(this, targetpos, time, removeOnDone);
 		}
