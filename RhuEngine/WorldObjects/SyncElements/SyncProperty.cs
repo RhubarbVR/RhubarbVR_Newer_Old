@@ -31,7 +31,10 @@ namespace RhuEngine.WorldObjects
 		public T Value
 		{
 			get => GetValue.Invoke();
-			set => SetValue.Invoke(value);
+			set {
+				Changed.Invoke(this);
+				SetValue.Invoke(value);
+			}
 		}
 		public object Object { get => GetValue.Invoke(); set => SetValue.Invoke((T)value); }
 		

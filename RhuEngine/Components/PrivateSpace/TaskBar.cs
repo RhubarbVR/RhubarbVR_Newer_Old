@@ -251,24 +251,14 @@ namespace RhuEngine.Components
 		public void OpenStart(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				RLog.Info("OpenStart");
-				if (OpenLevel != OpenPart.Start) {
-					OpenLevel = OpenPart.Start;
-				}
-				else {
-					OpenLevel = OpenPart.None;
-				}
+				OpenLevel = OpenLevel != OpenPart.Start ? OpenPart.Start : OpenPart.None;
 			}
 		}
 		[Exsposed]
 		public void OpenSoundOptions(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				RLog.Info("OpenSoundOptions");
-				if (OpenLevel != OpenPart.Audio) {
-					OpenLevel = OpenPart.Audio;
-				}
-				else {
-					OpenLevel = OpenPart.None;
-				}
+				OpenLevel = OpenLevel != OpenPart.Audio ? OpenPart.Audio : OpenPart.None;
 			}
 		}
 
@@ -276,12 +266,7 @@ namespace RhuEngine.Components
 		public void OpenNotifications(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				RLog.Info("OpenNotifications");
-				if (OpenLevel != OpenPart.Notifications) {
-					OpenLevel = OpenPart.Notifications;
-				}
-				else {
-					OpenLevel = OpenPart.None;
-				}
+				OpenLevel = OpenLevel != OpenPart.Notifications ? OpenPart.Notifications : OpenPart.None;
 			}
 		}
 
