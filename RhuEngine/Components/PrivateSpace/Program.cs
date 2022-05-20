@@ -25,7 +25,6 @@ namespace RhuEngine.Components
 		[NoSyncUpdate]
 		public TaskBar taskBar;
 
-
 		[NoSave]
 		[NoSync]
 		[NoLoad]
@@ -47,6 +46,7 @@ namespace RhuEngine.Components
 			window = Entity.AttachComponent<Window>();
 			window.OnMinimize.Target = Minimize;
 			window.OnClose.Target = Close;
+			window.PinChanged.Target = OnPin;
 			window.NameValue.Value = ProgramName;
 			LoadUI(window.PannelRoot.Target);
 			BringToMe();
@@ -63,6 +63,16 @@ namespace RhuEngine.Components
 		public void Minimize() {
 			window.Entity.enabled.Value = Minimized;
 			Minimized = !Minimized;
+		}
+
+		[Exsposed]
+		public void OnPin(bool pin) {
+			if (pin) {
+				Entity.SetParent(taskBar.Entity);
+			}
+			else {
+				Entity.SetParent(taskBar.ProgramsHolder);
+			}
 		}
 
 		[Exsposed]

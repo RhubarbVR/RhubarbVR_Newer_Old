@@ -16,7 +16,11 @@ namespace RhuEngine.Components
 
 		[OnChanged(nameof(ProssCollapsed))]
 		public readonly Sync<bool> IsCollapsed;
-
+		[OnChanged(nameof(ProssPin))]
+		public readonly Sync<bool> IsPin;
+		[Default(true)]
+		[OnChanged(nameof(UpdateButtons))]
+		public readonly Sync<bool> PinButton;
 		[Default(true)]
 		[OnChanged(nameof(UpdateButtons))]
 		public readonly Sync<bool> MinimizeButton;
@@ -47,6 +51,11 @@ namespace RhuEngine.Components
 
 		public readonly Linker<bool> CollapseButtonEnable;
 
+		public readonly Linker<bool> PinButtonEnable;
+
+		public readonly Linker<Vector2i> PinButtonIconOne;
+		public readonly Linker<Vector2i> PinButtonIconTwo;
+
 		public readonly Linker<Vector2f> WindowRootRectOffsetMin;
 		public readonly Linker<Vector2f> HeaderRectOffsetMax;
 
@@ -60,7 +69,11 @@ namespace RhuEngine.Components
 
 		public readonly SyncDelegate OnCollapse;
 
+		public readonly SyncDelegate OnPin;
+
 		public readonly SyncDelegate OnMinimize;
+
+		public readonly SyncDelegate<Action<bool>> PinChanged;
 
 		public readonly SyncRef<DynamicMaterial> IconMit;
 
@@ -127,7 +140,7 @@ namespace RhuEngine.Components
 			HeaderRectOffsetMax.Target = headerrect.OffsetMax;
 			var headerTextSide = header.AddChild("HeaderTextSide");
 			var headerTextSiderect = headerTextSide.AttachComponent<UIRect>();
-			headerTextSiderect.OffsetMax.Value -= new Vector2f(HeaderHeight.Value * 3, 0);
+			headerTextSiderect.OffsetMax.Value -= new Vector2f(HeaderHeight.Value * 4, 0);
 			
 			var text = headerTextSide.AttachComponent<UIText>();
 			NameLink.Target = text.Text;
@@ -135,7 +148,7 @@ namespace RhuEngine.Components
 
 			var headerButtonSide = header.AddChild("ButtonGroup");
 			var headerButtonSiderect = headerButtonSide.AttachComponent<UIRect>();
-			headerButtonSiderect.OffsetMin.Value -= new Vector2f(HeaderHeight.Value * 3, 1);
+			headerButtonSiderect.OffsetMin.Value -= new Vector2f(HeaderHeight.Value * 4, 1);
 			headerButtonSiderect.AnchorMin.Value = Vector2f.One;
 			var headerButtonSideh = headerButtonSide.AddChild("ButtonGroup");
 			var headerButtonSiderecth = headerButtonSideh.AttachComponent<HorizontalList>();
@@ -146,9 +159,14 @@ namespace RhuEngine.Components
 			CollapseButtonEnable.Target = calps.Item1.enabled;
 			CollapseButtonIconTwo.Target = calps.Item2.PosMin;
 			CollapseButtonIconOne.Target = calps.Item2.PosMax;
+			calps = AddButton(headerButtonSideh, 0f, new Vector2i(5, 6), PinAction);
+			PinButtonEnable.Target = calps.Item1.enabled;
+			PinButtonIconOne.Target = calps.Item2.PosMin;
+			PinButtonIconTwo.Target = calps.Item2.PosMax;
 			var close = AddButton(headerButtonSideh, 0f, new Vector2i(20, 0), CloseAction);
 			CloseButtonEnable.Target = close.Item1.enabled;
 			OnCollapse.Target = CollapseUI;
+			OnPin.Target = PinUI;
 			UpdateButtons();
 			var img = Entity.AttachComponent<UIRectangle>();
 			img.Tint.Value = new Colorf(0, 0, 0, 0.7f);
@@ -193,17 +211,49 @@ namespace RhuEngine.Components
 			}
 		}
 
+		private void ProssPin() {
+			if (IsPin) {
+				if (PinButtonIconOne.Linked) {
+					PinButtonIconOne.LinkedValue = new Vector2i(6, 6);
+				}
+				if (PinButtonIconTwo.Linked) {
+					PinButtonIconTwo.LinkedValue = new Vector2i(6, 6);
+				}
+			}
+			else {
+				if (PinButtonIconOne.Linked) {
+					PinButtonIconOne.LinkedValue = new Vector2i(5, 6);
+				}
+				if (PinButtonIconTwo.Linked) {
+					PinButtonIconTwo.LinkedValue = new Vector2i(5, 6);
+				}
+			}
+		}
+
+
 		[Exsposed]
 		public void CollapseUI() {
 			IsCollapsed.Value = !IsCollapsed.Value;
 		}
-
+		[Exsposed]
+		public void PinUI() {
+			IsPin.Value = !IsPin.Value;
+			PinChanged.Target?.Invoke(IsPin.Value);
+		}
 		[Exsposed]
 		public void CollapseAction(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				OnCollapse.Target?.Invoke();
 			}
 		}
+
+		[Exsposed]
+		public void PinAction(ButtonEvent buttonEvent) {
+			if (buttonEvent.IsClicked) {
+				OnPin.Target?.Invoke();
+			}
+		}
+
 
 		[Exsposed]
 		public void CloseAction(ButtonEvent buttonEvent) {

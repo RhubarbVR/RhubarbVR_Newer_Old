@@ -241,7 +241,8 @@ namespace RhuEngine.Components
 
 			var mainentity = uICanvas.Entity.AddChild("scroll");
 			scrollRect = mainentity.AttachComponent<ScrollUIRect>();
-
+			mainentity = mainentity.AddChild("scroll");
+			mainentity.AttachComponent<UIRect>();
 			var img = mainentity.AttachComponent<UIRectangle>();
 			img.Tint.Value = new Colorf(0, 0, 0, 0.9f);
 			img.Material.Target = mit;
@@ -351,7 +352,7 @@ namespace RhuEngine.Components
 			if (RInput.Key(Key.Ctrl).IsActive() && RInput.Key(Key.Space).IsJustActive()) {
 				Open = !Open;
 			}
-			_newvalue = MathUtil.Lerp(_newvalue, _openTarget, RTime.Elapsedf * 2);
+			_newvalue = MathUtil.Lerp(_newvalue, _openTarget, RTime.Elapsedf * 5);
 			if (_newvalue is > 0.01f and < 0.95f) {
 				if (!uICanvas.Entity.enabled.Value) {
 					uICanvas.Entity.enabled.Value = true;

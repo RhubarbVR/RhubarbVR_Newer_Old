@@ -20,6 +20,7 @@ namespace RhuEngine.Components.PrivateSpace
 		public override string ProgramName => "Login";
 
 		public override void LoadUI(Entity uiRoot) {
+			window.CloseButton.Value = false;
 			var ma = uiRoot.AttachComponent<UIRect>();
 			var test = uiRoot.AddChild("Test");
 			test.AttachComponent<UIRect>();

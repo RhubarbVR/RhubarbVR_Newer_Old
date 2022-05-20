@@ -245,6 +245,8 @@ namespace RhuEngine.Components
 		public readonly Sync<float> Depth;
 		public float DepthValue => Depth;
 
+		public IRectData ParrentRect => _rectDataOverride ?? ParentRect;
+
 		public virtual Vector2f CutZonesMax => Entity.parent.Target?.UIRect?.CutZonesMax ?? Vector2f.Inf;
 
 		public virtual Vector2f CutZonesMin => Entity.parent.Target?.UIRect?.CutZonesMin ?? Vector2f.NInf;
