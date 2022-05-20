@@ -169,7 +169,7 @@ namespace RhuEngine.Components
 			delegatecall.action = taskBarItem.Clicked;
 			var padding = 0.2f;
 			var child = taskBarItem.Texture is null
-				? AddButton(element, taskBarItem.Icon ?? new Vector2i(0, 3), buttonevent.Call, padding, padding)
+				? AddButton(element, taskBarItem.Icon ?? new Vector2i(7, 5), buttonevent.Call, padding, padding)
 				: AddButton(element, taskBarItem.Texture, buttonevent.Call, padding, padding);
 
 			var text = child.AddChild("Text");
@@ -357,7 +357,7 @@ namespace RhuEngine.Components
 				if (!uICanvas.Entity.enabled.Value) {
 					uICanvas.Entity.enabled.Value = true;
 				}
-				scrollRect.ScrollPos.Value = new Vector2f(0, -_newvalue);
+				scrollRect.ScrollPos.Value = new Vector2f(0, _newvalue);
 			}
 			else if (_newvalue > 0.95f) {
 				if (uICanvas.Entity.enabled.Value) {
