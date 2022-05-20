@@ -6,7 +6,7 @@ using RhuEngine.DataStructure;
 
 namespace RhuEngine.WorldObjects
 {
-	public class SyncPlayback : Sync<Playback>
+	public class SyncPlayback : Sync<Playback>, ISyncMember
 	{
 
 		public event Func<double> StateChange;

@@ -9,7 +9,7 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
-	public abstract class SyncListBase<T> : SyncObject, INetworkedObject, IEnumerable<ISyncObject> , IChangeable where T : ISyncObject
+	public abstract class SyncListBase<T> : SyncObject, INetworkedObject, IEnumerable<ISyncObject> , IChangeable, ISyncMember where T : ISyncObject
 	{
 		private readonly SynchronizedCollection<T> _syncObjects = new(5);
 

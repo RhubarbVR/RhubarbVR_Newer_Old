@@ -365,6 +365,9 @@ namespace RNumerics
 			return (m == dot0) ? 0 : (m == dot1) ? 1 : 2;
 		}
 
+		public static T DynamicLerp<T>(T a, T b, double t) {
+			return ((1.0 - t) * (dynamic)a) + ((dynamic)t * b);
+		}
 
 
 		public static float Lerp(float a, float b, float t) {

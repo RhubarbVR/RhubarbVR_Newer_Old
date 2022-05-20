@@ -11,7 +11,7 @@ namespace RhuEngine.WorldObjects
 		NetPointer NetValue { get; set; }
 	}
 
-	public class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, INetworkedObject, IChangeable where T : class, IWorldObject
+	public class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, INetworkedObject, IChangeable, ISyncMember where T : class, IWorldObject
 	{
 		public object Object { get => _targetPointer; set => _targetPointer = (NetPointer)value; }
 

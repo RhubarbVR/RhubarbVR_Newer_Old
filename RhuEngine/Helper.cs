@@ -6,6 +6,7 @@ using RhuEngine.WorldObjects;
 using RNumerics;
 using RhuEngine.Linker;
 using System.Reflection;
+using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine
 {
@@ -163,6 +164,76 @@ namespace RhuEngine
 		}
 		public static float DistSquared(this Vector3f start, Vector3f end) {
 			return System.Numerics.Vector3.DistanceSquared(start, end);
+		}
+
+		public static IWorldObject GetClosedSyncObject(this IWorldObject worldObject, bool allowSyncVals = false) {
+			allowSyncVals = allowSyncVals || typeof(SyncStream).IsAssignableFrom(worldObject.GetType());
+			try {
+				return allowSyncVals
+					? (IWorldObject)worldObject
+					: typeof(ISyncProperty).IsAssignableFrom(worldObject.GetType())
+						? (worldObject.Parent?.GetClosedSyncObject(allowSyncVals))
+						: (IWorldObject)worldObject;
+			}
+			catch {
+				return worldObject?.Parent?.GetClosedSyncObject(allowSyncVals);
+			}
+		}
+
+		public static Entity GetClosedEntityOrRoot(this IWorldObject worldObject) {
+			return worldObject.GetClosedEntityOrRoot() ?? worldObject.World.RootEntity;
+		}
+
+
+		public static Entity GetClosedEntity(this IWorldObject worldObject) {
+			try {
+				return (Entity)worldObject;
+			}
+			catch {
+				return worldObject?.Parent?.GetClosedEntity();
+			}
+		}
+
+		public static User GetClosedUser(this IWorldObject worldObject) {
+			try {
+				return (User)worldObject;
+			}
+			catch {
+				return worldObject?.Parent?.GetClosedUser();
+			}
+		}
+
+		public static Component GetClosedComponent(this IWorldObject worldObject) {
+			try {
+				return (Component)worldObject;
+			}
+			catch {
+				return worldObject?.Parent?.GetClosedComponent();
+			}
+		}
+
+		public static T GetClosedGeneric<T>(this IWorldObject worldObject) where T : class, IWorldObject {
+			try {
+				return (T)worldObject;
+			}
+			catch {
+				return worldObject?.Parent?.GetClosedGeneric<T>();
+			}
+		}
+
+		public static string GetNameString(this IWorldObject worldObject) {
+			return worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null";
+		}
+
+
+		public static string GetExtendedNameString(this IWorldObject worldObject) {
+			var comp = worldObject.GetClosedComponent();
+			if (comp is null || comp == worldObject) {
+				return worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null";
+			}
+			else {
+				return $"{comp.GetType().GetFormattedName()} attached to " + (worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null");
+			}
 		}
 	}
 }

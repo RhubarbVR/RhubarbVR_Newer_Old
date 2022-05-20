@@ -1,6 +1,6 @@
 ﻿namespace RhuEngine.WorldObjects
 {
-	public class Linker<T> : SyncRef<ILinkerMember<T>>, ILinker
+	public class Linker<T> : SyncRef<ILinkerMember<T>>, ILinker, ISyncMember
 	{
 		public Linker() { }
 

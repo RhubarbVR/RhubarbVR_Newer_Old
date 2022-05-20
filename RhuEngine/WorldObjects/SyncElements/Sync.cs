@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
+using RhuEngine.Components;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 
@@ -12,7 +13,7 @@ namespace RhuEngine.WorldObjects
 		public void SetStartingObject();
 		public void SetValue(object value);
 	}
-	public class Sync<T> : SyncObject, ILinkerMember<T>, ISync, INetworkedObject, IChangeable
+	public class Sync<T> : SyncObject, ILinkerMember<T>, ISync, INetworkedObject, IChangeable, ISyncMember
 	{
 		private readonly object _locker = new();
 
@@ -68,6 +69,11 @@ namespace RhuEngine.WorldObjects
 			UpdatedValue();
 		}
 		public override void InitializeMembers(bool networkedObject, bool deserializeFunc, Func<NetPointer> func) {
+		}
+
+		public void Lerp(T targetpos,double time,bool removeOnDone = true) {
+			var lerp = this.GetClosedEntityOrRoot().AttachComponent<Lerp<T>>();
+			lerp.StartLerp(this, targetpos, time, removeOnDone);
 		}
 
 		public virtual T OnSave(SyncObjectSerializerObject serializerObject) {

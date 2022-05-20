@@ -12,7 +12,7 @@ namespace RhuEngine.WorldObjects
 	{
 	}
 
-	public class SyncDelegate<T> : SyncRef<IWorldObject> where T : Delegate
+	public class SyncDelegate<T> : SyncRef<IWorldObject>, ISyncMember where T : Delegate
 	{
 		private Type _type;
 		private string _method;

@@ -14,7 +14,7 @@ namespace RhuEngine.WorldObjects
 		public T Add(bool networkedObject = false, bool deserialize = false);
 	}
 
-	public class SyncValueList<T> : SyncObjList<Sync<T>>
+	public class SyncValueList<T> : SyncObjList<Sync<T>>, ISyncMember
 	{
 		[Exsposed]
 		public new T this[int index]
