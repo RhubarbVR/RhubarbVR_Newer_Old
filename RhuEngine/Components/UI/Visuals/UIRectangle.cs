@@ -25,6 +25,8 @@ namespace RhuEngine.Components
 		[Default(0f)]
 		[OnChanged(nameof(ProcessMesh))]
 		public readonly Sync<float> Rounding;
+		[OnChanged(nameof(ProcessMesh))]
+		public readonly Sync<bool> FullBox;
 		public override RMaterial RenderMaterial => Material.Asset;
 		public override Colorf RenderTint => Tint.Value;
 
@@ -52,7 +54,7 @@ namespace RhuEngine.Components
 			downleft += min.XY_;
 			var rotrationOffseter = new Vector3f(Rounding.Value / 100, Rounding.Value / 100, 0);
 			rotrationOffseter /= Rect.Canvas.scale.Value / 10;
-			if (Rounding.Value > 0 && Rect.ParentRect is not null) {
+			if (Rounding.Value > 0 && Rect.ParentRect is not null && !FullBox.Value) {
 				upright -= rotrationOffseter;
 				downleft += rotrationOffseter;
 				downright += new Vector3f(-1 * rotrationOffseter.x, rotrationOffseter.y);
@@ -64,8 +66,8 @@ namespace RhuEngine.Components
 			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.AxisX }, bHaveC = false, v = upright });
 			mesh.AppendTriangle(0, 1, 2);
 			mesh.AppendTriangle(1, 3, 2);
-			if (Rounding.Value <= 0 || Rect.ParentRect is null) {
-				if (Rect.ParentRect is null) {
+			if (Rounding.Value <= 0 || Rect.ParentRect is null || FullBox.Value) {
+				if (Rect.ParentRect is null || FullBox.Value) {
 					//Add back if first rec
 
 					//Depth

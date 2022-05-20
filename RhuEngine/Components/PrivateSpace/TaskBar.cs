@@ -21,11 +21,41 @@ namespace RhuEngine.Components
 	[UpdateLevel(UpdateEnum.Normal)]
 	public class TaskBar : Component
 	{
+		public enum OpenPart
+		{
+			None,
+			Start,
+			Audio,
+			Notifications
+		}
+
+		private OpenPart CurrentState { get; set; } = OpenPart.None;
+
+		private OpenPart _part = OpenPart.None;
+
+		public OpenPart OpenLevel
+		{
+			get => _part;
+			set {
+				_part = value;
+				CurrentState = CurrentState switch {
+					OpenPart.None => value,
+					_ => OpenPart.None,
+				};
+			}
+		}
 		[NoSave]
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
 		public UICanvas uICanvas;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UICanvas startCanvas;
+
 		[NoSave]
 		[NoSync]
 		[NoLoad]
@@ -59,8 +89,30 @@ namespace RhuEngine.Components
 		[NoLoad]
 		[NoSyncUpdate]
 		public ScrollUIRect scrollRect;
-
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public ScrollUIRect scrollRectTwo;
 		public List<ITaskBarItem> taskBarItems = new();
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Entity StartEntity;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Entity AudioEntiy;
+		
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Entity NotificationEntiy;
 
 		public bool _open = true;
 
@@ -199,12 +251,24 @@ namespace RhuEngine.Components
 		public void OpenStart(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				RLog.Info("OpenStart");
+				if (OpenLevel != OpenPart.Start) {
+					OpenLevel = OpenPart.Start;
+				}
+				else {
+					OpenLevel = OpenPart.None;
+				}
 			}
 		}
 		[Exsposed]
 		public void OpenSoundOptions(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				RLog.Info("OpenSoundOptions");
+				if (OpenLevel != OpenPart.Audio) {
+					OpenLevel = OpenPart.Audio;
+				}
+				else {
+					OpenLevel = OpenPart.None;
+				}
 			}
 		}
 
@@ -212,15 +276,69 @@ namespace RhuEngine.Components
 		public void OpenNotifications(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				RLog.Info("OpenNotifications");
+				if (OpenLevel != OpenPart.Notifications) {
+					OpenLevel = OpenPart.Notifications;
+				}
+				else {
+					OpenLevel = OpenPart.None;
+				}
 			}
 		}
+
+		private void LoadStart(Entity mainentity) {
+			StartEntity = mainentity.AddChild("Start");
+			var startrect = StartEntity.AttachComponent<UIRect>();
+			startrect.AnchorMax.Value = new Vector2f(0.3f, 1f);
+			var img = StartEntity.AttachComponent<UIRectangle>();
+			img.Tint.Value = new Colorf(0, 0, 0, 0.9f);
+			img.Material.Target = mit;
+			img.FullBox.Value = true;
+		}
+
+		private void LoadAudio(Entity mainentity) {
+			AudioEntiy = mainentity.AddChild("Audio");
+			var startrect = AudioEntiy.AttachComponent<UIRect>();
+			startrect.AnchorMax.Value = new Vector2f(0.4f, 0.35f);
+			startrect.AnchorMin.Value = new Vector2f(0.1f, 0f);
+			var img = AudioEntiy.AttachComponent<UIRectangle>();
+			img.Tint.Value = new Colorf(0, 0, 0, 0.9f);
+			img.Material.Target = mit;
+			img.FullBox.Value = true;
+		}
+		private void LoadNotification(Entity mainentity) {
+			NotificationEntiy = mainentity.AddChild("Notify");
+			var startrect = NotificationEntiy.AttachComponent<UIRect>();
+			startrect.AnchorMin.Value = new Vector2f(0.7f, 0f);
+
+			var img = NotificationEntiy.AttachComponent<UIRectangle>();
+			img.Tint.Value = new Colorf(0, 0, 0, 0.9f);
+			img.Material.Target = mit;
+			img.FullBox.Value = true;
+		}
+		public void AddStartAndNotification() {
+			startCanvas = Entity.AddChild("TopOver").AttachComponent<UICanvas>();
+			startCanvas.scale.Value = new Vector3f(16, 6.5f, 1);
+			var rectTwo = startCanvas.Entity.AttachComponent<CuttingUIRect>();
+			rectTwo.AnchorMin.Value = Vector2f.Zero;
+			rectTwo.AnchorMax.Value = Vector2f.One;
+
+			var mainentity = startCanvas.Entity.AddChild("scroll");
+			scrollRectTwo = mainentity.AttachComponent<ScrollUIRect>();
+			LoadAudio(mainentity);
+			LoadStart(mainentity);
+			LoadNotification(mainentity);
+			
+
+
+		}
+
 
 		public override void OnAttach() {
 			ProgramsHolder = World.RootEntity.AddChild("Programms");
 			uICanvas = Entity.AddChild("Canvas").AttachComponent<UICanvas>();
 			Engine.SettingsUpdate += Engine_SettingsUpdate;
 			uICanvas.scale.Value = new Vector3f(16, 1.25f, 1);
-			Engine_SettingsUpdate();
+			
 			var shader = World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
 			mit = Entity.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;
@@ -233,6 +351,8 @@ namespace RhuEngine.Components
 			sprite.Texture.Target = icons;
 			sprite.GridSize.Value = new Vector2i(26, 7);
 			mit.transparency.Value = Transparency.Blend;
+			AddStartAndNotification();
+			Engine_SettingsUpdate();
 
 			//BackGround
 			var rectTwo = uICanvas.Entity.AttachComponent<CuttingUIRect>();
@@ -334,10 +454,12 @@ namespace RhuEngine.Components
 			uICanvas.FrontBindAngle.Value = Engine.MainSettings.UISettings.FrontBindAngle;
 			uICanvas.FrontBindRadus.Value = Engine.MainSettings.UISettings.FrontBindRadus;
 
-
-
+			startCanvas.FrontBindSegments.Value = Engine.MainSettings.UISettings.DashRoundingSteps;
+			startCanvas.FrontBind.Value = Engine.MainSettings.UISettings.FrontBindAngle + Engine.MainSettings.UISettings.TopOffset > 0;
+			startCanvas.FrontBindAngle.Value = Engine.MainSettings.UISettings.FrontBindAngle;
+			startCanvas.FrontBindRadus.Value = Engine.MainSettings.UISettings.FrontBindRadus + Engine.MainSettings.UISettings.TopOffset;
 			Entity.position.Value = new Vector3f(-0.7f, 0.1f, -0.1f);
-
+			startCanvas.Entity.position.Value = new Vector3f((-Engine.MainSettings.UISettings.TopOffset)/10, (uICanvas.scale.Value.y/10) + 0.01f, 0);
 			//uICanvas.TopOffset.Value = false;
 			//uICanvas.FrontBind.Value = false;
 			//Entity.position.Value = new Vector3f(-0.7f, 0.1f, -1f);
@@ -347,6 +469,8 @@ namespace RhuEngine.Components
 			Entity.parent.Target.position.Value = new Vector3f(0, -0.4f - Engine.MainSettings.UISettings.DashOffsetDown, -(Engine.MainSettings.UISettings.FrontBindRadus / 100) - Engine.MainSettings.UISettings.DashOffsetForward);
 
 		}
+		private float _newvaluetwo = 0;
+
 		private float _newvalue = 0;
 		public override void Step() {
 			if (RInput.Key(Key.Ctrl).IsActive() && RInput.Key(Key.Space).IsJustActive()) {
@@ -362,6 +486,37 @@ namespace RhuEngine.Components
 			else if (_newvalue > 0.95f) {
 				if (uICanvas.Entity.enabled.Value) {
 					uICanvas.Entity.enabled.Value = false;
+				}
+			}
+			_newvaluetwo = MathUtil.Lerp(_newvaluetwo, (CurrentState != OpenPart.None)?0f:1f, RTime.Elapsedf * ((CurrentState != _part)?10f:5f));
+			if (_newvaluetwo is > 0.01f and < 0.97f) {
+				if (!startCanvas.Entity.enabled.Value) {
+					StartEntity.enabled.Value = false;
+					NotificationEntiy.enabled.Value = false;
+					AudioEntiy.enabled.Value = false;
+					switch (CurrentState) {
+						case OpenPart.Start:
+							StartEntity.enabled.Value = true;
+							break;
+						case OpenPart.Audio:
+							AudioEntiy.enabled.Value = true;
+							break;
+						case OpenPart.Notifications:
+							NotificationEntiy.enabled.Value = true;
+							break;
+						default:
+							break;
+					}
+					startCanvas.Entity.enabled.Value = true;
+				}
+				scrollRectTwo.ScrollPos.Value = new Vector2f(0, -_newvaluetwo);
+			}
+			else if (_newvaluetwo > 0.97f) {
+				if (CurrentState == OpenPart.None && _part != CurrentState) {
+					CurrentState = _part;
+				}
+				if (startCanvas.Entity.enabled.Value) {
+					startCanvas.Entity.enabled.Value = false;
 				}
 			}
 			//MathUtil.Lerp()
