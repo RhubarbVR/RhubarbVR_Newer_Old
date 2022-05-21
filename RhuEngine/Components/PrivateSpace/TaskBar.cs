@@ -283,7 +283,7 @@ namespace RhuEngine.Components
 		private void LoadAudio(Entity mainentity) {
 			AudioEntiy = mainentity.AddChild("Audio");
 			var startrect = AudioEntiy.AttachComponent<UIRect>();
-			startrect.AnchorMax.Value = new Vector2f(0.4f, 0.35f);
+			startrect.AnchorMax.Value = new Vector2f(0.4f, 0.45f);
 			startrect.AnchorMin.Value = new Vector2f(0.1f, 0f);
 			var img = AudioEntiy.AttachComponent<UIRectangle>();
 			img.Tint.Value = new Colorf(0, 0, 0, 0.9f);
@@ -312,9 +312,6 @@ namespace RhuEngine.Components
 			LoadAudio(mainentity);
 			LoadStart(mainentity);
 			LoadNotification(mainentity);
-			
-
-
 		}
 
 
