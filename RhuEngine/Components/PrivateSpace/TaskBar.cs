@@ -118,12 +118,21 @@ namespace RhuEngine.Components
 
 		public float _openTarget;
 
+		public OpenPart LastState = OpenPart.None;
+
 		public bool Open
 		{
 			get => _open;
 			set {
 				_open = value;
 				_openTarget = value ? 0f : 1f;
+				if (!_open) {
+					LastState = OpenLevel;
+					OpenLevel = OpenPart.None;
+				}
+				else {
+					OpenLevel = LastState;
+				}
 			}
 		}
 

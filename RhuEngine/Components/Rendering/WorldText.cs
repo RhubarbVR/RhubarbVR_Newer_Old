@@ -6,8 +6,12 @@ using RNumerics;
 using System.Linq;
 namespace RhuEngine.Components
 {
+	public interface ITextComp : ISyncObject {
+		public DynamicTextRender TextRender { get; }
+	}
+
 	[Category(new string[] { "Rendering" })]
-	public class WorldText : RenderingComponent
+	public class WorldText : RenderingComponent, ITextComp
 	{
 		[Default("<color=hsv(240,100,100)>Hello<color=blue><size14>World \n <size5>Trains \n are cool man<size10>\nHello ")]
 		[OnChanged(nameof(UpdateText))]
@@ -40,6 +44,8 @@ namespace RhuEngine.Components
 		public readonly Sync<bool> MiddleLines;
 
 		public DynamicTextRender textRender = new();
+
+		public DynamicTextRender TextRender => textRender;
 		private void UpdateText() {
 			if (!Engine.EngineLink.CanRender) {
 				return;

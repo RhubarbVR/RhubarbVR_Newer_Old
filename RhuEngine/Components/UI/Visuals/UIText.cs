@@ -23,8 +23,10 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "UI/Visuals" })]
-	public class UIText : UIComponent
+	public class UIText : UIComponent,ITextComp
 	{
+		public DynamicTextRender TextRender => textRender;
+
 		[Default("<color=hsv(240,100,100)>Hello<color=blue><size14>World \n <size5>Trains \n are cool man<size10>\nHello ")]
 		[OnChanged(nameof(UpdateText))]
 		public readonly Sync<string> Text;
