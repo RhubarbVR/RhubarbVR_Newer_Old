@@ -47,6 +47,10 @@ namespace RhuEngine.Components
 		[Default(10f)]
 		public readonly Sync<float> StatingSize;
 
+		[Default(false)]
+		[OnChanged(nameof(UpdateText))]
+		public readonly Sync<bool> Password;
+
 		public DynamicTextRender textRender = new();
 
 		[Default(EVerticalAlien.Center)]
@@ -67,7 +71,11 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien, MiddleLines);
+			var newtext = Text.Value;
+			if (Password.Value) {
+				newtext = new string('●', newtext.Length);
+			}
+			textRender.LoadText(Pointer.ToString(), newtext, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien, MiddleLines);
 			UpdateTextOffset();
 		}
 

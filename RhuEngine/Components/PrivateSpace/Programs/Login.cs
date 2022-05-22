@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using RhuEngine.Linker;
+using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
@@ -19,6 +20,10 @@ namespace RhuEngine.Components.PrivateSpace
 
 		public override string ProgramName => "Login";
 
+		[Exsposed]
+		public void Click() {
+		}
+
 		public override void LoadUI(Entity uiRoot) {
 			window.CloseButton.Value = false;
 			var ma = uiRoot.AttachComponent<UIRect>();
@@ -26,6 +31,7 @@ namespace RhuEngine.Components.PrivateSpace
 			var buttonint = test.AttachComponent<UIButtonInteraction>();
 			var buttonpramremove = test.AttachComponent<ButtonEventManager>();
 			var texteditor = test.AttachComponent<UITextEditorInteraction>();
+			texteditor.OnDoneEditing.Target = Click;
 			var textcurrsor = test.AttachComponent<UITextCurrsor>();
 			buttonpramremove.Click.Target = texteditor.EditingClick;
 			buttonint.ButtonEvent.Target = buttonpramremove.Call;
@@ -34,8 +40,9 @@ namespace RhuEngine.Components.PrivateSpace
 			trains.AnchorMin.Value = new Vector2f(0.25f);
 			var textEntity = test.AddChild("Trains");
 			textEntity.AttachComponent<UIRect>();
-			var text = textEntity.AttachComponent<UIText>();
-			texteditor.Value.SetLinkerTarget(text.Text);
+			var _text = textEntity.AttachComponent<UIText>();
+			_text.Password.Value = true;
+			texteditor.Value.SetLinkerTarget(_text.Text);
 			var rectTwo = test.AttachComponent<UIRect>();
 			rectTwo.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
 			rectTwo.AnchorMax.Value = new Vector2f(0.9f, 0.9f);
@@ -45,7 +52,7 @@ namespace RhuEngine.Components.PrivateSpace
 			mittrains.shader.Target = test.AttachComponent<UnlitShader>();
 			img.Material.Target = mittrains;
 			textcurrsor.Material.Target = mittrains;
-			textcurrsor.TextComp.Target = text;
+			textcurrsor.TextComp.Target = _text;
 			textcurrsor.TextCurrsor.Target = texteditor;
 		}
 	}
