@@ -337,7 +337,6 @@ namespace RhuEngine.Components
 			uICanvas = Entity.AddChild("Canvas").AttachComponent<UICanvas>();
 			Engine.SettingsUpdate += Engine_SettingsUpdate;
 			uICanvas.scale.Value = new Vector3f(16, 1.25f, 1);
-			
 			var shader = World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
 			mit = Entity.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;

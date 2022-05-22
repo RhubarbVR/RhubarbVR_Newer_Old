@@ -168,12 +168,12 @@ namespace RhuEngine.Components
 			OnCollapse.Target = CollapseUI;
 			OnPin.Target = PinUI;
 			UpdateButtons();
+			PannelRoot.Target = windowRoot.AddChild("PannelRoot");
+			CollapseUIEnable.Target = PannelRoot.Target.enabled;
+
 			var img = Entity.AttachComponent<UIRectangle>();
 			img.Tint.Value = new Colorf(0, 0, 0, 0.7f);
 			img.Material.Target = mit;
-
-			PannelRoot.Target = windowRoot.AddChild("PannelRoot");
-			CollapseUIEnable.Target = PannelRoot.Target.enabled;
 		}
 		private void UpdateButtons() {
 			if (CloseButtonEnable.Linked) {

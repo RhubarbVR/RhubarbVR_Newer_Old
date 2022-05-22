@@ -75,6 +75,10 @@ namespace RhuEngine.WorldObjects
 			var lerp = this.GetClosedEntityOrRoot().AttachComponent<Lerp<T>>();
 			lerp.StartLerp(this, targetpos, time, removeOnDone);
 		}
+		public void SmoothLerp(T targetpos, double multiply = 5f) {
+			var lerp = this.GetClosedEntityOrRoot().AttachComponent<SmoothLerp<T>>();
+			lerp.StartSmoothLerp(this, targetpos, multiply);
+		}
 
 		public virtual T OnSave(SyncObjectSerializerObject serializerObject) {
 			return _value;

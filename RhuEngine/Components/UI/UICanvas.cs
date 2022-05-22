@@ -58,7 +58,7 @@ namespace RhuEngine.Components
 		}
 
 		public void UpdateMeshes() {
-			Entity.UIRect?.UpdateMeshes();
+			Entity.UIRect?.RegUpdateUIMeshes();
 		}
 
 		public void RenderUI() {

@@ -16,9 +16,9 @@ namespace RhuEngine.Components
 		public readonly SyncPlayback playback;
 		public readonly Sync<double> time;
 		public readonly Sync<bool> removeOnDone;
-		
+
 		[Exsposed]
-		public void StartLerp(ILinkerMember<T> target,T targetpos,double timef,bool removeondone = true) {
+		public void StartLerp(ILinkerMember<T> target, T targetpos, double timef, bool removeondone = true) {
 			driver.SetLinkerTarget(target);
 			from.Value = driver.LinkedValue;
 			to.Value = targetpos;
@@ -42,13 +42,27 @@ namespace RhuEngine.Components
 				try {
 					var pos = playback.Position / playback.ClipLength;
 					if (pos != 1f) {
-						driver.LinkedValue = MathUtil.DynamicLerp(from.Value, to.Value, pos);
+						try {
+							driver.LinkedValue = MathUtil.DynamicLerp(from.Value, to.Value, pos);
+						}
+						catch {
+							if (typeof(T) == typeof(Quaternionf)) {
+								driver.LinkedValue = Quaternionf.Slerp((dynamic)from.Value, (dynamic)to.Value, (float)pos);
+							}
+							else if (typeof(T) == typeof(Quaterniond)) {
+								driver.LinkedValue = Quaterniond.Slerp((dynamic)from.Value, (dynamic)to.Value, pos);
+							}
+							else {
+								throw;
+							}
+						}
 					}
 					else if (removeOnDone) {
 						Destroy();
 					}
 				}
 				catch {
+
 					driver.LinkedValue = default;
 				}
 			}

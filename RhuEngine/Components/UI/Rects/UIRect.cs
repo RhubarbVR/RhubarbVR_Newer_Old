@@ -480,8 +480,8 @@ namespace RhuEngine.Components
 
 		public override void OnLoaded() {
 			base.OnLoaded();
-			RegisterCanvas();
 			Entity.SetUIRect(Entity.GetFirstComponent<UIRect>() ?? this);
+			RegisterCanvas();
 			Entity.components.Changed += RegisterUIList;
 			Entity.children.Changed += Children_Changed;
 			Children_Changed(null);
