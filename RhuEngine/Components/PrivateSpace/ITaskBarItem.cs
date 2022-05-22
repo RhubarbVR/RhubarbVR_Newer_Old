@@ -3,11 +3,37 @@ using System.Collections.Generic;
 using System.Text;
 
 using RhuEngine.Linker;
+using RhuEngine.WorldObjects;
 
 using RNumerics;
 
 namespace RhuEngine.Components.PrivateSpace
 {
+	public class WorldTaskBarItem: ITaskBarItem {
+
+		public World target;
+
+		public WorldTaskBarItem(World world) {
+			target = world;
+		}
+
+		public bool ShowOpenFlag => target.Focus == World.FocusLevel.Focused;
+
+		public string ID => "World" + target.SessionID.Value;
+
+		public Vector2i? Icon => new Vector2i(0,4);
+
+		public RTexture2D Texture => null;
+
+		public string Name => target.SessionName.Value;
+
+		public void Clicked() {
+			if (target.Focus != World.FocusLevel.Focused) {
+				target.Focus = World.FocusLevel.Focused;
+			}
+		}
+	}
+
 	public class ProgramTaskBarItem:ITaskBarItem
 	{
 		public Program Program;

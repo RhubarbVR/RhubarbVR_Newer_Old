@@ -20,6 +20,7 @@ namespace RhuEngine.Managers
 {
 	public class WorldManager : IManager
 	{
+		public Action OnWorldUpdateTaskBar;
 		public Engine Engine { get; private set; }
 
 		public SynchronizedCollection<World> worlds = new();
@@ -60,6 +61,7 @@ namespace RhuEngine.Managers
 					RLog.Err($"Failed to dispose world {worlds[i].WorldDebugName}. Error: {ex}");
 				}
 			}
+			OnWorldUpdateTaskBar?.Invoke();
 		}
 
 		private readonly Stack<World> _isRunning = new();
@@ -114,6 +116,7 @@ namespace RhuEngine.Managers
 				world.WaitingForWorldStartState = false;
 			}
 			worlds.Add(world);
+			OnWorldUpdateTaskBar?.Invoke();
 			ShowLoadingFeedback(world, focusLevel);
 			return world;
 		}
@@ -127,6 +130,7 @@ namespace RhuEngine.Managers
 			world.SessionName.SetValueNoOnChangeAndNetworking(sessionName);
 			Task.Run(() => world.StartNetworking(false));
 			worlds.Add(world);
+			OnWorldUpdateTaskBar?.Invoke();
 			ShowLoadingFeedback(world, focusLevel);
 			return world;
 		}
@@ -154,6 +158,7 @@ namespace RhuEngine.Managers
 			}
 			worlds.Add(world);
 			ShowLoadingFeedback(world, focusLevel);
+			OnWorldUpdateTaskBar?.Invoke();
 			return world;
 		}
 
@@ -187,6 +192,7 @@ namespace RhuEngine.Managers
 					Task.Run(() => item.Dispose());
 				}
 			}
+			OnWorldUpdateTaskBar?.Invoke();
 		}
 		public void Step() {
 			float totalStep = 0;
@@ -240,6 +246,7 @@ namespace RhuEngine.Managers
 			}
 			worlds.Remove(world);
 			world.Dispose();
+			OnWorldUpdateTaskBar?.Invoke();
 		}
 	}
 }

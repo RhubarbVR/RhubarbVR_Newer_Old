@@ -128,6 +128,7 @@ namespace RhuEngine.WorldObjects
 					}
 					LastFocusChange = DateTime.UtcNow;
 					UpdateFocus();
+					worldManager.OnWorldUpdateTaskBar?.Invoke();
 				}
 			}
 		}

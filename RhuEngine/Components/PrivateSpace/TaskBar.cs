@@ -147,12 +147,12 @@ namespace RhuEngine.Components
 				taskBarItems.Remove(item);
 			}
 			taskBarItems.Add(taskBarItem);
-			TaskBarItemsUpdate();
+			RegTaskBarItemsUpdate();
 		}
 
 		public void RemoveTaskBarItemToList(ITaskBarItem taskBarItem) {
 			taskBarItems.Remove(taskBarItem);
-			TaskBarItemsUpdate();
+			RegTaskBarItemsUpdate();
 		}
 
 		public List<Program> programs = new();
@@ -211,8 +211,17 @@ namespace RhuEngine.Components
 			return icon;
 		}
 
+		public void RegTaskBarItemsUpdate() {
+			RWorld.ExecuteOnEndOfFrame(this,TaskBarItemsUpdate);
+		}
+
 		public void TaskBarItemsUpdate() {
 			TaskBarItems.children.Clear();
+			foreach (var item in Engine.worldManager.worlds) {
+				if(item.Focus is World.FocusLevel.Background or World.FocusLevel.Focused) {
+					AddTaskBarItem(new WorldTaskBarItem(item));
+				}
+			}
 			foreach (var item in taskBarItems) {
 				AddTaskBarItem(item);
 			}
@@ -417,6 +426,7 @@ namespace RhuEngine.Components
 			text.StartingColor.Value = Colorf.White;
 
 			AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(Login)));
+			WorldManager.OnWorldUpdateTaskBar += RegTaskBarItemsUpdate;
 		}
 
 		public void OpenProgram(string name, Type programType) {

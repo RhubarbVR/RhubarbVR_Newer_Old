@@ -58,6 +58,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		internal void SessionInfoChanged() {
+			worldManager.OnWorldUpdateTaskBar?.Invoke();
 			if (MasterUser != LocalUserID) {
 				return;
 			}
