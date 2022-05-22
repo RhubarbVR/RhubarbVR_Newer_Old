@@ -31,11 +31,15 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			MainMesh = null;
-			ScrollMesh = null;
-			CutMesh = null;
-			RenderMesh = null;
-			RenderMainMesh(true);
+			RenderMesh = CutMesh = ScrollMesh = MainMesh = null;
+			RenderMainMesh();
+		}
+
+		public void RegProcessMesh() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
+			RWorld.ExecuteOnEndOfFrame(this, ProcessMesh);
 		}
 
 		public override void RenderTargetChange() {
@@ -64,7 +68,7 @@ namespace RhuEngine.Components
 
 		private bool _isCut;
 
-		public override void CutElement(bool cut,bool update = true) {
+		public override void CutElement(bool cut, bool update = true) {
 			_isCut = cut;
 			RenderCutMesh(update, update);
 		}
@@ -110,11 +114,11 @@ namespace RhuEngine.Components
 			RWorld.ExecuteOnEndOfFrame(BoxBased ? RunLoadPhysicsBox : RunLoadPhysicsMesh);
 		}
 
-		public virtual bool BoxBased => !((Rect.Canvas?.FrontBind.Value??false) || (Rect.Canvas?.TopOffset.Value??false));
+		public virtual bool BoxBased => !((Rect.Canvas?.FrontBind.Value ?? false) || (Rect.Canvas?.TopOffset.Value ?? false));
 
 		public void RenderMainMesh(bool updateMesh = true, bool PhysicsMesh = true) {
 			if (CutMesh is null) {
-				RenderCutMesh(false);
+				RenderCutMesh(false,false,false);
 			}
 			var returnMesh = CutMesh;
 			if (Rect.Canvas.TopOffset.Value) {
@@ -122,7 +126,7 @@ namespace RhuEngine.Components
 				returnMesh.OffsetTop(Rect.Canvas.TopOffsetValue.Value);
 			}
 			if (Rect.Canvas.FrontBind.Value) {
-				returnMesh = returnMesh.UIBind(Rect.Canvas.FrontBindAngle.Value, Rect.Canvas.FrontBindRadus.Value, Rect.Canvas.FrontBindSegments.Value,Rect.Canvas.scale);
+				returnMesh = returnMesh.UIBind(Rect.Canvas.FrontBindAngle.Value, Rect.Canvas.FrontBindRadus.Value, Rect.Canvas.FrontBindSegments.Value, Rect.Canvas.scale);
 			}
 			if (!BoxBased) {
 				returnMesh.Scale(Rect.Canvas.scale.Value.x / 10, Rect.Canvas.scale.Value.y / 10, Rect.Canvas.scale.Value.z / 10);
@@ -136,13 +140,15 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public void RenderCutMesh(bool updateMesh = true,bool PhysicsMesh = true) {
+		public void RenderCutMesh(bool updateMesh = true, bool PhysicsMesh = true, bool UpdateManMesh = true) {
 			if (ScrollMesh is null) {
 				RenderScrollMesh(false);
 			}
 			var cutMesh = _isCut ? ScrollMesh.Cut(Rect.CutZonesMax, Rect.CutZonesMin) : ScrollMesh;
 			CutMesh = cutMesh;
-			RenderMainMesh(updateMesh,PhysicsMesh);
+			if (UpdateManMesh) {
+				RenderMainMesh(updateMesh, PhysicsMesh);
+			}
 		}
 	}
 }

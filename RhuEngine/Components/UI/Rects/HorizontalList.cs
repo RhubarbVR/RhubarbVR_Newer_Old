@@ -32,14 +32,10 @@ namespace RhuEngine.Components
 		}
 
 		public override void UpdateUIMeshes() {
-			UpdateMinMaxNoPross();
-			fakeRects.SafeOperation((list) => {
-				list.Clear();
+			fakeRects.SafeOperation((flist) => {
+				flist.Clear();
 				_childRects.SafeOperation((list) => {
 					foreach (var item in list) {
-						if (item is null) {
-							continue;
-						}
 						var fakeRec = new BasicRectOvride {
 							Child = item,
 							ParentRect = this,
@@ -49,7 +45,7 @@ namespace RhuEngine.Components
 							AnchorMin = Vector2f.Zero,
 						};
 						item.SetOverride(fakeRec);
-						fakeRects.SafeAdd(fakeRec);
+						flist.Add(fakeRec);
 					}
 				});
 			});
@@ -76,7 +72,6 @@ namespace RhuEngine.Components
 					foreach (var item in list) {
 						item.Canvas = Canvas;
 						item.ParentRect = this;
-						item.UpdateMinMaxNoPross();
 						var targetSize = item.Child.AnchorMaxValue - item.Child.AnchorMinValue;
 						item.AnchorMin = new Vector2f(xpos, 0);
 						item.AnchorMax = new Vector2f(xpos+1f,1);
@@ -95,6 +90,7 @@ namespace RhuEngine.Components
 						_maxScroll = new Vector2f(0, 0);
 						_minScroll = new Vector2f(-scollmax.x + scale.x, -(scollmax.y - scale.y));
 					}
+					UpdateMinMax();
 				});
 			}
 			base.UpdateUIMeshes();

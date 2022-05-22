@@ -67,11 +67,11 @@ namespace RhuEngine.Components
 		public float DepthValue { get; set; }
 
 		public void UpdateMinMax() {
-			Child.UpdateMinMax();
+			Child?.UpdateMinMax();
 		}
 
 		public void UpdateMinMaxNoPross() {
-			Child.UpdateMinMaxNoPross();
+			Child?.UpdateMinMaxNoPross();
 		}
 	}
 

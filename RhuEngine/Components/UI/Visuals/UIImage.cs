@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI/Visuals" })]
 	public class UIImage : RenderUIComponent
 	{
-		[OnAssetLoaded(nameof(ProcessMesh))]
+		[OnAssetLoaded(nameof(RegProcessMesh))]
 		public readonly AssetRef<RTexture2D> Texture;
 
 		public readonly AssetRef<RMaterial> Material;
@@ -20,15 +20,15 @@ namespace RhuEngine.Components
 		public override bool HasPhysics => true;
 
 		[Default(EVerticalAlien.Center)]
-		[OnChanged(nameof(ProcessMesh))]
+		[OnChanged(nameof(RegProcessMesh))]
 		public readonly Sync<EVerticalAlien> VerticalAlien;
 
 		[Default(EHorizontalAlien.Middle)]
-		[OnChanged(nameof(ProcessMesh))]
+		[OnChanged(nameof(RegProcessMesh))]
 		public readonly Sync<EHorizontalAlien> HorizontalAlien;
 
 		[Default(true)]
-		[OnChanged(nameof(ProcessMesh))]
+		[OnChanged(nameof(RegProcessMesh))]
 		public readonly Sync<bool> KeepAspectRatio;
 
 		public override RMaterial RenderMaterial => Material.Asset;

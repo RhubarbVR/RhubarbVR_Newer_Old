@@ -218,7 +218,7 @@ namespace RhuEngine.Components
 		public void TaskBarItemsUpdate() {
 			TaskBarItems.children.Clear();
 			//foreach (var item in Engine.worldManager.worlds) {
-			//	if(item.Focus is World.FocusLevel.Background or World.FocusLevel.Focused) {
+			//	if (item.Focus is World.FocusLevel.Background or World.FocusLevel.Focused) {
 			//		AddTaskBarItem(new WorldTaskBarItem(item));
 			//	}
 			//}
@@ -262,7 +262,6 @@ namespace RhuEngine.Components
 				img.Tint.Value = new Colorf(0.7f, 0.7f, 0.7f, 0.5f);
 				img.Material.Target = mit;
 			}
-
 		}
 
 		[Exsposed]

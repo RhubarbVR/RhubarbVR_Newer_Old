@@ -10,13 +10,13 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI/Visuals" })]
 	public class UISprite : RenderUIComponent
 	{
-		[OnAssetLoaded(nameof(ProcessMesh))]
+		[OnChanged(nameof(RegProcessMesh))]
 		public readonly SyncRef<SpriteProvder> Sprite;
 
-		[OnAssetLoaded(nameof(ProcessMesh))]
+		[OnChanged(nameof(RegProcessMesh))]
 		public readonly Sync<Vector2i> PosMin;
 		
-		[OnAssetLoaded(nameof(ProcessMesh))]
+		[OnChanged(nameof(RegProcessMesh))]
 		public readonly Sync<Vector2i> PosMax;
 		
 		[Exsposed]
@@ -32,15 +32,15 @@ namespace RhuEngine.Components
 		public override bool HasPhysics => true;
 
 		[Default(EVerticalAlien.Center)]
-		[OnChanged(nameof(ProcessMesh))]
+		[OnChanged(nameof(RegProcessMesh))]
 		public readonly Sync<EVerticalAlien> VerticalAlien;
 
 		[Default(EHorizontalAlien.Middle)]
-		[OnChanged(nameof(ProcessMesh))]
+		[OnChanged(nameof(RegProcessMesh))]
 		public readonly Sync<EHorizontalAlien> HorizontalAlien;
 
 		[Default(true)]
-		[OnChanged(nameof(ProcessMesh))]
+		[OnChanged(nameof(RegProcessMesh))]
 		public readonly Sync<bool> KeepAspectRatio;
 
 		public override RMaterial RenderMaterial => Material.Asset;

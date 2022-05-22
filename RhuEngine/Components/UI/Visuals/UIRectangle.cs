@@ -20,12 +20,12 @@ namespace RhuEngine.Components
 
 		public readonly Sync<Colorf> Tint;
 		[Default(5)]
-		[OnChanged(nameof(ProcessMesh))]
+		[OnChanged(nameof(RegProcessMesh))]
 		public readonly Sync<int> RoundingSteps;
 		[Default(0f)]
-		[OnChanged(nameof(ProcessMesh))]
+		[OnChanged(nameof(RegProcessMesh))]
 		public readonly Sync<float> Rounding;
-		[OnChanged(nameof(ProcessMesh))]
+		[OnChanged(nameof(RegProcessMesh))]
 		public readonly Sync<bool> FullBox;
 		public override RMaterial RenderMaterial => Material.Asset;
 		public override Colorf RenderTint => Tint.Value;
