@@ -32,6 +32,9 @@ namespace RhuEngine.Components
 		}
 
 		public override void UpdateUIMeshes() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			UpdateMinMaxNoPross();
 			fakeRects.SafeOperation((flist) => {
 				flist.Clear();

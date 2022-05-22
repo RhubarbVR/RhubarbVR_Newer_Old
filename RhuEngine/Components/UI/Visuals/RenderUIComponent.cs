@@ -28,6 +28,9 @@ namespace RhuEngine.Components
 		public abstract void ProcessBaseMesh();
 
 		public void ProcessMesh() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			MainMesh = null;
 			ScrollMesh = null;
 			CutMesh = null;
