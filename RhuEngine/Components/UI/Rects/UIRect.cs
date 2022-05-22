@@ -263,14 +263,14 @@ namespace RhuEngine.Components
 
 		public virtual Vector2f CutZonesMin => Entity.parent.Target?.UIRect?.CutZonesMin ?? Vector2f.NInf;
 
-		private Vector2f _cachedMin;
-		private Vector2f _cachedMax;
+		public Vector2f _cachedMin;
+		public Vector2f _cachedMax;
 
 		public void UpdateMinMax() {
 			UpdateMinMaxNoPross();
 			RegUpdateUIMeshes();
 		}
-		public void UpdateMinMaxNoPross() {
+		public virtual void UpdateMinMaxNoPross() {
 			_cachedMin = CompMin;
 			_cachedMax = CompMax;
 			_childRects.SafeOperation((list) => {
@@ -319,7 +319,7 @@ namespace RhuEngine.Components
 			}
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
-					item.ProcessBaseMesh();
+					item.ProcessMesh();
 				}
 			});
 			
@@ -494,13 +494,15 @@ namespace RhuEngine.Components
 		public virtual void ChildAdded(UIRect child) {
 			child?.SetOverride(null);
 		}
+
+		public object children_ChangedClass = Guid.NewGuid();
+
 		private void Children_Changed(IChangeable obj) {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			RWorld.ExecuteOnStartOfFrame(() => {
+			RWorld.ExecuteOnStartOfFrame(children_ChangedClass, () => {
 				_boundTo.SafeOperation((alist) => {
-					var added = false;
 					foreach (var item in alist) {
 						item.components.Changed -= Children_Changed;
 					}
@@ -510,34 +512,27 @@ namespace RhuEngine.Components
 						foreach (Entity item in Entity.children) {
 							item.components.Changed += Children_Changed;
 							alist.Add(item);
-							var childadded = item.GetFirstComponent<UIRect>();
-							if (childadded != null) {
-								ChildAdded(childadded);
+							var childadded = item.UIRect;
+							if (childadded is not null) {
 								list.Add(childadded);
-								added = true;
+								childadded.RegisterCanvas();
+								childadded.UpdateMinMax();
 							}
 						}
 					});
-					ProcessCutting(false);
-					UpdateUIMeshes();
-					if (added) {
-						ChildRectAdded();
-					}
 				});
-				Scroll(ScrollOffset, true);
+				UpdateUIMeshes();
+				Scroll(ScrollOffset,true,true);
 			});
 		}
 
-		public virtual void ChildRectAdded() {
-
-		}
-
+		public object RegisterUIListClass = Guid.NewGuid();
 
 		private void RegisterUIList(IChangeable obj) {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			RWorld.ExecuteOnStartOfFrame(() => {
+			RWorld.ExecuteOnStartOfFrame(RegisterUIListClass ,() => {
 				_uiComponents.SafeOperation((list) => list.Clear());
 				_uiComponents.SafeOperation((list) => {
 					foreach (var item in Entity.GetAllComponents<UIComponent>()) {
@@ -553,7 +548,7 @@ namespace RhuEngine.Components
 						list.Add(item);
 					}
 				});
-				Scroll(ScrollOffset, true);
+				Scroll(ScrollOffset, true,true);
 			});
 		}
 
@@ -572,22 +567,27 @@ namespace RhuEngine.Components
 			});
 		}
 
-		public void Scroll(Vector3f value, bool forceUpdate = false) {
+		public void Scroll(Vector3f value, bool forceUpdate = false,bool forcePhsics = false) {
 			if (value == ScrollOffset && !forceUpdate) {
 				return;
 			}
-			var phsicsupdate = value.x == ScrollOffset.x && value.y == ScrollOffset.y;
+			var phsicsupdate = !(value.x == ScrollOffset.x && value.y == ScrollOffset.y);
 			ScrollOffset = value;
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.RenderScrollMesh(false);
 				}
 			});
-			ProcessCutting(false, !phsicsupdate);
+			_uiComponents.SafeOperation((list) => {
+				foreach (var item in list) {
+					item.RenderTargetChange();
+				}
+			});
+			ProcessCutting(false, phsicsupdate || forcePhsics);
 			UpdateMeshes();
 			_childRects.SafeOperation((list) => {
 				foreach (var item in list) {
-					item.Scroll(value, forceUpdate);
+					item.Scroll(value, forceUpdate, forcePhsics);
 				}
 			});
 		}

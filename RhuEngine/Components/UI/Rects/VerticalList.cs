@@ -27,10 +27,6 @@ namespace RhuEngine.Components
 
 		public override Vector2f MinScroll => _minScroll;
 
-		public override void ChildRectAdded() {
-			RegUpdateUIMeshes();
-		}
-
 		public override void UpdateUIMeshes() {
 			if (!Engine.EngineLink.CanRender) {
 				return;

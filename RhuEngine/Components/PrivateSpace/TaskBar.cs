@@ -217,11 +217,11 @@ namespace RhuEngine.Components
 
 		public void TaskBarItemsUpdate() {
 			TaskBarItems.children.Clear();
-			//foreach (var item in Engine.worldManager.worlds) {
-			//	if (item.Focus is World.FocusLevel.Background or World.FocusLevel.Focused) {
-			//		AddTaskBarItem(new WorldTaskBarItem(item));
-			//	}
-			//}
+			foreach (var item in Engine.worldManager.worlds) {
+				if (item.Focus is World.FocusLevel.Background or World.FocusLevel.Focused) {
+					AddTaskBarItem(new WorldTaskBarItem(item));
+				}
+			}
 			foreach (var item in taskBarItems) {
 				AddTaskBarItem(item);
 			}
@@ -383,6 +383,7 @@ namespace RhuEngine.Components
 			var listentit = listentitHolder.AddChild("list");
 			var list = listentit.AttachComponent<HorizontalList>();
 			var interaction = listentit.AttachComponent<UIScrollInteraction>();
+			interaction.AllowOtherZones.Value = true;
 			interaction.OnScroll.Target += list.Scroll;
 			var img4 = listentit.AttachComponent<UIRectangle>();
 			img4.Tint.Value = new Colorf(0.2f, 0.2f, 0.2f, 0.5f);

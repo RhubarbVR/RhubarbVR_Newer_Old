@@ -114,7 +114,7 @@ namespace RhuEngine
 				e.AttachText(new Vector2f(0), new Vector2f(0.5f, 1), Colorf.White,text);
 			}
 			var random = new Random();
-			var amount = random.Next(1, 25);
+			var amount = random.Next(4, 25);
 			for (var i = 0; i < amount; i++) {
 				AttachListElement(listRoot,$"Element {i} / {amount - 1}");
 			}
