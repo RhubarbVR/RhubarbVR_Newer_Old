@@ -17,6 +17,9 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
+			if (Engine.HasNoKeyboard) {
+				return;
+			}
 			if(RInput.Key(Key.V).IsJustActive() && RInput.Key(Key.Ctrl).IsActive()) {
 				//ToDO inprove to have imgs and also have render bindings
 				var data = ClipboardService.GetText();

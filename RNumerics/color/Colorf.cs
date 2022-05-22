@@ -30,13 +30,13 @@ namespace RNumerics
 	public struct Colorf : IComparable<Colorf>, IEquatable<Colorf>
 	{
 		[Key(0)]
-		public float r;
+		public float r = 1;
 		[Key(1)]
-		public float g;
+		public float g = 1;
 		[Key(2)]
-		public float b;
+		public float b = 1;
 		[Key(3)]
-		public float a;
+		public float a = 1;
 
 		public Colorf(float greylevel, float a = 1) { r = g = b = greylevel; this.a = a; }
 		public Colorf(float r, float g, float b, float a = 1) { this.r = r; this.g = g; this.b = b; this.a = a; }
@@ -183,6 +183,7 @@ namespace RNumerics
 
 		public static Colorf operator *(float f, Colorf v) => new(f * v.r, f * v.g, f * v.b, f * v.a);
 		public static Colorf operator *(Colorf v, float f) => new(f * v.r, f * v.g, f * v.b, f * v.a);
+		public static Colorf operator *(Colorf v, Colorf f) => new(f.r * v.r, f.g  * v.g, f.b * v.b, f.a * v.a);
 
 		public static Colorf operator +(Colorf v0, Colorf v1) => new(v0.r + v1.r, v0.g + v1.g, v0.b + v1.b, v0.a + v1.a);
 		public static Colorf operator +(Colorf v0, float f) => new(v0.r + f, v0.g + f, v0.b + f, v0.a + f);

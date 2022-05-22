@@ -19,7 +19,7 @@ namespace RStereoKit
 
 	public class SKMouse : IRMouse
 	{
-		public Vector2f ScrollChange => new Vector2f(0, Input.Mouse.scrollChange/1000);
+		public Vector2f ScrollChange => new Vector2f(0, Input.Mouse.scrollChange / 1000);
 
 		public Vector2f PosChange => (Vector2f)(Vector2)Input.Mouse.posChange;
 	}
@@ -98,6 +98,18 @@ namespace RStereoKit
 		public IRController CLeft { get; set; } = new SKConttroller(Input.Controller(StereoKit.Handed.Left));
 
 		public IRController CRight { get; set; } = new SKConttroller(Input.Controller(StereoKit.Handed.Right));
+
+		public string TypeDelta
+		{
+			get {
+				var chare = Input.TextConsume();
+				Input.TextReset();
+				if(chare == '\0') {
+					return "";
+				}
+				return chare.ToString();
+			}
+		}
 
 		public IRController Controller(RhuEngine.Linker.Handed handed) {
 			switch (handed) {

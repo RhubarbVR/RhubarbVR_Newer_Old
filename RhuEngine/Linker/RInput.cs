@@ -46,6 +46,7 @@ namespace RhuEngine.Linker
 	}
 	public interface IRInput
 	{
+		public string TypeDelta { get; }
 		public IRHead Head { get; }
 
 
@@ -66,6 +67,10 @@ namespace RhuEngine.Linker
 
 
 		public static IRMouse Mouse => Instance?.Mouse;
+
+		public static string InjectedTypeDelta = "";
+
+		public static string TypeDelta => Instance.TypeDelta + InjectedTypeDelta;
 
 		public static IKeyPress Key(Key secondKey) {
 			return Instance?.Key(secondKey);

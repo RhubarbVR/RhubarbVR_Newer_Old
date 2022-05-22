@@ -148,7 +148,11 @@ namespace RhuEngine.Managers
 			return GetInputFloatFromController(inputType, GetController(false), _engine.MainSettings.InputSettings.SecondaryControllerInputSettings);
 		}
 		public float GetInputFloat(InputTypes inputType,bool? mainController = null) {
-			var main = GetInputFloatFromKeyboard(inputType) + GetInputFloatFromGamePad(inputType);
+			var keyboardFloat = GetInputFloatFromKeyboard(inputType);
+			if (_engine.HasNoKeyboard) {
+				keyboardFloat = 0;
+			}
+			var main = keyboardFloat + GetInputFloatFromGamePad(inputType);
 			if(mainController is null) {
 				main += GetInputFloatFromMainController(inputType);
 				main += GetInputFloatFromSeccondController(inputType);

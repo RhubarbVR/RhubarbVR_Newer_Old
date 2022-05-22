@@ -6,6 +6,7 @@ using RhuEngine.Linker;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using static RhuEngine.Components.DynamicTextRender;
 
 namespace RhuEngine.Components
 {
@@ -25,6 +26,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI/Visuals" })]
 	public class UIText : UIComponent,ITextComp
 	{
+		public event Action<Matrix, TextChar,int> OnCharRender;
 		public DynamicTextRender TextRender => textRender;
 
 		[Default("<color=hsv(240,100,100)>Hello<color=blue><size14>World \n <size5>Trains \n are cool man<size10>\nHello ")]
@@ -131,7 +133,7 @@ namespace RhuEngine.Components
 		}
 
 		public override void Render(Matrix matrix) {
-			textRender.Render(textOffset, Matrix.T(Rect.ScrollOffset) * Matrix.S((Rect.Canvas?.scale.Value ?? Vector3f.One) / 10) * matrix);
+			textRender.Render(textOffset, Matrix.T(Rect.ScrollOffset) * Matrix.S((Rect.Canvas?.scale.Value ?? Vector3f.One) / 10) * matrix, OnCharRender);
 		}
 
 		public override void CutElement(bool cut, bool update) {
@@ -140,6 +142,9 @@ namespace RhuEngine.Components
 			if (cut) {
 				textRender.Chars.SafeOperation((list) => {
 					foreach (var chare in list) {
+						if(chare is null) {
+							continue;
+						}
 						var charbottomleft = (chare.p * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
 						var charbottomright = (Matrix.T(new Vector3f(chare.textsize.x, 0, 0) + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
 						var chartopleft = (Matrix.T(new Vector3f(0, chare.textsize.y, 0) + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
@@ -182,6 +187,9 @@ namespace RhuEngine.Components
 			else {
 				textRender.Chars.SafeOperation((list) => {
 					foreach (var chare in list) {
+						if(chare is null) {
+							continue;
+						}
 						chare.textCut = Vector2f.Zero;
 						chare.Cull = false;
 					}
@@ -189,6 +197,9 @@ namespace RhuEngine.Components
 			}
 			textRender.Chars.SafeOperation((list) => {
 				foreach (var chare in list) {
+					if(chare is null) {
+						continue;
+					}
 					var newMat = Rect.MatrixMove(chare.p * textOffset * Matrix.T(Rect.ScrollOffset));
 					chare.Offset = Matrix.T(newMat.Translation);
 					chare.Offset2 = Matrix.R(newMat.Rotation);

@@ -34,6 +34,7 @@ namespace RhuEngine.Components
 			public Vector2f textCut;
 			public bool Cull = false;
 			public float Leading = 0f;
+			public bool NullChar = false;
 			public TextChar(string id, char c, Matrix p, Colorf color, RFont rFont, FontStyle fontStyle, Vector2f textCut, Vector2f textsize,float Leading) {
 				this.id = id;
 				this.c = c;
@@ -46,17 +47,25 @@ namespace RhuEngine.Components
 				this.Leading = Leading;
 			}
 
-			public void Render(Matrix root) {
+			public void Render(Matrix root, Action<Matrix, TextChar, int> action, int index) {
+				if (NullChar) {
+					action?.Invoke(Offset2 * p * root, this, index);
+					return;
+				}
 				if (!Cull) {
 					RText.Add(id, c, Offset2 * p * root, color, rFont, fontStyle, textCut);
 				}
+				action?.Invoke(Offset2 * p * root, this, index);
 			}
 		}
 
-		public void Render(Matrix offset,Matrix root) {
+
+		public void Render(Matrix offset,Matrix root,Action<Matrix,TextChar,int> action = null) {
 			Chars.SafeOperation((list) => {
+				var index = 0;
 				foreach (var item in list) {
-					item.Render(offset * item.Offset * root);
+					item?.Render(offset * item.Offset * root, action, index);
+					index++;
 				}
 			});
 		}
@@ -65,13 +74,11 @@ namespace RhuEngine.Components
 			if(Font is null) {
 				return;
 			}
-			if (string.IsNullOrEmpty(Text)) {
-				Chars.SafeOperation((list) => list.Clear());
-				axisAlignedBox3F = AxisAlignedBox3f.Zero;
-				return;
-			}
 			var bounds = new List<Vector3f>();
 			Chars.SafeOperation((list) => list.Clear());
+			if (string.IsNullOrEmpty(Text)) {
+				Text = " ";
+			}
 			var textXpos = 0f;
 			var textsizeY = 0f;
 			var textYpos = 0f;
@@ -86,6 +93,15 @@ namespace RhuEngine.Components
 			var thisrow = new Stack<TextChar>();
 			color.Push(StartingColor);
 			var index = 0;
+			void AddNullText(int first) {
+				for (var i = 0; i < first; i++) {
+					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
+					var chare = new TextChar(Id + "null" + index.ToString(), '\0', Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Font, style.Peek(), Vector2f.Zero, Vector2f.One, leaded.Peek() / 10) { 
+						NullChar = true
+					};
+					Chars.SafeAdd(chare);
+				}
+			}
 			void RenderText(string text) {
 				foreach (var item in text) {
 					var textsize = RText.Size(Font, item,style.Peek());
@@ -133,6 +149,9 @@ namespace RhuEngine.Components
 				}
 			}
 			void Loop(string segment) {
+				
+
+
 				var first = segment.IndexOf('<');
 				if(first <= -1) {
 					RenderText(segment);
@@ -143,6 +162,9 @@ namespace RhuEngine.Components
 				if (last <= -1) {
 					RenderText(segment);
 					return;
+				}
+				else if (first != 0) {
+					RenderText(segment.Substring(0, first));
 				}
 				if (check == -1) {
 					check = int.MaxValue;
@@ -155,16 +177,19 @@ namespace RhuEngine.Components
 				var smartCommand = new string(command.ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToArray());
 				var haseq = smartCommand.Contains('=');
 				if (smartCommand.StartsWith("<color")) {
+					AddNullText(command.Length + 1);
 					var data = smartCommand.Substring(6 + (haseq ? 1 : 0));
 					color.Push(Colorf.Parse(data));
 				}
 				else if (smartCommand.StartsWith("<style")) {
+					AddNullText(command.Length + 1);
 					var data = smartCommand.Substring(6 + (haseq ? 1 : 0));
 					if(Enum.TryParse(data,true,out FontStyle fontStyle)) {
 						style.Push(fontStyle);
 					}
 				}
 				else if (smartCommand.StartsWith("<size")) {
+					AddNullText(command.Length + 1);
 					var data = smartCommand.Substring(5 + (haseq ? 1 : 0));
 					try {
 						fontSize.Push(float.Parse(data));
@@ -172,6 +197,7 @@ namespace RhuEngine.Components
 					catch { }
 				}
 				else if (smartCommand.StartsWith("<leading")) {
+					AddNullText(command.Length + 1);
 					var data = smartCommand.Substring(8 + (haseq ? 1 : 0));
 					try {
 						leaded.Push(float.Parse(data));
@@ -179,6 +205,7 @@ namespace RhuEngine.Components
 					catch { }
 				}
 				else if (smartCommand.StartsWith("</color") || smartCommand.StartsWith("<\\color")) {
+					AddNullText(command.Length + 1);
 					try {
 						if (color.Count != 1) {
 							color.Pop();
@@ -187,6 +214,7 @@ namespace RhuEngine.Components
 					catch { }
 				}
 				else if (smartCommand.StartsWith("</size") || smartCommand.StartsWith("<\\size")) {
+					AddNullText(command.Length + 1);
 					try {
 						if (fontSize.Count != 1) {
 							fontSize.Pop();
@@ -195,6 +223,7 @@ namespace RhuEngine.Components
 					catch { }
 				}
 				else if (smartCommand.StartsWith("</leading") || smartCommand.StartsWith("<\\size")) {
+					AddNullText(command.Length + 1);
 					try {
 						if (leaded.Count != 1) {
 							leaded.Pop();
@@ -203,6 +232,7 @@ namespace RhuEngine.Components
 					catch { }
 				}
 				else if (smartCommand.StartsWith("</style") || smartCommand.StartsWith("<\\style")) {
+					AddNullText(command.Length + 1);
 					try {
 						if (style.Count != 1) {
 							style.Pop();
@@ -221,7 +251,9 @@ namespace RhuEngine.Components
 				RenderText(segment.Substring(last + 1, end - last - 1));
 				Loop(segment.Substring(end));
 			}
+			AddNullText(1);
 			Loop(Text);
+			AddNullText(1);
 			axisAlignedBox3F = BoundsUtil.Bounds(bounds);
 			if (horizontalAlien == EHorizontalAlien.Right || middleLines) {
 				Chars.SafeOperation((list) => {
@@ -231,6 +263,9 @@ namespace RhuEngine.Components
 					}
 					var offset = 0f;
 					foreach (var item in list) {
+						if(item is null) {
+							continue;
+						}
 						if (item.c == '\n') {
 							if (thisrow.Count != 0) {
 								foreach (var element in thisrow) {

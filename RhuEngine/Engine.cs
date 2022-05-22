@@ -14,6 +14,7 @@ using System.Reflection;
 using RhuEngine.Linker;
 using RNumerics;
 using System.Threading;
+using RhuEngine.Components;
 
 namespace RhuEngine
 {
@@ -124,6 +125,21 @@ namespace RhuEngine
 				}
 			}
 			MainSettings = lists.Count == 0 ? new MainSettingsObject() : SettingsManager.LoadSettingsObject<MainSettingsObject>(lists.ToArray());
+		}
+
+		public bool HasNoKeyboard => KeyboardInteraction is not null;
+
+		public IKeyboardInteraction KeyboardInteraction { get;private set; }
+
+		public void KeyboardInteractionBind(IKeyboardInteraction uITextEditorInteraction) {
+			KeyboardInteraction?.KeyboardUnBind();
+			KeyboardInteraction = uITextEditorInteraction;
+		}
+
+		public void KeyboardInteractionUnBind(IKeyboardInteraction uITextEditorInteraction) {
+			if(KeyboardInteraction == uITextEditorInteraction) {
+				KeyboardInteraction = null;
+			}
 		}
 
 		public void SaveSettings() {
