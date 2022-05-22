@@ -9,6 +9,7 @@ using RhuEngine.WorldObjects.ECS;
 using RhuEngine.AssetSystem;
 using System.Collections.Generic;
 using RhuEngine.Linker;
+using System.Threading.Tasks;
 
 namespace RhuEngine.WorldObjects
 {
@@ -24,10 +25,12 @@ namespace RhuEngine.WorldObjects
 	{
 		private readonly List<Action> _actions = new();
 
-		public void AddCoroutine(Action action) {
+		public void AddCoroutineEnd(Action action) {
 			_actions.Add(action);
 		}
-
+		public void AddCoroutine(Action action) {
+			_actions.Add(Task.Run(action).Wait);
+		}
 		private void UpdateCoroutine() {
 			var e = _actions.GetEnumerator();
 			while (e.MoveNext()) {

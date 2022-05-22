@@ -30,6 +30,10 @@ namespace RhuEngine.Components
 
 		public float DepthValue { get; }
 
+		public void UpdateMinMaxNoPross();
+
+		public void UpdateMinMax();
+
 	}
 
 	public class BasicRectOvride : IRectData
@@ -61,6 +65,14 @@ namespace RhuEngine.Components
 		public float StartPoint => (ParentRect?.StartPoint ?? 0) + (ParentRect?.DepthValue ?? 0);
 
 		public float DepthValue { get; set; }
+
+		public void UpdateMinMax() {
+			Child.UpdateMinMax();
+		}
+
+		public void UpdateMinMaxNoPross() {
+			Child.UpdateMinMaxNoPross();
+		}
 	}
 
 	public struct HitData
@@ -190,17 +202,17 @@ namespace RhuEngine.Components
 				}
 			}
 		}
-		[OnChanged(nameof(RegUpdateUIMeshes))]
+		[OnChanged(nameof(UpdateMinMax))]
 		public readonly Sync<Vector2f> OffsetLocalMin;
-		[OnChanged(nameof(RegUpdateUIMeshes))]
+		[OnChanged(nameof(UpdateMinMax))]
 		public readonly Sync<Vector2f> OffsetLocalMax;
-		[OnChanged(nameof(RegUpdateUIMeshes))]
+		[OnChanged(nameof(UpdateMinMax))]
 		public readonly Sync<Vector2f> OffsetMin;
-		[OnChanged(nameof(RegUpdateUIMeshes))]
+		[OnChanged(nameof(UpdateMinMax))]
 		public readonly Sync<Vector2f> OffsetMax;
-		[OnChanged(nameof(RegUpdateUIMeshes))]
+		[OnChanged(nameof(UpdateMinMax))]
 		public readonly Sync<Vector2f> AnchorMin;
-		[OnChanged(nameof(RegUpdateUIMeshes))]
+		[OnChanged(nameof(UpdateMinMax))]
 		public readonly Sync<Vector2f> AnchorMax;
 
 		public Matrix MatrixMove(Matrix matrix) {
@@ -241,7 +253,7 @@ namespace RhuEngine.Components
 		public Vector2f AnchorMaxValue => AnchorMax;
 
 		[Default(0.1f)]
-		[OnChanged(nameof(RegUpdateUIMeshes))]
+		[OnChanged(nameof(UpdateMinMax))]
 		public readonly Sync<float> Depth;
 		public float DepthValue => Depth;
 
@@ -251,9 +263,29 @@ namespace RhuEngine.Components
 
 		public virtual Vector2f CutZonesMin => Entity.parent.Target?.UIRect?.CutZonesMin ?? Vector2f.NInf;
 
-		public Vector2f Min => TrueMin + (OffsetLocalMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
+		private Vector2f _cachedMin;
+		private Vector2f _cachedMax;
 
-		public Vector2f Max => TrueMax + (OffsetLocalMax.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
+		public void UpdateMinMax() {
+			UpdateMinMaxNoPross();
+			RegUpdateUIMeshes();
+		}
+		public void UpdateMinMaxNoPross() {
+			_cachedMin = CompMin;
+			_cachedMax = CompMax;
+			_childRects.SafeOperation((list) => {
+				foreach (var item in list) {
+					item.UpdateMinMaxNoPross();
+				}
+			});
+		}
+		public Vector2f Min => _cachedMin;
+
+		public Vector2f Max => _cachedMax;
+
+		public Vector2f CompMin => TrueMin + (OffsetLocalMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
+
+		public Vector2f CompMax => TrueMax + (OffsetLocalMax.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 
 		public Vector2f BadMin => ((((_rectDataOverride ?? ParentRect)?.BadMin ?? Vector2f.One) - (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One))) * (Vector2f.One - AnchorMin.Value)) + (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One)) - (OffsetMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 
@@ -271,9 +303,8 @@ namespace RhuEngine.Components
 		public void SetOverride(IRectData rectDataOverride) {
 			if (rectDataOverride != _rectDataOverride) {
 				_rectDataOverride = rectDataOverride;
-				RegUpdateUIMeshes();
 			}
-		}
+ 		}
 
 		public void RegUpdateUIMeshes() {
 			RWorld.ExecuteOnStartOfFrame(this, UpdateUIMeshes);
@@ -291,17 +322,18 @@ namespace RhuEngine.Components
 					item.ProcessBaseMesh();
 				}
 			});
+			
+			_uiComponents.SafeOperation((list) => {
+				for (var i = 0; i < _uiComponents.List.Count; i++) {
+					list[i].RenderTargetChange();
+				}
+			});
 			_childRects.SafeOperation((list) => {
 				foreach (var item in list) {
 					if (RemoveFakeRecs) {
 						item?.SetOverride(null);
 					}
-					item?.RegUpdateUIMeshes();
-				}
-			});
-			_uiComponents.SafeOperation((list) => {
-				for (var i = 0; i < _uiComponents.List.Count; i++) {
-					list[i].RenderTargetChange();
+					item?.UpdateUIMeshes();
 				}
 			});
 			UpdateMeshes();
@@ -319,7 +351,7 @@ namespace RhuEngine.Components
 			foreach (Entity item in Entity.children) {
 				item?.UIRect?.RegisterCanvas();
 			}
-			RegUpdateUIMeshes();
+			UpdateMinMax();
 		}
 		[UnExsposed]
 		[NoShow]
@@ -374,11 +406,6 @@ namespace RhuEngine.Components
 						meshList[i].LoadMesh(list[i].RenderMesh);
 					}
 				});
-			});
-			_uiComponents.SafeOperation((list) => {
-				for (var i = 0; i < _uiComponents.List.Count; i++) {
-					list[i].RenderTargetChange();
-				}
 			});
 		}
 
@@ -487,7 +514,6 @@ namespace RhuEngine.Components
 							if (childadded != null) {
 								ChildAdded(childadded);
 								list.Add(childadded);
-								childadded.RegUpdateUIMeshes();
 								added = true;
 							}
 						}
@@ -498,6 +524,7 @@ namespace RhuEngine.Components
 						ChildRectAdded();
 					}
 				});
+				Scroll(ScrollOffset, true);
 			});
 		}
 
@@ -551,18 +578,18 @@ namespace RhuEngine.Components
 			}
 			var phsicsupdate = value.x == ScrollOffset.x && value.y == ScrollOffset.y;
 			ScrollOffset = value;
-			_childRects.SafeOperation((list) => {
-				foreach (var item in list) {
-					item.Scroll(value);
-				}
-			});
 			_uiRenderComponents.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.RenderScrollMesh(false);
 				}
 			});
 			ProcessCutting(false, !phsicsupdate);
-			UpdateUIMeshes();
+			UpdateMeshes();
+			_childRects.SafeOperation((list) => {
+				foreach (var item in list) {
+					item.Scroll(value, forceUpdate);
+				}
+			});
 		}
 	}
 }

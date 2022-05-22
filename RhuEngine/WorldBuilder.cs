@@ -114,8 +114,9 @@ namespace RhuEngine
 				e.AttachText(new Vector2f(0), new Vector2f(0.5f, 1), Colorf.White,text);
 			}
 			var random = new Random();
-			for (var i = 0; i < random.Next(8, 25); i++) {
-				AttachListElement(listRoot,$"Element {i}");
+			var amount = random.Next(1, 25);
+			for (var i = 0; i < amount; i++) {
+				AttachListElement(listRoot,$"Element {i} / {amount - 1}");
 			}
 			listRoot.GetFirstComponent<UIRect>().RegUpdateUIMeshes();
 			//pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red);

@@ -10,5 +10,9 @@
     <ProjectReference Include="..\RBullet\RBullet.csproj" />
     <ProjectReference Include="..\RhuEngine\RhuEngine.csproj" />
   </ItemGroup>
-
+	
+	<PropertyGroup>
+		<ServerGarbageCollection>true</ServerGarbageCollection>
+		<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+	</PropertyGroup>
 </Project>

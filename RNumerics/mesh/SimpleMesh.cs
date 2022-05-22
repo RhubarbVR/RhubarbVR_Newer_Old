@@ -70,23 +70,24 @@ namespace RNumerics
 		public List<(NewVertexInfo, NewVertexInfo, NewVertexInfo)> MakeCutTriangles(List<(NewVertexInfo, NewVertexInfo, NewVertexInfo)> trys, PlaneSetting planeSetting) {
 			var savedCount = trys.Count;
 			for (var i = 0; i < savedCount; i++) {
-				var v1 = trys[0].Item1;
-				var v2 = trys[0].Item2;
-				var v3 = trys[0].Item3;
-				trys.RemoveAt(0);
+				var v1 = trys[i].Item1;
+				var v2 = trys[i].Item2;
+				var v3 = trys[i].Item3;
 				var v1PastPlane = (planeSetting.plane.DistanceTo(v1.v) > 0) == planeSetting.switchSide;
 				var v2PastPlane = (planeSetting.plane.DistanceTo(v2.v) > 0) == planeSetting.switchSide;
 				var v3PastPlane = (planeSetting.plane.DistanceTo(v3.v) > 0) == planeSetting.switchSide;
 				if (!(v1PastPlane || v2PastPlane || v3PastPlane)) {
-					trys.Add((v1, v2, v3));
+					trys[i] = ((v1, v2, v3));
 					continue;
 				}
 				if (v1PastPlane && v2PastPlane && v3PastPlane) {
 					if (planeSetting.removeOtherSide) {
+						trys.RemoveAt(i);
+						i--;
 						continue;
 					}
 					else {
-						trys.Add((v1, v2, v3));
+						trys[i] = ((v1, v2, v3));
 						continue;
 					}
 				}
@@ -95,7 +96,7 @@ namespace RNumerics
 					var newtry2 = planeSetting.plane.IntersectLine(v1.v, v3.v);
 					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v1.v, v2.v, v1.uv, v2.uv), bHaveUV = true };
 					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v1.v, v3.v, v1.uv, v3.uv), bHaveUV = true };
-					trys.Add((v3, newvert2, newvert1));
+					trys[i] = ((v3, newvert2, newvert1));
 					trys.Add((newvert1, v2, v3));
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((newvert1, newvert2, v1));
@@ -107,7 +108,7 @@ namespace RNumerics
 					var newtry2 = planeSetting.plane.IntersectLine(v1.v, v3.v);
 					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v1.v, v2.v, v1.uv, v2.uv), bHaveUV = true };
 					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v1.v, v3.v, v1.uv, v3.uv), bHaveUV = true };
-					trys.Add((newvert1, newvert2, v1));
+					trys[i] = ((newvert1, newvert2, v1));
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((v3, newvert2, newvert1));
 						trys.Add((newvert1, v2, v3));
@@ -120,7 +121,7 @@ namespace RNumerics
 					var newtry2 = planeSetting.plane.IntersectLine(v2.v, v1.v);
 					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v2.v, v3.v, v2.uv, v3.uv), bHaveUV = true };
 					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v2.v, v1.v, v2.uv, v1.uv), bHaveUV = true };
-					trys.Add((newvert2, newvert1, v3));
+					trys[i] = ((newvert2, newvert1, v3));
 					trys.Add((v1, newvert2, v3));
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((v2, newvert1, newvert2));
@@ -132,7 +133,7 @@ namespace RNumerics
 					var newtry2 = planeSetting.plane.IntersectLine(v2.v, v1.v);
 					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v2.v, v3.v, v2.uv, v3.uv), bHaveUV = true };
 					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v2.v, v1.v, v2.uv, v1.uv), bHaveUV = true };
-					trys.Add((v2, newvert1, newvert2));
+					trys[i] = ((v2, newvert1, newvert2));
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((newvert2, newvert1, v3));
 						trys.Add((v1, newvert2, v3));
@@ -145,7 +146,7 @@ namespace RNumerics
 					var newtry2 = planeSetting.plane.IntersectLine(v3.v, v2.v);
 					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v3.v, v1.v, v3.uv, v1.uv), bHaveUV = true };
 					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v3.v, v2.v, v3.uv, v2.uv), bHaveUV = true };
-					trys.Add((v2, newvert2, newvert1));
+					trys[i] = ((v2, newvert2, newvert1));
 					trys.Add((v2, newvert1, v1));
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((v3, newvert1, newvert2));
@@ -157,7 +158,7 @@ namespace RNumerics
 					var newtry2 = planeSetting.plane.IntersectLine(v3.v, v2.v);
 					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v3.v, v1.v, v3.uv, v1.uv), bHaveUV = true };
 					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v3.v, v2.v, v3.uv, v2.uv), bHaveUV = true };
-					trys.Add((v3, newvert1, newvert2));
+					trys[i] = ((v3, newvert1, newvert2));
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((v2, newvert2, newvert1));
 						trys.Add((v2, newvert1, v1));

@@ -32,23 +32,26 @@ namespace RhuEngine.Components
 		}
 
 		public override void UpdateUIMeshes() {
-			fakeRects.SafeOperation((list) => list.Clear());
-			_childRects.SafeOperation((list) => {
-				foreach (var item in list) {
-					if(item is null) {
-						continue;
+			UpdateMinMaxNoPross();
+			fakeRects.SafeOperation((list) => {
+				list.Clear();
+				_childRects.SafeOperation((list) => {
+					foreach (var item in list) {
+						if (item is null) {
+							continue;
+						}
+						var fakeRec = new BasicRectOvride {
+							Child = item,
+							ParentRect = this,
+							Canvas = Canvas,
+							DepthValue = 0,
+							AnchorMax = Vector2f.One,
+							AnchorMin = Vector2f.Zero,
+						};
+						item.SetOverride(fakeRec);
+						fakeRects.SafeAdd(fakeRec);
 					}
-					var fakeRec = new BasicRectOvride {
-						Child = item,
-						ParentRect = this,
-						Canvas = Canvas,
-						DepthValue = 0,
-						AnchorMax = Vector2f.One,
-						AnchorMin = Vector2f.Zero,
-					};
-					item.SetOverride(fakeRec);
-					fakeRects.SafeAdd(fakeRec);
-				}
+				});
 			});
 			if (Fit) {
 				fakeRects.SafeOperation((list) => {
@@ -59,6 +62,7 @@ namespace RhuEngine.Components
 						item.AnchorMin = new Vector2f(currentpos,0f);
 						currentpos += inc;
 						item.AnchorMax = new Vector2f(currentpos, 1f);
+						item.UpdateMinMaxNoPross();
 					}
 					_maxScroll = Vector2f.Zero;
 					_minScroll = Vector2f.Zero;
@@ -72,10 +76,12 @@ namespace RhuEngine.Components
 					foreach (var item in list) {
 						item.Canvas = Canvas;
 						item.ParentRect = this;
+						item.UpdateMinMaxNoPross();
 						var targetSize = item.Child.AnchorMaxValue - item.Child.AnchorMinValue;
 						item.AnchorMin = new Vector2f(xpos, 0);
 						item.AnchorMax = new Vector2f(xpos+1f,1);
 						xpos += targetSize.x;
+						item.UpdateMinMax();
 						min ??= item.Child.Min;
 						max = item.Child.Max;
 					}

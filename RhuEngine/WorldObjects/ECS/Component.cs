@@ -61,6 +61,9 @@ namespace RhuEngine.WorldObjects.ECS
 
 		public event Action OffsetChanged;
 
+		public void AddWorldCoroutineEnd(Action action) {
+			World.AddCoroutineEnd(action);
+		}
 		public void AddWorldCoroutine(Action action) {
 			World.AddCoroutine(action);
 		}

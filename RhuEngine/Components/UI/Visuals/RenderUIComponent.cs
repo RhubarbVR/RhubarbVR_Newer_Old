@@ -29,11 +29,10 @@ namespace RhuEngine.Components
 
 		public void ProcessMesh() {
 			MainMesh = null;
-			ProcessBaseMesh();
 			ScrollMesh = null;
 			CutMesh = null;
 			RenderMesh = null;
-			Entity.UIRect?.UpdateMeshes();
+			RenderMainMesh(true);
 		}
 
 		public override void RenderTargetChange() {
@@ -111,6 +110,9 @@ namespace RhuEngine.Components
 		public virtual bool BoxBased => !((Rect.Canvas?.FrontBind.Value??false) || (Rect.Canvas?.TopOffset.Value??false));
 
 		public void RenderMainMesh(bool updateMesh = true, bool PhysicsMesh = true) {
+			if (CutMesh is null) {
+				RenderCutMesh(false);
+			}
 			var returnMesh = CutMesh;
 			if (Rect.Canvas.TopOffset.Value) {
 				returnMesh = returnMesh.Copy();
