@@ -43,6 +43,9 @@ namespace RhuEngine.Components
 			_shape = new RSphereShape(0.02f);
 		}
 		public override void Step() {
+			if (!Engine.EngineLink.CanInput) {
+				return;
+			}
 			var head = LocalUser.userRoot.Target?.head.Target;
 			if (head != null) {
 				UpdateHeadLazer(head);

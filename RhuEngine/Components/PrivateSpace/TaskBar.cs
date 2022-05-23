@@ -473,6 +473,9 @@ namespace RhuEngine.Components
 
 		private float _newvalue = 0;
 		public override void Step() {
+			if (!Engine.EngineLink.CanInput) {
+				return;
+			}
 			if (RInput.Key(Key.Ctrl).IsActive() && RInput.Key(Key.Space).IsJustActive()) {
 				Open = !Open;
 			}

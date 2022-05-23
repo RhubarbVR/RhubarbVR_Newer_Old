@@ -11,7 +11,7 @@ namespace RBullet
 {  
 	public class BulletPhsyicsLink: PhysicsHelper.Physics<BulletRigidBodyCollider, BulletPhysicsSim, BulletColliderShape>
     {
-		
+		public BulletPhsyicsLink(bool ByPass) { }
 
 		public BulletPhsyicsLink() {
 			if (!Native.Load()) {
@@ -28,7 +28,7 @@ namespace RBullet
 					}
 				}
 				else {
-					throw new Exception("Failed to load lib");
+						throw new Exception("Failed to load lib");
 				}
 			}
 		}
