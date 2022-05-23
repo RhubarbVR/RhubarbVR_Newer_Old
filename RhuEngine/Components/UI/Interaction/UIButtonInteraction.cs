@@ -58,7 +58,7 @@ namespace RhuEngine.Components
 		private HitData _lastHitData;
 
 		private void SendEvent(ButtonEvent buttonEvent) {
-			RWorld.ExecuteOnStartOfFrame(this,() => ButtonEvent.Target?.Invoke(buttonEvent));
+			RWorld.ExecuteOnEndOfFrame(this,() => ButtonEvent.Target?.Invoke(buttonEvent));
 		}
 
 		private void RunButtonClickEvent(HitData hitData) {
