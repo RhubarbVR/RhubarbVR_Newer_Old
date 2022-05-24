@@ -94,8 +94,8 @@ namespace RhuEngine.Components
 			sprite.Texture.Target = icons;
 			sprite.GridSize.Value = new Vector2i(26, 7);
 			IconMit.Target = Entity.AttachComponent<DynamicMaterial>();
-			IconMit.Target.Transparency = Transparency.Blend;
 			IconMit.Target.shader.Target = shader;
+			IconMit.Target.Transparency = Transparency.Blend;
 			IconMit.Target.MainTexture = icons;
 			var mit = Entity.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;

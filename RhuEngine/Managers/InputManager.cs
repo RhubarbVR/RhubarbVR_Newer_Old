@@ -182,8 +182,8 @@ namespace RhuEngine.Managers
 			public Vector3f pos = new Vector3f(0, 1.84f, 0);
 
 			public Vector2f yawpitch;
-
-			public const float SPEED = 2;
+			public const float Pitch = 85.5f;
+			public const float SPEED = -0.5f;
 
 			public bool MouseFree { get; set; }
 			public InputManager InputManager { get; }
@@ -206,18 +206,19 @@ namespace RhuEngine.Managers
 
 			public void Step() {
 				var temp = InputManager.GetInputBool(InputTypes.UnlockMouse);
-				if ((temp != _last) & temp) {
+				if (!_last & temp) {
 					if (MouseFree) {
-						FreeMouse();
+						UnFreeMouse();
 					}
 					else {
-						UnFreeMouse();
+						FreeMouse();
 					}
 				}
 				_last = temp;
 
 				if (!MouseFree) {
 					yawpitch += RInput.Mouse.PosChange * SPEED;
+					yawpitch.y = MathUtil.Clamp(yawpitch.y, -Pitch, Pitch);
 				}
 				RInput.screenhd.HeadMatrix = Matrix.TR(pos, Quaternionf.CreateFromEuler(yawpitch.x, yawpitch.y, 0));
 			}
@@ -225,7 +226,7 @@ namespace RhuEngine.Managers
 
 		public ScreenInput screenInput;
 		public void Step() {
-			if (!RWorld.IsInVR && _engine.EngineLink.SpawnPlayer) {
+			if (!RWorld.IsInVR && _engine.EngineLink.CanInput) {
 				screenInput.Step();
 			}
 		}
