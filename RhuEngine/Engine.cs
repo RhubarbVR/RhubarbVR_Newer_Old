@@ -205,7 +205,7 @@ namespace RhuEngine
 		public RMaterial LoadingLogo = null;
 
 		public Thread startingthread;
-		public void Init() {
+		public void Init(bool RunStartThread = true) {
 			EngineLink.Start();
 			IntMsg = $"Engine started Can Render {EngineLink.CanRender} Can Audio {EngineLink.CanAudio} Can input {EngineLink.CanInput}";
 			RLog.Info(IntMsg);
@@ -214,7 +214,7 @@ namespace RhuEngine
 				LoadingLogo = new RMaterial(RShader.UnlitClip);
 				LoadingLogo["diffuse"] = staticResources.RhubarbLogoV2;
 			}
-			startingthread = new Thread(() => {
+			var startcode = () => {
 				IntMsg = "Building NetApiManager";
 				netApiManager = new NetApiManager(_userDataPathOverRide);
 				IntMsg = "Building AssetManager";
@@ -239,10 +239,16 @@ namespace RhuEngine
 				RLog.Info("Engine Started");
 				IntMsg = $"Engine Started\nRunning First Step...";
 				OnEngineStarted?.Invoke();
-			}) {
-				Priority = ThreadPriority.AboveNormal
 			};
-			startingthread.Start();
+			if (RunStartThread) {
+				startingthread = new Thread(startcode.Invoke) {
+					Priority = ThreadPriority.AboveNormal
+				};
+				startingthread.Start();
+			}
+			else {
+				startcode.Invoke();
+			}
 		}
 
 		private Vector3f _oldPlayerPos = Vector3f.Zero;

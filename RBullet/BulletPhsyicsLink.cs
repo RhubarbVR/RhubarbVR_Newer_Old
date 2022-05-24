@@ -11,7 +11,9 @@ namespace RBullet
 {  
 	public class BulletPhsyicsLink: PhysicsHelper.Physics<BulletRigidBodyCollider, BulletPhysicsSim, BulletColliderShape>
     {
-		public BulletPhsyicsLink(bool ByPass) { }
+		public BulletPhsyicsLink(bool ByPass) {
+			RLog.Info($"Used Bypass for Pysics {ByPass}");
+		}
 
 		public BulletPhsyicsLink() {
 			if (!Native.Load()) {

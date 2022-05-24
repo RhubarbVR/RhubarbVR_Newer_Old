@@ -32,9 +32,9 @@ namespace RhuEngine.WorldObjects.ECS
 			RenderLink.RenderingComponentGen = this;
 			RenderLink.Init();
 		}
-		public override void OnInitialize() {
+		public override void OnLoaded() {
+			base.OnLoaded();
 			BuildRenderLink();
-			base.OnInitialize();
 		}
 
 		public override void AddListObject() {

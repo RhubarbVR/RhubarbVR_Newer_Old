@@ -412,6 +412,7 @@ namespace RhuEngine.WorldObjects.ECS
 			foreach (Entity item in children) {
 				item.GlobalTransMark();
 			}
+			GlobalTransformChange?.Invoke(this);
 		}
 
 		public override void FirstCreation() {
