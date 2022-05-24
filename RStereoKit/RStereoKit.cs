@@ -41,6 +41,8 @@ namespace RStereoKit
 
 		public bool ForceLibLoad => false;
 
+		public bool InVR => (SK.ActiveDisplayMode == DisplayMode.MixedReality) || !engine._noVRSim;
+
 		public void BindEngine(Engine engine) {
 			this.engine = engine;
 			RLog.Instance = new Logger();
@@ -67,6 +69,7 @@ namespace RStereoKit
 		public void LoadStatics() {
 			RTexture2D.Instance = new SKTexture2d();
 			RMaterial.Instance = new SKRMaterial();
+			RMaterial.ConstInstance = new SKMitStactic();
 			RShader.Instance = new SKShader();
 			RText.Instance = new SkRText();
 			RMesh.Instance = new SKRMesh();

@@ -94,13 +94,12 @@ namespace RhuEngine.Components
 			sprite.Texture.Target = icons;
 			sprite.GridSize.Value = new Vector2i(26, 7);
 			IconMit.Target = Entity.AttachComponent<DynamicMaterial>();
-			IconMit.Target.transparency.Value = Transparency.Blend;
+			IconMit.Target.Transparency = Transparency.Blend;
 			IconMit.Target.shader.Target = shader;
-			IconMit.Target.SetPram("diffuse", icons);
-			IconMit.Target.queueOffset.Value = 1;
+			IconMit.Target.MainTexture = icons;
 			var mit = Entity.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;
-			mit.transparency.Value = Transparency.Blend;
+			mit.Transparency = Transparency.Blend;
 			(Entity, UISprite) AddButton(Entity were, float PADDING, Vector2i iconindex, Action<ButtonEvent> action) {
 				var child = were.AddChild("childEliment");
 				var rectTwo = child.AttachComponent<UIRect>();

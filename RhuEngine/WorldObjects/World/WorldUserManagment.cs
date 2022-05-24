@@ -90,7 +90,7 @@ namespace RhuEngine.WorldObjects
 					var comp = RootEntity.GetFirstComponent<DynamicMaterial>();
 					if (comp is null) {
 						comp = RootEntity.AttachComponent<DynamicMaterial>();
-						comp.transparency.Value = Transparency.Blend;
+						comp.Transparency = Transparency.Blend;
 						comp.shader.Target = RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
 					}
 					var debugcube = RootEntity.AddChild("DebugCube");
@@ -119,7 +119,7 @@ namespace RhuEngine.WorldObjects
 					var comp = RootEntity.GetFirstComponent<DynamicMaterial>();
 					if (comp is null) {
 						comp = RootEntity.AttachComponent<DynamicMaterial>();
-						comp.transparency.Value = Transparency.Blend;
+						comp.Transparency = Transparency.Blend;
 						comp.shader.Target = RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
 					}
 					var debugcube = RootEntity.AddChild("DebugCube");
@@ -163,7 +163,7 @@ namespace RhuEngine.WorldObjects
 					var comp = worldManager.PrivateOverlay.RootEntity.GetFirstComponent<DynamicMaterial>();
 					if (comp is null) {
 						comp = worldManager.PrivateOverlay.RootEntity.AttachComponent<DynamicMaterial>();
-						comp.transparency.Value = Transparency.Blend;
+						comp.Transparency = Transparency.Blend;
 						comp.shader.Target = RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
 					}
 					var debugcube = worldManager.PrivateOverlay.RootEntity.AddChild("DebugCube");

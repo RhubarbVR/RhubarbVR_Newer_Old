@@ -69,7 +69,8 @@ namespace RhuEngine.Components
 				}
 			});
 		}
-	
+
+#pragma warning disable IDE0060 // Remove unused parameter 
 		public void LoadText(string Id ,string Text, RFont Font,float leading, Colorf StartingColor, FontStyle StartingStyle = FontStyle.Regular,float StatingSize = 10f, EVerticalAlien verticalAlien = EVerticalAlien.Center,EHorizontalAlien horizontalAlien= EHorizontalAlien.Middle,bool middleLines = true) {
 			if(Font is null) {
 				return;
@@ -291,5 +292,6 @@ namespace RhuEngine.Components
 				});
 			}
 		}
+#pragma warning restore IDE0060 // Remove unused parameter
 	}
 }

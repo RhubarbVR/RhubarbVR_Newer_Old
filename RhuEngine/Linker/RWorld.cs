@@ -7,7 +7,7 @@ namespace RhuEngine.Linker
 {
 	public static class RWorld
 	{
-		public static bool IsInVR { get; internal set; } = false;
+		public static bool IsInVR => Engine.MainEngine.EngineLink.InVR;
 
 		public static Dictionary<object, Action> StartOfFrameExecute = new();
 		public static List<Action> StartOfFrameList = new();

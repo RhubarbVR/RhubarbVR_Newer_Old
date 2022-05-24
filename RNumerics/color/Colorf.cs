@@ -140,6 +140,9 @@ namespace RNumerics
 		public Vector3f ToRGB() {
 			return new Vector3f(r, g, b);
 		}
+		public Vector4f ToRGBA() {
+			return new Vector4f(r, g, b, a);
+		}
 		public Colorb ToBytes() {
 			return new Colorb(r, g, b, a);
 		}

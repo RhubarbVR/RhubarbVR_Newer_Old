@@ -14,26 +14,28 @@ namespace Rhubarb_VR_HeadLess
 
 	public static class Program
     {
-		public static bool isRunning = true;
-		public static Engine app;
-		public static OutputCapture cap;
-		public static NullLinker rhu;
-		public static Type[] commands;
+#pragma warning disable CA2211 // Non-constant fields should not be visible
+		public static bool _isRunning = true;
+		public static Engine _app;
+		static OutputCapture _cap;
+		static NullLinker _rhu;
+		public static Type[] _commands;
+#pragma warning restore CA2211 // Non-constant fields should not be visible
 		static void Main(string[] args)
         {
-			AppDomain.CurrentDomain.ProcessExit += (_, _) => isRunning = false;
+			AppDomain.CurrentDomain.ProcessExit += (_, _) => _isRunning = false;
 			Console.WriteLine("Starting Rhubarb HeadLess!");
-			cap = new OutputCapture();
-			rhu = new NullLinker();
-			app = new Engine(rhu, args, cap, AppDomain.CurrentDomain.BaseDirectory);
+			_cap = new OutputCapture();
+			_rhu = new NullLinker();
+			_app = new Engine(_rhu, args, _cap, AppDomain.CurrentDomain.BaseDirectory);
 			var EngineThread = new Thread(() => {
-				while (isRunning) {
+				while (_isRunning) {
 					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.Write($"{app?.netApiManager.User?.UserName ?? "Not Login"}> ");
+					Console.Write($"{_app?.netApiManager.User?.UserName ?? "Not Login"}> ");
 					Console.ForegroundColor = ConsoleColor.White;
 					var line = Console.ReadLine();
 					var foundcomand = false;
-					foreach (var item in commands) {
+					foreach (var item in _commands) {
 						if (item.Name.ToLower() == line.ToLower()) {
 							foundcomand = true;
 							((Command)Activator.CreateInstance(item)).RunCommand();
@@ -47,22 +49,22 @@ namespace Rhubarb_VR_HeadLess
 			}) {
 				Priority = ThreadPriority.AboveNormal
 			};
-			app.OnEngineStarted = () => EngineThread.Start();
-			app.Init();
+			_app.OnEngineStarted = () => EngineThread.Start();
+			_app.Init();
 			var EngineStopWatch = new Stopwatch();
-			commands = (from a in AppDomain.CurrentDomain.GetAssemblies()
+			_commands = (from a in AppDomain.CurrentDomain.GetAssemblies()
 						   from t in a.GetTypes()
 						   where typeof(Command).IsAssignableFrom(t)
 						   where t.IsClass && !t.IsAbstract
 						   select t).ToArray();
 
 			try {
-				while (isRunning) {
+				while (_isRunning) {
 					EngineStopWatch.Start();
-					app.Step();
-					rhu.Elapsedf = EngineStopWatch.ElapsedMilliseconds;
+					_app.Step();
+					_rhu.Elapsedf = EngineStopWatch.ElapsedMilliseconds;
 					EngineStopWatch.Restart();
-					var wait = (int)((1000 / 120) - rhu.Elapsedf);
+					var wait = (int)((1000 / 120) - _rhu.Elapsedf);
 					if (wait > 0) {
 						Thread.Sleep(wait);
 					}
@@ -71,10 +73,10 @@ namespace Rhubarb_VR_HeadLess
 			catch (Exception ex) {
 				RLog.Err("Engine Crashed" + ex);
 			}
-			app.IsCloseing = true;
-			cap.DisableSingleString = true;
-			app.Dispose();
-			cap.Dispose();
+			_app.IsCloseing = true;
+			_cap.DisableSingleString = true;
+			_app.Dispose();
+			_cap.Dispose();
         }
 	}
 }

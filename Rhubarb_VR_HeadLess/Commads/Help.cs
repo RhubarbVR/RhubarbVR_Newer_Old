@@ -12,9 +12,9 @@ namespace Rhubarb_VR_HeadLess.Commads
 	{
 		public override string HelpMsg => "Lists all commands and what they do";
 		public override void RunCommand() {
-			Console.WriteLine($"  ======  Help {Program.app.version}  ======");
+			Console.WriteLine($"  ======  Help {Program._app.version}  ======");
 			Console.WriteLine("");
-			foreach (var comand in Program.commands) {
+			foreach (var comand in Program._commands) {
 				Console.ForegroundColor = ConsoleColor.White;
 				Console.Write("  " + comand.Name);
 				Console.ForegroundColor = ConsoleColor.Magenta;

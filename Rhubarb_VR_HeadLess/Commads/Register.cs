@@ -25,7 +25,7 @@ namespace Rhubarb_VR_HeadLess.Commads
 				return;
 			}
 			Task.Run(async () => {
-				var req = await Program.app.netApiManager.SignUp(username, email,Password,DateTime.UtcNow);
+				var req = await Program._app.netApiManager.SignUp(username, email,Password,DateTime.UtcNow);
 				if (!req?.Error??false) {
 					Console.WriteLine(req.Message);
 				}

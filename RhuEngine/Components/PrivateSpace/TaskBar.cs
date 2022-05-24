@@ -202,8 +202,8 @@ namespace RhuEngine.Components
 			assetProvider.LoadAsset(textue);
 			var mmit = child.AttachComponent<DynamicMaterial>();
 			mmit.shader.Target = World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
-			mmit.transparency.Value = Transparency.Blend;
-			mmit.SetPram("diffuse", assetProvider);
+			mmit.Transparency = Transparency.Blend;
+			mit.MainTexture = assetProvider;
 			spriterender.Material.Target = mmit;
 			if (action != null) {
 				child.AttachComponent<UIButtonInteraction>().ButtonEvent.Target = action;
@@ -343,12 +343,12 @@ namespace RhuEngine.Components
 			iconMit = Entity.AttachComponent<DynamicMaterial>();
 			iconMit.shader.Target = shader;
 			var icons = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
-			iconMit.SetPram("diffuse", icons);
-			iconMit.transparency.Value = Transparency.Blend;
+			iconMit.MainTexture = icons;
+			iconMit.Transparency = Transparency.Blend;
 			sprite = Entity.AttachComponent<SpriteProvder>();
 			sprite.Texture.Target = icons;
 			sprite.GridSize.Value = new Vector2i(26, 7);
-			mit.transparency.Value = Transparency.Blend;
+			mit.Transparency = Transparency.Blend;
 			AddStartAndNotification();
 			Engine_SettingsUpdate();
 

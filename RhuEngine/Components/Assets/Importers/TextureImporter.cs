@@ -33,8 +33,8 @@ namespace RhuEngine.Components
 				var textur = Entity.AttachComponent<StaticTexture>();
 				scaler.texture.Target = textur;
 				textur.url.Value = data;
-				mit.faceCull.Value = Cull.None;
-				mit.SetPram("diffuse", textur);
+				mit.FaceCull = Cull.None;
+				mit.MainTexture = textur;
 				Destroy();
 			}
 			else {

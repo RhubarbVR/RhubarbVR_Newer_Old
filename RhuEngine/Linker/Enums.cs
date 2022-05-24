@@ -303,17 +303,11 @@ namespace RhuEngine.Linker
 	/// to on the shader.</summary>
 	public enum MaterialParam
 	{
-		/// <summary>This data type is not currently recognized. Please
-		/// report your case on Github Issues!</summary>
+		/// <summary>This is for use of hardtype</summary>
 		Unknown = 0,
 		/// <summary>A single 32 bit float value.</summary>
 		Float = 1,
-		/// <summary>A color value described by 4 floating point values. Memory-wise this is
-		/// the same as a Vector4, but in the shader this variable has a ':color'
-		/// tag applied to it using StereoKits's shader info syntax, indicating it's
-		/// a color value. Color values for shaders should be in linear space, not
-		/// gamma.</summary>
-		Color128 = 2,
+		Bool = 2,
 		/// <summary>A 2 component vector composed of floating point values.</summary>
 		Vector2 = 3,
 		/// <summary>A 3 component vector composed of floating point values.</summary>
@@ -341,6 +335,11 @@ namespace RhuEngine.Linker
 		UInt3 = 14,
 		/// <summary>A 4 component vector composed of unsigned integers.</summary>
 		UInt4 = 15,
+		DepthTest = 16,
+		Cull = 17,
+		Transparency = 18,
+		TexAddress = 19,
+		TexSample = 20,
 	}
 
 

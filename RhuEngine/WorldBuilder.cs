@@ -22,7 +22,7 @@ namespace RhuEngine
 			img.Tint.Value = color;
 			var mit = child.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;
-			mit.SetPram("diffuse", assetProvider);
+			mit.MainTexture = assetProvider;
 			img.Material.Target = mit;
 			img.Texture.Target = assetProvider;
 			return child;

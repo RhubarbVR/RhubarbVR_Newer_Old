@@ -20,36 +20,31 @@ namespace RStereoKit
 		public RShader Unlit => new RShader(Shader.Unlit);
 	}
 
+	public class SKMitStactic : IRMitConsts
+	{
+		public string FaceCull => "FaceCall";
+
+		public string Transparency => "Transparency";
+
+		public string MainTexture => "diffuse";
+
+		public string WireFrame => "WireFrame";
+
+		public string MainColor => "color";
+	}
+
 	public class SKRMaterial : IRMaterial
 	{
 		public IEnumerable<RMaterial.RMatParamInfo> GetAllParamInfo(object tex) {
+			yield return new RMaterial.RMatParamInfo { name = "FACECULL_RHUBARB_CUSTOM", type = RhuEngine.Linker.MaterialParam.Cull };
+			yield return new RMaterial.RMatParamInfo { name = "TRANSPARENCY_RHUBARB_CUSTOM", type = RhuEngine.Linker.MaterialParam.Transparency };
+			yield return new RMaterial.RMatParamInfo { name = "WIREFRAME_RHUBARB_CUSTOM", type = RhuEngine.Linker.MaterialParam.Bool };
 			foreach (var item in ((Material)tex).GetAllParamInfo()) {
-				yield return new RMaterial.RMatParamInfo { name = item.name, type = (RhuEngine.Linker.MaterialParam)item.type };
+				var main = new RMaterial.RMatParamInfo { name = RMaterial.RenameFromEngine(item.name), type = (RhuEngine.Linker.MaterialParam)item.type };
+				if (main.name != RMaterial.MainColor) {
+					yield return main;
+				}
 			}
-		}
-
-		public RhuEngine.Linker.DepthTest GetDepthTest(object tex) {
-			return (RhuEngine.Linker.DepthTest)((Material)tex).DepthTest;
-		}
-
-		public bool GetDepthWrite(object tex) {
-			return ((Material)tex).DepthWrite;
-		}
-
-		public RhuEngine.Linker.Cull GetFaceCull(object tex) {
-			return (RhuEngine.Linker.Cull)((Material)tex).FaceCull;
-		}
-
-		public int GetQueueOffset(object tex) {
-			return ((Material)tex).QueueOffset;
-		}
-
-		public RhuEngine.Linker.Transparency GetTransparency(object tex) {
-			return (RhuEngine.Linker.Transparency)((Material)tex).Transparency;
-		}
-
-		public bool GetWireframe(object tex) {
-			return ((Material)tex).Wireframe;
 		}
 
 		public object Make(RShader rShader) {
@@ -57,22 +52,59 @@ namespace RStereoKit
 		}
 
 		public void Pram(object ex, string tex, object value) {
-			if (value is Colorb value1) {
-				var colorGamma = new Color(value1.r, value1.g, value1.b, value1.a);
-				((Material)ex)[tex] = colorGamma;
+			if(tex == "WIREFRAME_RHUBARB_CUSTOM") {
+				((Material)ex).Wireframe = (bool)value;
 				return;
 			}
-			if (value is Colorf value2) {
-				var colorGamma = new Color(value2.r, value2.g, value2.b, value2.a);
-				((Material)ex)[tex] = colorGamma;
+			if (tex == "FACECULL_RHUBARB_CUSTOM") {
+				((Material)ex).FaceCull = (StereoKit.Cull)(int)value;
 				return;
 			}
-			if (value is ColorHSV color) {
-				var temp = color.ConvertToRGB();
-				var colorGamma = new Color(temp.r, temp.g, temp.b, temp.a);
-				((Material)ex)[tex] = colorGamma;
+			if (tex == "TRANSPARENCY_RHUBARB_CUSTOM") {
+				((Material)ex).Transparency = (StereoKit.Transparency)(int)value;
 				return;
 			}
+			tex = RMaterial.RenameFromRhubarb(tex);
+			try {
+				if (value is Colorb value1) {
+					try {
+						var colorGamma = new Color(value1.r, value1.g, value1.b, value1.a);
+						((Material)ex)[tex] = colorGamma;
+					}
+					catch {
+						
+					}
+					return;
+				}
+			}
+			catch { }
+			try {
+				if (value is Colorf value2) {
+					try {
+						var colorGamma = new Color(value2.r, value2.g, value2.b, value2.a);
+						((Material)ex)[tex] = colorGamma;
+					}
+					catch {
+						((Material)ex)[tex] = (Vec4)(Vector4)value2.ToRGBA();
+					}
+					return;
+				}
+			}
+			catch { }
+			try {
+				if (value is ColorHSV color) {
+					try {
+						var temp = color.ConvertToRGB();
+						var colorGamma = new Color(temp.r, temp.g, temp.b, temp.a);
+						((Material)ex)[tex] = colorGamma;
+					}
+					catch {
+						((Material)ex)[tex] = (Vec4)(Vector4)color.ConvertToRGB().ToRGBA();
+					}
+					return;
+				}
+			}
+			catch { }
 
 			if (value is Vec4) {
 				((Material)ex)[tex] = (Vec4)(Vector4)(Vector4f)value;
@@ -106,30 +138,6 @@ namespace RStereoKit
 			}
 
 			((Material)ex)[tex] = value;
-		}
-
-		public void SetDepthTest(object tex, RhuEngine.Linker.DepthTest value) {
-			((Material)tex).DepthTest = (StereoKit.DepthTest)value;
-		}
-
-		public void SetDepthWrite(object tex, bool value) {
-			((Material)tex).DepthWrite = value;
-		}
-
-		public void SetFaceCull(object tex, RhuEngine.Linker.Cull value) {
-			((Material)tex).FaceCull = (StereoKit.Cull)value;
-		}
-
-		public void SetQueueOffset(object tex, int value) {
-			((Material)tex).QueueOffset = value;
-		}
-
-		public void SetTransparency(object tex, RhuEngine.Linker.Transparency value) {
-			((Material)tex).Transparency = (StereoKit.Transparency)value;
-		}
-
-		public void SetWireframe(object tex, bool value) {
-			((Material)tex).Wireframe = value;
 		}
 	}
 }

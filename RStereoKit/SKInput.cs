@@ -22,6 +22,9 @@ namespace RStereoKit
 		public Vector2f ScrollChange => new Vector2f(0, Input.Mouse.scrollChange / 1000);
 
 		public Vector2f PosChange => (Vector2f)(Vector2)Input.Mouse.posChange;
+
+		public bool HideMouse { get; set; }
+		public bool CenterMouse { get; set; }
 	}
 
 	public class SKKeyPress : IKeyPress
@@ -104,10 +107,7 @@ namespace RStereoKit
 			get {
 				var chare = Input.TextConsume();
 				Input.TextReset();
-				if(chare == '\0') {
-					return "";
-				}
-				return chare.ToString();
+				return chare == '\0' ? "" : chare.ToString();
 			}
 		}
 

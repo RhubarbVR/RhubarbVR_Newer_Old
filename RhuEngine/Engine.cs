@@ -28,7 +28,7 @@ namespace RhuEngine
 
 		public readonly bool _forceFlatscreen = false;
 
-		public readonly bool _noVRSim = false;
+		public readonly bool _noVRSim = true;
 
 		private readonly string _cachePathOverRide = null;
 
@@ -67,7 +67,7 @@ namespace RhuEngine
 			MainEngine = this;
 			string error = null;
 			_forceFlatscreen = arg.Any((v) => v.ToLower() == "--no-vr") | arg.Any((v) => v.ToLower() == "-no-vr") | arg.Any((v) => v.ToLower() == "-novr");
-			_noVRSim = arg.Any((v) => v.ToLower() == "--no-vr-sim") | arg.Any((v) => v.ToLower() == "-no-vr-sim") | arg.Any((v) => v.ToLower() == "-novrsim");
+			_noVRSim = !(arg.Any((v) => v.ToLower() == "--vr-sim") | arg.Any((v) => v.ToLower() == "-vr-sim") | arg.Any((v) => v.ToLower() == "-vrsim"));
 			DebugVisuals = arg.Any((v) => v.ToLower() == "--debug-visuals") | arg.Any((v) => v.ToLower() == "-debug-visuals") | arg.Any((v) => v.ToLower() == "-debugvisuals");
 			string settingsArg = null;
 			for (var i = 0; i < arg.Length; i++) {

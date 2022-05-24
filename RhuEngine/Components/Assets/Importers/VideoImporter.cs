@@ -110,8 +110,8 @@ namespace RhuEngine.Components
 				left.AttachComponent<SoundSource>().sound.Target = textur.AudioChannels[0];
 				rignt.AttachComponent<SoundSource>().sound.Target = textur.AudioChannels[1];
 				scaler.texture.Target = textur;
-				mit.faceCull.Value = Cull.None;
-				mit.SetPram("diffuse", textur);
+				mit.FaceCull = Cull.None;
+				mit.MainTexture = textur;
 				Destroy();
 				var WinEntit = Entity.AddChild("Window");
 				// TODO

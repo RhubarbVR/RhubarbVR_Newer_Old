@@ -21,6 +21,8 @@ namespace RhuEngine.Linker
 	}
 	public interface IRMouse
 	{
+		public bool HideMouse { get; set; }
+		public bool CenterMouse { get; set; }
 		public Vector2f ScrollChange { get; }
 		public Vector2f PosChange { get; }
 	}
@@ -47,8 +49,8 @@ namespace RhuEngine.Linker
 	public interface IRInput
 	{
 		public string TypeDelta { get; }
-		public IRHead Head { get; }
 
+		public IRHead Head { get; }
 
 		public IRMouse Mouse { get; }
 
@@ -72,8 +74,29 @@ namespace RhuEngine.Linker
 
 		public static string TypeDelta => Instance.TypeDelta + InjectedTypeDelta;
 
+		public class InjectKey : IKeyPress
+		{
+			public InjectKey(bool isActive, bool isJustActive) {
+				IsActive1 = isActive;
+				IsJustActive1 = isJustActive;
+			}
+
+			public bool IsActive1 { get; }
+			public bool IsJustActive1 { get; }
+
+			public bool IsActive() {
+				return IsActive1;
+			}
+
+			public bool IsJustActive() {
+				return IsJustActive1;
+			}
+		}
+
+		public static Dictionary<Key, InjectKey> ingectedkeys = new();
+
 		public static IKeyPress Key(Key secondKey) {
-			return Instance?.Key(secondKey);
+			return ingectedkeys.ContainsKey(secondKey) ? ingectedkeys[secondKey] : (Instance?.Key(secondKey));
 		}
 
 		public static IRHand Hand(Handed value) {
