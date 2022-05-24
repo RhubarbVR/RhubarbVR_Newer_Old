@@ -38,9 +38,14 @@ namespace OpusDotNet
 		}
 	}
 
-
+	/// <summary>
+	/// The Library manager
+	/// </summary>
 	public static class NativeLib
 	{
+		/// <summary>
+		/// Makes think lib is already loaded
+		/// </summary>
 		public static void ForceLoad() {
 			_loaded = true;
 		}

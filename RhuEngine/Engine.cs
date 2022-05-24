@@ -265,7 +265,7 @@ namespace RhuEngine
 						_loadingPos += playerPos - _oldPlayerPos;
 						_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
 						_oldPlayerPos = playerPos;
-						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt((EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero), _loadingPos));
+						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt(EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos));
 						RText.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0, -0.07f, 0) * rootMatrix);
 						RMesh.Quad.Draw("LoadingUi",LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
 					}
