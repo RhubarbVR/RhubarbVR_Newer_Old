@@ -52,7 +52,7 @@ namespace RhuEngine.Components
 					Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
 				}
 				if (Engine.EngineLink.CanRender) {
-					RRenderer.CameraRoot = Entity.GlobalTrans;
+					RRenderer.CameraRoot = RWorld.IsInVR ? Entity.GlobalTrans : head.Target?.GlobalTrans ?? Entity.GlobalTrans;
 				}
 			}
 			else {

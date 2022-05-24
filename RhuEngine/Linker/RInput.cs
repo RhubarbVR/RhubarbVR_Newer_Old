@@ -65,7 +65,17 @@ namespace RhuEngine.Linker
 	{
 		public static IRInput Instance { get; set; }
 
-		public static IRHead Head => Instance?.Head;
+		public class ScreenHead : IRHead
+		{
+
+			public Vector3f Position => HeadMatrix.Translation;
+
+			public Matrix HeadMatrix { get; set;}
+		}
+
+		public static ScreenHead screenhd = new();
+
+		public static IRHead Head => RWorld.IsInVR? (Instance?.Head): screenhd;
 
 
 		public static IRMouse Mouse => Instance?.Mouse;

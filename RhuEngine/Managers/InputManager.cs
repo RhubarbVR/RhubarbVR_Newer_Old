@@ -8,6 +8,7 @@ using System.IO;
 using System.Threading.Tasks;
 using RhuEngine.Settings;
 using RhuEngine.Linker;
+using RNumerics;
 
 namespace RhuEngine.Managers
 {
@@ -37,6 +38,7 @@ namespace RhuEngine.Managers
 			Primary,
 			Secondary,
 			Grab,
+			UnlockMouse
 		}
 
 
@@ -45,6 +47,7 @@ namespace RhuEngine.Managers
 
 		public void Init(Engine engine) {
 			_engine = engine;
+			screenInput = new ScreenInput(this);
 		}
 
 		public float GetInputFloatFromKeyboard(InputTypes inputType) {
@@ -68,6 +71,8 @@ namespace RhuEngine.Managers
 				InputTypes.Grab => keyboard.Grab.GetInput() ? 1.0f : 0.0f,
 				InputTypes.ObjectPull => keyboard.ObjectPull.GetInput() ? 1.0f : 0.0f,
 				InputTypes.ObjectPush => keyboard.ObjectPush.GetInput() ? 1.0f : 0.0f,
+				InputTypes.UnlockMouse => keyboard.UnlockMouse.GetInput() ? 1.0f : 0.0f,
+
 				_ => 0,
 			};
 			if (keyboard.MousePositive == inputType) {
@@ -172,7 +177,57 @@ namespace RhuEngine.Managers
 			return GetInputFloat(inputType, mainController) >= 0.9f;
 		}
 
+		public class ScreenInput
+		{
+			public Vector3f pos = new Vector3f(0, 1.84f, 0);
+
+			public Vector2f yawpitch;
+
+			public const float SPEED = 2;
+
+			public bool MouseFree { get; set; }
+			public InputManager InputManager { get; }
+
+			public ScreenInput(InputManager inputManager) {
+				UnFreeMouse();
+				InputManager = inputManager;
+			}
+			bool _last = false;
+			public void FreeMouse() {
+				RInput.Mouse.HideMouse = false;
+				RInput.Mouse.CenterMouse = false;
+				MouseFree = true;
+			}
+			public void UnFreeMouse() {
+				RInput.Mouse.HideMouse = true;
+				RInput.Mouse.CenterMouse = true;
+				MouseFree = false;
+			}
+
+			public void Step() {
+				var temp = InputManager.GetInputBool(InputTypes.UnlockMouse);
+				if ((temp != _last) & temp) {
+					if (MouseFree) {
+						FreeMouse();
+					}
+					else {
+						UnFreeMouse();
+					}
+				}
+				_last = temp;
+
+				if (!MouseFree) {
+					yawpitch += RInput.Mouse.PosChange * SPEED;
+				}
+				RInput.screenhd.HeadMatrix = Matrix.TR(pos, Quaternionf.CreateFromEuler(yawpitch.x, yawpitch.y, 0));
+			}
+		}
+
+		public ScreenInput screenInput;
 		public void Step() {
+			if (!RWorld.IsInVR && _engine.EngineLink.SpawnPlayer) {
+				screenInput.Step();
+			}
 		}
 	}
 }

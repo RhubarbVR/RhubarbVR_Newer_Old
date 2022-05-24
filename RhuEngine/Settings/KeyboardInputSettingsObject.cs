@@ -104,5 +104,8 @@ namespace RhuEngine.Settings
 
 		[SettingsField()]
 		public KeyInput ObjectPush = new();
+
+		[SettingsField()]
+		public KeyInput UnlockMouse = new(Key.R);
 	}
 }

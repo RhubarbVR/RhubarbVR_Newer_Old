@@ -41,9 +41,9 @@ namespace RhuEngine.Components
 					return;
 				}
 				if (user.Target == World.GetLocalUser()) {
-						Entity.LocalTrans = RInput.Head.HeadMatrix * RRenderer.CameraRoot.Inverse;
-						user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("HeadPos").Value = Entity.position.Value;
-						user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>("HeadRot").Value = Entity.rotation.Value;
+					Entity.LocalTrans = RWorld.IsInVR ? RInput.Head.HeadMatrix * RRenderer.CameraRoot.Inverse : RInput.Head.HeadMatrix;
+					user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("HeadPos").Value = Entity.position.Value;
+					user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>("HeadRot").Value = Entity.rotation.Value;
 				}
 				else {
 					var position = user.Target.FindSyncStream<SyncValueStream<Vector3f>>("HeadPos")?.Value ?? Vector3f.Zero;
