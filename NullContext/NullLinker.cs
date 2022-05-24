@@ -27,6 +27,8 @@ namespace NullContext
 
 		public bool ForceLibLoad => false;
 
+		public bool InVR => false;
+
 		public void BindEngine(Engine engine) {
 			RLog.Instance = this;
 		}
