@@ -9,7 +9,7 @@ namespace RhuEngine.Linker
 	{
 		public static bool IsInVR { get; internal set; } = false;
 
-		public static Dictionary<object,Action> StartOfFrameExecute = new();
+		public static Dictionary<object, Action> StartOfFrameExecute = new();
 		public static List<Action> StartOfFrameList = new();
 
 		public static void ExecuteOnStartOfFrame(Action p) {
@@ -18,28 +18,31 @@ namespace RhuEngine.Linker
 			}
 		}
 
-		public static void ExecuteOnStartOfFrame(object target,Action p) {
+		public static void ExecuteOnStartOfFrame(object target, Action p) {
 			lock (StartOfFrameExecute) {
 				if (!StartOfFrameExecute.ContainsKey(target)) {
 					StartOfFrameExecute.Add(target, p);
 				}
 				else {
 					StartOfFrameExecute.Remove(target);
-					StartOfFrameExecute.Add(target,p);
+					StartOfFrameExecute.Add(target, p);
 				}
 			}
 		}
 
 		public static void RunOnStartOfFrame() {
 			lock (StartOfFrameExecute) {
-				foreach (var item in StartOfFrameExecute.ToArray()) {
-					item.Value.Invoke();
+				var startcountlist = StartOfFrameList.Count;
+				for (var i = 0; i < startcountlist; i++) {
+					StartOfFrameList[0].Invoke();
+					StartOfFrameList.RemoveAt(0);
 				}
-				foreach (var item in StartOfFrameList.ToArray()) {
-					item.Invoke();
+				var dectionaryvalues = StartOfFrameExecute.ToArray();
+				for (var i = 0; i < dectionaryvalues.Length; i++) {
+					var currentobj = dectionaryvalues[i];
+					currentobj.Value.Invoke();
+					StartOfFrameExecute.Remove(currentobj.Key);
 				}
-				StartOfFrameList.Clear();
-				StartOfFrameExecute.Clear();
 			}
 		}
 
@@ -67,14 +70,17 @@ namespace RhuEngine.Linker
 
 		public static void RunOnEndOfFrame() {
 			lock (EndOfFrameExecute) {
-				foreach (var item in EndOfFrameExecute.ToArray()) {
-					item.Value.Invoke();
+				var startcountlist = EndOfFrameList.Count;
+				for (var i = 0; i < startcountlist; i++) {
+					EndOfFrameList[0].Invoke();
+					EndOfFrameList.RemoveAt(0);
 				}
-				foreach (var item in EndOfFrameList.ToArray()) {
-					item.Invoke();
+				var dectionaryvalues = EndOfFrameExecute.ToArray();
+				for (var i = 0; i < dectionaryvalues.Length; i++) {
+					var currentobj = dectionaryvalues[i];
+					currentobj.Value.Invoke();
+					EndOfFrameExecute.Remove(currentobj.Key);
 				}
-				EndOfFrameList.Clear();
-				EndOfFrameExecute.Clear();
 			}
 		}
 
