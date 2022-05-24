@@ -52,7 +52,9 @@ namespace RhuEngine
 		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null,bool PassErrors = false) : base() {
 			this.PassErrors = PassErrors;
 			EngineLink = _EngineLink;
-
+			if (_EngineLink.ForceLibLoad) {
+				OpusDotNet.NativeLib.ForceLoad();
+			}
 			_EngineLink.BindEngine(this);
 			RLog.Info($"Platform Information OSArc: {RuntimeInformation.OSArchitecture} Framework: {RuntimeInformation.FrameworkDescription} OS: {RuntimeInformation.OSDescription} ProcessArc: {RuntimeInformation.ProcessArchitecture}");
 			EngineLink.LoadStatics();

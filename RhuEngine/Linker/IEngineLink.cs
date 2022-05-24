@@ -6,6 +6,7 @@ namespace RhuEngine.Linker
 {
 	public interface IEngineLink
 	{
+		bool ForceLibLoad { get; }
 		bool SpawnPlayer { get; }
 		bool CanRender { get; }
 		bool CanAudio { get; }

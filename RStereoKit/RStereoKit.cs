@@ -39,6 +39,8 @@ namespace RStereoKit
 		public bool CanAudio => true;
 		public bool CanInput => true;
 
+		public bool ForceLibLoad => false;
+
 		public void BindEngine(Engine engine) {
 			this.engine = engine;
 			RLog.Instance = new Logger();

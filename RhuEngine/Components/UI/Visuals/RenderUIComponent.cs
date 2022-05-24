@@ -111,7 +111,9 @@ namespace RhuEngine.Components
 			PhysicsCollider.Active = true;
 		}
 		public void LoadPhysicsMesh() {
-			RWorld.ExecuteOnEndOfFrame(BoxBased ? RunLoadPhysicsBox : RunLoadPhysicsMesh);
+			if (!Rect.PysicsLock) {
+				RWorld.ExecuteOnEndOfFrame(BoxBased ? RunLoadPhysicsBox : RunLoadPhysicsMesh);
+			}
 		}
 
 		public virtual bool BoxBased => !((Rect.Canvas?.FrontBind.Value ?? false) || (Rect.Canvas?.TopOffset.Value ?? false));

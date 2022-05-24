@@ -39,8 +39,12 @@ namespace OpusDotNet
 	}
 
 
-	static class NativeLib
+	public static class NativeLib
 	{
+		public static void ForceLoad() {
+			_loaded = true;
+		}
+
 		static bool _loaded = false;
 		internal static bool Load() {
 			if (_loaded) {

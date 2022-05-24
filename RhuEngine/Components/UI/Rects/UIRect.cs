@@ -99,6 +99,19 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI\\Rects" })]
 	public class UIRect : Component, IRectData
 	{
+		public bool PysicsLock { get; private set; }
+		public void PhysicsLock() {
+			PysicsLock = true;
+		}
+		public void PhysicsUnLock() {
+			PysicsLock = false;
+			_uiRenderComponents.SafeOperation((list) => {
+				foreach (var item in list) {
+					item.LoadPhysicsMesh();
+				}
+			});
+		}
+
 		private readonly List<HitData> _rayHitPoses = new();
 		private readonly List<HitData> _lastRayHitPoses = new();
 
@@ -304,7 +317,7 @@ namespace RhuEngine.Components
 			if (rectDataOverride != _rectDataOverride) {
 				_rectDataOverride = rectDataOverride;
 			}
- 		}
+		}
 
 		public void RegUpdateUIMeshes() {
 			RWorld.ExecuteOnStartOfFrame(this, UpdateUIMeshes);
@@ -322,7 +335,7 @@ namespace RhuEngine.Components
 					item.ProcessMesh();
 				}
 			});
-			
+
 			_uiComponents.SafeOperation((list) => {
 				for (var i = 0; i < _uiComponents.List.Count; i++) {
 					list[i].RenderTargetChange();
@@ -522,7 +535,7 @@ namespace RhuEngine.Components
 					});
 				});
 				UpdateUIMeshes();
-				Scroll(ScrollOffset,true,true);
+				Scroll(ScrollOffset, true, true);
 			});
 		}
 
@@ -532,7 +545,7 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			RWorld.ExecuteOnStartOfFrame(RegisterUIListClass ,() => {
+			RWorld.ExecuteOnStartOfFrame(RegisterUIListClass, () => {
 				_uiComponents.SafeOperation((list) => list.Clear());
 				_uiComponents.SafeOperation((list) => {
 					foreach (var item in Entity.GetAllComponents<UIComponent>()) {
@@ -548,7 +561,7 @@ namespace RhuEngine.Components
 						list.Add(item);
 					}
 				});
-				Scroll(ScrollOffset, true,true);
+				Scroll(ScrollOffset, true, true);
 			});
 		}
 
@@ -567,7 +580,7 @@ namespace RhuEngine.Components
 			});
 		}
 
-		public void Scroll(Vector3f value, bool forceUpdate = false,bool forcePhsics = false) {
+		public void Scroll(Vector3f value, bool forceUpdate = false, bool forcePhsics = false) {
 			if (value == ScrollOffset && !forceUpdate) {
 				return;
 			}

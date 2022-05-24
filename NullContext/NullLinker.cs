@@ -25,6 +25,8 @@ namespace NullContext
 
 		public float Elapsedf { get; set; }
 
+		public bool ForceLibLoad => false;
+
 		public void BindEngine(Engine engine) {
 			RLog.Instance = this;
 		}

@@ -41,7 +41,7 @@ namespace RhuEngine.Components.PrivateSpace
 			var textEntity = test.AddChild("Trains");
 			textEntity.AttachComponent<UIRect>();
 			var _text = textEntity.AttachComponent<UIText>();
-			_text.Password.Value = true;
+			//_text.Password.Value = true;
 			texteditor.Value.SetLinkerTarget(_text.Text);
 			var rectTwo = test.AttachComponent<UIRect>();
 			rectTwo.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
