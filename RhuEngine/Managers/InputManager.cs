@@ -199,8 +199,13 @@ namespace RhuEngine.Managers
 				MouseFree = true;
 			}
 			public void UnFreeMouse() {
-				RInput.Mouse.HideMouse = true;
-				RInput.Mouse.CenterMouse = true;
+				try {
+					RInput.Mouse.HideMouse = true;
+					RInput.Mouse.CenterMouse = true;
+				}
+				catch {
+
+				}
 				MouseFree = false;
 			}
 
@@ -226,7 +231,7 @@ namespace RhuEngine.Managers
 
 		public ScreenInput screenInput;
 		public void Step() {
-			if (!RWorld.IsInVR && _engine.EngineLink.CanInput) {
+			if ((!RWorld.IsInVR) && _engine.EngineLink.CanInput) {
 				screenInput.Step();
 			}
 		}

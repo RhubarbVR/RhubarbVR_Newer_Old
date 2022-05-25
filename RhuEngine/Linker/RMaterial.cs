@@ -27,15 +27,15 @@ namespace RhuEngine.Linker
 	{
 		public static IRMitConsts ConstInstance { get; set; }
 
-		public static string FaceCull => ConstInstance.FaceCull;
+		public static string FaceCull => ConstInstance?.FaceCull;
 
-		public static string Transparency => ConstInstance.Transparency;
+		public static string Transparency => ConstInstance?.Transparency;
 
-		public static string MainTexture => ConstInstance.MainTexture;
+		public static string MainTexture => ConstInstance?.MainTexture;
 
-		public static string WireFrame => ConstInstance.WireFrame;
+		public static string WireFrame => ConstInstance?.WireFrame;
 
-		public static string MainColor => ConstInstance.MainColor;
+		public static string MainColor => ConstInstance?.MainColor;
 
 		public static IRMaterial Instance { get; set; }
 

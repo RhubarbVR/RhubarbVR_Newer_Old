@@ -214,7 +214,7 @@ namespace RhuEngine
 			if (EngineLink.CanRender) {
 				RRenderer.EnableSky = false;
 				LoadingLogo = new RMaterial(RShader.UnlitClip);
-				LoadingLogo["diffuse"] = staticResources.RhubarbLogoV2;
+				LoadingLogo[RMaterial.MainTexture] = staticResources.RhubarbLogoV2;
 			}
 			var startcode = () => {
 				IntMsg = "Building NetApiManager";
