@@ -32,8 +32,8 @@ namespace RhuEngine.Components
 				return;
 			}
 			UpdateMinMaxNoPross();
-			fakeRects.SafeOperation((flist) => {
-				flist.Clear();
+			fakeRects.SafeOperation((list) => {
+				list.Clear();
 				_childRects.SafeOperation((list) => {
 					foreach (var item in list) {
 						if (item is null) {
@@ -48,7 +48,7 @@ namespace RhuEngine.Components
 							AnchorMin = Vector2f.Zero,
 						};
 						item.SetOverride(fakeRec);
-						flist.Add(fakeRec);
+						fakeRects.SafeAdd(fakeRec);
 					}
 				});
 			});
@@ -61,7 +61,6 @@ namespace RhuEngine.Components
 						item.AnchorMax = new Vector2f(1f, currentpos + inc);
 						item.AnchorMin = new Vector2f(0f, currentpos);
 						currentpos += inc;
-						item.UpdateMinMaxNoPross();
 					}
 					_maxScroll = Vector2f.Zero;
 					_minScroll = Vector2f.Zero;

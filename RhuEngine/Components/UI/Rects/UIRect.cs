@@ -278,12 +278,14 @@ namespace RhuEngine.Components
 
 		public Vector2f _cachedMin;
 		public Vector2f _cachedMax;
+		public Vector2f _cachedBadMin;
 
 		public void UpdateMinMax() {
 			UpdateMinMaxNoPross();
 			RegUpdateUIMeshes();
 		}
 		public virtual void UpdateMinMaxNoPross() {
+			_cachedBadMin = CompBadMin;
 			_cachedMin = CompMin;
 			_cachedMax = CompMax;
 			_childRects.SafeOperation((list) => {
@@ -300,7 +302,9 @@ namespace RhuEngine.Components
 
 		public Vector2f CompMax => TrueMax + (OffsetLocalMax.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 
-		public Vector2f BadMin => ((((_rectDataOverride ?? ParentRect)?.BadMin ?? Vector2f.One) - (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One))) * (Vector2f.One - AnchorMin.Value)) + (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One)) - (OffsetMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
+		public Vector2f BadMin => _cachedBadMin;
+
+		public Vector2f CompBadMin => ((((_rectDataOverride ?? ParentRect)?.BadMin ?? Vector2f.One) - (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One))) * (Vector2f.One - AnchorMin.Value)) + (Vector2f.One - ((_rectDataOverride ?? ParentRect)?.TrueMax ?? Vector2f.One)) - (OffsetMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 
 		public Vector2f TrueMin => Vector2f.One - BadMin;
 

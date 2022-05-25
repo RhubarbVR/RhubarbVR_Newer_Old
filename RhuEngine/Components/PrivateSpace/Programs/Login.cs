@@ -46,14 +46,15 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(null, null, 0);
 			uiBuilder.PushRect(new Vector2f(0, 0), new Vector2f(0.5, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			uiBuilder.AddButton(false, new Colorf(0.9f, 0.9f));
+			uiBuilder.AddButton(false, new Colorf(0.1f, 0.9f));
 			uiBuilder.AddText("Login");
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
+
 			uiBuilder.PushRect(new Vector2f(0.5, 0), new Vector2f(1, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			uiBuilder.AddButton(false,new Colorf(0.9f,0.9f));
+			uiBuilder.AddButton(false,new Colorf(0.1f,0.9f));
 			uiBuilder.AddText("Register");
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
