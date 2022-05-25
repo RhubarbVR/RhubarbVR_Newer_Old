@@ -22,6 +22,16 @@ namespace RhuEngine.Components
 			pos.SetLinkerTarget(Entity.position);
 			rot.SetLinkerTarget(Entity.rotation);
 			scale.SetLinkerTarget(Entity.scale);
+			if (!World.IsPersonalSpace) {
+				return;
+			}
+			var invr = Entity.AttachComponent<IsInVR>();
+			var entity = Entity.AddChild("Currsor");
+			entity.position.Value = new Vector3f(0, 0, -0.1f);
+			entity.scale.Value = new Vector3f(0.005f);
+			entity.rotation.Value = Quaternionf.CreateFromEuler(0, 90, 0);
+			invr.isNotVR.Target = entity.enabled;
+			entity.AttachMeshWithMeshRender<RectangleMesh, UnlitShader>();
 		}
 
 
