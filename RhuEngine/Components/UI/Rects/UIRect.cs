@@ -412,7 +412,7 @@ namespace RhuEngine.Components
 							meshList.Remove(new RMesh(null));
 						}
 					}
-					for (var i = 0; i < _uiRenderComponents.List.Count; i++) {
+					for (var i = 0; i < meshList.Count; i++) {
 						if (list[i].CutMesh is null) {
 							list[i].RenderCutMesh(false);
 						}

@@ -39,11 +39,11 @@ namespace RhuEngine.Components
 			return CurretRectEntity.AttachComponent<T>();
 		}
 
-		public UIRect PushRect(Vector2f? min = null, Vector2f? max = null) { 
-			return AttachChildRect<UIRect>(min, max);
+		public UIRect PushRect(Vector2f? min = null, Vector2f? max = null,float? Depth = null) { 
+			return AttachChildRect<UIRect>(min, max, Depth);
 		}
 
-		public T AttachChildRect<T>(Vector2f? min = null, Vector2f? max = null) where T : UIRect,new() {
+		public T AttachChildRect<T>(Vector2f? min = null, Vector2f? max = null, float? Depth = null) where T : UIRect,new() {
 			CurretRectEntity = CurretRectEntity.AddChild("ChildRect");
 			var comp = AttachComponentToStack<T>();
 			if (min is not null) {
@@ -52,8 +52,19 @@ namespace RhuEngine.Components
 			if (max is not null) {
 				comp.AnchorMax.Value = max ?? Vector2f.One;
 			}
+			if (Depth is not null) {
+				comp.Depth.Value = Depth ?? 0f;
+			}
 			CurrentRect = comp;
 			return comp;
+		}
+
+		public void AddSprit(Vector2i min,Vector2i max,IAssetProvider<RMaterial> asset,SpriteProvder psprite) {
+			var sprite = AttachComponentToStack<UISprite>();
+			sprite.PosMax.Value = max;
+			sprite.PosMin.Value = min;
+			sprite.Material.Target = asset;
+			sprite.Sprite.Target = psprite;
 		}
 
 		public void SetAnchorMinMax(Vector2f? min = null, Vector2f? max = null) {

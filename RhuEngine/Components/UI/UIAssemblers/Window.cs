@@ -45,6 +45,8 @@ namespace RhuEngine.Components
 			}
 		}
 
+		public readonly SyncRef<SpriteProvder> IconSprite; 
+
 		public readonly Linker<bool> MinimizeButtonEnable;
 
 		public readonly Linker<bool> CloseButtonEnable;
@@ -91,7 +93,7 @@ namespace RhuEngine.Components
 			base.OnAttach();
 			var shader = World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
 			var icons = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
-			var sprite = World.RootEntity.GetFirstComponentOrAttach<SpriteProvder>();
+			var sprite = IconSprite.Target = World.RootEntity.GetFirstComponentOrAttach<SpriteProvder>();
 			sprite.Texture.Target = icons;
 			sprite.GridSize.Value = new Vector2i(26, 7);
 			IconMit.Target = Entity.AttachComponent<DynamicMaterial>();

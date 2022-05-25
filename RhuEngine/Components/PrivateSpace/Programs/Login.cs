@@ -29,10 +29,44 @@ namespace RhuEngine.Components.PrivateSpace
 			var ma = uiRoot.AttachComponent<UIRect>();
 			var mit = window.MainMit.Target;
 			var uiBuilder = new UIBuilder(uiRoot, mit, ma);
-			uiBuilder.PushRect(new Vector2f(0.5f,0.6f), new Vector2f(0.5f, 0.6f));
-			var windowSize = new Vector2f(2.5f, 3f);
+			uiBuilder.PushRect(new Vector2f(0.5f,0.6f), new Vector2f(0.5f, 0.6f),0);
+			var windowSize = new Vector2f(2.5f, 3.25f);
 			uiBuilder.SetOffsetMinMax(-windowSize, windowSize);
-			uiBuilder.AddRectangle(Colorf.Blue);
+			uiBuilder.PushRect(new Vector2f(0, 0.75f), new Vector2f(1, 1),0);
+			uiBuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f));
+			uiBuilder.AddSprit(new Vector2i(11, 0), new Vector2i(11, 0), window.IconMit.Target, window.IconSprite.Target);
+			uiBuilder.PopRect();
+			uiBuilder.PopRect();
+			uiBuilder.PushRect(new Vector2f(0, 0), new Vector2f(1, 0.75f));
+			uiBuilder.PushRect(new Vector2f(0.01f), new Vector2f(0.99f));
+			var list = uiBuilder.AttachChildRect<VerticalList>();
+			list.Fit.Value = true;
+			list.Depth.Value = 0f;
+
+			uiBuilder.PushRect(null, null, 0);
+			uiBuilder.PushRect(new Vector2f(0, 0), new Vector2f(0.5, 1), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.AddButton(false, new Colorf(0.9f, 0.9f));
+			uiBuilder.AddText("Login");
+			uiBuilder.PopRect();
+			uiBuilder.PopRect();
+			uiBuilder.PopRect();
+			uiBuilder.PushRect(new Vector2f(0.5, 0), new Vector2f(1, 1), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.AddButton(false,new Colorf(0.9f,0.9f));
+			uiBuilder.AddText("Register");
+			uiBuilder.PopRect();
+			uiBuilder.PopRect();
+			uiBuilder.PopRect();
+			uiBuilder.PopRect();
+
+			uiBuilder.PushRect();
+			uiBuilder.AddText("Password");
+			uiBuilder.PopRect();
+
+			uiBuilder.PushRect();
+			uiBuilder.AddText("UserName");
+			uiBuilder.PopRect();
 		}
 	}
 }
