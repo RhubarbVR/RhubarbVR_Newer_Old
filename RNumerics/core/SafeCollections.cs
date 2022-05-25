@@ -12,18 +12,15 @@ namespace RNumerics
 	public class SafeCall<T>
 	{
 		public T data;
-		private readonly Semaphore _semaphore = new(1, 1);
 
 		public SafeCall(T val) {
 			data = val;
 		}
 
 		public void SafeOperation(Action<T> opF) {
-			_semaphore.WaitOne();
-
-			opF(data);
-
-			_semaphore.Release();
+			lock (data) {
+				opF(data);
+			}
 		}
 	}
 
@@ -33,35 +30,28 @@ namespace RNumerics
 	public class SafeList<T>
 	{
 		public List<T> List;
-		private readonly Semaphore _semaphore = new(1, 1);
 
 		public SafeList() {
 			List = new List<T>();
 		}
 
 		public void SafeAdd(T value) {
-			//_semaphore.WaitOne();
-
-			List.Add(value);
-
-			//_semaphore.Release();
+			lock (List) {
+				List.Add(value);
+			}
 		}
 
 
 		public void SafeOperation(Action<List<T>> opF) {
-			//_semaphore.WaitOne();
-
-			opF(List);
-
-			//_semaphore.Release();
+			lock (List) {
+				opF(List);
+			}
 		}
 
 		public void SafeRemove(T value) {
-			//_semaphore.WaitOne();
-
-			List.Remove(value);
-
-			//_semaphore.Release();
+			lock (List) {
+				List.Remove(value);
+			}
 		}
 	}
 
