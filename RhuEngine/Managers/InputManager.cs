@@ -182,7 +182,7 @@ namespace RhuEngine.Managers
 			public Vector3f pos = new Vector3f(0, 1.84f, 0);
 
 			public Vector2f yawpitch;
-			public const float Pitch = 85.5f;
+			public const float PITCH = 85.5f;
 			public const float SPEED = -0.5f;
 
 			public bool MouseFree { get; set; }
@@ -223,7 +223,7 @@ namespace RhuEngine.Managers
 
 				if (!MouseFree) {
 					yawpitch += RInput.Mouse.PosChange * SPEED;
-					yawpitch.y = MathUtil.Clamp(yawpitch.y, -Pitch, Pitch);
+					yawpitch.y = MathUtil.Clamp(yawpitch.y, -PITCH, PITCH);
 				}
 				RInput.screenhd.HeadMatrix = Matrix.TR(pos, Quaternionf.CreateFromEuler(yawpitch.x, yawpitch.y, 0));
 			}

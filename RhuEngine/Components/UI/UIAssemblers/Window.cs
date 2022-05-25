@@ -76,6 +76,7 @@ namespace RhuEngine.Components
 		public readonly SyncDelegate<Action<bool>> PinChanged;
 
 		public readonly SyncRef<DynamicMaterial> IconMit;
+		public readonly SyncRef<DynamicMaterial> MainMit;
 
 		private void ChangeHeader() {
 			if (WindowRootRectOffsetMin.Linked) {
@@ -97,7 +98,7 @@ namespace RhuEngine.Components
 			IconMit.Target.shader.Target = shader;
 			IconMit.Target.Transparency = Transparency.Blend;
 			IconMit.Target.MainTexture = icons;
-			var mit = Entity.AttachComponent<DynamicMaterial>();
+			var mit = MainMit.Target = Entity.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;
 			mit.Transparency = Transparency.Blend;
 			(Entity, UISprite) AddButton(Entity were, float PADDING, Vector2i iconindex, Action<ButtonEvent> action) {

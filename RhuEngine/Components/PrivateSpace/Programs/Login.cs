@@ -27,33 +27,12 @@ namespace RhuEngine.Components.PrivateSpace
 		public override void LoadUI(Entity uiRoot) {
 			window.CloseButton.Value = false;
 			var ma = uiRoot.AttachComponent<UIRect>();
-			var test = uiRoot.AddChild("Test");
-			var buttonint = test.AttachComponent<UIButtonInteraction>();
-			var buttonpramremove = test.AttachComponent<ButtonEventManager>();
-			var texteditor = test.AttachComponent<UITextEditorInteraction>();
-			texteditor.OnDoneEditing.Target = Click;
-			var textcurrsor = test.AttachComponent<UITextCurrsor>();
-			buttonpramremove.Click.Target = texteditor.EditingClick;
-			buttonint.ButtonEvent.Target = buttonpramremove.Call;
-			var trains = test.AttachComponent<UIRect>();
-			trains.AnchorMax.Value = new Vector2f(0.75f);
-			trains.AnchorMin.Value = new Vector2f(0.25f);
-			var textEntity = test.AddChild("Trains");
-			textEntity.AttachComponent<UIRect>();
-			var _text = textEntity.AttachComponent<UIText>();
-			//_text.Password.Value = true;
-			texteditor.Value.SetLinkerTarget(_text.Text);
-			var rectTwo = test.AttachComponent<UIRect>();
-			rectTwo.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
-			rectTwo.AnchorMax.Value = new Vector2f(0.9f, 0.9f);
-			var img = test.AttachComponent<UIRectangle>();
-			img.Tint.Value = new Colorf(0.1f, 0.1f, 0.1f, 0.5f);
-			var mittrains = test.AttachComponent<DynamicMaterial>();
-			mittrains.shader.Target = test.AttachComponent<UnlitShader>();
-			img.Material.Target = mittrains;
-			textcurrsor.Material.Target = mittrains;
-			textcurrsor.TextComp.Target = _text;
-			textcurrsor.TextCurrsor.Target = texteditor;
+			var mit = window.MainMit.Target;
+			var uiBuilder = new UIBuilder(uiRoot, mit, ma);
+			uiBuilder.PushRect(new Vector2f(0.5f,0.6f), new Vector2f(0.5f, 0.6f));
+			var windowSize = new Vector2f(2.5f, 3f);
+			uiBuilder.SetOffsetMinMax(-windowSize, windowSize);
+			uiBuilder.AddRectangle(Colorf.Blue);
 		}
 	}
 }

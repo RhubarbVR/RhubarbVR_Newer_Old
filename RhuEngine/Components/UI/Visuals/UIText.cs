@@ -32,6 +32,12 @@ namespace RhuEngine.Components
 		[Default("<color=hsv(240,100,100)>Hello<color=blue><size14>World \n <size5>Trains \n are cool man<size10>\nHello ")]
 		[OnChanged(nameof(UpdateText))]
 		public readonly Sync<string> Text;
+		[Default("")]
+		[OnChanged(nameof(UpdateText))]
+		public readonly Sync<string> EmptyString;
+		[Default("<color=rgb(0.9,0.9,0.9)>null")]
+		[OnChanged(nameof(UpdateText))]
+		public readonly Sync<string> NullString;
 		[OnAssetLoaded(nameof(UpdateText))]
 		public readonly AssetRef<RFont> Font;
 		[OnChanged(nameof(UpdateText))]
@@ -74,6 +80,12 @@ namespace RhuEngine.Components
 			var newtext = Text.Value;
 			if (Password.Value) {
 				newtext = new string('●', newtext.Length);
+			}
+			if(newtext is null) {
+				newtext = NullString.Value;
+			}
+			if (string.IsNullOrEmpty(newtext)) {
+				newtext = EmptyString.Value;
 			}
 			textRender.LoadText(Pointer.ToString(), newtext, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien, MiddleLines);
 			UpdateTextOffset();
