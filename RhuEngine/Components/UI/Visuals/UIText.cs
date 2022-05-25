@@ -138,7 +138,9 @@ namespace RhuEngine.Components
 			var largestscaleside = Math.Max(size.x, size.y);
 			var largestestside = Math.Max(textRender.Width, textRender.Height);
 			var small = Math.Min(size.y / textRender.Height, size.x / textRender.Width);
-			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + 0.01f), new Vector3f(small) / Rect.Canvas.scale.Value);
+
+
+			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + Entity.UIRect.Depth.Value + 0.01f), new Vector3f(small) / Rect.Canvas.scale.Value);
 			CutElement(true, false);
 		}
 

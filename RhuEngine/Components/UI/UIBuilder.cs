@@ -165,6 +165,7 @@ namespace RhuEngine.Components
 			var currsor = AttachComponentToStack<UITextCurrsor>();
 			currsor.TextCurrsor.Target = editor;
 			currsor.TextComp.Target = uitext;
+			currsor.Material.Target = MainMit;
 			PopRect();
 			return (uitext, editor, currsor,uitext.Text);
 		}
