@@ -56,6 +56,25 @@ namespace RNumerics
 
 	public static class MeshExtensions
 	{
+		public static IEnumerable<int> RenderIndicesClockWizeint(this IMesh mesh) {
+			int? first = null;
+			int? Next = null;
+			foreach (var item in mesh.RenderIndices()) {
+				if(first == null) {
+					first = item;
+				}else if (Next == null) {
+					Next = item;
+				}
+				else {
+					yield return item;
+					yield return Next??0;
+					yield return first??0;
+					first = null;
+					Next = null;
+				}
+			}
+		}
+
 		public static IEnumerable<uint> RenderIndicesUint(this IMesh mesh) {
 			foreach (var item in mesh.RenderIndices()) {
 				yield return (uint)item;

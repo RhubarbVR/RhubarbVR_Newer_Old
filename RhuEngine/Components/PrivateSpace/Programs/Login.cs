@@ -50,7 +50,9 @@ namespace RhuEngine.Components.PrivateSpace
 		public void Error(string error) {
 			ErrorText.Text.Value = $"<colorred>{error}";
 		}
-
+		public void Normal(string n) {
+			ErrorText.Text.Value = $"{n}";
+		}
 		[NoSave]
 		[NoSync]
 		[NoLoad]
@@ -90,6 +92,7 @@ namespace RhuEngine.Components.PrivateSpace
 						Error(info.Message);
 					}
 					else {
+						Normal(info.Message);
 						SwitchReg();
 					}
 				});
