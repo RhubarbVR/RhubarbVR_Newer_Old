@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
@@ -24,6 +25,119 @@ namespace RhuEngine.Components.PrivateSpace
 		public void Click() {
 		}
 
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIText ErrorText;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Entity RegEntiyOne;
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Entity RegEntiyTwo;
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Entity RegEntiyThree;
+
+		public void Error(string error) {
+			ErrorText.Text.Value = $"<colorred>{error}";
+		}
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIText Password;
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIText ConfPassword;
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIText UserName;
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIText Email;
+
+
+		[Exsposed]
+		public void MainButton(ButtonEvent buttonEvent) {
+			if (!buttonEvent.IsClicked) {
+				return;
+			}
+			if (RegScreen) {
+				if(Password.Text.Value != ConfPassword.Text.Value) {
+					Error("Passwords Don't Match");
+					return;
+				}
+
+				Task.Run(async () => {
+					var info = await Engine.netApiManager.SignUp(UserName.Text, Email.Text, Password.Text, new DateTime(1980, 9, 19));
+					if (info.Error || info.ErrorDetails == "Normal Error") {
+						Error(info.Message);
+					}
+					else {
+						SwitchReg();
+					}
+				});
+			}
+			else {
+				Task.Run(async () => {
+					var info = await Engine.netApiManager.Login(Email.Text, Password.Text);
+					if (!info.Login) {
+						Error(info.Message);
+					}
+					else {
+						Close();
+					}
+				});
+			}
+		}
+
+		public bool RegScreen = false;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIText ButtonOneText;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIText ButtonTwoText;
+
+		
+		[Exsposed]
+		public void ToggleButton(ButtonEvent buttonEvent) {
+			if (!buttonEvent.IsClicked) {
+				return;
+			}
+			SwitchReg();
+		}
+
+		public void SwitchReg() {
+			RegScreen = !RegScreen;
+			RegEntiyOne.enabled.Value = RegScreen;
+			RegEntiyTwo.enabled.Value = RegScreen;
+			ButtonOneText.Text.Value = RegScreen ? "SignUp" : "Login";
+			ButtonTwoText.Text.Value = RegScreen ? "Login" : "SignUp";
+		}
+		
 		public override void LoadUI(Entity uiRoot) {
 			window.CloseButton.Value = false;
 			var ma = uiRoot.AttachComponent<UIRect>();
@@ -47,16 +161,16 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(null, null, 0);
 			uiBuilder.PushRect(new Vector2f(0, 0), new Vector2f(0.5, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			uiBuilder.AddButton(false, buttonColor);
-			uiBuilder.AddText("Login");
+			uiBuilder.AddButton(false, buttonColor).ButtonEvent.Target = MainButton;
+			ButtonOneText = uiBuilder.AddText("Login");
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 
 			uiBuilder.PushRect(new Vector2f(0.5, 0), new Vector2f(1, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			uiBuilder.AddButton(false, buttonColor);
-			uiBuilder.AddText("Register");
+			uiBuilder.AddButton(false, buttonColor).ButtonEvent.Target = ToggleButton;
+			ButtonTwoText = uiBuilder.AddText("Register");
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
@@ -67,42 +181,44 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			var Confirmpassword = uiBuilder.AddTextEditor("Confirm Password", buttonColor);
 			Confirmpassword.Item1.Password.Value = true;
+			ConfPassword = Confirmpassword.Item1;
 			uiBuilder.PopRect();
-			var confentity = uiBuilder.CurretRectEntity;
-			confentity.enabled.Value = false;
+			RegEntiyOne = uiBuilder.CurretRectEntity;
+			RegEntiyOne.enabled.Value = false;
 			uiBuilder.PopRect();
 
 			uiBuilder.PushRect();
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			var password = uiBuilder.AddTextEditor("Password", buttonColor);
 			password.Item1.Password.Value = true;
+			Password = password.Item1;
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 
 
 			uiBuilder.PushRect();
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			uiBuilder.AddTextEditor("Email", buttonColor);
+			Email = uiBuilder.AddTextEditor("Email", buttonColor).Item1;
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 
 			uiBuilder.PushRect();
 
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			uiBuilder.AddTextEditor("Username", buttonColor);
-			var usernameEntity = uiBuilder.CurretRectEntity;
-			usernameEntity.enabled.Value = false;
+			UserName = uiBuilder.AddTextEditor("Username", buttonColor).Item1;
+			RegEntiyTwo = uiBuilder.CurretRectEntity;
+			RegEntiyTwo.enabled.Value = false;
 			uiBuilder.PopRect();
 
 			uiBuilder.PopRect();
 
-			uiBuilder.PushRect();
-			//DateOfBirth
-			uiBuilder.PopRect();
+			//uiBuilder.PushRect();
+			////DateOfBirth
+			//uiBuilder.PopRect();
 
 			uiBuilder.PushRect();
 			//Error
-			uiBuilder.AddText("<colorred>This is an error somthing badhappend");
+			ErrorText = uiBuilder.AddText("<colorred>");
 			uiBuilder.PopRect();
 		}
 	}

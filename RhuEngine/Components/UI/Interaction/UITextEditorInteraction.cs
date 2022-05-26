@@ -112,6 +112,11 @@ namespace RhuEngine.Components
 		public override void KeyboardUnBind() {
 			EndEditing();
 		}
+
+		public override void Dispose() {
+			Engine.KeyboardInteractionUnBind(this);
+			base.Dispose();
+		}
 	}
 
 	public abstract class AbstractTextEditorInteraction : UIInteractionComponent, ICurrsorTextProvider, IKeyboardInteraction

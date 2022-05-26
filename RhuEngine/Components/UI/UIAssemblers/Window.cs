@@ -130,6 +130,7 @@ namespace RhuEngine.Components
 			Canvas.Target = Entity.AttachComponent<UICanvas>();
 			Canvas.Target.scale.Value = new Vector3f(10, 8, 1.5f);
 			var rect = Entity.AttachComponent<UIRect>();
+			rect.OffsetMax.Value = new Vector2f(0, HeaderHeight.Value);
 			MainUIMax.Target = rect.AnchorMax;
 			var windowRoot = Entity.AddChild("WindowRoot");
 			var windowRootrect = windowRoot.AttachComponent<UIRect>();

@@ -424,11 +424,13 @@ namespace RhuEngine.Components
 			TimeText.SetLinkerTarget(text.Text);
 			text.StartingColor.Value = Colorf.White;
 
-			AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(Login)));
+			if (!Engine.netApiManager.IsLoggedIn) {
+				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(Login)));
+			}
 			WorldManager.OnWorldUpdateTaskBar += RegTaskBarItemsUpdate;
 		}
 
-		public void OpenProgram(string name, Type programType) {
+		public Program OpenProgram(string name, Type programType) {
 			RLog.Info($"Open program {name} Type: {programType.GetFormattedName()}");
 			var programentity = ProgramsHolder.AddChild(name);
 			var programcomp = programentity.AttachComponent<Program>(programType);
@@ -437,6 +439,7 @@ namespace RhuEngine.Components
 			programcomp.IntProgram();
 			programs.Add(programcomp);
 			AddTaskBarItemToList(programcomp.taskBarItem);
+			return programcomp;
 		}
 
 		public void ProgramClose(Program program) {
