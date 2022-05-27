@@ -12,56 +12,35 @@ namespace RStereoKit
 {
 	public class SkFontLoader
 	{
-		public Font Regular { get; private set; }
-		public Font Bold { get; private set; }
-		public Font Italic { get; private set; }
-		public Font Oblique { get; private set; }
-		public Font Strikeout { get; private set; }
-		public Font Underline { get; private set; }
-
-		public ConcurrentDictionary<(Colorf,FontStyle),TextStyle> StyleList = new ConcurrentDictionary<(Colorf, FontStyle), TextStyle>();
+		public readonly Font Font;
+		public ConcurrentDictionary<Colorf,TextStyle> StyleList = new ConcurrentDictionary<Colorf, TextStyle>();
 		public SkFontLoader(Font font) {
-			Regular = font;
-			GetTextStyle(Colorf.White,FontStyle.Regular);
+			Font = font;
+			GetTextStyle(Colorf.White);
 		}
 
-		public TextStyle GetTextStyle(Colorf color,FontStyle fontStyle) {
-			if(StyleList.TryGetValue((color, fontStyle),out var textStyle)) {
+		public TextStyle GetTextStyle(Colorf color) {
+			if(StyleList.TryGetValue(color,out var textStyle)) {
 				return textStyle;
 			}
 			else {
-				var Font = Regular;
-				switch (fontStyle) {
-					case FontStyle.Regular:
-						Font = Regular ?? Font.Default;
-						break;
-					case FontStyle.Bold:
-						Font = Bold ?? Regular;
-						break;
-					case FontStyle.Italic:
-						Font = Italic ?? Font.Default;
-						break;
-					case FontStyle.oblique:
-						Font = Oblique ?? Font.Default;
-						break;
-					case FontStyle.Strikeout:
-						Font = Strikeout ?? Font.Default;
-						break;
-					case FontStyle.Underline:
-						Font = Underline ?? Font.Default;
-						break;
-					default:
-						break;
-				}
 				var style = Text.MakeStyle(Font, 1, new Color(color.r, color.g, color.b, color.a));
-				StyleList.TryAdd((color, fontStyle), style);
+				StyleList.TryAdd(color, style);
 				return style;
 			}
 		}
 	}
 	public class SKFont : IRFont
 	{
-		public RFont Default => new RFont(new SkFontLoader(Font.Default));
+		public RFont MainFont => new RFontRoot(new RenderFont(new SkFontLoader(Font.Default)));
+
+		public bool CharExsets(RenderFont renderFont, char c) {
+			return Text.Size(c.ToString(), ((SkFontLoader)renderFont.Fontist).GetTextStyle(Colorf.White)).v != Vec2.Zero.v;
+		}
+
+		public Vector2f TextSize(RenderFont renderFont, char c) {
+			return (Vector2f)Text.Size(c.ToString(), ((SkFontLoader)renderFont.Fontist).GetTextStyle(Colorf.White)).v;
+		}
 	}
 
 	public class SkRText : IRText
@@ -70,8 +49,8 @@ namespace RStereoKit
 			Text.Add(v, new StereoKit.Matrix(p.m));
 		}
 
-		public void Add(string id, char c, RNumerics.Matrix p, Colorf color, RFont rFont,FontStyle fontStyle, Vector2f textCut) {
-			var textsize = (Vec2)(Vector2)Size(rFont, c, fontStyle);
+		public void Add(string id, char c, RNumerics.Matrix p, Colorf color, RenderFont rFont, Vector2f textCut) {
+			var textsize = Text.Size(c.ToString(), ((SkFontLoader)rFont.Fontist).GetTextStyle(Colorf.White));
 			var textAlien = TextAlign.BottomLeft;
 			var offsetX = 0f;
 			var offsetY = 0f;
@@ -102,11 +81,7 @@ namespace RStereoKit
 				textAlien = TextAlign.TopLeft;
 				textsize += new Vec2(1);
 			}
-			Text.Add(c.ToString(), StereoKit.Matrix.T((textCut == Vector2f.Zero)?new Vec3(0, - (textsize.y - 1), 0): Vec3.Zero) * (StereoKit.Matrix)p.m, textsize, StereoKit.TextFit.Clip, ((SkFontLoader)rFont.Instances).GetTextStyle(color, fontStyle), TextAlign.BottomLeft, textAlien, offsetX, offsetY);
-		}
-
-		public Vector2f Size(RFont rFont, char c,FontStyle fontStyle) {
-			return (Vector2f)Text.Size(c.ToString(), ((SkFontLoader)rFont.Instances).GetTextStyle(Colorf.White, fontStyle)).v;
+			Text.Add(c.ToString(), StereoKit.Matrix.T((textCut == Vector2f.Zero)?new Vec3(0, - (textsize.y - 1), 0): Vec3.Zero) * (StereoKit.Matrix)p.m, textsize, StereoKit.TextFit.Clip, ((SkFontLoader)rFont.Fontist).GetTextStyle(color), TextAlign.BottomLeft, textAlien, offsetX, offsetY);
 		}
 	}
 }

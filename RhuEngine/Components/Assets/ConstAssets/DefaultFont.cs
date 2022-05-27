@@ -4,14 +4,14 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/ConstAssets" })]
-	public class DefaultFont : AssetProvider<RFont>
+	public class MainFont : AssetProvider<RFont>
 	{
 		RFont _font;
 		private void LoadFont() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			_font = RFont.Default;
+			_font = RFont.MainFont;
 			Load(_font);
 		}
 		public override void OnLoaded() {

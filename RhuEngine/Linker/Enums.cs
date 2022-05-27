@@ -23,15 +23,6 @@ namespace RhuEngine.Linker
 		Error,
 	}
 
-	public enum FontStyle
-	{
-		Regular,
-		Bold,
-		Italic,
-		oblique,
-		Strikeout,
-		Underline,
-	}
 
 	/// <summary>When rendering content, you can filter what you're rendering by the
 	/// RenderLayer that they're on. This allows you to draw items that are

@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 		public readonly AssetRef<RMaterial> Material;
 
 		public readonly AssetRef<RMesh> CurrsorMesh;
-		
+
 		public readonly Sync<Colorf> Tint;
 
 		[Default(0.5f)]
@@ -39,7 +39,7 @@ namespace RhuEngine.Components
 		}
 
 		public void BindToTextComp() {
-			if(_lastUIText is not null) {
+			if (_lastUIText is not null) {
 				_lastUIText.OnCharRender -= LastUIText_OnCharRender;
 			}
 			_lastUIText = null;
@@ -53,14 +53,14 @@ namespace RhuEngine.Components
 		public override void Step() {
 			base.Step();
 			_timer += RTime.Elapsedf;
-			if(_timer > (FlashSpeed.Value * 2)) {
+			if (_timer > (FlashSpeed.Value * 2)) {
 				_timer = _timer - (FlashSpeed.Value * 2);
 			}
 		}
 
 		private float _timer = 0f;
 
-		private void LastUIText_OnCharRender(Matrix arg1, DynamicTextRender.TextChar arg2,int index) {
+		private void LastUIText_OnCharRender(Matrix arg1, DynamicTextRender.TextChar arg2, int index) {
 			if (_timer < FlashSpeed.Value) {
 				return;
 			}
@@ -73,7 +73,7 @@ namespace RhuEngine.Components
 			if (TextCurrsor.Target is null) {
 				return;
 			}
-			if(TextComp.Target is null) {
+			if (TextComp.Target is null) {
 				return;
 			}
 			if (arg2 is null) {
@@ -84,7 +84,7 @@ namespace RhuEngine.Components
 			}
 			var pos = TextComp.Target.Text.Value.Length - TextCurrsor.Target.CurrsorPos + 1;
 			var otherpos = pos + TextCurrsor.Target.CurrsorLength;
-			if(otherpos < pos) {
+			if (otherpos < pos) {
 				(otherpos, pos) = (pos, otherpos);
 			}
 			if (index > otherpos) {
@@ -95,18 +95,18 @@ namespace RhuEngine.Components
 			}
 			if (otherpos - pos == 0) {
 				if (arg2.NullChar) {
-					CurrsorMesh.Asset.Draw(index.ToString() + Pointer.id.ToString(), Material.Asset, Matrix.TS(new Vector3f(0.01f, 0.5f), new Vector3f(0.1f, 1.1f, 0.01f)) * arg1, arg2.color * Tint.Value);
+					CurrsorMesh.Asset.Draw(index.ToString() + Pointer.id.ToString(), Material.Asset, Matrix.TS(new Vector3f(0.01f, 0.5f), new Vector3f(0.1f, 1.1f, 0.01f)) * arg1, arg2.color * Tint.Value, Entity.UIRect?.ZDepth ?? 0);
 				}
 				else {
-					CurrsorMesh.Asset.Draw(index.ToString() + Pointer.id.ToString(), Material.Asset, Matrix.TS(new Vector3f(0.01f, 0.5f), new Vector3f(0.1f, 1.1f, 0.01f)) * arg1, arg2.color * Tint.Value);
+					CurrsorMesh.Asset.Draw(index.ToString() + Pointer.id.ToString(), Material.Asset, Matrix.TS(new Vector3f(0.01f, 0.5f), new Vector3f(0.1f, 1.1f, 0.01f)) * arg1, arg2.color * Tint.Value, Entity.UIRect?.ZDepth ?? 0);
 				}
 			}
 			else {
-				if(otherpos == index) {
+				if (otherpos == index) {
 					return;
 				}
 				if (!arg2.NullChar) {
-					CurrsorMesh.Asset.Draw(index.ToString() + Pointer.id.ToString(), Material.Asset, Matrix.TS(new Vector3f(-(arg2.textsize.x * 10 / 2), 0.55f), new Vector3f((arg2.textsize.x * 10) + 0.1f, 1.2f, 0.01f)) * arg1, arg2.color * Tint.Value);
+					CurrsorMesh.Asset.Draw(index.ToString() + Pointer.id.ToString(), Material.Asset, Matrix.TS(new Vector3f(-(arg2.textsize.x * 10 / 2), 0.55f), new Vector3f((arg2.textsize.x * 10) + 0.1f, 1.2f, 0.01f)) * arg1, arg2.color * Tint.Value, Entity.UIRect?.ZDepth ?? 0);
 				}
 			}
 

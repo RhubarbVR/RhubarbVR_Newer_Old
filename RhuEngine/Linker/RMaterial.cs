@@ -6,6 +6,10 @@ namespace RhuEngine.Linker
 {
 	public interface IRMaterial
 	{
+		public void SetRenderQueueOffset(object mit, int tex);
+
+		public int GetRenderQueueOffset(object mit);
+
 		public object Make(RShader rShader);
 		public void Pram(object ex, string tex, object value);
 		public IEnumerable<RMaterial.RMatParamInfo> GetAllParamInfo(object tex);
@@ -23,8 +27,17 @@ namespace RhuEngine.Linker
 		public string MainColor { get; }
 	}
 
-	public class RMaterial
+	public partial class RMaterial:IDisposable
 	{
+
+		public int RenderOrderOffset
+		{
+			get => Instance.GetRenderQueueOffset(Target);
+			set { Instance.SetRenderQueueOffset(Target, value); PramChanged.Invoke(this); }
+		}
+
+		public event Action<RMaterial> PramChanged;
+
 		public static IRMitConsts ConstInstance { get; set; }
 
 		public static string FaceCull => ConstInstance?.FaceCull;
@@ -50,7 +63,7 @@ namespace RhuEngine.Linker
 		}
 		public object this[string parameterName]
 		{
-			set => Instance.Pram(Target, parameterName, value);
+			set { Instance.Pram(Target, parameterName, value); PramChanged?.Invoke(this); }
 		}
 
 		public static string RenameFromEngine(string newName) {
@@ -86,6 +99,14 @@ namespace RhuEngine.Linker
 		public IEnumerable<RMatParamInfo> GetAllParamInfo() {
 			return Instance.GetAllParamInfo(Target);
 		}
+
+		public event Action<RMaterial> OnDispose;
+
+		public void Dispose() {
+			OnDispose?.Invoke(this);
+			Target = null;
+		}
+
 		/// <summary>Information and details about the shader parameters
 		/// available on a Material. Currently only the text name and data type
 		/// of the parameter are surfaced here. This contains textures as well as

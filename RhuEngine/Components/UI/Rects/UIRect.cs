@@ -23,6 +23,8 @@ namespace RhuEngine.Components
 		public Vector2f BadMin { get; }
 
 		public Vector2f TrueMin { get; }
+		public int ZDepth { get; }
+
 
 		public Vector2f TrueMax { get; }
 
@@ -38,6 +40,8 @@ namespace RhuEngine.Components
 
 	public class BasicRectOvride : IRectData
 	{
+		public int ZDepth => ((ParentRect)?.ZDepth ?? 0) + 1;
+
 		public IRectData Child { get; set; }
 		public IRectData ParentRect { get; set; }
 
@@ -276,10 +280,10 @@ namespace RhuEngine.Components
 
 		public virtual Vector2f CutZonesMin => Entity.parent.Target?.UIRect?.CutZonesMin ?? Vector2f.NInf;
 
-		public Vector2f _cachedMin;
-		public Vector2f _cachedMax;
-		public Vector2f _cachedBadMin;
-
+		Vector2f _cachedMin;
+		Vector2f _cachedMax;
+		Vector2f _cachedBadMin;
+		int _cachedZDepth;
 		public void UpdateMinMax() {
 			UpdateMinMaxNoPross();
 			RegUpdateUIMeshes();
@@ -288,12 +292,17 @@ namespace RhuEngine.Components
 			_cachedBadMin = CompBadMin;
 			_cachedMin = CompMin;
 			_cachedMax = CompMax;
+			_cachedZDepth = CompZDepth;
 			_childRects.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.UpdateMinMaxNoPross();
 				}
 			});
 		}
+		public int ZDepth => _cachedZDepth;
+
+		public int CompZDepth => ((_rectDataOverride ?? ParentRect)?.ZDepth??0) + 1;
+
 		public Vector2f Min => _cachedMin;
 
 		public Vector2f Max => _cachedMax;
@@ -468,7 +477,7 @@ namespace RhuEngine.Components
 							list[i].PhysicsCollider.Matrix = list[i].PhysicsPose * mataddon * matrix;
 						}
 						if (list[i].RenderMaterial is not null) {
-							meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, mataddon * matrix, list[i].RenderTint);
+							meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, mataddon * matrix, list[i].RenderTint,ZDepth);
 						}
 					}
 				});

@@ -16,6 +16,13 @@ namespace RhuEngine.Components
 
 		public readonly SyncAbstractObjList<PramInfo> Prams;
 
+		[OnAssetLoaded(nameof(UpdateRenderOrder))]
+		public readonly Sync<int> RenderOrderOffset;
+
+		public void UpdateRenderOrder() {
+			_material.RenderOrderOffset = RenderOrderOffset;
+		}
+
 		public void UpdatePram(string pram, object data) {
 			if (_material is not null) {
 				_material[pram] = data;
@@ -367,13 +374,15 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public override void OnAttach() {
-			base.OnAttach();
-			LoadMaterial();
+		public override void Dispose() {
+			base.Dispose();
+			_material?.Dispose();
+			_material = null;
 		}
 
 		public override void OnLoaded() {
 			base.OnLoaded();
+			LoadMaterial();
 		}
 	}
 }

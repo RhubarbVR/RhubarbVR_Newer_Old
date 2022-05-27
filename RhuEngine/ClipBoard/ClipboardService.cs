@@ -21,14 +21,22 @@ public static partial class ClipboardService
 	/// </summary>
 	public static Task<string> GetTextAsync(CancellationToken cancellation = default)
     {
-        return _getAsyncFunc(cancellation);
+		if (OverRide is not null) {
+			return OverRide.GetTextAsync();
+		}
+		return _getAsyncFunc(cancellation);
     }
+
+	public static IClipboard OverRide;
 
     /// <summary>
     /// Retrieves text data from the Clipboard.
     /// </summary>
     public static string GetText()
     {
+		if(OverRide is not null) {
+			return OverRide.GetText();
+		}
         return _getFunc();
     }
 
@@ -48,7 +56,10 @@ public static partial class ClipboardService
     /// </summary>
     public static Task SetTextAsync(string text, CancellationToken cancellation = default)
     {
-        return _setAsyncAction(text, cancellation);
+		if (OverRide is not null) {
+			return OverRide.SetTextAsync(text, cancellation);
+		}
+		return _setAsyncAction(text, cancellation);
     }
 
     /// <summary>
@@ -56,6 +67,11 @@ public static partial class ClipboardService
     /// </summary>
     public static void SetText(string text)
     {
-        _setAction(text);
+		if (OverRide is not null) {
+			OverRide.SetText(text);
+		}
+		else {
+			_setAction(text);
+		}
     }
 }

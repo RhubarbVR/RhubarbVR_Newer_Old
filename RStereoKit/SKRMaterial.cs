@@ -47,6 +47,10 @@ namespace RStereoKit
 			}
 		}
 
+		public int GetRenderQueueOffset(object mit) {
+			return ((Material)mit).QueueOffset;
+		}
+
 		public object Make(RShader rShader) {
 			return new Material((Shader)rShader.e);
 		}
@@ -138,6 +142,10 @@ namespace RStereoKit
 			}
 
 			((Material)ex)[tex] = value;
+		}
+
+		public void SetRenderQueueOffset(object mit, int tex) {
+			((Material)mit).QueueOffset = tex;
 		}
 	}
 }

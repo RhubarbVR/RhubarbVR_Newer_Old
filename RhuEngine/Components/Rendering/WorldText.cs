@@ -54,7 +54,7 @@ namespace RhuEngine.Components
 		}
 		public override void OnAttach() {
 			base.OnAttach();
-			Font.Target = World.RootEntity.GetFirstComponentOrAttach<DefaultFont>();
+			Font.Target = World.RootEntity.GetFirstComponentOrAttach<MainFont>();
 		}
 	}
 }

@@ -11,7 +11,7 @@ namespace RhuEngine.Linker
 	{
 		public void LoadMesh(RMesh meshtarget, IMesh mesh);
 
-		public void Draw(string id,object mesh, RMaterial loadingLogo, Matrix p,Colorf tint);
+		public void Draw(string id,object mesh, RMaterial loadingLogo, Matrix p,Colorf tint, int zDepth);
 
 		public RMesh Quad { get; }
 
@@ -40,8 +40,8 @@ namespace RhuEngine.Linker
 			Instance.LoadMesh(this,mesh);
 		}
 
-		public void Draw(string id,RMaterial loadingLogo, Matrix p,Colorf? tint = null) {
-			Instance.Draw(id,mesh, loadingLogo, p,tint?? Colorf.White);
+		public void Draw(string id,RMaterial loadingLogo, Matrix p,Colorf? tint = null, int zDepth = 0) {
+			Instance.Draw(id,mesh, loadingLogo, p,tint?? Colorf.White, zDepth);
 		}
 	}
 }
