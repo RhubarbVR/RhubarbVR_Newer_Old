@@ -267,6 +267,7 @@ namespace RhuEngine
 					try {
 						var headMat = RInput.Head.HeadMatrix;
 						if (!RWorld.IsInVR) {
+							RRenderer.CameraRoot = Matrix.Identity;
 							headMat = Matrix.T(Vector3f.Forward / 10);
 						}
 						var textpos = Matrix.T(Vector3f.Forward * 0.25f) * (EngineLink.CanInput ? headMat : Matrix.S(1));
