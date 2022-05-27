@@ -244,7 +244,7 @@ namespace RhuEngine
 					RRenderer.EnableSky = true;
 				}
 				RLog.Info("Engine Started");
-				IntMsg = $"Engine Started\nRunning First Step...";
+				IntMsg = $"{localisationManager?.GetLocalString("Common.Loaded")}\nRunning First Step...";
 				OnEngineStarted?.Invoke();
 			};
 			if (RunStartThread) {
@@ -276,7 +276,7 @@ namespace RhuEngine
 						_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
 						_oldPlayerPos = playerPos;
 						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt(EngineLink.CanInput ? headMat.Translation : Vector3f.Zero, _loadingPos));
-						RText.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0, -0.07f, 0) * rootMatrix);
+						RText.Add($"{localisationManager?.GetLocalString("Common.Loading")}\n{IntMsg}", Matrix.T(0, -0.07f, 0) * rootMatrix);
 						RMesh.Quad.Draw("LoadingUi",LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
 					}
 					catch (Exception ex) {
