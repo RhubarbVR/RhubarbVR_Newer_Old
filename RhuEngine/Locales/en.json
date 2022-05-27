@@ -12,6 +12,9 @@
     "Common.Color.Yellow": "Yellow",
     "Common.Color.Key": "Key",
     "Common.Color.Black": "Black",
+    "Common.Color.hue": "Hue",
+    "Common.Color.saturation": "Saturation",
+    "Common.Color.value": "Value",
 
     "Common.Failed": "<color=red>FAILED",
     "Common.FailedToJoinWorld": "<color=red>FAILED</color> to join world",
@@ -98,7 +101,7 @@
     "Common.Sort.Descending": "Descending",
     "Common.Home": "Home",
     "Common.Worlds": "Worlds",
-    "Common.Contacts": "Contacts",
+    "Common.Contacts": "acquaintances",
     "Common.Sessions": "Sessions",
     "Common.Exit": "Exit",
     "Common.Logout": "Logout",
