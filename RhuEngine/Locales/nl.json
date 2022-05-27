@@ -95,7 +95,7 @@
       "Common.AudioVolume": "Volume",
       "Common.ObjectVolume": "Volume",
       "Common.WorldAudioVolume": "Wereld Volume",
-      "Common.UserAudioVolume": "gebruiker Volume",
+      "Common.UserAudioVolume": "spraakvolume",
       "Common.MasterAudioVolume": "Hoofdvolume",
       "Common.Sort.Ascending": "Oplopend",
       "Common.Sort.Descending": "Aflopend",
