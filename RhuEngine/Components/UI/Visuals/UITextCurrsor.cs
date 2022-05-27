@@ -95,10 +95,10 @@ namespace RhuEngine.Components
 			}
 			if (otherpos - pos == 0) {
 				if (arg2.NullChar) {
-					CurrsorMesh.Asset.Draw(index.ToString() + Pointer.id.ToString(), Material.Asset, Matrix.TS(new Vector3f(0.01f, 0.5f), new Vector3f(0.1f, 1.1f, 0.01f)) * arg1, arg2.color * Tint.Value, Entity.UIRect?.ZDepth ?? 0);
+					CurrsorMesh.Asset.Draw(index.ToString() + Pointer.id.ToString(), Material.Asset, Matrix.TS(new Vector3f(0.01f, 0.5f), new Vector3f(0.1f, 1.1f, 0.01f)) * arg1, arg2.color * Tint.Value, (Entity.UIRect?.ZDepth ?? 0) + 1151);
 				}
 				else {
-					CurrsorMesh.Asset.Draw(index.ToString() + Pointer.id.ToString(), Material.Asset, Matrix.TS(new Vector3f(0.01f, 0.5f), new Vector3f(0.1f, 1.1f, 0.01f)) * arg1, arg2.color * Tint.Value, Entity.UIRect?.ZDepth ?? 0);
+					CurrsorMesh.Asset.Draw(index.ToString() + Pointer.id.ToString(), Material.Asset, Matrix.TS(new Vector3f(0.01f, 0.5f), new Vector3f(0.1f, 1.1f, 0.01f)) * arg1, arg2.color * Tint.Value, (Entity.UIRect?.ZDepth ?? 0) + 1151);
 				}
 			}
 			else {
@@ -106,7 +106,7 @@ namespace RhuEngine.Components
 					return;
 				}
 				if (!arg2.NullChar) {
-					CurrsorMesh.Asset.Draw(index.ToString() + Pointer.id.ToString(), Material.Asset, Matrix.TS(new Vector3f(-(arg2.textsize.x * 10 / 2), 0.55f), new Vector3f((arg2.textsize.x * 10) + 0.1f, 1.2f, 0.01f)) * arg1, arg2.color * Tint.Value, Entity.UIRect?.ZDepth ?? 0);
+					CurrsorMesh.Asset.Draw(index.ToString() + Pointer.id.ToString(), Material.Asset, Matrix.TS(new Vector3f(-(arg2.textsize.x * 10 / 2), 0.55f), new Vector3f((arg2.textsize.x * 10) + 0.1f, 1.2f, 0.01f)) * arg1, arg2.color * Tint.Value, (Entity.UIRect?.ZDepth ?? 0) + 1151);
 				}
 			}
 
