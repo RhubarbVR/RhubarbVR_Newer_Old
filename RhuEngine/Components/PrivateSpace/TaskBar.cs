@@ -250,6 +250,11 @@ namespace RhuEngine.Components
 
 			var uitext = text.AttachComponent<UIText>();
 			uitext.Text.Value = taskBarItem.Name;
+			if (taskBarItem.LocalName) {
+				var local = text.AttachComponent<StandardLocale>();
+				local.TargetValue.Target = uitext.Text;
+				local.Key.Value = taskBarItem.Name;
+			}
 			uitext.VerticalAlien.Value = EVerticalAlien.Center;
 			uitext.HorizontalAlien.Value = EHorizontalAlien.Middle;
 			if (taskBarItem.ShowOpenFlag) {

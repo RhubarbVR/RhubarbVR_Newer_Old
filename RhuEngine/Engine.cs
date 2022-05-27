@@ -28,6 +28,8 @@ namespace RhuEngine
 
 		public readonly bool _forceFlatscreen = false;
 
+		public readonly bool _buildMissingLocal = false;
+
 		public readonly bool _noVRSim = true;
 
 		private readonly string _cachePathOverRide = null;
@@ -66,6 +68,7 @@ namespace RhuEngine
 			}
 			MainEngine = this;
 			string error = null;
+			_buildMissingLocal = arg.Any((v) => v.ToLower() == "--build-missing-local") | arg.Any((v) => v.ToLower() == "-build-missing-local") | arg.Any((v) => v.ToLower() == "-buildmissinglocal");
 			_forceFlatscreen = arg.Any((v) => v.ToLower() == "--no-vr") | arg.Any((v) => v.ToLower() == "-no-vr") | arg.Any((v) => v.ToLower() == "-novr");
 			_noVRSim = !(arg.Any((v) => v.ToLower() == "--vr-sim") | arg.Any((v) => v.ToLower() == "-vr-sim") | arg.Any((v) => v.ToLower() == "-vrsim"));
 			DebugVisuals = arg.Any((v) => v.ToLower() == "--debug-visuals") | arg.Any((v) => v.ToLower() == "-debug-visuals") | arg.Any((v) => v.ToLower() == "-debugvisuals");
@@ -192,6 +195,8 @@ namespace RhuEngine
 
 		public InputManager inputManager = new();
 
+		public LocalisationManager localisationManager = new();
+
 		public MainSettingsObject MainSettings;
 
 		public OutputCapture outputCapture;
@@ -221,7 +226,7 @@ namespace RhuEngine
 				netApiManager = new NetApiManager(_userDataPathOverRide);
 				IntMsg = "Building AssetManager";
 				assetManager = new AssetManager(_cachePathOverRide);
-				_managers = new IManager[] { inputManager, netApiManager, assetManager, worldManager };
+				_managers = new IManager[] {localisationManager, inputManager, netApiManager, assetManager, worldManager };
 				foreach (var item in _managers) {
 					IntMsg = $"Starting {item.GetType().Name}";
 					try {
@@ -260,12 +265,16 @@ namespace RhuEngine
 			if (EngineStarting) {
 				if (EngineLink.CanRender) {
 					try {
-						var textpos = Matrix.T(Vector3f.Forward * 0.25f) * (EngineLink.CanInput ? RInput.Head.HeadMatrix : Matrix.S(1));
+						var headMat = RInput.Head.HeadMatrix;
+						if (!RWorld.IsInVR) {
+							headMat = Matrix.T(Vector3f.Forward / 10);
+						}
+						var textpos = Matrix.T(Vector3f.Forward * 0.25f) * (EngineLink.CanInput ? headMat : Matrix.S(1));
 						var playerPos = RRenderer.CameraRoot.Translation;
 						_loadingPos += playerPos - _oldPlayerPos;
 						_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
 						_oldPlayerPos = playerPos;
-						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt(EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos));
+						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt(EngineLink.CanInput ? headMat.Translation : Vector3f.Zero, _loadingPos));
 						RText.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0, -0.07f, 0) * rootMatrix);
 						RMesh.Quad.Draw("LoadingUi",LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
 					}

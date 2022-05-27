@@ -19,7 +19,9 @@ namespace RhuEngine.Components.PrivateSpace
 
 		public override RTexture2D Texture => null;
 
-		public override string ProgramName => "Login";
+		public override string ProgramName => "Programs.Login.Name";
+
+		public override bool LocalName => true;
 
 		[Exsposed]
 		public void Click() {
@@ -116,13 +118,13 @@ namespace RhuEngine.Components.PrivateSpace
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public UIText ButtonOneText;
+		public StandardLocale ButtonOneText;
 
 		[NoSave]
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public UIText ButtonTwoText;
+		public StandardLocale ButtonTwoText;
 
 		
 		[Exsposed]
@@ -137,15 +139,15 @@ namespace RhuEngine.Components.PrivateSpace
 			RegScreen = !RegScreen;
 			RegEntiyOne.enabled.Value = RegScreen;
 			RegEntiyTwo.enabled.Value = RegScreen;
-			ButtonOneText.Text.Value = RegScreen ? "SignUp" : "Login";
-			ButtonTwoText.Text.Value = RegScreen ? "Login" : "SignUp";
+			ButtonOneText.Key.Value = RegScreen ? "Programs.Login.Register" : "Programs.Login.Login";
+			ButtonTwoText.Key.Value = RegScreen ? "Programs.Login.Login" : "Programs.Login.Register";
 		}
 		
 		public override void LoadUI(Entity uiRoot) {
 			window.CloseButton.Value = false;
 			var ma = uiRoot.AttachComponent<UIRect>();
 			var mit = window.MainMit.Target;
-			var uiBuilder = new UIBuilder(uiRoot, mit, ma);
+			var uiBuilder = new UIBuilder(uiRoot, mit, ma,true);
 			uiBuilder.PushRect(new Vector2f(0.5f,0.6f), new Vector2f(0.5f, 0.6f),0);
 			var windowSize = new Vector2f(2.5f, 3.25f);
 			var buttonColor = new Colorf(0.1f, 0.8f);
@@ -165,7 +167,7 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(new Vector2f(0, 0), new Vector2f(0.5, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			uiBuilder.AddButton(false, buttonColor).ButtonEvent.Target = MainButton;
-			ButtonOneText = uiBuilder.AddText("Login");
+			ButtonOneText = uiBuilder.AddTextWithLocal("Programs.Login.LoginButton");
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
@@ -173,7 +175,7 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(new Vector2f(0.5, 0), new Vector2f(1, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			uiBuilder.AddButton(false, buttonColor).ButtonEvent.Target = ToggleButton;
-			ButtonTwoText = uiBuilder.AddText("Register");
+			ButtonTwoText = uiBuilder.AddTextWithLocal("Programs.Login.Register");
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
@@ -182,7 +184,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PushRect();
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			var Confirmpassword = uiBuilder.AddTextEditor("Confirm Password", buttonColor);
+			var Confirmpassword = uiBuilder.AddTextEditor("Programs.Login.ConfirmPassword", buttonColor);
 			Confirmpassword.Item1.Password.Value = true;
 			ConfPassword = Confirmpassword.Item1;
 			uiBuilder.PopRect();
@@ -192,7 +194,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PushRect();
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			var password = uiBuilder.AddTextEditor("Password", buttonColor);
+			var password = uiBuilder.AddTextEditor("Programs.Login.Password", buttonColor);
 			password.Item1.Password.Value = true;
 			Password = password.Item1;
 			uiBuilder.PopRect();
@@ -201,14 +203,14 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PushRect();
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			Email = uiBuilder.AddTextEditor("Email", buttonColor).Item1;
+			Email = uiBuilder.AddTextEditor("Programs.Login.Email", buttonColor).Item1;
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 
 			uiBuilder.PushRect();
 
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			UserName = uiBuilder.AddTextEditor("Username", buttonColor).Item1;
+			UserName = uiBuilder.AddTextEditor("Programs.Login.Username", buttonColor).Item1;
 			RegEntiyTwo = uiBuilder.CurretRectEntity;
 			RegEntiyTwo.enabled.Value = false;
 			uiBuilder.PopRect();
@@ -221,7 +223,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PushRect();
 			//Error
-			ErrorText = uiBuilder.AddText("<colorred>");
+			ErrorText = uiBuilder.AddText("<colorred>",null,null,null,true);
 			uiBuilder.PopRect();
 		}
 	}

@@ -180,6 +180,11 @@ namespace RhuEngine.Components
 					var data = smartCommand.Substring(6 + (haseq ? 1 : 0));
 					color.Push(Colorf.Parse(data));
 				}
+				else if(smartCommand.StartsWith("<colour")) {
+					AddNullText(command.Length + 1);
+					var data = smartCommand.Substring(7 + (haseq ? 1 : 0));
+					color.Push(Colorf.Parse(data));
+				}
 				else if (smartCommand.StartsWith("<style")) {
 					AddNullText(command.Length + 1);
 					var data = smartCommand.Substring(6 + (haseq ? 1 : 0));
@@ -204,6 +209,15 @@ namespace RhuEngine.Components
 					catch { }
 				}
 				else if (smartCommand.StartsWith("</color") || smartCommand.StartsWith("<\\color")) {
+					AddNullText(command.Length + 1);
+					try {
+						if (color.Count != 1) {
+							color.Pop();
+						}
+					}
+					catch { }
+				}
+				else if (smartCommand.StartsWith("</colour") || smartCommand.StartsWith("<\\color")) {
 					AddNullText(command.Length + 1);
 					try {
 						if (color.Count != 1) {

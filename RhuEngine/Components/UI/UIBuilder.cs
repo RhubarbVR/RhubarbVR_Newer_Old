@@ -15,17 +15,20 @@ namespace RhuEngine.Components
 		public Stack<Entity> RectEntityStack = new();
 		public Stack<UIRect> RectStack = new();
 
-		public UIRect CurrentRect { get=> RectStack.Peek(); set=> RectStack.Push(value); }
+		public UIRect CurrentRect { get => RectStack.Peek(); set => RectStack.Push(value); }
 
 		public Entity CurretRectEntity { get => RectEntityStack.Peek(); set => RectEntityStack.Push(value); }
-		
+
 		public void PopRect() {
 			RectEntityStack.Pop();
 			RectStack.Pop();
 		}
 		public Entity Root { get; }
 
-		public UIBuilder(Entity entity, AssetProvider<RMaterial> mainMit, UIRect firstRect = null) {
+		public bool AddLocal;
+
+		public UIBuilder(Entity entity, AssetProvider<RMaterial> mainMit, UIRect firstRect = null, bool addLocal = false) {
+			AddLocal = addLocal;
 			Root = entity;
 			CurretRectEntity = entity;
 			if (firstRect is null) {
@@ -39,15 +42,15 @@ namespace RhuEngine.Components
 			return CurretRectEntity.AttachComponent<T>();
 		}
 
-		public UIRect PushRect(Vector2f? min = null, Vector2f? max = null,float? Depth = null) { 
+		public UIRect PushRect(Vector2f? min = null, Vector2f? max = null, float? Depth = null) {
 			return AttachChildRect<UIRect>(min, max, Depth);
 		}
 
-		public T AttachChildRect<T>(Vector2f? min = null, Vector2f? max = null, float? Depth = null) where T : UIRect,new() {
+		public T AttachChildRect<T>(Vector2f? min = null, Vector2f? max = null, float? Depth = null) where T : UIRect, new() {
 			CurretRectEntity = CurretRectEntity.AddChild("ChildRect");
 			var comp = AttachComponentToStack<T>();
 			if (min is not null) {
-				comp.AnchorMin.Value = min??Vector2f.Zero;
+				comp.AnchorMin.Value = min ?? Vector2f.Zero;
 			}
 			if (max is not null) {
 				comp.AnchorMax.Value = max ?? Vector2f.One;
@@ -59,7 +62,7 @@ namespace RhuEngine.Components
 			return comp;
 		}
 
-		public void AddSprit(Vector2i min,Vector2i max,IAssetProvider<RMaterial> asset,SpriteProvder psprite) {
+		public void AddSprit(Vector2i min, Vector2i max, IAssetProvider<RMaterial> asset, SpriteProvder psprite) {
 			var sprite = AttachComponentToStack<UISprite>();
 			sprite.PosMax.Value = max;
 			sprite.PosMin.Value = min;
@@ -91,11 +94,33 @@ namespace RhuEngine.Components
 				CurrentRect.OffsetLocalMax.Value = max ?? Vector2f.Zero;
 			}
 		}
-
-		public UIText AddText(string text, float? size = null,Colorf ? color = null,FontStyle? fontStyle = null) {
+		public StandardLocale AddTextWithLocal(string text, float? size = null, Colorf? color = null, FontStyle? fontStyle = null) {
 			var uitext = AttachComponentToStack<UIText>();
+			var local = AttachComponentToStack<StandardLocale>();
+			local.Key.Value = text;
+			local.TargetValue.Target = uitext.Text;
+			if (size is not null) {
+				uitext.StatingSize.Value = size ?? 0;
+			}
+			if (color is not null) {
+				uitext.StartingColor.Value = color ?? Colorf.White;
+			}
+			if (fontStyle is not null) {
+				uitext.StartingStyle.Value = fontStyle ?? FontStyle.Regular;
+			}
+			return local;
+		}
+
+		public UIText AddText(string text, float? size = null, Colorf? color = null, FontStyle? fontStyle = null, bool removeLocal = false) {
+			var uitext = AttachComponentToStack<UIText>();
+
 			uitext.Text.Value = text;
-			if(size is not null) {
+			if (AddLocal && !removeLocal) {
+				var local = AttachComponentToStack<StandardLocale>();
+				local.Key.Value = text;
+				local.TargetValue.Target = uitext.Text;
+			}
+			if (size is not null) {
 				uitext.StatingSize.Value = size ?? 0;
 			}
 			if (color is not null) {
@@ -107,12 +132,12 @@ namespace RhuEngine.Components
 			return uitext;
 		}
 
-		public void AddRectangle(Colorf? color = null,bool? fullbox = null) {
+		public void AddRectangle(Colorf? color = null, bool? fullbox = null) {
 			var rectangle = AttachComponentToStack<UIRectangle>();
 			rectangle.Material.Target = MainMit;
 			if (color is not null) {
 				rectangle.Tint.Value = color ?? Colorf.White;
-			} 
+			}
 			if (fullbox is not null) {
 				rectangle.FullBox.Value = fullbox ?? false;
 			}
@@ -124,7 +149,7 @@ namespace RhuEngine.Components
 		/// <param name="onPressing">Needs to be a method with the <see cref="ExsposedAttribute"/></param>
 		/// <param name="onReleases">Needs to be a method with the <see cref="ExsposedAttribute"/></param>
 		/// <param name="autoPop">Auto reset the stack after the button</param>
-		public (UIButtonInteraction,ButtonEventManager) AddButtonEvent(Action onClick = null, Action onPressing = null, Action onReleases = null, bool autoPop = true, Colorf? color = null, bool? fullbox = null, Vector2f? min = null, Vector2f? max = null) {
+		public (UIButtonInteraction, ButtonEventManager) AddButtonEvent(Action onClick = null, Action onPressing = null, Action onReleases = null, bool autoPop = true, Colorf? color = null, bool? fullbox = null, Vector2f? min = null, Vector2f? max = null) {
 			AttachChildRect<UIRect>(min, max);
 			AddRectangle(color, fullbox);
 			var buttonInteraction = AttachComponentToStack<UIButtonInteraction>();
@@ -145,9 +170,9 @@ namespace RhuEngine.Components
 			return (buttonInteraction, enevents);
 		}
 
-		public UIButtonInteraction AddButton(bool autoPop = true,Colorf? color = null,bool? fullbox = null,Vector2f ? min = null, Vector2f? max = null) {
-			AttachChildRect<UIRect>(min,max);
-			AddRectangle(color,fullbox);
+		public UIButtonInteraction AddButton(bool autoPop = true, Colorf? color = null, bool? fullbox = null, Vector2f? min = null, Vector2f? max = null) {
+			AttachChildRect<UIRect>(min, max);
+			AddRectangle(color, fullbox);
 			var buttonInteraction = AttachComponentToStack<UIButtonInteraction>();
 			if (autoPop) {
 				PopRect();
@@ -155,10 +180,15 @@ namespace RhuEngine.Components
 			return buttonInteraction;
 		}
 
-		public (UIText,UITextEditorInteraction,UITextCurrsor,Sync<string>) AddTextEditor(string emptytext = "This Is Input", Colorf? buttoncolor = null,string defaultString = "", float? size = null, Colorf? color = null, FontStyle? fontStyle = null, Vector2f? min = null, Vector2f? max = null) {
+		public (UIText, UITextEditorInteraction, UITextCurrsor, Sync<string>) AddTextEditor(string emptytext = "This Is Input", Colorf? buttoncolor = null, string defaultString = "", float? size = null, Colorf? color = null, FontStyle? fontStyle = null, Vector2f? min = null, Vector2f? max = null) {
 			var button = AddButtonEvent(null, null, null, false, buttoncolor, null, min, max);
-			var uitext = AddText(defaultString, size, color, fontStyle);
+			var uitext = AddText(defaultString, size, color, fontStyle, true);
 			uitext.EmptyString.Value = emptytext;
+			if (AddLocal) {
+				var local = AttachComponentToStack<StandardLocale>();
+				local.Key.Value = emptytext;
+				local.TargetValue.Target = uitext.EmptyString;
+			}
 			var editor = AttachComponentToStack<UITextEditorInteraction>();
 			editor.Value.Target = uitext.Text;
 			button.Item2.Click.Target = editor.EditingClick;
@@ -167,7 +197,7 @@ namespace RhuEngine.Components
 			currsor.TextComp.Target = uitext;
 			currsor.Material.Target = MainMit;
 			PopRect();
-			return (uitext, editor, currsor,uitext.Text);
+			return (uitext, editor, currsor, uitext.Text);
 		}
 	}
 }

@@ -79,11 +79,12 @@ namespace RhuEngine.WorldObjects
 					_target = value;
 					BroadcastValue();
 					Bind();
-					Changed?.Invoke(this);
-					OnChanged();
 				}
+				OnChanged();
+				Changed?.Invoke(this);
 			}
 		}
+
 		public event Action<IChangeable> Changed;
 
 		public virtual void Bind() {

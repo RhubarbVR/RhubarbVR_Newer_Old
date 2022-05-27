@@ -175,6 +175,7 @@ namespace RhuEngine.WorldObjects
 							}
 						}
 						if (typeof(IChangeable).IsAssignableFrom(item.FieldType)) {
+							//RLog.Info($"Loaded Change Field {GetType().GetFormattedName()} , {item.Name} type {item.FieldType.GetFormattedName()}");
 							var startValue = item.GetCustomAttribute<OnChangedAttribute>();
 							if (startValue != null) {
 								var method = GetType().GetMethod(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);

@@ -27,6 +27,8 @@ namespace RhuEngine.Components.PrivateSpace
 
 		public string Name => target.SessionName.Value;
 
+		public bool LocalName => false;
+
 		public void Clicked() {
 			if (target.Focus != World.FocusLevel.Focused) {
 				target.Focus = World.FocusLevel.Focused;
@@ -52,6 +54,7 @@ namespace RhuEngine.Components.PrivateSpace
 				Icon = program.Icon;
 				Texture = program.Texture;
 				Name = program.ProgramName;
+				LocalName = program.LocalName;
 			}
 		}
 		public ProgramTaskBarItem(TaskBar taskBar, Type programLink) {
@@ -64,6 +67,7 @@ namespace RhuEngine.Components.PrivateSpace
 				Texture = program.Texture;
 				Name = program.ProgramName;
 				ProgramType = programLink;
+				LocalName = program.LocalName;
 			}
 			else {
 				throw new Exception("Not a program");
@@ -78,6 +82,7 @@ namespace RhuEngine.Components.PrivateSpace
 		public RTexture2D Texture { get; set; }
 
 		public string Name { get; set; }
+		public bool LocalName { get; set; }
 
 		public void Clicked() {
 			if(Program is null) {
@@ -101,6 +106,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 		public string Name { get; }
 
+		public bool LocalName { get; }
 		public void Clicked();
 	}
 }

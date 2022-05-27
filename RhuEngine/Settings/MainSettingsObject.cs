@@ -12,5 +12,8 @@ namespace RhuEngine.Settings
 		public InputSettingsObject InputSettings = new();
 		[SettingsField("UI Settings")]
 		public UISettingsObject UISettings = new();
+
+		[SettingsField("Three Letter Language Name")]
+		public string ThreeLetterLanguageName = null;
 	}
 }

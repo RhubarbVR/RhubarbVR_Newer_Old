@@ -85,4 +85,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Res\Icons.png" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Locales\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

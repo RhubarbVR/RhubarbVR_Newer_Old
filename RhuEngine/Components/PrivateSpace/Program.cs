@@ -41,6 +41,8 @@ namespace RhuEngine.Components
 
 		public abstract string ProgramName { get; }
 
+		public abstract bool LocalName { get; }
+
 		public void IntProgram() {
 			World.DrawDebugText(taskBar.Entity.GlobalTrans, new Vector3f(0,1,-1), Vector3f.One, Colorf.Green,"Program Loaded", 5);
 			window = Entity.AttachComponent<Window>();
@@ -48,6 +50,11 @@ namespace RhuEngine.Components
 			window.OnClose.Target = Close;
 			window.PinChanged.Target = OnPin;
 			window.NameValue.Value = ProgramName;
+			if (LocalName) {
+				var local = Entity.AttachComponent<StandardLocale>();
+				local.TargetValue.Target = window.NameValue;
+				local.Key.Value = ProgramName;
+			}
 			LoadUI(window.PannelRoot.Target);
 			BringToMe();
 		}
