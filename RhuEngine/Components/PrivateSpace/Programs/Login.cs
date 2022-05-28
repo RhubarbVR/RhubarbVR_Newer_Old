@@ -11,7 +11,8 @@ using RNumerics;
 
 namespace RhuEngine.Components.PrivateSpace
 {
-	public class Login : Program
+	[RemoveFromProgramList]
+	public class LoginProgram : Program
 	{
 		public override string ProgramID => "LoginScreen";
 
@@ -152,12 +153,12 @@ namespace RhuEngine.Components.PrivateSpace
 			var windowSize = new Vector2f(2.5f, 3.25f);
 			var buttonColor = new Colorf(0.1f, 0.8f);
 			uiBuilder.SetOffsetMinMax(-windowSize, windowSize);
-			uiBuilder.PushRect(new Vector2f(0, 0.75f), new Vector2f(1, 1),0);
+			uiBuilder.PushRect(new Vector2f(0, 0.85f), new Vector2f(1, 1),0);
 			uiBuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f),0);
 			uiBuilder.AddSprit(new Vector2i(11, 0), new Vector2i(11, 0), window.IconMit.Target, window.IconSprite.Target);
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
-			uiBuilder.PushRect(new Vector2f(0, 0), new Vector2f(1, 0.75f),0);
+			uiBuilder.PushRect(new Vector2f(0, 0), new Vector2f(1, 0.85f),0);
 			uiBuilder.PushRect(new Vector2f(0.01f), new Vector2f(0.99f),0);
 			var list = uiBuilder.AttachChildRect<VerticalList>();
 			list.Fit.Value = true;
@@ -167,7 +168,9 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(new Vector2f(0, 0), new Vector2f(0.5, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			uiBuilder.AddButton(false, buttonColor).ButtonEvent.Target = MainButton;
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			ButtonOneText = uiBuilder.AddTextWithLocal("Programs.Login.LoginButton");
+			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
@@ -175,10 +178,16 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(new Vector2f(0.5, 0), new Vector2f(1, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			uiBuilder.AddButton(false, buttonColor).ButtonEvent.Target = ToggleButton;
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			ButtonTwoText = uiBuilder.AddTextWithLocal("Programs.Login.Register");
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
+			uiBuilder.PopRect();
+			uiBuilder.PopRect();
+
+			var minclamp = new Vector2f(1,float.MinValue);
+			uiBuilder.PushRect();
 			uiBuilder.PopRect();
 
 
@@ -190,6 +199,8 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PopRect();
 			RegEntiyOne = uiBuilder.CurretRectEntity;
 			RegEntiyOne.enabled.Value = false;
+			ConfPassword.HorizontalAlien.Value = EHorizontalAlien.Left;
+			ConfPassword.MinClamp.Value = minclamp;
 			uiBuilder.PopRect();
 
 			uiBuilder.PushRect();
@@ -197,6 +208,8 @@ namespace RhuEngine.Components.PrivateSpace
 			var password = uiBuilder.AddTextEditor("Programs.Login.Password", buttonColor);
 			password.Item1.Password.Value = true;
 			Password = password.Item1;
+			password.Item1.HorizontalAlien.Value = EHorizontalAlien.Left;
+			password.Item1.MinClamp.Value = minclamp;
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 
@@ -204,6 +217,8 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect();
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			Email = uiBuilder.AddTextEditor("Programs.Login.Email", buttonColor).Item1;
+			Email.HorizontalAlien.Value = EHorizontalAlien.Left;
+			Email.MinClamp.Value = minclamp;
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 
@@ -213,6 +228,8 @@ namespace RhuEngine.Components.PrivateSpace
 			UserName = uiBuilder.AddTextEditor("Programs.Login.Username", buttonColor).Item1;
 			RegEntiyTwo = uiBuilder.CurretRectEntity;
 			RegEntiyTwo.enabled.Value = false;
+			UserName.HorizontalAlien.Value = EHorizontalAlien.Left;
+			UserName.MinClamp.Value = minclamp;
 			uiBuilder.PopRect();
 
 			uiBuilder.PopRect();

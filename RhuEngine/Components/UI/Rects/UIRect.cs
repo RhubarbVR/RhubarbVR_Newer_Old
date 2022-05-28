@@ -283,7 +283,7 @@ namespace RhuEngine.Components
 		Vector2f _cachedMin;
 		Vector2f _cachedMax;
 		Vector2f _cachedBadMin;
-		int _cachedZDepth;
+
 		public void UpdateMinMax() {
 			UpdateMinMaxNoPross();
 			RegUpdateUIMeshes();
@@ -292,14 +292,14 @@ namespace RhuEngine.Components
 			_cachedBadMin = CompBadMin;
 			_cachedMin = CompMin;
 			_cachedMax = CompMax;
-			_cachedZDepth = CompZDepth;
+			ZDepth = CompZDepth;
 			_childRects.SafeOperation((list) => {
 				foreach (var item in list) {
 					item.UpdateMinMaxNoPross();
 				}
 			});
 		}
-		public int ZDepth => _cachedZDepth;
+		public int ZDepth { get; private set; }
 
 		public int CompZDepth => ((_rectDataOverride ?? ParentRect)?.ZDepth??0) + 1;
 

@@ -70,6 +70,16 @@ namespace RhuEngine.Components
 			sprite.Sprite.Target = psprite;
 		}
 
+		public (UIImage, DynamicMaterial) AddImg(IAssetProvider<RTexture2D> assetProvider) {
+			var img = AttachComponentToStack<UIImage>();
+			var imgmit = AttachComponentToStack<DynamicMaterial>();
+			imgmit.shader.Target = Root.World.RootEntity.GetFirstComponentOrAttach<UnlitShader>();
+			img.Texture.Target = assetProvider;
+			img.Material.Target = imgmit;
+			imgmit.MainTexture = assetProvider;
+			return (img, imgmit);
+		}
+
 		public void SetAnchorMinMax(Vector2f? min = null, Vector2f? max = null) {
 			if (min is not null) {
 				CurrentRect.AnchorMin.Value = min ?? Vector2f.Zero;
@@ -182,6 +192,7 @@ namespace RhuEngine.Components
 
 		public (UIText, UITextEditorInteraction, UITextCurrsor, Sync<string>) AddTextEditor(string emptytext = "This Is Input", Colorf? buttoncolor = null, string defaultString = "", float? size = null, Colorf? color = null, FontStyle? fontStyle = null, Vector2f? min = null, Vector2f? max = null) {
 			var button = AddButtonEvent(null, null, null, false, buttoncolor, null, min, max);
+			PushRect(new Vector2f(0.1f), new Vector2f(0.9f),0);
 			var uitext = AddText(defaultString, size, color, fontStyle, true);
 			uitext.EmptyString.Value = emptytext;
 			if (AddLocal) {
@@ -196,6 +207,7 @@ namespace RhuEngine.Components
 			currsor.TextCurrsor.Target = editor;
 			currsor.TextComp.Target = uitext;
 			currsor.Material.Target = MainMit;
+			PopRect();
 			PopRect();
 			return (uitext, editor, currsor, uitext.Text);
 		}

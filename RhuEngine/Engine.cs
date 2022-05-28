@@ -299,6 +299,12 @@ namespace RhuEngine
 			RWorld.RunOnEndOfFrame();
 		}
 
+		public event Action OnCloseEngine;
+
+		public void Close() {
+			OnCloseEngine?.Invoke();
+		}
+
 		public void Dispose() {
 			RLog.Info("Engine Disposed");
 			SaveSettings();

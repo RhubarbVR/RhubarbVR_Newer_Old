@@ -135,6 +135,13 @@
     "Programs.Login.ConfirmPassword": "Confirm Password",
     "Programs.Login.Password": "Password",
     "Programs.Login.Email": "Email",
-    "Programs.Login.Username": "Username"
+    "Programs.Login.Username": "Username",
+
+    "Programs.Settings.Name": "Settings",
+
+
+    "Programs.FileExplorer.Name": "File Explorer"
+
+
   }
 }

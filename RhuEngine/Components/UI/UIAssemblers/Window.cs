@@ -144,7 +144,10 @@ namespace RhuEngine.Components
 			var headerTextSide = header.AddChild("HeaderTextSide");
 			var headerTextSiderect = headerTextSide.AttachComponent<UIRect>();
 			headerTextSiderect.OffsetMax.Value -= new Vector2f(HeaderHeight.Value * 4, 0);
-			
+			headerTextSide = headerTextSide.AddChild("HeaderTextSide");
+			var rectoffset = headerTextSide.AttachComponent<UIRect>();
+			rectoffset.AnchorMax.Value = new Vector2f(0.9f);
+			rectoffset.AnchorMin.Value = new Vector2f(0.1f);
 			var text = headerTextSide.AttachComponent<UIText>();
 			NameLink.Target = text.Text;
 			text.VerticalAlien.Value = EVerticalAlien.Bottom;

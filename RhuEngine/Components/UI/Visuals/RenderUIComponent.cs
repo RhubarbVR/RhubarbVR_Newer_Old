@@ -152,5 +152,11 @@ namespace RhuEngine.Components
 				RenderMainMesh(updateMesh, PhysicsMesh);
 			}
 		}
+
+		public override void Dispose() {
+			base.Dispose();
+			PhysicsCollider?.Remove();
+			PhysicsCollider = null;
+		}
 	}
 }

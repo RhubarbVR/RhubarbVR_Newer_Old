@@ -16,6 +16,10 @@ using RhuEngine.Components.PrivateSpace;
 
 namespace RhuEngine.Components
 {
+	public class RemoveFromProgramListAttribute : Attribute {
+
+	}
+
 	[PrivateSpaceOnly]
 	public abstract class Program : Component
 	{

@@ -296,6 +296,8 @@ namespace RhuEngine.Components
 			StartEntity = mainentity.AddChild("Start");
 			var startrect = StartEntity.AttachComponent<UIRect>();
 			startrect.AnchorMax.Value = new Vector2f(0.3f, 1f);
+			var min = StartEntity.AttachComponent<StartMenu>();
+			min.BuildStart(this,startrect, mit, iconMit, sprite);
 			var img = StartEntity.AttachComponent<UIRectangle>();
 			img.Tint.Value = new Colorf(0, 0, 0, 0.9f);
 			img.Material.Target = mit;
@@ -430,9 +432,28 @@ namespace RhuEngine.Components
 			text.StartingColor.Value = Colorf.White;
 
 			if (!Engine.netApiManager.IsLoggedIn) {
-				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(Login)));
+				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(LoginProgram)));
 			}
 			WorldManager.OnWorldUpdateTaskBar += RegTaskBarItemsUpdate;
+		}
+
+		public T HasProgramOpen<T>() where T : Program {
+			foreach (var item in programs) {
+				if(item.GetType() == typeof(T)) {
+					return (T)item;
+				} 
+			}
+			return null;
+		}
+
+		public T OpenProgram<T>(bool forceOpen = false) where T:Program {
+			if (!forceOpen) {
+				var lastProgram = HasProgramOpen<T>();
+				if(lastProgram is not null) {
+					return lastProgram;
+				}
+			}
+			return (T)OpenProgram(typeof(T).GetFormattedName(), typeof(T));
 		}
 
 		public Program OpenProgram(string name, Type programType) {

@@ -14,9 +14,12 @@ namespace RhuEngine.Components
 
 		public SafeList<TextChar> Chars = new();
 
-		public float Width => axisAlignedBox3F.Width + 0.05f;
+		public Vector2f MinClamp = Vector2f.MinValue;
 
-		public float Height => axisAlignedBox3F.Height + 0.05f;
+		public Vector2f MaxClamp = Vector2f.MaxValue;
+		public float Width => MathUtil.Clamp(axisAlignedBox3F.Width + 0.05f, MinClamp.x, MaxClamp.x);
+
+		public float Height => MathUtil.Clamp(axisAlignedBox3F.Height + 0.05f, MinClamp.y,MaxClamp.y);
 
 		public AxisAlignedBox3f axisAlignedBox3F = AxisAlignedBox3f.Zero;
 
