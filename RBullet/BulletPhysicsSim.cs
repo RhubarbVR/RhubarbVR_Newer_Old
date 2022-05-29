@@ -21,17 +21,17 @@ namespace RBullet
 		public readonly SequentialImpulseConstraintSolverMultiThreaded _parallelSolver;
 
 		public BPhysicsSim() {
-			var collisionConfigurationInfo = new DefaultCollisionConstructionInfo {
-				DefaultMaxPersistentManifoldPoolSize = 80000,
-				DefaultMaxCollisionAlgorithmPoolSize = 80000
-			};
-			_collisionConfiguration = new DefaultCollisionConfiguration(collisionConfigurationInfo);
+			//var collisionConfigurationInfo = new DefaultCollisionConstructionInfo {
+			//	DefaultMaxPersistentManifoldPoolSize = 80000,
+			//	DefaultMaxCollisionAlgorithmPoolSize = 80000
+			//};
+			_collisionConfiguration = new DefaultCollisionConfiguration();
 			_dispatcher = new CollisionDispatcher(_collisionConfiguration);
 			_broadphase = new DbvtBroadphase();
 			_solverPool = new ConstraintSolverPoolMultiThreaded(Math.Min(Environment.ProcessorCount - 1,1));
 			_parallelSolver = new SequentialImpulseConstraintSolverMultiThreaded();
 			_physicsWorld = new DiscreteDynamicsWorldMultiThreaded(_dispatcher, _broadphase, _solverPool, _parallelSolver, _collisionConfiguration);
-			collisionConfigurationInfo.Dispose();
+			//collisionConfigurationInfo.Dispose();
 		}
 
 		public SafeList<BRigidBodyCollider> Updates = new SafeList<BRigidBodyCollider>();
