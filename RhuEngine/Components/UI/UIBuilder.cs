@@ -174,6 +174,7 @@ namespace RhuEngine.Components
 		public void AddRectangle(float coloroffset = 0, float alpha = 1, bool? fullbox = null) {
 			var rectangle = AttachComponentToStack<UIRectangle>();
 			rectangle.Material.Target = MainMit;
+			rectangle.AddRoundingSettings();
 			var colorassing = AttachComponentToStack<UIColorAssign>();
 			colorassing.ColorShif.Value = coloroffset;
 			colorassing.Alpha.Value = alpha;

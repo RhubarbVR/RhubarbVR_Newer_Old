@@ -264,7 +264,7 @@ namespace RhuEngine
 				var cubeHolder = entity.AddChild("CubeHolder");
 				cubeHolder.rotation.Value = Quaternionf.CreateFromEuler(NextFloat() * 180, NextFloat() * 180, NextFloat() * 180);
 				var cube = cubeHolder.AddChild("Cube");
-				cube.position.Value = new Vector3f(0, 2, 0);
+				cube.position.Value = new Vector3f(0, 6, 0);
 				cube.scale.Value = new Vector3f(0.5f, 0.5f, 0.5f);
 				AttachRender(boxMesh, mit, cube, color);
 			}
