@@ -134,6 +134,13 @@
       "Programs.Login.ConfirmPassword": "Wachtwoord bevestigen",
       "Programs.Login.Password": "Wachtwoord",
       "Programs.Login.Email": "Email",
-      "Programs.Login.Username": "Gebruikersnaam"
+      "Programs.Login.Username": "Gebruikersnaam",
+
+      "Programs.Settings.Name": "Instellingen",
+
+
+      "Programs.FileExplorer.Name": "Bestand verkenner",
+      "Programs.FileExplorer.Path": "Pad"
+
     }
   }
