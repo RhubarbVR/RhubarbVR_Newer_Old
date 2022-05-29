@@ -28,7 +28,7 @@ namespace RhuEngine.Components.PrivateSpace
 			var mit = window.MainMit.Target;
 			var uiBuilder = new UIBuilder(uiRoot, mit, ma,true);
 			uiBuilder.PushRect(new Vector2f(.25f), new Vector2f(.75f));
-			uiBuilder.AddRectangle(Colorf.Blue);
+			uiBuilder.AddGenaricCheckBox(window.IconMit.Target, window.IconSprite.Target);
 		}
 	}
 }

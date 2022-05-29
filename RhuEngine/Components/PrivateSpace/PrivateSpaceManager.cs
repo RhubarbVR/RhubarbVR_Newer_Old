@@ -98,7 +98,7 @@ namespace RhuEngine.Components
 			if (world.PhysicsSim.ConvexRayTest(_shape, ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
 				if (collider.CustomObject is RenderUIComponent uIComponent) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-					uIComponent.Rect.AddHitPoses(new HitData { Touchindex = 10, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = RInput.Key(Key.MouseLeft).IsActive() ? 1f : 0f });
+					uIComponent.Rect.AddHitPoses(new HitData { Touchindex = 10, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = RInput.Key(Key.MouseLeft).IsActive() ? 1f : 0f, GripForce = RInput.Key(Key.MouseRight).IsActive() ? 1f : 0f });
 				}
 				return true;
 			}

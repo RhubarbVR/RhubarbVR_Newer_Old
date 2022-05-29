@@ -14,6 +14,7 @@ using RhuEngine.Physics;
 using RhuEngine.WorldObjects;
 using RhuEngine.Components.PrivateSpace;
 using System.Globalization;
+using System.Reflection;
 
 namespace RhuEngine.Components
 {
@@ -167,7 +168,10 @@ namespace RhuEngine.Components
 			rectTwo.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
 			rectTwo.AnchorMax.Value = new Vector2f(0.9f, 0.9f);
 			var img = child.AttachComponent<UIRectangle>();
-			img.Tint.Value = new Colorf(0.1f, 0.1f, 0.1f, 0.5f);
+			var colorassign = child.AttachComponent<UIColorAssign>();
+			colorassign.Alpha.Value = 0.5f;
+			colorassign.ColorShif.Value = 0.5f;
+			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 			img.AddRoundingSettings();
 			var icon = child.AddChild("Icon");
@@ -175,6 +179,11 @@ namespace RhuEngine.Components
 			iconrect.AnchorMin.Value = new Vector2f(PADDING + paddingoffset, PADDING + paddingoffset + yoffset);
 			iconrect.AnchorMax.Value = new Vector2f(1 - (PADDING + paddingoffset), 1 - (PADDING + paddingoffset) + yoffset);
 			var spriterender = icon.AttachComponent<UISprite>();
+			if (iconindex != new Vector2i(16, 0)) {
+				colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
+				colorassign.ColorShif.Value = 1.9f;
+				colorassign.TargetColor.Target = spriterender.Tint;
+			}
 			spriterender.Sprite.Target = sprite;
 			spriterender.Material.Target = iconMit;
 			spriterender.PosMin.Value = iconindex;
@@ -190,7 +199,10 @@ namespace RhuEngine.Components
 			rectTwo.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
 			rectTwo.AnchorMax.Value = new Vector2f(0.9f, 0.9f);
 			var img = child.AttachComponent<UIRectangle>();
-			img.Tint.Value = new Colorf(0.1f, 0.1f, 0.1f, 0.5f);
+			var colorassign = child.AttachComponent<UIColorAssign>();
+			colorassign.Alpha.Value = 0.5f;
+			colorassign.ColorShif.Value = 0.5f;
+			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 			img.AddRoundingSettings();
 			var icon = child.AddChild("Icon");
@@ -219,16 +231,16 @@ namespace RhuEngine.Components
 			TaskBarItems.children.Clear();
 			foreach (var item in Engine.worldManager.worlds) {
 				if (item.Focus is World.FocusLevel.Background or World.FocusLevel.Focused) {
-					AddTaskBarItem(new WorldTaskBarItem(item));
+					AddTaskBarItem(new WorldTaskBarItem(item),"");
 				}
 			}
 			foreach (var item in taskBarItems) {
-				AddTaskBarItem(item);
+				AddTaskBarItem(item, item.ExtraText);
 			}
 		}
 
 
-		public void AddTaskBarItem(ITaskBarItem taskBarItem) {
+		public void AddTaskBarItem(ITaskBarItem taskBarItem,string appenedText) {
 			var element = TaskBarItems.AddChild("listElementHolder");
 			var rect = element.AttachComponent<UIRect>();
 			rect.AnchorMin.Value = Vector2f.Zero;
@@ -250,8 +262,13 @@ namespace RhuEngine.Components
 
 			var uitext = text.AttachComponent<UIText>();
 			uitext.Text.Value = taskBarItem.Name;
+			var colorassign = text.AttachComponent<UIColorAssign>();
+			colorassign.ColorShif.Value = 1.9f;
+			colorassign.TargetColor.Target = uitext.StartingColor;
+
 			if (taskBarItem.LocalName) {
 				var local = text.AttachComponent<StandardLocale>();
+				local.Append.Value = appenedText;
 				local.TargetValue.Target = uitext.Text;
 				local.Key.Value = taskBarItem.Name;
 			}
@@ -264,7 +281,10 @@ namespace RhuEngine.Components
 				openoverlayrect.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
 				openoverlayrect.AnchorMax.Value = new Vector2f(0.9f, 0.15f);
 				var img = openoverlay.AttachComponent<UIRectangle>();
-				img.Tint.Value = new Colorf(0.7f, 0.7f, 0.7f, 0.5f);
+				colorassign = openoverlay.AttachComponent<UIColorAssign>();
+				colorassign.Alpha.Value = 0.5f;
+				colorassign.ColorShif.Value = 0.7f;
+				colorassign.TargetColor.Target = img.Tint;
 				img.Material.Target = mit;
 			}
 		}
@@ -299,7 +319,9 @@ namespace RhuEngine.Components
 			var min = StartEntity.AttachComponent<StartMenu>();
 			min.BuildStart(this,startrect, mit, iconMit, sprite);
 			var img = StartEntity.AttachComponent<UIRectangle>();
-			img.Tint.Value = new Colorf(0, 0, 0, 0.9f);
+			var colorassign = StartEntity.AttachComponent<UIColorAssign>();
+			colorassign.Alpha.Value = 0.9f;
+			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 			img.FullBox.Value = true;
 		}
@@ -310,7 +332,9 @@ namespace RhuEngine.Components
 			startrect.AnchorMax.Value = new Vector2f(0.4f, 0.45f);
 			startrect.AnchorMin.Value = new Vector2f(0.1f, 0f);
 			var img = AudioEntiy.AttachComponent<UIRectangle>();
-			img.Tint.Value = new Colorf(0, 0, 0, 0.9f);
+			var colorassign = AudioEntiy.AttachComponent<UIColorAssign>();
+			colorassign.Alpha.Value = 0.9f;
+			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 			img.FullBox.Value = true;
 		}
@@ -320,7 +344,9 @@ namespace RhuEngine.Components
 			startrect.AnchorMin.Value = new Vector2f(0.7f, 0f);
 
 			var img = NotificationEntiy.AttachComponent<UIRectangle>();
-			img.Tint.Value = new Colorf(0, 0, 0, 0.9f);
+			var colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
+			colorassign.Alpha.Value = 0.9f;
+			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 			img.FullBox.Value = true;
 		}
@@ -369,7 +395,9 @@ namespace RhuEngine.Components
 			mainentity = mainentity.AddChild("scroll");
 			mainentity.AttachComponent<UIRect>();
 			var img = mainentity.AttachComponent<UIRectangle>();
-			img.Tint.Value = new Colorf(0, 0, 0, 0.9f);
+			var colorassign = mainentity.AttachComponent<UIColorAssign>();
+			colorassign.Alpha.Value = 0.9f;
+			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 			
 			var leftSide = mainentity.AddChild("leftSide");
@@ -392,7 +420,10 @@ namespace RhuEngine.Components
 			interaction.AllowOtherZones.Value = true;
 			interaction.OnScroll.Target += list.Scroll;
 			var img4 = listentit.AttachComponent<UIRectangle>();
-			img4.Tint.Value = new Colorf(0.2f, 0.2f, 0.2f, 0.5f);
+			var colorassign2 = listentit.AttachComponent<UIColorAssign>();
+			colorassign2.Alpha.Value = 0.5f;
+			colorassign2.ColorShif.Value = 0.3f;
+			colorassign2.TargetColor.Target = img4.Tint;
 			img4.Material.Target = mit;
 			list.Fit.Value = false;
 			TaskBarItems = listentit;
@@ -407,7 +438,10 @@ namespace RhuEngine.Components
 			rectTwo2.AnchorMin.Value = new Vector2f(0f);
 			rectTwo2.AnchorMax.Value = new Vector2f(0.4f, 1f);
 			img = child.AttachComponent<UIRectangle>();
-			img.Tint.Value = new Colorf(0.1f, 0.1f, 0.1f, 0.5f);
+			colorassign = child.AttachComponent<UIColorAssign>();
+			colorassign.Alpha.Value = 0.5f;
+			colorassign.ColorShif.Value = 0.3f;
+			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 			img.AddRoundingSettings();
 			var icon = child.AddChild("Icon");
@@ -418,6 +452,9 @@ namespace RhuEngine.Components
 			spriterender.Sprite.Target = sprite;
 			spriterender.Material.Target = iconMit;
 			var iconindex = new Vector2i(2, 0);
+			colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
+			colorassign.ColorShif.Value = 1.9f;
+			colorassign.TargetColor.Target = spriterender.Tint;
 			spriterender.PosMin.Value = iconindex;
 			spriterender.PosMax.Value = iconindex;
 			child.AttachComponent<UIButtonInteraction>().ButtonEvent.Target = OpenNotifications;
@@ -429,8 +466,9 @@ namespace RhuEngine.Components
 			var rectTwom = child3.AttachComponent<UIRect>();
 			var text = child3.AttachComponent<UIText>();
 			TimeText.SetLinkerTarget(text.Text);
-			text.StartingColor.Value = Colorf.White;
-
+			colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
+			colorassign.ColorShif.Value = 1.9f;
+			colorassign.TargetColor.Target = text.StartingColor;
 			if (!Engine.netApiManager.IsLoggedIn) {
 				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(LoginProgram)));
 			}
@@ -447,6 +485,7 @@ namespace RhuEngine.Components
 		}
 
 		public T OpenProgram<T>(bool forceOpen = false) where T:Program {
+			forceOpen |= typeof(T).GetCustomAttribute<OpenManyAttribute>() != null;
 			if (!forceOpen) {
 				var lastProgram = HasProgramOpen<T>();
 				if(lastProgram is not null) {
@@ -456,6 +495,16 @@ namespace RhuEngine.Components
 			return (T)OpenProgram(typeof(T).GetFormattedName(), typeof(T));
 		}
 
+		public int HowManyProgramsOpen(Type programType) {
+			var count = 0;
+			foreach (var item in programs) {
+				if(item.GetType() == programType) {
+					count++;
+				}
+			}
+			return count;
+		}
+
 		public Program OpenProgram(string name, Type programType) {
 			RLog.Info($"Open program {name} Type: {programType.GetFormattedName()}");
 			var programentity = ProgramsHolder.AddChild(name);
@@ -463,6 +512,11 @@ namespace RhuEngine.Components
 			programcomp.taskBar = this;
 			programcomp.taskBarItem = new ProgramTaskBarItem(this, programcomp);
 			programcomp.IntProgram();
+			var amount = HowManyProgramsOpen(programType);
+			programcomp.taskBarItem.ID += $".{amount}";
+			if(amount != 0) {
+				programcomp.taskBarItem.ExtraText = amount.ToString();
+			}
 			programs.Add(programcomp);
 			AddTaskBarItemToList(programcomp.taskBarItem);
 			return programcomp;

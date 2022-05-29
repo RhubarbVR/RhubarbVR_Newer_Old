@@ -52,10 +52,13 @@ namespace RhuEngine.Components
 
 		[Exsposed]
 		public void UserButton(ButtonEvent buttonEvent) {
+			if (!buttonEvent.IsClicked) {
+				return;
+			}
 
 		}
 
-		public void BuildStart(TaskBar taskBar,UIRect parentrect, AssetProvider<RMaterial> mit, AssetProvider<RMaterial> iconsMit, SpriteProvder iconsSprite) {
+		public void BuildStart(TaskBar taskBar, UIRect parentrect, AssetProvider<RMaterial> mit, AssetProvider<RMaterial> iconsMit, SpriteProvder iconsSprite) {
 			_taskBar = taskBar;
 			var uibuilder = new UIBuilder(Entity, mit, parentrect, true);
 			var buttonColor = new Colorf(0.1f, 0.8f);
@@ -67,7 +70,7 @@ namespace RhuEngine.Components
 					{
 						uibuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f), 0);
 						{
-							uibuilder.AddButton(false, buttonColor);
+							uibuilder.AddButton(false, 0.2f);
 							{
 								uibuilder.PushRect(new Vector2f(0.05f), new Vector2f(0.95f));
 								{
@@ -78,7 +81,7 @@ namespace RhuEngine.Components
 									uibuilder.PopRect();
 									uibuilder.PushRect(new Vector2f(0f), new Vector2f(0.25f, 1f), 0);
 									{
-										uibuilder.AddText("Trains", null, null, null, true);
+										uibuilder.AddText("Trains", null, 1.9f, 1, null, true);
 									}
 									uibuilder.PopRect();
 								}
@@ -90,7 +93,7 @@ namespace RhuEngine.Components
 					}
 					uibuilder.PopRect();
 				}
-			uibuilder.PopRect();
+				uibuilder.PopRect();
 			}
 			uibuilder.PopRect();
 			var list = uibuilder.AttachChildRect<VerticalList>(new Vector2f(0.5f, 0), new Vector2f(1), 0);
@@ -98,13 +101,13 @@ namespace RhuEngine.Components
 
 			uibuilder.PushRect(null, null, 0);
 			uibuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f), 0);
-			uibuilder.AddButton(false, buttonColor).ButtonEvent.Target += ExitButton;
+			uibuilder.AddButton(false, 0.2f).ButtonEvent.Target += ExitButton;
 			uibuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f));
 			uibuilder.PushRect(new Vector2f(0), new Vector2f(0.25f, 1f), 0);
 			uibuilder.AddSprit(new Vector2i(12, 0), new Vector2i(12, 0), iconsMit, iconsSprite);
 			uibuilder.PopRect();
 			uibuilder.PushRect(new Vector2f(0.25f, 0), new Vector2f(1f), 0);
-			uibuilder.AddText("Common.Exit");
+			uibuilder.AddText("Common.Exit", null, 1.9f, 1);
 			uibuilder.PopRect();
 			uibuilder.PopRect();
 			uibuilder.PopRect();
@@ -113,13 +116,13 @@ namespace RhuEngine.Components
 
 			uibuilder.PushRect(null, null, 0);
 			uibuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f), 0);
-			uibuilder.AddButton(false, buttonColor).ButtonEvent.Target += SettingsButton;
+			uibuilder.AddButton(false, 0.2f).ButtonEvent.Target += SettingsButton;
 			uibuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f));
 			uibuilder.PushRect(new Vector2f(0), new Vector2f(0.25f, 1f), 0);
 			uibuilder.AddSprit(new Vector2i(0, 0), new Vector2i(0, 0), iconsMit, iconsSprite);
 			uibuilder.PopRect();
 			uibuilder.PushRect(new Vector2f(0.25f, 0), new Vector2f(1f), 0);
-			uibuilder.AddText("Programs.Settings.Name");
+			uibuilder.AddText("Programs.Settings.Name", null, 1.9f, 1);
 			uibuilder.PopRect();
 			uibuilder.PopRect();
 			uibuilder.PopRect();
@@ -128,15 +131,15 @@ namespace RhuEngine.Components
 
 			uibuilder.PushRect(null, null, 0);
 			uibuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f), 0);
-			uibuilder.AddButton(false, buttonColor).ButtonEvent.Target += FileExplorerButton;
+			uibuilder.AddButton(false, 0.2f).ButtonEvent.Target += FileExplorerButton;
 			uibuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f));
-				uibuilder.PushRect(new Vector2f(0), new Vector2f(0.25f,1f), 0);
-					uibuilder.AddSprit(new Vector2i(1,0), new Vector2i(1, 0), iconsMit, iconsSprite);
-				uibuilder.PopRect();
-					uibuilder.PushRect(new Vector2f(0.25f,0), new Vector2f(1f),0);
-					uibuilder.AddText("Programs.FileExplorer.Name");
-					uibuilder.PopRect();
-				uibuilder.PopRect();
+			uibuilder.PushRect(new Vector2f(0), new Vector2f(0.25f, 1f), 0);
+			uibuilder.AddSprit(new Vector2i(1, 0), new Vector2i(1, 0), iconsMit, iconsSprite);
+			uibuilder.PopRect();
+			uibuilder.PushRect(new Vector2f(0.25f, 0), new Vector2f(1f), 0);
+			uibuilder.AddText("Programs.FileExplorer.Name", null, 1.9f, 1);
+			uibuilder.PopRect();
+			uibuilder.PopRect();
 			uibuilder.PopRect();
 			uibuilder.PopRect();
 			uibuilder.PopRect();
@@ -149,7 +152,7 @@ namespace RhuEngine.Components
 
 			uibuilder.PushRect(null, null, 0);
 			uibuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f), 0);
-			uibuilder.AddButton(false, buttonColor).ButtonEvent.Target += UserButton;
+			uibuilder.AddButton(false, 0.2f).ButtonEvent.Target += UserButton;
 			uibuilder.PushRect(new Vector2f(0.05f), new Vector2f(0.95f));
 			uibuilder.PushRect(new Vector2f(0.75f, 0f), new Vector2f(1f), 0);
 			var imgasset = uibuilder.AttachComponentToStack<StaticTexture>();
@@ -157,7 +160,7 @@ namespace RhuEngine.Components
 			uibuilder.PopRect();
 
 			uibuilder.PushRect(new Vector2f(0f), new Vector2f(0.75f, 1f), 0);
-			var text = uibuilder.AddText("Trains", null, null, null, true);
+			var text = uibuilder.AddText("Trains", null, 1.9f, 1, null, true);
 			uibuilder.PopRect();
 			void OnLogin(bool login) {
 				if (login) {

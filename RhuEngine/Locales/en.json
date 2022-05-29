@@ -140,8 +140,8 @@
     "Programs.Settings.Name": "Settings",
 
 
-    "Programs.FileExplorer.Name": "File Explorer"
-
+    "Programs.FileExplorer.Name": "File Explorer",
+    "Programs.FileExplorer.Path": "Path",
 
   }
 }

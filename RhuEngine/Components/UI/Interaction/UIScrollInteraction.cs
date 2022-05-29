@@ -21,7 +21,7 @@ namespace RhuEngine.Components
 		public readonly SyncDelegate<Action<Vector2f>> OnScroll;
 
 		[Default(0.5f)]
-		public readonly Sync<float> FingerPressForce;
+		public readonly Sync<float> GripPressForce;
 
 		public override void OnAttach() {
 			base.OnAttach();
@@ -59,7 +59,7 @@ namespace RhuEngine.Components
 			}
 			if (HasFirst) {
 				//DragScroll 
-				var scroll = Rect.ClickFingerChange(FingerPressForce.Value, !AllowOtherZones.Value);
+				var scroll = Rect.ClickGripChange(GripPressForce.Value, !AllowOtherZones.Value);
 				var scrollavrage = Vector2f.Zero;
 				foreach (var item in scroll) {
 					if (scrollavrage == Vector2f.Zero) {

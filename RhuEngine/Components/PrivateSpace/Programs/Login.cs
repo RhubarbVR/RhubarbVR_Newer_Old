@@ -151,7 +151,6 @@ namespace RhuEngine.Components.PrivateSpace
 			var uiBuilder = new UIBuilder(uiRoot, mit, ma,true);
 			uiBuilder.PushRect(new Vector2f(0.5f,0.6f), new Vector2f(0.5f, 0.6f),0);
 			var windowSize = new Vector2f(2.5f, 3.25f);
-			var buttonColor = new Colorf(0.1f, 0.8f);
 			uiBuilder.SetOffsetMinMax(-windowSize, windowSize);
 			uiBuilder.PushRect(new Vector2f(0, 0.85f), new Vector2f(1, 1),0);
 			uiBuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f),0);
@@ -167,9 +166,9 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(null, null, 0);
 			uiBuilder.PushRect(new Vector2f(0, 0), new Vector2f(0.5, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			uiBuilder.AddButton(false, buttonColor).ButtonEvent.Target = MainButton;
+			uiBuilder.AddButton(false, 0.2f).ButtonEvent.Target = MainButton;
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			ButtonOneText = uiBuilder.AddTextWithLocal("Programs.Login.LoginButton");
+			ButtonOneText = uiBuilder.AddTextWithLocal("Programs.Login.LoginButton", 1.9f);
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
@@ -177,9 +176,9 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PushRect(new Vector2f(0.5, 0), new Vector2f(1, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			uiBuilder.AddButton(false, buttonColor).ButtonEvent.Target = ToggleButton;
+			uiBuilder.AddButton(false, 0.2f).ButtonEvent.Target = ToggleButton;
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			ButtonTwoText = uiBuilder.AddTextWithLocal("Programs.Login.Register");
+			ButtonTwoText = uiBuilder.AddTextWithLocal("Programs.Login.Register",1.9f);
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
@@ -193,7 +192,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PushRect();
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			var Confirmpassword = uiBuilder.AddTextEditor("Programs.Login.ConfirmPassword", buttonColor);
+			var Confirmpassword = uiBuilder.AddTextEditor("Programs.Login.ConfirmPassword", 0.2f, 1, "", 0.1f, null, 1.9f);
 			Confirmpassword.Item1.Password.Value = true;
 			ConfPassword = Confirmpassword.Item1;
 			uiBuilder.PopRect();
@@ -205,7 +204,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PushRect();
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			var password = uiBuilder.AddTextEditor("Programs.Login.Password", buttonColor);
+			var password = uiBuilder.AddTextEditor("Programs.Login.Password", 0.2f, 1, "", 0.1f, null, 1.9f);
 			password.Item1.Password.Value = true;
 			Password = password.Item1;
 			password.Item1.HorizontalAlien.Value = EHorizontalAlien.Left;
@@ -216,7 +215,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PushRect();
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			Email = uiBuilder.AddTextEditor("Programs.Login.Email", buttonColor).Item1;
+			Email = uiBuilder.AddTextEditor("Programs.Login.Email", 0.2f,1,"",0.1f,null,1.9f).Item1;
 			Email.HorizontalAlien.Value = EHorizontalAlien.Left;
 			Email.MinClamp.Value = minclamp;
 			uiBuilder.PopRect();
@@ -225,7 +224,7 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect();
 
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
-			UserName = uiBuilder.AddTextEditor("Programs.Login.Username", buttonColor).Item1;
+			UserName = uiBuilder.AddTextEditor("Programs.Login.Username", 0.2f, 1, "", 0.1f, null, 1.9f).Item1;
 			RegEntiyTwo = uiBuilder.CurretRectEntity;
 			RegEntiyTwo.enabled.Value = false;
 			UserName.HorizontalAlien.Value = EHorizontalAlien.Left;
@@ -240,7 +239,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PushRect();
 			//Error
-			ErrorText = uiBuilder.AddText("<colorred>",null,null,null,true);
+			ErrorText = uiBuilder.AddText("<colorred>",null,0,1,null,true);
 			uiBuilder.PopRect();
 		}
 	}

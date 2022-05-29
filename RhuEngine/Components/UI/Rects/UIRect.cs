@@ -42,7 +42,7 @@ namespace RhuEngine.Components
 	{
 		public int ZDepth => ((ParentRect)?.ZDepth ?? 0) + 1;
 
-		public IRectData Child { get; set; }
+		public UIRect Child { get; set; }
 		public IRectData ParentRect { get; set; }
 
 		public UICanvas Canvas { get; set; }
@@ -90,6 +90,7 @@ namespace RhuEngine.Components
 		public bool Laser;
 		public bool CustomTouch;
 		public float PressForce;
+		public float GripForce;
 
 		public void Clean(Matrix parrent, Vector3f canvasScale) {
 			var pointNoScale = Matrix.T(HitPosWorld) * (Matrix.S(1 / canvasScale) * parrent).Inverse;
@@ -180,6 +181,28 @@ namespace RhuEngine.Components
 				}
 			}
 		}
+
+		public IEnumerable<Vector3f> ClickGripChange(float threshold, bool ignoreOtherInputZones = false) {
+			var lastpoint = LastHitPosesByFingerID(ignoreOtherInputZones).GetEnumerator();
+			var newHitpoin = HitPosesByFingerID(ignoreOtherInputZones).GetEnumerator();
+			var hasData1 = newHitpoin.MoveNext();
+			var hasData2 = lastpoint.MoveNext();
+			while (hasData1 && hasData2) {
+				var currentIndex = Math.Min(lastpoint.Current.Touchindex, newHitpoin.Current.Touchindex);
+				if (lastpoint.Current.Touchindex == newHitpoin.Current.Touchindex) {
+					if (lastpoint.Current.GripForce >= threshold && newHitpoin.Current.GripForce >= threshold) {
+						yield return lastpoint.Current.HitPos - newHitpoin.Current.HitPos;
+					}
+				}
+				if (lastpoint.Current.Touchindex <= currentIndex) {
+					hasData2 = lastpoint.MoveNext();
+				}
+				if (newHitpoin.Current.Touchindex <= currentIndex) {
+					hasData1 = newHitpoin.MoveNext();
+				}
+			}
+		}
+
 		public IEnumerable<HitData> LastHitPosesByFingerID(bool ignoreOtherInputZones = false) {
 			return from hitPoses in LastHitPoses(ignoreOtherInputZones)
 				   orderby hitPoses.Touchindex ascending

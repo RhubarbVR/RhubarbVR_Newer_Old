@@ -14,10 +14,11 @@ namespace RhuEngine.Components
 		public readonly Sync<string> Key;
 		[OnChanged(nameof(LoadLocale))]
 		public readonly Linker<string> TargetValue;
-
+		[OnChanged(nameof(LoadLocale))]
+		public readonly Sync<string> Append;
 		public void LoadLocale() {
 			if (TargetValue.Linked) {
-				TargetValue.LinkedValue = Engine.localisationManager.GetLocalString(Key);
+				TargetValue.LinkedValue = Engine.localisationManager.GetLocalString(Key) + Append.Value;
 			}
 		}
 

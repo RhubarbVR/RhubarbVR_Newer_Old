@@ -109,7 +109,10 @@ namespace RhuEngine.Components
 				rectTwo.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
 				rectTwo.AnchorMax.Value = new Vector2f(0.9f, 0.9f);
 				var img = child.AttachComponent<UIRectangle>();
-				img.Tint.Value = new Colorf(0.1f, 0.1f, 0.1f, 0.5f);
+				var colorassign = child.AttachComponent<UIColorAssign>();
+				colorassign.Alpha.Value = 0.5f;
+				colorassign.ColorShif.Value = 0.2f;
+				colorassign.TargetColor.Target = img.Tint;
 				img.Material.Target = mit;
 				img.AddRoundingSettings();
 				var icon = child.AddChild("Icon");
@@ -121,6 +124,9 @@ namespace RhuEngine.Components
 				spriterender.Material.Target = IconMit.Target;
 				spriterender.PosMin.Value = iconindex;
 				spriterender.PosMax.Value = iconindex;
+				colorassign = child.AttachComponent<UIColorAssign>();
+				colorassign.ColorShif.Value = 1.9f;
+				colorassign.TargetColor.Target = spriterender.Tint;
 				if (action != null) {
 					child.AttachComponent<UIButtonInteraction>().ButtonEvent.Target = action;
 				}
@@ -134,7 +140,7 @@ namespace RhuEngine.Components
 			MainUIMax.Target = rect.AnchorMax;
 			var windowRoot = Entity.AddChild("WindowRoot");
 			var windowRootrect = windowRoot.AttachComponent<UIRect>();
-			windowRootrect.OffsetMin.Value = new Vector2f(0, -HeaderHeight.Value);
+			windowRootrect.OffsetMin.Value = new Vector2f(0, HeaderHeight.Value);
 			WindowRootRectOffsetMin.Target = windowRootrect.OffsetMin;
 			var header = Entity.AddChild("Header");
 			var headerrect = header.AttachComponent<UIRect>();
@@ -151,7 +157,9 @@ namespace RhuEngine.Components
 			var text = headerTextSide.AttachComponent<UIText>();
 			NameLink.Target = text.Text;
 			text.VerticalAlien.Value = EVerticalAlien.Bottom;
-
+			var colorassign = Entity.AttachComponent<UIColorAssign>();
+			colorassign.ColorShif.Value = 1.9f;
+			colorassign.TargetColor.Target = text.StartingColor;
 			var headerButtonSide = header.AddChild("ButtonGroup");
 			var headerButtonSiderect = headerButtonSide.AttachComponent<UIRect>();
 			headerButtonSiderect.OffsetMin.Value -= new Vector2f(HeaderHeight.Value * 4, 1);
@@ -174,11 +182,16 @@ namespace RhuEngine.Components
 			OnCollapse.Target = CollapseUI;
 			OnPin.Target = PinUI;
 			UpdateButtons();
+
+
+
 			PannelRoot.Target = windowRoot.AddChild("PannelRoot");
 			CollapseUIEnable.Target = PannelRoot.Target.enabled;
 
 			var img = Entity.AttachComponent<UIRectangle>();
-			img.Tint.Value = new Colorf(0, 0, 0, 0.7f);
+			colorassign = Entity.AttachComponent<UIColorAssign>();
+			colorassign.Alpha.Value = 0.7f;
+			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 		}
 		private void UpdateButtons() {

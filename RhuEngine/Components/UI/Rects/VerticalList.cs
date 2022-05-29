@@ -75,10 +75,12 @@ namespace RhuEngine.Components
 					foreach (var item in list) {
 						item.Canvas = Canvas;
 						item.ParentRect = this;
-						var targetSize = item.Child.AnchorMaxValue - item.Child.AnchorMinValue;
+						item.AnchorMin = new Vector2f(0);
+						item.AnchorMax = new Vector2f(1);
+						var targetSize = item.Child.CompMax - item.Child.CompMin;
 						item.AnchorMin = new Vector2f(0, ypos);
 						item.AnchorMax = new Vector2f(1, ypos + 1f);
-						ypos += targetSize.y;
+						ypos -= targetSize.y;
 						item.UpdateMinMaxNoPross();
 						min ??= item.Child.Min;
 						max = item.Child.Max;

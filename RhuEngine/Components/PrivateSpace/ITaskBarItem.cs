@@ -10,6 +10,7 @@ using RNumerics;
 namespace RhuEngine.Components.PrivateSpace
 {
 	public class WorldTaskBarItem: ITaskBarItem {
+		public string ExtraText { get; set; }
 
 		public World target;
 
@@ -38,6 +39,8 @@ namespace RhuEngine.Components.PrivateSpace
 
 	public class ProgramTaskBarItem:ITaskBarItem
 	{
+		public string ExtraText { get; set; }
+
 		public Program Program;
 
 		public Type ProgramType;
@@ -62,7 +65,7 @@ namespace RhuEngine.Components.PrivateSpace
 			if (typeof(Program).IsAssignableFrom(programLink)) {
 				var program = (Program)Activator.CreateInstance(programLink);
 				ShowOpenFlag = false;
-				ID = program.ProgramID;
+				ID = program.ProgramID + ".0";
 				Icon = program.Icon;
 				Texture = program.Texture;
 				Name = program.ProgramName;
@@ -96,6 +99,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 	public interface ITaskBarItem
 	{
+		public string ExtraText { get; set; }
 		public bool ShowOpenFlag { get; }
 		
 		public string ID { get; }
