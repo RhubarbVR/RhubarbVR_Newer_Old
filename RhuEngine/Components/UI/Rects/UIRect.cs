@@ -81,6 +81,7 @@ namespace RhuEngine.Components
 
 	public struct HitData
 	{
+		public Handed Handed;
 		public Vector3f HitPosNoScale;
 		public Vector3f HitPosWorld;
 		public Vector3f HitPos;

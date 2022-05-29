@@ -23,6 +23,7 @@ namespace RhuEngine.Components
 				var userRoot = userEntity.AttachComponent<UserRoot>();
 				userEntity.AttachComponent<LocomotionManager>().user.Target = World.GetLocalUser();
 				var leftHand = userEntity.AddChild("LeftHand");
+				leftHand.AttachComponent<GrabbableHolder>().InitializeGrabHolder(Handed.Left);
 				var leftComp = leftHand.AttachComponent<Hand>();
 				leftComp.hand.Value = Handed.Left;
 				leftComp.user.Target = World.GetLocalUser();
@@ -33,6 +34,7 @@ namespace RhuEngine.Components
 					r.Item3.colorLinear.Value = Colorf.RhubarbRed;
 				}
 				var rightHand = userEntity.AddChild("RightHand");
+				rightHand.AttachComponent<GrabbableHolder>().InitializeGrabHolder(Handed.Right);
 				var rightComp = rightHand.AttachComponent<Hand>();
 				rightComp.hand.Value = Handed.Right;
 				rightComp.user.Target = World.GetLocalUser();
@@ -43,6 +45,7 @@ namespace RhuEngine.Components
 				}
 				userRoot.rightHand.Target = rightHand;
 				var head = userEntity.AddChild("Head");
+				head.AttachComponent<GrabbableHolder>().InitializeGrabHolder(Handed.Max);
 				head.AttachComponent<Head>().user.Target = World.GetLocalUser();
 				if (!World.IsPersonalSpace) {
 					var thing = head.AddChild("Render").AttachMeshWithMeshRender<CylinderMesh, UnlitShader>();

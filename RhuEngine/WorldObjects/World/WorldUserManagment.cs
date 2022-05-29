@@ -156,6 +156,8 @@ namespace RhuEngine.WorldObjects
 			DrawDebugSphere(matrix, pos, (Vector3f)scale, colorf, drawTime);
 		}
 		private bool DebugVisuals => Engine.DebugVisuals;
+
+
 		public void DrawDebugSphere(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf, float drawTime = 1) {
 			if (DebugVisuals) {
 				RWorld.ExecuteOnStartOfFrame(() => {

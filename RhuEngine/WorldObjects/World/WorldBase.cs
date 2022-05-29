@@ -206,6 +206,26 @@ namespace RhuEngine.WorldObjects
 
 		public object RenderLock = new();
 
+
+		[NoSync]
+		[NoSave]
+		[NoShow]
+		[UnExsposed]
+		[NoLoad]
+		public GrabbableHolder LeftGrabbableHolder;
+		[NoSync]
+		[NoSave]
+		[NoShow]
+		[UnExsposed]
+		[NoLoad]
+		public GrabbableHolder RightGrabbableHolder;
+		[NoSync]
+		[NoSave]
+		[NoShow]
+		[UnExsposed]
+		[NoLoad]
+		public GrabbableHolder HeadGrabbableHolder;
+
 		public void Step() {
 			_netManager?.PollEvents();
 			_netManager?.NatPunchModule.PollEvents();
