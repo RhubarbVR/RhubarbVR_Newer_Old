@@ -14,6 +14,7 @@ namespace RhuEngine.WorldObjects
 		public T Add(bool networkedObject = false, bool deserialize = false);
 	}
 
+	[GenericTypeConstraint()]
 	public class SyncValueList<T> : SyncObjList<Sync<T>>, ISyncMember
 	{
 		[Exsposed]

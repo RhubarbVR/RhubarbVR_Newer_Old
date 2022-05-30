@@ -79,11 +79,11 @@ namespace RhuEngine.GameTests.Tests
 			tester.Dispose();
 		}
 
-		public IEnumerable<Type> GetAllTypes(Func<Type,bool> func) {
+		public IEnumerable<Type> GetAllTypes(Func<Type, bool> func) {
 			return from asm in AppDomain.CurrentDomain.GetAssemblies()
-					from type in asm.GetTypes()
-					where func.Invoke(type)
-					select type;
+				   from type in asm.GetTypes()
+				   where func.Invoke(type)
+				   select type;
 		}
 
 
@@ -94,7 +94,7 @@ namespace RhuEngine.GameTests.Tests
 			var inputTypes = new List<Type>[arguments.Length];
 			List<Type> GetDeffrentTypeConstrantes(Type type) {
 				var types = new List<Type>();
-				
+
 				if (type.GetGenericParameterConstraints().Length == 0) {
 					types.Add(typeof(string));
 					types.Add(typeof(int));
@@ -162,7 +162,8 @@ namespace RhuEngine.GameTests.Tests
 			public SyncObject GetObject();
 		}
 
-		public class TestSyncObject<T>:Component, ITestSyncObject where T : SyncObject {
+		public class TestSyncObject<T> : Component, ITestSyncObject where T : SyncObject
+		{
 			public readonly T SyncObject;
 
 			public SyncObject GetObject() {
@@ -180,12 +181,21 @@ namespace RhuEngine.GameTests.Tests
 						Console.WriteLine("Testing SyncObjects " + testType.GetFormattedName());
 						ITestSyncObject e = null;
 						try {
-							e = (ITestSyncObject)testEntity.AttachComponent<Component>(typeof(TestSyncObject<>).MakeGenericType(testType));
+							try {
+								e = (ITestSyncObject)testEntity.AttachComponent<Component>(typeof(TestSyncObject<>).MakeGenericType(testType));
+							}
+							catch {
+								if (testType.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) {
+									throw;
+								}
+							}
 						}
-						catch {
-							if (testType.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) {
+						catch (Exception normalex) {
+							if(normalex.InnerException.GetType() != typeof(SyncObject.NotVailedGenaric)) {
 								throw;
 							}
+							RLog.Warn("used Invailed Genaric Type");
+							continue;
 						}
 						if (testType.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && e != null) {
 							throw new Exception("Loaded PrivateSpaceOnly object");
@@ -246,7 +256,7 @@ namespace RhuEngine.GameTests.Tests
 			tester.RunForSteps(2);
 			var outer = Matrix.T(OuterPoint);
 			var startpoint = Matrix.T(pointworld);
-			var hashit = testWorld.PhysicsSim.ConvexRayTest(box,ref startpoint, ref outer, out var hitcollider,out var hitnorm,out var worldhit);
+			var hashit = testWorld.PhysicsSim.ConvexRayTest(box, ref startpoint, ref outer, out var hitcollider, out var hitnorm, out var worldhit);
 			Assert.IsTrue(hashit);
 			Assert.AreEqual("Trains", hitcollider.CustomObject);
 			tester.RunForSteps(2);
@@ -295,7 +305,7 @@ namespace RhuEngine.GameTests.Tests
 		public void RayTest() {
 			var testWorld = StartNewTestWorld();
 			var box = new RBoxShape(0.5f);
-			var collider = box.GetCollider(testWorld.PhysicsSim,  Matrix.TS(Vector3f.Zero, 1),"Trains");
+			var collider = box.GetCollider(testWorld.PhysicsSim, Matrix.TS(Vector3f.Zero, 1), "Trains");
 			var pointworld = Vector3f.AxisX * -5;
 			var OuterPoint = Vector3f.AxisX * 5;
 			tester.RunForSteps();
@@ -378,7 +388,7 @@ namespace RhuEngine.GameTests.Tests
 			var random = new Random();
 			var inputs = testEntity.AttachComponent<Components.ValueList<int>>();
 			var one = inputs.Value.Add();
-			var valueone = one.Value = random.Next(-100,100);
+			var valueone = one.Value = random.Next(-100, 100);
 			inttest.Inputs.Add().Target = one;
 
 			var two = inputs.Value.Add();
@@ -423,20 +433,26 @@ namespace RhuEngine.GameTests.Tests
 			var components = GetAllTypes((type) => !type.IsAbstract && !type.IsInterface && typeof(Component).IsAssignableFrom(type));
 			foreach (var item in components) {
 				if (typeof(ITestSyncObject).IsAssignableFrom(item)) {
-					continue;	
+					continue;
 				}
 				if (item.IsGenericType) {
 					foreach (var testes in MakeTestGenerics(item)) {
 						Console.WriteLine("Testing Component " + testes.GetFormattedName());
 						Component comp = null;
 						try {
-							comp = testEntity.AttachComponent<Component>(testes);
-							RunComponentTest(comp);
-						}
-						catch {
-							if(testes.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) {
-								throw;
+							try {
+								comp = testEntity.AttachComponent<Component>(testes);
+								RunComponentTest(comp);
 							}
+							catch {
+								if (testes.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) {
+									throw;
+								}
+							}
+						}
+						catch (SyncObject.NotVailedGenaric) {
+							RLog.Warn("used Invailed Genaric Type");
+							continue;
 						}
 						if (testes.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && comp != null) {
 							throw new Exception("Loaded PrivateSpaceOnly object");
@@ -474,7 +490,7 @@ namespace RhuEngine.GameTests.Tests
 				tester.Dispose();
 				return;
 			}
-			var userName = "AutoRemovedTestAcount"+Guid.NewGuid().ToString();
+			var userName = "AutoRemovedTestAcount" + Guid.NewGuid().ToString();
 			var email = $"{userName}@AutoRemovedTestAcount.rhubarbvr.net";
 			var password = "Password" + Guid.NewGuid().ToString();
 			var dateOfBirth = DateTime.Now.AddYears(-100);

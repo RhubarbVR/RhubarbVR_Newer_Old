@@ -5,6 +5,7 @@ using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.Components
 {
+	[GenericTypeConstraint()]
 	[Category(new string[] { "CoreEvents" })]
 	public class AddTwoValuePram<T1,T2> : Component
 	{

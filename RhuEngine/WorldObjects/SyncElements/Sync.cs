@@ -13,6 +13,7 @@ namespace RhuEngine.WorldObjects
 		public void SetStartingObject();
 		public void SetValue(object value);
 	}
+	[GenericTypeConstraint()]
 	public class Sync<T> : SyncObject, ILinkerMember<T>, ISync, INetworkedObject, IChangeable, ISyncMember
 	{
 		private readonly object _locker = new();

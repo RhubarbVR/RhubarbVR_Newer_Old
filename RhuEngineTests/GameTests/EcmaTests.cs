@@ -208,6 +208,22 @@ namespace RhuEngine.GameTests.Tests
 		}
 
 		[TestMethod()]
+		public void TryToMakeSyncWorldTest() {
+			var script = AttachTestScript();
+			script.Script.Value = @"
+				function RunCode()	{
+					script.Entity.AttachComponent(getType(""ValueField<World>""));
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.IsNull(script.Entity.GetFirstComponent<ValueField<World>>());
+			tester.Dispose();
+		}
+
+		[TestMethod()]
 		public void AttachComponentTest() {
 			var script = AttachTestScript();
 			script.Script.Value = @"
@@ -222,6 +238,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsNotNull(script.Entity.GetFirstComponent<Spinner>());			
 			tester.Dispose();
 		}
+
 		[TestMethod()]
 		public void AttachEntityTest() {
 			var script = AttachTestScript();

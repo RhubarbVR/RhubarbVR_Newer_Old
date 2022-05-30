@@ -67,7 +67,7 @@ namespace RhuEngine.Components
 				catch { }
 			}
 		}
-
+		[GenericTypeConstraint()]
 		public class ValuePramInfo<T> : PramInfo
 		{
 			[OnChanged(nameof(OnValueChangeed))]

@@ -107,7 +107,7 @@ namespace RhuEngine.Components
 			_ecma.SetValue("world", World);
 			_ecma.SetValue("localUser", LocalUser);
 			_ecma.SetValue("log", new Action<string>(RLog.Info));
-			_ecma.SetValue("getType", (string a) => Type.GetType(a, false, true));
+			_ecma.SetValue("getType", (string a) => FamcyTypeParser.PraseType(a));
 			_ecma.SetValue("typeOf", (object a) => a?.GetType());
 			_ecma.SetValue("toString", new Func<object, string>((object a) => (a.GetType() == typeof(Type)) ? ((Type)a).GetFormattedName() : a?.ToString()));
 			try {

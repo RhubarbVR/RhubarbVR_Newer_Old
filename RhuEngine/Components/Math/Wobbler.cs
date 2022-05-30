@@ -4,6 +4,7 @@ using RNumerics.Noise;
 
 namespace RhuEngine.Components
 {
+	[GenericTypeConstraint()]
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Math" })]
 	public class Wobbler<T> : Component where T : struct

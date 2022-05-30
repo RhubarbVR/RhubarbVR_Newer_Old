@@ -117,10 +117,52 @@ namespace RhuEngine.WorldObjects
 
 		}
 
-		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize,Func<NetPointer> netPointer = null) {
+		public class NotVailedGenaric:Exception
+		{
+			public override string Message => "Generic given is invalid";
+		}
+
+		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize, Func<NetPointer> netPointer = null) {
 			if (GetType().GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && !world.IsPersonalSpace) {
 				throw new InvalidOperationException("This SyncObject is PrivateSpaceOnly");
 			}
+			var arguments = GetType().GetGenericArguments();
+			foreach (var arguiminet in arguments) {
+				var isVailed = false;
+				var types = GetType().GetCustomAttributes<GenericTypeConstraintAttribute>(true);
+				if (types.Count() == 0) {
+					isVailed = true;
+				}
+				foreach (var item in types) {
+					foreach (var typ in item.Data) {
+						if (typ == typeof(Enum)) {
+							if (arguiminet.IsEnum) {
+								isVailed = true;
+							}
+						}
+						if (arguiminet.IsAssignableFrom(typ)) {
+							isVailed = true;
+						}
+					}
+					var LoopGroups = item.Groups switch {
+						TypeConstGroups.Serializable => TypeCollections.StandaredTypes,
+						_ => Array.Empty<Type>(),
+					};
+					foreach (var typ in LoopGroups) {
+						if (typ == typeof(Enum)) {
+							if (arguiminet.IsEnum) {
+								isVailed = true;
+							}
+						}
+						if (arguiminet.IsAssignableFrom(typ)) {
+							isVailed = true;
+						}
+					}
+				}
+				if (!isVailed) {
+					throw new NotVailedGenaric();
+				}
+			} 
 			Name = name;
 			World = world;
 			Parent = parent;
