@@ -71,6 +71,7 @@ namespace RhuEngine
 				if (_app == null) {
 					throw new System.Exception("StereoKit loader couldn't construct an instance of the App!");
 				}
+				_app.OnCloseEngine += () => SK.Shutdown();
 
 				// Initialize StereoKit, and the app
 				var settings = skstereo.Settings;

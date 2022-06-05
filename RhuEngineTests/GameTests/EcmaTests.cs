@@ -213,6 +213,7 @@ namespace RhuEngine.GameTests.Tests
 			script.Script.Value = @"
 				function RunCode()	{
 					script.Entity.AttachComponent(getType(""ValueField<World>""));
+					var e = new Vector3f(1,1,1);
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -235,7 +236,7 @@ namespace RhuEngine.GameTests.Tests
 				throw new Exception("Script not loaded");
 			}
 			script.Invoke("RunCode");
-			Assert.IsNotNull(script.Entity.GetFirstComponent<Spinner>());			
+			Assert.IsNotNull(script.Entity.GetFirstComponent<Spinner>());
 			tester.Dispose();
 		}
 
@@ -254,7 +255,7 @@ namespace RhuEngine.GameTests.Tests
 				throw new Exception("Script not loaded");
 			}
 			script.Invoke("RunCode");
-			Assert.AreEqual(4,script.Entity.children.Count);
+			Assert.AreEqual(4, script.Entity.children.Count);
 			tester.Dispose();
 		}
 		[TestMethod()]
@@ -414,7 +415,7 @@ function dwad daw da
 			}
 			RLog.Info("Running function Invoke tests");
 			for (var i = 0; i < functionAmount; i++) {
-				script.Functions.GetValue(i).Invoke();	
+				script.Functions.GetValue(i).Invoke();
 				Assert.AreEqual(i, value.Value.Value);
 			}
 
