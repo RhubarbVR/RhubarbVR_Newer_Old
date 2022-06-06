@@ -142,6 +142,7 @@
 
     "Programs.FileExplorer.Name": "File Explorer",
     "Programs.FileExplorer.Path": "Path",
+    "Programs.CreateNewWorld.Name": "Create New World"
 
   }
 }

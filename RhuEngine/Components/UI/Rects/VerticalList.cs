@@ -68,32 +68,32 @@ namespace RhuEngine.Components
 				});
 			}
 			else {
+				var scale = Max - Min;
 				fakeRects.SafeOperation((list) => {
-					var ypos = 0f;
-					Vector2f? min = null;
-					var max = Vector2f.Zero;
+					var ypos = 1f;
+					var min = Vector2f.Zero;
+					Vector2f? max = null;
 					foreach (var item in list) {
 						item.Canvas = Canvas;
 						item.ParentRect = this;
 						item.AnchorMin = new Vector2f(0);
 						item.AnchorMax = new Vector2f(1);
-						var targetSize = item.Child.CompMax - item.Child.CompMin;
+						var targetSize = item.Child.AnchorMax.Value - item.Child.AnchorMin.Value;
+						ypos -= targetSize.y;
 						item.AnchorMin = new Vector2f(0, ypos);
 						item.AnchorMax = new Vector2f(1, ypos + 1f);
-						ypos -= targetSize.y;
 						item.UpdateMinMaxNoPross();
-						min ??= item.Child.Min;
-						max = item.Child.Max;
+						min = item.Child.Min;
+						max ??= item.Child.Max;
 					}
-					var scollmax = max - (min ?? Vector2f.Zero);
-					var scale = Max - Min;
-					if (scale.y >= scollmax.y) {
+					var scollmax = (max ?? Vector2f.Zero) - min;
+					if (scale.y <= ypos) {
 						_maxScroll = Vector2f.Zero;
 						_minScroll = Vector2f.Zero;
 					}
 					else {
-						_maxScroll = new Vector2f(0, 0);
-						_minScroll = new Vector2f(-(scollmax.x - scale.x), -scollmax.y + scale.y);
+						_minScroll = Vector2f.Zero;
+						_maxScroll = new Vector2f(0, -ypos * scale.y);
 					}
 				});
 			}

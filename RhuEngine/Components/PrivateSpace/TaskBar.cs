@@ -474,6 +474,14 @@ namespace RhuEngine.Components
 			}
 			WorldManager.OnWorldUpdateTaskBar += RegTaskBarItemsUpdate;
 		}
+		public Program HasProgramOpen(Type ProGramType) {
+			foreach (var item in programs) {
+				if (item.GetType() == ProGramType) {
+					return item;
+				}
+			}
+			return null;
+		}
 
 		public T HasProgramOpen<T>() where T : Program {
 			foreach (var item in programs) {
@@ -492,7 +500,18 @@ namespace RhuEngine.Components
 					return lastProgram;
 				}
 			}
-			return (T)OpenProgram(typeof(T).GetFormattedName(), typeof(T));
+			return (T)OpenProgramForced(typeof(T).GetFormattedName(), typeof(T));
+		}
+
+		public Program OpenProgram(Type ProgramType,bool forceOpen = false) {
+			forceOpen |= ProgramType.GetCustomAttribute<OpenManyAttribute>() != null;
+			if (!forceOpen) {
+				var lastProgram = HasProgramOpen(ProgramType);
+				if (lastProgram is not null) {
+					return lastProgram;
+				}
+			}
+			return OpenProgramForced(ProgramType.GetFormattedName(), ProgramType);
 		}
 
 		public int HowManyProgramsOpen(Type programType) {
@@ -505,7 +524,7 @@ namespace RhuEngine.Components
 			return count;
 		}
 
-		public Program OpenProgram(string name, Type programType) {
+		public Program OpenProgramForced(string name, Type programType) {
 			RLog.Info($"Open program {name} Type: {programType.GetFormattedName()}");
 			var programentity = ProgramsHolder.AddChild(name);
 			var programcomp = programentity.AttachComponent<Program>(programType);

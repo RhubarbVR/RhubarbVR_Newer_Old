@@ -89,7 +89,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 		public void Clicked() {
 			if(Program is null) {
-				TaskBar.OpenProgram(ID,ProgramType);
+				TaskBar.OpenProgramForced(ID,ProgramType);
 			}
 			else {
 				Program.ClickedButton();

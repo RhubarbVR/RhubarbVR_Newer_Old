@@ -56,18 +56,18 @@ namespace RhuEngine
 
 		static bool _running = false;
 		void Run(IntPtr activityHandle) {
-				if (_running) {
-					return;
-				}
+			if (_running) {
+				return;
+			}
 
-				_running = true;
+			_running = true;
 			var runningtask = Task.Run(() => {
 				if ((ContextCompat.CheckSelfPermission(this, Manifest.Permission.RecordAudio) != Android.Content.PM.Permission.Granted) || (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != Android.Content.PM.Permission.Granted) || (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Android.Content.PM.Permission.Granted)) {
 					ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.RecordAudio, Manifest.Permission.WriteExternalStorage, Manifest.Permission.ReadExternalStorage }, 1);
 				}
 				var cap = new OutputCapture();
 				var skstereo = new RhuStereoKit();
-				_app = new Engine(skstereo,new string[] { "" }, cap, System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments));
+				_app = new Engine(skstereo, new string[] { "" }, cap, System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments));
 				if (_app == null) {
 					throw new System.Exception("StereoKit loader couldn't construct an instance of the App!");
 				}
