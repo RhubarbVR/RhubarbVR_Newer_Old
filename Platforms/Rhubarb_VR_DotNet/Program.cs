@@ -20,7 +20,7 @@ class SKLoader
 		if (!SK.Initialize(rhu.Settings)) {
 			Environment.Exit(1);
 		}
-		app.OnCloseEngine += () => SK.Shutdown();
+		app.OnCloseEngine += () => SK.Quit();
 		app.Init();
 
 		// Now loop until finished, and then shut down

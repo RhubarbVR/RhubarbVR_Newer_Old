@@ -17,8 +17,6 @@ namespace RhuEngine.Components
 
 		public readonly SyncRef<GrabbableHolder> grabbableHolder;
 
-		Vector3f _offset;
-
 		public bool LaserGrabbed;
 
 		public bool Grabbed => (grabbableHolder.Target is not null) && (grabbingUser.Target is not null);

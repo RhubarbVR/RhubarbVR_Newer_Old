@@ -301,7 +301,13 @@ namespace RhuEngine
 
 		public event Action OnCloseEngine;
 
+		public bool IsClosing;
+
 		public void Close() {
+			if (IsClosing) {
+				return;
+			}
+			IsCloseing = true;
 			OnCloseEngine?.Invoke();
 		}
 
