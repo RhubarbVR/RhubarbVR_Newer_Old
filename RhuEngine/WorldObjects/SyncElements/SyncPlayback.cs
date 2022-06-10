@@ -33,7 +33,7 @@ namespace RhuEngine.WorldObjects
 			return Value.Playing ? Stream ? 1f : Looping ? RawPos() % ClipLength : RawPos() > ClipLength ? ClipLength : RawPos() : Value.Position;
 		}
 		public double RawPos() {
-			return ((Value.Offset - World.WorldTime) * Speed) + Value.Position;
+			return ((World.WorldTime - Value.Offset) * Speed) + Value.Position;
 		}
 
 		public override void OnLoad(SyncObjectDeserializerObject networked) {

@@ -59,11 +59,11 @@ namespace RhuEngine.Components
 						}
 					}
 					else if (removeOnDone) {
+						driver.LinkedValue = to.Value;
 						Destroy();
 					}
 				}
 				catch {
-
 					driver.LinkedValue = default;
 				}
 			}

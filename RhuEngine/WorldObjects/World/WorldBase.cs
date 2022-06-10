@@ -188,7 +188,7 @@ namespace RhuEngine.WorldObjects
 		[NoSave]
 		public readonly Sync<DateTime> StartTime;
 
-		public double WorldTime => (StartTime - DateTime.UtcNow).TotalSeconds;
+		public double WorldTime => (DateTime.UtcNow - StartTime).TotalSeconds;
 
 		[Default("New World")]
 		public readonly Sync<string> WorldName;

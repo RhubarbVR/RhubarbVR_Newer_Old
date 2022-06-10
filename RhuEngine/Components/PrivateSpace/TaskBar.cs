@@ -589,11 +589,22 @@ namespace RhuEngine.Components
 				scrollRect.ScrollPos.Value = new Vector2f(0, _newvalue);
 			}
 			else if (_newvalue > 0.95f) {
+				if(scrollRect.ScrollPos.Value.x != 1) {
+					scrollRect.ScrollPos.Value = new Vector2f(0, 1);
+				}
 				if (uICanvas.Entity.enabled.Value) {
 					uICanvas.Entity.enabled.Value = false;
 				}
+			}else if(_newvalue <= 0.01f && scrollRect.ScrollPos.Value.x != 0) {
+				scrollRect.ScrollPos.Value = new Vector2f(0);
 			}
 			_newvaluetwo = MathUtil.Lerp(_newvaluetwo, (CurrentState != OpenPart.None)?0f:1f, RTime.Elapsedf * ((CurrentState != _part)?10f:5f));
+			if (_newvaluetwo <= 0.01f && scrollRectTwo.ScrollPos.Value.x != 0) {
+				scrollRectTwo.ScrollPos.Value = new Vector2f(0);
+			}
+			if (_newvaluetwo >= 0.97f && scrollRectTwo.ScrollPos.Value.x != -1) {
+				scrollRectTwo.ScrollPos.Value = new Vector2f(0,-1);
+			}
 			if (_newvaluetwo is > 0.01f and < 0.97f) {
 				if (!startCanvas.Entity.enabled.Value) {
 					StartEntity.enabled.Value = false;

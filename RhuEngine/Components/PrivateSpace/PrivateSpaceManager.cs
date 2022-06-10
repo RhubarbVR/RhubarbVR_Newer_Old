@@ -38,9 +38,12 @@ namespace RhuEngine.Components
 		}
 
 		RSphereShape _shape;
+		RSphereShape _lazershape;
+
 		public override void OnLoaded() {
 			base.OnLoaded();
 			_shape = new RSphereShape(0.02f);
+			_lazershape = new RSphereShape(0.005f);
 		}
 		public override void Step() {
 			if (!Engine.EngineLink.CanInput) {
@@ -95,9 +98,9 @@ namespace RhuEngine.Components
 		}
 
 		public bool RunLaserCastInWorld(World world, ref Matrix headFrompos, ref Matrix headToPos) {
-			if (world.PhysicsSim.ConvexRayTest(_shape, ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
+			if (world.PhysicsSim.ConvexRayTest(_lazershape, ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
 				if (collider.CustomObject is RenderUIComponent uIComponent) {
-					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
+					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.005f), new Colorf(1, 1, 0, 0.5f));
 					uIComponent.Rect.AddHitPoses(new HitData { Touchindex = 10, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Primary), GripForce = Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Grab), Handed = Handed.Max });
 				}
 				return true;
