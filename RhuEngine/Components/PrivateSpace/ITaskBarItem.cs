@@ -30,10 +30,16 @@ namespace RhuEngine.Components.PrivateSpace
 
 		public bool LocalName => false;
 
+		public bool CanCloses => target != target.worldManager.LocalWorld;
+
 		public void Clicked() {
 			if (target.Focus != World.FocusLevel.Focused) {
 				target.Focus = World.FocusLevel.Focused;
 			}
+		}
+
+		public void Close() {
+			target.Dispose();
 		}
 	}
 
@@ -48,6 +54,10 @@ namespace RhuEngine.Components.PrivateSpace
 		public TaskBar TaskBar;
 
 		public ProgramTaskBarItem(TaskBar taskBar,Program program = null){
+			CanCloses = true;
+			if (program.GetType() == typeof(LoginProgram)) {
+				CanCloses = false;
+			}
 			TaskBar = taskBar;
 			Program = program;
 			if (program != null) {
@@ -61,6 +71,10 @@ namespace RhuEngine.Components.PrivateSpace
 			}
 		}
 		public ProgramTaskBarItem(TaskBar taskBar, Type programLink) {
+			CanCloses = true;
+			if (programLink == typeof(LoginProgram)) {
+				CanCloses = false;
+			}
 			TaskBar = taskBar;
 			if (typeof(Program).IsAssignableFrom(programLink)) {
 				var program = (Program)Activator.CreateInstance(programLink);
@@ -87,6 +101,8 @@ namespace RhuEngine.Components.PrivateSpace
 		public string Name { get; set; }
 		public bool LocalName { get; set; }
 
+		public bool CanCloses { get; set; }
+
 		public void Clicked() {
 			if(Program is null) {
 				TaskBar.OpenProgramForced(ID,ProgramType);
@@ -94,6 +110,10 @@ namespace RhuEngine.Components.PrivateSpace
 			else {
 				Program.ClickedButton();
 			}
+		}
+
+		public void Close() {
+			Program.Close();
 		}
 	}
 
@@ -111,6 +131,9 @@ namespace RhuEngine.Components.PrivateSpace
 		public string Name { get; }
 
 		public bool LocalName { get; }
+		public bool CanCloses { get; }
+
 		public void Clicked();
+		public void Close();
 	}
 }

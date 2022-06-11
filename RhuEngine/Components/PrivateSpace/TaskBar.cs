@@ -90,6 +90,7 @@ namespace RhuEngine.Components
 		[NoLoad]
 		[NoSyncUpdate]
 		public ScrollUIRect scrollRect;
+
 		[NoSave]
 		[NoSync]
 		[NoLoad]
@@ -108,7 +109,7 @@ namespace RhuEngine.Components
 		[NoLoad]
 		[NoSyncUpdate]
 		public Entity AudioEntiy;
-		
+
 		[NoSave]
 		[NoSync]
 		[NoLoad]
@@ -162,7 +163,7 @@ namespace RhuEngine.Components
 
 		public readonly Linker<string> TimeText;
 
-		public Entity AddButton(Entity were, Vector2i iconindex, Action<ButtonEvent> action, float paddingoffset = 0, float yoffset = 0) {
+		public (Entity, UIRect) AddButton(Entity were, Vector2i iconindex, Action<ButtonEvent> action, float paddingoffset = 0, float yoffset = 0) {
 			var child = were.AddChild("childEliment");
 			var rectTwo = child.AttachComponent<UIRect>();
 			rectTwo.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
@@ -189,11 +190,13 @@ namespace RhuEngine.Components
 			spriterender.PosMin.Value = iconindex;
 			spriterender.PosMax.Value = iconindex;
 			if (action != null) {
-				child.AttachComponent<UIButtonInteraction>().ButtonEvent.Target = action;
+				var buttoninter = child.AttachComponent<UIButtonInteraction>();
+				buttoninter.ButtonEvent.Target = action;
+				buttoninter.AllowOtherZones.Value = false;
 			}
-			return child;
+			return (child, iconrect);
 		}
-		public Entity AddButton(Entity were, RTexture2D textue, Action<ButtonEvent> action, float paddingoffset = 0, float yoffset = 0) {
+		public (Entity, UIRect) AddButton(Entity were, RTexture2D textue, Action<ButtonEvent> action, float paddingoffset = 0, float yoffset = 0) {
 			var child = were.AddChild("childEliment");
 			var rectTwo = child.AttachComponent<UIRect>();
 			rectTwo.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
@@ -220,18 +223,18 @@ namespace RhuEngine.Components
 			if (action != null) {
 				child.AttachComponent<UIButtonInteraction>().ButtonEvent.Target = action;
 			}
-			return icon;
+			return (icon, iconrect);
 		}
 
 		public void RegTaskBarItemsUpdate() {
-			RWorld.ExecuteOnEndOfFrame(this,TaskBarItemsUpdate);
+			RWorld.ExecuteOnEndOfFrame(this, TaskBarItemsUpdate);
 		}
 
 		public void TaskBarItemsUpdate() {
 			TaskBarItems.children.Clear();
 			foreach (var item in Engine.worldManager.worlds) {
 				if (item.Focus is World.FocusLevel.Background or World.FocusLevel.Focused) {
-					AddTaskBarItem(new WorldTaskBarItem(item),"");
+					AddTaskBarItem(new WorldTaskBarItem(item), "");
 				}
 			}
 			foreach (var item in taskBarItems) {
@@ -240,7 +243,7 @@ namespace RhuEngine.Components
 		}
 
 
-		public void AddTaskBarItem(ITaskBarItem taskBarItem,string appenedText) {
+		public void AddTaskBarItem(ITaskBarItem taskBarItem, string appenedText) {
 			var element = TaskBarItems.AddChild("listElementHolder");
 			var rect = element.AttachComponent<UIRect>();
 			rect.AnchorMin.Value = Vector2f.Zero;
@@ -250,10 +253,40 @@ namespace RhuEngine.Components
 			buttonevent.Click.Target = delegatecall.CallDelegate;
 			delegatecall.action = taskBarItem.Clicked;
 			var padding = 0.2f;
-			var child = taskBarItem.Texture is null
+			var (child, taskbarrect) = taskBarItem.Texture is null
 				? AddButton(element, taskBarItem.Icon ?? new Vector2i(7, 5), buttonevent.Call, padding, padding)
 				: AddButton(element, taskBarItem.Texture, buttonevent.Call, padding, padding);
-
+			if (taskBarItem.CanCloses) {
+				var eventComp = child.parent.Target.AttachComponent<UIHoverInteraction>();
+				var onhover = element.AttachComponent<DelegateCall>();
+				var unHover = element.AttachComponent<DelegateCall>();
+				var closeeButtpon = element.AttachComponent<DelegateCall>();
+				var LastClick = DateTime.UtcNow;
+				closeeButtpon.action = () => {
+					if((DateTime.UtcNow - LastClick).TotalSeconds < 0.5f) {
+						taskBarItem.Close();
+					}
+					LastClick = DateTime.UtcNow;
+				};
+				var closeeButtponEvent = element.AttachComponent<ButtonEventManager>();
+				closeeButtponEvent.Click.Target = closeeButtpon.CallDelegate;
+				eventComp.OnHover.Target += onhover.CallDelegate;
+				eventComp.OnUnHover.Target += unHover.CallDelegate;
+				var lastValue = taskbarrect.AnchorMax.Value;
+				var newValue = ((lastValue - taskbarrect.AnchorMin.Value) * new Vector2f(1f, 0.5f)) + taskbarrect.AnchorMin.Value;
+				var closebutton = child.parent.Target.AddChild("CloseButton");
+				var closeRect = closebutton.AttachComponent<UIRect>();
+				closeRect.AnchorMax.Value = lastValue;
+				closeRect.AnchorMin.Value = newValue;
+				closebutton.enabled.Value = false;
+				AddButton(closebutton, new Vector2i(20,0), closeeButtponEvent.Call);
+				onhover.action = () => {
+					closebutton.enabled.Value = true;
+				};
+				unHover.action = () => {
+					closebutton.enabled.Value = false;
+				};
+			}
 			var text = child.AddChild("Text");
 			var textrect = text.AttachComponent<UIRect>();
 			textrect.AnchorMin.Value = new Vector2f(0.1f, 0f);
@@ -317,7 +350,7 @@ namespace RhuEngine.Components
 			var startrect = StartEntity.AttachComponent<UIRect>();
 			startrect.AnchorMax.Value = new Vector2f(0.3f, 1f);
 			var min = StartEntity.AttachComponent<StartMenu>();
-			min.BuildStart(this,startrect, mit, iconMit, sprite);
+			min.BuildStart(this, startrect, mit, iconMit, sprite);
 			var img = StartEntity.AttachComponent<UIRectangle>();
 			var colorassign = StartEntity.AttachComponent<UIColorAssign>();
 			colorassign.Alpha.Value = 0.9f;
@@ -399,7 +432,7 @@ namespace RhuEngine.Components
 			colorassign.Alpha.Value = 0.9f;
 			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
-			
+
 			var leftSide = mainentity.AddChild("leftSide");
 			var leftSideList = leftSide.AttachComponent<HorizontalList>();
 			leftSideList.AnchorMin.Value = Vector2f.Zero;
@@ -485,25 +518,25 @@ namespace RhuEngine.Components
 
 		public T HasProgramOpen<T>() where T : Program {
 			foreach (var item in programs) {
-				if(item.GetType() == typeof(T)) {
+				if (item.GetType() == typeof(T)) {
 					return (T)item;
-				} 
+				}
 			}
 			return null;
 		}
 
-		public T OpenProgram<T>(bool forceOpen = false) where T:Program {
+		public T OpenProgram<T>(bool forceOpen = false) where T : Program {
 			forceOpen |= typeof(T).GetCustomAttribute<OpenManyAttribute>() != null;
 			if (!forceOpen) {
 				var lastProgram = HasProgramOpen<T>();
-				if(lastProgram is not null) {
+				if (lastProgram is not null) {
 					return lastProgram;
 				}
 			}
 			return (T)OpenProgramForced(typeof(T).GetFormattedName(), typeof(T));
 		}
 
-		public Program OpenProgram(Type ProgramType,bool forceOpen = false) {
+		public Program OpenProgram(Type ProgramType, bool forceOpen = false) {
 			forceOpen |= ProgramType.GetCustomAttribute<OpenManyAttribute>() != null;
 			if (!forceOpen) {
 				var lastProgram = HasProgramOpen(ProgramType);
@@ -517,7 +550,7 @@ namespace RhuEngine.Components
 		public int HowManyProgramsOpen(Type programType) {
 			var count = 0;
 			foreach (var item in programs) {
-				if(item.GetType() == programType) {
+				if (item.GetType() == programType) {
 					count++;
 				}
 			}
@@ -533,7 +566,7 @@ namespace RhuEngine.Components
 			programcomp.IntProgram();
 			var amount = HowManyProgramsOpen(programType);
 			programcomp.taskBarItem.ID += $".{amount}";
-			if(amount != 0) {
+			if (amount != 0) {
 				programcomp.taskBarItem.ExtraText = amount.ToString();
 			}
 			programs.Add(programcomp);
@@ -561,7 +594,7 @@ namespace RhuEngine.Components
 			startCanvas.FrontBindAngle.Value = Engine.MainSettings.UISettings.FrontBindAngle;
 			startCanvas.FrontBindRadus.Value = Engine.MainSettings.UISettings.FrontBindRadus + Engine.MainSettings.UISettings.TopOffset;
 			Entity.position.Value = new Vector3f(-0.7f, 0.1f, -0.1f);
-			startCanvas.Entity.position.Value = new Vector3f((-Engine.MainSettings.UISettings.TopOffset)/10, (uICanvas.scale.Value.y/10) + 0.01f, 0);
+			startCanvas.Entity.position.Value = new Vector3f((-Engine.MainSettings.UISettings.TopOffset) / 10, (uICanvas.scale.Value.y / 10) + 0.01f, 0);
 			//uICanvas.TopOffset.Value = false;
 			//uICanvas.FrontBind.Value = false;
 			//Entity.position.Value = new Vector3f(-0.7f, 0.1f, -1f);
@@ -589,21 +622,22 @@ namespace RhuEngine.Components
 				scrollRect.ScrollPos.Value = new Vector2f(0, _newvalue);
 			}
 			else if (_newvalue > 0.95f) {
-				if(scrollRect.ScrollPos.Value.x != 1) {
+				if (scrollRect.ScrollPos.Value.x != 1) {
 					scrollRect.ScrollPos.Value = new Vector2f(0, 1);
 				}
 				if (uICanvas.Entity.enabled.Value) {
 					uICanvas.Entity.enabled.Value = false;
 				}
-			}else if(_newvalue <= 0.01f && scrollRect.ScrollPos.Value.x != 0) {
+			}
+			else if (_newvalue <= 0.01f && scrollRect.ScrollPos.Value.x != 0) {
 				scrollRect.ScrollPos.Value = new Vector2f(0);
 			}
-			_newvaluetwo = MathUtil.Lerp(_newvaluetwo, (CurrentState != OpenPart.None)?0f:1f, RTime.Elapsedf * ((CurrentState != _part)?10f:5f));
+			_newvaluetwo = MathUtil.Lerp(_newvaluetwo, (CurrentState != OpenPart.None) ? 0f : 1f, RTime.Elapsedf * ((CurrentState != _part) ? 10f : 5f));
 			if (_newvaluetwo <= 0.01f && scrollRectTwo.ScrollPos.Value.x != 0) {
 				scrollRectTwo.ScrollPos.Value = new Vector2f(0);
 			}
 			if (_newvaluetwo >= 0.97f && scrollRectTwo.ScrollPos.Value.x != -1) {
-				scrollRectTwo.ScrollPos.Value = new Vector2f(0,-1);
+				scrollRectTwo.ScrollPos.Value = new Vector2f(0, -1);
 			}
 			if (_newvaluetwo is > 0.01f and < 0.97f) {
 				if (!startCanvas.Entity.enabled.Value) {
