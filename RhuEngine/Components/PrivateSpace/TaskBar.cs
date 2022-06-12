@@ -180,7 +180,7 @@ namespace RhuEngine.Components
 			iconrect.AnchorMin.Value = new Vector2f(PADDING + paddingoffset, PADDING + paddingoffset + yoffset);
 			iconrect.AnchorMax.Value = new Vector2f(1 - (PADDING + paddingoffset), 1 - (PADDING + paddingoffset) + yoffset);
 			var spriterender = icon.AttachComponent<UISprite>();
-			if (iconindex != new Vector2i(16, 0)) {
+			if (!(iconindex == new Vector2i(16, 0) || iconindex == new Vector2i(7, 6))) {
 				colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
 				colorassign.ColorShif.Value = 1.9f;
 				colorassign.TargetColor.Target = spriterender.Tint;
@@ -437,9 +437,12 @@ namespace RhuEngine.Components
 			leftSideList.AnchorMax.Value = new Vector2f(0.20f, 1);
 			leftSideList.Depth.Value = 0;
 			leftSideList.Fit.Value = true;
+#if DEBUG
+			AddButton(leftSide, new Vector2i(7, 6), OpenStart);
+#else
 			AddButton(leftSide, new Vector2i(16, 0), OpenStart);
+#endif
 			AddButton(leftSide, new Vector2i(8, 3), OpenSoundOptions);
-
 			var listentitHolder = mainentity.AddChild("listentitHolder");
 			var listentitHolderrect = listentitHolder.AttachComponent<CuttingUIRect>();
 			listentitHolderrect.AnchorMin.Value = new Vector2f(0.20f, 0.1f);
