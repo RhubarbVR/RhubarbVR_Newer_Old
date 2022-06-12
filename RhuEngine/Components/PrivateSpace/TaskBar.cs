@@ -272,12 +272,10 @@ namespace RhuEngine.Components
 				closeeButtponEvent.Click.Target = closeeButtpon.CallDelegate;
 				eventComp.OnHover.Target += onhover.CallDelegate;
 				eventComp.OnUnHover.Target += unHover.CallDelegate;
-				var lastValue = taskbarrect.AnchorMax.Value;
-				var newValue = ((lastValue - taskbarrect.AnchorMin.Value) * new Vector2f(1f, 0.5f)) + taskbarrect.AnchorMin.Value;
 				var closebutton = child.parent.Target.AddChild("CloseButton");
 				var closeRect = closebutton.AttachComponent<UIRect>();
-				closeRect.AnchorMax.Value = lastValue;
-				closeRect.AnchorMin.Value = newValue;
+				closeRect.AnchorMax.Value = new Vector2f(1f);
+				closeRect.AnchorMin.Value = new Vector2f(0.65f);
 				closebutton.enabled.Value = false;
 				AddButton(closebutton, new Vector2i(20,0), closeeButtponEvent.Call);
 				onhover.action = () => {
