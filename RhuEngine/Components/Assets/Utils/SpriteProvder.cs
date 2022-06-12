@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 
 		public readonly Sync<Vector2i> GridSize;
 		
-		[Exsposed]
+		[Exposed]
 		public Vector2i GetSizeOfSprite(Vector2i min, Vector2i max) {
 			max += Vector2i.One;
 			var size = max - min;
@@ -25,7 +25,7 @@ namespace RhuEngine.Components
 			return new Vector2i(x, y) * size;
 		}
 
-		[Exsposed]
+		[Exposed]
 		public (Vector2f, Vector2f) GetSpriteSizePoints(Vector2i min, Vector2i max) {
 			max += Vector2i.One;
 			var size = (Vector2f)(max - min) / (Vector2f)GridSize.Value;

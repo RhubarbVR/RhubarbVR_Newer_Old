@@ -26,17 +26,17 @@ namespace RhuEngine.WorldObjects
 		private readonly object _buildRefIDLock = new();
 
 		public ulong ItemIndex { get; private set; } = 1;
-		[Exsposed]
+		[Exposed]
 		public int EntityCount => _entities.Count;
-		[Exsposed]
+		[Exposed]
 		public int UpdatingEntityCount => _updatingEntities.Count;
-		[Exsposed]
+		[Exposed]
 		public int RenderingComponentsCount => _renderingComponents.Count;
-		[Exsposed]
+		[Exposed]
 		public int GlobalStepableCount => _globalStepables.Count;
-		[Exsposed]
+		[Exposed]
 		public int WorldObjectsCount => _worldObjects.Count;
-		[Exsposed]
+		[Exposed]
 		public int NetworkedObjectsCount => _networkedObjects.Count;
 		public NetPointer NextRefID() {
 			NetPointer netPointer;

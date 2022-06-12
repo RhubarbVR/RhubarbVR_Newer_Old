@@ -24,7 +24,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 		public override bool LocalName => true;
 
-		[Exsposed]
+		[Exposed]
 		public void Click() {
 		}
 
@@ -78,7 +78,7 @@ namespace RhuEngine.Components.PrivateSpace
 		public UIText Email;
 
 
-		[Exsposed]
+		[Exposed]
 		public void MainButton(ButtonEvent buttonEvent) {
 			if (!buttonEvent.IsClicked) {
 				return;
@@ -128,7 +128,7 @@ namespace RhuEngine.Components.PrivateSpace
 		public StandardLocale ButtonTwoText;
 
 		
-		[Exsposed]
+		[Exposed]
 		public void ToggleButton(ButtonEvent buttonEvent) {
 			if (!buttonEvent.IsClicked) {
 				return;

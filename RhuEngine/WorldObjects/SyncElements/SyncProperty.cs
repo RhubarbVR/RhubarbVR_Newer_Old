@@ -27,7 +27,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public T Value
 		{
 			get => GetValue.Invoke();

@@ -23,7 +23,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 		public override bool LocalName => true;
 
-		[Exsposed]
+		[Exposed]
 		public void CreateNewWorld(ButtonEvent buttonEvent) {
 			if (!buttonEvent.IsClicked) {
 				return;

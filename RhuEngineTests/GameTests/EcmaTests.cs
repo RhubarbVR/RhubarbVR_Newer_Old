@@ -89,7 +89,7 @@ namespace RhuEngine.GameTests.Tests
 			}
 
 			public bool IGoTrue = false;
-			[Exsposed]
+			[Exposed]
 			public void IfIrunISetValueToTrue() {
 				RLog.Err("I Ran Value Change");
 				IGoTrue = true;

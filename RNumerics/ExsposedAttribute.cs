@@ -1,7 +1,7 @@
 ﻿
-public class ExsposedAttribute : System.Attribute
+public class ExposedAttribute : System.Attribute
 {
-	public ExsposedAttribute() {
+	public ExposedAttribute() {
 	}
 }
 public class UnExsposedAttribute : System.Attribute

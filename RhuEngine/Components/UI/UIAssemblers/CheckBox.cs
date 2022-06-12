@@ -33,7 +33,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void Click(ButtonEvent buttonEvent) {
 			if (!buttonEvent.IsClicked) {
 				return;

@@ -20,7 +20,7 @@ namespace RhuEngine.WorldObjects
 
 		private T _value;
 
-		[Exsposed]
+		[Exposed]
 		public T Value
 		{
 			get => _value;

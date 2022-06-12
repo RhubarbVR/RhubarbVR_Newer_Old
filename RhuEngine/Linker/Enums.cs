@@ -54,9 +54,6 @@ namespace RhuEngine.Linker
 		Layer8 = 1 << 8,
 		/// <summary>Render layer 9.</summary>
 		Layer9 = 1 << 9,
-		/// <summary>The default VFX layer, StereoKit draws some non-standard
-		/// mesh content using this flag, such as lines.</summary>
-		Vfx = 1 << 10,
 		/// <summary>This is a flag that specifies all possible layers. If you
 		/// want to render all layers, then this is the layer filter
 		/// you would use. This is the default for render filtering.</summary>

@@ -320,14 +320,14 @@ namespace RhuEngine.Components
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void OpenStart(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				RLog.Info("OpenStart");
 				OpenLevel = OpenLevel != OpenPart.Start ? OpenPart.Start : OpenPart.None;
 			}
 		}
-		[Exsposed]
+		[Exposed]
 		public void OpenSoundOptions(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				RLog.Info("OpenSoundOptions");
@@ -335,7 +335,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void OpenNotifications(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				RLog.Info("OpenNotifications");
@@ -404,6 +404,7 @@ namespace RhuEngine.Components
 			var shader = World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
 			mit = Entity.AttachComponent<DynamicMaterial>();
 			mit.shader.Target = shader;
+			mit.Transparency = Transparency.Blend;
 			iconMit = Entity.AttachComponent<DynamicMaterial>();
 			iconMit.shader.Target = shader;
 			var icons = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();

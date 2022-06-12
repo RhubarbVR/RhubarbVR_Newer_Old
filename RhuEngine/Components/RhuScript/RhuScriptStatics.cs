@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace RhuEngine.Components
 {
-	[Exsposed]
+	[Exposed]
 	public static class RhuScriptStatics
 	{
 		public static string ToString(object value) {

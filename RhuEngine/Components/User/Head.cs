@@ -31,9 +31,22 @@ namespace RhuEngine.Components
 			entity.scale.Value = new Vector3f(0.005f);
 			entity.rotation.Value = Quaternionf.CreateFromEuler(0, 90, 0);
 			invr.isNotVR.Target = entity.enabled;
-			entity.AttachMeshWithMeshRender<RectangleMesh, UnlitShader>();
+			var (mesh,mrit,render) = entity.AttachMeshWithMeshRender<SpriteMesh, UnlitShader>();
+			var colorer = entity.AttachComponent<UIColorAssign>();
+			colorer.TargetColor.Target = render.colorLinear;
+			colorer.ColorShif.Value = 1.9f;
+			colorer.Alpha.Value = 0.9f;
+			var ea = entity.AttachComponent<IconsTex>();
+			var sprite = entity.AttachComponent<SpriteProvder>();
+			sprite.Texture.Target = ea;
+			mrit.MainTexture = ea;
+			mrit.Transparency = Transparency.Blend;
+			render.OrderOffset.Value = 1000000000;
+			sprite.GridSize.Value = new Vector2i(26, 7);
+			mesh.Dimensions.Value = new Vector2f(1.25f);
+			mesh.Sprite.Target = sprite;
+			mesh.SetPos(new Vector2i(16,2));
 		}
-
 
 		public override void Step() {
 			if (!Engine.EngineLink.CanInput) {

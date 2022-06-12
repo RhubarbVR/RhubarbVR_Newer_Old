@@ -13,7 +13,7 @@ namespace RhuEngine.Components
 		public readonly Linker<float> RectRounding;
 		public readonly Linker<int> RectRoundingSteps;
 
-		[Exsposed]
+		[Exposed]
 		public void BindRect(UIRectangle uIRectangle) {
 			RectRounding.SetLinkerTarget(uIRectangle.Rounding);
 			RectRoundingSteps.SetLinkerTarget(uIRectangle.RoundingSteps);

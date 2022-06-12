@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 
 		public readonly SyncObjList<SyncDelegate> Events;
 
-		[Exsposed]
+		[Exposed]
 		public void Call() {
 			if(Index.Value < 0) {
 				return;

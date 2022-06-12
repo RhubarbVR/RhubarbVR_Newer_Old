@@ -66,7 +66,7 @@ namespace RhuEngine.Components
 			}
 			catch { }
 		}
-		[Exsposed]
+		[Exposed]
 		public void RemoteGrab(Handed hand) {
 			RLog.Info("Remote grab");
 			var grabbableHolder = hand switch {

@@ -186,9 +186,9 @@ namespace RhuEngine.Components
 		/// <summary>
 		/// Add button to click
 		/// </summary>
-		/// <param name="onClick">Needs to be a method with the <see cref="ExsposedAttribute"/></param>
-		/// <param name="onPressing">Needs to be a method with the <see cref="ExsposedAttribute"/></param>
-		/// <param name="onReleases">Needs to be a method with the <see cref="ExsposedAttribute"/></param>
+		/// <param name="onClick">Needs to be a method with the <see cref="ExposedAttribute"/></param>
+		/// <param name="onPressing">Needs to be a method with the <see cref="ExposedAttribute"/></param>
+		/// <param name="onReleases">Needs to be a method with the <see cref="ExposedAttribute"/></param>
 		/// <param name="autoPop">Auto reset the stack after the button</param>
 		public (UIButtonInteraction, ButtonEventManager) AddButtonEvent(Action onClick = null, Action onPressing = null, Action onReleases = null, bool autoPop = true, float coloroffset = 0, float alpha = 1, bool? fullbox = null, Vector2f? min = null, Vector2f? max = null) {
 			AttachChildRect<UIRect>(min, max);

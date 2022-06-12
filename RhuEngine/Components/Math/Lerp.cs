@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 		public readonly Sync<double> time;
 		public readonly Sync<bool> removeOnDone;
 
-		[Exsposed]
+		[Exposed]
 		public void StartLerp(ILinkerMember<T> target, T targetpos, double timef, bool removeondone = true) {
 			driver.SetLinkerTarget(target);
 			from.Value = driver.LinkedValue;

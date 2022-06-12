@@ -51,7 +51,7 @@ namespace RhuEngine.Components
 
 		public readonly SyncDelegate<Action<ButtonEvent>> ButtonEvent;
 
-		[Exsposed]
+		[Exposed]
 		[NoWriteExsposed]
 		public bool IsClicking { get; private set; }
 

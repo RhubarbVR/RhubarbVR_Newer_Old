@@ -21,12 +21,12 @@ namespace RhuEngine.Components
 			[Default("RunCode")]
 			public readonly Sync<string> FunctionName;
 
-			[Exsposed]
+			[Exposed]
 			public void Invoke() {
 				((ECMAScript)Parent.Parent).RunCode(FunctionName.Value);
 			}
 
-			[Exsposed]
+			[Exposed]
 			public void Invoke(params object[] prams) {
 				((ECMAScript)Parent.Parent).RunCode(FunctionName.Value, prams);
 			}
@@ -39,7 +39,7 @@ namespace RhuEngine.Components
 			Functions.Add();
 		}
 
-		[Exsposed]
+		[Exposed]
 		public bool ScriptLoaded => _ecma is not null;
 
 		public readonly SyncObjList<SyncRef<IWorldObject>> Targets;
@@ -54,7 +54,7 @@ namespace RhuEngine.Components
 
 		private Jint.Engine _ecma;
 
-		[Exsposed]
+		[Exposed]
 		public void Invoke(string function, params object[] values) {
 			RunCode(function, values);
 		}
@@ -85,7 +85,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public IWorldObject GetTarget(int index) {
 			return Targets.GetValue(index).Target;
 		}
@@ -97,7 +97,7 @@ namespace RhuEngine.Components
 				options.TimeoutInterval(TimeSpan.FromSeconds(1));
 				options.MaxStatements(1580);
 				options.SetTypeResolver(new TypeResolver {
-					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()))&& !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
+					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()))&& !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
 				});
 				options.Strict = true;
 			});

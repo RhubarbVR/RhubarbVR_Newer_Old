@@ -253,23 +253,23 @@ namespace RhuEngine.Components
 		}
 
 
-		[Exsposed]
+		[Exposed]
 		public void CollapseUI() {
 			IsCollapsed.Value = !IsCollapsed.Value;
 		}
-		[Exsposed]
+		[Exposed]
 		public void PinUI() {
 			IsPin.Value = !IsPin.Value;
 			PinChanged.Target?.Invoke(IsPin.Value);
 		}
-		[Exsposed]
+		[Exposed]
 		public void CollapseAction(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				OnCollapse.Target?.Invoke();
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void PinAction(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				OnPin.Target?.Invoke();
@@ -277,14 +277,14 @@ namespace RhuEngine.Components
 		}
 
 
-		[Exsposed]
+		[Exposed]
 		public void CloseAction(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				OnClose.Target?.Invoke();
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void MinimizeAction(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				OnMinimize.Target?.Invoke();

@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 
 		public readonly SyncDelegate<Action<T>> Target;
 
-		[Exsposed]
+		[Exposed]
 		public void Call() {
 			Target.Target?.Invoke(Ref.Target);
 		}

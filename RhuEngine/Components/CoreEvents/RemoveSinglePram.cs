@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 
 		public readonly SyncDelegate Target;
 
-		[Exsposed]
+		[Exposed]
 		public void Call(T value) {
 			if (Linker.Linked) {
 				Linker.LinkedValue = value;

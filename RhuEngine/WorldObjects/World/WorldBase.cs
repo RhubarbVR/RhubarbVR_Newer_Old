@@ -192,7 +192,7 @@ namespace RhuEngine.WorldObjects
 
 		[Default("New World")]
 		public readonly Sync<string> WorldName;
-		[Exsposed]
+		[Exposed]
 		public string WorldDebugName => $"{(IsPersonalSpace ? "P" : "")}{((worldManager.LocalWorld == this) ? "L" : "")} {SessionName.Value}";
 
 		private void UpdateFocus() {

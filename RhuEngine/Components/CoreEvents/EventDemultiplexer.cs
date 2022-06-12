@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 
 		public class InnerEvent : SyncObject
 		{
-			[Exsposed]
+			[Exposed]
 			public void Call() {
 				try {
 					((EventDemultiplexer)Parent.Parent).CalledMethod(this);

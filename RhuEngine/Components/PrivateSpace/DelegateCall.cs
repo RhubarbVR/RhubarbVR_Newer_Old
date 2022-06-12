@@ -11,7 +11,7 @@ namespace RhuEngine.Components.PrivateSpace
 	public class DelegateCall:Component
 	{
 		public Action action;
-		[Exsposed]
+		[Exposed]
 		public void CallDelegate() {
 			action();
 		}

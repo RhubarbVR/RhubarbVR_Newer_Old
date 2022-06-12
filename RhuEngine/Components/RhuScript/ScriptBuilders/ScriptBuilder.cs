@@ -64,7 +64,7 @@ namespace RhuEngine.Components
 		public abstract void OnGainFocus();
 
 		public abstract void OnLostFocus();
-		[Exsposed]
+		[Exposed]
 		public void FocusScriptBuilder() {
 			if (IsFocused) {
 				OnGainFocus();
@@ -77,15 +77,15 @@ namespace RhuEngine.Components
 
 		public bool IsFocused => World.FocusedScriptBuilder == this;
 
-		[Exsposed]
+		[Exposed]
 		public abstract void LoadFromScript();
-		[Exsposed]
+		[Exposed]
 		public abstract void Compile();
-		[Exsposed]
+		[Exposed]
 
 		public abstract void OnError();
 
-		[Exsposed]
+		[Exposed]
 
 		public abstract void OnClearError();
 

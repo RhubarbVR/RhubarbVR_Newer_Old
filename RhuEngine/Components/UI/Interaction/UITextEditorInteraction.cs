@@ -11,11 +11,11 @@ namespace RhuEngine.Components
 {
 	public interface ICurrsorTextProvider : ISyncObject
 	{
-		[Exsposed]
+		[Exposed]
 		public int CurrsorPos { get; }
-		[Exsposed]
+		[Exposed]
 		public int CurrsorLength { get; }
-		[Exsposed]
+		[Exposed]
 		public bool RenderCurrsor { get; }
 	}
 
@@ -46,7 +46,7 @@ namespace RhuEngine.Components
 			CurrentEditor = false;
 			OnDoneEditing.Target?.Invoke();
 		}
-		[Exsposed]
+		[Exposed]
 		public override void EditingClick() {
 			CurrentEditor = !CurrentEditor;
 			if (!CurrentEditor) {
@@ -70,7 +70,7 @@ namespace RhuEngine.Components
 		public override int RenderCurrsorPos { get; set; }
 		public override int RenderCurrsorLength { get; set; }
 
-		[Exsposed]
+		[Exposed]
 		public override void EditingClick() {
 			if (CurrentUser.Target is null) {
 				ForceStartEditing();
@@ -79,26 +79,26 @@ namespace RhuEngine.Components
 				ForceEndEditing();
 			}
 		}
-		[Exsposed]
+		[Exposed]
 		public void ForceEndEditing() {
 			Engine.KeyboardInteractionUnBind(this);
 			CurrentUser.Target = null;
 			OnDoneEditing.Target?.Invoke();
 		}
-		[Exsposed]
+		[Exposed]
 		public void ForceStartEditing() {
 			Engine.KeyboardInteractionBind(this);
 			CurrentUser.Target = LocalUser;
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void EndEditing() {
 			if (CurrentUser.Target == LocalUser) {
 				ForceEndEditing();
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void StartEditing() {
 			if (CurrentUser.Target is null) {
 				ForceStartEditing();
@@ -140,7 +140,7 @@ namespace RhuEngine.Components
 		public abstract void KeyboardBind();
 
 		public abstract void KeyboardUnBind();
-		[Exsposed]
+		[Exposed]
 		public abstract void EditingClick();
 
 		public override void Step() {

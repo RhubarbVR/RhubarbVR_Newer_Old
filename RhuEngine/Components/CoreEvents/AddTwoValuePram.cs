@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 
 		public readonly SyncDelegate<Action<T1,T2>> Target;
 
-		[Exsposed]
+		[Exposed]
 		public void Call() {
 			Target.Target?.Invoke(FirstValue, SecondValue);
 		}

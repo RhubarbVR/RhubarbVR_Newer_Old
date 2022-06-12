@@ -42,7 +42,7 @@ namespace RhuEngine.Components.ScriptNodes
 			if (field.GetCustomAttribute<NoWriteExsposedAttribute>(true) is not null) {
 				return;
 			}
-			if (field.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+			if (field.GetCustomAttribute<ExposedAttribute>(true) is null) {
 				return;
 			}
 			_field = field;
@@ -84,7 +84,7 @@ namespace RhuEngine.Components.ScriptNodes
 			if (fieldInfo.GetCustomAttribute<NoWriteExsposedAttribute>(true) is not null) {
 				throw new Exception("Not Exposed");
 			}
-			if (fieldInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+			if (fieldInfo.GetCustomAttribute<ExposedAttribute>(true) is null) {
 				throw new Exception("Not Exposed");
 			}
 			InputType = node.ReturnType;
@@ -99,7 +99,7 @@ namespace RhuEngine.Components.ScriptNodes
 			if (fieldInfo.GetCustomAttribute<NoWriteExsposedAttribute>(true) is not null) {
 				throw new Exception("Not Exposed");
 			}
-			if (fieldInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+			if (fieldInfo.GetCustomAttribute<ExposedAttribute>(true) is null) {
 				throw new Exception("Not Exposed");
 			}
 			InputType = node;

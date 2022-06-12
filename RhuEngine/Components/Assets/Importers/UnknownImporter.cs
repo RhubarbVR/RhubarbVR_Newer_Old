@@ -47,7 +47,7 @@ namespace RhuEngine.Components
 			//}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void RunImport(string data) {
 			var e = Type.GetType(data);
 			if(e != null) {

@@ -27,7 +27,7 @@ namespace RhuEngine.Components
 		[NoSync]
 		TaskBar _taskBar;
 
-		[Exsposed]
+		[Exposed]
 		public void ExitButton(ButtonEvent buttonEvent) {
 			if (!buttonEvent.IsClicked) {
 				return;
@@ -35,7 +35,7 @@ namespace RhuEngine.Components
 			Engine.Close();
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void SettingsButton(ButtonEvent buttonEvent) {
 			if (!buttonEvent.IsClicked) {
 				return;
@@ -43,7 +43,7 @@ namespace RhuEngine.Components
 			_taskBar.OpenProgram<SettingsProgram>();
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void FileExplorerButton(ButtonEvent buttonEvent) {
 			if (!buttonEvent.IsClicked) {
 				return;
@@ -51,7 +51,7 @@ namespace RhuEngine.Components
 			_taskBar.OpenProgram<FileExplorerProgram>();
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void UserButton(ButtonEvent buttonEvent) {
 			if (!buttonEvent.IsClicked) {
 				return;

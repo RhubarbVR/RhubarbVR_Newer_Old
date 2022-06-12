@@ -39,7 +39,7 @@ namespace RhuEngine.WorldObjects
 					if (worldObject.World != World) {
 						throw new Exception("Delegate owner belongs to a different world");
 					}
-					if(@delegate.GetMethodInfo().GetCustomAttribute<ExsposedAttribute>() is null) {
+					if(@delegate.GetMethodInfo().GetCustomAttribute<ExposedAttribute>() is null) {
 						throw new Exception("Method does not have Exsposed Attribute");
 					}
 					_type = @delegate.Method.DeclaringType;
