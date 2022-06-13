@@ -96,6 +96,13 @@ namespace RNumerics
 			}
 		}
 
+		public static Random random = new();
+
+		public static Colorf RandomHue() {
+			var color = new ColorHSV((float)random.NextDouble() * 360, 1,1);
+			return color.ConvertToRGB();
+		}
+
 		public Colorf Clone(float fAlphaMultiply = 1.0f) {
 			return new Colorf(r, g, b, a * fAlphaMultiply);
 		}

@@ -18,6 +18,12 @@ namespace RhuEngine
 			RLog.Info("Building Local World");
 			var floor = world.RootEntity.AddChild("Floor");
 			floor.position.Value = new Vector3f(0, 0, 0);
+
+			
+			//Todo: fix problem with RigidBody
+			//var rigbody = PowerCube.AttachComponent<RigidBody>();
+			//rigbody.PhysicsObject.Target = boxshape;
+			var coloider = floor.AttachComponent<CylinderShape>();
 			var (mesh, mit, render) = floor.AttachMeshWithMeshRender<CylinderMesh, UnlitShader>();
 			mit.Transparency = Transparency.Blend;
 			var colorFollower = floor.AttachComponent<UIColorAssign>();
@@ -28,9 +34,29 @@ namespace RhuEngine
 			mesh.TopRadius.Value = 4;
 			mesh.BaseRadius.Value = 3.5f;
 			mesh.Height.Value = 0.25f;
+			coloider.boxHalfExtent.Value = new Vector3d(8, 0.25f, 8)/2;
 			var spinningCubes = world.RootEntity.AddChild("SpinningCubes");
 			spinningCubes.position.Value = new Vector3f(0, 0.5f, 0);
 			AttachSpiningCubes(spinningCubes);
+			var box = floor.AttachComponent<TrivialBox3Mesh>();
+			var size = 10;
+			Entity LastpowerCube = null;
+			for (var y = 0; y < size; y++) {
+				for (var a = 0; a < size; a++) {
+					for (var i = 0; i < size; i++) {
+						var PowerCube = world.RootEntity.AddChild($"PowerCube{i}{a}{y}");
+						PowerCube.position.Value = new Vector3f((i * 0.3f) - (size * 0.15), 1.7f + (y * 0.3f), -0.4f - (a * 0.3f));
+						PowerCube.scale.Value = new Vector3f(0.15);
+						if (LastpowerCube is not null) {
+							PowerCube.SetParent(LastpowerCube);
+						}
+						AttachRender(box, mit, PowerCube, Colorf.RandomHue());
+						var boxshape = PowerCube.AttachComponent<BoxShape>();
+						PowerCube.AttachComponent<Grabbable>();
+						LastpowerCube = PowerCube;
+					}
+				}
+			}
 			RLog.Info("Built Local World");
 		}
 

@@ -37,6 +37,8 @@ namespace RhuEngine.Managers
 
 		public float TotalStepTime { get; private set; }
 
+		public PrivateSpaceManager PrivateSpaceManager { get; internal set; }
+
 		private readonly Stopwatch _stepStopwatch = new();
 
 		private void FocusedWorldChange() {
@@ -46,8 +48,7 @@ namespace RhuEngine.Managers
 			if (SaveLocalWorld) {
 				try {
 					var data = LocalWorld.Serialize(new SyncObjectSerializerObject(false));
-					var json = MessagePack.MessagePackSerializer.ConvertToJson(data.GetByteArray(), Serializer.Options);
-					File.WriteAllText(Engine.BaseDir + "LocalWorldTest.json", json);
+					File.WriteAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld", data.GetByteArray());
 				}
 				catch (Exception ex) {
 					RLog.Err($"Failed to save world {ex}");

@@ -40,10 +40,40 @@ namespace RhuEngine.WorldObjects.ECS
 
 		public override bool Persistence => persistence.Value;
 
+		public event Action<int, Vector3f, Vector3f, float, float> OnLazerPyhsics;
+		
+		internal void CallOnLazer(int v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce) {
+			OnLazerPyhsics?.Invoke(v,hitnormal, hitpointworld, pressForce, gripForce);
+		}
+		
+		public event Action<uint, Vector3f, Vector3f> OnTouchPyhsics;
+
+		internal void CallOnTouch(uint v, Vector3f hitnormal, Vector3f hitpointworld) {
+			OnTouchPyhsics?.Invoke(v, hitnormal, hitpointworld);
+		}
+
 		public void ParentDepthUpdate() {
 			CachedDepth = Depth;
 			foreach (var child in children) {
 				((Entity)child).ParentDepthUpdate();
+			}
+		}
+
+		internal void SetGlobalMatrixPysics(Matrix matrix) {
+			var parentMatrix = Matrix.S(Vector3f.One);
+			if (_internalParent != null) {
+				parentMatrix = _internalParent.GlobalTrans;
+			}
+			var newLocal = matrix * parentMatrix.Inverse;
+			newLocal.Decompose(out var newtranslation, out var newrotation, out var newscale);
+			position.SetValueNoOnChange(newtranslation);
+			rotation.SetValueNoOnChange(newrotation);
+			scale.SetValueNoOnChange(newscale);
+			_cachedGlobalMatrix = matrix;
+			_cachedLocalMatrix = newLocal;
+			GlobalTransformChange?.Invoke(this, false);
+			foreach (Entity item in children) {
+				item.GlobalTransMark();
 			}
 		}
 
@@ -335,7 +365,7 @@ namespace RhuEngine.WorldObjects.ECS
 		[Exposed]
 		public bool IsRoot => World?.RootEntity == this;
 
-		public event Action<Entity> GlobalTransformChange;
+		public event Action<Entity,bool> GlobalTransformChange;
 
 		public event Action OffsetChanged;
 		[Exposed]
@@ -360,7 +390,7 @@ namespace RhuEngine.WorldObjects.ECS
 				scale.SetValueNoOnChange(newscale);
 				_cachedGlobalMatrix = value;
 				_cachedLocalMatrix = newLocal;
-				GlobalTransformChange?.Invoke(this);
+				GlobalTransformChange?.Invoke(this,true);
 				foreach (Entity item in children) {
 					item.GlobalTransMark();
 				}
@@ -386,7 +416,7 @@ namespace RhuEngine.WorldObjects.ECS
 				scale.SetValueNoOnChange(newscale);
 				_cachedGlobalMatrix = value * parentMatrix;
 				_cachedLocalMatrix = value;
-				GlobalTransformChange?.Invoke(this);
+				GlobalTransformChange?.Invoke(this, true);
 				foreach (Entity item in children) {
 					item.GlobalTransMark();
 				}
@@ -412,7 +442,7 @@ namespace RhuEngine.WorldObjects.ECS
 			foreach (Entity item in children) {
 				item.GlobalTransMark();
 			}
-			GlobalTransformChange?.Invoke(this);
+			GlobalTransformChange?.Invoke(this, true);
 		}
 
 		public override void FirstCreation() {

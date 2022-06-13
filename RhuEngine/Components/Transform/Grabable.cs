@@ -13,6 +13,9 @@ namespace RhuEngine.Components
 
 		public readonly Sync<bool> CanNotDestroy;
 
+		[Default(0.5f)]
+		public readonly Sync<float> GripForce;
+
 		public readonly SyncRef<User> grabbingUser;
 
 		public readonly SyncRef<GrabbableHolder> grabbableHolder;
@@ -41,12 +44,37 @@ namespace RhuEngine.Components
 			grabbableHolder.Target = null;
 		}
 
+		public override void OnLoaded() {
+			base.OnLoaded();
+			Entity.OnLazerPyhsics += Entity_OnLazerPyhsics;
+		}
 
-		private void Entity_onGrip(GrabbableHolder obj, bool Laser) {
+		private void Entity_OnLazerPyhsics(int arg1, Vector3f arg2, Vector3f arg3, float arg4, float arg5) {
+			if(arg1 == 10) {
+				GripProcess(World.HeadGrabbableHolder, true, arg5);
+			}
+		}
+
+		private void GripProcess(GrabbableHolder obj, bool Laser,float gripForce) {
+			if (gripForce < GripForce.Value) {
+				return;
+			}
 			if (grabbableHolder.Target == obj) {
 				return;
 			}
-
+			if (Laser) {
+				switch (obj.source.Value) {
+					case Handed.Left:
+						break;
+					case Handed.Right:
+						break;
+					case Handed.Max:
+						WorldManager.PrivateSpaceManager.DisableHeadLaser = true;
+						break;
+					default:
+						break;
+				}
+			}
 			if (obj == null) {
 				return;
 			}
@@ -68,14 +96,13 @@ namespace RhuEngine.Components
 		}
 		[Exposed]
 		public void RemoteGrab(Handed hand) {
-			RLog.Info("Remote grab");
 			var grabbableHolder = hand switch {
 				Handed.Left => World.LeftGrabbableHolder,
 				Handed.Right => World.RightGrabbableHolder,
 				_ => World.HeadGrabbableHolder,
 			};
 			if (grabbableHolder is not null) {
-				Entity_onGrip(grabbableHolder, true);
+				GripProcess(grabbableHolder, true,1f);
 			}
 		}
 	}

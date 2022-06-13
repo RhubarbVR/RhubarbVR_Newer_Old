@@ -101,17 +101,38 @@ namespace RhuEngine.Components
 			};
 			if (isGrab && !_gripping) {
 				//StartGabbing
-				RLog.Info("StartGabbing");
+				RWorld.ExecuteOnStartOfFrame(() => {
+					switch (source.Value) {
+						case Handed.Left:
+							break;
+						case Handed.Right:
+							break;
+						case Handed.Max:
+							WorldManager.PrivateSpaceManager.DisableHeadLaser = true;
+							break;
+						default:
+							break;
+					}
+				});
 				_gripping = true;
-			}
-			if (_gripping) {
-
 			}
 			if (_gripping && !isGrab) {
 				//DoneGrabbing
-				RLog.Info("DoneGrabbing");
+				RWorld.ExecuteOnStartOfFrame(() => {
+					switch (source.Value) {
+						case Handed.Left:
+							break;
+						case Handed.Right:
+							break;
+						case Handed.Max:
+							WorldManager.PrivateSpaceManager.DisableHeadLaser = false;
+							break;
+						default:
+							break;
+					}
+				});
 				for (var i = 0; i < GrabbedObjects.Count; i++) {
-					GrabbedObjects[i].Drop();
+					GrabbedObjects[0].Drop();
 				}
 				_gripping = false;
 			}

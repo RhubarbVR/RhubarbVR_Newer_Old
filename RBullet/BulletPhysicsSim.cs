@@ -27,6 +27,8 @@ namespace RBullet
 			_solverPool = new ConstraintSolverPoolMultiThreaded(Math.Max(Environment.ProcessorCount - 1,1));
 			_parallelSolver = new SequentialImpulseConstraintSolverMultiThreaded();
 			_physicsWorld = new DiscreteDynamicsWorldMultiThreaded(_dispatcher, _broadphase, _solverPool, _parallelSolver, _collisionConfiguration);
+			var grav = new Vector3(0, -10, 0);
+			_physicsWorld.SetGravity(ref grav);
 		}
 
 		public SafeList<BRigidBodyCollider> Updates = new SafeList<BRigidBodyCollider>();

@@ -246,6 +246,22 @@ namespace RhuEngine.GameTests.Tests
 			tester.Dispose();
 		}
 
+		//Todo: fix problem with RigidBody
+		//[TestMethod]
+		//public void RiggedBodyTest() {
+		//	var testWorld = StartNewTestWorld();
+		//	var box = new RBoxShape(0.5f);
+		//	var startPos = Matrix.TS(Vector3f.One, 1);
+		//	var collider = box.GetCollider(testWorld.PhysicsSim, startPos);
+		//	collider.NoneStaticBody = true;
+		//	collider.Mass = 100f;
+		//	collider.Active = true;
+		//	tester.RunForSteps(2);
+		//	Assert.AreNotEqual(startPos, collider.Matrix);
+		//	tester.Dispose();
+		//}
+
+
 		[TestMethod]
 		public void ConvexRayTest() {
 			var testWorld = StartNewTestWorld();
