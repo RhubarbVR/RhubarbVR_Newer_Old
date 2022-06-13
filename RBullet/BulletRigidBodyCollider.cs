@@ -17,7 +17,7 @@ namespace RBullet
 		public Matrix Matrix;
 
 		public bool Enabled = true;
-		public bool NoneStaticBody = false;
+		public bool NoneStaticBody = true;
 
 		public ECollisionFilterGroups Group = ECollisionFilterGroups.AllFilter;
 		public ECollisionFilterGroups Mask = ECollisionFilterGroups.AllFilter;
@@ -66,13 +66,6 @@ namespace RBullet
 
 		private bool _added = false;
 
-		public void UpdateMass() {
-			var isDynamic = Mass != 0.0f;
-			var localInertia = isDynamic ? collisionObject.CollisionShape.CalculateLocalInertia(Mass) : Vector3.Zero;
-			collisionObject.SetMassProps(Mass, localInertia);
-			collisionObject.Activate(true);
-		}
-
 		public void ReloadCollission() {
 			if (collisionObject is null) {
 				StartShape();
@@ -109,9 +102,14 @@ namespace RBullet
 			collisionObject = newCol;
 		}
 
+		private Matrix _matrix;
+
 		public void ReloadTrans() {
 			if (collisionObject != null) {
-				collisionObject.WorldTransform = CastMet(Matrix);
+				if (Matrix != _matrix) {
+					_matrix = Matrix; 
+					collisionObject.WorldTransform = CastMet(Matrix);
+				}
 			}
 		}
 
@@ -142,10 +140,6 @@ namespace RBullet
 		public void Remove() {
 			BuildCollissionObject(null);
 		}
-
-		public Matrix GetPysihcsMetrix() {
-			return CastMet(collisionObject.WorldTransform);
-		}
 	}
 	public class BulletRigidBodyCollider : ILinkedRigidBodyCollider
 	{
@@ -155,8 +149,7 @@ namespace RBullet
 
 		public void ActiveSet(object obj, bool val) {
 			((BRigidBodyCollider)obj).Enabled = val;
-			((BRigidBodyCollider)obj).collisionObject.ForceActivationState(ActivationState.ActiveTag);
-			((BRigidBodyCollider)obj).collisionObject.Activate(true);
+			((BRigidBodyCollider)obj).ReloadCollission();
 		}
 
 
@@ -184,11 +177,11 @@ namespace RBullet
 
 		public void MassSet(object obj, float val) {
 			((BRigidBodyCollider)obj).Mass = val;
-			((BRigidBodyCollider)obj).UpdateMass();
+			((BRigidBodyCollider)obj).ReloadCollission();
 		}
 
 		public Matrix MatrixGet(object obj) {
-			return ((BRigidBodyCollider)obj).GetPysihcsMetrix();
+			return ((BRigidBodyCollider)obj).collisionObject.WorldTransform;
 		}
 
 		public void MatrixSet(object obj, Matrix val) {
@@ -202,7 +195,7 @@ namespace RBullet
 
 		public void NoneStaticBodySet(object obj, bool val) {
 			((BRigidBodyCollider)obj).NoneStaticBody = val;
-			((BRigidBodyCollider)obj).StartShape();
+			((BRigidBodyCollider)obj).ReloadCollission();
 		}
 
 		public void Remove(object obj) {
