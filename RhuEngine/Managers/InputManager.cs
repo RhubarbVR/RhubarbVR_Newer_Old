@@ -200,6 +200,9 @@ namespace RhuEngine.Managers
 			}
 			public void UnFreeMouse() {
 				try {
+					if(RInput.Mouse is null) {
+						return;
+					}
 					RInput.Mouse.HideMouse = true;
 					RInput.Mouse.CenterMouse = true;
 				}

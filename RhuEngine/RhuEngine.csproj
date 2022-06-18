@@ -80,6 +80,7 @@
 
   <ItemGroup>
     <Folder Include="ClipBoard\" />
+    <Folder Include="Terminal\" />
   </ItemGroup>
 
   <ItemGroup>

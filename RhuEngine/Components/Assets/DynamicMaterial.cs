@@ -107,7 +107,11 @@ namespace RhuEngine.Components
 
 		public bool TrySet(string name, object data) {
 			try {
-				GetParam(name).Item1.SetValue(data);        
+				var pram = GetParam(name);
+				if (pram.Item1 is null) {
+					return false;
+				}
+				pram.Item1.SetValue(data);        
 				return true;
 			}
 			catch {

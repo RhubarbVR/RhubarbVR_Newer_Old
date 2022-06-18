@@ -4,11 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rhubarb_VR_HeadLess
+namespace RhuEngine
 {
 	public abstract class Command
 	{
+		public CommandManager Manager { get; set; }
+
+		public string ReadNextLine() {
+			return Manager.ReadNextLine();
+		}
+
 		public abstract void RunCommand();
+
+		public string[] args;
 
 		public abstract string HelpMsg { get; }
 	}

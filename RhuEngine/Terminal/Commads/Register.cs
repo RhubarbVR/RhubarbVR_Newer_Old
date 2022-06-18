@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RhuEngine;
 using RhuEngine.Linker;
-namespace Rhubarb_VR_HeadLess.Commads
+namespace RhuEngine.Commads
 {
 	public class Register : Command
 	{
@@ -13,9 +13,9 @@ namespace Rhubarb_VR_HeadLess.Commads
 
 		public override void RunCommand() {
 			Console.WriteLine("Email");
-			var email = Console.ReadLine();
+			var email = ReadNextLine();
 			Console.WriteLine("Username");
-			var username = Console.ReadLine();
+			var username = ReadNextLine();
 			Console.WriteLine("Password");
 			var Password = Login.MaskPass();
 			Console.WriteLine("Confirm Password");
@@ -25,7 +25,7 @@ namespace Rhubarb_VR_HeadLess.Commads
 				return;
 			}
 			Task.Run(async () => {
-				var req = await Program._app.netApiManager.SignUp(username, email,Password,DateTime.UtcNow);
+				var req = await Engine.MainEngine.netApiManager.SignUp(username, email,Password,DateTime.UtcNow);
 				if (!req?.Error??false) {
 					Console.WriteLine(req.Message);
 				}

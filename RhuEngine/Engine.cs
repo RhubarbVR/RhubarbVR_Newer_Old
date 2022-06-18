@@ -51,9 +51,12 @@ namespace RhuEngine
 
 		public Action OnEngineStarted;
 
+		public CommandManager commandManager;
+
 		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null,bool PassErrors = false) : base() {
 			this.PassErrors = PassErrors;
 			EngineLink = _EngineLink;
+			commandManager = new CommandManager();
 			if (_EngineLink.ForceLibLoad) {
 				OpusDotNet.NativeLib.ForceLoad();
 			}

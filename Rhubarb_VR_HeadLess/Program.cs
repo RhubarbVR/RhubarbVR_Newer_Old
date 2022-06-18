@@ -19,7 +19,6 @@ namespace Rhubarb_VR_HeadLess
 		public static Engine _app;
 		static OutputCapture _cap;
 		static NullLinker _rhu;
-		public static Type[] _commands;
 #pragma warning restore CA2211 // Non-constant fields should not be visible
 		static void Main(string[] args)
         {
@@ -34,16 +33,7 @@ namespace Rhubarb_VR_HeadLess
 					Console.Write($"{_app?.netApiManager.User?.UserName ?? "Not Login"}> ");
 					Console.ForegroundColor = ConsoleColor.White;
 					var line = Console.ReadLine();
-					var foundcomand = false;
-					foreach (var item in _commands) {
-						if (item.Name.ToLower() == line.ToLower()) {
-							foundcomand = true;
-							((Command)Activator.CreateInstance(item)).RunCommand();
-						}
-					}
-					if (!foundcomand) {
-						Console.WriteLine($"{line} Is not a valid command run Help for available commands");
-					}
+					_app.commandManager.RunComand(line);
 					Thread.Sleep(8);
 				}
 			}) {
@@ -52,12 +42,6 @@ namespace Rhubarb_VR_HeadLess
 			_app.OnEngineStarted = () => EngineThread.Start();
 			_app.Init();
 			var EngineStopWatch = new Stopwatch();
-			_commands = (from a in AppDomain.CurrentDomain.GetAssemblies()
-						   from t in a.GetTypes()
-						   where typeof(Command).IsAssignableFrom(t)
-						   where t.IsClass && !t.IsAbstract
-						   select t).ToArray();
-
 			try {
 				while (_isRunning) {
 					EngineStopWatch.Start();
