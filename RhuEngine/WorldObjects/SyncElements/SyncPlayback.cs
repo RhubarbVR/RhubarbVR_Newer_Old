@@ -4,6 +4,8 @@ using System.Text;
 
 using RhuEngine.DataStructure;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public class SyncPlayback : Sync<Playback>, ISyncMember

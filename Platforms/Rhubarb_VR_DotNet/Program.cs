@@ -27,7 +27,6 @@ class SKLoader
 		while (SK.Step(app.Step)) {
 		}
 		app.IsCloseing = true;
-		cap.DisableSingleString = true;
 		app.Dispose();
 		SK.Shutdown();
 	}

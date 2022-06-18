@@ -3,6 +3,8 @@
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
+using RNumerics;
+
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreEvents" })]

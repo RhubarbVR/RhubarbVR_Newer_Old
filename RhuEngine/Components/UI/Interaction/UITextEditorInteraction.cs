@@ -187,7 +187,8 @@ namespace RhuEngine.Components
 			}
 			if (RInput.Key(Key.Left).IsJustActive()) {
 				if (RInput.Key(Key.Shift).IsActive()) {
-					RenderCurrsorLength = Math.Min(RenderCurrsorLength - 1, Value.LinkedValue.Length - RenderCurrsorPos);
+					RenderCurrsorLength--;
+					RenderCurrsorLength = Math.Min(Math.Max(RenderCurrsorLength, -(Value.LinkedValue.Length - RenderCurrsorPos)), RenderCurrsorPos);
 				}
 				else {
 					var nstartpoint = Value.LinkedValue.Length - CurrsorPos;
@@ -206,7 +207,8 @@ namespace RhuEngine.Components
 			}
 			if (RInput.Key(Key.Right).IsJustActive()) {
 				if (RInput.Key(Key.Shift).IsActive()) {
-					RenderCurrsorLength = Math.Max(RenderCurrsorLength + 1, -Value.LinkedValue.Length - RenderCurrsorPos);
+					RenderCurrsorLength++;
+					RenderCurrsorLength = Math.Min(Math.Max(RenderCurrsorLength, -(Value.LinkedValue.Length - RenderCurrsorPos)), RenderCurrsorPos);
 				}
 				else {
 					var nstartpoint = Value.LinkedValue.Length - CurrsorPos;
@@ -229,6 +231,7 @@ namespace RhuEngine.Components
 			else if (RInput.Key(Key.Ctrl).IsActive()) {
 				return;
 			}
+			try { 
 			if (RenderCurrsorPos == 0 && RenderCurrsorLength == 0) {
 				if (deltaType == "") {
 					return;
@@ -267,8 +270,14 @@ namespace RhuEngine.Components
 					deltaType = "";
 				}
 				var pos = -CurrsorLength;
-				var newstring = (deltaType + Value.LinkedValue.Substring(pos)).ApplyStringFunctions();
-				Value.LinkedValue = newstring;
+				if (pos >= 0) {
+					var newstring = (deltaType + Value.LinkedValue.Substring(pos)).ApplyStringFunctions();
+					Value.LinkedValue = newstring;
+				}
+				else {
+					Value.LinkedValue = deltaType.ApplyStringFunctions();
+					RenderCurrsorPos = 0;
+				}
 				RenderCurrsorLength = 0;
 				return;
 			}
@@ -289,8 +298,11 @@ namespace RhuEngine.Components
 			Value.LinkedValue = nstring;
 			RenderCurrsorPos = addend.Length;
 			RenderCurrsorLength = 0;
+			}
+			catch {
+				RenderCurrsorPos = 0;
+				RenderCurrsorLength = 0;
+			}
 		}
-
-
 	}
 }

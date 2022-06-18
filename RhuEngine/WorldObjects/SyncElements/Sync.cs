@@ -6,6 +6,8 @@ using RhuEngine.Components;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public interface ISync

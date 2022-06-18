@@ -7,6 +7,7 @@ using RhuEngine.DataStructure;
 using SharedModels;
 using System.Collections.Generic;
 using System.Linq;
+using RNumerics;
 
 namespace RhuEngine.Components
 {

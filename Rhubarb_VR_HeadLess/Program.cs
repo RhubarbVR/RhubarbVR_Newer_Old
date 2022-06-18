@@ -58,7 +58,6 @@ namespace Rhubarb_VR_HeadLess
 				RLog.Err("Engine Crashed" + ex);
 			}
 			_app.IsCloseing = true;
-			_cap.DisableSingleString = true;
 			_app.Dispose();
 			_cap.Dispose();
         }

@@ -12,6 +12,7 @@ using SharedModels.Session;
 using SharedModels.UserSession;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
+using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {

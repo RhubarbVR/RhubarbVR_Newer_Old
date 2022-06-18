@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using SharedModels.GameSpecific;
 using RhuEngine.Linker;
+using RNumerics;
 
 namespace RhuEngine.Components
 {

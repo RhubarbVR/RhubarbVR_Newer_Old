@@ -7,6 +7,8 @@ using System.Runtime.CompilerServices;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public interface ISyncObjectList<T> : ISyncObject

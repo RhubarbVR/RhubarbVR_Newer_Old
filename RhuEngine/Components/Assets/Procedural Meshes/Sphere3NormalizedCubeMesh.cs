@@ -8,9 +8,9 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Assets/Procedural Meshes" })]
 	public class Sphere3NormalizedCubeMesh : ProceduralMesh
 	{
-		[Default(1f)]
+		[Default(0.5f)]
 		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<float> Diameter;
+		public readonly Sync<float> Radius;
 
 		[Default(Sphere3Generator_NormalizedCube.NormalizationTypes.CubeMapping)]
 		[OnChanged(nameof(LoadMesh))]
@@ -41,7 +41,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			var mesh = new Sphere3Generator_NormalizedCube {
-				Radius = Diameter/2,
+				Radius = Radius,
 				NormalizeType = NormalizeType,
 				NoSharedVertices = NoSharedVertices.Value,
 				WantUVs = WantUVs,

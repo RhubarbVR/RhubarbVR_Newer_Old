@@ -54,6 +54,7 @@ namespace RhuEngine
 		public CommandManager commandManager;
 
 		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null,bool PassErrors = false) : base() {
+			Console.ForegroundColor = ConsoleColor.White;
 			this.PassErrors = PassErrors;
 			EngineLink = _EngineLink;
 			commandManager = new CommandManager();
@@ -217,6 +218,7 @@ namespace RhuEngine
 		public Thread startingthread;
 		public void Init(bool RunStartThread = true) {
 			EngineLink.Start();
+			commandManager.Init(this);
 			IntMsg = $"Engine started Can Render {EngineLink.CanRender} Can Audio {EngineLink.CanAudio} Can input {EngineLink.CanInput}";
 			RLog.Info(IntMsg);
 			if (EngineLink.CanRender) {

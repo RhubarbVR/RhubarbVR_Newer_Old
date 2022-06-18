@@ -53,7 +53,6 @@ namespace RhuEngine.GameTests.Tests
 
 		public void Dispose() {
 			app.IsCloseing = true;
-			cap.DisableSingleString = true;
 			app.Dispose();
 			cap.Dispose();
 		}

@@ -20,6 +20,12 @@ namespace RhuEngine
 
 		}
 
+		public Engine Engine;
+
+		public void Init(Engine engine) {
+			Engine = engine;
+		}
+
 		public Semaphore semaphore = new Semaphore(1, 1);
 
 		public bool WaitingForComand = false;
@@ -33,13 +39,16 @@ namespace RhuEngine
 		public string LastLine = string.Empty;
 
 		public void RunComand(string line) {
+			if (string.IsNullOrEmpty(line)) {
+				return;
+			}
 			LastLine = line;
 			if (WaitingForComand) {
 				semaphore.Release();
 			}
 			var foundcomand = false;
 			foreach (var item in _commands) {
-				if (line.ToLower().StartsWith(item.Name.ToLower())) {
+				if (line.ToLower().StartsWith(item.Name.ToLower()+" ") || (line.ToLower() == item.Name.ToLower())) {
 					foundcomand = true;
 					var comand = (Command)Activator.CreateInstance(item);
 					comand.args = line.Split(' ');

@@ -30,7 +30,7 @@ namespace RhuEngine.Components
 				userRoot.leftHand.Target = leftHand;
 				if (!World.IsPersonalSpace) {
 					var r = leftHand.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitShader>();
-					r.Item1.Diameter.Value = 0.06f;
+					r.Item1.Radius.Value = 0.03f;
 					r.Item3.colorLinear.Value = Colorf.RhubarbRed;
 				}
 				var rightHand = userEntity.AddChild("RightHand");
@@ -40,7 +40,7 @@ namespace RhuEngine.Components
 				rightComp.user.Target = World.GetLocalUser();
 				if (!World.IsPersonalSpace) {
 					var l = rightHand.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitShader>();
-					l.Item1.Diameter.Value = 0.06f;
+					l.Item1.Radius.Value = 0.03f;
 					l.Item3.colorLinear.Value = Colorf.RhubarbGreen;
 				}
 				userRoot.rightHand.Target = rightHand;

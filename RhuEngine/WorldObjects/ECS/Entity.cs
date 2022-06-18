@@ -41,11 +41,11 @@ namespace RhuEngine.WorldObjects.ECS
 		public override bool Persistence => persistence.Value;
 
 		public event Action<int, Vector3f, Vector3f, float, float> OnLazerPyhsics;
-		
+
 		internal void CallOnLazer(int v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce) {
-			OnLazerPyhsics?.Invoke(v,hitnormal, hitpointworld, pressForce, gripForce);
+			OnLazerPyhsics?.Invoke(v, hitnormal, hitpointworld, pressForce, gripForce);
 		}
-		
+
 		public event Action<uint, Vector3f, Vector3f> OnTouchPyhsics;
 
 		internal void CallOnTouch(uint v, Vector3f hitnormal, Vector3f hitpointworld) {
@@ -80,7 +80,7 @@ namespace RhuEngine.WorldObjects.ECS
 		[Exposed]
 		public Entity GetChildByName(string v) {
 			foreach (var child in children) {
-				if(((Entity)child).name.Value == v) {
+				if (((Entity)child).name.Value == v) {
 					return (Entity)child;
 				}
 			}
@@ -108,7 +108,7 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 		[Exposed]
 		public T AttachComponent<T>(Type type) where T : Component {
-			if(!typeof(T).IsAssignableFrom(type)) {
+			if (!typeof(T).IsAssignableFrom(type)) {
 				throw new ArgumentException($"Type {type.GetFormattedName()} is not assignable to {typeof(T).GetFormattedName()}");
 			}
 			var comp = components.Add(type);
@@ -156,17 +156,17 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 		[Exposed]
-		public Matrix GlobalToLocal(Matrix point,bool Child = true) {
+		public Matrix GlobalToLocal(Matrix point, bool Child = true) {
 			var parentMatrix = Child ? GlobalTrans : parent.Target?.GlobalTrans ?? Matrix.Identity;
 			var newLocal = point * parentMatrix.Inverse;
 			return newLocal;
 		}
 		public void GlobalToLocal(Matrix point, bool Child, out Vector3f translation, out Quaternionf rotation, out Vector3f scale) {
-			GlobalToLocal(point,Child).Decompose(out translation, out rotation, out scale);
+			GlobalToLocal(point, Child).Decompose(out translation, out rotation, out scale);
 		}
 		[Exposed]
 		public Vector3f GlobalPointToLocal(Vector3f point, bool Child = true) {
-			GlobalToLocal(Matrix.T(point),Child,out var newTranslation, out _, out _);
+			GlobalToLocal(Matrix.T(point), Child, out var newTranslation, out _, out _);
 			return newTranslation;
 		}
 		[Exposed]
@@ -180,7 +180,7 @@ namespace RhuEngine.WorldObjects.ECS
 			return newRotation;
 		}
 		[Exposed]
-		public Matrix LocalToGlobal(Matrix point,bool Child = true) {
+		public Matrix LocalToGlobal(Matrix point, bool Child = true) {
 			return point * (Child ? GlobalTrans : _internalParent?.GlobalTrans ?? Matrix.Identity);
 		}
 		public void LocalToGlobal(Matrix point, bool Child, out Vector3f translation, out Quaternionf rotation, out Vector3f scale) {
@@ -188,7 +188,7 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 		[Exposed]
 		public Quaternionf LocalRotToGlobal(Quaternionf Rot, bool Child = true) {
-			LocalToGlobal(Matrix.R(Rot),Child,out _, out var newRotation, out _);
+			LocalToGlobal(Matrix.R(Rot), Child, out _, out var newRotation, out _);
 			return newRotation;
 		}
 		[Exposed]
@@ -365,7 +365,7 @@ namespace RhuEngine.WorldObjects.ECS
 		[Exposed]
 		public bool IsRoot => World?.RootEntity == this;
 
-		public event Action<Entity,bool> GlobalTransformChange;
+		public event Action<Entity, bool> GlobalTransformChange;
 
 		public event Action OffsetChanged;
 		[Exposed]
@@ -390,14 +390,15 @@ namespace RhuEngine.WorldObjects.ECS
 				scale.SetValueNoOnChange(newscale);
 				_cachedGlobalMatrix = value;
 				_cachedLocalMatrix = newLocal;
-				GlobalTransformChange?.Invoke(this,true);
+				GlobalTransformChange?.Invoke(this, true);
 				foreach (Entity item in children) {
 					item.GlobalTransMark();
 				}
 			}
 		}
 		[Exposed]
-		public Matrix LocalTrans {
+		public Matrix LocalTrans
+		{
 			get {
 				if (_dirtyLocal) {
 					_cachedLocalMatrix = Matrix.TRS(position.Value, rotation.Value, scale.Value);
@@ -438,11 +439,13 @@ namespace RhuEngine.WorldObjects.ECS
 			if (IsRoot) {
 				return;
 			}
-			_dirtyGlobal = true;
-			foreach (Entity item in children) {
-				item.GlobalTransMark();
+			if (!_dirtyGlobal) {
+				foreach (Entity item in children) {
+					item.GlobalTransMark();
+				}
+				GlobalTransformChange?.Invoke(this, true);
 			}
-			GlobalTransformChange?.Invoke(this, true);
+			_dirtyGlobal = true;
 		}
 
 		public override void FirstCreation() {

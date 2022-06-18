@@ -5,6 +5,7 @@ using System.Reflection;
 using MessagePack;
 using RhuEngine.WorldObjects;
 using System.Linq;
+using RNumerics;
 
 namespace RhuEngine.Components.ScriptNodes
 {

@@ -7,6 +7,8 @@ using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 using RhuEngine.Linker;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public abstract class SyncListBase<T> : SyncObject, INetworkedObject, IEnumerable<ISyncObject> , IChangeable, ISyncMember where T : ISyncObject

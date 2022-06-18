@@ -6,6 +6,7 @@ using LiteNetLib;
 
 using RhuEngine.Components;
 
+using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {

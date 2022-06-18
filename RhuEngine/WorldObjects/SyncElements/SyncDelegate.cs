@@ -5,6 +5,7 @@ using RhuEngine.DataStructure;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects.ECS;
 
+using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
