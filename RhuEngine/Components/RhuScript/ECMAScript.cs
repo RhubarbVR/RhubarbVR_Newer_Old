@@ -30,6 +30,16 @@ namespace RhuEngine.Components
 			public void Invoke(params object[] prams) {
 				((ECMAScript)Parent.Parent).RunCode(FunctionName.Value, prams);
 			}
+
+			[Exposed]
+			public object InvokeWithReturn() {
+				return ((ECMAScript)Parent.Parent).RunCode(FunctionName.Value);
+			}
+
+			[Exposed]
+			public object InvokeWithReturn(params object[] prams) {
+				return ((ECMAScript)Parent.Parent).RunCode(FunctionName.Value, prams);
+			}
 		}
 
 		public readonly SyncObjList<ECMAScriptFunction> Functions;
@@ -58,9 +68,13 @@ namespace RhuEngine.Components
 		public void Invoke(string function, params object[] values) {
 			RunCode(function, values);
 		}
+		[Exposed]
+		public object InvokeWithReturn(string function, params object[] values) {
+			return RunCode(function, values);
+		}
 
-
-		private void RunCode(string function, params object[] values) {
+		private object RunCode(string function, params object[] values) {
+			object reterndata = null;
 			try {
 				WorldThreadSafty.MethodCalls++;
 				if (WorldThreadSafty.MethodCalls > WorldThreadSafty.MaxCalls) {
@@ -69,7 +83,7 @@ namespace RhuEngine.Components
 				if (_ecma.GetValue(function) == JsValue.Undefined) {
 					throw new Exception("function " + function + " Not found");
 				}
-				_ecma.Invoke(function, values);
+				reterndata = _ecma.Invoke(function, values);
 				WorldThreadSafty.MethodCalls--;
 			}
 			catch (StackOverflowException) {
@@ -83,6 +97,7 @@ namespace RhuEngine.Components
 				RLog.Err("Script Err " + ex.ToString());
 #endif
 			}
+			return reterndata;
 		}
 
 		[Exposed]

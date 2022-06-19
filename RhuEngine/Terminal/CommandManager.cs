@@ -52,6 +52,7 @@ namespace RhuEngine
 					foundcomand = true;
 					var comand = (Command)Activator.CreateInstance(item);
 					comand.args = line.Split(' ');
+					comand.FullCommand = line;
 					comand.Manager = this;
 					Task.Run(() => comand.RunCommand());
 				}

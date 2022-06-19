@@ -139,7 +139,8 @@ namespace RhuEngine.WorldObjects
 		[UnExsposed]
 		[NoLoad]
 		public ScriptBuilder FocusedScriptBuilder = null;
-
+		
+		[Exposed]
 		[NoShow]
 		public readonly Entity RootEntity;
 

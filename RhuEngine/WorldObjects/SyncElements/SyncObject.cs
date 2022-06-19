@@ -10,6 +10,8 @@ using RhuEngine.Linker;
 using RhuEngine.Managers;
 using RhuEngine.WorldObjects.ECS;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public abstract class SyncObject : ISyncObject
@@ -75,7 +77,7 @@ namespace RhuEngine.WorldObjects
 		public virtual bool Persistence => true;
 
 		public event Action<object> OnDispose;
-
+		[Exposed]
 		public virtual void Destroy() {
 			if (IsDestroying) {
 				return;

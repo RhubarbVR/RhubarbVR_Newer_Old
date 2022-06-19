@@ -18,6 +18,8 @@ namespace RhuEngine
 
 		public string[] args;
 
+		public string FullCommand;
+
 		public abstract string HelpMsg { get; }
 	}
 }
