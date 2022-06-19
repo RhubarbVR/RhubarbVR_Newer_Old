@@ -31,7 +31,7 @@ namespace RhuEngine.Commads
 			Console.WriteLine("Email");
 			var email = ReadNextLine();
 			Console.WriteLine("Password");
-			var pass = MaskPass();
+			var pass = PasswordInput();
 			Task.Run(async () => {
 				var req = await Engine.MainEngine.netApiManager.Login(email, pass);
 				if (req.Login) {
@@ -41,29 +41,6 @@ namespace RhuEngine.Commads
 					Console.WriteLine("Failed to Login Error " + req?.Message??"Error is null");
 				}
 			});
-		}
-
-		public static string MaskPass() {
-			var pass = "";
-			ConsoleKeyInfo key;
-			do {
-				key = Console.ReadKey(true);
-				if (key.Key is not ConsoleKey.Backspace and not ConsoleKey.Enter) {
-					pass += key.KeyChar;
-					Console.Write("*");
-				}
-				else {
-					if (key.Key == ConsoleKey.Backspace && pass.Length > 0) {
-						pass = pass.Substring(0, pass.Length - 1);
-						Console.Write("\b \b");
-					}
-					else if (key.Key == ConsoleKey.Enter) {
-						break;
-					}
-				}
-			} while (key.Key != ConsoleKey.Enter);
-			Console.WriteLine("");
-			return pass;
 		}
 	}
 }

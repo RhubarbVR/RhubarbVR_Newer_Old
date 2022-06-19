@@ -293,7 +293,7 @@ namespace RhuEngine.Components
 
 		public Vector2f AnchorMaxValue => AnchorMax;
 
-		[Default(0.1f)]
+		[Default(0.05f)]
 		[OnChanged(nameof(UpdateMinMax))]
 		public readonly Sync<float> Depth;
 		public float DepthValue => Depth;

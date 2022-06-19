@@ -20,20 +20,26 @@ namespace RhuEngine
 
 		}
 
+		public Func<string> PasswordEvent;
+
+		public string PasswordInput() {
+			return PasswordEvent?.Invoke();
+		}
+
+		public bool WaitingForNextLine { get; private set; }
+
+		public string ReadNextLine() {
+			WaitingForNextLine = true;
+			while(WaitingForNextLine) {
+				Thread.Sleep(40);
+			}
+			return LastLine;
+		}
+
 		public Engine Engine;
 
 		public void Init(Engine engine) {
 			Engine = engine;
-		}
-
-		public Semaphore semaphore = new Semaphore(1, 1);
-
-		public bool WaitingForComand = false;
-
-		public string ReadNextLine() {
-			WaitingForComand = true;
-			semaphore.WaitOne();
-			return LastLine;
 		}
 
 		public string LastLine = string.Empty;
@@ -43,8 +49,9 @@ namespace RhuEngine
 				return;
 			}
 			LastLine = line;
-			if (WaitingForComand) {
-				semaphore.Release();
+			if (WaitingForNextLine) {
+				WaitingForNextLine = false;
+				return;
 			}
 			var foundcomand = false;
 			foreach (var item in _commands) {

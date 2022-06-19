@@ -77,6 +77,13 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 
+		public override void Destroy() {
+			if (IsRoot) {
+				return;
+			}
+			base.Destroy();
+		}
+
 		[Exposed]
 		public Entity GetChildByName(string v) {
 			foreach (var child in children) {

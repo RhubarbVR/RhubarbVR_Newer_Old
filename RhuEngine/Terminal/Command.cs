@@ -14,6 +14,10 @@ namespace RhuEngine
 			return Manager.ReadNextLine();
 		}
 
+		public string PasswordInput() {
+			return Manager.PasswordInput();
+		}
+
 		public abstract void RunCommand();
 
 		public string[] args;

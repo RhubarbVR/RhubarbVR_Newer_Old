@@ -17,9 +17,9 @@ namespace RhuEngine.Commads
 			Console.WriteLine("Username");
 			var username = ReadNextLine();
 			Console.WriteLine("Password");
-			var Password = Login.MaskPass();
+			var Password = PasswordInput();
 			Console.WriteLine("Confirm Password");
-			var ConfirmPassword = Login.MaskPass();
+			var ConfirmPassword = PasswordInput();
 			if (Password != ConfirmPassword) {
 				Console.WriteLine("Passwords are not the same");
 				return;

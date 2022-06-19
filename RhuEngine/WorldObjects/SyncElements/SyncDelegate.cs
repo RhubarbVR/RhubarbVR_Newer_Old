@@ -82,7 +82,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void BuildDelegate() {
-			if (_type == null || _method == "" || _method == null || base.Target == null) {
+			if (_type == null || string.IsNullOrEmpty(_method) || base.Target == null) {
 				return;
 			}
 			try {
