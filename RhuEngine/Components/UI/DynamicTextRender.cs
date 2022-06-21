@@ -7,6 +7,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using System.Text;
+using SixLabors.Fonts;
 
 namespace RhuEngine.Components
 {
@@ -34,17 +35,15 @@ namespace RhuEngine.Components
 			public Matrix Offset2 = Matrix.Identity;
 			public Matrix p;
 			public Colorf color;
-			public RenderFont rFont;
 			public Vector2f textCut;
 			public bool Cull = false;
 			public float Leading = 0f;
 			public bool NullChar = false;
-			public TextChar(string id, Rune c, Matrix p, Colorf color, RenderFont rFont, Vector2f textCut, Vector2f textsize,float Leading) {
+			public TextChar(string id, Rune c, Matrix p, Colorf color, Vector2f textCut, Vector2f textsize,float Leading) {
 				this.id = id;
 				this.c = c;
 				this.p = p;
 				this.color = color;
-				this.rFont = rFont;
 				this.textCut = textCut;
 				this.textsize = textsize;
 				this.Leading = Leading;
@@ -55,9 +54,9 @@ namespace RhuEngine.Components
 					action?.Invoke(Offset2 * p * root, this, index);
 					return;
 				}
-				if (!Cull) {
-					RText.Add(id, group, c, Offset2 * p * root, color, rFont, textCut);
-				}
+				//if (!Cull) {
+				//	RText.Add(id, group, c, Offset2 * p * root, color, rFont, textCut);
+				//}
 				action?.Invoke(Offset2 * p * root, this, index);
 			}
 		}
@@ -100,7 +99,7 @@ namespace RhuEngine.Components
 			void AddNullText(int first) {
 				for (var i = 0; i < first; i++) {
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
-					var chare = new TextChar(Id + "null" + index.ToString(), Rune.GetRuneAt("\0",0), Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), null, Vector2f.Zero, Vector2f.One, leaded.Peek() / 10) { 
+					var chare = new TextChar(Id + "null" + index.ToString(), Rune.GetRuneAt("\0",0), Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Vector2f.Zero, Vector2f.One, leaded.Peek() / 10) { 
 						NullChar = true
 					};
 					Chars.SafeAdd(chare);
@@ -117,7 +116,7 @@ namespace RhuEngine.Components
 						textYpos -= textsizeY + (leaded.Peek() / 10);
 						textXpos = 0;
 						thisrow.Clear();
-						var charee = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(new Vector3f(textXpos, textYpos - textsizeY, 0), Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), FontManager.GetFont(Font,item,style.Peek()),  Vector2f.Zero,Vector2f.Zero,leaded.Peek()/10);
+						var charee = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(new Vector3f(textXpos, textYpos - textsizeY, 0), Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(),  Vector2f.Zero,Vector2f.Zero,leaded.Peek()/10);
 						Chars.SafeAdd(charee);
 						continue;
 					}
@@ -141,7 +140,7 @@ namespace RhuEngine.Components
 					}
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
 					var ew = new Vector2f((textsize.x + 0.01f) * (fontSize.Peek() / 100), textsize.y * (fontSize.Peek() / 100));
-					var chare = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), FontManager.GetFont(Font, item, style.Peek()),  Vector2f.Zero,ew, leaded.Peek() / 10);
+					var chare = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(),  Vector2f.Zero,ew, leaded.Peek() / 10);
 					Chars.SafeAdd(chare);
 					thisrow.Push(chare);
 					bounds.Add(textpos - new Vector3f(0,chare.Leading,0));

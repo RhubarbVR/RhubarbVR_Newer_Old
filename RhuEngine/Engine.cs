@@ -216,12 +216,23 @@ namespace RhuEngine
 		public RMaterial LoadingLogo = null;
 
 		public Thread startingthread;
+
+		public RText StartingText;
+		public RMaterial StartingTextMit;
+
 		public void Init(bool RunStartThread = true) {
 			EngineLink.Start();
 			commandManager.Init(this);
 			IntMsg = $"Engine started Can Render {EngineLink.CanRender} Can Audio {EngineLink.CanAudio} Can input {EngineLink.CanInput}";
 			RLog.Info(IntMsg);
 			if (EngineLink.CanRender) {
+				StartingText = new RText(staticResources.MainFont) {
+					Text = "Starting"
+				};
+				StartingTextMit = new RMaterial(RShader.UnlitClip);
+				StartingTextMit[RMaterial.Transparency] = Transparency.Blend;
+				StartingTextMit[RMaterial.MainTexture] = StartingText.texture2D;
+				StartingText.UpdatedTexture += () => StartingTextMit[RMaterial.MainTexture] = StartingText.texture2D;
 				RRenderer.EnableSky = false;
 				LoadingLogo = new RMaterial(RShader.UnlitClip);
 				LoadingLogo[RMaterial.MainTexture] = staticResources.RhubarbLogoV2;
@@ -281,7 +292,8 @@ namespace RhuEngine
 						_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
 						_oldPlayerPos = playerPos;
 						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt(EngineLink.CanInput ? headMat.Translation : Vector3f.Zero, _loadingPos));
-						RText.Add($"{localisationManager?.GetLocalString("Common.Loading")}\n{IntMsg}", Matrix.T(0, -0.07f, 0) * rootMatrix);
+						StartingText.Text = $"{localisationManager?.GetLocalString("Common.Loading")}\n{IntMsg}";
+						RMesh.Quad.Draw("UIText", StartingTextMit, Matrix.TS(0, -0.2f, 0,new Vector3f(StartingText.AspectRatio,1,1)/7) * rootMatrix);
 						RMesh.Quad.Draw("LoadingUi",LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
 					}
 					catch (Exception ex) {

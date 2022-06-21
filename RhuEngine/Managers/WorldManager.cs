@@ -229,10 +229,10 @@ namespace RhuEngine.Managers
 					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
 					_oldPlayerPos = playerPos;
 					if (world.IsLoading && !world.IsDisposed) {
-						RText.Add($"Loading World: \n{world.LoadMsg}", Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos)));
+						//RText.Add($"Loading World: \n{world.LoadMsg}", Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos)));
 					}
 					else {
-						RText.Add($"Failed to load world{(Engine.netApiManager.User?.UserName == null ? ", JIM": "")}\nError {world.LoadMsg}", Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos)));
+						//RText.Add($"Failed to load world{(Engine.netApiManager.User?.UserName == null ? ", JIM": "")}\nError {world.LoadMsg}", Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos)));
 					}
 				}
 			}

@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			_font = RFont.MainFont;
+			_font = Engine.staticResources.MainFont;
 			Load(_font);
 		}
 		public override void OnLoaded() {

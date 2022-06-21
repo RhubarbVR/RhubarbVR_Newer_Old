@@ -4,6 +4,7 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 using RhuEngine.Linker;
+using SixLabors.Fonts;
 
 namespace RhuEngine
 {
@@ -53,10 +54,18 @@ namespace RhuEngine
 		private RTexture2D _icons;
 
 		public RTexture2D Icons => _icons ??= LoadTexture("Icons.png");
+		
+		private RFont _mainFont;
+		public RFont MainFont => _mainFont ??= LoadMainFont();
 
-
-		//public Font LoadFont(string name) {
-		//	return Font.FromMemory(GetStaticResource(name));
-		//}
+		private RFont LoadMainFont() {
+			var fonts = new FontCollection();
+			var main = fonts.Add(GetStaticResourceStream("Fonts.NotoSans-Regular.ttf"));
+			fonts.Add(GetStaticResourceStream("Fonts.NotoEmoji-Regular.ttf"));
+			fonts.Add(GetStaticResourceStream("Fonts.NotoSansSymbols-Regular.ttf"));
+			fonts.Add(GetStaticResourceStream("Fonts.NotoSansSymbols2-Regular.ttf"));
+			fonts.Add(GetStaticResourceStream("Fonts.NotoSansEgyptianHieroglyphs-Regular.ttf"));
+			return new RFont(main.CreateFont(RFont.FONTSIZE), fonts);
+		}
 	}
 }
