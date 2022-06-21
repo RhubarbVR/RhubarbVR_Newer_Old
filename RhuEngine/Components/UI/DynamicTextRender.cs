@@ -6,6 +6,7 @@ using RhuEngine.Linker;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Text;
 
 namespace RhuEngine.Components
 {
@@ -28,7 +29,7 @@ namespace RhuEngine.Components
 		{
 			public Vector2f textsize = Vector2f.Zero;
 			public string id;
-			public char c;
+			public Rune c;
 			public Matrix Offset = Matrix.Identity;
 			public Matrix Offset2 = Matrix.Identity;
 			public Matrix p;
@@ -38,7 +39,7 @@ namespace RhuEngine.Components
 			public bool Cull = false;
 			public float Leading = 0f;
 			public bool NullChar = false;
-			public TextChar(string id, char c, Matrix p, Colorf color, RenderFont rFont, Vector2f textCut, Vector2f textsize,float Leading) {
+			public TextChar(string id, Rune c, Matrix p, Colorf color, RenderFont rFont, Vector2f textCut, Vector2f textsize,float Leading) {
 				this.id = id;
 				this.c = c;
 				this.p = p;
@@ -99,16 +100,16 @@ namespace RhuEngine.Components
 			void AddNullText(int first) {
 				for (var i = 0; i < first; i++) {
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
-					var chare = new TextChar(Id + "null" + index.ToString(), '\0', Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), null, Vector2f.Zero, Vector2f.One, leaded.Peek() / 10) { 
+					var chare = new TextChar(Id + "null" + index.ToString(), Rune.GetRuneAt("\0",0), Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), null, Vector2f.Zero, Vector2f.One, leaded.Peek() / 10) { 
 						NullChar = true
 					};
 					Chars.SafeAdd(chare);
 				}
 			}
 			void RenderText(string text) {
-				foreach (var item in text) {
+				foreach (var item in text.EnumerateRunes()) {
 					var textsize = FontManager.Size(Font, item,style.Peek());
-					if (item == '\n') {
+					if (item == Rune.GetRuneAt("\n", 0)) {
 						if(textsizeY == 0) {
 							textsizeY = 1 * (fontSize.Peek() / 100);
 						}
@@ -283,7 +284,7 @@ namespace RhuEngine.Components
 						if(item is null) {
 							continue;
 						}
-						if (item.c == '\n') {
+						if (item.c == Rune.GetRuneAt("\n", 0)) {
 							if (thisrow.Count != 0) {
 								foreach (var element in thisrow) {
 									var old = element.p.Translation;

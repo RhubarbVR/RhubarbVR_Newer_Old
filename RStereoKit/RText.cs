@@ -34,11 +34,11 @@ namespace RStereoKit
 	{
 		public RFont MainFont => new RFontRoot(new RenderFont(new SkFontLoader(Font.Default)));
 
-		public bool CharExsets(RenderFont renderFont, char c) {
+		public bool CharExsets(RenderFont renderFont, Rune c) {
 			return Text.Size(c.ToString(), ((SkFontLoader)renderFont.Fontist).GetTextStyle(Colorf.White)).v != Vec2.Zero.v;
 		}
 
-		public Vector2f TextSize(RenderFont renderFont, char c) {
+		public Vector2f TextSize(RenderFont renderFont, Rune c) {
 			return (Vector2f)Text.Size(c.ToString(), ((SkFontLoader)renderFont.Fontist).GetTextStyle(Colorf.White)).v;
 		}
 	}
@@ -49,7 +49,7 @@ namespace RStereoKit
 			Text.Add(v, new StereoKit.Matrix(p.m));
 		}
 
-		public void Add(string id,string group, char c, RNumerics.Matrix p, Colorf color, RenderFont rFont, Vector2f textCut) {
+		public void Add(string id,string group, Rune c, RNumerics.Matrix p, Colorf color, RenderFont rFont, Vector2f textCut) {
 			var textsize = Text.Size(c.ToString(), ((SkFontLoader)rFont.Fontist).GetTextStyle(Colorf.White));
 			var textAlien = TextAlign.BottomLeft;
 			var offsetX = 0f;

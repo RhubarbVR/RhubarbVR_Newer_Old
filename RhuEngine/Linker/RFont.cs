@@ -7,7 +7,7 @@ using RNumerics;
 namespace RhuEngine.Linker
 {
 	public static class FontManager {
-		public static RenderFont GetFont(RFont rFont, char c, FontStyle fontStyle) {
+		public static RenderFont GetFont(RFont rFont, Rune c, FontStyle fontStyle) {
 			foreach (var item in rFont.GetFallBackArray()) {
 				var font = item.GetFontFromStyle(fontStyle);
 				if (RFont.inst.CharExsets(font, c)) {
@@ -17,7 +17,7 @@ namespace RhuEngine.Linker
 			return null;
 		}
 
-		public static Vector2f Size(RFont rFont, char c, FontStyle fontStyle) {
+		public static Vector2f Size(RFont rFont, Rune c, FontStyle fontStyle) {
 			foreach (var item in rFont.GetFallBackArray()) {
 				var font = item.GetFontFromStyle(fontStyle);
 				if(RFont.inst.CharExsets(font, c)) {
@@ -31,9 +31,9 @@ namespace RhuEngine.Linker
 	{
 		public RFont MainFont { get; }
 
-		public Vector2f TextSize(RenderFont renderFont, char c);
+		public Vector2f TextSize(RenderFont renderFont, Rune c);
 
-		public bool CharExsets(RenderFont renderFont, char c);
+		public bool CharExsets(RenderFont renderFont, Rune c);
 	}
 
 	public abstract class RFont
