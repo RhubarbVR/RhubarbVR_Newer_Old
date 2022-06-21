@@ -197,8 +197,10 @@ namespace RhuEngine.WorldObjects
 		[Exposed]
 		public string WorldDebugName => $"{(IsPersonalSpace ? "P" : "")}{((worldManager.LocalWorld == this) ? "L" : "")} {SessionName.Value}";
 
-		private void UpdateFocus() {
+		public event Action FoucusChanged;
 
+		private void UpdateFocus() {
+			FoucusChanged?.Invoke();
 		}
 
 		/// <summary>

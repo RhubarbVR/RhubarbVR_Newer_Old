@@ -11,6 +11,7 @@ namespace RhuEngine.Components
 {
 	public class DynamicTextRender
 	{
+		public string guid = Guid.NewGuid().ToString();
 
 		public SafeList<TextChar> Chars = new();
 
@@ -48,13 +49,13 @@ namespace RhuEngine.Components
 				this.Leading = Leading;
 			}
 
-			public void Render(Matrix root, Action<Matrix, TextChar, int> action, int index) {
+			public void Render(Matrix root,string group, Action<Matrix, TextChar, int> action, int index) {
 				if (NullChar) {
 					action?.Invoke(Offset2 * p * root, this, index);
 					return;
 				}
 				if (!Cull) {
-					RText.Add(id, c, Offset2 * p * root, color, rFont, textCut);
+					RText.Add(id, group, c, Offset2 * p * root, color, rFont, textCut);
 				}
 				action?.Invoke(Offset2 * p * root, this, index);
 			}
@@ -65,7 +66,7 @@ namespace RhuEngine.Components
 			Chars.SafeOperation((list) => {
 				var index = 0;
 				foreach (var item in list) {
-					item?.Render(offset * item.Offset * root, action, index);
+					item?.Render(offset * item.Offset * root, guid, action, index);
 					index++;
 				}
 			});

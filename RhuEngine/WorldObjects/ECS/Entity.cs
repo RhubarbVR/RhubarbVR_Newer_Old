@@ -40,6 +40,10 @@ namespace RhuEngine.WorldObjects.ECS
 
 		public override bool Persistence => persistence.Value;
 
+		public event Action<GrabbableHolder, bool, float> OnGrip;
+		internal void CallOnGrip(GrabbableHolder obj, bool Laser, float gripForce) {
+			OnGrip?.Invoke(obj,Laser, gripForce);
+		}
 		public event Action<int, Vector3f, Vector3f, float, float> OnLazerPyhsics;
 
 		internal void CallOnLazer(int v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce) {

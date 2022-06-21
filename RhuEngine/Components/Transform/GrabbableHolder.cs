@@ -4,6 +4,7 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
 using System.Collections.Generic;
+using RhuEngine.Physics;
 
 namespace RhuEngine.Components
 {
@@ -23,7 +24,49 @@ namespace RhuEngine.Components
 		public readonly Sync<Handed> source;
 
 		public readonly List<Grabbable> GrabbedObjects = new();
-		
+
+		[OnChanged(nameof(PhysicsObjectChanged))]
+		public readonly SyncRef<PhysicsObject> OverlapingPhysicsObject;
+
+		[NoLoad]
+		[NoSave]
+		[NoSync]
+		private PhysicsObject _physicsObject;
+
+		public override void OnLoaded() {
+			base.OnLoaded();
+			PhysicsObjectChanged();
+		}
+
+		private void PhysicsObjectChanged() {
+			if (_physicsObject == OverlapingPhysicsObject.Target) {
+				return;
+			}
+			if (_physicsObject is not null) {
+				_physicsObject.rigidBody.Overlap -= RigidBody_Overlap; 
+				_physicsObject.AddedData -= PhysicsObject_AddedData;
+			}
+			_physicsObject = OverlapingPhysicsObject.Target;
+			if (_physicsObject is null) {
+				return;
+			}
+			_physicsObject.AddedData += PhysicsObject_AddedData;
+			PhysicsObject_AddedData(_physicsObject.rigidBody);
+		}
+
+		private readonly List<RigidBodyCollider> _overLappingObjects = new();
+
+		private void RigidBody_Overlap(Vector3f PositionWorldOnA, Vector3f PositionWorldOnB, Vector3f NormalWorldOnB, double Distance, double Distance1, RigidBodyCollider hit) {
+			_overLappingObjects.Add(hit);
+		}
+
+		private void PhysicsObject_AddedData(RigidBodyCollider obj) {
+			if (obj is null) {
+				return;
+			}
+			obj.Overlap += RigidBody_Overlap;
+		}
+
 		public override void OnAttach() {
 			base.OnAttach();
 			holder.Target = Entity.AddChild("Holder");
@@ -64,6 +107,11 @@ namespace RhuEngine.Components
 		public void InitializeGrabHolder(Handed _source) {
 			user.Target = LocalUser;
 			source.Value = _source;
+			if(_source != Handed.Max) {
+				var shape = Entity.AttachComponent<SphereShape>();
+				shape.Radus.Value = 0.03f / 2;
+				OverlapingPhysicsObject.Target = shape;
+			}
 			switch (_source) {
 				case Handed.Left:
 					World.LeftGrabbableHolder = this;
@@ -92,14 +140,25 @@ namespace RhuEngine.Components
 			if (user.Target != LocalUser) {
 				return;
 			}
-
-			var isGrab = source.Value switch {
-				Handed.Left => Engine.inputManager.GetInputFloatFromController(Managers.InputManager.InputTypes.Grab, RInput.Controller(Handed.Left), Engine.MainSettings.InputSettings.SecondaryControllerInputSettings) > 0.5,
-				Handed.Right => Engine.inputManager.GetInputFloatFromController(Managers.InputManager.InputTypes.Grab, RInput.Controller(Handed.Right), Engine.MainSettings.InputSettings.MainControllerInputSettings) > 0.5,
-				Handed.Max => Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Grab) > 0.5f,
-				_ => false,
+			if(source.Value == Handed.Max) {
+				if (RWorld.IsInVR) {
+					return;
+				}
+			}
+			var grabForce = source.Value switch {
+				Handed.Left => Engine.inputManager.GetInputFloatFromController(Managers.InputManager.InputTypes.Grab, RInput.Controller(Handed.Left), Engine.MainSettings.InputSettings.SecondaryControllerInputSettings),
+				Handed.Right => Engine.inputManager.GetInputFloatFromController(Managers.InputManager.InputTypes.Grab, RInput.Controller(Handed.Right), Engine.MainSettings.InputSettings.MainControllerInputSettings),
+				Handed.Max => Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Grab),
+				_ => 0f,
 			};
+			var isGrab = grabForce > 0.5;
 			if (isGrab && !_gripping) {
+				RLog.Info("StartGrabbing");
+				foreach (var item in _overLappingObjects) {
+					if (item.CustomObject is PhysicsObject physicsObject) {
+						physicsObject.Entity.CallOnGrip(this, false, grabForce);
+					}
+				}
 				//StartGabbing
 				RWorld.ExecuteOnStartOfFrame(() => {
 					switch (source.Value) {
@@ -131,11 +190,15 @@ namespace RhuEngine.Components
 							break;
 					}
 				});
-				for (var i = 0; i < GrabbedObjects.Count; i++) {
-					GrabbedObjects[0].Drop();
+				for (var i = GrabbedObjects.Count - 1; i >= 0; i--) {
+					try {
+						GrabbedObjects[i]?.Drop();
+					}
+					catch { }
 				}
 				_gripping = false;
 			}
+			_overLappingObjects.Clear();
 		}
 	}
 }

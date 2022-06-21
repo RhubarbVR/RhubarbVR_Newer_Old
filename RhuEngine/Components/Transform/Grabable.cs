@@ -47,6 +47,13 @@ namespace RhuEngine.Components
 		public override void OnLoaded() {
 			base.OnLoaded();
 			Entity.OnLazerPyhsics += Entity_OnLazerPyhsics;
+			Entity.OnGrip += GripProcess;
+		}
+
+		public override void Dispose() {
+			base.Dispose();
+			Entity.OnLazerPyhsics -= Entity_OnLazerPyhsics;
+			Entity.OnGrip -= GripProcess;
 		}
 
 		private void Entity_OnLazerPyhsics(int arg1, Vector3f arg2, Vector3f arg3, float arg4, float arg5) {
@@ -55,7 +62,8 @@ namespace RhuEngine.Components
 			}
 		}
 
-		private void GripProcess(GrabbableHolder obj, bool Laser,float gripForce) {
+		internal void GripProcess(GrabbableHolder obj, bool Laser,float gripForce) {
+			RLog.Info("Grip Processed");
 			if (gripForce < GripForce.Value) {
 				return;
 			}

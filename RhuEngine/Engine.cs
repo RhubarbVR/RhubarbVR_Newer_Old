@@ -275,7 +275,7 @@ namespace RhuEngine
 							RRenderer.CameraRoot = Matrix.Identity;
 							headMat = Matrix.T(Vector3f.Forward / 10);
 						}
-						var textpos = Matrix.T(Vector3f.Forward * 0.25f) * (EngineLink.CanInput ? headMat : Matrix.S(1));
+						var textpos = Matrix.T(Vector3f.Forward * 0.5f) * (EngineLink.CanInput ? headMat : Matrix.S(1));
 						var playerPos = RRenderer.CameraRoot.Translation;
 						_loadingPos += playerPos - _oldPlayerPos;
 						_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);

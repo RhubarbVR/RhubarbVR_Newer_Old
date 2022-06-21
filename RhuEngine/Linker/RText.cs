@@ -8,7 +8,7 @@ namespace RhuEngine.Linker
 	public interface IRText
 	{
 		public void Add(string id,string v, Matrix p);
-		public void Add(string id,char c, Matrix p,Colorf color,RenderFont rFont, Vector2f textCut);
+		public void Add(string id, string textGroup, char c, Matrix p,Colorf color,RenderFont rFont, Vector2f textCut);
 
 	}
 
@@ -20,8 +20,8 @@ namespace RhuEngine.Linker
 		public static void Add(string v, Matrix p, string id = "loading") {
 			Instance.Add(id,v, p);
 		}
-		public static void Add(string id, char c, Matrix p, Colorf color, RenderFont rFont, Vector2f textCut) {
-			Instance.Add(id, c, p,color,rFont, textCut);
+		public static void Add(string id, string textGroup, char c, Matrix p, Colorf color, RenderFont rFont, Vector2f textCut) {
+			Instance.Add(id, textGroup, c, p,color,rFont, textCut);
 		}
 	}
 }

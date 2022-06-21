@@ -49,7 +49,7 @@ namespace RStereoKit
 			Text.Add(v, new StereoKit.Matrix(p.m));
 		}
 
-		public void Add(string id, char c, RNumerics.Matrix p, Colorf color, RenderFont rFont, Vector2f textCut) {
+		public void Add(string id,string group, char c, RNumerics.Matrix p, Colorf color, RenderFont rFont, Vector2f textCut) {
 			var textsize = Text.Size(c.ToString(), ((SkFontLoader)rFont.Fontist).GetTextStyle(Colorf.White));
 			var textAlien = TextAlign.BottomLeft;
 			var offsetX = 0f;

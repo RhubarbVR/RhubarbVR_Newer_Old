@@ -52,7 +52,9 @@ namespace RhuEngine.Components
 			}
 			var head = LocalUser.userRoot.Target?.head.Target;
 			if (head != null) {
-				UpdateHeadLazer(head);
+				if (!RWorld.IsInVR) {
+					UpdateHeadLazer(head);
+				}
 				UpdateTouch(RInput.Hand(Handed.Right).Wrist,2);
 				UpdateTouch(RInput.Hand(Handed.Left).Wrist,1);
 			}
