@@ -48,8 +48,10 @@ namespace RhuEngine.Components
 			}
 			if (World.IsPersonalSpace) {
 				if (WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target is not null) {
-					var focusUserRoot = WorldManager.FocusedWorld.GetLocalUser().userRoot.Target;
-					Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
+					RWorld.ExecuteOnStartOfFrame(() => {
+						var focusUserRoot = WorldManager.FocusedWorld.GetLocalUser().userRoot.Target;
+						Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
+					});
 				}
 				if (Engine.EngineLink.CanRender) {
 					if (RWorld.IsInVR) {

@@ -37,18 +37,21 @@ namespace RhuEngine.Components
 				return;
 			}
 			_material.Texture = MainTexture.Asset;
+			_material.Material?.UpdatePrams();
 		}
 		private void TintUpdate() {
 			if (_material is null) {
 				return;
 			}
 			_material.Tint = Tint;
+			_material.Material?.UpdatePrams();
 		}
 		private void TransparencyUpdate() {
 			if (_material is null) {
 				return;
 			}
 			_material.Transparency = Transparency;
+			_material.Material?.UpdatePrams();
 		}
 	}
 }
