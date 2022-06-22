@@ -10,8 +10,9 @@ namespace RhuEngine
 {
 	public static class FontManager
 	{
-		public static Vector2f Size(RFont font, Rune item, FontStyle fontStyle) {
-			return new Vector2f();
+		public static Vector2f Size(RFont font, Rune item) {
+			var textRect = font.GetSizeOfText(item.ToString());
+			return new Vector2f(textRect.Width / textRect.Height,1);
 		}
 	}
 }

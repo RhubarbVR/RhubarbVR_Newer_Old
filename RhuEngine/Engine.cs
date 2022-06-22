@@ -213,12 +213,12 @@ namespace RhuEngine
 
 		public bool EngineStarting = true;
 
-		public RMaterial LoadingLogo = null;
+		public IUnlitMaterial LoadingLogo;
 
 		public Thread startingthread;
 
 		public RText StartingText;
-		public RMaterial StartingTextMit;
+		public ITextMaterial StartingTextMit;
 
 		public void Init(bool RunStartThread = true) {
 			EngineLink.Start();
@@ -229,13 +229,13 @@ namespace RhuEngine
 				StartingText = new RText(staticResources.MainFont) {
 					Text = "Starting"
 				};
-				StartingTextMit = new RMaterial(RShader.UnlitClip);
-				StartingTextMit[RMaterial.Transparency] = Transparency.Blend;
-				StartingTextMit[RMaterial.MainTexture] = StartingText.texture2D;
-				StartingText.UpdatedTexture += () => StartingTextMit[RMaterial.MainTexture] = StartingText.texture2D;
+				StartingTextMit = StaticMaterialManager.GetMaterial<ITextMaterial>();
+				StartingTextMit.Texture = StartingText.texture2D;
+				StartingText.UpdatedTexture += () => StartingTextMit.Texture = StartingText.texture2D;
 				RRenderer.EnableSky = false;
-				LoadingLogo = new RMaterial(RShader.UnlitClip);
-				LoadingLogo[RMaterial.MainTexture] = staticResources.RhubarbLogoV2;
+				LoadingLogo = StaticMaterialManager.GetMaterial<IUnlitMaterial>();
+				LoadingLogo.Transparency = Transparency.Blend;
+				LoadingLogo.Texture = staticResources.RhubarbLogoV2;
 			}
 			var startcode = () => {
 				IntMsg = "Building NetApiManager";
@@ -254,8 +254,9 @@ namespace RhuEngine
 						throw ex;
 					}
 				}
+				EngineStarting = false;
 				if (EngineLink.CanRender) {
-					EngineStarting = false;
+					StartingText = null;
 					LoadingLogo = null;
 					RRenderer.EnableSky = true;
 				}
@@ -293,8 +294,8 @@ namespace RhuEngine
 						_oldPlayerPos = playerPos;
 						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt(EngineLink.CanInput ? headMat.Translation : Vector3f.Zero, _loadingPos));
 						StartingText.Text = $"{localisationManager?.GetLocalString("Common.Loading")}\n{IntMsg}";
-						RMesh.Quad.Draw("UIText", StartingTextMit, Matrix.TS(0, -0.2f, 0,new Vector3f(StartingText.AspectRatio,1,1)/7) * rootMatrix);
-						RMesh.Quad.Draw("LoadingUi",LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
+						RMesh.Quad.Draw("UIText", StartingTextMit.Material, Matrix.TS(0, -0.2f, 0,new Vector3f(StartingText.AspectRatio,1,1)/7) * rootMatrix);
+						RMesh.Quad.Draw("LoadingUi",LoadingLogo.Material, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
 					}
 					catch (Exception ex) {
 						RLog.Err("Failed to update msg text Error: " + ex.ToString());

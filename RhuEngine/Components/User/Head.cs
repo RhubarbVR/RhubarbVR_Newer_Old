@@ -31,7 +31,7 @@ namespace RhuEngine.Components
 			entity.scale.Value = new Vector3f(0.005f);
 			entity.rotation.Value = Quaternionf.CreateFromEuler(0, 90, 0);
 			invr.isNotVR.Target = entity.enabled;
-			var (mesh,mrit,render) = entity.AttachMeshWithMeshRender<SpriteMesh, UnlitShader>();
+			var (mesh,mrit,render) = entity.AttachMeshWithMeshRender<SpriteMesh, UnlitMaterial>();
 			var colorer = entity.AttachComponent<UIColorAssign>();
 			colorer.TargetColor.Target = render.colorLinear;
 			colorer.ColorShif.Value = 1.9f;
@@ -39,8 +39,8 @@ namespace RhuEngine.Components
 			var ea = entity.AttachComponent<IconsTex>();
 			var sprite = entity.AttachComponent<SpriteProvder>();
 			sprite.Texture.Target = ea;
-			mrit.MainTexture = ea;
-			mrit.Transparency = Transparency.Blend;
+			mrit.MainTexture.Target = ea;
+			mrit.Transparency.Value = Transparency.Blend;
 			render.OrderOffset.Value = 1000000000;
 			sprite.GridSize.Value = new Vector2i(26, 7);
 			mesh.Dimensions.Value = new Vector2f(1.25f);

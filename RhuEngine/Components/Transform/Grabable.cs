@@ -63,7 +63,6 @@ namespace RhuEngine.Components
 		}
 
 		internal void GripProcess(GrabbableHolder obj, bool Laser,float gripForce) {
-			RLog.Info("Grip Processed");
 			if (gripForce < GripForce.Value) {
 				return;
 			}

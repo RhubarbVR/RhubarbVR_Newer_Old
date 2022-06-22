@@ -12,25 +12,23 @@ namespace RhuEngine
 		public static Stream GetStaticResourceStream(string name) {
 			return Assembly.GetCallingAssembly().GetManifestResourceStream("RhuEngine.Res." + name);
 		}
-		public static byte[] GetStaticResource(string name) {
+		public static Stream GetStaticResource(string name) {
 			if(File.Exists(Engine.BaseDir + "\\" + name)) {
-				return File.ReadAllBytes(Engine.BaseDir + "\\" + name);
+				return File.OpenRead(Engine.BaseDir + "\\" + name);
 			}
 			if (File.Exists(Engine.BaseDir + "\\res\\" + name)) {
-				return File.ReadAllBytes(Engine.BaseDir + "\\" + name);
+				return File.OpenRead(Engine.BaseDir + "\\" + name);
 			}
 			if (File.Exists(Engine.BaseDir + "\\Res\\" + name)) {
-				return File.ReadAllBytes(Engine.BaseDir + "\\Res\\" + name);
+				return File.OpenRead(Engine.BaseDir + "\\Res\\" + name);
 			}
 			if (File.Exists(Engine.BaseDir + "\\OverRide\\" + name)) {
-				return File.ReadAllBytes(Engine.BaseDir + "\\OverRide\\" + name);
+				return File.OpenRead(Engine.BaseDir + "\\OverRide\\" + name);
 			}
 			if (File.Exists(Engine.BaseDir + "\\override\\" + name)) {
-				return File.ReadAllBytes(Engine.BaseDir + "\\override\\" + name);
+				return File.OpenRead(Engine.BaseDir + "\\override\\" + name);
 			}
-			var ms = new MemoryStream();
-			GetStaticResourceStream(name).CopyTo(ms);
-			return ms.ToArray();
+			return GetStaticResourceStream(name);
 		}
 
 		public RTexture2D LoadTexture(string name) {
@@ -60,11 +58,11 @@ namespace RhuEngine
 
 		private RFont LoadMainFont() {
 			var fonts = new FontCollection();
-			var main = fonts.Add(GetStaticResourceStream("Fonts.NotoSans-Regular.ttf"));
-			fonts.Add(GetStaticResourceStream("Fonts.NotoEmoji-Regular.ttf"));
-			fonts.Add(GetStaticResourceStream("Fonts.NotoSansSymbols-Regular.ttf"));
-			fonts.Add(GetStaticResourceStream("Fonts.NotoSansSymbols2-Regular.ttf"));
-			fonts.Add(GetStaticResourceStream("Fonts.NotoSansEgyptianHieroglyphs-Regular.ttf"));
+			var main = fonts.Add(GetStaticResource("Fonts.NotoSans-Regular.ttf"));
+			fonts.Add(GetStaticResource("Fonts.NotoEmoji-Regular.ttf"));
+			fonts.Add(GetStaticResource("Fonts.NotoSansSymbols-Regular.ttf"));
+			fonts.Add(GetStaticResource("Fonts.NotoSansSymbols2-Regular.ttf"));
+			fonts.Add(GetStaticResource("Fonts.NotoSansEgyptianHieroglyphs-Regular.ttf"));
 			return new RFont(main.CreateFont(RFont.FONTSIZE), fonts);
 		}
 	}

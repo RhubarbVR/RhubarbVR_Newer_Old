@@ -61,12 +61,12 @@ namespace RhuEngine.Components
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public DynamicMaterial iconMit;
+		public UnlitMaterial iconMit;
 		[NoSave]
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public DynamicMaterial mit;
+		public UnlitMaterial mit;
 		[NoSave]
 		[NoSync]
 		[NoLoad]
@@ -215,10 +215,9 @@ namespace RhuEngine.Components
 			var spriterender = icon.AttachComponent<UIImage>();
 			var assetProvider = child.AttachComponent<RawAssetProvider<RTexture2D>>();
 			assetProvider.LoadAsset(textue);
-			var mmit = child.AttachComponent<DynamicMaterial>();
-			mmit.shader.Target = World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
-			mmit.Transparency = Transparency.Blend;
-			mit.MainTexture = assetProvider;
+			var mmit = child.AttachComponent<UnlitMaterial>();
+			mmit.Transparency.Value = Transparency.Blend;
+			mit.MainTexture.Target = assetProvider;
 			spriterender.Material.Target = mmit;
 			if (action != null) {
 				child.AttachComponent<UIButtonInteraction>().ButtonEvent.Target = action;
@@ -278,12 +277,8 @@ namespace RhuEngine.Components
 				closeRect.AnchorMin.Value = new Vector2f(0.65f);
 				closebutton.enabled.Value = false;
 				AddButton(closebutton, new Vector2i(20,0), closeeButtponEvent.Call);
-				onhover.action = () => {
-					closebutton.enabled.Value = true;
-				};
-				unHover.action = () => {
-					closebutton.enabled.Value = false;
-				};
+				onhover.action = () => closebutton.enabled.Value = true;
+				unHover.action = () => closebutton.enabled.Value = false;
 			}
 			var text = child.AddChild("Text");
 			var textrect = text.AttachComponent<UIRect>();
@@ -401,19 +396,16 @@ namespace RhuEngine.Components
 			uICanvas = Entity.AddChild("Canvas").AttachComponent<UICanvas>();
 			Engine.SettingsUpdate += Engine_SettingsUpdate;
 			uICanvas.scale.Value = new Vector3f(16, 1.25f, 1);
-			var shader = World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
-			mit = Entity.AttachComponent<DynamicMaterial>();
-			mit.shader.Target = shader;
-			mit.Transparency = Transparency.Blend;
-			iconMit = Entity.AttachComponent<DynamicMaterial>();
-			iconMit.shader.Target = shader;
+			mit = Entity.AttachComponent<UnlitMaterial>();
+			mit.Transparency.Value = Transparency.Blend;
+			iconMit = Entity.AttachComponent<UnlitMaterial>();
 			var icons = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
-			iconMit.MainTexture = icons;
-			iconMit.Transparency = Transparency.Blend;
+			iconMit.MainTexture.Target = icons;
+			iconMit.Transparency.Value = Transparency.Blend;
 			sprite = Entity.AttachComponent<SpriteProvder>();
 			sprite.Texture.Target = icons;
 			sprite.GridSize.Value = new Vector2i(26, 7);
-			mit.Transparency = Transparency.Blend;
+			mit.Transparency.Value = Transparency.Blend;
 			AddStartAndNotification();
 			Engine_SettingsUpdate();
 

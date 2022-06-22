@@ -87,11 +87,10 @@ namespace RhuEngine.WorldObjects
 			if (DebugVisuals) {
 				RWorld.ExecuteOnStartOfFrame(() => {
 					var mesh = RootEntity.GetFirstComponentOrAttach<RawMeshAsset>();
-					var comp = RootEntity.GetFirstComponent<DynamicMaterial>();
+					var comp = RootEntity.GetFirstComponent<UnlitMaterial>();
 					if (comp is null) {
-						comp = RootEntity.AttachComponent<DynamicMaterial>();
-						comp.Transparency = Transparency.Blend;
-						comp.shader.Target = RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
+						comp = RootEntity.AttachComponent<UnlitMaterial>();
+						comp.Transparency.Value = Transparency.Blend;
 					}
 					var debugcube = RootEntity.AddChild("DebugCube");
 					var meshrender = debugcube.AttachComponent<MeshRender>();
@@ -116,11 +115,10 @@ namespace RhuEngine.WorldObjects
 			if (DebugVisuals) {
 				RWorld.ExecuteOnStartOfFrame(() => {
 					var mesh = RootEntity.GetFirstComponentOrAttach<TrivialBox3Mesh>();
-					var comp = RootEntity.GetFirstComponent<DynamicMaterial>();
+					var comp = RootEntity.GetFirstComponent<UnlitMaterial>();
 					if (comp is null) {
-						comp = RootEntity.AttachComponent<DynamicMaterial>();
-						comp.Transparency = Transparency.Blend;
-						comp.shader.Target = RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
+						comp = RootEntity.AttachComponent<UnlitMaterial>();
+						comp.Transparency.Value = Transparency.Blend;
 					}
 					var debugcube = RootEntity.AddChild("DebugCube");
 					var meshrender = debugcube.AttachComponent<MeshRender>();
@@ -162,11 +160,10 @@ namespace RhuEngine.WorldObjects
 			if (DebugVisuals) {
 				RWorld.ExecuteOnStartOfFrame(() => {
 					var mesh = worldManager.PrivateOverlay.RootEntity.GetFirstComponentOrAttach<Sphere3NormalizedCubeMesh>();
-					var comp = worldManager.PrivateOverlay.RootEntity.GetFirstComponent<DynamicMaterial>();
+					var comp = worldManager.PrivateOverlay.RootEntity.GetFirstComponent<UnlitMaterial>();
 					if (comp is null) {
-						comp = worldManager.PrivateOverlay.RootEntity.AttachComponent<DynamicMaterial>();
-						comp.Transparency = Transparency.Blend;
-						comp.shader.Target = RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
+						comp = worldManager.PrivateOverlay.RootEntity.AttachComponent<UnlitMaterial>();
+						comp.Transparency.Value = Transparency.Blend;
 					}
 					var debugcube = worldManager.PrivateOverlay.RootEntity.AddChild("DebugCube");
 					var meshrender = debugcube.AttachComponent<MeshRender>();

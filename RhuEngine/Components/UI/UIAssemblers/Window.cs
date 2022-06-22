@@ -77,8 +77,8 @@ namespace RhuEngine.Components
 
 		public readonly SyncDelegate<Action<bool>> PinChanged;
 
-		public readonly SyncRef<DynamicMaterial> IconMit;
-		public readonly SyncRef<DynamicMaterial> MainMit;
+		public readonly SyncRef<UnlitMaterial> IconMit;
+		public readonly SyncRef<UnlitMaterial> MainMit;
 
 		private void ChangeHeader() {
 			if (WindowRootRectOffsetMin.Linked) {
@@ -91,18 +91,15 @@ namespace RhuEngine.Components
 
 		public override void OnAttach() {
 			base.OnAttach();
-			var shader = World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
 			var icons = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
 			var sprite = IconSprite.Target = World.RootEntity.GetFirstComponentOrAttach<SpriteProvder>();
 			sprite.Texture.Target = icons;
 			sprite.GridSize.Value = new Vector2i(26, 7);
-			IconMit.Target = Entity.AttachComponent<DynamicMaterial>();
-			IconMit.Target.shader.Target = shader;
-			IconMit.Target.Transparency = Transparency.Blend;
-			IconMit.Target.MainTexture = icons;
-			var mit = MainMit.Target = Entity.AttachComponent<DynamicMaterial>();
-			mit.shader.Target = shader;
-			mit.Transparency = Transparency.Blend;
+			IconMit.Target = Entity.AttachComponent<UnlitMaterial>();
+			IconMit.Target.Transparency.Value = Transparency.Blend;
+			IconMit.Target.MainTexture.Target = icons;
+			var mit = MainMit.Target = Entity.AttachComponent<UnlitMaterial>();
+			mit.Transparency.Value = Transparency.Blend;
 			(Entity, UISprite) AddButton(Entity were, float PADDING, Vector2i iconindex, Action<ButtonEvent> action) {
 				var child = were.AddChild("childEliment");
 				var rectTwo = child.AttachComponent<UIRect>();

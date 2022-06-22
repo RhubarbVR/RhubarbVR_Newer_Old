@@ -44,40 +44,40 @@ namespace RhuEngine.Commads
 			IAssetProvider<RMesh> meshe;
 			switch (spawntype) {
 				case SpawnObject.sphere:
-					(meshe, _) = AttachEntiyTo.AttachMesh<Sphere3NormalizedCubeMesh, UnlitShader>();
+					(meshe, _) = AttachEntiyTo.AttachMesh<Sphere3NormalizedCubeMesh, UnlitMaterial>();
 					break;
 				case SpawnObject.arrow:
-					(meshe, _) = AttachEntiyTo.AttachMesh<ArrowMesh, UnlitShader>();
+					(meshe, _) = AttachEntiyTo.AttachMesh<ArrowMesh, UnlitMaterial>();
 					break;
 				case SpawnObject.capsule:
-					(meshe, _) = AttachEntiyTo.AttachMesh<CapsuleMesh, UnlitShader>();
+					(meshe, _) = AttachEntiyTo.AttachMesh<CapsuleMesh, UnlitMaterial>();
 					break;
 				case SpawnObject.cone:
-					(meshe, _) = AttachEntiyTo.AttachMesh<ConeMesh, UnlitShader>();
+					(meshe, _) = AttachEntiyTo.AttachMesh<ConeMesh, UnlitMaterial>();
 					break;
 				case SpawnObject.cylinder:
-					(meshe, _) = AttachEntiyTo.AttachMesh<CylinderMesh, UnlitShader>();
+					(meshe, _) = AttachEntiyTo.AttachMesh<CylinderMesh, UnlitMaterial>();
 					break;
 				case SpawnObject.icosphere:
-					(meshe, _) = AttachEntiyTo.AttachMesh<IcosphereMesh, UnlitShader>();
+					(meshe, _) = AttachEntiyTo.AttachMesh<IcosphereMesh, UnlitMaterial>();
 					break;
 				case SpawnObject.mobiusstrip:
-					(meshe, _) = AttachEntiyTo.AttachMesh<MobiusStripMesh, UnlitShader>();
+					(meshe, _) = AttachEntiyTo.AttachMesh<MobiusStripMesh, UnlitMaterial>();
 					break;
 				case SpawnObject.circle:
-					(meshe, _) = AttachEntiyTo.AttachMesh<CircleMesh, UnlitShader>();
+					(meshe, _) = AttachEntiyTo.AttachMesh<CircleMesh, UnlitMaterial>();
 					break;
 				case SpawnObject.rectangle:
-					(meshe, _) = AttachEntiyTo.AttachMesh<RectangleMesh, UnlitShader>();
+					(meshe, _) = AttachEntiyTo.AttachMesh<RectangleMesh, UnlitMaterial>();
 					break;
 				case SpawnObject.torus:
-					(meshe, _) = AttachEntiyTo.AttachMesh<TorusMesh, UnlitShader>();
+					(meshe, _) = AttachEntiyTo.AttachMesh<TorusMesh, UnlitMaterial>();
 					break;
 				case SpawnObject.triangle:
-					(meshe, _) = AttachEntiyTo.AttachMesh<TriangleMesh, UnlitShader>();
+					(meshe, _) = AttachEntiyTo.AttachMesh<TriangleMesh, UnlitMaterial>();
 					break;
 				default:
-					(meshe, _) = AttachEntiyTo.AttachMesh<TrivialBox3Mesh, UnlitShader>();
+					(meshe, _) = AttachEntiyTo.AttachMesh<TrivialBox3Mesh, UnlitMaterial>();
 					break;
 			}
 			AttachEntiyTo.AttachComponent<ConvexMeshShape>().TargetMesh.Target = meshe;

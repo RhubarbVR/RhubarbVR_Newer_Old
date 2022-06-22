@@ -107,7 +107,7 @@ namespace RhuEngine.Components
 			}
 			void RenderText(string text) {
 				foreach (var item in text.EnumerateRunes()) {
-					var textsize = FontManager.Size(Font, item,style.Peek());
+					var textsize = FontManager.Size(Font, item);
 					if (item == Rune.GetRuneAt("\n", 0)) {
 						if(textsizeY == 0) {
 							textsizeY = 1 * (fontSize.Peek() / 100);

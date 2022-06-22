@@ -76,13 +76,12 @@ namespace RhuEngine.Components
 			return sprite;
 		}
 
-		public (UIImage, DynamicMaterial) AddImg(IAssetProvider<RTexture2D> assetProvider) {
+		public (UIImage, UnlitMaterial) AddImg(IAssetProvider<RTexture2D> assetProvider) {
 			var img = AttachComponentToStack<UIImage>();
-			var imgmit = AttachComponentToStack<DynamicMaterial>();
-			imgmit.shader.Target = Root.World.RootEntity.GetFirstComponentOrAttach<UnlitShader>();
+			var imgmit = AttachComponentToStack<UnlitMaterial>();
 			img.Texture.Target = assetProvider;
 			img.Material.Target = imgmit;
-			imgmit.MainTexture = assetProvider;
+			imgmit.MainTexture.Target = assetProvider;
 			return (img, imgmit);
 		}
 

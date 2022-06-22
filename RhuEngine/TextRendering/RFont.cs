@@ -81,10 +81,8 @@ namespace RhuEngine
 				return RTexture2D.White;
 			}
 			using var img = new Image<Rgba32>((int)size.Width, (int)size.Height);
-			img.Mutate(x => x.Fill(Color.Black));
-
 			img.Mutate(x => x.DrawText(TextOptions, text, Color.White));
-			return new ImageSharpTexture(img).CreateTexture();
+			return new ImageSharpTexture(img).CreateTextureAndDisposes();
 		}
 
 	}

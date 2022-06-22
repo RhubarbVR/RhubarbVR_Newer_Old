@@ -78,6 +78,7 @@ namespace RStereoKit
 			RSound.Instance = new SKSound();
 			RSoundInst.Instance = new SKSoundInst();
 			RMicrophone.Instance = new SKMic();
+			StaticMaterialManager.Instanances = new StaticMitsManager();
 			PhysicsHelper.RegisterPhysics<RBullet.BulletPhsyicsLink>();
 		}
 

@@ -52,7 +52,12 @@ namespace RhuEngine.Components
 					Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
 				}
 				if (Engine.EngineLink.CanRender) {
-					RWorld.ExecuteOnEndOfFrame(() => RRenderer.CameraRoot = RWorld.IsInVR ? Entity.GlobalTrans : head.Target?.GlobalTrans ?? Entity.GlobalTrans);
+					if (RWorld.IsInVR) {
+						RWorld.ExecuteOnEndOfFrame(() => RRenderer.CameraRoot = Entity.GlobalTrans);
+					}
+					else {
+						RWorld.ExecuteOnEndOfFrame(() => Engine.inputManager.screenInput.CamPos = Entity.GlobalTrans);
+					}
 				}
 			}
 			else {

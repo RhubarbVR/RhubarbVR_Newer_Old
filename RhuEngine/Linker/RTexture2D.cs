@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 using RhuEngine.WorldObjects;
@@ -21,8 +22,6 @@ namespace RhuEngine.Linker
 		void SetSampleMode(object target, TexSample value);
 
 		object Make(TexType dynamic, TexFormat rgba32Linear);
-
-		object MakeFromMemory(byte[] data);
 		public object MakeFromColors(Colorb[] colors, int width, int height, bool srgb);
 
 		public void SetSize(object tex,int width, int height);
@@ -61,9 +60,12 @@ namespace RhuEngine.Linker
 			get => Instance?.GetSampleMode(Tex) ?? 0;
 			set => Instance?.SetSampleMode(Tex, value);
 		}
+		public static RTexture2D FromMemory(Stream vs) {
+			return new ImageSharpTexture(vs).CreateTextureAndDisposes();
+		}
 
 		public static RTexture2D FromMemory(byte[] vs) {
-			return new RTexture2D(Instance.MakeFromMemory(vs));
+			return new ImageSharpTexture(new MemoryStream(vs)).CreateTextureAndDisposes();
 		}
 
 		public static RTexture2D FromColors(Colorb[] colors, int width, int height, bool srgb) {

@@ -24,8 +24,8 @@ namespace RhuEngine
 			//var rigbody = PowerCube.AttachComponent<RigidBody>();
 			//rigbody.PhysicsObject.Target = boxshape;
 			var coloider = floor.AttachComponent<CylinderShape>();
-			var (mesh, mit, render) = floor.AttachMeshWithMeshRender<CylinderMesh, UnlitShader>();
-			mit.Transparency = Transparency.Blend;
+			var (mesh, mit, render) = floor.AttachMeshWithMeshRender<CylinderMesh, UnlitMaterial>();
+			mit.Transparency.Value = Transparency.Blend;
 			var colorFollower = floor.AttachComponent<UIColorAssign>();
 			colorFollower.Alpha.Value = 0.75f;
 			colorFollower.Color.Value = UIColorAssign.ColorSelection.Primary;
@@ -96,11 +96,9 @@ namespace RhuEngine
 			group61.AttachComponent<Spinner>().speed.Value = new Vector3f(-speed, 0, -speed);
 
 
-			var shader = root.GetFirstComponentOrAttach<UnlitClipShader>();
 			var boxMesh = root.AttachComponent<TrivialBox3Mesh>();
 			boxMesh.Extent.Value = new Vector3f(0.4f, 0.4f, 0.4f);
-			var mit = root.AttachComponent<DynamicMaterial>();
-			mit.shader.Target = shader;
+			var mit = root.AttachComponent<UnlitMaterial>();
 			BuildGroup(boxMesh, mit, group1, Colorf.RhubarbGreen);
 			BuildGroup(boxMesh, mit, group2, Colorf.RhubarbRed);
 			BuildGroup(boxMesh, mit, group3, Colorf.RhubarbGreen);
@@ -116,7 +114,7 @@ namespace RhuEngine
 
 		}
 
-		public static void BuildGroup(TrivialBox3Mesh boxMesh, DynamicMaterial mit, Entity entity, Colorf color) {
+		public static void BuildGroup(TrivialBox3Mesh boxMesh, UnlitMaterial mit, Entity entity, Colorf color) {
 			for (var i = 0; i < 6; i++) {
 				var cubeHolder = entity.AddChild("CubeHolder");
 				cubeHolder.rotation.Value = Quaternionf.CreateFromEuler(NextFloat() * 180, NextFloat() * 180, NextFloat() * 180);
@@ -127,7 +125,7 @@ namespace RhuEngine
 			}
 		}
 
-		public static void AttachRender(TrivialBox3Mesh boxMesh, DynamicMaterial mit, Entity entity, Colorf color) {
+		public static void AttachRender(TrivialBox3Mesh boxMesh, UnlitMaterial mit, Entity entity, Colorf color) {
 			var meshRender = entity.AttachComponent<MeshRender>();
 			meshRender.colorLinear.Value = color;
 			meshRender.materials.Add().Target = mit;

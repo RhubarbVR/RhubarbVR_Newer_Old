@@ -29,7 +29,7 @@ namespace RhuEngine.Components
 				leftComp.user.Target = World.GetLocalUser();
 				userRoot.leftHand.Target = leftHand;
 				if (!World.IsPersonalSpace) {
-					var r = leftHand.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitShader>();
+					var r = leftHand.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
 					r.Item1.Radius.Value = 0.03f / 2;
 					r.Item3.colorLinear.Value = Colorf.RhubarbRed;
 				}
@@ -39,7 +39,7 @@ namespace RhuEngine.Components
 				rightComp.hand.Value = Handed.Right;
 				rightComp.user.Target = World.GetLocalUser();
 				if (!World.IsPersonalSpace) {
-					var l = rightHand.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitShader>();
+					var l = rightHand.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
 					l.Item1.Radius.Value = 0.03f / 2;
 					l.Item3.colorLinear.Value = Colorf.RhubarbGreen;
 				}
@@ -48,10 +48,11 @@ namespace RhuEngine.Components
 				head.AttachComponent<GrabbableHolder>().InitializeGrabHolder(Handed.Max);
 				head.AttachComponent<Head>().user.Target = World.GetLocalUser();
 				if (!World.IsPersonalSpace) {
-					var thing = head.AddChild("Render").AttachMeshWithMeshRender<CylinderMesh, UnlitShader>();
+					var thing = head.AddChild("Render").AttachMeshWithMeshRender<CylinderMesh, UnlitMaterial>();
 					thing.Item3.colorLinear.Value = user.UserName.GetHashHue();
 					var mesh = thing.Item1;
 					mesh.Entity.rotation.Value = Quaternionf.Pitched;
+					mesh.Entity.position.Value = new Vector3f(0, 0, -0.01);
 					mesh.Height.Value = 0.1f;
 					mesh.BaseRadius.Value = 0.05f;
 					mesh.TopRadius.Value = 0.05f;
