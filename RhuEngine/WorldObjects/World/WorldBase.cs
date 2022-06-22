@@ -246,7 +246,12 @@ namespace RhuEngine.WorldObjects
 			catch (Exception e) {
 				RLog.Err($"Failed to update global stepables for session {WorldDebugName}. Error: {e}");
 			}
-			PhysicsSim.UpdateSim(RTime.Elapsedf);
+			try {
+				PhysicsSim.UpdateSim(RTime.Elapsedf);
+			}
+			catch(Exception e) {
+				RLog.Err($"Failed To update PhysicsSim Error:{e}");
+			}
 			try {
 				var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
 											 group ent by ent.CachedDepth;
