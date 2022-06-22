@@ -45,42 +45,53 @@ namespace RhuEngine.Commads
 			switch (spawntype) {
 				case SpawnObject.sphere:
 					(meshe, _) = AttachEntiyTo.AttachMesh<Sphere3NormalizedCubeMesh, UnlitMaterial>();
+					AttachEntiyTo.AttachComponent<SphereShape>();
 					break;
 				case SpawnObject.arrow:
 					(meshe, _) = AttachEntiyTo.AttachMesh<ArrowMesh, UnlitMaterial>();
+					AttachEntiyTo.AttachComponent<BoxShape>();
 					break;
 				case SpawnObject.capsule:
 					(meshe, _) = AttachEntiyTo.AttachMesh<CapsuleMesh, UnlitMaterial>();
+					AttachEntiyTo.AttachComponent<CapsuleShape>();
 					break;
 				case SpawnObject.cone:
 					(meshe, _) = AttachEntiyTo.AttachMesh<ConeMesh, UnlitMaterial>();
+					AttachEntiyTo.AttachComponent<ConeShape>();
 					break;
 				case SpawnObject.cylinder:
 					(meshe, _) = AttachEntiyTo.AttachMesh<CylinderMesh, UnlitMaterial>();
+					AttachEntiyTo.AttachComponent<CylinderShape>();
 					break;
 				case SpawnObject.icosphere:
 					(meshe, _) = AttachEntiyTo.AttachMesh<IcosphereMesh, UnlitMaterial>();
+					AttachEntiyTo.AttachComponent<SphereShape>();
 					break;
 				case SpawnObject.mobiusstrip:
 					(meshe, _) = AttachEntiyTo.AttachMesh<MobiusStripMesh, UnlitMaterial>();
+					AttachEntiyTo.AttachComponent<BoxShape>();
 					break;
 				case SpawnObject.circle:
 					(meshe, _) = AttachEntiyTo.AttachMesh<CircleMesh, UnlitMaterial>();
+					AttachEntiyTo.AttachComponent<BoxShape>();
 					break;
 				case SpawnObject.rectangle:
 					(meshe, _) = AttachEntiyTo.AttachMesh<RectangleMesh, UnlitMaterial>();
+					AttachEntiyTo.AttachComponent<BoxShape>();
 					break;
 				case SpawnObject.torus:
 					(meshe, _) = AttachEntiyTo.AttachMesh<TorusMesh, UnlitMaterial>();
+					AttachEntiyTo.AttachComponent<BoxShape>();
 					break;
 				case SpawnObject.triangle:
 					(meshe, _) = AttachEntiyTo.AttachMesh<TriangleMesh, UnlitMaterial>();
+					AttachEntiyTo.AttachComponent<BoxShape>();
 					break;
 				default:
 					(meshe, _) = AttachEntiyTo.AttachMesh<TrivialBox3Mesh, UnlitMaterial>();
+					AttachEntiyTo.AttachComponent<BoxShape>();
 					break;
 			}
-			AttachEntiyTo.AttachComponent<ConvexMeshShape>().TargetMesh.Target = meshe;
 		}
 	}
 }
