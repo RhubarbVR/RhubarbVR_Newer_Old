@@ -36,7 +36,6 @@ namespace RhuEngine
 			JavaSystem.LoadLibrary("StereoKitC");
 			JavaSystem.LoadLibrary("opus");
 			JavaSystem.LoadLibrary("libbulletc");
-
 			// Set up a surface for StereoKit to draw on
 			Window.TakeSurface(this);
 			Window.SetFormat(Format.Unknown);
