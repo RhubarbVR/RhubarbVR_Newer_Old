@@ -135,6 +135,14 @@
     "Programs.Login.ConfirmPassword": "Passwort Bestätigen",
     "Programs.Login.Password": "Passwort",
     "Programs.Login.Email": "E-Mail",
-    "Programs.Login.Username": "Nutzername"
+    "Programs.Login.Username": "Nutzername",
+
+    "Programs.Settings.Name": "Einstellungen",
+
+
+    "Programs.FileExplorer.Name": "Dateibrowser",
+    "Programs.FileExplorer.Path": "Pfad",
+    "Programs.CreateNewWorld.Name": "Neue Welt Erstellen",
+    "Programs.Terminal.Name": "Terminal"
   }
 }
