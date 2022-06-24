@@ -200,6 +200,9 @@ namespace RhuEngine.Managers
 			}
 			public void UnFreeMouse() {
 				try {
+					if(RInput.Mouse is null) {
+						return;
+					}
 					RInput.Mouse.HideMouse = true;
 					RInput.Mouse.CenterMouse = true;
 				}
@@ -207,6 +210,17 @@ namespace RhuEngine.Managers
 
 				}
 				MouseFree = false;
+			}
+
+			private Matrix _camPos = Matrix.Identity;
+	
+			public Matrix CamPos
+			{
+				get => _camPos;
+				set {
+					_camPos = value;
+					RRenderer.CameraRoot = RInput.screenHead.HeadMatrix * CamPos;
+				}
 			}
 
 			public void Step() {
@@ -225,7 +239,9 @@ namespace RhuEngine.Managers
 					yawpitch += RInput.Mouse.PosChange * SPEED;
 					yawpitch.y = MathUtil.Clamp(yawpitch.y, -PITCH, PITCH);
 				}
-				RInput.screenhd.HeadMatrix = Matrix.TR(pos, Quaternionf.CreateFromEuler(yawpitch.x, yawpitch.y, 0));
+				var headData = Matrix.TR(pos, Quaternionf.CreateFromEuler(yawpitch.x, yawpitch.y, 0));
+				RInput.screenHead.HeadMatrix = headData;
+				RRenderer.CameraRoot = headData * CamPos; 
 			}
 		}
 

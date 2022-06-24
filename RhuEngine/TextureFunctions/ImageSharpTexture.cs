@@ -4,10 +4,11 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using RhuEngine.Linker;
 using RNumerics;
+using System;
 
 namespace RhuEngine
 {
-	public class ImageSharpTexture
+	public class ImageSharpTexture:IDisposable
 	{
 		public Image<Rgba32> Image { get; }
 		public bool Srgb { get; }
@@ -20,7 +21,7 @@ namespace RhuEngine
 		public ImageSharpTexture(string path, bool srgb) : this(SixLabors.ImageSharp.Image.Load<Rgba32>(path), srgb) { }
 		public ImageSharpTexture(Stream stream) : this(SixLabors.ImageSharp.Image.Load<Rgba32>(stream)) { }
 		public ImageSharpTexture(Stream stream, bool srgb) : this(SixLabors.ImageSharp.Image.Load<Rgba32>(stream), srgb) { }
-		public ImageSharpTexture(Image<Rgba32> image) : this(image, false) { }
+		public ImageSharpTexture(Image<Rgba32> image) : this(image, true) { }
 		public ImageSharpTexture(Image<Rgba32> image, bool srgb) {
 			Image = image;
 			Srgb = srgb;
@@ -36,6 +37,15 @@ namespace RhuEngine
 			}
 			var newtex = RTexture2D.FromColors(colors, Width, Height, Srgb);
 			return newtex;
+		}
+
+		public RTexture2D CreateTextureAndDisposes() {
+			var newtex = CreateTexture();
+			Dispose();
+			return newtex;
+		}
+		public void Dispose() {
+			Image?.Dispose();
 		}
 	}
 }

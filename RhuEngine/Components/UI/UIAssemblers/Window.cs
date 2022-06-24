@@ -77,8 +77,8 @@ namespace RhuEngine.Components
 
 		public readonly SyncDelegate<Action<bool>> PinChanged;
 
-		public readonly SyncRef<DynamicMaterial> IconMit;
-		public readonly SyncRef<DynamicMaterial> MainMit;
+		public readonly SyncRef<UnlitMaterial> IconMit;
+		public readonly SyncRef<UnlitMaterial> MainMit;
 
 		private void ChangeHeader() {
 			if (WindowRootRectOffsetMin.Linked) {
@@ -91,25 +91,25 @@ namespace RhuEngine.Components
 
 		public override void OnAttach() {
 			base.OnAttach();
-			var shader = World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
 			var icons = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
 			var sprite = IconSprite.Target = World.RootEntity.GetFirstComponentOrAttach<SpriteProvder>();
 			sprite.Texture.Target = icons;
 			sprite.GridSize.Value = new Vector2i(26, 7);
-			IconMit.Target = Entity.AttachComponent<DynamicMaterial>();
-			IconMit.Target.shader.Target = shader;
-			IconMit.Target.Transparency = Transparency.Blend;
-			IconMit.Target.MainTexture = icons;
-			var mit = MainMit.Target = Entity.AttachComponent<DynamicMaterial>();
-			mit.shader.Target = shader;
-			mit.Transparency = Transparency.Blend;
+			IconMit.Target = Entity.AttachComponent<UnlitMaterial>();
+			IconMit.Target.Transparency.Value = Transparency.Blend;
+			IconMit.Target.MainTexture.Target = icons;
+			var mit = MainMit.Target = Entity.AttachComponent<UnlitMaterial>();
+			mit.Transparency.Value = Transparency.Blend;
 			(Entity, UISprite) AddButton(Entity were, float PADDING, Vector2i iconindex, Action<ButtonEvent> action) {
 				var child = were.AddChild("childEliment");
 				var rectTwo = child.AttachComponent<UIRect>();
 				rectTwo.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
 				rectTwo.AnchorMax.Value = new Vector2f(0.9f, 0.9f);
 				var img = child.AttachComponent<UIRectangle>();
-				img.Tint.Value = new Colorf(0.1f, 0.1f, 0.1f, 0.5f);
+				var colorassign = child.AttachComponent<UIColorAssign>();
+				colorassign.Alpha.Value = 0.5f;
+				colorassign.ColorShif.Value = 0.2f;
+				colorassign.TargetColor.Target = img.Tint;
 				img.Material.Target = mit;
 				img.AddRoundingSettings();
 				var icon = child.AddChild("Icon");
@@ -121,6 +121,9 @@ namespace RhuEngine.Components
 				spriterender.Material.Target = IconMit.Target;
 				spriterender.PosMin.Value = iconindex;
 				spriterender.PosMax.Value = iconindex;
+				colorassign = child.AttachComponent<UIColorAssign>();
+				colorassign.ColorShif.Value = 1.9f;
+				colorassign.TargetColor.Target = spriterender.Tint;
 				if (action != null) {
 					child.AttachComponent<UIButtonInteraction>().ButtonEvent.Target = action;
 				}
@@ -130,11 +133,14 @@ namespace RhuEngine.Components
 			Canvas.Target = Entity.AttachComponent<UICanvas>();
 			Canvas.Target.scale.Value = new Vector3f(10, 8, 1.5f);
 			var rect = Entity.AttachComponent<UIRect>();
+			var grabber = Entity.AttachComponent<UIGrabInteraction>();
+			var grabable = Entity.AttachComponent<Grabbable>();
+			grabber.Grabeded.Target = grabable.RemoteGrab;
 			rect.OffsetMax.Value = new Vector2f(0, HeaderHeight.Value);
 			MainUIMax.Target = rect.AnchorMax;
 			var windowRoot = Entity.AddChild("WindowRoot");
 			var windowRootrect = windowRoot.AttachComponent<UIRect>();
-			windowRootrect.OffsetMin.Value = new Vector2f(0, -HeaderHeight.Value);
+			windowRootrect.OffsetMin.Value = new Vector2f(0, HeaderHeight.Value);
 			WindowRootRectOffsetMin.Target = windowRootrect.OffsetMin;
 			var header = Entity.AddChild("Header");
 			var headerrect = header.AttachComponent<UIRect>();
@@ -144,11 +150,16 @@ namespace RhuEngine.Components
 			var headerTextSide = header.AddChild("HeaderTextSide");
 			var headerTextSiderect = headerTextSide.AttachComponent<UIRect>();
 			headerTextSiderect.OffsetMax.Value -= new Vector2f(HeaderHeight.Value * 4, 0);
-			
+			headerTextSide = headerTextSide.AddChild("HeaderTextSide");
+			var rectoffset = headerTextSide.AttachComponent<UIRect>();
+			rectoffset.AnchorMax.Value = new Vector2f(0.9f);
+			rectoffset.AnchorMin.Value = new Vector2f(0.1f);
 			var text = headerTextSide.AttachComponent<UIText>();
 			NameLink.Target = text.Text;
 			text.VerticalAlien.Value = EVerticalAlien.Bottom;
-
+			var colorassign = Entity.AttachComponent<UIColorAssign>();
+			colorassign.ColorShif.Value = 1.9f;
+			colorassign.TargetColor.Target = text.StartingColor;
 			var headerButtonSide = header.AddChild("ButtonGroup");
 			var headerButtonSiderect = headerButtonSide.AttachComponent<UIRect>();
 			headerButtonSiderect.OffsetMin.Value -= new Vector2f(HeaderHeight.Value * 4, 1);
@@ -171,11 +182,16 @@ namespace RhuEngine.Components
 			OnCollapse.Target = CollapseUI;
 			OnPin.Target = PinUI;
 			UpdateButtons();
+
+
+
 			PannelRoot.Target = windowRoot.AddChild("PannelRoot");
 			CollapseUIEnable.Target = PannelRoot.Target.enabled;
 
 			var img = Entity.AttachComponent<UIRectangle>();
-			img.Tint.Value = new Colorf(0, 0, 0, 0.7f);
+			colorassign = Entity.AttachComponent<UIColorAssign>();
+			colorassign.Alpha.Value = 0.7f;
+			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 		}
 		private void UpdateButtons() {
@@ -234,23 +250,23 @@ namespace RhuEngine.Components
 		}
 
 
-		[Exsposed]
+		[Exposed]
 		public void CollapseUI() {
 			IsCollapsed.Value = !IsCollapsed.Value;
 		}
-		[Exsposed]
+		[Exposed]
 		public void PinUI() {
 			IsPin.Value = !IsPin.Value;
 			PinChanged.Target?.Invoke(IsPin.Value);
 		}
-		[Exsposed]
+		[Exposed]
 		public void CollapseAction(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				OnCollapse.Target?.Invoke();
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void PinAction(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				OnPin.Target?.Invoke();
@@ -258,14 +274,14 @@ namespace RhuEngine.Components
 		}
 
 
-		[Exsposed]
+		[Exposed]
 		public void CloseAction(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				OnClose.Target?.Invoke();
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void MinimizeAction(ButtonEvent buttonEvent) {
 			if (buttonEvent.IsClicked) {
 				OnMinimize.Target?.Invoke();

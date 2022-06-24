@@ -16,6 +16,15 @@ using RhuEngine.Components.PrivateSpace;
 
 namespace RhuEngine.Components
 {
+	public class OpenManyAttribute : Attribute
+	{
+
+	}
+
+	public class RemoveFromProgramListAttribute : Attribute {
+
+	}
+
 	[PrivateSpaceOnly]
 	public abstract class Program : Component
 	{
@@ -66,13 +75,13 @@ namespace RhuEngine.Components
 		public abstract void LoadUI(Entity uiRoot);
 
 		public bool Minimized = false;
-		[Exsposed]
+		[Exposed]
 		public void Minimize() {
 			window.Entity.enabled.Value = Minimized;
 			Minimized = !Minimized;
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void OnPin(bool pin) {
 			if (pin) {
 				Entity.SetParent(taskBar.Entity);
@@ -82,7 +91,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void Close() {
 			Entity.Destroy();
 		}

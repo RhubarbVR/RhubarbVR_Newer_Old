@@ -21,14 +21,24 @@ namespace RhuEngine.Components
 			[Default("RunCode")]
 			public readonly Sync<string> FunctionName;
 
-			[Exsposed]
+			[Exposed]
 			public void Invoke() {
 				((ECMAScript)Parent.Parent).RunCode(FunctionName.Value);
 			}
 
-			[Exsposed]
+			[Exposed]
 			public void Invoke(params object[] prams) {
 				((ECMAScript)Parent.Parent).RunCode(FunctionName.Value, prams);
+			}
+
+			[Exposed]
+			public object InvokeWithReturn() {
+				return ((ECMAScript)Parent.Parent).RunCode(FunctionName.Value);
+			}
+
+			[Exposed]
+			public object InvokeWithReturn(params object[] prams) {
+				return ((ECMAScript)Parent.Parent).RunCode(FunctionName.Value, prams);
 			}
 		}
 
@@ -39,7 +49,7 @@ namespace RhuEngine.Components
 			Functions.Add();
 		}
 
-		[Exsposed]
+		[Exposed]
 		public bool ScriptLoaded => _ecma is not null;
 
 		public readonly SyncObjList<SyncRef<IWorldObject>> Targets;
@@ -54,13 +64,17 @@ namespace RhuEngine.Components
 
 		private Jint.Engine _ecma;
 
-		[Exsposed]
+		[Exposed]
 		public void Invoke(string function, params object[] values) {
 			RunCode(function, values);
 		}
+		[Exposed]
+		public object InvokeWithReturn(string function, params object[] values) {
+			return RunCode(function, values);
+		}
 
-
-		private void RunCode(string function, params object[] values) {
+		private object RunCode(string function, params object[] values) {
+			object reterndata = null;
 			try {
 				WorldThreadSafty.MethodCalls++;
 				if (WorldThreadSafty.MethodCalls > WorldThreadSafty.MaxCalls) {
@@ -69,7 +83,7 @@ namespace RhuEngine.Components
 				if (_ecma.GetValue(function) == JsValue.Undefined) {
 					throw new Exception("function " + function + " Not found");
 				}
-				_ecma.Invoke(function, values);
+				reterndata = _ecma.Invoke(function, values);
 				WorldThreadSafty.MethodCalls--;
 			}
 			catch (StackOverflowException) {
@@ -83,9 +97,10 @@ namespace RhuEngine.Components
 				RLog.Err("Script Err " + ex.ToString());
 #endif
 			}
+			return reterndata;
 		}
 
-		[Exsposed]
+		[Exposed]
 		public IWorldObject GetTarget(int index) {
 			return Targets.GetValue(index).Target;
 		}
@@ -97,7 +112,7 @@ namespace RhuEngine.Components
 				options.TimeoutInterval(TimeSpan.FromSeconds(1));
 				options.MaxStatements(1580);
 				options.SetTypeResolver(new TypeResolver {
-					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()))&& !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
+					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()))&& !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
 				});
 				options.Strict = true;
 			});
@@ -107,7 +122,7 @@ namespace RhuEngine.Components
 			_ecma.SetValue("world", World);
 			_ecma.SetValue("localUser", LocalUser);
 			_ecma.SetValue("log", new Action<string>(RLog.Info));
-			_ecma.SetValue("getType", (string a) => Type.GetType(a, false, true));
+			_ecma.SetValue("getType", (string a) => FamcyTypeParser.PraseType(a));
 			_ecma.SetValue("typeOf", (object a) => a?.GetType());
 			_ecma.SetValue("toString", new Func<object, string>((object a) => (a.GetType() == typeof(Type)) ? ((Type)a).GetFormattedName() : a?.ToString()));
 			try {

@@ -21,17 +21,14 @@ namespace RBullet
 		public readonly SequentialImpulseConstraintSolverMultiThreaded _parallelSolver;
 
 		public BPhysicsSim() {
-			using (var collisionConfigurationInfo = new DefaultCollisionConstructionInfo {
-				DefaultMaxPersistentManifoldPoolSize = 80000,
-				DefaultMaxCollisionAlgorithmPoolSize = 80000
-			}) {
-				_collisionConfiguration = new DefaultCollisionConfiguration(collisionConfigurationInfo);
-			};
+			_collisionConfiguration = new DefaultCollisionConfiguration();
 			_dispatcher = new CollisionDispatcher(_collisionConfiguration);
 			_broadphase = new DbvtBroadphase();
-			_solverPool = new ConstraintSolverPoolMultiThreaded(Math.Min(Environment.ProcessorCount - 1,1));
+			_solverPool = new ConstraintSolverPoolMultiThreaded(Math.Max(Environment.ProcessorCount - 1,1));
 			_parallelSolver = new SequentialImpulseConstraintSolverMultiThreaded();
 			_physicsWorld = new DiscreteDynamicsWorldMultiThreaded(_dispatcher, _broadphase, _solverPool, _parallelSolver, _collisionConfiguration);
+			var grav = new Vector3(0, -10, 0);
+			_physicsWorld.SetGravity(ref grav);
 		}
 
 		public SafeList<BRigidBodyCollider> Updates = new SafeList<BRigidBodyCollider>();
@@ -61,23 +58,24 @@ namespace RBullet
 			}
 
 			public override float AddSingleResult(ManifoldPoint cp, CollisionObjectWrapper colObj0Wrap, int partId0, int index0, CollisionObjectWrapper colObj1Wrap, int partId1, int index1) {
-				callback1.Invoke(cp.PositionWorldOnA, cp.PositionWorldOnB, cp.NormalWorldOnB, cp.Distance, cp.Distance1, (BRigidBodyCollider)colObj0Wrap.CollisionObject.UserObject);
+				//Todo: fix overlap
+				//callback1.Invoke(cp.PositionWorldOnA, cp.PositionWorldOnB, cp.NormalWorldOnB, cp.Distance, cp.Distance1, (BRigidBodyCollider)colObj0Wrap.CollisionObject.UserObject);
 				return 0;
 			}
 		}
 
 		public void RunCallBacks() {
-			Updates.SafeOperation((list) => {
-				foreach (var item in list) {
-					if (item.collisionObject != null) {
-						_physicsWorld.ContactTest(item.collisionObject, new Tester((Vector3 PositionWorldOnA, Vector3 PositionWorldOnB, Vector3 NormalWorldOnB, double Distance, double Distance1, BRigidBodyCollider hit) => {
-							item.Call(new Vector3f((float)PositionWorldOnA.X, (float)PositionWorldOnA.Y, (float)PositionWorldOnA.Z),
-								new Vector3f((float)PositionWorldOnB.X, (float)PositionWorldOnB.Y, (float)PositionWorldOnB.Z),
-								new Vector3f((float)NormalWorldOnB.X, (float)NormalWorldOnB.Y, (float)NormalWorldOnB.Z), Distance, Distance1, hit.Collider);
-						}));
-					}
-				}
-			});
+			//Updates.SafeOperation((list) => {
+			//	foreach (var item in list) {
+			//		if (item.collisionObject != null) {
+			//			_physicsWorld.ContactTest(item.collisionObject, new Tester((Vector3 PositionWorldOnA, Vector3 PositionWorldOnB, Vector3 NormalWorldOnB, double Distance, double Distance1, BRigidBodyCollider hit) => {
+			//				item.Call(new Vector3f((float)PositionWorldOnA.X, (float)PositionWorldOnA.Y, (float)PositionWorldOnA.Z),
+			//					new Vector3f((float)PositionWorldOnB.X, (float)PositionWorldOnB.Y, (float)PositionWorldOnB.Z),
+			//					new Vector3f((float)NormalWorldOnB.X, (float)NormalWorldOnB.Y, (float)NormalWorldOnB.Z), Distance, Distance1, hit.Collider);
+			//			}));
+			//		}
+			//	}
+			//});
 		}
 	}
 

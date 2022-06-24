@@ -6,6 +6,7 @@ using LiteNetLib;
 
 using RhuEngine.Components;
 
+using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
@@ -14,13 +15,13 @@ namespace RhuEngine.WorldObjects
 		public readonly SyncRef<UserRoot> userRoot;
 
 		public readonly SyncAbstractObjList<SyncStream> syncStreams;
-		[Exsposed]
+		[Exposed]
 		[NoWriteExsposed]
 		public string NormalizedUserName { get; private set; }
-		[Exsposed]
+		[Exposed]
 		[NoWriteExsposed]
 		public string UserName { get;private set; }
-		[Exsposed]
+		[Exposed]
 		[NoWriteExsposed]
 		public string[] Roles { get; private set; }
 

@@ -32,11 +32,14 @@
     <PackageReference Include="Jint" Version="3.0.0-beta-2038" />
     <PackageReference Include="LibVLCSharp" Version="3.6.6" />
     <PackageReference Include="LiteNetLib" Version="0.9.5.2" />
-    <PackageReference Include="MessagePack" Version="2.3.85" />
+    <PackageReference Include="MessagePack" Version="2.3.112" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="NAudio.Core" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.1" />
+    <PackageReference Include="Shim.System.Text.Rune" Version="6.0.2" />
+    <PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta17" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta14" />
     <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
   </ItemGroup>
@@ -54,22 +57,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Res\Grid.jpg" />
-    <None Remove="Res\Icons.ai" />
-    <None Remove="Res\Icons.png" />
-    <None Remove="Res\nulltexture.jpg" />
-    <None Remove="Res\RhubarbVR.png" />
-    <None Remove="Res\RhubarbVR2.png" />
+    <None Remove="Res\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Res\Grid.jpg" />
-    <EmbeddedResource Include="Res\nulltexture.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Res\RhubarbVR.png" />
-    <EmbeddedResource Include="Res\RhubarbVR2.png" />
+    <EmbeddedResource Include="Res\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -80,10 +72,6 @@
 
   <ItemGroup>
     <Folder Include="ClipBoard\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Res\Icons.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using SharedModels.GameSpecific;
 using RhuEngine.Linker;
+using RNumerics;
 
 namespace RhuEngine.Components
 {
@@ -70,20 +71,20 @@ namespace RhuEngine.Components
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void InfoLog(string msg = "Hello World") {
 			RLog.Info("[RhuScript] "+ msg);
 		}
-		[Exsposed]
+		[Exposed]
 		public void ErrorLog(string msg) {
 			RLog.Err("[RhuScript] " + msg);
 		}
-		[Exsposed]
+		[Exposed]
 		public void CallMainMethod() {
 			CallMainMethodAndReturn();
 		}
 
-		[Exsposed]
+		[Exposed]
 		public object CallMainMethodAndReturn() {
 			if (Error != null) {
 				return null;
@@ -106,7 +107,7 @@ namespace RhuEngine.Components
 			return null;
 		}
 
-		[Exsposed]
+		[Exposed]
 		public T CallAndReturn<T>() {
 			return (T)CallMainMethodAndReturn();
 		}

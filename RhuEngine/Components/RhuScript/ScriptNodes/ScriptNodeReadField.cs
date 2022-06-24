@@ -5,6 +5,7 @@ using System.Reflection;
 using MessagePack;
 using RhuEngine.WorldObjects;
 using System.Linq;
+using RNumerics;
 
 namespace RhuEngine.Components.ScriptNodes
 {
@@ -34,7 +35,7 @@ namespace RhuEngine.Components.ScriptNodes
 			if (field.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
 				return;
 			}
-			if (field.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+			if (field.GetCustomAttribute<ExposedAttribute>(true) is null) {
 				if (!typeof(IWorldObject).IsAssignableFrom(field.FieldType)) {
 					return;
 				}
@@ -67,7 +68,7 @@ namespace RhuEngine.Components.ScriptNodes
 			if (fieldInfo.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
 				throw new Exception("Not Exposed");
 			}
-			if (fieldInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+			if (fieldInfo.GetCustomAttribute<ExposedAttribute>(true) is null) {
 				if (!typeof(IWorldObject).IsAssignableFrom(fieldInfo.FieldType)) {
 					throw new Exception("Not Exposed");
 				}
@@ -81,7 +82,7 @@ namespace RhuEngine.Components.ScriptNodes
 			if (fieldInfo.GetCustomAttribute<UnExsposedAttribute>(true) is not null) {
 				throw new Exception("Not Exposed");
 			}
-			if (fieldInfo.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+			if (fieldInfo.GetCustomAttribute<ExposedAttribute>(true) is null) {
 				if (!typeof(IWorldObject).IsAssignableFrom(fieldInfo.FieldType)) {
 					throw new Exception("Not Exposed");
 				}

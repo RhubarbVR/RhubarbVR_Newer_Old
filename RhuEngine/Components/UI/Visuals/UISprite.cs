@@ -19,7 +19,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(RegProcessMesh))]
 		public readonly Sync<Vector2i> PosMax;
 		
-		[Exsposed]
+		[Exposed]
 		public void SetPos(Vector2i pos) {
 			PosMax.Value = pos;
 			PosMin.Value = pos;

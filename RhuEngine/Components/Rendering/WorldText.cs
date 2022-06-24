@@ -4,6 +4,8 @@ using RhuEngine.WorldObjects.ECS;
 using RhuEngine.Linker;
 using RNumerics;
 using System.Linq;
+using SixLabors.Fonts;
+
 namespace RhuEngine.Components
 {
 	public interface ITextComp : ISyncObject {

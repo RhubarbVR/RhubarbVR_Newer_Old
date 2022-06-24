@@ -84,6 +84,7 @@ namespace RNumerics
 					if (planeSetting.removeOtherSide) {
 						trys.RemoveAt(i);
 						i--;
+						savedCount--;
 						continue;
 					}
 					else {

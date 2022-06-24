@@ -7,6 +7,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using static RhuEngine.Components.DynamicTextRender;
+using SixLabors.Fonts;
 
 namespace RhuEngine.Components
 {
@@ -57,6 +58,12 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(UpdateText))]
 		public readonly Sync<bool> Password;
 
+		[OnChanged(nameof(UpdateText))]
+		public readonly Sync<Vector2f> MaxClamp;
+
+		[OnChanged(nameof(UpdateText))]
+		public readonly Sync<Vector2f> MinClamp;
+
 		public DynamicTextRender textRender = new();
 
 		[Default(EVerticalAlien.Center)]
@@ -77,6 +84,8 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
+			textRender.MaxClamp = MaxClamp;
+			textRender.MinClamp = MinClamp;
 			var newtext = Text.Value;
 			if (Password.Value) {
 				newtext = new string('●', newtext.Length);
@@ -152,6 +161,8 @@ namespace RhuEngine.Components
 			base.OnAttach();
 			Font.Target = World.RootEntity.GetFirstComponentOrAttach<MainFont>();
 			StartingColor.Value = Colorf.White;
+			MinClamp.Value = Vector2f.MinValue;
+			MaxClamp.Value = Vector2f.MaxValue;
 		}
 
 		public override void Render(Matrix matrix) {

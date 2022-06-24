@@ -3,6 +3,8 @@
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public interface ISyncRef : IWorldObject
@@ -41,7 +43,7 @@ namespace RhuEngine.WorldObjects
 		public override void OnLoaded() {
 			NetValue = _targetPointer;
 		}
-		[Exsposed]
+		[Exposed]
 		public virtual NetPointer Value
 		{
 			get => _targetPointer;
@@ -68,7 +70,7 @@ namespace RhuEngine.WorldObjects
 
 		public IWorldObject TargetIWorldObject { get => Target; set { if (value != null) { Value = value.Pointer; } } }
 		
-		[Exsposed]
+		[Exposed]
 		public virtual T Target
 		{
 			get => _target == null || (_target?.IsRemoved ?? false) || _target?.World != World ? null : _target;

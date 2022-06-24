@@ -5,6 +5,7 @@ using RhuEngine.DataStructure;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects.ECS;
 
+using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
@@ -39,7 +40,7 @@ namespace RhuEngine.WorldObjects
 					if (worldObject.World != World) {
 						throw new Exception("Delegate owner belongs to a different world");
 					}
-					if(@delegate.GetMethodInfo().GetCustomAttribute<ExsposedAttribute>() is null) {
+					if(@delegate.GetMethodInfo().GetCustomAttribute<ExposedAttribute>() is null) {
 						throw new Exception("Method does not have Exsposed Attribute");
 					}
 					_type = @delegate.Method.DeclaringType;
@@ -81,7 +82,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void BuildDelegate() {
-			if (_type == null || _method == "" || _method == null || base.Target == null) {
+			if (_type == null || string.IsNullOrEmpty(_method) || base.Target == null) {
 				return;
 			}
 			try {

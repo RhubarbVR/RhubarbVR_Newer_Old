@@ -29,11 +29,11 @@ namespace RStereoKit
 
 	public class SKKeyPress : IKeyPress
 	{
-		public SKKeyPress(StereoKit.BtnState btnState) {
+		public SKKeyPress(BtnState btnState) {
 			BtnState = btnState;
 		}
 
-		public StereoKit.BtnState BtnState { get; }
+		public BtnState BtnState { get; }
 
 		public bool IsActive() {
 			return BtnState.IsActive();
@@ -74,6 +74,12 @@ namespace RStereoKit
 		public IKeyPress X2 => new SKKeyPress(Controller.x2);
 
 		public IRStick Stick { get; set; }
+
+		public string Model => "Unkown";
+
+		public float BatteryPercentage =>1f;
+
+		public KnownControllers ModelEnum => KnownControllers.Unknown;
 	}
 
 	public class SKHand : IRHand

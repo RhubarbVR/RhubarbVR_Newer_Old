@@ -63,15 +63,15 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 		}
-		[Exsposed]
+		[Exposed]
 		public User GetMasterUser() {
 			return Users[MasterUser];
 		}
-		[Exsposed]
+		[Exposed]
 		public User GetHostUser() {
 			return Users[0];
 		}
-		[Exsposed]
+		[Exposed]
 		public User GetLocalUser() {
 			return Users is null ? null : LocalUserID <= 0 ? null : (LocalUserID - 1) < Users.Count ? Users[LocalUserID - 1] : null;
 		}
@@ -87,11 +87,10 @@ namespace RhuEngine.WorldObjects
 			if (DebugVisuals) {
 				RWorld.ExecuteOnStartOfFrame(() => {
 					var mesh = RootEntity.GetFirstComponentOrAttach<RawMeshAsset>();
-					var comp = RootEntity.GetFirstComponent<DynamicMaterial>();
+					var comp = RootEntity.GetFirstComponent<UnlitMaterial>();
 					if (comp is null) {
-						comp = RootEntity.AttachComponent<DynamicMaterial>();
-						comp.Transparency = Transparency.Blend;
-						comp.shader.Target = RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
+						comp = RootEntity.AttachComponent<UnlitMaterial>();
+						comp.Transparency.Value = Transparency.Blend;
 					}
 					var debugcube = RootEntity.AddChild("DebugCube");
 					var meshrender = debugcube.AttachComponent<MeshRender>();
@@ -116,11 +115,10 @@ namespace RhuEngine.WorldObjects
 			if (DebugVisuals) {
 				RWorld.ExecuteOnStartOfFrame(() => {
 					var mesh = RootEntity.GetFirstComponentOrAttach<TrivialBox3Mesh>();
-					var comp = RootEntity.GetFirstComponent<DynamicMaterial>();
+					var comp = RootEntity.GetFirstComponent<UnlitMaterial>();
 					if (comp is null) {
-						comp = RootEntity.AttachComponent<DynamicMaterial>();
-						comp.Transparency = Transparency.Blend;
-						comp.shader.Target = RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
+						comp = RootEntity.AttachComponent<UnlitMaterial>();
+						comp.Transparency.Value = Transparency.Blend;
 					}
 					var debugcube = RootEntity.AddChild("DebugCube");
 					var meshrender = debugcube.AttachComponent<MeshRender>();
@@ -156,15 +154,16 @@ namespace RhuEngine.WorldObjects
 			DrawDebugSphere(matrix, pos, (Vector3f)scale, colorf, drawTime);
 		}
 		private bool DebugVisuals => Engine.DebugVisuals;
+
+
 		public void DrawDebugSphere(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf, float drawTime = 1) {
 			if (DebugVisuals) {
 				RWorld.ExecuteOnStartOfFrame(() => {
 					var mesh = worldManager.PrivateOverlay.RootEntity.GetFirstComponentOrAttach<Sphere3NormalizedCubeMesh>();
-					var comp = worldManager.PrivateOverlay.RootEntity.GetFirstComponent<DynamicMaterial>();
+					var comp = worldManager.PrivateOverlay.RootEntity.GetFirstComponent<UnlitMaterial>();
 					if (comp is null) {
-						comp = worldManager.PrivateOverlay.RootEntity.AttachComponent<DynamicMaterial>();
-						comp.Transparency = Transparency.Blend;
-						comp.shader.Target = RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
+						comp = worldManager.PrivateOverlay.RootEntity.AttachComponent<UnlitMaterial>();
+						comp.Transparency.Value = Transparency.Blend;
 					}
 					var debugcube = worldManager.PrivateOverlay.RootEntity.AddChild("DebugCube");
 					var meshrender = debugcube.AttachComponent<MeshRender>();

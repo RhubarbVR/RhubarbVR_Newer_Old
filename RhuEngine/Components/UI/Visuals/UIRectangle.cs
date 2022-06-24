@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI/Visuals" })]
 	public class UIRectangle : RenderUIComponent
 	{
-		[Exsposed]
+		[Exposed]
 		public void AddRoundingSettings() {
 			var rounding = Entity.AttachComponent<UIRounding>();
 			rounding.BindRect(this);

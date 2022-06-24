@@ -71,7 +71,6 @@ namespace RStereoKit
 			RMaterial.Instance = new SKRMaterial();
 			RMaterial.ConstInstance = new SKMitStactic();
 			RShader.Instance = new SKShader();
-			RText.Instance = new SkRText();
 			RMesh.Instance = new SKRMesh();
 			RTime.Instance = new SKTime();
 			RRenderer.Instance = new SKRRenderer();
@@ -79,7 +78,7 @@ namespace RStereoKit
 			RSound.Instance = new SKSound();
 			RSoundInst.Instance = new SKSoundInst();
 			RMicrophone.Instance = new SKMic();
-			RFont.inst = new SKFont();
+			StaticMaterialManager.Instanances = new StaticMitsManager();
 			PhysicsHelper.RegisterPhysics<RBullet.BulletPhsyicsLink>();
 		}
 

@@ -5,6 +5,7 @@ using System.Reflection;
 using MessagePack;
 using RhuEngine.WorldObjects;
 using System.Linq;
+using RNumerics;
 
 namespace RhuEngine.Components.ScriptNodes
 {
@@ -64,8 +65,8 @@ namespace RhuEngine.Components.ScriptNodes
 			if (method.IsGenericMethod && GenericArgument is not null) {
 				method = method?.MakeGenericMethod(GenericArgument);
 			}
-			if (method?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
-				if (InputType?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+			if (method?.GetCustomAttribute<ExposedAttribute>(true) is null) {
+				if (InputType?.GetCustomAttribute<ExposedAttribute>(true) is null) {
 					return;
 				}
 				else {
@@ -126,8 +127,8 @@ namespace RhuEngine.Components.ScriptNodes
 			}
 		}
 		public ScriptNodeMethod(IScriptNode node, MethodInfo methodInfo) {
-			if (methodInfo?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
-				if (node.ReturnType?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+			if (methodInfo?.GetCustomAttribute<ExposedAttribute>(true) is null) {
+				if (node.ReturnType?.GetCustomAttribute<ExposedAttribute>(true) is null) {
 					throw new Exception("Not Exposed");
 				}
 				else {
@@ -147,8 +148,8 @@ namespace RhuEngine.Components.ScriptNodes
 			_method = methodInfo;
 		}
 		public ScriptNodeMethod(Type node, MethodInfo methodInfo) {
-			if (methodInfo?.GetCustomAttribute<ExsposedAttribute>(true) is null) {
-				if (node.GetCustomAttribute<ExsposedAttribute>(true) is null) {
+			if (methodInfo?.GetCustomAttribute<ExposedAttribute>(true) is null) {
+				if (node.GetCustomAttribute<ExposedAttribute>(true) is null) {
 					throw new Exception("Not Exposed");
 				}
 				else {

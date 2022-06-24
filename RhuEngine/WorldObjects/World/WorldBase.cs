@@ -12,6 +12,7 @@ using SharedModels.Session;
 using SharedModels.UserSession;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
+using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
@@ -138,7 +139,8 @@ namespace RhuEngine.WorldObjects
 		[UnExsposed]
 		[NoLoad]
 		public ScriptBuilder FocusedScriptBuilder = null;
-
+		
+		[Exposed]
 		[NoShow]
 		public readonly Entity RootEntity;
 
@@ -188,15 +190,17 @@ namespace RhuEngine.WorldObjects
 		[NoSave]
 		public readonly Sync<DateTime> StartTime;
 
-		public double WorldTime => (StartTime - DateTime.UtcNow).TotalSeconds;
+		public double WorldTime => (DateTime.UtcNow - StartTime).TotalSeconds;
 
 		[Default("New World")]
 		public readonly Sync<string> WorldName;
-		[Exsposed]
+		[Exposed]
 		public string WorldDebugName => $"{(IsPersonalSpace ? "P" : "")}{((worldManager.LocalWorld == this) ? "L" : "")} {SessionName.Value}";
 
-		private void UpdateFocus() {
+		public event Action FoucusChanged;
 
+		private void UpdateFocus() {
+			FoucusChanged?.Invoke();
 		}
 
 		/// <summary>
@@ -205,6 +209,26 @@ namespace RhuEngine.WorldObjects
 		public float stepTime = 0f;
 
 		public object RenderLock = new();
+
+
+		[NoSync]
+		[NoSave]
+		[NoShow]
+		[UnExsposed]
+		[NoLoad]
+		public GrabbableHolder LeftGrabbableHolder;
+		[NoSync]
+		[NoSave]
+		[NoShow]
+		[UnExsposed]
+		[NoLoad]
+		public GrabbableHolder RightGrabbableHolder;
+		[NoSync]
+		[NoSave]
+		[NoShow]
+		[UnExsposed]
+		[NoLoad]
+		public GrabbableHolder HeadGrabbableHolder;
 
 		public void Step() {
 			_netManager?.PollEvents();
@@ -222,7 +246,12 @@ namespace RhuEngine.WorldObjects
 			catch (Exception e) {
 				RLog.Err($"Failed to update global stepables for session {WorldDebugName}. Error: {e}");
 			}
-			PhysicsSim.UpdateSim(RTime.Elapsedf);
+			try {
+				PhysicsSim.UpdateSim(RTime.Elapsedf);
+			}
+			catch(Exception e) {
+				RLog.Err($"Failed To update PhysicsSim Error:{e}");
+			}
 			try {
 				var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
 											 group ent by ent.CachedDepth;

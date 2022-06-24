@@ -47,15 +47,6 @@ namespace RStereoKit
 			}
 		}
 
-		public object MakeFromMemory(byte[] data) {
-			var tex = Tex.FromMemory(data);
-			//Is only used on startup logo
-			while (tex.AssetState != AssetState.Loaded) {
-				Thread.Sleep(1);
-			}
-			return tex;
-		}
-
 		public void SetAddressMode(object target, RhuEngine.Linker.TexAddress value) {
 			((Tex)target).AddressMode = (StereoKit.TexAddress)value;
 		}

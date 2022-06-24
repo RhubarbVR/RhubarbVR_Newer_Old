@@ -65,10 +65,10 @@
     <Reference Include="Mono.Android" />
     <Reference Include="System.Numerics" />
   </ItemGroup>
-  	<PropertyGroup>
-		<ServerGarbageCollection>true</ServerGarbageCollection>
-		<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
-	</PropertyGroup>
+  <PropertyGroup>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
@@ -77,8 +77,8 @@
   <ItemGroup>
     <AndroidNativeLibrary Abi="arm64-v8a" Include="arm64-v8a\libopus.so" />
     <AndroidNativeLibrary Abi="armeabi-v7a" Include="armeabi-v7a\libopus.so" />
-    <AndroidNativeLibrary Include="arm64-v8a\libbulletc.so" />
-    <AndroidNativeLibrary Include="armeabi-v7a\libbulletc.so" />
+    <AndroidNativeLibrary Include="arm64-v8a\liblibbulletc.so" />
+    <AndroidNativeLibrary Include="armeabi-v7a\liblibbulletc.so" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Assets\AboutAssets.txt" />

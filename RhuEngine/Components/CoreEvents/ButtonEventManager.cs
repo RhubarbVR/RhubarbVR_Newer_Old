@@ -28,7 +28,7 @@ namespace RhuEngine.Components
 
 		public readonly Linker<bool> CustomTouch;
 
-		[Exsposed]
+		[Exposed]
 		public void Call(ButtonEvent value) {
 			if (value.IsPressing) {
 				Pressing.Target?.Invoke();

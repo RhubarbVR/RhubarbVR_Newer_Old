@@ -39,7 +39,7 @@ namespace RhuEngine.Physics
 	{
 		public delegate void OverlapCallback(Vector3f PositionWorldOnA, Vector3f PositionWorldOnB, Vector3f NormalWorldOnB, double Distance, double Distance1, RigidBodyCollider hit);
 
-		public event OverlapCallback Overlap { add { Manager.AddOverlapCallback(obj, value); } remove { Manager.RemoveOverlapCallback(obj, value); } }
+		public event OverlapCallback Overlap { add => Manager.AddOverlapCallback(obj, value); remove => Manager.RemoveOverlapCallback(obj, value); }
 
 		public object obj;
 		public object CustomObject { get; set; }

@@ -35,11 +35,26 @@ namespace RhuEngine.WorldObjects.ECS
 		public override void OnLoaded() {
 			base.OnLoaded();
 			BuildRenderLink();
+			World.FoucusChanged += World_FoucusChanged;
+		}
+
+		private void World_FoucusChanged() {
+			if(World.Focus == World.FocusLevel.Background) {
+				RenderLink?.Stopped();
+			}
+			else {
+				RenderLink?.Started();
+			}
 		}
 
 		public override void AddListObject() {
 			World.RegisterRenderObject(this);
-			RenderLink?.Started();
+			if (World.Focus == World.FocusLevel.Background) {
+				RenderLink?.Stopped();
+			}
+			else {
+				RenderLink?.Started();
+			}
 		}
 		public override void RemoveListObject() {
 			World.UnregisterRenderObject(this);
@@ -47,6 +62,7 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		public override void Dispose() {
+			World.FoucusChanged -= World_FoucusChanged;
 			World.UnregisterRenderObject(this);
 			base.Dispose();
 		}

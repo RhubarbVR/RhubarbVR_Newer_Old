@@ -8,8 +8,6 @@ namespace RhuEngine.Linker
 	{
 		public void SetRenderQueueOffset(object mit, int tex);
 
-		public int GetRenderQueueOffset(object mit);
-
 		public object Make(RShader rShader);
 		public void Pram(object ex, string tex, object value);
 		public IEnumerable<RMaterial.RMatParamInfo> GetAllParamInfo(object tex);
@@ -32,8 +30,11 @@ namespace RhuEngine.Linker
 
 		public int RenderOrderOffset
 		{
-			get => Instance.GetRenderQueueOffset(Target);
-			set { Instance.SetRenderQueueOffset(Target, value); PramChanged.Invoke(this); }
+			set { Instance.SetRenderQueueOffset(Target, value); PramChanged?.Invoke(this); }
+		}
+
+		public void UpdatePrams() {
+			PramChanged?.Invoke(this);
 		}
 
 		public event Action<RMaterial> PramChanged;

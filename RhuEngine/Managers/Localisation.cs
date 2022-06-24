@@ -83,15 +83,15 @@ namespace RhuEngine.Managers
 			if (_engine.MainSettings.ThreeLetterLanguageName is not null) {
 				targetcode = new CultureInfo(_engine.MainSettings.ThreeLetterLanguageName, false);
 			}
+			RLog.Info($"Local is {targetcode.Name} parrent is {targetcode.Parent.Name}");
 			if (Directory.Exists(localDir)) {
 				foreach (var item in Directory.GetFiles(localDir)) {
 					try {
-						
 						var mainobject = JObject.Parse(File.ReadAllText(item));
 						if (((string)mainobject["languageName"]) == "en") {
 							fallBack = mainobject["sheet"];
 						}
-						if(string.IsNullOrEmpty(targetcode.Parent.Name)) {
+						if(!string.IsNullOrEmpty(targetcode.Parent.Name)) {
 							if (((string)mainobject["languageName"]) == targetcode.Parent.Name) {
 								parretnfallBack = mainobject["sheet"];
 							}

@@ -37,6 +37,8 @@ namespace RhuEngine.Managers
 
 		public float TotalStepTime { get; private set; }
 
+		public PrivateSpaceManager PrivateSpaceManager { get; internal set; }
+
 		private readonly Stopwatch _stepStopwatch = new();
 
 		private void FocusedWorldChange() {
@@ -46,8 +48,7 @@ namespace RhuEngine.Managers
 			if (SaveLocalWorld) {
 				try {
 					var data = LocalWorld.Serialize(new SyncObjectSerializerObject(false));
-					var json = MessagePack.MessagePackSerializer.ConvertToJson(data.GetByteArray(), Serializer.Options);
-					File.WriteAllText(Engine.BaseDir + "LocalWorldTest.json", json);
+					File.WriteAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld", data.GetByteArray());
 				}
 				catch (Exception ex) {
 					RLog.Err($"Failed to save world {ex}");
@@ -228,10 +229,10 @@ namespace RhuEngine.Managers
 					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
 					_oldPlayerPos = playerPos;
 					if (world.IsLoading && !world.IsDisposed) {
-						RText.Add($"Loading World: \n{world.LoadMsg}", Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos)));
+						//RText.Add($"Loading World: \n{world.LoadMsg}", Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos)));
 					}
 					else {
-						RText.Add($"Failed to load world{(Engine.netApiManager.User?.UserName == null ? ", JIM": "")}\nError {world.LoadMsg}", Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos)));
+						//RText.Add($"Failed to load world{(Engine.netApiManager.User?.UserName == null ? ", JIM": "")}\nError {world.LoadMsg}", Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos)));
 					}
 				}
 			}

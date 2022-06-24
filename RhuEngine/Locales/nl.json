@@ -3,7 +3,7 @@
     "languageName": "nl",
     "authors": [ "jeana" ],
     "sheet": {
-      "Common.Color": "Kluer",
+      "Common.Color": "Kleur",
       "Common.Color.Red": "Rood",
       "Common.Color.Green": "Groen",
       "Common.Color.Blue": "Blauw",
@@ -14,7 +14,7 @@
       "Common.Color.Black": "Zwart",
       "Common.Color.hue": "Hue",
       "Common.Color.saturation": "Saturation",
-      "Common.Color.value": "Value",
+      "Common.Color.value": "Waarde",
   
       "Common.Failed": "<color=red>MISLUKT",
       "Common.FailedToJoinWorld": "<color=red>Kon niet met wereld verbinden</color>",
@@ -95,7 +95,7 @@
       "Common.AudioVolume": "Volume",
       "Common.ObjectVolume": "Volume",
       "Common.WorldAudioVolume": "Wereld Volume",
-      "Common.UserAudioVolume": "gebruiker Volume",
+      "Common.UserAudioVolume": "spraakvolume",
       "Common.MasterAudioVolume": "Hoofdvolume",
       "Common.Sort.Ascending": "Oplopend",
       "Common.Sort.Descending": "Aflopend",
@@ -110,15 +110,15 @@
       "Editor.AddEntity": "Object creëren",
       "Editor.RemoveEntity": "Object verwijderen",
       "Editor.Root": "Root",
-      "Editor.Child": "Kind",
-      "Editor.Parrent": "Ouder",
+      "Editor.Child": "onderobject",
+      "Editor.Parrent": "Bovenobject",
       "Editor.Enabled": "Ingeschakeld",
       "Editor.Transforms.Position": "Positie",
       "Editor.Transforms.Rotation": "Rotatie",
       "Editor.Transforms.Scale": "Schaal",
       "Editor.Entity.BringTo": "Breng hier",
       "Editor.Entity.AddPivot": "Draaipunt toevoegen",
-      "Editor.Entity.AddParent": "Ouder toevoegen",
+      "Editor.Entity.AddParent": "Bovenobject toevoegen",
       "Editor.Pivot": "Draaipunt",
   
       "Editor.Entities": "objecten",
@@ -134,6 +134,13 @@
       "Programs.Login.ConfirmPassword": "Wachtwoord bevestigen",
       "Programs.Login.Password": "Wachtwoord",
       "Programs.Login.Email": "Email",
-      "Programs.Login.Username": "Gebruikersnaam"
+      "Programs.Login.Username": "Gebruikersnaam",
+
+      "Programs.Settings.Name": "Instellingen",
+
+
+      "Programs.FileExplorer.Name": "Bestand verkenner",
+      "Programs.FileExplorer.Path": "Pad"
+
     }
   }

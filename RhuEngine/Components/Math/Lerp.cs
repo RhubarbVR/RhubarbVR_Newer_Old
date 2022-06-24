@@ -6,6 +6,7 @@ using RNumerics.Noise;
 
 namespace RhuEngine.Components
 {
+	[GenericTypeConstraint()]
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Math" })]
 	public class Lerp<T> : Component
@@ -17,7 +18,7 @@ namespace RhuEngine.Components
 		public readonly Sync<double> time;
 		public readonly Sync<bool> removeOnDone;
 
-		[Exsposed]
+		[Exposed]
 		public void StartLerp(ILinkerMember<T> target, T targetpos, double timef, bool removeondone = true) {
 			driver.SetLinkerTarget(target);
 			from.Value = driver.LinkedValue;
@@ -58,11 +59,11 @@ namespace RhuEngine.Components
 						}
 					}
 					else if (removeOnDone) {
+						driver.LinkedValue = to.Value;
 						Destroy();
 					}
 				}
 				catch {
-
 					driver.LinkedValue = default;
 				}
 			}

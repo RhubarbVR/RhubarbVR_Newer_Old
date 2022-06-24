@@ -51,9 +51,13 @@ namespace RhuEngine
 
 		public Action OnEngineStarted;
 
+		public CommandManager commandManager;
+
 		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null,bool PassErrors = false) : base() {
+			Console.ForegroundColor = ConsoleColor.White;
 			this.PassErrors = PassErrors;
 			EngineLink = _EngineLink;
+			commandManager = new CommandManager();
 			if (_EngineLink.ForceLibLoad) {
 				OpusDotNet.NativeLib.ForceLoad();
 			}
@@ -209,17 +213,29 @@ namespace RhuEngine
 
 		public bool EngineStarting = true;
 
-		public RMaterial LoadingLogo = null;
+		public IUnlitMaterial LoadingLogo;
 
 		public Thread startingthread;
+
+		public RText StartingText;
+		public ITextMaterial StartingTextMit;
+
 		public void Init(bool RunStartThread = true) {
 			EngineLink.Start();
+			commandManager.Init(this);
 			IntMsg = $"Engine started Can Render {EngineLink.CanRender} Can Audio {EngineLink.CanAudio} Can input {EngineLink.CanInput}";
 			RLog.Info(IntMsg);
 			if (EngineLink.CanRender) {
+				StartingText = new RText(staticResources.MainFont) {
+					Text = "Starting"
+				};
+				StartingTextMit = StaticMaterialManager.GetMaterial<ITextMaterial>();
+				StartingTextMit.Texture = StartingText.texture2D;
+				StartingText.UpdatedTexture += () => StartingTextMit.Texture = StartingText.texture2D;
 				RRenderer.EnableSky = false;
-				LoadingLogo = new RMaterial(RShader.UnlitClip);
-				LoadingLogo[RMaterial.MainTexture] = staticResources.RhubarbLogoV2;
+				LoadingLogo = StaticMaterialManager.GetMaterial<IUnlitMaterial>();
+				LoadingLogo.Transparency = Transparency.Blend;
+				LoadingLogo.Texture = staticResources.RhubarbLogoV2;
 			}
 			var startcode = () => {
 				IntMsg = "Building NetApiManager";
@@ -238,13 +254,14 @@ namespace RhuEngine
 						throw ex;
 					}
 				}
+				EngineStarting = false;
 				if (EngineLink.CanRender) {
-					EngineStarting = false;
+					StartingText = null;
 					LoadingLogo = null;
 					RRenderer.EnableSky = true;
 				}
 				RLog.Info("Engine Started");
-				IntMsg = $"Engine Started\nRunning First Step...";
+				IntMsg = $"{localisationManager?.GetLocalString("Common.Loaded")}\nRunning First Step...";
 				OnEngineStarted?.Invoke();
 			};
 			if (RunStartThread) {
@@ -267,16 +284,18 @@ namespace RhuEngine
 					try {
 						var headMat = RInput.Head.HeadMatrix;
 						if (!RWorld.IsInVR) {
+							RRenderer.CameraRoot = Matrix.Identity;
 							headMat = Matrix.T(Vector3f.Forward / 10);
 						}
-						var textpos = Matrix.T(Vector3f.Forward * 0.25f) * (EngineLink.CanInput ? headMat : Matrix.S(1));
+						var textpos = Matrix.T(Vector3f.Forward * 0.5f) * (EngineLink.CanInput ? headMat : Matrix.S(1));
 						var playerPos = RRenderer.CameraRoot.Translation;
 						_loadingPos += playerPos - _oldPlayerPos;
 						_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
 						_oldPlayerPos = playerPos;
 						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt(EngineLink.CanInput ? headMat.Translation : Vector3f.Zero, _loadingPos));
-						RText.Add($"Loading Engine\n{IntMsg}...", Matrix.T(0, -0.07f, 0) * rootMatrix);
-						RMesh.Quad.Draw("LoadingUi",LoadingLogo, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
+						StartingText.Text = $"{localisationManager?.GetLocalString("Common.Loading")}\n{IntMsg}";
+						RMesh.Quad.Draw("UIText", StartingTextMit.Material, Matrix.TS(0, -0.2f, 0,new Vector3f(StartingText.AspectRatio,1,1)/7) * rootMatrix);
+						RMesh.Quad.Draw("LoadingUi",LoadingLogo.Material, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
 					}
 					catch (Exception ex) {
 						RLog.Err("Failed to update msg text Error: " + ex.ToString());
@@ -296,6 +315,18 @@ namespace RhuEngine
 				}
 			}
 			RWorld.RunOnEndOfFrame();
+		}
+
+		public event Action OnCloseEngine;
+
+		public bool IsClosing;
+
+		public void Close() {
+			if (IsClosing) {
+				return;
+			}
+			IsCloseing = true;
+			OnCloseEngine?.Invoke();
 		}
 
 		public void Dispose() {

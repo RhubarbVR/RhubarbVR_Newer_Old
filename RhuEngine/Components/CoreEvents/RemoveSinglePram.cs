@@ -3,6 +3,8 @@
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
+using RNumerics;
+
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreEvents" })]
@@ -12,7 +14,7 @@ namespace RhuEngine.Components
 
 		public readonly SyncDelegate Target;
 
-		[Exsposed]
+		[Exposed]
 		public void Call(T value) {
 			if (Linker.Linked) {
 				Linker.LinkedValue = value;

@@ -7,6 +7,7 @@ using RNumerics.Noise;
 
 namespace RhuEngine.Components
 {
+	[GenericTypeConstraint()]
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Math" })]
 	public class SmoothLerp<T> : Component
@@ -15,7 +16,7 @@ namespace RhuEngine.Components
 		public readonly Sync<T> to;
 		public readonly Sync<double> Multiply;
 		
-		[Exsposed]
+		[Exposed]
 		public void StartSmoothLerp(ILinkerMember<T> target,T targetpos,double Multiplyf) {
 			driver.SetLinkerTarget(target);
 			to.Value = targetpos;

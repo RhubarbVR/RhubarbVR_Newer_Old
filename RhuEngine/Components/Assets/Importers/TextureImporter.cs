@@ -26,15 +26,14 @@ namespace RhuEngine.Components
 		public override void Import(string data, bool wasUri, byte[] rawdata) {
 			RLog.Info($"Loaded Texture Data {data} Uri{wasUri}");
 			if (wasUri) {
-				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<RectangleMesh, UnlitClipShader>();
+				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<RectangleMesh, UnlitMaterial>();
 				var scaler = Entity.AttachComponent<TextureScaler>();
 				scaler.scale.SetLinkerTarget(pmesh.Dimensions);
 				scaler.scaleMultiplier.Value = 0.1f;
 				var textur = Entity.AttachComponent<StaticTexture>();
 				scaler.texture.Target = textur;
 				textur.url.Value = data;
-				mit.FaceCull = Cull.None;
-				mit.MainTexture = textur;
+				mit.MainTexture.Target = textur;
 				Destroy();
 			}
 			else {

@@ -38,9 +38,13 @@ namespace RhuEngine.Components
 		}
 
 		RSphereShape _shape;
+		RSphereShape _lazershape;
+
 		public override void OnLoaded() {
 			base.OnLoaded();
+			WorldManager.PrivateSpaceManager = this;
 			_shape = new RSphereShape(0.02f);
+			_lazershape = new RSphereShape(0.005f);
 		}
 		public override void Step() {
 			if (!Engine.EngineLink.CanInput) {
@@ -48,7 +52,9 @@ namespace RhuEngine.Components
 			}
 			var head = LocalUser.userRoot.Target?.head.Target;
 			if (head != null) {
-				UpdateHeadLazer(head);
+				if (!RWorld.IsInVR) {
+					UpdateHeadLazer(head);
+				}
 				UpdateTouch(RInput.Hand(Handed.Right).Wrist,2);
 				UpdateTouch(RInput.Hand(Handed.Left).Wrist,1);
 			}
@@ -67,14 +73,18 @@ namespace RhuEngine.Components
 					}
 					var pressForce = (poses[(int)handed] * pos.Inverse).Translation.z * 20;
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-					uIComponent.Rect.AddHitPoses(new HitData { Laser = false, HitPosWorld = hitpointworld, HitNormalWorld = hitnormal, PressForce = pressForce, Touchindex = handed });
+					uIComponent.Rect.AddHitPoses(new HitData { Laser = false, HitPosWorld = hitpointworld, HitNormalWorld = hitnormal, PressForce = pressForce, Touchindex = handed, Handed = (handed == 2)?Handed.Right:Handed.Left });
+				}
+				if (collider.CustomObject is PhysicsObject physicsObject) {
+					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
+					physicsObject.Touch(handed, hitnormal, hitpointworld);
 				}
 				return true;
 			}
 			return false;
 		}
 
-
+		
 		public void UpdateTouch(Matrix pos, uint handed) {
 			var Frompos = Matrix.T(Vector3f.AxisY * -0.07f) * pos;
 			var ToPos = Matrix.T(Vector3f.AxisY * 0.03f) * pos;
@@ -95,17 +105,27 @@ namespace RhuEngine.Components
 		}
 
 		public bool RunLaserCastInWorld(World world, ref Matrix headFrompos, ref Matrix headToPos) {
-			if (world.PhysicsSim.ConvexRayTest(_shape, ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
+			if (world.PhysicsSim.ConvexRayTest(_lazershape, ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
+				var PressForce = Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Primary);
+				var GripForce = Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Grab);
 				if (collider.CustomObject is RenderUIComponent uIComponent) {
+					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.005f), new Colorf(1, 1, 0, 0.5f));
+					uIComponent.Rect.AddHitPoses(new HitData { Touchindex = 10, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = PressForce,GripForce = GripForce, Handed = Handed.Max });
+				}
+				if (collider.CustomObject is PhysicsObject physicsObject) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-					uIComponent.Rect.AddHitPoses(new HitData { Touchindex = 10, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = RInput.Key(Key.MouseLeft).IsActive() ? 1f : 0f });
+					physicsObject.Lazer(10,hitnormal, hitpointworld, PressForce,GripForce);
 				}
 				return true;
 			}
 			return false;
 		}
+		public bool DisableHeadLaser;
 
 		public void UpdateHeadLazer(Entity head) {
+			if (DisableHeadLaser) {
+				return;
+			}
 			var headPos = head.GlobalTrans;
 			var headFrompos = headPos;
 			var headToPos = Matrix.T(Vector3f.AxisZ * -5) * headPos;

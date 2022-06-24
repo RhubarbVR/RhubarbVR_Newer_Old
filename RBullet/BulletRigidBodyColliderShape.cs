@@ -76,6 +76,9 @@ namespace RBullet
 			if (mesh == null) {
 				return new EmptyShape();
 			}
+			if(mesh.TriangleCount <= 0) {
+				return new EmptyShape();
+			}
 			var indces = mesh.RenderIndices().ToArray();
 			var verts = mesh.VertexPos().Select((val) => new Vector3(val.x, val.y, val.z)).ToArray();
 			var indexVertexArray2 = new TriangleIndexVertexArray();

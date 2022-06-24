@@ -9,15 +9,66 @@ using System.Numerics;
 
 namespace RStereoKit
 {
+	public class StaticMitsManager : IStaticMaterialManager
+	{
+		public class TextMaterial : StaticMaterialBase<Material>, ITextMaterial
+		{
+			public TextMaterial() {
+				UpdateMaterial(StereoKit.Material.Unlit.Copy());
+			}
+
+			public RTexture2D Texture
+			{
+				set {
+					if (value is null) {
+						YourData[MatParamName.DiffuseTex] = null;
+					}
+					if (value.Tex is null) {
+						YourData[MatParamName.DiffuseTex] = null;
+						return;
+					}
+					YourData[MatParamName.DiffuseTex] = (Tex)value.Tex;
+					return;
+				}
+			}
+		}
+
+		public class UnlitMaterial : StaticMaterialBase<Material>, IUnlitMaterial
+		{
+			public UnlitMaterial() {
+				UpdateMaterial(StereoKit.Material.Unlit.Copy());
+			}
+
+			public RTexture2D Texture
+			{
+				set {
+					if (value is null) {
+						YourData[MatParamName.DiffuseTex] = Tex.White;
+						return;
+					}
+					if (value.Tex is null) {
+						YourData[MatParamName.DiffuseTex] = Tex.DevTex;
+						return;
+					}
+					YourData[MatParamName.DiffuseTex] = (Tex)value.Tex;
+				}
+			}
+
+			public RhuEngine.Linker.Transparency Transparency { set => YourData.Transparency = (StereoKit.Transparency)(int)value; }
+			public Colorf Tint { set => YourData[MatParamName.ColorTint] = new Color(value.r, value.g, value.b, value.a); }
+		}
+
+		public ITextMaterial CreateTextMaterial() {
+			return new TextMaterial();
+		}
+
+		public IUnlitMaterial CreateUnlitMaterial() {
+			return new UnlitMaterial();
+		}
+	}
+
 	public class SKShader : IRShader
 	{
-		public RShader UnlitClip => new RShader(Shader.UnlitClip);
-
-		public RShader PBRClip => new RShader(Shader.PBRClip);
-
-		public RShader PBR => new RShader(Shader.PBR);
-
-		public RShader Unlit => new RShader(Shader.Unlit);
 	}
 
 	public class SKMitStactic : IRMitConsts
@@ -52,11 +103,14 @@ namespace RStereoKit
 		}
 
 		public object Make(RShader rShader) {
+			if(rShader == null) {
+				return null;
+			}
 			return new Material((Shader)rShader.e);
 		}
 
 		public void Pram(object ex, string tex, object value) {
-			if(tex == "WIREFRAME_RHUBARB_CUSTOM") {
+			if (tex == "WIREFRAME_RHUBARB_CUSTOM") {
 				((Material)ex).Wireframe = (bool)value;
 				return;
 			}
@@ -76,7 +130,7 @@ namespace RStereoKit
 						((Material)ex)[tex] = colorGamma;
 					}
 					catch {
-						
+
 					}
 					return;
 				}
@@ -131,10 +185,11 @@ namespace RStereoKit
 			}
 
 			if (value is RTexture2D texer) {
-				if(texer is null) {
+				if (texer is null) {
 					((Material)ex)[tex] = value;
 				}
-				if(texer.Tex is null) {
+				if (texer.Tex is null) {
+					((Material)ex)[tex] = null;
 					return;
 				}
 				((Material)ex)[tex] = (Tex)texer.Tex;

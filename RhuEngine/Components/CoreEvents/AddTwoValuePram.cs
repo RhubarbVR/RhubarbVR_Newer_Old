@@ -3,8 +3,11 @@
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
+using RNumerics;
+
 namespace RhuEngine.Components
 {
+	[GenericTypeConstraint()]
 	[Category(new string[] { "CoreEvents" })]
 	public class AddTwoValuePram<T1,T2> : Component
 	{
@@ -13,7 +16,7 @@ namespace RhuEngine.Components
 
 		public readonly SyncDelegate<Action<T1,T2>> Target;
 
-		[Exsposed]
+		[Exposed]
 		public void Call() {
 			Target.Target?.Invoke(FirstValue, SecondValue);
 		}

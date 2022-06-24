@@ -181,7 +181,7 @@ namespace RBullet
 		}
 
 		public Matrix MatrixGet(object obj) {
-			return ((BRigidBodyCollider)obj).Matrix;
+			return ((BRigidBodyCollider)obj).collisionObject.WorldTransform;
 		}
 
 		public void MatrixSet(object obj, Matrix val) {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 using RhuEngine.WorldObjects;
@@ -13,16 +14,11 @@ namespace RhuEngine.Linker
 		RTexture2D White { get; }
 		int GetWidth(object target);
 		int GetHeight(object target);
-		int GetAnisoptropy(object target);
 		void SetAnisoptropy(object target,int value);
-		TexAddress GetAddressMode(object target);
 		void SetAddressMode(object target, TexAddress value);
-		TexSample GetSampleMode(object target);
 		void SetSampleMode(object target, TexSample value);
 
 		object Make(TexType dynamic, TexFormat rgba32Linear);
-
-		object MakeFromMemory(byte[] data);
 		public object MakeFromColors(Colorb[] colors, int width, int height, bool srgb);
 
 		public void SetSize(object tex,int width, int height);
@@ -48,22 +44,22 @@ namespace RhuEngine.Linker
 		public int Height => Instance?.GetHeight(Tex) ?? 0;
 		public int Anisoptropy
 		{
-			get => Instance?.GetAnisoptropy(Tex)??0;
 			set => Instance?.SetAnisoptropy(Tex, value);
 		}
 		public TexAddress AddressMode
 		{
-			get => Instance?.GetAddressMode(Tex) ?? 0;
 			set => Instance?.SetAddressMode(Tex, value);
 		}
 		public TexSample SampleMode
 		{
-			get => Instance?.GetSampleMode(Tex) ?? 0;
 			set => Instance?.SetSampleMode(Tex, value);
+		}
+		public static RTexture2D FromMemory(Stream vs) {
+			return new ImageSharpTexture(vs).CreateTextureAndDisposes();
 		}
 
 		public static RTexture2D FromMemory(byte[] vs) {
-			return new RTexture2D(Instance.MakeFromMemory(vs));
+			return new ImageSharpTexture(new MemoryStream(vs)).CreateTextureAndDisposes();
 		}
 
 		public static RTexture2D FromColors(Colorb[] colors, int width, int height, bool srgb) {

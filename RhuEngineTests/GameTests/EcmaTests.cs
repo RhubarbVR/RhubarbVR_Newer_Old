@@ -89,7 +89,7 @@ namespace RhuEngine.GameTests.Tests
 			}
 
 			public bool IGoTrue = false;
-			[Exsposed]
+			[Exposed]
 			public void IfIrunISetValueToTrue() {
 				RLog.Err("I Ran Value Change");
 				IGoTrue = true;
@@ -208,6 +208,23 @@ namespace RhuEngine.GameTests.Tests
 		}
 
 		[TestMethod()]
+		public void TryToMakeSyncWorldTest() {
+			var script = AttachTestScript();
+			script.Script.Value = @"
+				function RunCode()	{
+					script.Entity.AttachComponent(getType(""ValueField<World>""));
+					var e = new Vector3f(1,1,1);
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.IsNull(script.Entity.GetFirstComponent<ValueField<World>>());
+			tester.Dispose();
+		}
+
+		[TestMethod()]
 		public void AttachComponentTest() {
 			var script = AttachTestScript();
 			script.Script.Value = @"
@@ -219,9 +236,10 @@ namespace RhuEngine.GameTests.Tests
 				throw new Exception("Script not loaded");
 			}
 			script.Invoke("RunCode");
-			Assert.IsNotNull(script.Entity.GetFirstComponent<Spinner>());			
+			Assert.IsNotNull(script.Entity.GetFirstComponent<Spinner>());
 			tester.Dispose();
 		}
+
 		[TestMethod()]
 		public void AttachEntityTest() {
 			var script = AttachTestScript();
@@ -237,7 +255,7 @@ namespace RhuEngine.GameTests.Tests
 				throw new Exception("Script not loaded");
 			}
 			script.Invoke("RunCode");
-			Assert.AreEqual(4,script.Entity.children.Count);
+			Assert.AreEqual(4, script.Entity.children.Count);
 			tester.Dispose();
 		}
 		[TestMethod()]
@@ -397,7 +415,7 @@ function dwad daw da
 			}
 			RLog.Info("Running function Invoke tests");
 			for (var i = 0; i < functionAmount; i++) {
-				script.Functions.GetValue(i).Invoke();	
+				script.Functions.GetValue(i).Invoke();
 				Assert.AreEqual(i, value.Value.Value);
 			}
 

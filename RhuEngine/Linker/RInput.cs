@@ -9,9 +9,29 @@ namespace RhuEngine.Linker
 	{
 		public Vector2f YX { get; }
 	}
-
+	[Flags]
+	public enum KnownControllers: uint
+	{
+		Unknown,
+		Vive = 1,
+		Index = 2,
+		Touch = 4,
+		Cosmos = 8,
+		HPReverb = 16,
+		WindowsMR = 32,
+		Etee = 64,
+		Khronos = 128,
+		MicrosoftHand = 256,
+		GenericXR = 512,
+	}
 	public interface IRController
 	{
+		public string Model { get; }
+
+		public KnownControllers ModelEnum { get; }
+
+		public float BatteryPercentage { get; }
+
 		public float Trigger { get; }
 		public float Grip { get; }
 		public IKeyPress StickClick { get; }
@@ -65,18 +85,16 @@ namespace RhuEngine.Linker
 	{
 		public static IRInput Instance { get; set; }
 
+
 		public class ScreenHead : IRHead
 		{
-
 			public Vector3f Position => HeadMatrix.Translation;
 
-			public Matrix HeadMatrix { get; set;}
+			public Matrix HeadMatrix { get; set; }
 		}
+		public static ScreenHead screenHead = new();
 
-		public static ScreenHead screenhd = new();
-
-		public static IRHead Head => RWorld.IsInVR? (Instance?.Head): screenhd;
-
+		public static IRHead Head => RWorld.IsInVR?Instance?.Head:screenHead;
 
 		public static IRMouse Mouse => Instance?.Mouse;
 
@@ -116,5 +134,6 @@ namespace RhuEngine.Linker
 		public static IRController Controller(Handed handed) {
 			return Instance?.Controller(handed);
 		}
+
 	}
 }

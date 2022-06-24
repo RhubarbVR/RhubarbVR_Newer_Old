@@ -8,10 +8,11 @@ using SharedModels;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using RNumerics;
 
 namespace RhuEngine.Components
 {
-	[Exsposed]
+	[Exposed]
 	public static class RhuScriptStatics
 	{
 		public static string ToString(object value) {

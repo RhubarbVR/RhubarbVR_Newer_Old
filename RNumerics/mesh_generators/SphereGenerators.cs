@@ -39,7 +39,7 @@ namespace RNumerics
 					v = (sx * Box.AxisX) + (sy * Box.AxisY) + (sz * Box.AxisZ);
 				}
 				v.Normalize();
-				vertices[i] = Box.Center + (Radius * v);
+				vertices[i] = Box.Center + (Radius * 2 * v);
 				normals[i] = (Vector3f)v;
 			}
 

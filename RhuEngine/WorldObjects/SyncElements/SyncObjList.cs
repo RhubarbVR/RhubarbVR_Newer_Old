@@ -7,6 +7,8 @@ using System.Runtime.CompilerServices;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public interface ISyncObjectList<T> : ISyncObject
@@ -14,9 +16,10 @@ namespace RhuEngine.WorldObjects
 		public T Add(bool networkedObject = false, bool deserialize = false);
 	}
 
+	[GenericTypeConstraint()]
 	public class SyncValueList<T> : SyncObjList<Sync<T>>, ISyncMember
 	{
-		[Exsposed]
+		[Exposed]
 		public new T this[int index]
 		{
 			get => base[index].Value;
@@ -31,7 +34,7 @@ namespace RhuEngine.WorldObjects
 		public override void OnElementRemmoved(Sync<T> element) {
 			element.Changed -= ChildElementOnChanged;
 		}
-		[Exsposed]
+		[Exposed]
 		public void Add(T value) {
 			Add().Value = value;
 		}
@@ -41,7 +44,7 @@ namespace RhuEngine.WorldObjects
 				Add(item);
 			}
 		}
-		[Exsposed]
+		[Exposed]
 		public T[] GetValues() {
 			return this;
 		}
@@ -58,7 +61,7 @@ namespace RhuEngine.WorldObjects
 			AddInternal(newElement);
 			return newElement;
 		}
-		[Exsposed]
+		[Exposed]
 		public T AddElement() {
 			return Add();
 		}

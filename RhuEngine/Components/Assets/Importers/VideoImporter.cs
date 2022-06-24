@@ -90,7 +90,7 @@ namespace RhuEngine.Components
 		public override void Import(string data, bool wasUri, byte[] rawdata) {
 			if (wasUri) {
 				RLog.Info("Building video");
-				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<RectangleMesh, UnlitClipShader>();
+				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<RectangleMesh, UnlitMaterial>();
 				var scaler = Entity.AttachComponent<TextureScaler>();
 				scaler.scale.SetLinkerTarget(pmesh.Dimensions);
 				scaler.scaleMultiplier.Value = 0.5f;
@@ -105,13 +105,12 @@ namespace RhuEngine.Components
 				left.scale.Value = new Vector3f(0.1f);
 				rignt.scale.Value = new Vector3f(0.1f);
 				textur.AudioChannels.Add();
-				left.AttachMesh<Sphere3NormalizedCubeMesh, UnlitShader>();
-				rignt.AttachMesh<Sphere3NormalizedCubeMesh, UnlitShader>();
+				left.AttachMesh<Sphere3NormalizedCubeMesh, UnlitMaterial>();
+				rignt.AttachMesh<Sphere3NormalizedCubeMesh, UnlitMaterial>();
 				left.AttachComponent<SoundSource>().sound.Target = textur.AudioChannels[0];
 				rignt.AttachComponent<SoundSource>().sound.Target = textur.AudioChannels[1];
 				scaler.texture.Target = textur;
-				mit.FaceCull = Cull.None;
-				mit.MainTexture = textur;
+				mit.MainTexture.Target = textur;
 				Destroy();
 				var WinEntit = Entity.AddChild("Window");
 				// TODO

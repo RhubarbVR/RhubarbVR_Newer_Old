@@ -13,16 +13,14 @@ namespace Rhubarb_VR_HeadLess
 {
 
 	public static class Program
-    {
+	{
 #pragma warning disable CA2211 // Non-constant fields should not be visible
 		public static bool _isRunning = true;
 		public static Engine _app;
 		static OutputCapture _cap;
 		static NullLinker _rhu;
-		public static Type[] _commands;
 #pragma warning restore CA2211 // Non-constant fields should not be visible
-		static void Main(string[] args)
-        {
+		static void Main(string[] args) {
 			AppDomain.CurrentDomain.ProcessExit += (_, _) => _isRunning = false;
 			Console.WriteLine("Starting Rhubarb HeadLess!");
 			_cap = new OutputCapture();
@@ -34,16 +32,7 @@ namespace Rhubarb_VR_HeadLess
 					Console.Write($"{_app?.netApiManager.User?.UserName ?? "Not Login"}> ");
 					Console.ForegroundColor = ConsoleColor.White;
 					var line = Console.ReadLine();
-					var foundcomand = false;
-					foreach (var item in _commands) {
-						if (item.Name.ToLower() == line.ToLower()) {
-							foundcomand = true;
-							((Command)Activator.CreateInstance(item)).RunCommand();
-						}
-					}
-					if (!foundcomand) {
-						Console.WriteLine($"{line} Is not a valid command run Help for available commands");
-					}
+					_app.commandManager.RunComand(line);
 					Thread.Sleep(8);
 				}
 			}) {
@@ -51,13 +40,29 @@ namespace Rhubarb_VR_HeadLess
 			};
 			_app.OnEngineStarted = () => EngineThread.Start();
 			_app.Init();
+			_app.commandManager.PasswordEvent += () => {
+				var pass = "";
+				ConsoleKeyInfo key;
+				do {
+					key = Console.ReadKey(true);
+					if (key.Key is not ConsoleKey.Backspace and not ConsoleKey.Enter) {
+						pass += key.KeyChar;
+						Console.Write("*");
+					}
+					else {
+						if (key.Key == ConsoleKey.Backspace && pass.Length > 0) {
+							pass = pass.Substring(0, pass.Length - 1);
+							Console.Write("\b \b");
+						}
+						else if (key.Key == ConsoleKey.Enter) {
+							break;
+						}
+					}
+				} while (key.Key != ConsoleKey.Enter);
+				Console.WriteLine("");
+				return pass;
+			};
 			var EngineStopWatch = new Stopwatch();
-			_commands = (from a in AppDomain.CurrentDomain.GetAssemblies()
-						   from t in a.GetTypes()
-						   where typeof(Command).IsAssignableFrom(t)
-						   where t.IsClass && !t.IsAbstract
-						   select t).ToArray();
-
 			try {
 				while (_isRunning) {
 					EngineStopWatch.Start();
@@ -74,9 +79,8 @@ namespace Rhubarb_VR_HeadLess
 				RLog.Err("Engine Crashed" + ex);
 			}
 			_app.IsCloseing = true;
-			_cap.DisableSingleString = true;
 			_app.Dispose();
 			_cap.Dispose();
-        }
+		}
 	}
 }

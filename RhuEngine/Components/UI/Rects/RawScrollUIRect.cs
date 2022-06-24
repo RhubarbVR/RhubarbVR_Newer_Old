@@ -36,7 +36,7 @@ namespace RhuEngine.Components
 			ScrollPosChange();
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void Scroll(Vector2f scroll) {
 			scroll = scroll * ScrollSpeed.Value / Canvas.scale.Value.Xy;
 			if (!(scroll.x == 0 && scroll.y == 0)) {

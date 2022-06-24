@@ -117,7 +117,7 @@ namespace RhuEngine.Settings
 				//NotSetup;
 			}
 			if (InputManager.InputTypes.StickLocker != inputType) {
-				if (!StickLocker || GetInputFloatFromController(InputManager.InputTypes.StickLocker,controller) >= 0.9f) {
+				if (!(StickLocker != (controller.ModelEnum == KnownControllers.Vive)) || GetInputFloatFromController(InputManager.InputTypes.StickLocker,controller) >= 0.9f) {
 					if (Stick.positiveX == inputType) {
 						return controller.Stick.YX.x;
 					}

@@ -8,24 +8,6 @@ using System.Text;
 namespace RNumerics
 {
 
-	public static class StringHelper
-	{
-		public static IEnumerable<string> GetStrings(this string str) {
-			var section = "";
-			foreach (var item in str) {
-				if (item == ',') {
-					yield return section;
-					section = "";
-				}
-				else {
-					if (item != '(') {
-						section += item;
-					}
-				}
-			}
-		}
-	}
-
 	[MessagePackObject]
 	public struct Colorf : IComparable<Colorf>, IEquatable<Colorf>
 	{
@@ -75,7 +57,7 @@ namespace RNumerics
 				}
 				if (colorString.Contains("(") && colorString.Contains(")")) {
 					var lowerText = colorString.ToLower();
-					var waStrings = lowerText.Substring(lowerText.IndexOf('(')).GetStrings().GetEnumerator();
+					var waStrings = lowerText.Substring(lowerText.IndexOf('(')).GetArgStrings().GetEnumerator();
 					if (lowerText.Contains("rgba")) {
 						waStrings.MoveNext();
 						var fr = float.Parse(waStrings.Current);
@@ -112,6 +94,13 @@ namespace RNumerics
 			catch {
 				return White;
 			}
+		}
+
+		public static Random random = new();
+
+		public static Colorf RandomHue() {
+			var color = new ColorHSV((float)random.NextDouble() * 360, 1,1);
+			return color.ConvertToRGB();
 		}
 
 		public Colorf Clone(float fAlphaMultiply = 1.0f) {
