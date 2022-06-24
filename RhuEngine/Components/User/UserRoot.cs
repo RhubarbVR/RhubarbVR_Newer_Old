@@ -2,7 +2,7 @@
 using RhuEngine.WorldObjects.ECS;
 
 using RhuEngine.Linker;
-using RNumerics;
+using RNumerics; 
 
 namespace RhuEngine.Components
 {
@@ -49,6 +49,9 @@ namespace RhuEngine.Components
 			if (World.IsPersonalSpace) {
 				if (WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target is not null) {
 					RWorld.ExecuteOnStartOfFrame(() => {
+						if (WorldManager.FocusedWorld is null) {
+							return;
+						}
 						var focusUserRoot = WorldManager.FocusedWorld.GetLocalUser().userRoot.Target;
 						Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
 					});

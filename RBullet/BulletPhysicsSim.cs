@@ -58,7 +58,8 @@ namespace RBullet
 			}
 
 			public override float AddSingleResult(ManifoldPoint cp, CollisionObjectWrapper colObj0Wrap, int partId0, int index0, CollisionObjectWrapper colObj1Wrap, int partId1, int index1) {
-				callback1.Invoke(cp.PositionWorldOnA, cp.PositionWorldOnB, cp.NormalWorldOnB, cp.Distance, cp.Distance1, (BRigidBodyCollider)colObj1Wrap.CollisionObject.UserObject);
+				//Todo: fix overlap
+				//callback1.Invoke(cp.PositionWorldOnA, cp.PositionWorldOnB, cp.NormalWorldOnB, cp.Distance, cp.Distance1, (BRigidBodyCollider)colObj0Wrap.CollisionObject.UserObject);
 				return 0;
 			}
 		}

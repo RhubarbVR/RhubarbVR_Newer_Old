@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="RhuBulletSharp" Version="1.0.4" GeneratePathProperty="true">
+	  <PackageReference Include="RhuBulletSharp" Version="1.0.5" GeneratePathProperty="true">
 	  </PackageReference>
   </ItemGroup>
 
