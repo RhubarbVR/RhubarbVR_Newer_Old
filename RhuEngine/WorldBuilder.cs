@@ -58,6 +58,20 @@ namespace RhuEngine
 				}
 			}
 			RLog.Info("Built Local World");
+
+			// Begin DFG crap
+			var dfgSlot = world.RootEntity.AddChild("DFGSlot-Noise");
+			dfgSlot.position.Value = new Vector3f(0, 3, 0);
+			var (dfgMesh, dfgMat, dfgRender) = dfgSlot.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var noiseComp = dfgSlot.AttachComponent<NoiseTexture>();
+			dfgMat.MainTexture.Target = noiseComp;
+
+			var dfgSlot2 = world.RootEntity.AddChild("DFGSlot-UV");
+			dfgSlot2.position.Value = new Vector3f(0, 5, 0);
+			var (dfgMesh2, dfgMat2, dfgRender2) = dfgSlot2.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var UVComp = dfgSlot2.AttachComponent<UVTexture>();
+			dfgMat2.MainTexture.Target = UVComp;
+
 		}
 
 

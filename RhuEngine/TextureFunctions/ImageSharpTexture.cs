@@ -8,7 +8,7 @@ using System;
 
 namespace RhuEngine
 {
-	public class ImageSharpTexture:IDisposable
+	public class ImageSharpTexture : IDisposable
 	{
 		public Image<Rgba32> Image { get; }
 		public bool Srgb { get; }
