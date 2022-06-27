@@ -155,6 +155,15 @@ namespace RNumerics
 		public Vector2f[] uv;
 		public bool bHaveN, bHaveUV, bHaveC;
 
+		public NewVertexInfo(Vector3d v,Vector2f nuv,Colorf color) {
+			this.v = v;
+			n = c = Vector3f.Zero;
+			c = color.ToRGB();
+			uv = new Vector2f[] { nuv };
+			bHaveN = false;
+			bHaveC = bHaveUV = true;
+		}
+
 		public NewVertexInfo(Vector3d v) {
 			this.v = v;
 			n = c = Vector3f.Zero;

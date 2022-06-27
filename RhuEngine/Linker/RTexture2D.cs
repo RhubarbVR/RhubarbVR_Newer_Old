@@ -22,11 +22,14 @@ namespace RhuEngine.Linker
 		public object MakeFromColors(Colorb[] colors, int width, int height, bool srgb);
 
 		public void SetSize(object tex,int width, int height);
+		public void Dispose(object tex);
 
 		public void SetColors(object tex,int width, int height, byte[] rgbaData);
+		public void SetColors(object tex, int width, int height, Colorb[] rgbaData);
+
 	}
 
-	public class RTexture2D
+	public class RTexture2D : IDisposable
 	{
 		public static IRTexture2D Instance { get; set; }
 
@@ -72,6 +75,14 @@ namespace RhuEngine.Linker
 
 		public void SetColors(int width, int height, byte[] rgbaData) {
 			Instance.SetColors(Tex, width, height, rgbaData);
+		}
+		public void SetColors(int width, int height, Colorb[] rgbaData) {
+			Instance.SetColors(Tex, width, height, rgbaData);
+		}
+
+		public void Dispose() {
+			Instance.Dispose(Tex);
+			Tex = null;
 		}
 	}
 }

@@ -13,8 +13,7 @@ namespace RhuEngine.Components
 {
 	public class DynamicTextRender
 	{
-		public string guid = Guid.NewGuid().ToString();
-
+		public string ID = Guid.NewGuid().ToString();
 		public SafeList<TextChar> Chars = new();
 
 		public Vector2f MinClamp = Vector2f.MinValue;
@@ -22,14 +21,13 @@ namespace RhuEngine.Components
 		public Vector2f MaxClamp = Vector2f.MaxValue;
 		public float Width => MathUtil.Clamp(axisAlignedBox3F.Width + 0.05f, MinClamp.x, MaxClamp.x);
 
-		public float Height => MathUtil.Clamp(axisAlignedBox3F.Height + 0.05f, MinClamp.y,MaxClamp.y);
+		public float Height => MathUtil.Clamp(axisAlignedBox3F.Height + 0.05f, MinClamp.y, MaxClamp.y);
 
 		public AxisAlignedBox3f axisAlignedBox3F = AxisAlignedBox3f.Zero;
 
 		public class TextChar
 		{
 			public Vector2f textsize = Vector2f.Zero;
-			public string id;
 			public Rune c;
 			public Matrix Offset = Matrix.Identity;
 			public Matrix Offset2 = Matrix.Identity;
@@ -39,44 +37,91 @@ namespace RhuEngine.Components
 			public bool Cull = false;
 			public float Leading = 0f;
 			public bool NullChar = false;
-			public TextChar(string id, Rune c, Matrix p, Colorf color, Vector2f textCut, Vector2f textsize,float Leading) {
-				this.id = id;
+			public int mitIndex = 0;
+			public TextChar(Rune c, Matrix p, Colorf color, Vector2f textCut, Vector2f textsize, float Leading, int mitIndex) {
 				this.c = c;
 				this.p = p;
 				this.color = color;
 				this.textCut = textCut;
 				this.textsize = textsize;
 				this.Leading = Leading;
+				this.mitIndex = mitIndex;
+			}
+			public TextChar(Rune c, Matrix p, Colorf color, Vector2f textCut, Vector2f textsize, float Leading, int mitIndex, Vector2f bottomleft, Vector2f topright) {
+				this.c = c;
+				this.p = p;
+				this.color = color;
+				this.textCut = textCut;
+				this.textsize = textsize;
+				this.Leading = Leading;
+				this.mitIndex = mitIndex;
+				Bottomleft = bottomleft;
+				Topright = topright;
 			}
 
-			public void Render(Matrix root,string group, Action<Matrix, TextChar, int> action, int index) {
-				if (NullChar) {
-					action?.Invoke(Offset2 * p * root, this, index);
-					return;
-				}
-				//if (!Cull) {
-				//	RText.Add(id, group, c, Offset2 * p * root, color, rFont, textCut);
-				//}
+			public Vector2f Bottomleft { get; }
+			public Vector2f Topright { get; }
+
+			public void Render(Matrix root, Action<Matrix, TextChar, int> action, int index) {
 				action?.Invoke(Offset2 * p * root, this, index);
 			}
 		}
 
+		public List<RMaterial> renderMits = new();
+		public List<RMesh> rendermeshes= new();
 
-		public void Render(Matrix offset,Matrix root,Action<Matrix,TextChar,int> action = null) {
+		private void LoadRenderMeshes() {
+			for (var i = 0; i < rendermeshes.Count - renderMits.Count; i++) {
+				rendermeshes.RemoveAt(0);
+			}
+			for (var i = 0; i < renderMits.Count - rendermeshes.Count; i++) {
+				rendermeshes.Add(null);
+			}
 			Chars.SafeOperation((list) => {
-				var index = 0;
+				var meshses = new Dictionary<int, SimpleMesh>();
 				foreach (var item in list) {
-					item?.Render(offset * item.Offset * root, guid, action, index);
-					index++;
+					if (rendermeshes.Count > item.mitIndex) {
+						if(item.mitIndex == -1) {
+							continue;
+						}
+						var rmesh = rendermeshes[item.mitIndex];
+						if (!meshses.ContainsKey(item.mitIndex)) {
+							meshses.Add(item.mitIndex, new SimpleMesh());
+						}
+						var smesh = meshses[item.mitIndex];
+						smesh.AppendUVRectangle(item.Offset2 * item.p * item.Offset, item.Bottomleft, item.Topright,item.textsize * new Vector2f(-10,10), item.color);
+					}
+				}
+				foreach (var item in meshses) {
+					var rmesh = rendermeshes[item.Key];
+					if(rmesh is null) {
+						rendermeshes[item.Key] = new RMesh(item.Value);
+					}
+					else {
+						rmesh.LoadMesh(item.Value);
+					}
 				}
 			});
 		}
 
+		public void Render(Matrix offset, Matrix root, Action<Matrix, TextChar, int> action = null) {
+			for (var i = 0; i < renderMits.Count; i++) {
+				rendermeshes[i]?.Draw($"TextRender{ID}{i}", renderMits[i], offset * root);
+			}
+			Chars.SafeOperation((list) => {
+				var index = 0;
+				foreach (var item in list) {
+					item?.Render(offset * item.Offset * root, action, index);
+					index++;
+				}
+			});
+		}
 #pragma warning disable IDE0060 // Remove unused parameter 
-		public void LoadText(string Id ,string Text, RFont Font,float leading, Colorf StartingColor, FontStyle StartingStyle = FontStyle.Regular,float StatingSize = 10f, EVerticalAlien verticalAlien = EVerticalAlien.Center,EHorizontalAlien horizontalAlien= EHorizontalAlien.Middle,bool middleLines = true) {
-			if(Font is null) {
+		public void LoadText(string Id, string Text, RFont Font, float leading, Colorf StartingColor, FontStyle StartingStyle = FontStyle.Regular, float StatingSize = 10f, EVerticalAlien verticalAlien = EVerticalAlien.Center, EHorizontalAlien horizontalAlien = EHorizontalAlien.Middle, bool middleLines = true) {
+			if (Font is null) {
 				return;
 			}
+			renderMits.Clear();
 			var bounds = new List<Vector3f>();
 			Chars.SafeOperation((list) => list.Clear());
 			if (string.IsNullOrEmpty(Text)) {
@@ -99,7 +144,7 @@ namespace RhuEngine.Components
 			void AddNullText(int first) {
 				for (var i = 0; i < first; i++) {
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
-					var chare = new TextChar(Id + "null" + index.ToString(), Rune.GetRuneAt("\0",0), Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Vector2f.Zero, Vector2f.One, leaded.Peek() / 10) { 
+					var chare = new TextChar(Rune.GetRuneAt("\0", 0), Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Vector2f.Zero, Vector2f.One, leaded.Peek() / 10, -1) {
 						NullChar = true
 					};
 					Chars.SafeAdd(chare);
@@ -109,14 +154,14 @@ namespace RhuEngine.Components
 				foreach (var item in text.EnumerateRunes()) {
 					var textsize = FontManager.Size(Font, item);
 					if (item == Rune.GetRuneAt("\n", 0)) {
-						if(textsizeY == 0) {
+						if (textsizeY == 0) {
 							textsizeY = 1 * (fontSize.Peek() / 100);
 						}
 						textPosZ++;
 						textYpos -= textsizeY + (leaded.Peek() / 10);
 						textXpos = 0;
 						thisrow.Clear();
-						var charee = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(new Vector3f(textXpos, textYpos - textsizeY, 0), Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(),  Vector2f.Zero,Vector2f.Zero,leaded.Peek()/10);
+						var charee = new TextChar(item, Matrix.TRS(new Vector3f(textXpos, textYpos - textsizeY, 0), Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Vector2f.Zero, Vector2f.Zero, leaded.Peek() / 10, -1);
 						Chars.SafeAdd(charee);
 						continue;
 					}
@@ -140,10 +185,14 @@ namespace RhuEngine.Components
 					}
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
 					var ew = new Vector2f((textsize.x + 0.01f) * (fontSize.Peek() / 100), textsize.y * (fontSize.Peek() / 100));
-					var chare = new TextChar(Id + item + index.ToString(), item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(),  Vector2f.Zero,ew, leaded.Peek() / 10);
+					var data = Font.GetGlygh(item);
+					if (!renderMits.Contains(data.mit)) {
+						renderMits.Add(data.mit);
+					}
+					var chare = new TextChar(item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Vector2f.Zero, ew, leaded.Peek() / 10,renderMits.IndexOf(data.mit),data.bottomleft,data.topright);
 					Chars.SafeAdd(chare);
 					thisrow.Push(chare);
-					bounds.Add(textpos - new Vector3f(0,chare.Leading,0));
+					bounds.Add(textpos - new Vector3f(0, chare.Leading, 0));
 					bounds.Add(textpos + ew.X__ - new Vector3f(0, chare.Leading, 0));
 					bounds.Add(textpos + ew.XY_);
 					bounds.Add(textpos + ew._Y_);
@@ -152,16 +201,13 @@ namespace RhuEngine.Components
 				}
 			}
 			void Loop(string segment) {
-				
-
-
 				var first = segment.IndexOf('<');
-				if(first <= -1) {
+				if (first <= -1) {
 					RenderText(segment);
 					return;
 				}
-				var check = segment.IndexOf('<',first + 1);
-				var last = segment.IndexOf('>',first );
+				var check = segment.IndexOf('<', first + 1);
+				var last = segment.IndexOf('>', first);
 				if (last <= -1) {
 					RenderText(segment);
 					return;
@@ -172,8 +218,8 @@ namespace RhuEngine.Components
 				if (check == -1) {
 					check = int.MaxValue;
 				}
-				if(last > check) {
-					RenderText(segment.Substring(first,check - first));
+				if (last > check) {
+					RenderText(segment.Substring(first, check - first));
 					return;
 				}
 				var command = segment.Substring(first, last - first).ToLower();
@@ -184,7 +230,7 @@ namespace RhuEngine.Components
 					var data = smartCommand.Substring(6 + (haseq ? 1 : 0));
 					color.Push(Colorf.Parse(data));
 				}
-				else if(smartCommand.StartsWith("<colour")) {
+				else if (smartCommand.StartsWith("<colour")) {
 					AddNullText(command.Length + 1);
 					var data = smartCommand.Substring(7 + (haseq ? 1 : 0));
 					color.Push(Colorf.Parse(data));
@@ -192,7 +238,7 @@ namespace RhuEngine.Components
 				else if (smartCommand.StartsWith("<style")) {
 					AddNullText(command.Length + 1);
 					var data = smartCommand.Substring(6 + (haseq ? 1 : 0));
-					if(Enum.TryParse(data,true,out FontStyle fontStyle)) {
+					if (Enum.TryParse(data, true, out FontStyle fontStyle)) {
 						style.Push(fontStyle);
 					}
 				}
@@ -258,11 +304,11 @@ namespace RhuEngine.Components
 					catch { }
 				}
 				else {
-					RenderText(command + segment.Substring(last,1));
+					RenderText(command + segment.Substring(last, 1));
 				}
-				var end = segment.IndexOf('<',last);
+				var end = segment.IndexOf('<', last);
 				if (end <= -1) {
-					RenderText(segment.Substring(last+1));
+					RenderText(segment.Substring(last + 1));
 					return;
 				}
 				RenderText(segment.Substring(last + 1, end - last - 1));
@@ -280,7 +326,7 @@ namespace RhuEngine.Components
 					}
 					var offset = 0f;
 					foreach (var item in list) {
-						if(item is null) {
+						if (item is null) {
 							continue;
 						}
 						if (item.c == Rune.GetRuneAt("\n", 0)) {
@@ -307,6 +353,7 @@ namespace RhuEngine.Components
 					offset = 0f;
 				});
 			}
+			LoadRenderMeshes();
 		}
 #pragma warning restore IDE0060 // Remove unused parameter
 	}

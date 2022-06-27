@@ -15,6 +15,10 @@ namespace RStereoKit
 		{
 			public TextMaterial() {
 				UpdateMaterial(StereoKit.Material.Unlit.Copy());
+				YourData.Transparency = StereoKit.Transparency.Blend;
+				YourData.DepthWrite = false;
+				YourData.FaceCull = StereoKit.Cull.None;
+				YourData.QueueOffset = int.MaxValue;
 			}
 
 			public RTexture2D Texture

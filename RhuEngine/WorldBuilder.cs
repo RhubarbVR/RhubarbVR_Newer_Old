@@ -51,12 +51,21 @@ namespace RhuEngine
 							PowerCube.SetParent(LastpowerCube);
 						}
 						AttachRender(box, mit, PowerCube, Colorf.RandomHue());
-						var boxshape = PowerCube.AttachComponent<BoxShape>();
+						PowerCube.AttachComponent<BoxShape>();
 						PowerCube.AttachComponent<Grabbable>();
 						LastpowerCube = PowerCube;
 					}
 				}
 			}
+
+			var fontAtlis = world.RootEntity.AddChild("FontAtlis");
+			fontAtlis.AttachComponent<BoxShape>();
+			fontAtlis.AttachComponent<Grabbable>();
+			var data = fontAtlis.AttachMesh<TrivialBox3Mesh, UnlitMaterial>();
+			data.Item2.MainTexture.Target = fontAtlis.AttachComponent<FontAtlasTexture>();
+			var text = fontAtlis.AddChild("Text");
+			text.position.Value = new Vector3f(1, 1, 1);
+			text.AttachComponent<WorldText>();
 			RLog.Info("Built Local World");
 		}
 

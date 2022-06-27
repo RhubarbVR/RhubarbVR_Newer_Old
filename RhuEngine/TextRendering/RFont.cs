@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 
 using RhuEngine.Linker;
+using RhuEngine.TextRendering;
+
+using RNumerics;
 
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -13,7 +16,7 @@ using SixLabors.ImageSharp.Processing;
 
 namespace RhuEngine
 {
-	public class RText
+	public class RText : IDisposable
 	{
 		public RText(RFont rFont) {
 			TargetFont = rFont;
@@ -46,10 +49,17 @@ namespace RhuEngine
 			if (TargetFont is null) {
 				throw new Exception("Need a font to Make text");
 			}
-			texture2D = TargetFont.RenderText(_text);
-			FontRectangle = TargetFont.GetSizeOfText(_text);
+			texture2D = TargetFont?.RenderText(_text);
+			FontRectangle = TargetFont?.GetSizeOfText(_text)??new FontRectangle();
 			AspectRatio = FontRectangle.Width / FontRectangle.Height;
 			UpdatedTexture?.Invoke();
+		}
+
+		public void Dispose() {
+			TargetFont = null;
+			UpdatedTexture = null;
+			texture2D?.Dispose();
+			texture2D = null;
 		}
 	}
 
@@ -59,6 +69,9 @@ namespace RhuEngine
 		public const float FONTSIZE = 96f;
 		public FontCollection Collection { get; set; }
 		public TextOptions TextOptions { get; set; }
+
+		public event Action UpdateAtlas;
+
 		public RFont(Font mainFont,FontCollection fallBacks) {
 			Collection = fallBacks;
 			TextOptions = new TextOptions(mainFont) {
@@ -66,17 +79,37 @@ namespace RhuEngine
 				FallbackFontFamilies = Collection.Families.ToArray(),
 			};
 		}
+
+
 		public RFont(Font mainFont) {
 			TextOptions = new TextOptions(mainFont) {
 				Dpi = 96,
 			};
 		}
 
-		public readonly List<Rune> LoadedRunes = new();
+		public readonly List<FontAtlisPart> fontAtlisParts = new();
+
+		public (RMaterial mit,RTexture2D texture,Vector2f bottomleft, Vector2f topright) GetGlygh(Rune rune) {
+			foreach (var item in fontAtlisParts) {
+				var glyih = item.GetGlygh(rune);
+				if (glyih != null) {
+					return glyih.GetValueOrDefault();
+				}
+			}
+			RLog.Info("Ran out of room adding another text texture");
+			var fontAtlis = new FontAtlisPart(this);
+			fontAtlisParts.Add(fontAtlis);
+			UpdateAtlas?.Invoke();
+			return fontAtlis.GetGlygh(rune).GetValueOrDefault();
+		}
 
 		public FontRectangle GetSizeOfText(string text) {
 			return TextMeasurer.Measure(text, TextOptions);
 		}
+		public FontRectangle GetSizeOfRune(Rune rune) {
+			return TextMeasurer.Measure(rune.ToString(), TextOptions);
+		}
+
 
 		public RTexture2D RenderText(string text) {
 			var size = TextMeasurer.Measure(text, TextOptions);

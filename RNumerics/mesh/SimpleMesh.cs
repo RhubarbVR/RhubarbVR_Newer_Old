@@ -171,6 +171,24 @@ namespace RNumerics
 			return trys;
 		}
 
+		public void AppendUVRectangle(Matrix offset,Vector2f bottomleft, Vector2f topright,Vector2f size, Colorf color) {
+			var ftopLeft = new Vector2f(bottomleft.x, topright.y);
+			var fbottomLeft = bottomleft;
+			var ftopRight = topright;
+			var fbottomRight = new Vector2f(topright.x,bottomleft.y);
+			var zoff = 0.01f;
+			var topLeft = offset.Transform(size._Y_ + new Vector3f(0,0,zoff));
+			var bottomLeft = offset.Transform(new Vector3f(0, 0, zoff));
+			var topRight = offset.Transform(size.XY_ + new Vector3f(0, 0, zoff));
+			var bottomRight = offset.Transform(size.X__ + new Vector3f(0, 0, zoff));
+			var vtopLeft = new NewVertexInfo(topLeft, ftopLeft, color);
+			var vbottomLeft = new NewVertexInfo(bottomLeft, fbottomLeft, color);
+			var vtopRight = new NewVertexInfo(topRight, ftopRight, color);
+			var vbottomRight = new NewVertexInfo(bottomRight, fbottomRight, color);
+			AppendTriangle(vtopLeft, vtopRight, vbottomRight);
+			AppendTriangle(vbottomRight, vbottomLeft, vtopLeft );
+		}
+
 		public SimpleMesh CutOnPlane(params PlaneSetting[] planeSetting) {
 			var cutMesh = new SimpleMesh();
 			var vertexInfos = new List<(NewVertexInfo, NewVertexInfo, NewVertexInfo)>(TriangleCount);

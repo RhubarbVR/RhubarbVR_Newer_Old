@@ -231,7 +231,7 @@ namespace RhuEngine
 				};
 				StartingTextMit = StaticMaterialManager.GetMaterial<ITextMaterial>();
 				StartingTextMit.Texture = StartingText.texture2D;
-				StartingText.UpdatedTexture += () => StartingTextMit.Texture = StartingText.texture2D;
+				StartingText.UpdatedTexture += () => StartingTextMit.Texture = StartingText?.texture2D;
 				RRenderer.EnableSky = false;
 				LoadingLogo = StaticMaterialManager.GetMaterial<IUnlitMaterial>();
 				LoadingLogo.Transparency = Transparency.Blend;
@@ -256,7 +256,9 @@ namespace RhuEngine
 				}
 				EngineStarting = false;
 				if (EngineLink.CanRender) {
+					StartingText?.Dispose();
 					StartingText = null;
+					LoadingLogo?.Dispose();
 					LoadingLogo = null;
 					RRenderer.EnableSky = true;
 				}
@@ -293,9 +295,15 @@ namespace RhuEngine
 						_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
 						_oldPlayerPos = playerPos;
 						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt(EngineLink.CanInput ? headMat.Translation : Vector3f.Zero, _loadingPos));
-						StartingText.Text = $"{localisationManager?.GetLocalString("Common.Loading")}\n{IntMsg}";
-						RMesh.Quad.Draw("UIText", StartingTextMit.Material, Matrix.TS(0, -0.2f, 0,new Vector3f(StartingText.AspectRatio,1,1)/7) * rootMatrix);
-						RMesh.Quad.Draw("LoadingUi",LoadingLogo.Material, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
+						if (StartingText is not null) {
+							StartingText.Text = $"{localisationManager?.GetLocalString("Common.Loading")}\n{IntMsg}";
+							if (StartingTextMit is not null) {
+								RMesh.Quad.Draw("UIText", StartingTextMit?.Material, Matrix.TS(0, -0.2f, 0, new Vector3f(StartingText?.AspectRatio??1, 1, 1) / 7) * rootMatrix);
+							}
+							if (LoadingLogo is not null) {
+								RMesh.Quad.Draw("LoadingUi", LoadingLogo?.Material, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
+							}
+						}
 					}
 					catch (Exception ex) {
 						RLog.Err("Failed to update msg text Error: " + ex.ToString());
