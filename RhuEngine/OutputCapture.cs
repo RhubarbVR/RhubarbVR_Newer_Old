@@ -51,7 +51,7 @@ namespace RhuEngine
 			if(consoleColor == ConsoleColor.Gray) {
 				consoleColor = ConsoleColor.White;
 			}
-			InGameConsole += $"<color{consoleColor}>" + data.Replace("info", "<colorBlue>info</color>").Replace("error", "<colorRed>error</color>").Replace("diagnostic", "<colorMidnightBlue>diagnostic</color>").Replace("warn", "<coloryellow>warn</color>");
+			InGameConsole += $"<color{consoleColor}>{data.Replace("info", "<colorBlue>info</color>").Replace("error", "<colorRed>error</color>").Replace("diagnostic", "<colorMidnightBlue>diagnostic</color>").Replace("warn", "<coloryellow>warn</color>")}</clearstyle>";
 			RemoveNewLines(AmountOfNewLines - 35);
 			_writer?.Write(data);
 			TextEdied?.Invoke();

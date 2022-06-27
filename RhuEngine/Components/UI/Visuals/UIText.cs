@@ -64,7 +64,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(UpdateText))]
 		public readonly Sync<Vector2f> MinClamp;
 
-		public DynamicTextRender textRender = new();
+		public DynamicTextRender textRender = new(true);
 
 		[Default(EVerticalAlien.Center)]
 		[OnChanged(nameof(UpdateText))]
@@ -102,6 +102,7 @@ namespace RhuEngine.Components
 
 		public override void OnLoaded() {
 			base.OnLoaded();
+			textRender.UpdatedMeshses = MeshUpdate;
 			UpdateText();
 		}
 
@@ -149,8 +150,8 @@ namespace RhuEngine.Components
 			var small = Math.Min(size.y / textRender.Height, size.x / textRender.Width);
 
 
-			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + Entity.UIRect.Depth.Value + 0.01f), new Vector3f(small) / Rect.Canvas.scale.Value);
-			CutElement(true, false);
+			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + Entity.UIRect.Depth.Value + 0.01f), new Vector3f(small) / Rect.Canvas.scale.Value) * Matrix.T(Rect.ScrollOffset);
+			CutElement(true, true);
 		}
 
 		public override void RenderTargetChange() {
@@ -166,78 +167,50 @@ namespace RhuEngine.Components
 		}
 
 		public override void Render(Matrix matrix) {
-			textRender.Render(textOffset, Matrix.T(Rect.ScrollOffset) * Matrix.S((Rect.Canvas?.scale.Value ?? Vector3f.One) / 10) * matrix, OnCharRender);
+			textRender.Render(textOffset,  Matrix.S((Rect.Canvas?.scale.Value ?? Vector3f.One) / 10) * matrix, OnCharRender);
+			for (var i = 0; i < mainMeshes.Length; i++) {
+				mainMeshes[i]?.Draw(textRender.ID + i, textRender.renderMits[i], matrix);
+			}
+		}
+		private void MeshUpdate() {
+			UpdateTextOffset();
 		}
 
+		public RMesh[] mainMeshes = Array.Empty<RMesh>();
+
 		public override void CutElement(bool cut, bool update) {
-			var min = Rect.CutZonesMin;
-			var max = Rect.CutZonesMax;
-			if (cut) {
-				textRender.Chars.SafeOperation((list) => {
-					foreach (var chare in list) {
-						if(chare is null) {
-							continue;
-						}
-						var charbottomleft = (chare.p * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
-						var charbottomright = (Matrix.T(new Vector3f(chare.textsize.x, 0, 0) + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
-						var chartopleft = (Matrix.T(new Vector3f(0, chare.textsize.y, 0) + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
-						var chartopright = (Matrix.T(chare.textsize.XY_ + chare.p.Translation) * textOffset * Matrix.T(Rect.ScrollOffset)).Translation.Xy;
-						var bottomleft = max.IsInBox(min, charbottomleft);
-						var bottomright = max.IsInBox(min, charbottomright);
-						var topleft = max.IsInBox(min, chartopleft);
-						var topright = max.IsInBox(min, chartopright);
-						if (!(bottomleft || bottomright || topleft || topright)) {
-							chare.Cull = true;
-							continue;
-						}
-						chare.Cull = false;
-						if (bottomleft && bottomright && topleft && topright) {
-							chare.textCut = Vector2f.Zero;
-							continue;
-						}
-						var ycut = 0f;
-						var xcut = 0f;
-						if (topleft && topright) {
-							var newpos = Vector2f.MinMaxIntersect(charbottomleft, min, max).y;
-							ycut = -((charbottomleft.y - newpos) / (chartopleft.y - charbottomleft.y));
-						}
-						if (bottomleft && bottomright) {
-							var newpos = Vector2f.MinMaxIntersect(chartopright, min, max).y;
-							ycut = -(chartopright.y - newpos) / (chartopleft.y - charbottomleft.y);
-						}
-						if (bottomleft && topleft) {
-							var newpos = Vector2f.MinMaxIntersect(chartopright, min, max).x;
-							xcut = -((chartopright.x - newpos) / (chartopright.x - chartopleft.x));
-						}
-						if (bottomright && topright) {
-							var newpos = Vector2f.MinMaxIntersect(charbottomleft, min, max).x;
-							xcut = -((charbottomleft.x - newpos) / (chartopright.x - chartopleft.x));
-						}
-						chare.textCut = new Vector2f(xcut, ycut);
-					}
-				});
-			}
-			else {
-				textRender.Chars.SafeOperation((list) => {
-					foreach (var chare in list) {
-						if(chare is null) {
-							continue;
-						}
-						chare.textCut = Vector2f.Zero;
-						chare.Cull = false;
-					}
-				});
-			}
-			textRender.Chars.SafeOperation((list) => {
-				foreach (var chare in list) {
-					if(chare is null) {
-						continue;
-					}
-					var newMat = Rect.MatrixMove(chare.p * textOffset * Matrix.T(Rect.ScrollOffset));
-					chare.Offset = Matrix.T(newMat.Translation);
-					chare.Offset2 = Matrix.R(newMat.Rotation);
+			var meshes = new SimpleMesh[textRender.simprendermeshes.Count];
+			for (var i = 0; i < meshes.Length; i++) {
+				meshes[i] = new SimpleMesh(TextRender.simprendermeshes[i]);
+				if(meshes[i] is null) {
+					continue;
 				}
-			});
+				meshes[i].Translate(textOffset);
+				if (cut) {
+					meshes[i] = meshes[i].Cut(Rect.CutZonesMax, Rect.CutZonesMin);
+				}
+				if (Rect.Canvas.TopOffset.Value) {
+					meshes[i].OffsetTop(Rect.Canvas.TopOffsetValue.Value);
+				}
+				if (Rect.Canvas.FrontBind.Value) {
+					meshes[i] = meshes[i].UIBind(Rect.Canvas.FrontBindAngle.Value, Rect.Canvas.FrontBindRadus.Value, Rect.Canvas.FrontBindSegments.Value, Rect.Canvas.scale);
+				}
+				meshes[i].Scale(Rect.Canvas.scale.Value.x / 10, Rect.Canvas.scale.Value.y / 10, Rect.Canvas.scale.Value.z / 10);
+			}
+			if(mainMeshes.Length != meshes.Length) {
+				Array.Resize(ref mainMeshes,meshes.Length);
+			}
+			for (var i = 0; i < meshes.Length; i++) {
+				var mesh = mainMeshes[i];
+				if(mesh is not null) {
+					mesh.LoadMesh(meshes[i]);
+				}
+				else {
+					if(meshes[i].TriangleCount > 0) {
+						mainMeshes[i] = new RMesh(meshes[i]);
+					}
+				}
+			}
 		}
 	}
 }

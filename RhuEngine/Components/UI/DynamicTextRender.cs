@@ -13,6 +13,12 @@ namespace RhuEngine.Components
 {
 	public class DynamicTextRender
 	{
+		public Action UpdatedMeshses;
+		public DynamicTextRender(bool uiText = false,Action update =  null) {
+			UpdatedMeshses = update;
+			UIText = uiText;
+		}
+
 		public string ID = Guid.NewGuid().ToString();
 		public SafeList<TextChar> Chars = new();
 
@@ -27,10 +33,10 @@ namespace RhuEngine.Components
 
 		public class TextChar
 		{
+			public float fontSize = 0;
+
 			public Vector2f textsize = Vector2f.Zero;
 			public Rune c;
-			public Matrix Offset = Matrix.Identity;
-			public Matrix Offset2 = Matrix.Identity;
 			public Matrix p;
 			public Colorf color;
 			public Vector2f textCut;
@@ -38,7 +44,8 @@ namespace RhuEngine.Components
 			public float Leading = 0f;
 			public bool NullChar = false;
 			public int mitIndex = 0;
-			public TextChar(Rune c, Matrix p, Colorf color, Vector2f textCut, Vector2f textsize, float Leading, int mitIndex) {
+			public TextChar(Rune c, Matrix p, Colorf color, Vector2f textCut, Vector2f textsize, float fontSize, float Leading, int mitIndex) {
+				this.fontSize = fontSize;
 				this.c = c;
 				this.p = p;
 				this.color = color;
@@ -47,9 +54,10 @@ namespace RhuEngine.Components
 				this.Leading = Leading;
 				this.mitIndex = mitIndex;
 			}
-			public TextChar(Rune c, Matrix p, Colorf color, Vector2f textCut, Vector2f textsize, float Leading, int mitIndex, Vector2f bottomleft, Vector2f topright) {
+			public TextChar(Rune c, Matrix p, Colorf color, Vector2f textCut, Vector2f textsize, float Leading, float fontSize, int mitIndex, Vector2f bottomleft, Vector2f topright) {
+				this.fontSize = fontSize;
 				this.c = c;
-				this.p = p;
+				this.p = Matrix.T(new Vector3f(0,-0.25,0)) * p;
 				this.color = color;
 				this.textCut = textCut;
 				this.textsize = textsize;
@@ -63,19 +71,22 @@ namespace RhuEngine.Components
 			public Vector2f Topright { get; }
 
 			public void Render(Matrix root, Action<Matrix, TextChar, int> action, int index) {
-				action?.Invoke(Offset2 * p * root, this, index);
+				action?.Invoke(Matrix.S(fontSize) * p * root, this, index);
 			}
 		}
 
 		public List<RMaterial> renderMits = new();
 		public List<RMesh> rendermeshes= new();
+		public List<SimpleMesh> simprendermeshes = new();
 
 		private void LoadRenderMeshes() {
 			for (var i = 0; i < rendermeshes.Count - renderMits.Count; i++) {
 				rendermeshes.RemoveAt(0);
+				simprendermeshes.RemoveAt(0);
 			}
 			for (var i = 0; i < renderMits.Count - rendermeshes.Count; i++) {
 				rendermeshes.Add(null);
+				simprendermeshes.Add(null);
 			}
 			Chars.SafeOperation((list) => {
 				var meshses = new Dictionary<int, SimpleMesh>();
@@ -89,32 +100,44 @@ namespace RhuEngine.Components
 							meshses.Add(item.mitIndex, new SimpleMesh());
 						}
 						var smesh = meshses[item.mitIndex];
-						smesh.AppendUVRectangle(item.Offset2 * item.p * item.Offset, item.Bottomleft, item.Topright,item.textsize * new Vector2f(-10,10), item.color);
+						smesh.AppendUVRectangle(item.p, item.Bottomleft, item.Topright,item.textsize * new Vector2f(-1,1),item.fontSize, item.color);
 					}
 				}
-				foreach (var item in meshses) {
-					var rmesh = rendermeshes[item.Key];
-					if(rmesh is null) {
-						rendermeshes[item.Key] = new RMesh(item.Value);
+				if (!UIText) {
+					foreach (var item in meshses) {
+						var rmesh = rendermeshes[item.Key];
+						if (rmesh is null) {
+							rendermeshes[item.Key] = new RMesh(item.Value);
+						}
+						else {
+							rmesh.LoadMesh(item.Value);
+						}
 					}
-					else {
-						rmesh.LoadMesh(item.Value);
+				}
+				else {
+					foreach (var item in meshses) {
+						simprendermeshes[item.Key] = item.Value;
 					}
 				}
 			});
+			UpdatedMeshses?.Invoke();
 		}
 
+		public bool UIText = false;
+
 		public void Render(Matrix offset, Matrix root, Action<Matrix, TextChar, int> action = null) {
-			for (var i = 0; i < renderMits.Count; i++) {
-				rendermeshes[i]?.Draw($"TextRender{ID}{i}", renderMits[i], offset * root);
-			}
 			Chars.SafeOperation((list) => {
 				var index = 0;
 				foreach (var item in list) {
-					item?.Render(offset * item.Offset * root, action, index);
+					item?.Render(offset * root, action, index);
 					index++;
 				}
 			});
+			if (!UIText) {
+				for (var i = 0; i < renderMits.Count; i++) {
+					rendermeshes[i]?.Draw($"TextRender{ID}{i}", renderMits[i], offset * root);
+				}
+			}
 		}
 #pragma warning disable IDE0060 // Remove unused parameter 
 		public void LoadText(string Id, string Text, RFont Font, float leading, Colorf StartingColor, FontStyle StartingStyle = FontStyle.Regular, float StatingSize = 10f, EVerticalAlien verticalAlien = EVerticalAlien.Center, EHorizontalAlien horizontalAlien = EHorizontalAlien.Middle, bool middleLines = true) {
@@ -144,7 +167,7 @@ namespace RhuEngine.Components
 			void AddNullText(int first) {
 				for (var i = 0; i < first; i++) {
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
-					var chare = new TextChar(Rune.GetRuneAt("\0", 0), Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Vector2f.Zero, Vector2f.One, leaded.Peek() / 10, -1) {
+					var chare = new TextChar(Rune.GetRuneAt("\0", 0), Matrix.TR(textpos, Quaternionf.Yawed180), color.Peek(), Vector2f.Zero, Vector2f.One, fontSize.Peek() / 10, leaded.Peek() / 10, -1) {
 						NullChar = true
 					};
 					Chars.SafeAdd(chare);
@@ -155,19 +178,19 @@ namespace RhuEngine.Components
 					var textsize = FontManager.Size(Font, item);
 					if (item == Rune.GetRuneAt("\n", 0)) {
 						if (textsizeY == 0) {
-							textsizeY = 1 * (fontSize.Peek() / 100);
+							textsizeY = fontSize.Peek() / 10;
 						}
 						textPosZ++;
 						textYpos -= textsizeY + (leaded.Peek() / 10);
 						textXpos = 0;
 						thisrow.Clear();
-						var charee = new TextChar(item, Matrix.TRS(new Vector3f(textXpos, textYpos - textsizeY, 0), Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Vector2f.Zero, Vector2f.Zero, leaded.Peek() / 10, -1);
+						var charee = new TextChar(item, Matrix.TR(new Vector3f(textXpos, textYpos - textsizeY, 0), Quaternionf.Yawed180), color.Peek(), Vector2f.Zero, Vector2f.Zero, fontSize.Peek() / 10, leaded.Peek() / 10, -1);
 						Chars.SafeAdd(charee);
 						continue;
 					}
-					var newsize = Math.Max(textsize.y * (fontSize.Peek() / 100), textsizeY);
-					if (newsize != textsizeY) {
-						var def = (textsize.y * (fontSize.Peek() / 100)) - textsizeY;
+					var newsize = Math.Max(textsize.y * (fontSize.Peek() / 10), textsizeY);
+					if (newsize > textsizeY) {
+						var def = (textsize.y * (fontSize.Peek() / 10)) - textsizeY;
 						textsizeY = newsize;
 						foreach (var charitem in thisrow) {
 							var ewe = charitem.textsize;
@@ -184,19 +207,19 @@ namespace RhuEngine.Components
 						}
 					}
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
-					var ew = new Vector2f((textsize.x + 0.01f) * (fontSize.Peek() / 100), textsize.y * (fontSize.Peek() / 100));
+					var ew = new Vector2f((textsize.x + 0.01f) * (fontSize.Peek() / 10), textsize.y * (fontSize.Peek() / 10));
 					var data = Font.GetGlygh(item);
 					if (!renderMits.Contains(data.mit)) {
 						renderMits.Add(data.mit);
 					}
-					var chare = new TextChar(item, Matrix.TRS(textpos, Quaternionf.Yawed180, fontSize.Peek() / 100), color.Peek(), Vector2f.Zero, ew, leaded.Peek() / 10,renderMits.IndexOf(data.mit),data.bottomleft,data.topright);
+					var chare = new TextChar(item, Matrix.TR(textpos, Quaternionf.Yawed180), color.Peek(), Vector2f.Zero, ew, fontSize.Peek() / 10, leaded.Peek() / 10,renderMits.IndexOf(data.mit),data.bottomleft,data.topright);
 					Chars.SafeAdd(chare);
 					thisrow.Push(chare);
 					bounds.Add(textpos - new Vector3f(0, chare.Leading, 0));
 					bounds.Add(textpos + ew.X__ - new Vector3f(0, chare.Leading, 0));
 					bounds.Add(textpos + ew.XY_);
 					bounds.Add(textpos + ew._Y_);
-					textXpos += (textsize.x + 0.05f) * (fontSize.Peek() / 100);
+					textXpos += Font.GetXAdvances(item) * (fontSize.Peek() / 10);
 					index++;
 				}
 			}
@@ -299,6 +322,24 @@ namespace RhuEngine.Components
 					try {
 						if (style.Count != 1) {
 							style.Pop();
+						}
+					}
+					catch { }
+				}
+				else if (smartCommand.StartsWith("</clearstyle") || smartCommand.StartsWith("<\\clearstyle")) {
+					AddNullText(command.Length + 1);
+					try {
+						for (var i = 0; i < style.Count - 1; i++) {
+							style.Pop();
+						}
+						for (var i = 0; i < fontSize.Count - 1; i++) {
+							fontSize.Pop();
+						}
+						for (var i = 0; i < color.Count - 1; i++) {
+							color.Pop();
+						}
+						for (var i = 0; i < leaded.Count - 1; i++) {
+							leaded.Pop();
 						}
 					}
 					catch { }

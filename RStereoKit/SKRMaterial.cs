@@ -18,7 +18,7 @@ namespace RStereoKit
 				YourData.Transparency = StereoKit.Transparency.Blend;
 				YourData.DepthWrite = false;
 				YourData.FaceCull = StereoKit.Cull.None;
-				YourData.QueueOffset = int.MaxValue;
+				YourData.QueueOffset = 4990;
 			}
 
 			public RTexture2D Texture

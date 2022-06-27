@@ -121,5 +121,8 @@ namespace RhuEngine
 			return new ImageSharpTexture(img).CreateTextureAndDisposes();
 		}
 
+		public float GetXAdvances(Rune item) {
+			return (TextMeasurer.Measure(item.ToString() + " ", TextOptions).Width - TextMeasurer.Measure(" ", TextOptions).Width) / 100;
+		}
 	}
 }

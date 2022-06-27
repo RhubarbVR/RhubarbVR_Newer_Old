@@ -99,7 +99,7 @@ namespace RhuEngine.Components.PrivateSpace
 			if (Engine.IsCloseing) {
 				return;
 			}
-			_text.Text.Value = string.Join("\n", Engine.outputCapture.InGameConsole.ToString());
+			RWorld.ExecuteOnEndOfFrame(this, () => _text.Text.Value = string.Join("\n", Engine.outputCapture.InGameConsole.ToString()));
 		}
 
 		public override void Dispose() {

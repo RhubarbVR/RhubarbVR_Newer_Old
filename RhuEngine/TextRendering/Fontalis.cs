@@ -61,7 +61,9 @@ namespace RhuEngine.TextRendering
 			var topLeft = new Vector2f(_xpos, _ypos);
 
 			var tempOptions = new TextOptions(_font.TextOptions) {
-				Origin = new System.Numerics.Vector2(topLeft.x, topLeft.y)
+				Origin = new System.Numerics.Vector2(topLeft.x, topLeft.y),
+				VerticalAlignment = VerticalAlignment.Top,
+				HorizontalAlignment = HorizontalAlignment.Left,
 			};
 			_image.Mutate(x => x.DrawText(tempOptions, rune.ToString(), Color.White));
 			UpdateMit();

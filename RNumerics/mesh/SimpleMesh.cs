@@ -171,16 +171,17 @@ namespace RNumerics
 			return trys;
 		}
 
-		public void AppendUVRectangle(Matrix offset,Vector2f bottomleft, Vector2f topright,Vector2f size, Colorf color) {
+		public void AppendUVRectangle(Matrix offset,Vector2f bottomleft, Vector2f topright,Vector2f size,float yoffset, Colorf color) {
 			var ftopLeft = new Vector2f(bottomleft.x, topright.y);
 			var fbottomLeft = bottomleft;
 			var ftopRight = topright;
 			var fbottomRight = new Vector2f(topright.x,bottomleft.y);
 			var zoff = 0.01f;
-			var topLeft = offset.Transform(size._Y_ + new Vector3f(0,0,zoff));
-			var bottomLeft = offset.Transform(new Vector3f(0, 0, zoff));
-			var topRight = offset.Transform(size.XY_ + new Vector3f(0, 0, zoff));
-			var bottomRight = offset.Transform(size.X__ + new Vector3f(0, 0, zoff));
+			var offseter = size.y * -0.2f;
+			var topLeft = offset.Transform(size._Y_ + new Vector3f(0, offseter, zoff));
+			var bottomLeft = offset.Transform(new Vector3f(0, offseter, zoff));
+			var topRight = offset.Transform(size.XY_ + new Vector3f(0, offseter, zoff));
+			var bottomRight = offset.Transform(size.X__ + new Vector3f(0, offseter, zoff));
 			var vtopLeft = new NewVertexInfo(topLeft, ftopLeft, color);
 			var vbottomLeft = new NewVertexInfo(bottomLeft, fbottomLeft, color);
 			var vtopRight = new NewVertexInfo(topRight, ftopRight, color);
@@ -494,7 +495,16 @@ namespace RNumerics
 			}
 			UpdateTimeStamp();
 		}
-
+		public void Translate(Matrix matrix) {
+			var c = VertexCount;
+			for (var i = 0; i < c; ++i) {
+				var transform = matrix.Transform(new Vector3f(Vertices[3 * i], Vertices[(3 * i) + 1], Vertices[(3 * i) + 2]));
+				Vertices[3 * i] = transform.x;
+				Vertices[(3 * i) + 1] = transform.y;
+				Vertices[(3 * i) + 2] = transform.z;
+			}
+			UpdateTimeStamp();
+		}
 		public void OffsetTop(double offset) {
 			var c = VertexCount;
 			for (var i = 0; i < c; ++i) {

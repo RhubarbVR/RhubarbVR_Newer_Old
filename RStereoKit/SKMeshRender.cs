@@ -43,7 +43,7 @@ namespace RStereoKit
 		}
 
 		public override void Render() {
-			RenderingComponent.textRender.Render(RNumerics.Matrix.Identity, RenderingComponent.Entity.GlobalTrans);
+			RenderingComponent.textRender.Render(RNumerics.Matrix.S(0.1f), RenderingComponent.Entity.GlobalTrans);
 		}
 
 		public override void Started() {
