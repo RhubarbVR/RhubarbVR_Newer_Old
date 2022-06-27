@@ -16,7 +16,7 @@ namespace RhuEngine.TextRendering
 {
 	public class FontAtlisPart
 	{
-		public const int ATLISSIZE = 4096;
+		public const int ATLISSIZE = 2048;
 		public Image<Rgba32> _image;
 		public ITextMaterial _material;
 		public RTexture2D _texture;
@@ -48,7 +48,7 @@ namespace RhuEngine.TextRendering
 			}
 			var size = _font.GetSizeOfRune(rune);
 			if(size.Width + _xpos > ATLISSIZE) {
-				if ((int)size.Height + _ypos > ATLISSIZE) {
+				if (((int)size.Height + _yposMax) >= ATLISSIZE) {
 					return null;//Has no room
 				}
 				else {

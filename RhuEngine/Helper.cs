@@ -7,28 +7,48 @@ using RNumerics;
 using RhuEngine.Linker;
 using System.Reflection;
 using RhuEngine.WorldObjects.ECS;
+using System.Text;
+using System.Collections.Generic;
 
 namespace RhuEngine
 {
 	public static class Helper
 	{
-		public static string ApplyStringFunctions(this string value) {
-			var newstring = "";
-			for (var i = 0; i < value.Length; i++) {
-				var currentchar = value[i];
-				if(currentchar == '\r') {
-					newstring += '\n';
+		public static int RuneLength(this string value) {
+			return value.EnumerateRunes().Count();
+		}
+		public static string ToNormalString(this IEnumerable<Rune> value) {
+			return string.Join(string.Empty, value.Select((x) => x.ToString()).ToArray());
+		}
+
+		public static string RuneSubstring(this string value,int startIndex, int endlength = int.MaxValue) {
+			var newstring = new List<Rune>();
+			var runeIndex = 0;
+			var endIndex = startIndex + endlength;
+			foreach (var item in value.EnumerateRunes()) {
+				if (runeIndex >= startIndex && runeIndex <= endIndex) {
+					newstring.Add(item);
 				}
-				else if(currentchar == '\b') {
-					if(newstring.Length != 0) {
-						newstring = newstring.Remove(newstring.Length - 1);
+				runeIndex++;
+			}
+			return newstring.ToNormalString();
+		}
+		public static string ApplyStringFunctions(this string value) {
+			var newstring = new List<Rune>();
+			foreach (var currentchar in value.EnumerateRunes()) {
+				if(currentchar == new Rune('\r')) {
+					newstring.Add(new Rune('\n'));
+				}
+				else if(currentchar == new Rune('\b')) {
+					if(newstring.Count != 0) {
+						newstring.RemoveAt(newstring.Count - 1);
 					}
 				}
 				else {
-					newstring += currentchar;
+					newstring.Add(currentchar);
 				}
 			}
-			return newstring;
+			return newstring.ToNormalString();
 		}
 
 		public static Matrix CastToNormal(this Assimp.Matrix4x4 matrix) {

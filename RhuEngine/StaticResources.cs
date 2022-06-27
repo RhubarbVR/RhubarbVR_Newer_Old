@@ -35,11 +35,18 @@ namespace RhuEngine
 			return RTexture2D.FromMemory(GetStaticResource(name));
 		}
 		private RTexture2D _rhubarbLogoV1;
-
+#if DEBUG
+		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("MilkSnake.png");
+#else
 		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("RhubarbVR.png");
-		private RTexture2D _rhubarbLogoV2;
+#endif
 
+		private RTexture2D _rhubarbLogoV2;
+#if DEBUG
+		public RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("MilkSnake.png");
+#else
 		public RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("RhubarbVR2.png");
+#endif
 
 		private RTexture2D _grip;
 
