@@ -138,19 +138,25 @@ namespace RhuEngine
 			MainSettings = lists.Count == 0 ? new MainSettingsObject() : SettingsManager.LoadSettingsObject<MainSettingsObject>(lists.ToArray());
 		}
 
-		public bool HasNoKeyboard => KeyboardInteraction is not null;
+		public bool HasKeyboard => KeyboardInteraction is not null;
 
 		public IKeyboardInteraction KeyboardInteraction { get;private set; }
+
+		private void KeyBoardUpdate() {
+			worldManager.PrivateSpaceManager?.KeyBoardUpdate(KeyboardInteraction?.WorldPos??Matrix.Identity);
+		}
 
 		public void KeyboardInteractionBind(IKeyboardInteraction uITextEditorInteraction) {
 			KeyboardInteraction?.KeyboardUnBind();
 			KeyboardInteraction = uITextEditorInteraction;
+			KeyBoardUpdate();
 		}
 
 		public void KeyboardInteractionUnBind(IKeyboardInteraction uITextEditorInteraction) {
 			if(KeyboardInteraction == uITextEditorInteraction) {
 				KeyboardInteraction = null;
 			}
+			KeyBoardUpdate();
 		}
 
 		public void SaveSettings() {
@@ -175,13 +181,11 @@ namespace RhuEngine
 			UpdateSettings();
 		}
 
-		private string _mainMic;
-
 		public string MainMic
 		{
-			get => _mainMic;
+			get => MainSettings.MainMic;
 			set {
-				_mainMic = value;
+				MainSettings.MainMic = value;
 				MicChanged?.Invoke(value);
 			}
 		}

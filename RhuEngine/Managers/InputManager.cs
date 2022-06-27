@@ -154,7 +154,7 @@ namespace RhuEngine.Managers
 		}
 		public float GetInputFloat(InputTypes inputType,bool? mainController = null) {
 			var keyboardFloat = GetInputFloatFromKeyboard(inputType);
-			if (_engine.HasNoKeyboard) {
+			if (_engine.HasKeyboard) {
 				keyboardFloat = 0;
 			}
 			var main = keyboardFloat + GetInputFloatFromGamePad(inputType);

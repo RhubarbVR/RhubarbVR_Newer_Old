@@ -35,6 +35,10 @@ namespace RhuEngine.WorldObjects.ECS
 		[OnChanged(nameof(OnComponentChange))]
 		public readonly SyncAbstractObjList<Component> components;
 
+		public void DestroyChildren() {
+			children.Clear();
+		}
+
 		[Default(true)]
 		public readonly Sync<bool> persistence;
 

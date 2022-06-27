@@ -29,12 +29,28 @@ namespace RhuEngine.Components
 		[NoLoad]
 		[NoSyncUpdate]
 		public Entity TaskBarHolder;
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public KeyBoard keyBoard;
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Entity KeyBoardHolder;
+
 		public override void OnAttach() {
 			base.OnAttach();
 			var TaskBarHoldermover = World.RootEntity.AddChild("TaskBarMover");
 			TaskBarHoldermover.AttachComponent<UserInterfacePositioner>();
 			TaskBarHolder = TaskBarHoldermover.AddChild("TaskBarHolder");
 			taskBar = TaskBarHolder.AddChild("TaskBar").AttachComponent<TaskBar>();
+			RWorld.ExecuteOnStartOfFrame(() => RWorld.ExecuteOnEndOfFrame(() => {
+				KeyBoardHolder = LocalUser.userRoot.Target.Entity.AddChild("KeyBoardHolder");
+				keyBoard = KeyBoardHolder.AddChild("KeyBoard").AttachComponent<KeyBoard>();
+				KeyBoardHolder.enabled.Value = false;
+			}));
 		}
 
 		RSphereShape _shape;
@@ -55,15 +71,15 @@ namespace RhuEngine.Components
 				if (!RWorld.IsInVR) {
 					UpdateHeadLazer(head);
 				}
-				UpdateTouch(RInput.Hand(Handed.Right).Wrist,2);
-				UpdateTouch(RInput.Hand(Handed.Left).Wrist,1);
+				UpdateTouch(RInput.Hand(Handed.Right).Wrist, 2);
+				UpdateTouch(RInput.Hand(Handed.Left).Wrist, 1);
 			}
 		}
 
 		public Matrix[] poses = new Matrix[2];
 
 		public bool RunTouchCastInWorld(uint handed, World world, Matrix pos, ref Matrix Frompos, ref Matrix ToPos) {
-			if(World is null) {
+			if (World is null) {
 				return false;
 			}
 			if (world.PhysicsSim.ConvexRayTest(_shape, ref Frompos, ref ToPos, out var collider, out var hitnormal, out var hitpointworld)) {
@@ -73,7 +89,7 @@ namespace RhuEngine.Components
 					}
 					var pressForce = (poses[(int)handed] * pos.Inverse).Translation.z * 20;
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-					uIComponent.Rect.AddHitPoses(new HitData { Laser = false, HitPosWorld = hitpointworld, HitNormalWorld = hitnormal, PressForce = pressForce, Touchindex = handed, Handed = (handed == 2)?Handed.Right:Handed.Left });
+					uIComponent.Rect.AddHitPoses(new HitData { Laser = false, HitPosWorld = hitpointworld, HitNormalWorld = hitnormal, PressForce = pressForce, Touchindex = handed, Handed = (handed == 2) ? Handed.Right : Handed.Left });
 				}
 				if (collider.CustomObject is PhysicsObject physicsObject) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
@@ -84,13 +100,13 @@ namespace RhuEngine.Components
 			return false;
 		}
 
-		
+
 		public void UpdateTouch(Matrix pos, uint handed) {
 			var Frompos = Matrix.T(Vector3f.AxisY * -0.07f) * pos;
 			var ToPos = Matrix.T(Vector3f.AxisY * 0.03f) * pos;
 			World.DrawDebugSphere(Frompos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
 			World.DrawDebugSphere(ToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
-			if(RunTouchCastInWorld(handed,World,pos,ref Frompos,ref ToPos)) {
+			if (RunTouchCastInWorld(handed, World, pos, ref Frompos, ref ToPos)) {
 
 			}
 			else if (RunTouchCastInWorld(handed, World.worldManager.FocusedWorld, pos, ref Frompos, ref ToPos)) {
@@ -110,11 +126,11 @@ namespace RhuEngine.Components
 				var GripForce = Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Grab);
 				if (collider.CustomObject is RenderUIComponent uIComponent) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.005f), new Colorf(1, 1, 0, 0.5f));
-					uIComponent.Rect.AddHitPoses(new HitData { Touchindex = 10, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = PressForce,GripForce = GripForce, Handed = Handed.Max });
+					uIComponent.Rect.AddHitPoses(new HitData { Touchindex = 10, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = PressForce, GripForce = GripForce, Handed = Handed.Max });
 				}
 				if (collider.CustomObject is PhysicsObject physicsObject) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-					physicsObject.Lazer(10,hitnormal, hitpointworld, PressForce,GripForce);
+					physicsObject.Lazer(10, hitnormal, hitpointworld, PressForce, GripForce);
 				}
 				return true;
 			}
@@ -138,5 +154,12 @@ namespace RhuEngine.Components
 			}
 		}
 
+		public void KeyBoardUpdate(Matrix openLocation) {
+			if (keyBoard is null) {
+				return;
+			}
+			KeyBoardHolder.enabled.Value = Engine.HasKeyboard;
+			keyBoard.uICanvas.Entity.GlobalTrans = Matrix.T(new Vector3f(0,-0.25f,0.1f)) * openLocation;
+		}
 	}
 }

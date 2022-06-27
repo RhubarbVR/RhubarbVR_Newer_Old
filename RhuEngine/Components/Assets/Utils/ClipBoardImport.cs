@@ -17,7 +17,7 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
-			if (Engine.HasNoKeyboard) {
+			if (Engine.HasKeyboard) {
 				return;
 			}
 			if(RInput.Key(Key.V).IsJustActive() && RInput.Key(Key.Ctrl).IsActive()) {

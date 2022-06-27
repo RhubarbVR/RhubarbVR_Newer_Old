@@ -23,7 +23,9 @@ namespace RhuEngine.Components
 	{
 		public void KeyboardBind();
 		public void KeyboardUnBind();
+		public Matrix WorldPos { get; }
 
+		public string EditString { get; }
 	}
 
 	[Category(new string[] { "UI\\Interaction" })]
@@ -125,6 +127,8 @@ namespace RhuEngine.Components
 
 		public readonly Linker<string> Value;
 
+		public string EditString => Value?.LinkedValue;
+
 		public abstract bool CurrentEditor { get; set; }
 
 		public int CurrsorPos => RenderCurrsorPos;
@@ -136,6 +140,8 @@ namespace RhuEngine.Components
 		public abstract int RenderCurrsorPos { get; set; }
 
 		public abstract int RenderCurrsorLength { get; set; }
+
+		public Matrix WorldPos =>  Rect.WorldPos;
 
 		public abstract void KeyboardBind();
 

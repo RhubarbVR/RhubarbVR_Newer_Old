@@ -405,7 +405,6 @@ namespace RhuEngine.Components
 			sprite = Entity.AttachComponent<SpriteProvder>();
 			sprite.Texture.Target = icons;
 			sprite.GridSize.Value = new Vector2i(26, 7);
-			mit.Transparency.Value = Transparency.Blend;
 			AddStartAndNotification();
 			Engine_SettingsUpdate();
 

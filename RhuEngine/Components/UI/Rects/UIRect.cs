@@ -325,7 +325,7 @@ namespace RhuEngine.Components
 		}
 		public int ZDepth { get; private set; }
 
-		public int CompZDepth => ((_rectDataOverride ?? ParentRect)?.ZDepth??0) + 1;
+		public int CompZDepth => ((_rectDataOverride ?? ParentRect)?.ZDepth ?? 0) + 1;
 
 		public Vector2f Min => _cachedMin;
 
@@ -486,6 +486,8 @@ namespace RhuEngine.Components
 			});
 		}
 
+		public Matrix WorldPos => Matrix.T(Min.XY_* (Canvas.scale.Value / 10)) * LastRenderPos;
+
 		public Matrix LastRenderPos { get; private set; }
 
 		public virtual void Render(Matrix matrix) {
@@ -501,7 +503,7 @@ namespace RhuEngine.Components
 							list[i].PhysicsCollider.Matrix = list[i].PhysicsPose * mataddon * matrix;
 						}
 						if (list[i].RenderMaterial is not null) {
-							meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, mataddon * matrix, list[i].RenderTint,ZDepth);
+							meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, mataddon * matrix, list[i].RenderTint, ZDepth);
 						}
 					}
 				});

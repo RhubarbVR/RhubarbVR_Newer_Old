@@ -1,0 +1,181 @@
+{
+  "name": "English Qwerty",
+  "id": 1033,
+  "authors": [ "Faolan" ],
+  "rowAmount": 6,
+  "colAmount": 21,
+  "keys": [
+    {
+      "row": 0,
+      "col": 0,
+      "h": 1,
+      "w": 1.5,
+      "layers": {
+        "ALL": {
+          "toggle": true,
+          "code": null,
+          "key": 17,
+          "lable": "CTRL"
+        }
+      }
+    },
+    {
+      "row": 0,
+      "col": 1.5,
+      "h": 1,
+      "w": 1,
+      "layers": {
+        "ALL": {
+          "code": null,
+          "key": -1,
+          "lable": "CLOSE"
+        }
+      }
+    },
+    {
+      "row": 0,
+      "col": 2.5,
+      "h": 1,
+      "w": 1.25,
+      "layers": {
+        "ALL": {
+          "code": null,
+          "key": 18,
+          "lable": "ALT"
+        }
+      }
+    },
+    {
+      "row": 0,
+      "col": 3.75,
+      "h": 1,
+      "w": 6,
+      "layers": {
+        "ALL": {
+          "code": " ",
+          "key": 32,
+          "lable": " "
+        }
+      }
+    },
+    {
+      "row": 0,
+      "col": 9.75,
+      "h": 1,
+      "w": 1.25,
+      "layers": {
+        "ALL": {
+          "code": null,
+          "key": 18,
+          "lable": "ALT"
+        }
+      }
+    },
+    {
+      "row": 0,
+      "col": 11,
+      "h": 1,
+      "w": 1,
+      "layers": {
+        "ALL": {
+          "changeLayer": 4,
+          "code": null,
+          "key": -2,
+          "lable": "FN"
+        }
+      }
+    },
+    {
+      "row": 0,
+      "col": 12,
+      "h": 1,
+      "w": 2,
+      "layers": {
+        "ALL": {
+          "toggle": true,
+          "code": null,
+          "key": 17,
+          "lable": "CTRL"
+        }
+      }
+    },
+    {
+      "row": 0,
+      "col": 14,
+      "h": 1,
+      "w": 1,
+      "layers": {
+        "ALL": {
+          "code": null,
+          "key": 37,
+          "lable": "🢀"
+        }
+      }
+    },
+    {
+      "row": 0,
+      "col": 15,
+      "h": 1,
+      "w": 1,
+      "layers": {
+        "ALL": {
+          "code": null,
+          "key": 40,
+          "lable": "🢃"
+        }
+      }
+    },
+    {
+      "row": 0,
+      "col": 16,
+      "h": 1,
+      "w": 1,
+      "layers": {
+        "ALL": {
+          "code": null,
+          "key": 39,
+          "lable": "🢂"
+        }
+      }
+    },
+    {
+      "row": 0,
+      "col": 17,
+      "h": 1,
+      "w": 2,
+      "layers": {
+        "ALL": {
+          "code": "0",
+          "key": 96,
+          "lable": "0"
+        }
+      }
+    },
+    {
+      "row": 0,
+      "col": 19,
+      "h": 1,
+      "w": 1,
+      "layers": {
+        "ALL": {
+          "code": ".",
+          "key": 190,
+          "lable": "."
+        }
+      }
+    },
+    {
+      "row": 0,
+      "col": 20,
+      "h": 2,
+      "w": 1,
+      "layers": {
+        "ALL": {
+          "code": "\r",
+          "key": 13,
+          "lable": "<"
+        }
+      }
+    }
+  ]
+}
