@@ -38,14 +38,18 @@ namespace RhuEngine
 			var spinningCubes = world.RootEntity.AddChild("SpinningCubes");
 			spinningCubes.position.Value = new Vector3f(0, 0.5f, 0);
 			AttachSpiningCubes(spinningCubes);
+#if DEBUG || UNITY
+			var DebugStuff = floor.AddChild("DebugStuff");
+			DebugStuff.position.Value = new Vector3f(-1.5f, 0f, -1f);
+
 			var box = floor.AttachComponent<TrivialBox3Mesh>();
 			var size = 10;
 			Entity LastpowerCube = null;
 			for (var y = 0; y < size; y++) {
 				for (var a = 0; a < size; a++) {
 					for (var i = 0; i < size; i++) {
-						var PowerCube = world.RootEntity.AddChild($"PowerCube{i}{a}{y}");
-						PowerCube.position.Value = new Vector3f((i * 0.3f) - (size * 0.15), 1.7f + (y * 0.3f), -0.4f - (a * 0.3f));
+						var PowerCube = DebugStuff.AddChild($"PowerCube{i}{a}{y}");
+						PowerCube.position.Value = new Vector3f((i * 0.3f) - (size * 0.15), 0.7f + (y * 0.3f), -0.4f - (a * 0.3f));
 						PowerCube.scale.Value = new Vector3f(0.15);
 						if (LastpowerCube is not null) {
 							PowerCube.SetParent(LastpowerCube);
@@ -57,38 +61,51 @@ namespace RhuEngine
 					}
 				}
 			}
+			var testCubes = DebugStuff.AddChild("Test cubes");
+			testCubes.position.Value = new Vector3f(2, 0.5f,-2);
+			testCubes.scale.Value = new Vector3f(0.5f);
 
-			var fontAtlis = world.RootEntity.AddChild("FontAtlis");
+			var fontAtlis = testCubes.AddChild("Font Stuff");
 			fontAtlis.AttachComponent<BoxShape>();
 			fontAtlis.AttachComponent<Grabbable>();
 			var data = fontAtlis.AttachMesh<TrivialBox3Mesh, UnlitMaterial>();
 			data.Item2.MainTexture.Target = fontAtlis.AttachComponent<FontAtlasTexture>();
+			
 			var text = fontAtlis.AddChild("Text");
-			text.position.Value = new Vector3f(1, 1, 1);
+			text.position.Value = new Vector3f(-0.5f, 1.5f, 0);
 			text.AttachComponent<WorldText>();
-			RLog.Info("Built Local World");
 
-			// Begin DFG crap
-			var dfgSlot = world.RootEntity.AddChild("DFGSlot-Noise");
-			dfgSlot.position.Value = new Vector3f(0, 3, 0);
-			var (dfgMesh, dfgMat, dfgRender) = dfgSlot.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
-			var noiseComp = dfgSlot.AttachComponent<NoiseTexture>();
+			var textureStuff = testCubes.AddChild("Texture Stuff");
+			var dfg = textureStuff.AddChild("DFG-Noise");
+			dfg.position.Value = new Vector3f(2, 0, 0);
+			var (dfgMesh, dfgMat, dfgRender) = dfg.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var noiseComp = dfg.AttachComponent<NoiseTexture>();
 			dfgMat.MainTexture.Target = noiseComp;
+			dfg.AttachComponent<Grabbable>();
+			dfg.AttachComponent<BoxShape>();
 
-			var dfgSlot2 = world.RootEntity.AddChild("DFGSlot-UV");
-			dfgSlot2.position.Value = new Vector3f(0, 5, 0);
-			var (dfgMesh2, dfgMat2, dfgRender2) = dfgSlot2.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
-			var UVComp = dfgSlot2.AttachComponent<UVTexture>();
+			var dfg2 = textureStuff.AddChild("DFG-UV");
+			dfg2.position.Value = new Vector3f(4, 0, 0);
+			var (dfgMesh2, dfgMat2, dfgRender2) = dfg2.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var UVComp = dfg2.AttachComponent<UVTexture>();
 			dfgMat2.MainTexture.Target = UVComp;
+			dfg2.AttachComponent<Grabbable>();
+			dfg2.AttachComponent<BoxShape>();
 
-			var dfgSlot3 = world.RootEntity.AddChild("DFGSlot-Voronoi");
-			dfgSlot3.position.Value = new Vector3f(0, 8, 0);
-			var (dfgMesh3, dfgMat3, dfgRender3) = dfgSlot3.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
-			var voronoiTexture = dfgSlot3.AttachComponent<VoronoiTexture>();
+			var dfg3 = textureStuff.AddChild("DFG-Voronoi");
+			dfg3.position.Value = new Vector3f(6, 0, 0);
+			var (dfgMesh3, dfgMat3, dfgRender3) = dfg3.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var voronoiTexture = dfg3.AttachComponent<VoronoiTexture>();
 			voronoiTexture.Tint.Value = Colorf.Magenta;
 			voronoiTexture.StartingColor.Value = Colorf.Orange;
 			dfgMat3.MainTexture.Target = voronoiTexture;
+			dfg3.AttachComponent<Grabbable>();
+			dfg3.AttachComponent<BoxShape>();
 
+			RLog.Info("Built Debug Local World");
+#else
+			RLog.Info("Built Local World");
+#endif
 		}
 
 

@@ -2,10 +2,15 @@
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<AssemblyName>MilkSnake</AssemblyName>
 		<ApplicationIcon>MilkSnake.ico</ApplicationIcon>
+		<Configurations>Debug;Release;Unity</Configurations>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
 		<AssemblyName>RhubarbVR</AssemblyName>
 		<ApplicationIcon>RhubarbVR.ico</ApplicationIcon>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Unity|AnyCPU'">
+	  <AssemblyName>RhubarbVR</AssemblyName>
+	  <ApplicationIcon>RhubarbVR.ico</ApplicationIcon>
 	</PropertyGroup>
 	
 	<PropertyGroup>
