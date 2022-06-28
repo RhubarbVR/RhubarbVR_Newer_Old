@@ -28,9 +28,9 @@ namespace Rhubarb_VR_HeadLess
 			_app = new Engine(_rhu, args, _cap, AppDomain.CurrentDomain.BaseDirectory);
 			var EngineThread = new Thread(() => {
 				while (_isRunning) {
-					Console.ForegroundColor = ConsoleColor.Yellow;
+					RhuConsole.ForegroundColor = ConsoleColor.Yellow;
 					Console.Write($"{_app?.netApiManager.User?.UserName ?? "Not Login"}> ");
-					Console.ForegroundColor = ConsoleColor.White;
+					RhuConsole.ForegroundColor = ConsoleColor.White;
 					var line = Console.ReadLine();
 					_app.commandManager.RunComand(line);
 					Thread.Sleep(8);

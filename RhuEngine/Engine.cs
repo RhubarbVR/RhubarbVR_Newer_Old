@@ -54,7 +54,11 @@ namespace RhuEngine
 		public CommandManager commandManager;
 
 		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null,bool PassErrors = false) : base() {
-			Console.ForegroundColor = ConsoleColor.White;
+			if (baseDir is null) {
+				baseDir = AppDomain.CurrentDomain.BaseDirectory;
+			}
+			BaseDir = baseDir;
+			RhuConsole.ForegroundColor = ConsoleColor.White;
 			this.PassErrors = PassErrors;
 			EngineLink = _EngineLink;
 			commandManager = new CommandManager();
@@ -64,12 +68,6 @@ namespace RhuEngine
 			_EngineLink.BindEngine(this);
 			RLog.Info($"Platform Information OSArc: {RuntimeInformation.OSArchitecture} Framework: {RuntimeInformation.FrameworkDescription} OS: {RuntimeInformation.OSDescription} ProcessArc: {RuntimeInformation.ProcessArchitecture}");
 			EngineLink.LoadStatics();
-			if (baseDir is null) {
-				baseDir = AppDomain.CurrentDomain.BaseDirectory;
-			}
-			else {
-				BaseDir = baseDir;
-			}
 			MainEngine = this;
 			string error = null;
 			_buildMissingLocal = arg.Any((v) => v.ToLower() == "--build-missing-local") | arg.Any((v) => v.ToLower() == "-build-missing-local") | arg.Any((v) => v.ToLower() == "-buildmissinglocal");

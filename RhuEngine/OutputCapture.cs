@@ -47,7 +47,7 @@ namespace RhuEngine
 		public void WriteText(string data) {
 			var amountOfnewLines = data.Count((car) => car == '\n');
 			AmountOfNewLines += amountOfnewLines;
-			var consoleColor = Console.ForegroundColor;
+			var consoleColor = RhuConsole.ForegroundColor;
 			if(consoleColor == ConsoleColor.Gray) {
 				consoleColor = ConsoleColor.White;
 			}

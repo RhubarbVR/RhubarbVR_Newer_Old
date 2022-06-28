@@ -19,7 +19,7 @@ namespace RhuEngine.Managers
 	{
 		public event Action LocalReload;
 		private Engine _engine;
-		public string localDir = Engine.BaseDir + "/Locales/";
+		public string localDir;
 		public JToken fallBack;
 		public JToken parretnfallBack;
 		public JToken main;
@@ -163,12 +163,13 @@ namespace RhuEngine.Managers
 			File.Delete(localDir + "NeededKeys.text");
 			var returnString = new List<string>();
 			foreach (var item in NeededKeys) {
-				returnString.Add($"		\"{item}\":\"{item}\"");
+				returnString.Add($"		\"{item}\":\"{item}\",");
 			}
 			File.WriteAllLines(localDir + "NeededKeys.text", returnString);
 		}
 
 		public void Init(Engine engine) {
+			localDir = Engine.BaseDir + "/Locales/";
 			_engine = engine;
 			if (_engine._buildMissingLocal) {
 				NeededKeys = new HashSet<string>();

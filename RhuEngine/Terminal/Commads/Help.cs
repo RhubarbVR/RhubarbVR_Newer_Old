@@ -15,12 +15,12 @@ namespace RhuEngine.Commads
 			Console.WriteLine($"  ======  Help {Engine.MainEngine.version}  ======");
 			Console.WriteLine("");
 			foreach (var comand in Manager._commands) {
-				Console.ForegroundColor = ConsoleColor.White;
+				RhuConsole.ForegroundColor = ConsoleColor.White;
 				Console.Write("  " + comand.Name);
-				Console.ForegroundColor = ConsoleColor.Magenta;
+				RhuConsole.ForegroundColor = ConsoleColor.Magenta;
 				Console.WriteLine(" : "+ ((Command)Activator.CreateInstance(comand)).HelpMsg);
 			}
-			Console.ForegroundColor = ConsoleColor.White;
+			RhuConsole.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine("");
 			Console.WriteLine("  --------===========--------");
 		}

@@ -45,22 +45,22 @@ namespace NullContext
 			var logPreamble = $"[{TimeStamp}]: ";
 			switch (logLevel) {
 				case LogLevel.Diagnostic:
-					Console.ForegroundColor = ConsoleColor.Magenta;
+					RhuConsole.ForegroundColor = ConsoleColor.Magenta;
 					break;
 				case LogLevel.Info:
-					Console.ForegroundColor = ConsoleColor.Green;
+					RhuConsole.ForegroundColor = ConsoleColor.Green;
 					break;
 				case LogLevel.Warning:
-					Console.ForegroundColor = ConsoleColor.Yellow;
+					RhuConsole.ForegroundColor = ConsoleColor.Yellow;
 					break;
 				case LogLevel.Error:
-					Console.ForegroundColor = ConsoleColor.Red;
+					RhuConsole.ForegroundColor = ConsoleColor.Red;
 					break;
 				default:
 					break;
 			}
 			Console.Write(logPreamble);
-			Console.ForegroundColor = ConsoleColor.Gray;
+			RhuConsole.ForegroundColor = ConsoleColor.Gray;
 			Console.WriteLine(log);
 			_semaphore.Release();
 			Log?.Invoke(logLevel, logPreamble + log);
