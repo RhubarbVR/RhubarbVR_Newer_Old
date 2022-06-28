@@ -1,72 +1,51 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace RNumerics.Voronoi
 {
-	public class Voronoi
+	public static class Voronoi
 	{
-		private int _numberOfCells;
-		private int _width;
-		private int _height;
-		private Random _rand;
-		private Colorf _tint;
-		private Colorf _startingColor;
-
-		public Colorb[] Generate(int height, int width, int cells, int seed, Colorf tint, Colorf startingColor) {
+		public static Colorb[] Generate(int height, int width, int cells, int seed, Colorf tint, Colorf startingColor) {
 			var _tex = new Colorb[width * height];
 			var _cell = new Vector2i[cells];
-			_height = height;
-			_width = width;
-			_numberOfCells = cells;
-			_rand = new Random(seed);
-			_tint = tint;
-			_startingColor = startingColor;
-
-			FillBackground(ref _tex);
-			PlaceCellOrigins(ref _cell);
-			FillPixelsAccordingToCell(ref _tex, ref _cell);
+			var rand = new Random(seed);
+			PlaceCellOrigins(ref _cell, rand, height, width);
+			FillPixelsAccordingToCell(ref _tex, ref _cell, height, width, tint, startingColor);
 			// Creates pixel artifacts
 			// StrokeCellPixel(ref _tex, ref _cell);
-
 			return _tex;
 		}
 
-		private void FillBackground(ref Colorb[] _tex) {
-			for (var x = 0; x < _width * _height; x++) {
-				_tex[x] = _startingColor.ToBytes();
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static void PlaceCellOrigins(ref Vector2i[] _cell, Random rand, int height, int width) {
+			for (var i = 0; i < _cell.Length; i++) {
+				_cell[i] = new Vector2i(rand.Next(0, width), rand.Next(0, height)); // GetRandomPixel
 			}
 		}
 
-		private void PlaceCellOrigins(ref Vector2i[] _cell) {
-			for (var i = 0; i < _numberOfCells; i++) {
-				_cell[i] = new Vector2i(_rand.Next(0, _width), _rand.Next(0, _height)); // GetRandomPixel
-			}
-		}
-
-		private void FillPixelsAccordingToCell(ref Colorb[] _tex, ref Vector2i[] _cell) {
-
-			for (var y = 0; y < _height; y++) {
-				for (var x = 0; x < _width; x++) {
+		private static void FillPixelsAccordingToCell(ref Colorb[] _tex, ref Vector2i[] _cell, int height, int width, Colorf tint, Colorf startingColor) {
+			for (var y = 0; y < height; y++) {
+				for (var x = 0; x < width; x++) {
 					var dist = new float[_cell.Length];
 					for (var c = 0; c < _cell.Length; c++) {
 						Vector2i temp = new(x, y);
 						dist[c] = ((Vector2f)_cell[c]).Distance((Vector2f)temp);
 					}
-
 					Array.Sort(dist);
-					_tex[(x * _width) + y] = ColourIntensity(dist[0]);
+					_tex[(x * width) + y] = (startingColor * ColourIntensity(dist[0], width, tint)).ToBytes();
 				}
 			}
 		}
 
-		private Colorb ColourIntensity(float distance) {
+		private static Colorf ColourIntensity(float distance, int width, Colorf tint) {
 			// var n = Mathf.Abs(map(x, 0, size, 0, 1));
-			var n = distance / _width;
-			return (new Colorf(n, n, n) * _tint).ToBytes();
+			var n = distance / width;
+			return new Colorf(n, n, n) * tint;
 		}
 
-		private void StrokeCellPixel(ref Colorb[] _tex, ref Vector2i[] _cell) {
-			for (var i = 0; i < _numberOfCells; i++) {
-				_tex[(byte)_cell[i].x + (byte)_cell[i].y] = new Colorb(0, 1, 0); 
+		private static void StrokeCellPixel(ref Colorb[] _tex, ref Vector2i[] _cell) {
+			for (var i = 0; i < _cell.Length; i++) {
+				_tex[(byte)_cell[i].x + (byte)_cell[i].y] = new Colorb(0, 1, 0);
 			}
 		}
 	}

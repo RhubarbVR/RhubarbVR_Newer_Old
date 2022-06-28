@@ -1,9 +1,12 @@
 ﻿using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
+using RhuEngine.WorldObjects.ECS;
+
 using RNumerics;
 
 namespace RhuEngine.Components
 {
+	[Category(new string[] { "Assets/Procedural Textures" })]
 	public class UVTexture : ProceduralTexture
 	{
 		[OnChanged(nameof(ComputeTexture))]

@@ -3,9 +3,15 @@ using RhuEngine.WorldObjects;
 using RNumerics;
 using RhuEngine.Linker;
 using System;
+using RhuEngine.WorldObjects.ECS;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Drawing;
+using SixLabors.ImageSharp.Processing;
 
 namespace RhuEngine.Components
 {
+	[Category(new string[] { "Assets/Procedural Textures" })]
 	public class VoronoiTexture : ProceduralTexture
 	{
 		[OnChanged(nameof(ComputeTexture))]
@@ -34,13 +40,12 @@ namespace RhuEngine.Components
 		}
 
 		public override void Generate() {
-			var _voronoi = new Voronoi();
 			var _clampedSizeX = MathUtil.Clamp(Size.Value.x, 2, int.MaxValue);
 			var _clampedSizeY = MathUtil.Clamp(Size.Value.y, 2, int.MaxValue);
 			var _clapmedSizeCells = MathUtil.Clamp(Cells, 2, 16);
 
 			Load(RTexture2D.FromColors(
-				_voronoi.Generate(_clampedSizeX, _clampedSizeY, _clapmedSizeCells, Seed, Tint, StartingColor),
+				Voronoi.Generate(_clampedSizeX, _clampedSizeY, _clapmedSizeCells, Seed, Tint, StartingColor),
 				_clampedSizeX,
 				_clampedSizeY,
 				true));
