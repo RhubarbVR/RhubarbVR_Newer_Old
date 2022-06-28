@@ -14,10 +14,11 @@ namespace RBullet
 
 		public BulletPhsyicsLink() {
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-				if (!RhuEngine.Engine.MainEngine.EngineLink.ForceLibLoad) {
+				try {
 					//This works becases i have no idea where dlopen is in macos 
 					File.Copy("./runtimes/MacOS/native/liblibbulletc.dylib", "./liblibbulletc.dylib");
 				}
+				catch { }
 			}
 			else if (!Native.Load()) {
 				if (Environment.OSVersion.Platform == PlatformID.Unix) {
