@@ -72,6 +72,14 @@ namespace RhuEngine
 			var UVComp = dfgSlot2.AttachComponent<UVTexture>();
 			dfgMat2.MainTexture.Target = UVComp;
 
+			var dfgSlot3 = world.RootEntity.AddChild("DFGSlot-Voronoi");
+			dfgSlot3.position.Value = new Vector3f(0, 8, 0);
+			var (dfgMesh3, dfgMat3, dfgRender3) = dfgSlot3.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var voronoiTexture = dfgSlot3.AttachComponent<VoronoiTexture>();
+			voronoiTexture.Tint.Value = Colorf.Magenta;
+			voronoiTexture.StartingColor.Value = Colorf.Orange;
+			dfgMat3.MainTexture.Target = voronoiTexture;
+
 		}
 
 

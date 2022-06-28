@@ -13,22 +13,22 @@ namespace RhuEngine.Components
 	{
 		private static readonly FastNoiseLite _noise = new FastNoiseLite();
 
-		[Default(128)]
 		[OnChanged(nameof(ComputeTexture))]
-		public readonly Sync<int> SizeX;
-
-		[Default(128)]
-		[OnChanged(nameof(ComputeTexture))]
-		public readonly Sync<int> SizeY;
+		public readonly Sync<Vector2i> Size;
 
 		[Default(FastNoiseLite.NoiseType.OpenSimplex2)]
 		[OnChanged(nameof(ComputeTexture))]
 		public readonly Sync<FastNoiseLite.NoiseType> NoiseType;
 
+		public override void OnAttach() {
+			base.OnAttach();
+			Size.Value = new Vector2i(128);
+		}
+
 		public override void Generate() 
 		{
-			var _clampedSizeX = MathUtil.Clamp(SizeX, 2, int.MaxValue);
-			var _clampedSizeY = MathUtil.Clamp(SizeY, 2, int.MaxValue);
+			var _clampedSizeX = MathUtil.Clamp(Size.Value.x, 2, int.MaxValue);
+			var _clampedSizeY = MathUtil.Clamp(Size.Value.y, 2, int.MaxValue);
 			_noise.SetNoiseType(NoiseType);
 			var noiseData = new Colorb[_clampedSizeX * _clampedSizeY];
 

@@ -1,28 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using RhuEngine.Linker;
+﻿using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
-
 using RNumerics;
 
 namespace RhuEngine.Components
 {
 	public class UVTexture : ProceduralTexture
 	{
-		[Default(128)]
 		[OnChanged(nameof(ComputeTexture))]
-		public readonly Sync<int> SizeX;
+		public readonly Sync<Vector2i> Size;
 
-		[Default(128)]
-		[OnChanged(nameof(ComputeTexture))]
-		public readonly Sync<int> SizeY;
+		public override void OnAttach() {
+			base.OnAttach();
+			Size.Value = new Vector2i(128);
+		}
 
 		public override void Generate() 
 		{
-			var _clampedSizeX = MathUtil.Clamp(SizeX, 2, int.MaxValue);
-			var _clampedSizeY = MathUtil.Clamp(SizeY, 2, int.MaxValue);
+			var _clampedSizeX = MathUtil.Clamp(Size.Value.x, 2, int.MaxValue);
+			var _clampedSizeY = MathUtil.Clamp(Size.Value.y, 2, int.MaxValue);
 
 			var uvData = new Colorb[_clampedSizeX * _clampedSizeY];
 			var index = 0;
