@@ -18,6 +18,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ComputeTexture))]
 		public readonly Sync<int> Seed;
 
+		// TODO Tint will always darken, make this brighten as well
 		[OnChanged(nameof(ComputeTexture))]
 		public readonly Sync<Colorf> Tint;
 
@@ -26,7 +27,7 @@ namespace RhuEngine.Components
 
 		public override void OnAttach() {
 			base.OnAttach();
-			Tint.Value = Colorf.Black;
+			StartingColor.Value = Colorf.Black;
 			Tint.Value = Colorf.White;
 			Size.Value = new Vector2i(128);
 			Seed.Value = new Random().Next();
