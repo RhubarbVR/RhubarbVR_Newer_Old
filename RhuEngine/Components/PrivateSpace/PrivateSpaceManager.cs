@@ -46,11 +46,13 @@ namespace RhuEngine.Components
 			TaskBarHoldermover.AttachComponent<UserInterfacePositioner>();
 			TaskBarHolder = TaskBarHoldermover.AddChild("TaskBarHolder");
 			taskBar = TaskBarHolder.AddChild("TaskBar").AttachComponent<TaskBar>();
-			RWorld.ExecuteOnStartOfFrame(() => RWorld.ExecuteOnEndOfFrame(() => {
-				KeyBoardHolder = LocalUser.userRoot.Target.Entity.AddChild("KeyBoardHolder");
-				keyBoard = KeyBoardHolder.AddChild("KeyBoard").AttachComponent<KeyBoard>();
-				KeyBoardHolder.enabled.Value = false;
-			}));
+			if (Engine.EngineLink.CanRender) {
+				RWorld.ExecuteOnStartOfFrame(() => RWorld.ExecuteOnEndOfFrame(() => {
+					KeyBoardHolder = LocalUser.userRoot.Target.Entity.AddChild("KeyBoardHolder");
+					keyBoard = KeyBoardHolder.AddChild("KeyBoard").AttachComponent<KeyBoard>();
+					KeyBoardHolder.enabled.Value = false;
+				}));
+			}
 		}
 
 		RSphereShape _shape;

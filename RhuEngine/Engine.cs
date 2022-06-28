@@ -225,6 +225,7 @@ namespace RhuEngine
 		public ITextMaterial StartingTextMit;
 
 		public void Init(bool RunStartThread = true) {
+			Thread.CurrentThread.Priority = ThreadPriority.Highest;
 			EngineLink.Start();
 			commandManager.Init(this);
 			IntMsg = $"Engine started Can Render {EngineLink.CanRender} Can Audio {EngineLink.CanAudio} Can input {EngineLink.CanInput}";
@@ -272,7 +273,7 @@ namespace RhuEngine
 			};
 			if (RunStartThread) {
 				startingthread = new Thread(startcode.Invoke) {
-					Priority = ThreadPriority.AboveNormal
+					Priority = ThreadPriority.Normal
 				};
 				startingthread.Start();
 			}
