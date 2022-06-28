@@ -11,12 +11,15 @@ namespace RBullet
 {  
 	public class BulletPhsyicsLink: PhysicsHelper.Physics<BulletRigidBodyCollider, BulletPhysicsSim, BulletColliderShape>
     {
-		public BulletPhsyicsLink(bool ByPass) {
-			RLog.Info($"Used Bypass for Pysics {ByPass}");
-		}
 
 		public BulletPhsyicsLink() {
-			if (!Native.Load()) {
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+				if (!RhuEngine.Engine.MainEngine.EngineLink.ForceLibLoad) {
+					//This works becases i have no idea where dlopen is in macos 
+					File.Copy("./runtimes/MacOS/native/liblibbulletc.dylib", "./liblibbulletc.dylib");
+				}
+			}
+			else if (!Native.Load()) {
 				if (Environment.OSVersion.Platform == PlatformID.Unix) {
 					RLog.Info("Did not load lib at first");
 					var files = Directory.GetFiles("./../../", "*/*/linux-x64/native/libbulletc.so");

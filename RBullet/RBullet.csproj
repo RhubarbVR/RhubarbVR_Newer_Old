@@ -19,6 +19,9 @@
     <None Update="runtimes\linux-x64\native\libbulletc.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="runtimes\MacOS\native\liblibbulletc.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="runtimes\win-x64\native\libbulletc.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
