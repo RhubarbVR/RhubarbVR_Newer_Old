@@ -58,24 +58,23 @@ namespace RBullet
 			}
 
 			public override float AddSingleResult(ManifoldPoint cp, CollisionObjectWrapper colObj0Wrap, int partId0, int index0, CollisionObjectWrapper colObj1Wrap, int partId1, int index1) {
-				//Todo: fix overlap
-				//callback1.Invoke(cp.PositionWorldOnA, cp.PositionWorldOnB, cp.NormalWorldOnB, cp.Distance, cp.Distance1, (BRigidBodyCollider)colObj0Wrap.CollisionObject.UserObject);
+				callback1.Invoke(cp.PositionWorldOnA, cp.PositionWorldOnB, cp.NormalWorldOnB, cp.Distance, cp.Distance1, (BRigidBodyCollider)colObj0Wrap.CollisionObject.UserObject);
 				return 0;
 			}
 		}
 
 		public void RunCallBacks() {
-			//Updates.SafeOperation((list) => {
-			//	foreach (var item in list) {
-			//		if (item.collisionObject != null) {
-			//			_physicsWorld.ContactTest(item.collisionObject, new Tester((Vector3 PositionWorldOnA, Vector3 PositionWorldOnB, Vector3 NormalWorldOnB, double Distance, double Distance1, BRigidBodyCollider hit) => {
-			//				item.Call(new Vector3f((float)PositionWorldOnA.X, (float)PositionWorldOnA.Y, (float)PositionWorldOnA.Z),
-			//					new Vector3f((float)PositionWorldOnB.X, (float)PositionWorldOnB.Y, (float)PositionWorldOnB.Z),
-			//					new Vector3f((float)NormalWorldOnB.X, (float)NormalWorldOnB.Y, (float)NormalWorldOnB.Z), Distance, Distance1, hit.Collider);
-			//			}));
-			//		}
-			//	}
-			//});
+			Updates.SafeOperation((list) => {
+				foreach (var item in list) {
+					if (item.collisionObject != null) {
+						_physicsWorld.ContactTest(item.collisionObject, new Tester((Vector3 PositionWorldOnA, Vector3 PositionWorldOnB, Vector3 NormalWorldOnB, double Distance, double Distance1, BRigidBodyCollider hit) => {
+							item.Call(new Vector3f((float)PositionWorldOnA.X, (float)PositionWorldOnA.Y, (float)PositionWorldOnA.Z),
+								new Vector3f((float)PositionWorldOnB.X, (float)PositionWorldOnB.Y, (float)PositionWorldOnB.Z),
+								new Vector3f((float)NormalWorldOnB.X, (float)NormalWorldOnB.Y, (float)NormalWorldOnB.Z), Distance, Distance1, hit.Collider);
+						}));
+					}
+				}
+			});
 		}
 	}
 

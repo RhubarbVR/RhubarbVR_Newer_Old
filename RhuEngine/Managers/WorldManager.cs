@@ -48,8 +48,7 @@ namespace RhuEngine.Managers
 			if (SaveLocalWorld) {
 				try {
 					var data = LocalWorld.Serialize(new SyncObjectSerializerObject(false));
-					//To do add later
-					//File.WriteAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld", data.GetByteArray());
+					File.WriteAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld", new DataSaver(data).SaveStore());
 				}
 				catch (Exception ex) {
 					RLog.Err($"Failed to save world {ex}");
