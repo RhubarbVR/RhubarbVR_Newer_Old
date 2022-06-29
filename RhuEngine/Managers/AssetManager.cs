@@ -13,7 +13,7 @@ namespace RhuEngine.Managers
 	public class AssetManager : IManager
 	{
 		public AssetManager(string cachePath) {
-			CacheDir = cachePath is null ? Engine.BaseDir + "\\Cache" : cachePath;
+			CacheDir = cachePath is null ? Engine.BaseDir + "/Cache" : cachePath;
 		}
 
 		public string CacheDir = "";
@@ -48,11 +48,11 @@ namespace RhuEngine.Managers
 		}
 
 		public string GetAssetFile(Uri asset) {
-			return $"{GetAssetDir(asset)}{asset.AbsolutePath.Replace('\\','_').Replace('/','_').Replace('%', 'P')}.RAsset";
+			return $"{GetAssetDir(asset)}{asset.AbsolutePath.Replace('/','_').Replace('/','_').Replace('%', 'P')}.RAsset";
 		}
 
 		public string GetAssetDir(Uri asset) {
-			return asset.Scheme.ToLower() == "local" ? $"{CacheDir}\\local\\" : $"{CacheDir}\\{asset.Host}{asset.Port}\\";
+			return asset.Scheme.ToLower() == "local" ? $"{CacheDir}/local/" : $"{CacheDir}/{asset.Host}{asset.Port}/";
 		}
 
 		public bool IsCache(Uri asset) {
@@ -79,8 +79,8 @@ namespace RhuEngine.Managers
 
 		public void Dispose() {
 			try {
-				if (Directory.Exists($"{CacheDir}\\local\\")) {
-					Directory.Delete($"{CacheDir}\\local\\", true);
+				if (Directory.Exists($"{CacheDir}/local/")) {
+					Directory.Delete($"{CacheDir}/local/", true);
 				}
 			}
 			catch (Exception e) {

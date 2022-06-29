@@ -13,7 +13,7 @@
 
 //namespace RhuEngine.Components
 //{
-//	[Category(new string[] { "RhuScript\\ScriptBuilders" })]
+//	[Category(new string[] { "RhuScript/ScriptBuilders" })]
 //	public class VisualScriptBuilder : ScriptBuilder
 //	{
 //		public SyncRef<UIWindow> EditWindow;

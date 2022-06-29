@@ -8,7 +8,7 @@ using RNumerics;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Assets\\Materials" })]
+	[Category(new string[] { "Assets/Materials" })]
 	public class DynamicMaterial : AssetProvider<RMaterial>
 	{
 		[OnAssetLoaded(nameof(LoadMaterial))]

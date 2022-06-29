@@ -303,7 +303,7 @@ namespace RhuEngine.Managers
 				//_httpClient?.BaseAddress ?? new Uri("http://localhost:5000/"); 
 				_httpClient?.BaseAddress ?? new Uri("https://rhubarbvr.net/");
 		public NetApiManager(string path) {
-			_cookiePath = path is null ? Engine.BaseDir + "\\RhuCookies" : path + "\\RhuCookies";
+			_cookiePath = path is null ? Engine.BaseDir + "/RhuCookies" : path + "/RhuCookies";
 		}
 		private readonly string _cookiePath;
 

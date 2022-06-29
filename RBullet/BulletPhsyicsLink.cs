@@ -8,15 +8,15 @@ using System.Linq;
 using RhuEngine.Linker;
 
 namespace RBullet
-{  
-	public class BulletPhsyicsLink: PhysicsHelper.Physics<BulletRigidBodyCollider, BulletPhysicsSim, BulletColliderShape>
-    {
+{
+	public class BulletPhsyicsLink : PhysicsHelper.Physics<BulletRigidBodyCollider, BulletPhysicsSim, BulletColliderShape>
+	{
 
 		public BulletPhsyicsLink() {
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
 				try {
 					//This works becases i have no idea where dlopen is in macos 
-					File.Copy("./runtimes/MacOS/native/liblibbulletc.dylib", "./liblibbulletc.dylib");
+					File.Copy("runtimes/MacOS/native/liblibbulletc.dylib", "liblibbulletc");
 				}
 				catch { }
 			}
@@ -34,7 +34,7 @@ namespace RBullet
 					}
 				}
 				else {
-						throw new Exception("Failed to load lib");
+					throw new Exception("Failed to load lib");
 				}
 			}
 		}

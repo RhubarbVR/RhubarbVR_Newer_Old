@@ -101,7 +101,7 @@ namespace RhuEngine
 					}
 				}
 			}
-			outputCapture.LogsPath = _userDataPathOverRide is null ? baseDir + "\\Logs\\" : _userDataPathOverRide + "\\Logs\\";
+			outputCapture.LogsPath = _userDataPathOverRide is null ? baseDir + "/Logs/" : _userDataPathOverRide + "/Logs/";
 			outputCapture.Start();
 			if (error is not null) {
 				RLog.Err(error);
@@ -115,7 +115,7 @@ namespace RhuEngine
 			this.outputCapture = outputCapture;
 
 			var lists = new List<DataList>();
-			SettingsFile = ((_userDataPathOverRide is not null) ? _userDataPathOverRide : baseDir) + "\\settings.json";
+			SettingsFile = ((_userDataPathOverRide is not null) ? _userDataPathOverRide : baseDir) + "/settings.json";
 			if (File.Exists(SettingsFile)) {
 				var text = File.ReadAllText(SettingsFile);
 				var liet = SettingsManager.GetDataFromJson(text);

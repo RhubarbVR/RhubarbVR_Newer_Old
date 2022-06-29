@@ -246,6 +246,20 @@ namespace RhuEngine.GameTests.Tests
 			tester.Dispose();
 		}
 
+		[TestMethod()]
+		public void TestSerializer() {
+			var testEntity = AttachEntity();
+			var e = testEntity.AttachComponent<TestSyncObject<SyncObjList<SyncObjList<Sync<double>>>>>();
+			e.SyncObject.Add().Add().Value = Math.PI;
+			var data = e.Serialize(new SyncObjectSerializerObject(false));
+			var t = testEntity.AttachComponent<TestSyncObject<SyncObjList<SyncObjList<Sync<double>>>>>();
+			t.Deserialize(data, new SyncObjectDeserializerObject(true));
+			Assert.AreEqual(t.SyncObject[0][0].Value, e.SyncObject[0][0].Value);
+			tester.RunForSteps();
+			tester.Dispose();
+		}
+
+
 		//Todo: fix problem with RigidBody
 		//[TestMethod]
 		//public void RiggedBodyTest() {

@@ -8,7 +8,7 @@ using RNumerics;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Assets\\Materials" })]
+	[Category(new string[] { "Assets/Materials" })]
 	public class UnlitMaterial : MaterialBase<IUnlitMaterial>
 	{
 		[OnChanged(nameof(TransparencyUpdate))]

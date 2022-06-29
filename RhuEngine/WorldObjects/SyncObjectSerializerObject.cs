@@ -118,7 +118,24 @@ namespace RhuEngine.WorldObjects
 			obj.SetValue("Value", Value);
 			return obj;
 		}
+
+		struct SerializeFunction {
+			internal ISyncObject _syncObject;
+
+			internal DataNodeGroup _parrentData;
+
+			internal string _name;
+		}
+
+		readonly List<SerializeFunction> _serializeFunctions = new();
+
+		bool _firstCall = false;
 		public DataNodeGroup CommonWorkerSerialize(IWorldObject @object) {
+			var localFirstCall = false;
+			if (!_firstCall) {
+				localFirstCall = true;
+				_firstCall = true;
+			}
 			var fields = @object.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
 			DataNodeGroup obj = null;
 			if (@object.Persistence || NetSync) {
@@ -135,10 +152,14 @@ namespace RhuEngine.WorldObjects
 				}
 				obj = new DataNodeGroup();
 				foreach (var field in fields) {
-					if (typeof(ISyncObject).IsAssignableFrom(field.FieldType) && ((field.GetCustomAttributes(typeof(NoSaveAttribute), false).Length <= 0) || (NetSync && (field.GetCustomAttributes(typeof(NoSyncAttribute), false).Length <= 0)))) {
+					if (typeof(ISyncObject).IsAssignableFrom(field.FieldType) && ((field.GetCustomAttribute<NoSaveAttribute>() is null) || (NetSync && (field.GetCustomAttribute<NoSyncAttribute>() is null)))) {
 						try {
 							if (!@object.IsRemoved) {
-								obj.SetValue(field.Name, ((ISyncObject)field.GetValue(@object)).Serialize(this));
+								_serializeFunctions.Add(new SerializeFunction {
+									_parrentData = obj,
+									_syncObject = ((ISyncObject)field.GetValue(@object)),
+									_name = field.Name
+								});
 							}
 						}
 						catch (Exception e) {
@@ -148,6 +169,11 @@ namespace RhuEngine.WorldObjects
 				}
 				var refID = new DataNode<NetPointer>(@object.Pointer);
 				obj.SetValue("Pointer", refID);
+			}
+			if (localFirstCall) {
+				for (var i = 0; i < _serializeFunctions.Count; i++) {
+					_serializeFunctions[i]._parrentData.SetValue(_serializeFunctions[i]._name, _serializeFunctions[i]._syncObject.Serialize(this));
+				}
 			}
 			return obj;
 		}

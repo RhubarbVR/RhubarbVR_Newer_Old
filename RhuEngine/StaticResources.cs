@@ -13,20 +13,20 @@ namespace RhuEngine
 			return Assembly.GetCallingAssembly().GetManifestResourceStream("RhuEngine.Res." + name);
 		}
 		public static Stream GetStaticResource(string name) {
-			if(File.Exists(Engine.BaseDir + "\\" + name)) {
-				return File.OpenRead(Engine.BaseDir + "\\" + name);
+			if(File.Exists(Engine.BaseDir + "/" + name)) {
+				return File.OpenRead(Engine.BaseDir + "/" + name);
 			}
-			if (File.Exists(Engine.BaseDir + "\\res\\" + name)) {
-				return File.OpenRead(Engine.BaseDir + "\\" + name);
+			if (File.Exists(Engine.BaseDir + "/res/" + name)) {
+				return File.OpenRead(Engine.BaseDir + "/" + name);
 			}
-			if (File.Exists(Engine.BaseDir + "\\Res\\" + name)) {
-				return File.OpenRead(Engine.BaseDir + "\\Res\\" + name);
+			if (File.Exists(Engine.BaseDir + "/Res/" + name)) {
+				return File.OpenRead(Engine.BaseDir + "/Res/" + name);
 			}
-			if (File.Exists(Engine.BaseDir + "\\OverRide\\" + name)) {
-				return File.OpenRead(Engine.BaseDir + "\\OverRide\\" + name);
+			if (File.Exists(Engine.BaseDir + "/OverRide/" + name)) {
+				return File.OpenRead(Engine.BaseDir + "/OverRide/" + name);
 			}
-			if (File.Exists(Engine.BaseDir + "\\override\\" + name)) {
-				return File.OpenRead(Engine.BaseDir + "\\override\\" + name);
+			if (File.Exists(Engine.BaseDir + "/override/" + name)) {
+				return File.OpenRead(Engine.BaseDir + "/override/" + name);
 			}
 			return GetStaticResourceStream(name);
 		}

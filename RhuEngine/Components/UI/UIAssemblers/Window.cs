@@ -7,7 +7,7 @@ using System;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "UI\\UIAssemblers" })]
+	[Category(new string[] { "UI/UIAssemblers" })]
 	public class Window : Component
 	{
 		[OnChanged(nameof(ChangeHeader))]

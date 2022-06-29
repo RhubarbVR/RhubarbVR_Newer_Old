@@ -13,7 +13,7 @@
 
 //namespace RhuEngine.Components
 //{
-//	[Category(new string[] { "RhuScript\\ScriptBuilders\\VisualForm" })]
+//	[Category(new string[] { "RhuScript/ScriptBuilders/VisualForm" })]
 //	public class NodeWorld : Node
 //	{
 //		public override string NodeName => "World";

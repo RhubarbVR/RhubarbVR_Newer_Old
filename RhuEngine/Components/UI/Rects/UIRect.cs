@@ -102,7 +102,7 @@ namespace RhuEngine.Components
 		}
 	}
 
-	[Category(new string[] { "UI\\Rects" })]
+	[Category(new string[] { "UI/Rects" })]
 	public class UIRect : Component, IRectData
 	{
 		public bool PysicsLock { get; private set; }

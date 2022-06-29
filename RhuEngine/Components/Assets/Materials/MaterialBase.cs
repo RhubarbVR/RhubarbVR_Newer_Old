@@ -8,7 +8,7 @@ using RNumerics;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Assets\\Materials" })]
+	[Category(new string[] { "Assets/Materials" })]
 	public abstract class MaterialBase<T> : AssetProvider<RMaterial> where T: IStaticMaterial
 	{
 		public T _material;

@@ -12,7 +12,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 #if DEBUG
-	[Category(new string[] { "RhuScript\\ScriptBuilders" })]
+	[Category(new string[] { "RhuScript/ScriptBuilders" })]
 	public class NullScriptBuilder : ScriptBuilder
 	{
 		public override void Compile() {
@@ -37,7 +37,7 @@ namespace RhuEngine.Components
 		}
 	}
 #endif
-	[Category(new string[] { "RhuScript\\ScriptBuilders" })]
+	[Category(new string[] { "RhuScript/ScriptBuilders" })]
 	public abstract class ScriptBuilder : Component
 	{
 		[OnChanged(nameof(OnRhuScriptAddedInt))]

@@ -9,7 +9,7 @@ using TextCopy;
 using RNumerics;
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Assets\\Utils" })]
+	[Category(new string[] { "Assets/Utils" })]
 	public class FontAtlasTexture : AssetProvider<RTexture2D>
 	{
 		[OnAssetLoaded(nameof(UpdateFont))]

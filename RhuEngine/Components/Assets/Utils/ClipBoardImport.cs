@@ -10,7 +10,7 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Assets\\Utils" })]
+	[Category(new string[] { "Assets/Utils" })]
 	public class ClipBoardImport :Component, IUpdatingComponent
 	{
 		public override void Step() {

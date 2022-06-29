@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "UI\\Rects" })]
+	[Category(new string[] { "UI/Rects" })]
 	public class CuttingUIRect : UIRect
 	{
 		[Default(true)]

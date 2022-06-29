@@ -11,7 +11,7 @@
 
 //namespace RhuEngine.Components
 //{
-//	[Category(new string[] { "RhuScript\\ScriptBuilders\\VisualForm" })]
+//	[Category(new string[] { "RhuScript/ScriptBuilders/VisualForm" })]
 //	public class NodeButton : UIComponent
 //	{
 //		public SyncRef<Node> Node;

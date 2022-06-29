@@ -12,7 +12,7 @@
 
 //namespace RhuEngine.Components
 //{
-//	[Category(new string[] { "RhuScript\\ScriptBuilders\\VisualForm" })]
+//	[Category(new string[] { "RhuScript/ScriptBuilders/VisualForm" })]
 //	public class InitNode : Node
 //	{
 //		public override bool HideFlow => false;

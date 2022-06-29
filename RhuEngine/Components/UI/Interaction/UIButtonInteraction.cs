@@ -31,7 +31,7 @@ namespace RhuEngine.Components
 		public bool CustomTouch;
 	}
 
-	[Category(new string[] { "UI\\Interaction" })]
+	[Category(new string[] { "UI/Interaction" })]
 	public class UIButtonInteraction : UIInteractionComponent
 	{
 		[Default(true)]

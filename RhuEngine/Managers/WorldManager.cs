@@ -48,7 +48,8 @@ namespace RhuEngine.Managers
 			if (SaveLocalWorld) {
 				try {
 					var data = LocalWorld.Serialize(new SyncObjectSerializerObject(false));
-					File.WriteAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld", data.GetByteArray());
+					//To do add later
+					//File.WriteAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld", data.GetByteArray());
 				}
 				catch (Exception ex) {
 					RLog.Err($"Failed to save world {ex}");
@@ -135,14 +136,9 @@ namespace RhuEngine.Managers
 			ShowLoadingFeedback(world, focusLevel);
 			return world;
 		}
-
-
-		public World LoadWorldFromJson(World.FocusLevel focusLevel, string json, bool localWorld = false) {
-			return LoadWorldFromDataNodeGroup(focusLevel, new DataNodeGroup(json), localWorld);
-		}
-
+		
 		public World LoadWorldFromBytes(World.FocusLevel focusLevel, byte[] data, bool localWorld = false) {
-			return LoadWorldFromDataNodeGroup(focusLevel, new DataNodeGroup(data), localWorld);
+			return LoadWorldFromDataNodeGroup(focusLevel,(DataNodeGroup)new DataReader(data).Data, localWorld);
 		}
 		public World LoadWorldFromDataNodeGroup(World.FocusLevel focusLevel, DataNodeGroup data, bool localWorld = false) {
 			var world = new World(this) {

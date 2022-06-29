@@ -62,7 +62,7 @@ namespace RhuEngine
 		}
 		
 		public static string TouchUpPath(this string path) {
-			return path.Replace("\\", "/");
+			return path.Replace("\\","/");
 		}
 
 		public static Matrix RotNormalized(this Matrix oldmatrix) {

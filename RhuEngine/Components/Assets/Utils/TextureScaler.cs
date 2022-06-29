@@ -9,7 +9,7 @@ using TextCopy;
 using RNumerics;
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Assets\\Utils" })]
+	[Category(new string[] { "Assets/Utils" })]
 	public class TextureScaler : Component
 	{
 		[OnAssetLoaded(nameof(TextScale))]

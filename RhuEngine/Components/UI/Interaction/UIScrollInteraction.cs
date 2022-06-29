@@ -8,7 +8,7 @@ using System;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "UI\\Interaction" })]
+	[Category(new string[] { "UI/Interaction" })]
 	public class UIScrollInteraction : UIInteractionComponent
 	{
 		[Default(true)]

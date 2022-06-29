@@ -15,10 +15,6 @@ namespace RhuEngine.DataStructure.Tests
 	{
 		[TestMethod()]
 		public void TestAllDataNodes() {
-			var test1 = new DataNode<int>(1);
-			var data1 = test1.GetByteArray();
-			Console.WriteLine(MessagePackSerializer.ConvertToJson(data1));
-		
 			var dataNodeGroup = new DataNodeGroup();
 			dataNodeGroup.SetValue("RenderLayer", new DataNode<int>(1));
 			dataNodeGroup.SetValue("Name", new DataNode<string>("Trains"));
@@ -28,22 +24,25 @@ namespace RhuEngine.DataStructure.Tests
 
 			var dataNodeGroupw = new DataNodeGroup();
 			dataNodeGroupw.SetValue("RenderLayer", new DataNode<int>(1));
-			dataNodeGroupw.SetValue("Name", new DataNode<string>("Trains"));
+			dataNodeGroupw.SetValue("Name", new DataNode<string>("Trains2"));
 			dataNodeGroupw.SetValue("Pos", new DataNode<Vector3f>(Vector3f.Forward));
 			dataNodeGroupw.SetValue("Rot", new DataNode<Quaternionf>(Quaternionf.Identity));
 			dataNodeGroupw.SetValue("scale", new DataNode<Vector3f>(Vector3f.Forward));
-			dataNodeGroup.SetValue("ew", dataNodeGroupw);
 			var list = new DataNodeList();
-			list.Add(dataNodeGroupw);
-			list.Add(dataNodeGroupw);
-			dataNodeGroup.SetValue("testlist", list);
+			list.Add(new DataNode<int>(1));
+			list.Add(new DataNode<string>("Wdadwa"));
+			dataNodeGroupw.SetValue("testlist", list);
+			dataNodeGroup.SetValue("ew", dataNodeGroupw);
 
-			var data = dataNodeGroup.GetByteArray();
-			var jsonstring = MessagePackSerializer.ConvertToJson(data, Serializer.Options);
-			Console.WriteLine(jsonstring);
-			var datanode = new DataNodeGroup(MessagePackSerializer.ConvertFromJson(jsonstring, Serializer.Options));
-			Console.WriteLine(((DataNode<string>)datanode.GetValue("Name")).Value);
-			Console.WriteLine(((DataNode<string>)((DataNodeGroup)datanode.GetValue("ew")).GetValue("Name")).Value);
+			var saver = new DataSaver(dataNodeGroup);
+			var data = saver.SaveStore();
+			var loaded = new DataReader(data);
+			if (loaded.Data is null) {
+				throw new Exception("Failed to load data at all");
+			}
+			Assert.AreEqual("Trains", ((DataNode<string>)((DataNodeGroup)loaded.Data).GetValue("Name")).Value);
+			Assert.AreEqual("Trains2", ((DataNode<string>)((DataNodeGroup)(((DataNodeGroup)loaded.Data).GetValue("ew"))).GetValue("Name")).Value);
+			Assert.AreEqual(1, ((DataNode<int>)((DataNodeList)((DataNodeGroup)(((DataNodeGroup)loaded.Data).GetValue("ew"))).GetValue("testlist"))[0]).Value);
 		}
 	}
 }

@@ -10,7 +10,7 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Assets\\StaticAssets" })]
+	[Category(new string[] { "Assets/StaticAssets" })]
 	public class StaticTexture : StaticAsset<RTexture2D>
 	{
 

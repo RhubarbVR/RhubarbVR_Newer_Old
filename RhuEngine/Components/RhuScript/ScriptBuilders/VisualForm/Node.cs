@@ -12,7 +12,7 @@
 
 //namespace RhuEngine.Components
 //{
-//	[Category(new string[] { "RhuScript\\ScriptBuilders\\VisualForm" })]
+//	[Category(new string[] { "RhuScript/ScriptBuilders/VisualForm" })]
 //	public abstract class Node : Component
 //	{
 //		public virtual bool HideFlow => true;

@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 
-	[Category(new string[] { "UI\\Rects" })]
+	[Category(new string[] { "UI/Rects" })]
 	public class Grid : RawScrollUIRect
 	{
 		[Default(2)]

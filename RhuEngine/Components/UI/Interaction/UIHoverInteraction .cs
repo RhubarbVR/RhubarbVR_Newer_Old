@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 {
 	
 
-	[Category(new string[] { "UI\\Interaction" })]
+	[Category(new string[] { "UI/Interaction" })]
 	public class UIHoverInteraction : UIInteractionComponent
 	{
 		[Default(true)]

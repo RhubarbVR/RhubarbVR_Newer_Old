@@ -326,14 +326,14 @@ namespace RhuEngine.WorldObjects
 				var data = reader.GetRemainingBytes();
 				if (peer.Tag is Peer) {
 					var tag = peer.Tag as Peer;
-					if (Serializer.TryToRead<Dictionary<string, IDataNode>>(data, out var keyValuePairs)) {
-						ProcessPackedData(new DataNodeGroup(keyValuePairs), deliveryMethod, tag);
+					if (Serializer.TryToRead<BlockStore>(data, out var keyValuePairs)) {
+						ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
 					}
 					else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
 						AssetResponses(assetRequest, tag, deliveryMethod);
 					}
 					else if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
-						ProcessPackedData(new DataNodeGroup(streamDataPacked.Data), deliveryMethod, tag);
+						ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
 					}
 					else {
 						throw new Exception("Uknown Data from User");
@@ -342,14 +342,14 @@ namespace RhuEngine.WorldObjects
 				else if (peer.Tag is RelayPeer) {
 					var tag = peer.Tag as RelayPeer;
 					if (Serializer.TryToRead<DataPacked>(data, out var packed)) {
-						if (Serializer.TryToRead<Dictionary<string, IDataNode>>(packed.Data, out var keyValuePairs)) {
-							ProcessPackedData(new DataNodeGroup(keyValuePairs), deliveryMethod, tag[packed.Id]);
+						if (Serializer.TryToRead<BlockStore>(packed.Data, out var keyValuePairs)) {
+							ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
 						}
 						else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
 							AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
 						}
 						else if (Serializer.TryToRead<StreamDataPacked>(packed.Data, out var streamDataPacked)) {
-							ProcessPackedData(new DataNodeGroup(streamDataPacked.Data), deliveryMethod, tag[packed.Id]);
+							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
 						}
 						else {
 							throw new Exception("Uknown Data from relay");
@@ -391,7 +391,7 @@ namespace RhuEngine.WorldObjects
 				RLog.Info("Sending initial world state to a new user");
 				var dataGroup = new DataNodeGroup();
 				dataGroup.SetValue("WorldData", Serialize(new SyncObjectSerializerObject(true)));
-				peer.Send(dataGroup.GetByteArray(), DeliveryMethod.ReliableOrdered);
+				peer.Send(new DataSaver(dataGroup).SaveStore(), DeliveryMethod.ReliableOrdered);
 			}
 			LoadUserIn(peer);
 			FindNewMaster();
@@ -562,7 +562,7 @@ namespace RhuEngine.WorldObjects
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			_netManager.SendToAll(netData.GetByteArray(), 0, deliveryMethod);
+			_netManager.SendToAll(new DataSaver(netData).SaveStore(), 0, deliveryMethod);
 		}
 
 		public void BroadcastDataToAllStream(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
@@ -582,7 +582,7 @@ namespace RhuEngine.WorldObjects
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			_netManager.SendToAll(Serializer.Save(new StreamDataPacked(netData.GetByteArray())), 1, deliveryMethod);
+			_netManager.SendToAll(Serializer.Save(new StreamDataPacked(new DataSaver(netData).SaveStore())), 1, deliveryMethod);
 		}
 
 

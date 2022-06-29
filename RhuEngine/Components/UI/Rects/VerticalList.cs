@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 
-	[Category(new string[] { "UI\\Rects" })]
+	[Category(new string[] { "UI/Rects" })]
 	public class VerticalList : RawScrollUIRect
 	{
 		[Default(false)]

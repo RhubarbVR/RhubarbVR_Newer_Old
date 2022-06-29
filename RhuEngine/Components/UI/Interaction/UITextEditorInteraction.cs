@@ -28,7 +28,7 @@ namespace RhuEngine.Components
 		public string EditString { get; }
 	}
 
-	[Category(new string[] { "UI\\Interaction" })]
+	[Category(new string[] { "UI/Interaction" })]
 	public class UIGroupTextEditorInteraction : AbstractTextEditorInteraction
 	{
 		public override bool CurrentEditor { get; set; }
@@ -57,7 +57,7 @@ namespace RhuEngine.Components
 		}
 	}
 
-	[Category(new string[] { "UI\\Interaction" })]
+	[Category(new string[] { "UI/Interaction" })]
 	public class UITextEditorInteraction : AbstractTextEditorInteraction
 	{
 		[OnChanged(nameof(UserReload))]
