@@ -82,6 +82,7 @@ namespace RhuEngine.GameTests.Tests
 		public IEnumerable<Type> GetAllTypes(Func<Type, bool> func) {
 			return from asm in AppDomain.CurrentDomain.GetAssemblies()
 				   from type in asm.GetTypes()
+				   where type.IsPublic
 				   where func.Invoke(type)
 				   select type;
 		}
