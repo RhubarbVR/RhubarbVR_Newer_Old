@@ -94,7 +94,7 @@ namespace RhuEngine.Components
 			PhysicsCollider.CustomObject = this;
 			PhysicsCollider.Group = ECollisionFilterGroups.UI;
 			PhysicsCollider.Mask = ECollisionFilterGroups.UI;
-			PhysicsCollider.Active = true;
+			PhysicsCollider.Active = Entity.IsEnabled;
 		}
 		private void RunLoadPhysicsMesh() {
 			PhysicsCollider?.Remove();
@@ -108,7 +108,7 @@ namespace RhuEngine.Components
 			PhysicsCollider.CustomObject = this;
 			PhysicsCollider.Group = ECollisionFilterGroups.UI;
 			PhysicsCollider.Mask = ECollisionFilterGroups.UI;
-			PhysicsCollider.Active = true;
+			PhysicsCollider.Active = Entity.IsEnabled;
 		}
 		public void LoadPhysicsMesh() {
 			if (!Rect.PysicsLock) {
@@ -151,6 +151,18 @@ namespace RhuEngine.Components
 			if (UpdateManMesh) {
 				RenderMainMesh(updateMesh, PhysicsMesh);
 			}
+		}
+
+		public override void OnLoaded() {
+			base.OnLoaded();
+			Entity.EnabledChanged += Entity_EnabledChanged;
+		}
+
+		private void Entity_EnabledChanged() {
+			if(PhysicsCollider is null) {
+				return;
+			}
+			PhysicsCollider.Active = Entity.IsEnabled;
 		}
 
 		public override void Dispose() {
