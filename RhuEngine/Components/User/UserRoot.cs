@@ -53,7 +53,9 @@ namespace RhuEngine.Components
 							return;
 						}
 						var focusUserRoot = WorldManager.FocusedWorld.GetLocalUser().userRoot.Target;
-						Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
+						if (focusUserRoot is not null) {
+							Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
+						}
 					});
 				}
 				if (Engine.EngineLink.CanRender) {

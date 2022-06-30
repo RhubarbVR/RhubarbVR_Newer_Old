@@ -153,7 +153,6 @@ namespace RhuEngine.Components
 			};
 			var isGrab = grabForce > 0.5;
 			if (isGrab && !_gripping) {
-				RLog.Info("StartGrabbing");
 				foreach (var item in _overLappingObjects) {
 					if (item.CustomObject is PhysicsObject physicsObject) {
 						physicsObject.Entity.CallOnGrip(this, false, grabForce);

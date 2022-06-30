@@ -63,9 +63,6 @@ namespace RhuEngine.Components
 
 		private void RunButtonClickEvent(HitData hitData) {
 			_lastHitData = hitData;
-#if DEBUG
-			RLog.Info("Click");
-#endif
 			Rect.PhysicsLock();
 			SendEvent(new ButtonEvent {
 					IsPressing = false,
@@ -100,9 +97,6 @@ namespace RhuEngine.Components
 		private void RunButtonReleaseEvent(HitData hitData) {
 			_lastHitData = hitData;
 			IsClicking = false;
-#if DEBUG
-			RLog.Info("Release");
-#endif
 			Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, Rect.ParentRect.ScrollOffset.z));
 			Rect.PhysicsUnLock();
 			SendEvent(new ButtonEvent {
