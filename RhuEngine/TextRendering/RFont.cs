@@ -76,6 +76,7 @@ namespace RhuEngine
 			Collection = fallBacks;
 			TextOptions = new TextOptions(mainFont) {
 				Dpi = FONTSIZE,
+				TextAlignment = TextAlignment.Center,
 				FallbackFontFamilies = Collection.Families.ToArray(),
 			};
 		}
@@ -121,8 +122,8 @@ namespace RhuEngine
 			return new ImageSharpTexture(img).CreateTextureAndDisposes();
 		}
 
-		public float GetXAdvances(Rune item) {
-			return (TextMeasurer.Measure(item.ToString() + " ", TextOptions).Width - TextMeasurer.Measure(" ", TextOptions).Width) / 100;
+		public float GetXAdvances(Rune item, Rune nextitem) {
+			return (TextMeasurer.Measure(item.ToString() + nextitem.ToString(), TextOptions).Width - TextMeasurer.MeasureBounds(nextitem.ToString(), TextOptions).Width) / (FONTSIZE * 2);
 		}
 	}
 }

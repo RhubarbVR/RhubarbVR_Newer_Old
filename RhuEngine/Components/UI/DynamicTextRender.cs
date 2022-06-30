@@ -170,6 +170,7 @@ namespace RhuEngine.Components
 				var thisrow = new Stack<TextChar>();
 				color.Push(StartingColor);
 				var index = 0;
+				Rune? lastRune = null;
 				void AddNullText(int first) {
 					for (var i = 0; i < first; i++) {
 						var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
@@ -192,8 +193,13 @@ namespace RhuEngine.Components
 							thisrow.Clear();
 							var charee = new TextChar(item, Matrix.TR(new Vector3f(textXpos, textYpos - textsizeY, 0), Quaternionf.Yawed180), color.Peek(), Vector2f.Zero, Vector2f.Zero, fontSize.Peek() / 10, leaded.Peek() / 10, -1);
 							Chars.SafeAdd(charee);
+							lastRune = null;
 							continue;
 						}
+						if (lastRune is not null) {
+							textXpos += Font.GetXAdvances(lastRune ?? throw new Exception(), item) * (fontSize.Peek() / 10);
+						}
+						lastRune = item;
 						var newsize = Math.Max(textsize.y * (fontSize.Peek() / 10), textsizeY);
 						if (newsize > textsizeY) {
 							var def = (textsize.y * (fontSize.Peek() / 10)) - textsizeY;
@@ -225,7 +231,6 @@ namespace RhuEngine.Components
 						bounds.Add(textpos + ew.X__ - new Vector3f(0, chare.Leading, 0));
 						bounds.Add(textpos + ew.XY_);
 						bounds.Add(textpos + ew._Y_);
-						textXpos += Font.GetXAdvances(item) * (fontSize.Peek() / 10);
 						index++;
 					}
 				}
