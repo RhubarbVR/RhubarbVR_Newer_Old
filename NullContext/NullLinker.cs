@@ -29,6 +29,8 @@ namespace NullContext
 
 		public bool InVR => false;
 
+		public bool LiveVRChange => false;
+
 		public void BindEngine(Engine engine) {
 			RLog.Instance = this;
 		}
@@ -79,6 +81,7 @@ namespace NullContext
 		}
 
 		public event Action<LogLevel, string> Log;
+		public event Action<bool> VRChange;
 
 		public void Subscribe(Action<LogLevel, string> logCall) {
 			Log += logCall;
@@ -90,6 +93,10 @@ namespace NullContext
 
 		public void Warn(string v) {
 			LogOutput(LogLevel.Warning, v);
+		}
+
+		public void ChangeVR(bool value) {
+			throw new NotImplementedException();
 		}
 	}
 
