@@ -11,22 +11,17 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Assets/Procedural Textures" })]
 	public class NoiseTexture : ProceduralTexture
 	{
-		private static readonly FastNoiseLite _noise = new FastNoiseLite();
-
-		[OnChanged(nameof(ComputeTexture))]
-		public readonly Sync<Vector2i> Size;
-
 		[Default(FastNoiseLite.NoiseType.OpenSimplex2)]
 		[OnChanged(nameof(ComputeTexture))]
 		public readonly Sync<FastNoiseLite.NoiseType> NoiseType;
 
-		public override void OnAttach() {
-			base.OnAttach();
-			Size.Value = new Vector2i(128);
-		}
+		[Default(1337)]
+		[OnChanged(nameof(ComputeTexture))]
+		public readonly Sync<int> Seed;
 
 		public override void Generate() 
 		{
+			var _noise = new FastNoiseLite(Seed);
 			var _clampedSizeX = MathUtil.Clamp(Size.Value.x, 2, int.MaxValue);
 			var _clampedSizeY = MathUtil.Clamp(Size.Value.y, 2, int.MaxValue);
 			_noise.SetNoiseType(NoiseType);
@@ -43,8 +38,7 @@ namespace RhuEngine.Components
 						1f);
 				}
 			}
-
-			Load(RTexture2D.FromColors(noiseData, _clampedSizeX, _clampedSizeY, true));
+			UpdateTexture(noiseData, _clampedSizeX, _clampedSizeY);
 		}
 	}
 }

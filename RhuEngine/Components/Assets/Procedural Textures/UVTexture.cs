@@ -9,14 +9,6 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Assets/Procedural Textures" })]
 	public class UVTexture : ProceduralTexture
 	{
-		[OnChanged(nameof(ComputeTexture))]
-		public readonly Sync<Vector2i> Size;
-
-		public override void OnAttach() {
-			base.OnAttach();
-			Size.Value = new Vector2i(128);
-		}
-
 		public override void Generate() 
 		{
 			var _clampedSizeX = MathUtil.Clamp(Size.Value.x, 2, int.MaxValue);
@@ -37,7 +29,7 @@ namespace RhuEngine.Components
 				}
 			}
 
-			Load(RTexture2D.FromColors(uvData, _clampedSizeX, _clampedSizeY, true));
+			UpdateTexture(uvData, _clampedSizeX, _clampedSizeY);
 		}
 	}
 }

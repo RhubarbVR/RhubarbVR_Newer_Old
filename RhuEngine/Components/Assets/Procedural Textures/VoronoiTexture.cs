@@ -14,8 +14,6 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Assets/Procedural Textures" })]
 	public class VoronoiTexture : ProceduralTexture
 	{
-		[OnChanged(nameof(ComputeTexture))]
-		public readonly Sync<Vector2i> Size;
 
 		[Default(12)]
 		[OnChanged(nameof(ComputeTexture))]
@@ -24,7 +22,6 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ComputeTexture))]
 		public readonly Sync<int> Seed;
 
-		// TODO Tint will always darken, make this brighten as well
 		[OnChanged(nameof(ComputeTexture))]
 		public readonly Sync<Colorf> Tint;
 
@@ -35,7 +32,6 @@ namespace RhuEngine.Components
 			base.OnAttach();
 			StartingColor.Value = Colorf.Black;
 			Tint.Value = Colorf.White;
-			Size.Value = new Vector2i(128);
 			Seed.Value = new Random().Next();
 		}
 
@@ -44,11 +40,10 @@ namespace RhuEngine.Components
 			var _clampedSizeY = MathUtil.Clamp(Size.Value.y, 2, int.MaxValue);
 			var _clapmedSizeCells = MathUtil.Clamp(Cells, 2, 16);
 
-			Load(RTexture2D.FromColors(
+			UpdateTexture(
 				Voronoi.Generate(_clampedSizeX, _clampedSizeY, _clapmedSizeCells, Seed, Tint, StartingColor),
 				_clampedSizeX,
-				_clampedSizeY,
-				true));
+				_clampedSizeY);
 		}
 	}
 }
