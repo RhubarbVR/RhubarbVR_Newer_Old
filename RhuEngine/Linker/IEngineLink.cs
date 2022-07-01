@@ -13,6 +13,13 @@ namespace RhuEngine.Linker
 		bool CanInput { get; }
 		string BackendID { get; }
 		bool InVR { get; }
+		
+		event Action<bool> VRChange;
+
+		bool LiveVRChange { get; }
+
+		void ChangeVR(bool value);
+
 		void BindEngine(Engine engine);
 		void Start();
 		void LoadStatics();

@@ -42,7 +42,12 @@ namespace RStereoKit
 		public bool ForceLibLoad => false;
 
 		public bool InVR => (SK.ActiveDisplayMode == DisplayMode.MixedReality) || !engine._noVRSim;
+		public event Action<bool> VRChange;
 
+		public bool LiveVRChange => false;
+		public void ChangeVR(bool value) {
+			throw new NotImplementedException();
+		}
 		public void BindEngine(Engine engine) {
 			this.engine = engine;
 			RLog.Instance = new Logger();
@@ -98,5 +103,7 @@ namespace RStereoKit
 					new GradientKey(new Color(1, 1, 1, 0), 0.4f),
 					new GradientKey(new Color(1, 1, 1, 1), 0.9f)));
 		}
+
+
 	}
 }

@@ -36,6 +36,14 @@ namespace RhuEngine.Components
 		}
 
 		[Exposed]
+		public void VRChangeAction(ButtonEvent buttonEvent) {
+			if (!buttonEvent.IsClicked) {
+				return;
+			}
+			Engine.EngineLink.ChangeVR(!RWorld.IsInVR);
+		}
+
+		[Exposed]
 		public void SettingsButton(ButtonEvent buttonEvent) {
 			if (!buttonEvent.IsClicked) {
 				return;
@@ -154,6 +162,25 @@ namespace RhuEngine.Components
 			uibuilder.PopRect();
 			uibuilder.PopRect();
 
+			if (Engine.EngineLink.LiveVRChange) {
+				uibuilder.PushRect(null, null, 0);
+				uibuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f), 0);
+				uibuilder.AddButton(false, 0.2f).ButtonEvent.Target += VRChangeAction;
+				uibuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f));
+				uibuilder.PushRect(new Vector2f(0), new Vector2f(0.25f, 1f), 0);
+				uibuilder.AddSprit(new Vector2i(16, 5), new Vector2i(16, 5), iconsMit, iconsSprite);
+				uibuilder.PopRect();
+				uibuilder.PushRect(new Vector2f(0.25f, 0), new Vector2f(1f), 0);
+				var vrText = uibuilder.AddTextWithLocal("Actions.ChangeVR.Enable", 1.9f, 1);
+				Action<bool> action = (mode) => vrText.Key.Value = mode ? "Actions.ChangeVR.Disable" : "Actions.ChangeVR.Enable";
+				Engine.EngineLink.VRChange += action;
+				action.Invoke(RWorld.IsInVR);
+				uibuilder.PopRect();
+				uibuilder.PopRect();
+				uibuilder.PopRect();
+				uibuilder.PopRect();
+				uibuilder.PopRect();
+			}
 			uibuilder.PushRect(null, null, 0);
 			uibuilder.PopRect();
 
@@ -191,6 +218,7 @@ namespace RhuEngine.Components
 
 			uibuilder.PopRect();
 		}
+
 
 		public override void Step() {
 		}
