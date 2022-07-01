@@ -49,6 +49,12 @@ namespace RhuSettings
 			}
 			return obj;
 		}
+		public static T LoadSettingsObject<T>(T start,params DataList[] args) where T : SettingsObject {
+			foreach (var item in args) {
+				start = (T)LoadSettingsObjectInternal(start, item);
+			}
+			return start;
+		}
 
 		public static T LoadSettingsObject<T>(params DataList[] args) where T : SettingsObject, new() {
 			var val = new T();

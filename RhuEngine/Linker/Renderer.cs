@@ -7,6 +7,10 @@ namespace RhuEngine.Linker
 {
 	public interface IRRenderer
 	{
+		public float MinClip { get; set; }
+
+		public float FarClip { get; set; }
+
 		public bool GetEnableSky();
 		public void SetEnableSky(bool e);
 
@@ -27,6 +31,17 @@ namespace RhuEngine.Linker
 		{
 			get => Instance.GetCameraRootMatrix();
 			set => Instance.SetCameraRootMatrix(value);
+		}
+
+		public static float MinClip
+		{
+			get => Instance.MinClip;
+			set => Instance.MinClip = value;
+		}
+		public static float FarClip
+		{
+			get => Instance.FarClip;
+			set => Instance.FarClip = value;
 		}
 	}
 }

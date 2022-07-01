@@ -12,6 +12,12 @@ namespace RStereoKit
 {
 	public class SKRRenderer : IRRenderer
 	{
+		public float _minClip = 0.08f;
+
+		public float _farClip = 50;
+		public float MinClip { get => _minClip; set { _minClip = value; Renderer.SetClip(_minClip, _farClip); } }
+		public float FarClip { get => _farClip; set { _farClip = value; Renderer.SetClip(_minClip, _farClip); } }
+
 		public bool GetEnableSky() {
 			return Renderer.EnableSky;
 		}
@@ -27,5 +33,6 @@ namespace RStereoKit
 		public void SetCameraRootMatrix(RNumerics.Matrix m) {
 			Renderer.CameraRoot = new StereoKit.Matrix(m.m);
 		}
+
 	}
 }

@@ -53,7 +53,7 @@ namespace RhuEngine
 
 		public CommandManager commandManager;
 
-		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null,bool PassErrors = false) : base() {
+		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null, bool PassErrors = false) : base() {
 			if (baseDir is null) {
 				baseDir = AppDomain.CurrentDomain.BaseDirectory;
 			}
@@ -133,15 +133,21 @@ namespace RhuEngine
 					}
 				}
 			}
-			MainSettings = lists.Count == 0 ? new MainSettingsObject() : SettingsManager.LoadSettingsObject<MainSettingsObject>(lists.ToArray());
+			var theType = typeof(MainSettingsObject<NullRenderSettingsBase>);
+			if (_EngineLink.RenderSettingsType is not null) {
+				theType = typeof(MainSettingsObject<>).MakeGenericType(_EngineLink.RenderSettingsType);
+			}
+			var thedata = (MainSettingsObject)Activator.CreateInstance(theType);
+			MainSettings = lists.Count == 0 ? thedata : SettingsManager.LoadSettingsObject(thedata, lists.ToArray());
+			MainSettings.RenderSettings.RenderSettingsChange?.Invoke();
 		}
 
 		public bool HasKeyboard => KeyboardInteraction is not null;
 
-		public IKeyboardInteraction KeyboardInteraction { get;private set; }
+		public IKeyboardInteraction KeyboardInteraction { get; private set; }
 
 		private void KeyBoardUpdate() {
-			worldManager.PrivateSpaceManager?.KeyBoardUpdate(KeyboardInteraction?.WorldPos??Matrix.Identity);
+			worldManager.PrivateSpaceManager?.KeyBoardUpdate(KeyboardInteraction?.WorldPos ?? Matrix.Identity);
 		}
 
 		public void KeyboardInteractionBind(IKeyboardInteraction uITextEditorInteraction) {
@@ -151,7 +157,7 @@ namespace RhuEngine
 		}
 
 		public void KeyboardInteractionUnBind(IKeyboardInteraction uITextEditorInteraction) {
-			if(KeyboardInteraction == uITextEditorInteraction) {
+			if (KeyboardInteraction == uITextEditorInteraction) {
 				KeyboardInteraction = null;
 			}
 			KeyBoardUpdate();
@@ -175,7 +181,13 @@ namespace RhuEngine
 				var liet = SettingsManager.GetDataFromJson(text);
 				lists.Add(liet);
 			}
-			MainSettings = lists.Count == 0 ? new MainSettingsObject() : SettingsManager.LoadSettingsObject<MainSettingsObject>(lists.ToArray());
+			var theType = typeof(MainSettingsObject<NullRenderSettingsBase>);
+			if (EngineLink.RenderSettingsType is not null) {
+				theType = typeof(MainSettingsObject<>).MakeGenericType(EngineLink.RenderSettingsType);
+			}
+			var thedata = (MainSettingsObject)Activator.CreateInstance(theType);
+			MainSettings = lists.Count == 0 ? thedata : SettingsManager.LoadSettingsObject(thedata, lists.ToArray());
+			MainSettings.RenderSettings.RenderSettingsChange?.Invoke();
 			UpdateSettings();
 		}
 
@@ -245,7 +257,7 @@ namespace RhuEngine
 				netApiManager = new NetApiManager(_userDataPathOverRide);
 				IntMsg = "Building AssetManager";
 				assetManager = new AssetManager(_cachePathOverRide);
-				_managers = new IManager[] {localisationManager, inputManager, netApiManager, assetManager, worldManager };
+				_managers = new IManager[] { localisationManager, inputManager, netApiManager, assetManager, worldManager };
 				foreach (var item in _managers) {
 					IntMsg = $"Starting {item.GetType().Name}";
 					try {
@@ -297,11 +309,11 @@ namespace RhuEngine
 						_loadingPos += playerPos - _oldPlayerPos;
 						_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
 						_oldPlayerPos = playerPos;
-						var rootMatrix = Matrix.TR(_loadingPos,Quaternionf.LookAt(EngineLink.CanInput ? headMat.Translation : Vector3f.Zero, _loadingPos));
+						var rootMatrix = Matrix.TR(_loadingPos, Quaternionf.LookAt(EngineLink.CanInput ? headMat.Translation : Vector3f.Zero, _loadingPos));
 						if (StartingText is not null) {
 							StartingText.Text = $"{localisationManager?.GetLocalString("Common.Loading")}\n{IntMsg}";
 							if (StartingTextMit is not null) {
-								RMesh.Quad.Draw("UIText", StartingTextMit?.Material, Matrix.TS(0, -0.2f, 0, new Vector3f(StartingText?.AspectRatio??1, 1, 1) / 7) * rootMatrix);
+								RMesh.Quad.Draw("UIText", StartingTextMit?.Material, Matrix.TS(0, -0.2f, 0, new Vector3f(StartingText?.AspectRatio ?? 1, 1, 1) / 7) * rootMatrix);
 							}
 							if (LoadingLogo is not null) {
 								RMesh.Quad.Draw("LoadingUi", LoadingLogo?.Material, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);

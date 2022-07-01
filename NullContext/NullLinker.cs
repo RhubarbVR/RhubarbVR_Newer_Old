@@ -31,6 +31,8 @@ namespace NullContext
 
 		public bool LiveVRChange => false;
 
+		public Type RenderSettingsType => null;
+
 		public void BindEngine(Engine engine) {
 			RLog.Instance = this;
 		}

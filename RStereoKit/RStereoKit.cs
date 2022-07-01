@@ -45,6 +45,9 @@ namespace RStereoKit
 		public event Action<bool> VRChange;
 
 		public bool LiveVRChange => false;
+
+		public Type RenderSettingsType => typeof(SKRenderSettings);
+
 		public void ChangeVR(bool value) {
 			throw new NotImplementedException();
 		}

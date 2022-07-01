@@ -20,6 +20,7 @@ namespace RhuEngine.Linker
 
 		void ChangeVR(bool value);
 
+		Type RenderSettingsType { get; }
 		void BindEngine(Engine engine);
 		void Start();
 		void LoadStatics();
