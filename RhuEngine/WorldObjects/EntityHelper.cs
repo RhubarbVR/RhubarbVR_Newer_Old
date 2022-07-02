@@ -7,6 +7,15 @@ namespace RhuEngine.WorldObjects
 {
 	public static class EntityHelper
 	{
+		public static T AttachMesh<T>(this Entity entity,IAssetProvider<RMaterial> material) where T : AssetProvider<RMesh>, new()  {
+			var meshRender = entity.AttachComponent<MeshRender>();
+			meshRender.materials.Add().Target = material;
+			var mesh = entity.AttachComponent<T>();
+			meshRender.mesh.Target = mesh;
+			return mesh;
+		}
+
+
 		public static (T, S) AttachMesh<T, S>(this Entity entity) where T : AssetProvider<RMesh>, new() where S : AssetProvider<RMaterial>, new() {
 			var meshRender = entity.AttachComponent<MeshRender>();
 			var material = entity.AttachComponent<S>();

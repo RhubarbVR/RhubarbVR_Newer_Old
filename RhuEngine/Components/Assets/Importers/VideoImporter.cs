@@ -90,6 +90,8 @@ namespace RhuEngine.Components
 		public override void Import(string data, bool wasUri, byte[] rawdata) {
 			if (wasUri) {
 				RLog.Info("Building video");
+				Entity.AttachComponent<Grabbable>();
+				Entity.AttachComponent<BoxShape>();
 				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<RectangleMesh, UnlitMaterial>();
 				var scaler = Entity.AttachComponent<TextureScaler>();
 				scaler.scale.SetLinkerTarget(pmesh.Dimensions);
@@ -111,8 +113,73 @@ namespace RhuEngine.Components
 				rignt.AttachComponent<SoundSource>().sound.Target = textur.AudioChannels[1];
 				scaler.texture.Target = textur;
 				mit.MainTexture.Target = textur;
-				Destroy();
 				var WinEntit = Entity.AddChild("Window");
+				WinEntit.rotation.Value = Quaternionf.Pitched.Inverse;
+				WinEntit.position.Value = new Vector3f(1,1, 1);
+				var gabable = WinEntit.AttachComponent<Grabbable>();
+				var attachComp = WinEntit.AttachComponent<UICanvas>();
+				attachComp.scale.Value = new Vector3f(2, 5, 1);
+				var uimit = WinEntit.AttachComponent<UnlitMaterial>();
+				var uiBuilder = new UIBuilder(WinEntit, uimit);
+				uiBuilder.PushRect();
+				uiBuilder.AddRectangle(0,0.9f,true);
+
+				var grabAction = uiBuilder.AttachComponentToStack<UIGrabInteraction>();
+				grabAction.AllowOtherZones.Value = true;
+				grabAction.Grabeded.Target = gabable.RemoteGrab;
+
+				var list = uiBuilder.AttachChildRect<VerticalList>();
+				list.Fit.Value = true;
+
+				uiBuilder.PushRect();
+				uiBuilder.SetOffsetMinMax(new Vector2f(0.1f), new Vector2f(-0.1f));
+				var button = uiBuilder.AddButton(false,0.2f,0.9f);
+				uiBuilder.PushRect();
+				uiBuilder.AddText("Play",null,1.8f);
+				var buttonevent = uiBuilder.AttachComponentToStack<ButtonEventManager>();
+				button.ButtonEvent.Target = buttonevent.Call;
+				buttonevent.Click.Target = textur.Playback.Play;
+				uiBuilder.PopRect();
+				uiBuilder.PopRect();
+				uiBuilder.PopRect();
+
+
+				uiBuilder.PushRect();
+				uiBuilder.SetOffsetMinMax(new Vector2f(0.1f), new Vector2f(-0.1f));
+				button = uiBuilder.AddButton(false, 0.2f, 0.9f);
+				uiBuilder.PushRect();
+				uiBuilder.AddText("Stop", null, 1.8f);
+				buttonevent = uiBuilder.AttachComponentToStack<ButtonEventManager>();
+				button.ButtonEvent.Target = buttonevent.Call;
+				buttonevent.Click.Target = textur.Playback.Stop;
+				uiBuilder.PopRect();
+				uiBuilder.PopRect();
+				uiBuilder.PopRect();
+
+				uiBuilder.PushRect();
+				uiBuilder.SetOffsetMinMax(new Vector2f(0.1f), new Vector2f(-0.1f));
+				button = uiBuilder.AddButton(false, 0.2f, 0.9f);
+				uiBuilder.PushRect();
+				uiBuilder.AddText("Pause", null, 1.8f);
+				buttonevent = uiBuilder.AttachComponentToStack<ButtonEventManager>();
+				button.ButtonEvent.Target = buttonevent.Call;
+				buttonevent.Click.Target = textur.Playback.Pause;
+				uiBuilder.PopRect();
+				uiBuilder.PopRect();
+				uiBuilder.PopRect();
+
+				uiBuilder.PushRect();
+				uiBuilder.SetOffsetMinMax(new Vector2f(0.1f), new Vector2f(-0.1f));
+				button = uiBuilder.AddButton(false, 0.2f, 0.9f);
+				uiBuilder.PushRect();
+				uiBuilder.AddText("Resume", null, 1.8f);
+				buttonevent = uiBuilder.AttachComponentToStack<ButtonEventManager>();
+				button.ButtonEvent.Target = buttonevent.Call;
+				buttonevent.Click.Target = textur.Playback.Resume;
+				uiBuilder.PopRect();
+				uiBuilder.PopRect();
+				uiBuilder.PopRect();
+
 				// TODO
 				//var window = WinEntit.AttachComponent<UIWindow>();
 				//WinEntit.rotation.Value *= Quaternionf.CreateFromYawPitchRoll(90, 0, 180);
@@ -132,6 +199,7 @@ namespace RhuEngine.Components
 				//var Resume = UIE.AttachComponent<UIButton>();
 				//Resume.Text.Value = "Resume";
 				//Resume.onClick.Target = textur.Playback.Resume;
+				Destroy();
 			}
 			else {
 				if (rawdata == null) {

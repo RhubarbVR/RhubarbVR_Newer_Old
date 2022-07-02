@@ -102,6 +102,154 @@ namespace RhuEngine
 			dfg3.AttachComponent<Grabbable>();
 			dfg3.AttachComponent<BoxShape>();
 
+
+			//Build Debug Man
+			var debugMan = world.RootEntity.AddChild("DebugMan");
+			var debugManMit = debugMan.AttachComponent<UnlitMaterial>();
+			debugMan.position.Value = new Vector3f(1f, 1.5f, -1f);
+			debugMan.scale.Value = new Vector3f(0.2f);
+
+			var debugManBody = debugMan.AddChild("body");
+			var bodyRender = debugManBody.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			bodyRender.Extent.Value = new Vector3f(1.5f,2f,1f)/2f;
+			debugManBody.AttachComponent<BoxShape>().boxHalfExtent.Value = bodyRender.Extent.Value;
+
+			var debugManHead = debugManBody.AddChild("Head");
+			debugManHead.position.Value = new Vector3f(0, 2, 0);
+			var sphere = debugManHead.AttachMesh<Sphere3NormalizedCubeMesh>(debugManMit);
+			debugManHead.AttachComponent<SphereShape>();
+
+			var debugManUpperLeftArm = debugManBody.AddChild("UpperLeftArm");
+			debugManUpperLeftArm.position.Value = new Vector3f(-1.6f, .8f, 0);
+			var upperLeftArmRender = debugManUpperLeftArm.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			upperLeftArmRender.Extent.Value = new Vector3f(1f, .5f, .5f) / 2f;
+			debugManUpperLeftArm.AttachComponent<BoxShape>().boxHalfExtent.Value = upperLeftArmRender.Extent.Value;
+
+			var debugManLowerLeftArm = debugManUpperLeftArm.AddChild("LowerLeftArm");
+			debugManLowerLeftArm.position.Value = new Vector3f(-1.4f, 0, 0);
+			var LowerLeftArmRender = debugManLowerLeftArm.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			LowerLeftArmRender.Extent.Value = new Vector3f(1f, .5f, .5f) / 2f;
+			debugManLowerLeftArm.AttachComponent<BoxShape>().boxHalfExtent.Value = LowerLeftArmRender.Extent.Value;
+
+			var debugManLeftHand = debugManLowerLeftArm.AddChild("leftHand");
+			debugManLeftHand.position.Value = new Vector3f(-.8f, 0, 0);
+			var debugManLeftHandRender = debugManLeftHand.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			debugManLeftHandRender.Extent.Value = new Vector3f(0.5f, 0.3f, 0.5f) / 2f;
+			debugManLeftHand.AttachComponent<BoxShape>().boxHalfExtent.Value = debugManLeftHandRender.Extent.Value;
+
+
+
+
+			var debugManUpperRightArm = debugManBody.AddChild("UpperRightArm");
+			debugManUpperRightArm.position.Value = new Vector3f(1.6f, .8f, 0);
+			var upperRightArmRender = debugManUpperRightArm.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			upperRightArmRender.Extent.Value = new Vector3f(1f, .5f, .5f) / 2f;
+			debugManUpperRightArm.AttachComponent<BoxShape>().boxHalfExtent.Value = upperRightArmRender.Extent.Value;
+
+			var debugManLowerRightArm = debugManUpperRightArm.AddChild("LowerRightArm");
+			debugManLowerRightArm.position.Value = new Vector3f(1.4f, 0, 0);
+			var LowerRightArmRender = debugManLowerRightArm.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			LowerRightArmRender.Extent.Value = new Vector3f(1f, .5f, .5f) / 2f;
+			debugManLowerRightArm.AttachComponent<BoxShape>().boxHalfExtent.Value = LowerRightArmRender.Extent.Value;
+
+			var debugManRightHand = debugManLowerRightArm.AddChild("RightHand");
+			debugManRightHand.position.Value = new Vector3f(.8f, 0, 0);
+			var debugManRightHandRender = debugManRightHand.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			debugManRightHandRender.Extent.Value = new Vector3f(0.5f, 0.3f, 0.5f) / 2f;
+			debugManRightHand.AttachComponent<BoxShape>().boxHalfExtent.Value = debugManRightHandRender.Extent.Value;
+
+			var debugManUpperLeftLeg = debugManBody.AddChild("UpperLeftLeg");
+			debugManUpperLeftLeg.position.Value = new Vector3f(-.6f, -2.1f, 0);
+			var upperLeftLegRender = debugManUpperLeftLeg.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			upperLeftLegRender.Extent.Value = new Vector3f(.5f, 1.3f, .5f) / 2f;
+			debugManUpperLeftLeg.AttachComponent<BoxShape>().boxHalfExtent.Value = upperLeftLegRender.Extent.Value;
+
+			var debugManLowerLeftLeg = debugManUpperLeftLeg.AddChild("LowerLeftLeg");
+			debugManLowerLeftLeg.position.Value = new Vector3f(0, -1.7f, 0);
+			var lowerLeftLegRender = debugManLowerLeftLeg.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			lowerLeftLegRender.Extent.Value = new Vector3f(.5f, 1.3f, .5f) / 2f;
+			debugManLowerLeftLeg.AttachComponent<BoxShape>().boxHalfExtent.Value = lowerLeftLegRender.Extent.Value;
+
+			var debugManLeftFoot = debugManLowerLeftLeg.AddChild("LeftFoot");
+			debugManLeftFoot.position.Value = new Vector3f(0, -0.9f, 0.25f);
+			var leftFootRender = debugManLeftFoot.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			leftFootRender.Extent.Value = new Vector3f(.5f, .4f, 1) / 2f;
+			debugManLeftFoot.AttachComponent<BoxShape>().boxHalfExtent.Value = leftFootRender.Extent.Value;
+
+			var debugManUpperRightLeg = debugManBody.AddChild("UpperRightLeg");
+			debugManUpperRightLeg.position.Value = new Vector3f(.6f, -2.1f, 0);
+			var upperRightLegRender = debugManUpperRightLeg.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			upperRightLegRender.Extent.Value = new Vector3f(.5f, 1.3f, .5f) / 2f;
+			debugManUpperRightLeg.AttachComponent<BoxShape>().boxHalfExtent.Value = upperRightLegRender.Extent.Value;
+
+			var debugManLowerRightLeg = debugManUpperRightLeg.AddChild("LowerRightLeg");
+			debugManLowerRightLeg.position.Value = new Vector3f(0, -1.7f, 0);
+			var lowerRightLegRender = debugManLowerRightLeg.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			lowerRightLegRender.Extent.Value = new Vector3f(.5f, 1.3f, .5f) / 2f;
+			debugManLowerRightLeg.AttachComponent<BoxShape>().boxHalfExtent.Value = lowerRightLegRender.Extent.Value;
+
+			var debugManRightFoot = debugManLowerRightLeg.AddChild("RightFoot");
+			debugManRightFoot.position.Value = new Vector3f(0, -0.9f, 0.25f);
+			var RightFootRender = debugManRightFoot.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			RightFootRender.Extent.Value = new Vector3f(.5f, .4f, 1) / 2f;
+			debugManRightFoot.AttachComponent<BoxShape>().boxHalfExtent.Value = RightFootRender.Extent.Value;
+
+			//IKloadeding
+			var IkManager = debugMan.AttachComponent<IKManager>();
+
+			var bodyBone = debugManBody.AttachComponent<IKBone>();
+			bodyBone.Radius.Value = .75f;
+			bodyBone.Height.Value = 2f;
+			var headBone = debugManHead.AttachComponent<IKBone>();
+			headBone.Radius.Value = 0.4f;
+			headBone.Height.Value = 0.8f;
+			
+			var upperLeftArmBone = debugManUpperLeftArm.AttachComponent<IKBone>();
+			debugManUpperLeftArm.rotation.Value = Quaternionf.AxisAngleR(new Vector3f(0, 0, 0.5f), MathUtil.HALF_P_IF);
+			var lowerLeftArmBone = debugManLowerLeftArm.AttachComponent<IKBone>();
+			var upperRightArmBone = debugManUpperRightArm.AttachComponent<IKBone>();
+			debugManUpperRightArm.rotation.Value = Quaternionf.AxisAngleR(new Vector3f(0, 0, -0.5f), MathUtil.HALF_P_IF);
+			var lowerRightArmBone = debugManLowerRightArm.AttachComponent<IKBone>();
+
+			var leftHandBone = debugManLeftHand.AttachComponent<IKBone>();
+			leftHandBone.Height.Value = .5f;
+			leftHandBone.Radius.Value = .2f;
+			var rightHandBone = debugManRightHand.AttachComponent<IKBone>();
+			rightHandBone.Height.Value = .5f;
+			rightHandBone.Radius.Value = .2f;
+
+
+			var upperLeftLegBone = debugManUpperLeftLeg.AttachComponent<IKBone>();
+			upperLeftLegBone.Height.Value = 1.3f;
+			var lowerLeftLegBone = debugManLowerLeftLeg.AttachComponent<IKBone>();
+			lowerLeftLegBone.Height.Value = 1.3f;
+
+			var leftFootBone = debugManLeftFoot.AttachComponent<IKBone>();
+			leftFootBone.Height.Value = 1f;
+			debugManLeftFoot.rotation.Value = Quaternionf.AxisAngleR(new Vector3f(-0.5f,0,0), MathUtil.HALF_P_IF);
+
+			var upperRightLegBone = debugManUpperRightLeg.AttachComponent<IKBone>();
+			upperRightLegBone.Height.Value = 1.3f;
+			var lowerRightLegBone = debugManLowerRightLeg.AttachComponent<IKBone>();
+			lowerRightLegBone.Height.Value = 1.3f;
+
+			var rightFootBone = debugManRightFoot.AttachComponent<IKBone>();
+			rightFootBone.Height.Value = 1f;
+			debugManRightFoot.rotation.Value = Quaternionf.AxisAngleR(new Vector3f(-0.5f, 0, 0), MathUtil.HALF_P_IF);
+
+			rightFootBone.MoveMentSpace.Target = leftFootBone.MoveMentSpace.Target = debugMan;
+			lowerRightLegBone.MoveMentSpace.Target = lowerLeftLegBone.MoveMentSpace.Target = debugMan;
+			upperRightLegBone.MoveMentSpace.Target = upperLeftLegBone.MoveMentSpace.Target = debugMan;
+
+
+			leftHandBone.MoveMentSpace.Target = rightHandBone.MoveMentSpace.Target = debugMan;
+			lowerLeftArmBone.MoveMentSpace.Target = lowerRightArmBone.MoveMentSpace.Target = debugMan;
+			upperLeftArmBone.MoveMentSpace.Target = upperRightArmBone.MoveMentSpace.Target = debugMan;
+			headBone.MoveMentSpace.Target = debugMan;
+			bodyBone.MoveMentSpace.Target = debugMan;
+
+
+
 			RLog.Info("Built Debug Local World");
 #else
 			RLog.Info("Built Local World");

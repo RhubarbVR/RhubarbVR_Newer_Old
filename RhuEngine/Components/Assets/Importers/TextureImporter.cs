@@ -26,6 +26,8 @@ namespace RhuEngine.Components
 		public override void Import(string data, bool wasUri, byte[] rawdata) {
 			RLog.Info($"Loaded Texture Data {data} Uri{wasUri}");
 			if (wasUri) {
+				Entity.AttachComponent<BoxShape>();
+				Entity.AttachComponent<Grabbable>();
 				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<RectangleMesh, UnlitMaterial>();
 				var scaler = Entity.AttachComponent<TextureScaler>();
 				scaler.scale.SetLinkerTarget(pmesh.Dimensions);

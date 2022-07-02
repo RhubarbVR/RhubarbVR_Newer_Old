@@ -122,10 +122,10 @@ namespace RNumerics
 			DefaultOpenSimplex2
 		};
 
-		private int mSeed = 1337;
-		private float mFrequency = 0.01f;
-		private NoiseType mNoiseType = NoiseType.OpenSimplex2;
-		private RotationType3D mRotationType3D = RotationType3D.None;
+		private int _mSeed = 1337;
+		private float _mFrequency = 0.01f;
+		private NoiseType _mNoiseType = NoiseType.OpenSimplex2;
+		private RotationType3D _mRotationType3D = RotationType3D.None;
 		private TransformType3D mTransformType3D = TransformType3D.DefaultOpenSimplex2;
 
 		private FractalType mFractalType = FractalType.None;
@@ -158,7 +158,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: 1337
 		/// </remarks>
-		public void SetSeed(int seed) { mSeed = seed; }
+		public void SetSeed(int seed) { _mSeed = seed; }
 
 		/// <summary>
 		/// Sets frequency for all noise types
@@ -166,7 +166,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: 0.01
 		/// </remarks>
-		public void SetFrequency(float frequency) { mFrequency = frequency; }
+		public void SetFrequency(float frequency) { _mFrequency = frequency; }
 
 		/// <summary>
 		/// Sets noise algorithm used for GetNoise(...)
@@ -175,7 +175,7 @@ namespace RNumerics
 		/// Default: OpenSimplex2
 		/// </remarks>
 		public void SetNoiseType(NoiseType noiseType) {
-			mNoiseType = noiseType;
+			_mNoiseType = noiseType;
 			UpdateTransformType3D();
 		}
 
@@ -187,7 +187,7 @@ namespace RNumerics
 		/// Default: None
 		/// </remarks>
 		public void SetRotationType3D(RotationType3D rotationType3D) {
-			mRotationType3D = rotationType3D;
+			_mRotationType3D = rotationType3D;
 			UpdateTransformType3D();
 			UpdateWarpTransformType3D();
 		}
@@ -308,7 +308,7 @@ namespace RNumerics
 
 			switch (mFractalType) {
 				default:
-					return GenNoiseSingle(mSeed, x, y);
+					return GenNoiseSingle(_mSeed, x, y);
 				case FractalType.FBm:
 					return GenFractalFBm(x, y);
 				case FractalType.Ridged:
@@ -330,7 +330,7 @@ namespace RNumerics
 
 			switch (mFractalType) {
 				default:
-					return GenNoiseSingle(mSeed, x, y, z);
+					return GenNoiseSingle(_mSeed, x, y, z);
 				case FractalType.FBm:
 					return GenFractalFBm(x, y, z);
 				case FractalType.Ridged:
@@ -689,26 +689,19 @@ namespace RNumerics
 		// Generic noise gen
 
 		private float GenNoiseSingle(int seed, FNLfloat x, FNLfloat y) {
-			switch (mNoiseType) {
-				case NoiseType.OpenSimplex2:
-					return SingleSimplex(seed, x, y);
-				case NoiseType.OpenSimplex2S:
-					return SingleOpenSimplex2S(seed, x, y);
-				case NoiseType.Cellular:
-					return SingleCellular(seed, x, y);
-				case NoiseType.Perlin:
-					return SinglePerlin(seed, x, y);
-				case NoiseType.ValueCubic:
-					return SingleValueCubic(seed, x, y);
-				case NoiseType.Value:
-					return SingleValue(seed, x, y);
-				default:
-					return 0;
-			}
+			return _mNoiseType switch {
+				NoiseType.OpenSimplex2 => SingleSimplex(seed, x, y),
+				NoiseType.OpenSimplex2S => SingleOpenSimplex2S(seed, x, y),
+				NoiseType.Cellular => SingleCellular(seed, x, y),
+				NoiseType.Perlin => SinglePerlin(seed, x, y),
+				NoiseType.ValueCubic => SingleValueCubic(seed, x, y),
+				NoiseType.Value => SingleValue(seed, x, y),
+				_ => 0,
+			};
 		}
 
 		private float GenNoiseSingle(int seed, FNLfloat x, FNLfloat y, FNLfloat z) {
-			switch (mNoiseType) {
+			switch (_mNoiseType) {
 				case NoiseType.OpenSimplex2:
 					return SingleOpenSimplex2(seed, x, y, z);
 				case NoiseType.OpenSimplex2S:
@@ -731,10 +724,10 @@ namespace RNumerics
 
 		[MethodImpl(INLINE)]
 		private void TransformNoiseCoordinate(ref FNLfloat x, ref FNLfloat y) {
-			x *= mFrequency;
-			y *= mFrequency;
+			x *= _mFrequency;
+			y *= _mFrequency;
 
-			switch (mNoiseType) {
+			switch (_mNoiseType) {
 				case NoiseType.OpenSimplex2:
 				case NoiseType.OpenSimplex2S: {
 					const FNLfloat SQRT3 = (FNLfloat)1.7320508075688772935274463415059;
@@ -751,9 +744,9 @@ namespace RNumerics
 
 		[MethodImpl(INLINE)]
 		private void TransformNoiseCoordinate(ref FNLfloat x, ref FNLfloat y, ref FNLfloat z) {
-			x *= mFrequency;
-			y *= mFrequency;
-			z *= mFrequency;
+			x *= _mFrequency;
+			y *= _mFrequency;
+			z *= _mFrequency;
 
 			switch (mTransformType3D) {
 				case TransformType3D.ImproveXYPlanes: {
@@ -788,7 +781,7 @@ namespace RNumerics
 		}
 
 		private void UpdateTransformType3D() {
-			switch (mRotationType3D) {
+			switch (_mRotationType3D) {
 				case RotationType3D.ImproveXYPlanes:
 					mTransformType3D = TransformType3D.ImproveXYPlanes;
 					break;
@@ -796,7 +789,7 @@ namespace RNumerics
 					mTransformType3D = TransformType3D.ImproveXZPlanes;
 					break;
 				default:
-					switch (mNoiseType) {
+					switch (_mNoiseType) {
 						case NoiseType.OpenSimplex2:
 						case NoiseType.OpenSimplex2S:
 							mTransformType3D = TransformType3D.DefaultOpenSimplex2;
@@ -864,7 +857,7 @@ namespace RNumerics
 		}
 
 		private void UpdateWarpTransformType3D() {
-			switch (mRotationType3D) {
+			switch (_mRotationType3D) {
 				case RotationType3D.ImproveXYPlanes:
 					mWarpTransformType3D = TransformType3D.ImproveXYPlanes;
 					break;
@@ -889,7 +882,7 @@ namespace RNumerics
 		// Fractal FBm
 
 		private float GenFractalFBm(FNLfloat x, FNLfloat y) {
-			int seed = mSeed;
+			int seed = _mSeed;
 			float sum = 0;
 			float amp = mFractalBounding;
 
@@ -907,7 +900,7 @@ namespace RNumerics
 		}
 
 		private float GenFractalFBm(FNLfloat x, FNLfloat y, FNLfloat z) {
-			int seed = mSeed;
+			int seed = _mSeed;
 			float sum = 0;
 			float amp = mFractalBounding;
 
@@ -929,7 +922,7 @@ namespace RNumerics
 		// Fractal Ridged
 
 		private float GenFractalRidged(FNLfloat x, FNLfloat y) {
-			int seed = mSeed;
+			int seed = _mSeed;
 			float sum = 0;
 			float amp = mFractalBounding;
 
@@ -947,7 +940,7 @@ namespace RNumerics
 		}
 
 		private float GenFractalRidged(FNLfloat x, FNLfloat y, FNLfloat z) {
-			int seed = mSeed;
+			int seed = _mSeed;
 			float sum = 0;
 			float amp = mFractalBounding;
 
@@ -969,7 +962,7 @@ namespace RNumerics
 		// Fractal PingPong 
 
 		private float GenFractalPingPong(FNLfloat x, FNLfloat y) {
-			int seed = mSeed;
+			int seed = _mSeed;
 			float sum = 0;
 			float amp = mFractalBounding;
 
@@ -987,7 +980,7 @@ namespace RNumerics
 		}
 
 		private float GenFractalPingPong(FNLfloat x, FNLfloat y, FNLfloat z) {
-			int seed = mSeed;
+			int seed = _mSeed;
 			float sum = 0;
 			float amp = mFractalBounding;
 
@@ -1928,9 +1921,9 @@ namespace RNumerics
 		// Domain Warp Single Wrapper
 
 		private void DomainWarpSingle(ref FNLfloat x, ref FNLfloat y) {
-			int seed = mSeed;
+			int seed = _mSeed;
 			float amp = mDomainWarpAmp * mFractalBounding;
-			float freq = mFrequency;
+			float freq = _mFrequency;
 
 			FNLfloat xs = x;
 			FNLfloat ys = y;
@@ -1940,9 +1933,9 @@ namespace RNumerics
 		}
 
 		private void DomainWarpSingle(ref FNLfloat x, ref FNLfloat y, ref FNLfloat z) {
-			int seed = mSeed;
+			int seed = _mSeed;
 			float amp = mDomainWarpAmp * mFractalBounding;
-			float freq = mFrequency;
+			float freq = _mFrequency;
 
 			FNLfloat xs = x;
 			FNLfloat ys = y;
@@ -1956,9 +1949,9 @@ namespace RNumerics
 		// Domain Warp Fractal Progressive
 
 		private void DomainWarpFractalProgressive(ref FNLfloat x, ref FNLfloat y) {
-			int seed = mSeed;
+			int seed = _mSeed;
 			float amp = mDomainWarpAmp * mFractalBounding;
-			float freq = mFrequency;
+			float freq = _mFrequency;
 
 			for (int i = 0; i < mOctaves; i++) {
 				FNLfloat xs = x;
@@ -1974,9 +1967,9 @@ namespace RNumerics
 		}
 
 		private void DomainWarpFractalProgressive(ref FNLfloat x, ref FNLfloat y, ref FNLfloat z) {
-			int seed = mSeed;
+			int seed = _mSeed;
 			float amp = mDomainWarpAmp * mFractalBounding;
-			float freq = mFrequency;
+			float freq = _mFrequency;
 
 			for (int i = 0; i < mOctaves; i++) {
 				FNLfloat xs = x;
@@ -1999,9 +1992,9 @@ namespace RNumerics
 			FNLfloat ys = y;
 			TransformDomainWarpCoordinate(ref xs, ref ys);
 
-			int seed = mSeed;
+			int seed = _mSeed;
 			float amp = mDomainWarpAmp * mFractalBounding;
-			float freq = mFrequency;
+			float freq = _mFrequency;
 
 			for (int i = 0; i < mOctaves; i++) {
 				DoSingleDomainWarp(seed, amp, freq, xs, ys, ref x, ref y);
@@ -2018,9 +2011,9 @@ namespace RNumerics
 			FNLfloat zs = z;
 			TransformDomainWarpCoordinate(ref xs, ref ys, ref zs);
 
-			int seed = mSeed;
+			int seed = _mSeed;
 			float amp = mDomainWarpAmp * mFractalBounding;
-			float freq = mFrequency;
+			float freq = _mFrequency;
 
 			for (int i = 0; i < mOctaves; i++) {
 				DoSingleDomainWarp(seed, amp, freq, xs, ys, zs, ref x, ref y, ref z);
