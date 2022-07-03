@@ -33,6 +33,8 @@ namespace NullContext
 
 		public Type RenderSettingsType => null;
 
+		public SupportedFancyFeatures SupportedFeatures => SupportedFancyFeatures.Basic;
+
 		public void BindEngine(Engine engine) {
 			RLog.Instance = this;
 		}
