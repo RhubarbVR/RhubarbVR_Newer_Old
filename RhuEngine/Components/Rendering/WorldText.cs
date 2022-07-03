@@ -45,6 +45,9 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(UpdateText))]
 		public readonly Sync<bool> MiddleLines;
 
+		[Default(RenderLayer.Text)]
+		public readonly Sync<RenderLayer> TargetRenderLayer;
+
 		public DynamicTextRender textRender = new();
 
 		public DynamicTextRender TextRender => textRender;

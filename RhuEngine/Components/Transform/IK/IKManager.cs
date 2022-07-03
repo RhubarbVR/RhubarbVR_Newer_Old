@@ -11,7 +11,6 @@ namespace RhuEngine.Components
 {
 	//Todo: Finish adding ik constraints and add the ik controllers to do movement
 	[Category("Transform/IK")]
-	[UpdateLevel(UpdateEnum.Movement)]
 	public class IKManager : Component
 	{
 		public IKSolver iKSolver;

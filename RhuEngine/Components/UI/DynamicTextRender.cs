@@ -121,7 +121,7 @@ namespace RhuEngine.Components
 
 		public bool UIText = false;
 
-		public void Render(Matrix offset, Matrix root, Action<Matrix, TextChar, int> action = null) {
+		public void Render(Matrix offset, Matrix root, RenderLayer tar, Action<Matrix, TextChar, int> action = null ) {
 			Chars.SafeOperation((list) => {
 				var index = 0;
 				foreach (var item in list) {
@@ -131,7 +131,7 @@ namespace RhuEngine.Components
 			});
 			if (!UIText) {
 				for (var i = 0; i < renderMits.Count; i++) {
-					rendermeshes[i]?.Draw($"TextRender{ID}{i}", renderMits[i], offset * root);
+					rendermeshes[i]?.Draw($"TextRender{ID}{i}", renderMits[i], offset * root,null,0,tar);
 				}
 			}
 		}

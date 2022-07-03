@@ -48,11 +48,14 @@ namespace RStereoKit
 
 		public Type RenderSettingsType => typeof(SKRenderSettings);
 
+		public SupportedFancyFeatures SupportedFeatures => SupportedFancyFeatures.Basic;
+
 		public void ChangeVR(bool value) {
 			throw new NotImplementedException();
 		}
 		public void BindEngine(Engine engine) {
 			this.engine = engine;
+			Renderer.OverrideCaptureFilter(true,(StereoKit.RenderLayer)(int)RhuEngine.Linker.RenderLayer.MainCam);
 			RLog.Instance = new Logger();
 		}
 

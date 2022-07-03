@@ -248,8 +248,6 @@ namespace RhuEngine
 			headBone.MoveMentSpace.Target = debugMan;
 			bodyBone.MoveMentSpace.Target = debugMan;
 
-
-
 			RLog.Info("Built Debug Local World");
 #else
 			RLog.Info("Built Local World");

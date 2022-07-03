@@ -33,13 +33,11 @@ namespace RhuEngine.Linker
 	[Flags]
 	public enum RenderLayer
 	{
-		/// <summary>The default render layer. All Draw use this layer unless
-		/// otherwise specified.</summary>
-		Layer0 = 1 << 0,
+		MainLayer = 1 << 0,
 		/// <summary>Render layer 1.</summary>
-		Layer1 = 1 << 1,
+		Text = 1 << 1,
 		/// <summary>Render layer 2.</summary>
-		Layer2 = 1 << 2,
+		UI = 1 << 2,
 		/// <summary>Render layer 3.</summary>
 		Layer3 = 1 << 3,
 		/// <summary>Render layer 4.</summary>
@@ -57,9 +55,7 @@ namespace RhuEngine.Linker
 		/// <summary>This is a flag that specifies all possible layers. If you
 		/// want to render all layers, then this is the layer filter
 		/// you would use. This is the default for render filtering.</summary>
-		All = 0xFFFF,
-		/// <summary>This is a combination of all layers that are not the VFX layer.</summary>
-		AllRegular = Layer0 | Layer1 | Layer2 | Layer3 | Layer4 | Layer5 | Layer6 | Layer7 | Layer8 | Layer9,
+		MainCam = MainLayer | Text | UI | Layer3,
 	}
 
 	/// <summary>Textures come in various types and flavors! These are bit-flags

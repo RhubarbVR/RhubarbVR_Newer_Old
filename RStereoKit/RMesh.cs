@@ -52,9 +52,9 @@ namespace RStereoKit
 	{
 		public RMesh Quad => new RMesh(Mesh.Quad);
 
-		public void Draw(string id, object mesh, RMaterial loadingLogo, RNumerics.Matrix p,Colorf colorf,int depth) {
+		public void Draw(string id, object mesh, RMaterial loadingLogo, RNumerics.Matrix p,Colorf colorf,int depth,RhuEngine.Linker.RenderLayer renderLayer) {
 			var mit = MitManager.GetMitWithOffset(loadingLogo, depth);
-			((Mesh)mesh).Draw(mit, new StereoKit.Matrix(p.m),new Color(colorf.r, colorf.g, colorf.b, colorf.a));
+			((Mesh)mesh).Draw(mit, new StereoKit.Matrix(p.m),new Color(colorf.r, colorf.g, colorf.b, colorf.a), (StereoKit.RenderLayer)(int)renderLayer);
 		}
 
 		public void LoadMesh(RMesh meshtarget, IMesh mesh) {

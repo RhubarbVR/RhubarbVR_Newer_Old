@@ -13,6 +13,25 @@ using RhuEngine.WorldObjects;
 
 namespace RStereoKit
 {
+	//NotSupprted
+	public class BasicLight : RenderLinkBase<Light>
+	{
+		public override void Init() {
+		}
+
+		public override void Remove() {
+		}
+
+		public override void Render() {
+		}
+
+		public override void Started() {
+		}
+
+		public override void Stopped() {
+		}
+	}
+
 	public class UIRender : RenderLinkBase<UICanvas>
 	{
 		public override void Init() {
@@ -43,7 +62,7 @@ namespace RStereoKit
 		}
 
 		public override void Render() {
-			RenderingComponent.textRender.Render(RNumerics.Matrix.S(0.1f), RenderingComponent.Entity.GlobalTrans);
+			RenderingComponent.textRender.Render(RNumerics.Matrix.S(0.1f), RenderingComponent.Entity.GlobalTrans,RenderingComponent.TargetRenderLayer);
 		}
 
 		public override void Started() {
@@ -74,7 +93,7 @@ namespace RStereoKit
 		private void SKRender(RMesh rMesh,IEnumerable<ISyncObject> mits, RNumerics.Matrix globalTrans,Colorf color,RhuEngine.Linker.RenderLayer layer) {
 			foreach (AssetRef<RMaterial> item in mits) {
 				if (item.Asset != null) {
-					rMesh?.Draw("NUllNotNeeded",item.Asset,globalTrans,color, RenderingComponent.OrderOffset.Value);
+					rMesh?.Draw("NUllNotNeeded",item.Asset,globalTrans,color, RenderingComponent.OrderOffset.Value, layer);
 				}
 			}
 		}
