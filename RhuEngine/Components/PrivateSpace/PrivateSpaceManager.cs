@@ -69,9 +69,16 @@ namespace RhuEngine.Components
 				return;
 			}
 			var head = LocalUser.userRoot.Target?.head.Target;
+			var left = LocalUser.userRoot.Target?.leftHand.Target;
+			var right = LocalUser.userRoot.Target?.rightHand.Target;
+
 			if (head != null) {
-				if (!RWorld.IsInVR) {
+				if (!RWorld.IsInVR && !Engine.inputManager.screenInput.MouseFree) {
 					UpdateHeadLazer(head);
+				}
+				if (RWorld.IsInVR) {
+					UpdateLazer(left, Handed.Left);
+					UpdateLazer(right, Handed.Right);
 				}
 				UpdateTouch(RInput.Hand(Handed.Right).Wrist, 2);
 				UpdateTouch(RInput.Hand(Handed.Left).Wrist, 1);
@@ -122,36 +129,65 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public bool RunLaserCastInWorld(World world, ref Matrix headFrompos, ref Matrix headToPos) {
+		public bool RunLaserCastInWorld(World world, ref Matrix headFrompos, ref Matrix headToPos, uint touchUndex, float pressForce,float gripForces,Handed side) {
 			if (world.PhysicsSim.ConvexRayTest(_lazershape, ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
-				var PressForce = Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Primary);
-				var GripForce = Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Grab);
+
 				if (collider.CustomObject is RenderUIComponent uIComponent) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.005f), new Colorf(1, 1, 0, 0.5f));
-					uIComponent.Rect.AddHitPoses(new HitData { Touchindex = 10, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = PressForce, GripForce = GripForce, Handed = Handed.Max });
+					uIComponent.Rect.AddHitPoses(new HitData { Touchindex = touchUndex, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = pressForce, GripForce = gripForces, Handed = side });
 				}
 				if (collider.CustomObject is PhysicsObject physicsObject) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-					physicsObject.Lazer(10, hitnormal, hitpointworld, PressForce, GripForce);
+					physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces);
 				}
 				return true;
 			}
 			return false;
 		}
+		public bool DisableRightLaser;
+
+		public bool DisableLeftLaser;
+
 		public bool DisableHeadLaser;
+		public void UpdateLazer(Entity heand, Handed handed) {
+			if (handed == Handed.Left) {
+				if (DisableLeftLaser) {
+					return;
+				}
+			}
+			else {
+				if (DisableRightLaser) {
+					return;
+				}
+			}
+			var PressForce = Engine.inputManager.GetInputFloatFromController(Managers.InputManager.InputTypes.Primary, handed);
+			var GripForce = Engine.inputManager.GetInputFloatFromController(Managers.InputManager.InputTypes.Grab, handed);
+			var headPos = heand.GlobalTrans;
+			var headFrompos = headPos;
+			var headToPos = Matrix.T(Vector3f.AxisZ * -5) * headPos;
+			World.DrawDebugSphere(headToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
+			if (RunLaserCastInWorld(World, ref headFrompos, ref headToPos, 10, PressForce, GripForce, handed)) {
+
+			}
+			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref headFrompos, ref headToPos, 10, PressForce, GripForce, handed)) {
+
+			}
+		}
 
 		public void UpdateHeadLazer(Entity head) {
 			if (DisableHeadLaser) {
 				return;
 			}
+			var PressForce = Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Primary);
+			var GripForce = Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Grab);
 			var headPos = head.GlobalTrans;
 			var headFrompos = headPos;
 			var headToPos = Matrix.T(Vector3f.AxisZ * -5) * headPos;
 			World.DrawDebugSphere(headToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
-			if (RunLaserCastInWorld(World, ref headFrompos, ref headToPos)) {
+			if (RunLaserCastInWorld(World, ref headFrompos, ref headToPos,10,PressForce,GripForce, Handed.Max)) {
 
 			}
-			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref headFrompos, ref headToPos)) {
+			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref headFrompos, ref headToPos, 10, PressForce, GripForce, Handed.Max)) {
 
 			}
 		}

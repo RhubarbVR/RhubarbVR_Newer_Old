@@ -76,7 +76,7 @@ namespace RhuEngine.Components
 			Entity.CallOnTouch(handed, hitnormal, hitpointworld);
 		}
 
-		public void Lazer(int v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce) {
+		public void Lazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce) {
 			Entity.CallOnLazer(v,hitnormal, hitpointworld, pressForce, gripForce);
 		}
 	}

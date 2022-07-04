@@ -179,8 +179,10 @@ namespace RhuEngine.Components
 				RWorld.ExecuteOnStartOfFrame(() => {
 					switch (source.Value) {
 						case Handed.Left:
+							WorldManager.PrivateSpaceManager.DisableLeftLaser = false;
 							break;
 						case Handed.Right:
+							WorldManager.PrivateSpaceManager.DisableRightLaser = false;
 							break;
 						case Handed.Max:
 							WorldManager.PrivateSpaceManager.DisableHeadLaser = false;

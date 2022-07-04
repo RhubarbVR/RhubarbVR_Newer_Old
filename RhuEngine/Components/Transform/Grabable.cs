@@ -56,7 +56,7 @@ namespace RhuEngine.Components
 			Entity.OnGrip -= GripProcess;
 		}
 
-		private void Entity_OnLazerPyhsics(int arg1, Vector3f arg2, Vector3f arg3, float arg4, float arg5) {
+		private void Entity_OnLazerPyhsics(uint arg1, Vector3f arg2, Vector3f arg3, float arg4, float arg5) {
 			if(arg1 == 10) {
 				GripProcess(World.HeadGrabbableHolder, true, arg5);
 			}
@@ -72,8 +72,10 @@ namespace RhuEngine.Components
 			if (Laser) {
 				switch (obj.source.Value) {
 					case Handed.Left:
+						WorldManager.PrivateSpaceManager.DisableLeftLaser = true;
 						break;
 					case Handed.Right:
+						WorldManager.PrivateSpaceManager.DisableRightLaser = true;
 						break;
 					case Handed.Max:
 						WorldManager.PrivateSpaceManager.DisableHeadLaser = true;
