@@ -115,9 +115,9 @@ namespace RhuEngine.Settings
 		public ControllerAixSettingsObject Trigger = new(InputManager.InputTypes.Primary);
 
 		public void UpdateController(IRController controller) {
-			X1.UpdateCheck(controller.X1.IsActive());
-			X2.UpdateCheck(controller.X2.IsActive());
-			StickPress.UpdateCheck(controller.StickClick.IsActive());
+			X1.UpdateCheck(controller?.X1?.IsActive()??false);
+			X2.UpdateCheck(controller?.X2?.IsActive() ?? false);
+			StickPress.UpdateCheck(controller?.StickClick?.IsActive() ?? false);
 		}
 
 		public float GetInputFloatFromController(InputManager.InputTypes inputType, IRController controller) {
