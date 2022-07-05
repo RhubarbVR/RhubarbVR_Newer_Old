@@ -242,7 +242,10 @@ namespace RNumerics
 		public static Vector2f operator *(Vector2f a, Vector2f b) => new(a.x * b.x, a.y * b.y);
 		public static Vector2f operator /(Vector2f a, Vector2f b) => new(a.x / b.x, a.y / b.y);
 
-
+		public static bool operator >(Vector2f a, Vector2f b) => a.x > b.x || a.y > b.y;
+		public static bool operator <(Vector2f a, Vector2f b) => a.x < b.x || a.y < b.y;
+		public static bool operator >=(Vector2f a, Vector2f b) => a.x >= b.x && a.y >= b.y;
+		public static bool operator <=(Vector2f a, Vector2f b) => a.x <= b.x && a.y <= b.y;
 		public static bool operator ==(Vector2f a, Vector2f b) => a.x == b.x && a.y == b.y;
 		public static bool operator !=(Vector2f a, Vector2f b) => a.x != b.x || a.y != b.y;
 		public override bool Equals(object obj) {

@@ -8,6 +8,7 @@ using RNumerics;
 using RhuEngine.WorldObjects;
 using System.Numerics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace RStereoKit
 {
@@ -68,7 +69,7 @@ namespace RStereoKit
 				return;
 			}
 			var loadedMesh = new Vertex[mesh.VertexCount];
-			for (var i = 0; i < mesh.VertexCount; i++) {
+			Parallel.For(0, mesh.VertexCount, (i) => {
 				var vert = mesh.GetVertexAll(i);
 				var tuv = Vector2.Zero;
 				if (vert.bHaveUV && ((vert.uv?.Length ?? 0) > 0)) {
@@ -79,7 +80,7 @@ namespace RStereoKit
 					color = new Color(vert.c.x, vert.c.y, vert.c.z, 1);
 				}
 				loadedMesh[i] = new Vertex { col = color, norm = (Vector3)vert.n, uv = tuv, pos = (Vector3)vert.v };
-			}
+			});
 			((Mesh)meshtarget.mesh).SetVerts(loadedMesh);
 			((Mesh)meshtarget.mesh).SetInds(mesh.RenderIndicesUint().ToArray());
 		}

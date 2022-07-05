@@ -107,8 +107,31 @@ namespace RhuEngine
 		public FontRectangle GetSizeOfText(string text) {
 			return TextMeasurer.Measure(text, TextOptions);
 		}
+
+		public Dictionary<Rune, FontRectangle> CachedRuneSize = new();
+
+		public Dictionary<(Rune,Rune), float> CachedXAdvancesSize = new();
+
+		public float GetXAdvances(Rune item, Rune nextitem) {
+			if (CachedXAdvancesSize.ContainsKey((item,nextitem))) {
+				return CachedXAdvancesSize[(item, nextitem)];
+			}
+			else {
+				var returnvalue = (TextMeasurer.Measure(item.ToString() + nextitem.ToString(), TextOptions).Width - TextMeasurer.MeasureBounds(nextitem.ToString(), TextOptions).Width) / (FONTSIZE * 2);
+				CachedXAdvancesSize.Add((item, nextitem), returnvalue);
+				return returnvalue;
+			}
+		}
+
 		public FontRectangle GetSizeOfRune(Rune rune) {
-			return TextMeasurer.Measure(rune.ToString(), TextOptions);
+			if (CachedRuneSize.ContainsKey(rune)) {
+				return CachedRuneSize[rune];
+			}
+			else {
+				var returnvalue = TextMeasurer.Measure(rune.ToString(), TextOptions);
+				CachedRuneSize.Add(rune, returnvalue);
+				return returnvalue;
+			}
 		}
 
 
@@ -122,8 +145,6 @@ namespace RhuEngine
 			return new ImageSharpTexture(img).CreateTextureAndDisposes();
 		}
 
-		public float GetXAdvances(Rune item, Rune nextitem) {
-			return (TextMeasurer.Measure(item.ToString() + nextitem.ToString(), TextOptions).Width - TextMeasurer.MeasureBounds(nextitem.ToString(), TextOptions).Width) / (FONTSIZE * 2);
-		}
+		
 	}
 }

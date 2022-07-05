@@ -182,7 +182,7 @@ namespace RhuEngine.Components
 			var meshes = new SimpleMesh[textRender.simprendermeshes.Count];
 			for (var i = 0; i < meshes.Length; i++) {
 				meshes[i] = new SimpleMesh(TextRender.simprendermeshes[i]);
-				if(meshes[i] is null) {
+				if(TextRender.simprendermeshes[i] is null) {
 					continue;
 				}
 				meshes[i].Translate(textOffset);
