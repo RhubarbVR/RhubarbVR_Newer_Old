@@ -56,9 +56,21 @@ namespace RhuEngine.Components
 			Entity.OnGrip -= GripProcess;
 		}
 
-		private void Entity_OnLazerPyhsics(uint arg1, Vector3f arg2, Vector3f arg3, float arg4, float arg5) {
+		private void Entity_OnLazerPyhsics(uint arg1, Vector3f arg2, Vector3f arg3, float arg4, float arg5,Handed handed) {
 			if(arg1 == 10) {
-				GripProcess(World.HeadGrabbableHolder, true, arg5);
+				switch (handed) {
+					case Handed.Left:
+						GripProcess(World.LeftGrabbableHolder, true, arg5);
+						break;
+					case Handed.Right:
+						GripProcess(World.RightGrabbableHolder, true, arg5);
+						break;
+					case Handed.Max:
+						GripProcess(World.HeadGrabbableHolder, true, arg5);
+						break;
+					default:
+						break;
+				}
 			}
 		}
 

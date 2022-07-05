@@ -145,8 +145,8 @@ namespace RhuEngine.Managers
 			return GetInputFloatFromController(inputType, GetController(true), _engine.MainSettings.InputSettings.MainControllerInputSettings);
 		}
 
-		private IRController GetController(bool v) {
-			return RInput.Controller(GetHand(v));
+		private IRController GetController(bool main) {
+			return RInput.Controller(GetHand(main));
 		}
 
 		public float GetInputFloatFromSeccondController(InputTypes inputType) {
@@ -255,6 +255,8 @@ namespace RhuEngine.Managers
 			if ((!RWorld.IsInVR) && _engine.EngineLink.CanInput) {
 				screenInput.Step();
 			}
+			_engine.MainSettings.InputSettings.MainControllerInputSettings.UpdateController(GetController(true));
+			_engine.MainSettings.InputSettings.SecondaryControllerInputSettings.UpdateController(GetController(false));
 		}
 	}
 }

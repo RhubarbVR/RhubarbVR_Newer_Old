@@ -45,6 +45,6 @@ namespace RhuEngine.Linker
 		void BindEngine(Engine engine);
 		void Start();
 		void LoadStatics();
-
+		void LoadArgs();
 	}
 }

@@ -601,12 +601,19 @@ namespace RhuEngine.Components
 		private float _newvaluetwo = 0;
 
 		private float _newvalue = 0;
+
+		public bool OpenedLastFrame = false;
 		public override void Step() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
-			if (RInput.Key(Key.Ctrl).IsActive() && RInput.Key(Key.Space).IsJustActive()) {
+			var isHeld = Engine.inputManager.GetInputBool(Managers.InputManager.InputTypes.OpenDash);
+			if (isHeld & !OpenedLastFrame) {
+				OpenedLastFrame = true;
 				Open = !Open;
+			}
+			if (!isHeld) {
+				OpenedLastFrame = false;
 			}
 			_newvalue = MathUtil.Lerp(_newvalue, _openTarget, RTime.Elapsedf * 5);
 			if (_newvalue is > 0.01f and < 0.95f) {

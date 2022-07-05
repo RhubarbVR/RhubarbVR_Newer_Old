@@ -48,9 +48,9 @@ namespace RhuEngine.Components
 
 		public override void OnLoaded() {
 			base.OnLoaded();
-			RebuildPysics();
 			Entity.GlobalTransformChange += Entity_GlobalTransformChange;
 			Entity.enabled.Changed += Enabled_Changed;
+			RebuildPysics();
 		}
 
 		private void Enabled_Changed(IChangeable obj) {
@@ -76,8 +76,8 @@ namespace RhuEngine.Components
 			Entity.CallOnTouch(handed, hitnormal, hitpointworld);
 		}
 
-		public void Lazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce) {
-			Entity.CallOnLazer(v,hitnormal, hitpointworld, pressForce, gripForce);
+		public void Lazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce,Handed hand) {
+			Entity.CallOnLazer(v,hitnormal, hitpointworld, pressForce, gripForce,hand);
 		}
 	}
 }

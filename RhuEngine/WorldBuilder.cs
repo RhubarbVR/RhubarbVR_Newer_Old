@@ -19,7 +19,7 @@ namespace RhuEngine
 			var floor = world.RootEntity.AddChild("Floor");
 			floor.position.Value = new Vector3f(0, 0, 0);
 
-			
+
 			//Todo: fix problem with RigidBody
 			//var rigbody = PowerCube.AttachComponent<RigidBody>();
 			//rigbody.PhysicsObject.Target = boxshape;
@@ -34,13 +34,65 @@ namespace RhuEngine
 			mesh.TopRadius.Value = 4;
 			mesh.BaseRadius.Value = 3.5f;
 			mesh.Height.Value = 0.25f;
-			coloider.boxHalfExtent.Value = new Vector3d(8, 0.25f, 8)/2;
+			coloider.boxHalfExtent.Value = new Vector3d(8, 0.25f, 8) / 2;
 			var spinningCubes = world.RootEntity.AddChild("SpinningCubes");
 			spinningCubes.position.Value = new Vector3f(0, 0.5f, 0);
 			AttachSpiningCubes(spinningCubes);
 #if DEBUG || UNITY
+
 			var DebugStuff = floor.AddChild("DebugStuff");
 			DebugStuff.position.Value = new Vector3f(-1.5f, 0f, -1f);
+			var Mits = DebugStuff.AddChild("DebugStuff");
+			Mits.position.Value = new Vector3f(2f, 3f, -2f);
+			Mits.scale.Value = new Vector3f(0.25f);
+			var unlitmit = Mits.AddChild("Unlit");
+			var (_, _, unliotRender) = unlitmit.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
+			unliotRender.CastShadows.Value = ShadowCast.On;
+			unliotRender.RecevieShadows.Value = true;
+			unlitmit.AttachComponent<Grabbable>();
+			unlitmit.AttachComponent<SphereShape>();
+			var pbrmit = Mits.AddChild("PBR");
+			var (_, _, pbrRender) = pbrmit.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, PBRMaterial>();
+			pbrRender.CastShadows.Value = ShadowCast.On;
+			pbrRender.RecevieShadows.Value = true;
+			pbrmit.AttachComponent<Grabbable>();
+			pbrmit.AttachComponent<SphereShape>();
+			pbrmit.position.Value = new Vector3f(4f, 0f, 0f);
+
+			var lights = DebugStuff.AddChild("Lights");
+			lights.position.Value = new Vector3f(2f, 4f, -2f);
+
+			var pointLight = lights.AddChild("PointLight");
+			var pointLightmesh = pointLight.AttachMeshWithMeshRender<IcosphereMesh, UnlitMaterial>();
+			pointLightmesh.Item1.Radius.Value = 0.05f;
+			pointLightmesh.Item3.colorLinear.Value = Colorf.Plum;
+			pointLight.AttachComponent<Grabbable>();
+			pointLight.AttachComponent<SphereShape>().Radus.Value = 0.05f;
+			var plight = pointLight.AddChild("Light");
+			plight.position.Value = new Vector3f(0f, 0f, 0.1f);
+			plight.AttachComponent<Light>().LightType.Value = RLightType.Point;
+
+			var dirLight = lights.AddChild("DirLight");
+			dirLight.position.Value = new Vector3f(1f, 0f, 0f);
+			var dirLightmesh = dirLight.AttachMeshWithMeshRender<IcosphereMesh, UnlitMaterial>();
+			dirLightmesh.Item1.Radius.Value = 0.05f;
+			dirLightmesh.Item3.colorLinear.Value = Colorf.Violet;
+			dirLight.AttachComponent<Grabbable>();
+			dirLight.AttachComponent<SphereShape>().Radus.Value = 0.05f;
+			var dlight = dirLight.AddChild("Light");
+			dlight.position.Value = new Vector3f(0f, 0f, 0.1f);
+			dlight.AttachComponent<Light>().LightType.Value = RLightType.Directional;
+
+			var spotLight = lights.AddChild("SpotLight");
+			spotLight.position.Value = new Vector3f(2f, 0f, 0f);
+			var spotLightmesh = spotLight.AttachMeshWithMeshRender<IcosphereMesh, UnlitMaterial>();
+			spotLightmesh.Item1.Radius.Value = 0.05f;
+			spotLightmesh.Item3.colorLinear.Value = Colorf.Beige;
+			spotLight.AttachComponent<Grabbable>();
+			spotLight.AttachComponent<SphereShape>().Radus.Value = 0.05f;
+			var slight = spotLight.AddChild("Light");
+			slight.position.Value = new Vector3f(0f, 0f, 0.1f);
+			slight.AttachComponent<Light>().LightType.Value = RLightType.Spot;
 
 			var box = floor.AttachComponent<TrivialBox3Mesh>();
 			var size = 10;
@@ -62,7 +114,7 @@ namespace RhuEngine
 				}
 			}
 			var testCubes = DebugStuff.AddChild("Test cubes");
-			testCubes.position.Value = new Vector3f(2, 0.5f,-2);
+			testCubes.position.Value = new Vector3f(2, 0.5f, -2);
 			testCubes.scale.Value = new Vector3f(0.5f);
 
 			var fontAtlis = testCubes.AddChild("Font Stuff");
@@ -70,7 +122,7 @@ namespace RhuEngine
 			fontAtlis.AttachComponent<Grabbable>();
 			var data = fontAtlis.AttachMesh<TrivialBox3Mesh, UnlitMaterial>();
 			data.Item2.MainTexture.Target = fontAtlis.AttachComponent<FontAtlasTexture>();
-			
+
 			var text = fontAtlis.AddChild("Text");
 			text.position.Value = new Vector3f(-0.5f, 1.5f, 0);
 			text.AttachComponent<WorldText>();
@@ -104,14 +156,14 @@ namespace RhuEngine
 
 
 			//Build Debug Man
-			var debugMan = world.RootEntity.AddChild("DebugMan");
+			var debugMan = DebugStuff.AddChild("DebugMan");
 			var debugManMit = debugMan.AttachComponent<UnlitMaterial>();
-			debugMan.position.Value = new Vector3f(1f, 1.5f, -1f);
+			debugMan.position.Value = new Vector3f(-3f, 1.5f, -1f);
 			debugMan.scale.Value = new Vector3f(0.2f);
 
 			var debugManBody = debugMan.AddChild("body");
 			var bodyRender = debugManBody.AttachMesh<TrivialBox3Mesh>(debugManMit);
-			bodyRender.Extent.Value = new Vector3f(1.5f,2f,1f)/2f;
+			bodyRender.Extent.Value = new Vector3f(1.5f, 2f, 1f) / 2f;
 			debugManBody.AttachComponent<BoxShape>().boxHalfExtent.Value = bodyRender.Extent.Value;
 
 			var debugManHead = debugManBody.AddChild("Head");
@@ -203,7 +255,7 @@ namespace RhuEngine
 			var headBone = debugManHead.AttachComponent<IKBone>();
 			headBone.Radius.Value = 0.4f;
 			headBone.Height.Value = 0.8f;
-			
+
 			var upperLeftArmBone = debugManUpperLeftArm.AttachComponent<IKBone>();
 			debugManUpperLeftArm.rotation.Value = Quaternionf.AxisAngleR(new Vector3f(0, 0, 0.5f), MathUtil.HALF_P_IF);
 			var lowerLeftArmBone = debugManLowerLeftArm.AttachComponent<IKBone>();
@@ -226,7 +278,7 @@ namespace RhuEngine
 
 			var leftFootBone = debugManLeftFoot.AttachComponent<IKBone>();
 			leftFootBone.Height.Value = 1f;
-			debugManLeftFoot.rotation.Value = Quaternionf.AxisAngleR(new Vector3f(-0.5f,0,0), MathUtil.HALF_P_IF);
+			debugManLeftFoot.rotation.Value = Quaternionf.AxisAngleR(new Vector3f(-0.5f, 0, 0), MathUtil.HALF_P_IF);
 
 			var upperRightLegBone = debugManUpperRightLeg.AttachComponent<IKBone>();
 			upperRightLegBone.Height.Value = 1.3f;

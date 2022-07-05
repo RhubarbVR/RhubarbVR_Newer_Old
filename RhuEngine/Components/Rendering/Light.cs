@@ -50,9 +50,6 @@ namespace RhuEngine.Components
 
 		public readonly Sync<RenderLayer> Culling;
 
-		[Supported(SupportedFancyFeatures.LightHalo)]
-		public readonly Sync<bool> Halo;
-
 		public override void FirstCreation() {
 			base.FirstCreation();
 			Color.Value = Colorf.White;

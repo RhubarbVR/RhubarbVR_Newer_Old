@@ -33,11 +33,6 @@ namespace RhuEngine.Components
 		[Default(false)]
 		public readonly Sync<bool> RecevieShadows;
 
-
-		[Default(false)]
-		[Supported(SupportedFancyFeatures.GlobalIllumination)]
-		public readonly Sync<bool> ContributeGlobalIllumination;
-
 		[Default(false)]
 		[Supported(SupportedFancyFeatures.ReflectionProbes)]
 		public readonly Sync<bool> ReflectionProbs;

@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<float> radius;
+		public readonly Sync<float> Radius;
 
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {
@@ -24,7 +24,7 @@ namespace RhuEngine.Components
 			}
 			var mesh = new IcosphereGenerator {
 				iterations = iterations,
-				radius = radius,
+				radius = Radius,
 			};
 			mesh.Generate();
 			GenMesh(mesh.MakeSimpleMesh());

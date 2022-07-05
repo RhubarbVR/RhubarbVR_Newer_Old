@@ -37,14 +37,14 @@ namespace RhuEngine.Components
 			var Rotspeed = AllowMultiplier ? MathUtil.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
 			var tempRotateRight = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateLeft, isMain) * RTime.Elapsedf;
 			var tempRotateLeft = Engine.inputManager.GetInputFloat(Managers.InputManager.InputTypes.RotateRight, isMain) * RTime.Elapsedf;
-			var rot = Quaternionf.CreateFromEuler(0, (tempRotateRight - tempRotateLeft) * RotationSpeed, 0);
+			var rot = Quaternionf.CreateFromEuler((tempRotateRight - tempRotateLeft) * RotationSpeed, 0, 0);
 			var AddToMatrix = Matrix.T(pos);
 			switch (Engine.inputManager.GetHand(isMain)) {
 				case Handed.Left:
-					ProcessGlobalRotToUserRootMovement(AddToMatrix,Matrix.R(Quaternionf.CreateFromEuler(180,0,90)) * LocalUser.userRoot.Target?.leftHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
+					ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot.Target?.leftHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
 					break;
 				case Handed.Right:
-					ProcessGlobalRotToUserRootMovement(AddToMatrix, Matrix.R(Quaternionf.CreateFromEuler(0, 0, -90)) * LocalUser.userRoot.Target?.rightHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
+					ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot.Target?.rightHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
 					break;
 				default:
 					break;
@@ -56,17 +56,17 @@ namespace RhuEngine.Components
 			var speed = AllowMultiplier ? MathUtil.Lerp(MovementSpeed, MaxSprintSpeed, MoveSpeed) : MovementSpeed;
 			var pos = new Vector3f(Right - Left, FlyUp - FlyDown, Back - Forward) * speed;
 			var Rotspeed = AllowMultiplier ? MathUtil.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
-			var rot = Quaternionf.CreateFromEuler(0, (RotateRight - RotateLeft) * RotationSpeed, 0);
+			var rot = Quaternionf.CreateFromEuler((RotateRight - RotateLeft) * RotationSpeed, 0, 0);
 			var AddToMatrix = Matrix.T(pos);
 			ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot?.Target.head.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
 			UserRootEnity.rotation.Value *= rot;
 		}
 
 		public override void ProcessMovement() {
-			if(UserRootEnity is null) {
+			if (UserRootEnity is null) {
 				return;
 			}
-			if(!RWorld.IsInVR) {
+			if (!RWorld.IsInVR) {
 				ProcessHeadBased();
 			}
 			else {

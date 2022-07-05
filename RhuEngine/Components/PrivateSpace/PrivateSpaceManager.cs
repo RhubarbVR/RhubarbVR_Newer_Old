@@ -138,7 +138,7 @@ namespace RhuEngine.Components
 				}
 				if (collider.CustomObject is PhysicsObject physicsObject) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-					physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces);
+					physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
 				}
 				return true;
 			}

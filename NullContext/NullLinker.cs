@@ -9,6 +9,8 @@ namespace NullContext
 {
 	public class NullLinker : IEngineLink, IRLog, IRTime
 	{
+		public void LoadArgs() {
+		}
 		public string BackendID => "HeadLess";
 
 		public bool SpawnPlayer => false;

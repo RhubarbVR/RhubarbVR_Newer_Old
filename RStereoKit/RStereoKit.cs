@@ -110,6 +110,7 @@ namespace RStereoKit
 					new GradientKey(new Color(1, 1, 1, 1), 0.9f)));
 		}
 
-
+		public void LoadArgs() {
+		}
 	}
 }

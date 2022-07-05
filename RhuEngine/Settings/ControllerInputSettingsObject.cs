@@ -20,6 +20,35 @@ namespace RhuEngine.Settings
 			Pressed = pressed;
 			Hold = hold;
 		}
+		[SettingsField("Time in seconds")]
+		public float HoldTime = 0.5f;
+
+		public bool HeldTime => IsHolding && (DateTime.UtcNow - TimeLastPress).Seconds > HoldTime;
+
+		public bool HeldForTime { get; private set; }
+
+		public bool IsHolding = false;
+
+		public DateTime TimeLastPress = DateTime.UtcNow;
+
+		public void UpdateCheck(bool isClickingThisFrame) {
+			if (HeldForTime) {
+				HeldForTime = false;
+				TimeLastPress = DateTime.UtcNow;
+			}
+			if (isClickingThisFrame) {
+				if (!IsHolding) {
+					IsHolding = true;
+					TimeLastPress = DateTime.UtcNow;
+				}
+				if (HeldTime & !HeldForTime) {
+					HeldForTime = true;
+				}
+			}
+			else {
+				IsHolding = false;
+			}
+		}
 
 		public ControllerButtonSettingsObject() {
 
@@ -85,54 +114,61 @@ namespace RhuEngine.Settings
 		[SettingsField("Trigger")]
 		public ControllerAixSettingsObject Trigger = new(InputManager.InputTypes.Primary);
 
+		public void UpdateController(IRController controller) {
+			X1.UpdateCheck(controller.X1.IsActive());
+			X2.UpdateCheck(controller.X2.IsActive());
+			StickPress.UpdateCheck(controller.StickClick.IsActive());
+		}
+
 		public float GetInputFloatFromController(InputManager.InputTypes inputType, IRController controller) {
+			var buttons = 0f;
 			if (Trigger.positiveX == inputType) {
-				return controller.Trigger;
+				buttons += controller.Trigger;
 			}
 			if (Trigger.negevitveX == inputType) {
-				return -controller.Trigger;
+				buttons += -controller.Trigger;
 			}
 			if (Grip.positiveX == inputType) {
-				return controller.Grip;
+				buttons += controller.Grip;
 			}
 			if (Grip.negevitveX == inputType) {
-				return -controller.Grip;
+				buttons += -controller.Grip;
 			}
 			if (StickPress.Pressed == inputType) {
-				return controller.StickClick.IsJustActive()? 1:0;
+				buttons += controller.StickClick.IsActive()? 1:0;
 			}
 			if (StickPress.Hold == inputType) {
-				//NotSetup;
+				buttons += StickPress.HeldForTime ? 1 : 0;
 			}
 			if (X1.Pressed == inputType) {
-				return controller.X1.IsJustActive() ? 1 : 0;
+				buttons += controller.X1.IsActive() ? 1 : 0;
 			}
 			if (X1.Hold == inputType) {
-				//NotSetup;
+				buttons += X1.HeldForTime ? 1 : 0;
 			}
 			if (X2.Pressed == inputType) {
-				return controller.X2.IsJustActive() ? 1 : 0;
+				buttons += controller.X2.IsActive() ? 1 : 0;
 			}
-			if (X1.Hold == inputType) {
-				//NotSetup;
+			if (X2.Hold == inputType) {
+				buttons += X2.HeldForTime ? 1 : 0;
 			}
 			if (InputManager.InputTypes.StickLocker != inputType) {
 				if (!(StickLocker != (controller.ModelEnum == KnownControllers.Vive)) || GetInputFloatFromController(InputManager.InputTypes.StickLocker,controller) >= 0.9f) {
 					if (Stick.positiveX == inputType) {
-						return controller.Stick.YX.x;
+						buttons += controller.Stick.YX.x;
 					}
 					if (Stick.negevitveX == inputType) {
-						return -controller.Stick.YX.x;
+						buttons += -controller.Stick.YX.x;
 					}
 					if (Stick.positiveY == inputType) {
-						return controller.Stick.YX.y;
+						buttons += controller.Stick.YX.y;
 					}
 					if (Stick.negevitveY == inputType) {
-						return -controller.Stick.YX.y;
+						buttons += -controller.Stick.YX.y;
 					}
 				}
 			}
-			return 0f;
+			return buttons;
 		}
 
 		public ControllerInputSettingsObject(bool isNotMain) {

@@ -48,10 +48,10 @@ namespace RhuEngine.WorldObjects.ECS
 		internal void CallOnGrip(GrabbableHolder obj, bool Laser, float gripForce) {
 			OnGrip?.Invoke(obj,Laser, gripForce);
 		}
-		public event Action<uint, Vector3f, Vector3f, float, float> OnLazerPyhsics;
+		public event Action<uint, Vector3f, Vector3f, float, float,Handed> OnLazerPyhsics;
 
-		internal void CallOnLazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce) {
-			OnLazerPyhsics?.Invoke(v, hitnormal, hitpointworld, pressForce, gripForce);
+		internal void CallOnLazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce, Handed handed) {
+			OnLazerPyhsics?.Invoke(v, hitnormal, hitpointworld, pressForce, gripForce, handed);
 		}
 
 		public event Action<uint, Vector3f, Vector3f> OnTouchPyhsics;
