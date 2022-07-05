@@ -21,6 +21,7 @@ namespace RNumerics
 		public Vector4 ToSystem() {
 			return new Vector4(x, y, z, w);
 		}
+		public Vector4f(Vector3f a,float w) { x = a.x; y = a.y; z = a.z; this.w = w; }
 
 		public Vector4f(float f) { x = y = z = w = f; }
 		public Vector4f(float x, float y, float z, float w) { this.x = x; this.y = y; this.z = z; this.w = w; }
