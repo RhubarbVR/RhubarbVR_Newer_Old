@@ -236,6 +236,15 @@ namespace RhuEngine.Components
 			AlbedoTint.Value = Colorf.White;
 			EmissionTint.Value = Colorf.Blue;
 			Tilling.Value = Vector2f.One;
+			AlbedoTextureTilling.Value = Vector2f.One;
+			DetailAlbedoTilling.Value = Vector2f.One;
+			DetailMaskTilling.Value = Vector2f.One;
+			DetailNormalTilling.Value = Vector2f.One;
+			EmissionTextureTilling.Value = Vector2f.One;
+			MetallicTextureTilling.Value = Vector2f.One;
+			NormalMapTilling.Value = Vector2f.One;
+			HeightMapTilling.Value = Vector2f.One;
+			OcclusionTilling.Value = Vector2f.One;
 		}
 
 		public override void UpdateAll() {
