@@ -35,20 +35,20 @@ namespace RNumerics
 		//    mTo.FaceGroups = Util.BufferCopy(this.FaceGroups, mTo.FaceGroups);
 		//}
 
-		public SimpleMesh Copy()
-		{
-		    return new SimpleMesh(this);
+		public SimpleMesh Copy() {
+			return new SimpleMesh(this);
 		}
-		private Vector2f[] CalcNewUV(Vector3d newtry1, Vector3d v1, Vector3d v2, Vector2f[] uv1, Vector2f[] uv2) {
+		private (Vector2f[], Colorf) CalcNewUV(Colorf colorOne, Colorf colorTwo, Vector3d newtry1, Vector3d v1, Vector3d v2, Vector2f[] uv1, Vector2f[] uv2) {
 			var newUvs = new Vector2f[uv1.Length];
 			//TODO: Try to remove sqrt from this
 			var disttwo = v1.Distance(v2);
 			var distone = v1.Distance(newtry1);
 			var present = (float)(distone / disttwo);
+			var newColor = (colorOne * present) + (colorTwo * (1f - present));
 			for (var i = 0; i < newUvs.Length; i++) {
 				newUvs[i] = ((uv2[i] - uv1[i]) * present) + uv1[i];
 			}
-			return newUvs;
+			return (newUvs, newColor);
 		}
 
 		public struct PlaneSetting
@@ -95,8 +95,10 @@ namespace RNumerics
 				if (v1PastPlane && !v2PastPlane && !v3PastPlane) {
 					var newtry1 = planeSetting.plane.IntersectLine(v1.v, v2.v);
 					var newtry2 = planeSetting.plane.IntersectLine(v1.v, v3.v);
-					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v1.v, v2.v, v1.uv, v2.uv), bHaveUV = true };
-					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v1.v, v3.v, v1.uv, v3.uv), bHaveUV = true };
+					var calulationone = CalcNewUV(v1.c, v2.c, newtry1, v1.v, v2.v, v1.uv, v2.uv);
+					var newvert1 = new NewVertexInfo { c = calulationone.Item2, v = newtry1, uv = calulationone.Item1, bHaveUV = true, bHaveC = true };
+					var calctwo = CalcNewUV(v1.c, v3.c, newtry2, v1.v, v3.v, v1.uv, v3.uv);
+					var newvert2 = new NewVertexInfo { c = calulationone.Item2, v = newtry2, uv = calctwo.Item1, bHaveUV = true, bHaveC = true };
 					trys[i] = ((v3, newvert2, newvert1));
 					trys.Add((newvert1, v2, v3));
 					if (!planeSetting.removeOtherSide) {
@@ -107,8 +109,10 @@ namespace RNumerics
 				if (!v1PastPlane && v2PastPlane && v3PastPlane) {
 					var newtry1 = planeSetting.plane.IntersectLine(v1.v, v2.v);
 					var newtry2 = planeSetting.plane.IntersectLine(v1.v, v3.v);
-					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v1.v, v2.v, v1.uv, v2.uv), bHaveUV = true };
-					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v1.v, v3.v, v1.uv, v3.uv), bHaveUV = true };
+					var calcone = CalcNewUV(v1.c, v2.c, newtry1, v1.v, v2.v, v1.uv, v2.uv);
+					var newvert1 = new NewVertexInfo { c = calcone.Item2, v = newtry1, uv = calcone.Item1, bHaveUV = true, bHaveC = true };
+					var calcTwo = CalcNewUV(v1.c, v3.c, newtry2, v1.v, v3.v, v1.uv, v3.uv);
+					var newvert2 = new NewVertexInfo { c = calcTwo.Item2, v = newtry2, uv = calcTwo.Item1, bHaveUV = true, bHaveC = true };
 					trys[i] = ((newvert1, newvert2, v1));
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((v3, newvert2, newvert1));
@@ -120,8 +124,10 @@ namespace RNumerics
 				if (v2PastPlane && !v3PastPlane && !v1PastPlane) {
 					var newtry1 = planeSetting.plane.IntersectLine(v2.v, v3.v);
 					var newtry2 = planeSetting.plane.IntersectLine(v2.v, v1.v);
-					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v2.v, v3.v, v2.uv, v3.uv), bHaveUV = true };
-					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v2.v, v1.v, v2.uv, v1.uv), bHaveUV = true };
+					var calc = CalcNewUV(v2.c, v3.c, newtry1, v2.v, v3.v, v2.uv, v3.uv);
+					var newvert1 = new NewVertexInfo { c = calc.Item2, v = newtry1, uv = calc.Item1, bHaveUV = true, bHaveC = true };
+					var calc2 = CalcNewUV(v2.c, v1.c, newtry2, v2.v, v1.v, v2.uv, v1.uv);
+					var newvert2 = new NewVertexInfo { c = calc2.Item2, v = newtry2, uv = calc2.Item1, bHaveUV = true, bHaveC = true };
 					trys[i] = ((newvert2, newvert1, v3));
 					trys.Add((v1, newvert2, v3));
 					if (!planeSetting.removeOtherSide) {
@@ -132,8 +138,10 @@ namespace RNumerics
 				if (!v2PastPlane && v3PastPlane && v1PastPlane) {
 					var newtry1 = planeSetting.plane.IntersectLine(v2.v, v3.v);
 					var newtry2 = planeSetting.plane.IntersectLine(v2.v, v1.v);
-					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v2.v, v3.v, v2.uv, v3.uv), bHaveUV = true };
-					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v2.v, v1.v, v2.uv, v1.uv), bHaveUV = true };
+					var calc = CalcNewUV(v2.c, v3.c, newtry1, v2.v, v3.v, v2.uv, v3.uv);
+					var newvert1 = new NewVertexInfo { c = calc.Item2, v = newtry1, uv = calc.Item1, bHaveUV = true, bHaveC = true };
+					var calc2 = CalcNewUV(v2.c, v1.c, newtry2, v2.v, v1.v, v2.uv, v1.uv);
+					var newvert2 = new NewVertexInfo { c = calc2.Item2, v = newtry2, uv = calc2.Item1, bHaveUV = true, bHaveC = true };
 					trys[i] = ((v2, newvert1, newvert2));
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((newvert2, newvert1, v3));
@@ -145,8 +153,10 @@ namespace RNumerics
 				if (v3PastPlane && !v1PastPlane && !v2PastPlane) {
 					var newtry1 = planeSetting.plane.IntersectLine(v3.v, v1.v);
 					var newtry2 = planeSetting.plane.IntersectLine(v3.v, v2.v);
-					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v3.v, v1.v, v3.uv, v1.uv), bHaveUV = true };
-					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v3.v, v2.v, v3.uv, v2.uv), bHaveUV = true };
+					var calc = CalcNewUV(v3.c, v1.c, newtry1, v3.v, v1.v, v3.uv, v1.uv);
+					var newvert1 = new NewVertexInfo { c = calc.Item2, v = newtry1, uv = calc.Item1, bHaveUV = true, bHaveC = true };
+					var calc2 = CalcNewUV(v3.c, v2.c, newtry2, v3.v, v2.v, v3.uv, v2.uv);
+					var newvert2 = new NewVertexInfo { c = calc2.Item2, v = newtry2, uv = calc2.Item1, bHaveUV = true, bHaveC = true };
 					trys[i] = ((v2, newvert2, newvert1));
 					trys.Add((v2, newvert1, v1));
 					if (!planeSetting.removeOtherSide) {
@@ -157,8 +167,10 @@ namespace RNumerics
 				if (!v3PastPlane && v1PastPlane && v2PastPlane) {
 					var newtry1 = planeSetting.plane.IntersectLine(v3.v, v1.v);
 					var newtry2 = planeSetting.plane.IntersectLine(v3.v, v2.v);
-					var newvert1 = new NewVertexInfo { v = newtry1, uv = CalcNewUV(newtry1, v3.v, v1.v, v3.uv, v1.uv), bHaveUV = true };
-					var newvert2 = new NewVertexInfo { v = newtry2, uv = CalcNewUV(newtry2, v3.v, v2.v, v3.uv, v2.uv), bHaveUV = true };
+					var calc = CalcNewUV(v3.c, v1.c, newtry1, v3.v, v1.v, v3.uv, v1.uv);
+					var newvert1 = new NewVertexInfo { c = calc.Item2, v = newtry1, uv = calc.Item1, bHaveUV = true, bHaveC = true };
+					var calc2 = CalcNewUV(v3.c, v2.c, newtry2, v3.v, v2.v, v3.uv, v2.uv);
+					var newvert2 = new NewVertexInfo { c = calc2.Item2, v = newtry2, uv = calc2.Item1, bHaveUV = true, bHaveC = true };
 					trys[i] = ((v3, newvert1, newvert2));
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((v2, newvert2, newvert1));
@@ -171,11 +183,11 @@ namespace RNumerics
 			return trys;
 		}
 
-		public void AppendUVRectangle(Matrix offset,Vector2f bottomleft, Vector2f topright,Vector2f size,float yoffset, Colorf color) {
+		public void AppendUVRectangle(Matrix offset, Vector2f bottomleft, Vector2f topright, Vector2f size, float yoffset, Colorf color) {
 			var ftopLeft = new Vector2f(bottomleft.x, topright.y);
 			var fbottomLeft = bottomleft;
 			var ftopRight = topright;
-			var fbottomRight = new Vector2f(topright.x,bottomleft.y);
+			var fbottomRight = new Vector2f(topright.x, bottomleft.y);
 			var zoff = 0.01f;
 			var offseter = size.y * -0.2f;
 			var topLeft = offset.Transform(size._Y_ + new Vector3f(0, offseter, zoff));
@@ -187,7 +199,7 @@ namespace RNumerics
 			var vtopRight = new NewVertexInfo(topRight, ftopRight, color);
 			var vbottomRight = new NewVertexInfo(bottomRight, fbottomRight, color);
 			AppendTriangle(vtopLeft, vtopRight, vbottomRight);
-			AppendTriangle(vbottomRight, vbottomLeft, vtopLeft );
+			AppendTriangle(vbottomRight, vbottomLeft, vtopLeft);
 		}
 
 		public SimpleMesh CutOnPlane(params PlaneSetting[] planeSetting) {
@@ -195,37 +207,37 @@ namespace RNumerics
 			var vertexInfos = new List<(NewVertexInfo, NewVertexInfo, NewVertexInfo)>(TriangleCount);
 			for (var i = 0; i < TriangleCount; i++) {
 				var tryangle = GetTriangle(i);
-				vertexInfos.Add((GetVertexAll(tryangle.a),GetVertexAll(tryangle.b),GetVertexAll(tryangle.c)));
+				vertexInfos.Add((GetVertexAll(tryangle.a), GetVertexAll(tryangle.b), GetVertexAll(tryangle.c)));
 			}
 			for (var pla = 0; pla < planeSetting.Length; pla++) {
 				vertexInfos = MakeCutTriangles(vertexInfos, planeSetting[pla]);
 			}
-			for (var vert = 0; vert < vertexInfos.Count; vert ++) {
+			for (var vert = 0; vert < vertexInfos.Count; vert++) {
 				cutMesh.AppendTriangle(vertexInfos[vert].Item1, vertexInfos[vert].Item2, vertexInfos[vert].Item3);
 			}
 			return cutMesh;
 		}
-		private void BindVerterts(float angle,float radus,Vector3f scale,int splits) {
+		private void BindVerterts(float angle, float radus, Vector3f scale, int splits) {
 			for (var i = 0; i < VertexCount; ++i) {
 				var v = new Vector3d(Vertices[3 * i], Vertices[(3 * i) + 1], Vertices[(3 * i) + 2]);
-				v.Bind(angle, radus,scale, splits);
+				v.Bind(angle, radus, scale, splits);
 				Vertices[3 * i] = v.x;
 				Vertices[(3 * i) + 1] = v.y;
 				Vertices[(3 * i) + 2] = v.z;
 			}
 			UpdateTimeStamp();
 		}
-		public SimpleMesh UIBind(float angle, float radus, int segments,Vector3f scale) {
-			
+		public SimpleMesh UIBind(float angle, float radus, int segments, Vector3f scale) {
+
 			var settings = new PlaneSetting[segments];
 			for (var i = 0; i < segments; i++) {
 				var pos = i % 2 == 0 ? (double)(1f / segments * i) : (double)(1f / segments * (segments - i));
-				settings[i] = new PlaneSetting{
+				settings[i] = new PlaneSetting {
 					plane = new Plane3d(Vector3d.AxisX, pos)
 				};
 			}
 			var lastmesh = CutOnPlane(settings);
-			lastmesh.BindVerterts(angle, radus,scale, segments);
+			lastmesh.BindVerterts(angle, radus, scale, segments);
 			return lastmesh;
 		}
 
@@ -249,9 +261,9 @@ namespace RNumerics
 			}
 		}
 
-		public SimpleMesh Cut(Vector2f cutmax,Vector2f cutmin) {
-			return CutOnPlane(new PlaneSetting(new Plane3d(Vector3d.AxisY, cutmin.y - 0.00001f), false, true,true),new PlaneSetting(new Plane3d(Vector3d.AxisY, cutmax.y + 0.00001f), true, true,true)
-				,new PlaneSetting(new Plane3d(Vector3d.AxisX, cutmin.x-0.00001f), false, true, true),new PlaneSetting(new Plane3d(Vector3d.AxisX, cutmax.x + 0.00001f), true, true,true));
+		public SimpleMesh Cut(Vector2f cutmax, Vector2f cutmin) {
+			return CutOnPlane(new PlaneSetting(new Plane3d(Vector3d.AxisY, cutmin.y - 0.00001f), false, true, true), new PlaneSetting(new Plane3d(Vector3d.AxisY, cutmax.y + 0.00001f), true, true, true)
+				, new PlaneSetting(new Plane3d(Vector3d.AxisX, cutmin.x - 0.00001f), false, true, true), new PlaneSetting(new Plane3d(Vector3d.AxisX, cutmax.x + 0.00001f), true, true, true));
 		}
 
 		public SimpleMesh(IMesh copy) {
