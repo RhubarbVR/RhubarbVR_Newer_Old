@@ -21,6 +21,8 @@ namespace RNumerics
 	// 
 	public partial class NTMesh3 : IDeformableMesh
 	{
+		public bool IsTriangleMesh => true;
+
 		public IEnumerable<Vector3f> VertexPos() {
 			for (var i = 0; i < VertexCount; i++) {
 				yield return GetVertexf(i);

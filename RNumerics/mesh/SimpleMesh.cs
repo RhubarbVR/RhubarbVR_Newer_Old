@@ -618,6 +618,8 @@ namespace RNumerics
 
 		public bool HasTriangleGroups => FaceGroups != null && FaceGroups.Length == Triangles.Length / 3;
 
+		public bool IsTriangleMesh => true;
+
 		public Index3i GetTriangle(int i) {
 			return new Index3i(Triangles[3 * i], Triangles[(3 * i) + 1], Triangles[(3 * i) + 2]);
 		}

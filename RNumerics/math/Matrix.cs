@@ -32,6 +32,13 @@ namespace RNumerics
 						   m41, m42, m43, m44);
 		}
 
+		public static Matrix CreateFromAssimp(Assimp.Matrix4x4 a) {
+			return new Matrix(a.A1, a.A2, a.A3, a.A4,
+							  a.B1, a.B2, a.B3, a.B4,
+							  a.C1, a.C2, a.C3, a.C4,
+							  a.D1, a.D2, a.D3, a.D4);
+		}
+
 		public Matrix(Matrix4x4 matrix) {
 			m = matrix;
 		}

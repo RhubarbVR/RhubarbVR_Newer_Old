@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
 using MessagePack;
+using Assimp;
 
 namespace RNumerics
 {
@@ -345,6 +346,21 @@ namespace RNumerics
 				return *(Vector3f*)vector3f;
 			}
 		}
+
+		public unsafe Vector3D ToAssimp() {
+			fixed (Vector3f* vector3f = &this) {
+				return *(Vector3D*)vector3f;
+			}
+		}
+		public static unsafe Vector3f ToRhuNumricsFromAssimp(ref Vector3D value) {
+			fixed (Vector3D* vector3f = &value) {
+				return *(Vector3f*)vector3f;
+			}
+		}
+
+		public static implicit operator Vector3D(Vector3f b) => b.ToAssimp();
+
+		public static implicit operator Vector3f(Vector3D b) => ToRhuNumricsFromAssimp(ref b);
 
 		public static implicit operator Vector3(Vector3f b) => b.ToSystemNumrics();
 

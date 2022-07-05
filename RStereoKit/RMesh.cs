@@ -68,6 +68,15 @@ namespace RStereoKit
 				((Mesh)meshtarget.mesh).SetInds(new uint[3]);
 				return;
 			}
+			if (!mesh.IsTriangleMesh) {
+				RLog.Err("StereoKit can only render Triangle Meshes");
+				return;
+			}
+			if (mesh is IComplexMesh complexMesh) {
+				if (!complexMesh.IsBasicMesh) {
+					RLog.Warn("StereoKit can only render Basic Meshes");
+				}
+			}
 			var loadedMesh = new Vertex[mesh.VertexCount];
 			Parallel.For(0, mesh.VertexCount, (i) => {
 				var vert = mesh.GetVertexAll(i);

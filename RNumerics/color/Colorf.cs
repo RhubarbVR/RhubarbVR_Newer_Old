@@ -1,4 +1,6 @@
-﻿using MessagePack;
+﻿using Assimp;
+
+using MessagePack;
 
 using System;
 using System.Collections.Generic;
@@ -186,6 +188,22 @@ namespace RNumerics
 
 		public static bool operator ==(Colorf a, Colorf b) => a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
 		public static bool operator !=(Colorf a, Colorf b) => a.r != b.r || a.g != b.g || a.b != b.b || a.a != b.a;
+
+		public unsafe Color4D ToAssimp() {
+			fixed (Colorf* vector3f = &this) {
+				return *(Color4D*)vector3f;
+			}
+		}
+		public static unsafe Colorf ToRhuNumricsFromAssimp(ref Color4D value) {
+			fixed (Color4D* vector3f = &value) {
+				return *(Colorf*)vector3f;
+			}
+		}
+		public static implicit operator Color4D(Colorf b) => b.ToAssimp();
+
+		public static implicit operator Colorf(Color4D b) => ToRhuNumricsFromAssimp(ref b);
+
+
 		public override bool Equals(object obj) {
 			return this == (Colorf)obj;
 		}

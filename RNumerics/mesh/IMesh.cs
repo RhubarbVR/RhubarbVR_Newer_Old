@@ -6,6 +6,64 @@ using System.Text;
 
 namespace RNumerics
 {
+	public interface IRawComplexMeshData
+	{
+		public List<Vector3f> Vertices { get; }
+		public List<Vector3f> Normals { get; }
+		public List<Vector3f> Tangents { get; }
+		public List<Vector3f> BiTangents { get; }
+		public List<Colorf>[] Colors { get; }
+		public List<Vector3f>[] TexCoords { get; }
+	}
+
+	public interface IAnimationAttachment : IRawComplexMeshData
+	{
+		public float Weight { get; }
+	}
+
+	public interface IVertexWeight
+	{
+		/// <summary>
+		///  Index of the vertex which is influenced by the bone.
+		/// </summary>
+		public int VertexID { get; }
+
+		/// <summary>
+		/// Strength of the influence in range of (0...1). All influences from all bones
+		/// at one vertex amounts to 1.
+		/// </summary>
+		public float Weight { get; }
+	}
+
+	public interface IBone
+	{
+		public string Name { get; }
+		public Matrix OffsetMatrix { get; }
+		public IEnumerable<IVertexWeight> VertexWeights { get; }
+		public bool HasVertexWeights { get; }
+		public int VertexWeightCount { get; }
+	}
+
+	public interface IFace
+	{
+		public List<int> Indices { get; }
+	}
+
+	public interface IComplexMesh : IRawComplexMeshData, IMesh
+	{
+		public string MeshName { get; }
+		public RPrimitiveType PrimitiveType { get; }
+		public IEnumerable<IBone> Bones { get; }
+		public bool HasBones { get; }
+		public IEnumerable<IFace> Faces { get; }
+		public int[] TexComponentCount { get; }
+		public IEnumerable<IAnimationAttachment> MeshAttachments { get; }
+		public bool HasMeshAttachments { get; }
+		public bool IsBasicMesh { get; }
+
+		public RMeshMorphingMethod MorphingMethod { get; }
+	}
+
 	public interface IPointSet
 	{
 		int VertexCount { get; }
@@ -33,6 +91,7 @@ namespace RNumerics
 
 	public interface IMesh : IPointSet
 	{
+		bool IsTriangleMesh { get; }
 		int TriangleCount { get; }
 		int MaxTriangleID { get; }
 
@@ -60,15 +119,16 @@ namespace RNumerics
 			int? first = null;
 			int? Next = null;
 			foreach (var item in mesh.RenderIndices()) {
-				if(first == null) {
+				if (first == null) {
 					first = item;
-				}else if (Next == null) {
+				}
+				else if (Next == null) {
 					Next = item;
 				}
 				else {
 					yield return item;
-					yield return Next??0;
-					yield return first??0;
+					yield return Next ?? 0;
+					yield return first ?? 0;
 					first = null;
 					Next = null;
 				}
@@ -146,8 +206,8 @@ namespace RNumerics
 
 
 	/*
-     * Abstracts construction of meshes, so that we can construct different types, etc
-     */
+	 * Abstracts construction of meshes, so that we can construct different types, etc
+	 */
 	public struct NewVertexInfo
 	{
 		public Vector3d v;
@@ -155,7 +215,7 @@ namespace RNumerics
 		public Vector2f[] uv;
 		public bool bHaveN, bHaveUV, bHaveC;
 
-		public NewVertexInfo(Vector3d v,Vector2f nuv,Colorf color) {
+		public NewVertexInfo(Vector3d v, Vector2f nuv, Colorf color) {
 			this.v = v;
 			n = c = Vector3f.Zero;
 			c = color.ToRGB();
@@ -194,7 +254,7 @@ namespace RNumerics
 			bHaveN = bHaveC = bHaveUV = true;
 		}
 
-		public NewVertexInfo(Vector3d v, Vector3f n, Vector3f c, Vector2f [] uv) {
+		public NewVertexInfo(Vector3d v, Vector3f n, Vector3f c, Vector2f[] uv) {
 			this.v = v;
 			this.n = n;
 			this.c = c;
