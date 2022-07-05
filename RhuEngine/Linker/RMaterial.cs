@@ -25,7 +25,7 @@ namespace RhuEngine.Linker
 		public string MainColor { get; }
 	}
 
-	public partial class RMaterial:IDisposable
+	public partial class RMaterial : IDisposable
 	{
 
 		public int RenderOrderOffset
@@ -34,7 +34,9 @@ namespace RhuEngine.Linker
 		}
 
 		public void UpdatePrams() {
-			PramChanged?.Invoke(this);
+			RWorld.ExecuteOnEndOfFrame(this, () =>
+				PramChanged?.Invoke(this)
+			);
 		}
 
 		public event Action<RMaterial> PramChanged;

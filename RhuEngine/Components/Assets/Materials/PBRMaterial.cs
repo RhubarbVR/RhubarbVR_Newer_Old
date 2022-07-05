@@ -16,6 +16,10 @@ namespace RhuEngine.Components
 		public readonly Sync<BasicRenderMode> RenderMode;
 		[OnAssetLoaded(nameof(BasicColorSettings))]
 		public readonly AssetRef<RTexture2D> AlbedoTexture;
+		[OnChanged(nameof(AlbedoTextureUVUpdate))]
+		public readonly Sync<Vector2f> AlbedoTextureTilling;
+		[OnChanged(nameof(AlbedoTextureUVUpdate))]
+		public readonly Sync<Vector2f> AlbedoTextureUVOffset;
 		[OnChanged(nameof(BasicColorSettings))]
 		public readonly Sync<Colorf> AlbedoTint;
 		[Default(0.5f)]
@@ -23,6 +27,10 @@ namespace RhuEngine.Components
 		public readonly Sync<float> AlphaCutOut;
 		[OnAssetLoaded(nameof(MetalicAndSmoothness))]
 		public readonly AssetRef<RTexture2D> MetallicTexture;
+		[OnChanged(nameof(MetallicTextureUVUpdate))]
+		public readonly Sync<Vector2f> MetallicTextureTilling;
+		[OnChanged(nameof(MetallicTextureUVUpdate))]
+		public readonly Sync<Vector2f> MetallicTextureUVOffset;
 		[OnChanged(nameof(MetalicAndSmoothness))]
 		public readonly Sync<float> Metallic;
 		[Default(0.5f)]
@@ -32,21 +40,51 @@ namespace RhuEngine.Components
 		public readonly Sync<bool> SmoothnessFromAlbedo;
 		[OnAssetLoaded(nameof(MapsUpdate))]
 		public readonly AssetRef<RTexture2D> NormalMap;
+		[OnChanged(nameof(NormalMapUVUpdate))]
+		public readonly Sync<Vector2f> NormalMapTilling;
+		[OnChanged(nameof(NormalMapUVUpdate))]
+		public readonly Sync<Vector2f> NormalMapUVOffset;
 		[OnAssetLoaded(nameof(MapsUpdate))]
 		public readonly AssetRef<RTexture2D> HeightMap;
+		[OnChanged(nameof(HeightMapUVUpdate))]
+		public readonly Sync<Vector2f> HeightMapTilling;
+		[OnChanged(nameof(HeightMapUVUpdate))]
+		public readonly Sync<Vector2f> HeightMapUVOffset;
 		[OnAssetLoaded(nameof(OtherTexturesUpdate))]
 		public readonly AssetRef<RTexture2D> Occlusion;
+		[OnChanged(nameof(OcclusionUVUpdate))]
+		public readonly Sync<Vector2f> OcclusionTilling;
+		[OnChanged(nameof(OcclusionUVUpdate))]
+		public readonly Sync<Vector2f> OcclusionUVOffset;
 		[OnAssetLoaded(nameof(OtherTexturesUpdate))]
 		public readonly AssetRef<RTexture2D> DetailMask;
-		[OnChanged(nameof(EmissionUpdate))]
-		public readonly Sync<bool> Emission;
+		[OnChanged(nameof(DetailMaskUVUpdate))]
+		public readonly Sync<Vector2f> DetailMaskTilling;
+		[OnChanged(nameof(DetailMaskUVUpdate))]
+		public readonly Sync<Vector2f> DetailMaskUVOffset;
+		[OnAssetLoaded(nameof(OtherTexturesUpdate))]
+		public readonly AssetRef<RTexture2D> DetailAlbedo;
+		[OnChanged(nameof(DetailAlbedoUVUpdate))]
+		public readonly Sync<Vector2f> DetailAlbedoTilling;
+		[OnChanged(nameof(DetailAlbedoUVUpdate))]
+		public readonly Sync<Vector2f> DetailAlbedoUVOffset;
+		[OnAssetLoaded(nameof(OtherTexturesUpdate))]
+		public readonly AssetRef<RTexture2D> DetailNormal;
+		[OnChanged(nameof(DetailNormalUVUpdate))]
+		public readonly Sync<Vector2f> DetailNormalTilling;
+		[OnChanged(nameof(DetailNormalUVUpdate))]
+		public readonly Sync<Vector2f> DetailNormalUVOffset;
 		[OnAssetLoaded(nameof(EmissionUpdate))]
 		public readonly AssetRef<RTexture2D> EmissionTexture;
+		[OnChanged(nameof(EmissionTextureUVUpdate))]
+		public readonly Sync<Vector2f> EmissionTextureTilling;
+		[OnChanged(nameof(EmissionTextureUVUpdate))]
+		public readonly Sync<Vector2f> EmissionTextureUVOffset;
 		[OnChanged(nameof(EmissionUpdate))]
 		public readonly Sync<Colorf> EmissionTint;
-		[OnChanged(nameof(UVUpdate))]
+		[OnChanged(nameof(FullUVUpdate))]
 		public readonly Sync<Vector2f> Tilling;
-		[OnChanged(nameof(UVUpdate))]
+		[OnChanged(nameof(FullUVUpdate))]
 		public readonly Sync<Vector2f> UVOffset;
 		private void RenderModeChanged() {
 			if (_material is null) {
@@ -88,25 +126,109 @@ namespace RhuEngine.Components
 			}
 			_material.Occlusion = Occlusion.Asset;
 			_material.DetailMask = DetailMask.Asset;
+			_material.DetailAlbedo = DetailAlbedo.Asset;
+			_material.DetailNormal = DetailNormal.Asset;
 			_material.Material?.UpdatePrams();
 		}
 		private void EmissionUpdate() {
 			if (_material is null) {
 				return;
 			}
-			_material.Emission = Emission;
 			_material.EmissionTexture = EmissionTexture.Asset;
 			_material.EmissionTint = EmissionTint;
 			_material.Material?.UpdatePrams();
 		}
-
-		private void UVUpdate() {
+		private void AlbedoTextureUVUpdate() {
 			if (_material is null) {
 				return;
 			}
-			_material.Tilling = Tilling;
-			_material.Offset = UVOffset;
+			_material.AlbedoTextureOffset = UVOffset.Value + AlbedoTextureUVOffset;
+			_material.AlbedoTextureTilling = Tilling.Value * AlbedoTextureTilling;
 			_material.Material?.UpdatePrams();
+		}
+
+		private void MetallicTextureUVUpdate() {
+			if (_material is null) {
+				return;
+			}
+			_material.MetallicTextureOffset = UVOffset.Value + MetallicTextureUVOffset;
+			_material.MetallicTextureTilling = Tilling.Value * MetallicTextureTilling;
+			_material.Material?.UpdatePrams();
+		}
+
+		private void NormalMapUVUpdate() {
+			if (_material is null) {
+				return;
+			}
+			_material.NormalMapOffset = UVOffset.Value + NormalMapUVOffset;
+			_material.NormalMapTilling = Tilling.Value * NormalMapTilling;
+			_material.Material?.UpdatePrams();
+		}
+
+		private void HeightMapUVUpdate() {
+			if (_material is null) {
+				return;
+			}
+			_material.HeightMapOffset = UVOffset.Value + HeightMapUVOffset;
+			_material.HeightMapTilling = Tilling.Value * HeightMapTilling;
+			_material.Material?.UpdatePrams();
+		}
+
+		private void OcclusionUVUpdate() {
+			if (_material is null) {
+				return;
+			}
+			_material.OcclusionOffset = UVOffset.Value + OcclusionUVOffset;
+			_material.OcclusionTilling = Tilling.Value * OcclusionTilling;
+			_material.Material?.UpdatePrams();
+		}
+
+		private void DetailMaskUVUpdate() {
+			if (_material is null) {
+				return;
+			}
+			_material.DetailMaskOffset = UVOffset.Value + DetailMaskUVOffset;
+			_material.DetailMaskTilling = Tilling.Value * DetailMaskTilling;
+			_material.Material?.UpdatePrams();
+		}
+
+		private void DetailAlbedoUVUpdate() {
+			if (_material is null) {
+				return;
+			}
+			_material.DetailAlbedoOffset = UVOffset.Value + DetailAlbedoUVOffset;
+			_material.DetailAlbedoTilling = Tilling.Value * DetailAlbedoTilling;
+			_material.Material?.UpdatePrams();
+		}
+
+		private void DetailNormalUVUpdate() {
+			if (_material is null) {
+				return;
+			}
+			_material.DetailNormalOffset = UVOffset.Value + DetailNormalUVOffset;
+			_material.DetailNormalTilling = Tilling.Value * DetailNormalTilling;
+			_material.Material?.UpdatePrams();
+		}
+
+		private void EmissionTextureUVUpdate() {
+			if (_material is null) {
+				return;
+			}
+			_material.EmissionTextureOffset = UVOffset.Value + EmissionTextureUVOffset;
+			_material.EmissionTextureTilling = Tilling.Value * EmissionTextureTilling;
+			_material.Material?.UpdatePrams();
+		}
+
+		private void FullUVUpdate() {
+			AlbedoTextureUVUpdate();
+			MetallicTextureUVUpdate();
+			NormalMapUVUpdate();
+			HeightMapUVUpdate();
+			OcclusionUVUpdate();
+			DetailMaskUVUpdate();
+			DetailAlbedoUVUpdate();
+			DetailNormalUVUpdate();
+			EmissionTextureUVUpdate();
 		}
 
 		public override void OnAttach() {
@@ -123,7 +245,7 @@ namespace RhuEngine.Components
 			MapsUpdate();
 			OtherTexturesUpdate();
 			EmissionUpdate();
-			UVUpdate();
+			FullUVUpdate();
 		}
 	}
 }

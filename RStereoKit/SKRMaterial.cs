@@ -113,10 +113,6 @@ namespace RStereoKit
 				}
 			}
 			public RTexture2D DetailMask { get; set; }
-			public bool Emission
-			{
-				get; set;
-			}
 			public RTexture2D EmissionTexture
 			{
 				set {
@@ -132,8 +128,27 @@ namespace RStereoKit
 				}
 			}
 			public Colorf EmissionTint { set => YourData[MatParamName.EmissionFactor] = new Color(value.r, value.g, value.b, value.a); }
-			public Vector2f Tilling { get; set; }
-			public Vector2f Offset { get; set; }
+			public Vector2f AlbedoTextureTilling { get; set; }
+			public Vector2f AlbedoTextureOffset { get; set; }
+			public Vector2f MetallicTextureTilling { get; set; }
+			public Vector2f MetallicTextureOffset { get; set; }
+			public Vector2f NormalMapTilling { get; set; }
+			public Vector2f NormalMapOffset { get; set; }
+			public Vector2f HeightMapTilling { get; set; }
+			public Vector2f HeightMapOffset { get; set; }
+			public Vector2f OcclusionTilling { get; set; }
+			public Vector2f OcclusionOffset { get; set; }
+			public Vector2f DetailMaskTilling { get; set; }
+			public Vector2f DetailMaskOffset { get; set; }
+			public RTexture2D DetailAlbedo { get; set; }
+			public Vector2f DetailAlbedoTilling { get; set; }
+			public Vector2f DetailAlbedoOffset { get; set; }
+			public RTexture2D DetailNormal { get; set; }
+			public Vector2f DetailNormalTilling { get; set; }
+			public Vector2f DetailNormalOffset { get; set; }
+			public float DetailNormalMapScale { get; set; }
+			public Vector2f EmissionTextureTilling { get; set; }
+			public Vector2f EmissionTextureOffset { get; set; }
 		}
 
 		public class ToonMaterial : StaticMaterialBase<Material>, IToonMaterial
@@ -179,6 +194,26 @@ namespace RStereoKit
 			public RTexture2D AnimationMask { set => throw new NotImplementedException(); }
 			public Vector2f ScrollAnimation { set => throw new NotImplementedException(); }
 			public float RotationAnimation { set => throw new NotImplementedException(); }
+			public Vector2f LitColorTextureTilling { set => throw new NotImplementedException(); }
+			public Vector2f LitColorTextureOffset { set => throw new NotImplementedException(); }
+			public Vector2f ShadeColorTextureTilling { set => throw new NotImplementedException(); }
+			public Vector2f ShadeColorTextureOffset { set => throw new NotImplementedException(); }
+			public Vector2f NormalMapTilling { set => throw new NotImplementedException(); }
+			public Vector2f NormalMapOffset { set => throw new NotImplementedException(); }
+			public Vector2f ShadowReceiveMultiplierTextureTilling { set => throw new NotImplementedException(); }
+			public Vector2f ShadowReceiveMultiplierTextureOffset { set => throw new NotImplementedException(); }
+			public Vector2f LitShadeMixingMultiplierTextureTilling { set => throw new NotImplementedException(); }
+			public Vector2f LitShadeMixingMultiplierTextureOffset { set => throw new NotImplementedException(); }
+			public Vector2f EmissionColorTextureTilling { set => throw new NotImplementedException(); }
+			public Vector2f EmissionColorTextureOffset { set => throw new NotImplementedException(); }
+			public Vector2f MatCapTilling { set => throw new NotImplementedException(); }
+			public Vector2f MatCapOffset { set => throw new NotImplementedException(); }
+			public Vector2f RimColorTextureTilling { set => throw new NotImplementedException(); }
+			public Vector2f RimColorTextureOffset { set => throw new NotImplementedException(); }
+			public Vector2f OutLineWidthTextureTilling { set => throw new NotImplementedException(); }
+			public Vector2f OutLineWidthTextureOffset { set => throw new NotImplementedException(); }
+			public Vector2f AnimationMaskTilling { set => throw new NotImplementedException(); }
+			public Vector2f AnimationMaskOffset { set => throw new NotImplementedException(); }
 		}
 
 		public class UnlitMaterial : StaticMaterialBase<Material>, IUnlitMaterial
