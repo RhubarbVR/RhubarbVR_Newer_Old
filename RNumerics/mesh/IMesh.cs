@@ -18,6 +18,8 @@ namespace RNumerics
 
 	public interface IAnimationAttachment : IRawComplexMeshData
 	{
+		public string Name { get; }
+
 		public float Weight { get; }
 	}
 
@@ -54,6 +56,7 @@ namespace RNumerics
 		public string MeshName { get; }
 		public RPrimitiveType PrimitiveType { get; }
 		public IEnumerable<IBone> Bones { get; }
+		public int BonesCount { get; }
 		public bool HasBones { get; }
 		public IEnumerable<IFace> Faces { get; }
 		public int[] TexComponentCount { get; }

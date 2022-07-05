@@ -42,10 +42,10 @@ namespace RNumerics
 		[Key(0)]
 		public Matrix OffsetMatrix = Matrix.Identity;
 
-		[Key(2)]
+		[Key(1)]
 		public List<RVertexWeight> VertexWeights = new();
 
-		[Key(3)]
+		[Key(2)]
 		public string BoneName;
 
 		[IgnoreMember]
@@ -131,6 +131,8 @@ namespace RNumerics
 	[MessagePackObject]
 	public class RAnimationAttachment : IAnimationAttachment
 	{
+		[Key(0)]
+		public string Name = "Unknown";
 		[Key(1)]
 		public List<Vector3f> Vertices = new();
 		[Key(2)]
@@ -159,6 +161,8 @@ namespace RNumerics
 		List<Colorf>[] IRawComplexMeshData.Colors => Colors;
 		[IgnoreMember]
 		List<Vector3f>[] IRawComplexMeshData.TexCoords => TexCoords;
+		[IgnoreMember]
+		string IAnimationAttachment.Name => Name;
 
 		public RAnimationAttachment(MeshAnimationAttachment meshAnimationAttachment) {
 			Vertices = meshAnimationAttachment.Vertices.Select((x) => (Vector3f)x).ToList();
@@ -168,6 +172,7 @@ namespace RNumerics
 			Colors = meshAnimationAttachment.VertexColorChannels.Select((x) => x.Select((y) => (Colorf)y).ToList()).ToArray();
 			TexCoords = meshAnimationAttachment.TextureCoordinateChannels.Select((x) => x.Select((y) => (Vector3f)y).ToList()).ToArray();
 			Weight = meshAnimationAttachment.Weight;
+			//Name = meshAnimationAttachment.Name; //Todo:UpdateAssimp
 		}
 		public RAnimationAttachment() {
 
@@ -199,6 +204,8 @@ namespace RNumerics
 		public int[] TexComponentCount = Array.Empty<int>();
 		[Key(10)]
 		public List<RBone> Bones = new();
+		[IgnoreMember]
+		public int BonesCount => Bones.Count;
 		[Key(11)]
 		public List<RAnimationAttachment> MeshAttachments = new();
 		[Key(12)]
