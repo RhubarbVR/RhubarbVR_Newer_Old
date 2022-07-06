@@ -21,6 +21,12 @@ namespace RhuEngine
 {
 	public class Engine : IDisposable
 	{
+		public void DragAndDropAction(List<string> files) {
+			DragAndDrop?.Invoke(files);
+		}
+
+		public event Action<List<string>> DragAndDrop;
+
 		public bool PassErrors { get; private set; }
 		public IEngineLink EngineLink { get; private set; }
 

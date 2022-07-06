@@ -13,6 +13,20 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Assets/Utils" })]
 	public class ClipBoardImport :Component, IUpdatingComponent
 	{
+		public override void OnLoaded() {
+			base.OnLoaded();
+			Engine.DragAndDrop += Engine_DragAndDrop;
+		}
+
+		private void Engine_DragAndDrop(System.Collections.Generic.List<string> obj) {
+			if (World.Focus != World.FocusLevel.Focused) {
+				return;
+			}
+			foreach (var item in obj) {
+				World.ImportString(item);
+			}
+		}
+
 		public override void Step() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
