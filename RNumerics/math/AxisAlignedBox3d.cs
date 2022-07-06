@@ -20,6 +20,9 @@ namespace RNumerics
 		[IgnoreMember]
 		public static readonly AxisAlignedBox3d Infinite =
 			new(double.MinValue, double.MinValue, double.MinValue, double.MaxValue, double.MaxValue, double.MaxValue);
+		[IgnoreMember]
+		public static readonly AxisAlignedBox3d CenterZero =
+			new(Vector3d.Zero, 0);
 
 
 		public AxisAlignedBox3d(double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
@@ -91,6 +94,7 @@ namespace RNumerics
 		public Vector3d Extents => new((Max.x - Min.x) * 0.5, (Max.y - Min.y) * 0.5, (Max.z - Min.z) * 0.5);
 		[IgnoreMember]
 		public Vector3d Center => new(0.5 * (Min.x + Max.x), 0.5 * (Min.y + Max.y), 0.5 * (Min.z + Max.z));
+
 
 		public static bool operator ==(AxisAlignedBox3d a, AxisAlignedBox3d b) => a.Min == b.Min && a.Max == b.Max;
 		public static bool operator !=(AxisAlignedBox3d a, AxisAlignedBox3d b) => a.Min != b.Min || a.Max != b.Max;

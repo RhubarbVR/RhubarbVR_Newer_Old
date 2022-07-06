@@ -24,6 +24,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Rendering" })]
 	public class Light : RenderingComponent
 	{
+		[Default(RLightType.Point)]
 		public readonly Sync<RLightType> LightType;
 
 		//SpotLight Point

@@ -18,11 +18,6 @@ namespace RhuEngine
 			RLog.Info("Building Local World");
 			var floor = world.RootEntity.AddChild("Floor");
 			floor.position.Value = new Vector3f(0, 0, 0);
-
-
-			//Todo: fix problem with RigidBody
-			//var rigbody = PowerCube.AttachComponent<RigidBody>();
-			//rigbody.PhysicsObject.Target = boxshape;
 			var coloider = floor.AttachComponent<CylinderShape>();
 			var (mesh, mit, render) = floor.AttachMeshWithMeshRender<CylinderMesh, UnlitMaterial>();
 			mit.Transparency.Value = Transparency.Blend;
@@ -42,6 +37,15 @@ namespace RhuEngine
 
 			var DebugStuff = floor.AddChild("DebugStuff");
 			DebugStuff.position.Value = new Vector3f(-1.5f, 0f, -1f);
+
+			var TempComps = DebugStuff.AddChild("RenderComps");
+			TempComps.position.Value = new Vector3f(0f, 3f, 4f);
+			TempComps.AttachComponent<Light>();
+			TempComps.AttachComponent<MeshRender>();
+			TempComps.AttachComponent<WorldText>();
+			TempComps.AttachComponent<Armature>();
+			TempComps.AttachComponent<SkinnedMeshRender>();
+
 			var Mits = DebugStuff.AddChild("DebugStuff");
 			Mits.position.Value = new Vector3f(2f, 3f, -2f);
 			Mits.scale.Value = new Vector3f(0.25f);
