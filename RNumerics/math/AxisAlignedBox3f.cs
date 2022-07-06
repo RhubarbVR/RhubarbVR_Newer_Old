@@ -85,6 +85,9 @@ namespace RNumerics
 			  + ((Max.y - Min.y) * (Max.y - Min.y)) + ((Max.z - Min.z) * (Max.z - Min.z)));
 			}
 		}
+
+		
+
 		[IgnoreMember]
 		public float MaxDim => Math.Max(Width, Math.Max(Height, Depth));
 
@@ -155,6 +158,10 @@ namespace RNumerics
 			Max.x -= fRadius;
 			Max.y -= fRadius;
 			Max.z -= fRadius;
+		}
+
+		public void Scale(Vector3f scale) {
+			Scale(scale.x, scale.y, scale.z);
 		}
 
 		public void Scale(float sx, float sy, float sz) {

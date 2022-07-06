@@ -117,6 +117,13 @@ namespace RNumerics
 			return box;
 		}
 
+		public static AxisAlignedBox3f Combined(AxisAlignedBox3f a, AxisAlignedBox3f b) {
+			return new AxisAlignedBox3f {
+				Max = new Vector3f(Math.Max(a.Max.x, b.Max.x), Math.Max(a.Max.y, b.Max.y), Math.Max(a.Max.z, b.Max.z)),
+				Min = new Vector3f(Math.Min(a.Min.x, b.Min.x), Math.Min(a.Min.y, b.Min.y), Math.Min(a.Min.z, b.Min.z)),
+			};
+		}
+
 
 		/// <summary>
 		/// compute axis-aligned bounds of set of points after transforming into frame f

@@ -94,14 +94,36 @@ namespace RhuEngine.Components
 			public List<AssetProvider<RTexture2D>> textures = new();
 			public List<AssetProvider<RMesh>> meshes = new();
 			public List<AssetProvider<RMaterial>> materials = new();
-
+			public bool ReScale = true;
+			public float TargetSize = 0.5f;
 			public Dictionary<string, Entity> Nodes = new();
 			public Dictionary<string[], Armature> Armatures = new(new StringArrayEqualityComparer());
-
+			public AxisAlignedBox3f BoundingBox = AxisAlignedBox3f.CenterZero;
 			public AssimpHolder(Scene scene, Entity _root, Entity _assetEntity) {
 				this.scene = scene;
 				root = _root;
 				assetEntity = _assetEntity;
+			}
+
+			public void CalculateOptimumBounds(Mesh amesh,Entity entity) {
+				var local = root.GlobalToLocal(entity.GlobalTrans);
+				var mesh = BoundsUtil.Bounds(amesh.Vertices, (x) => x);
+				mesh.Translate(local.Translation);
+				mesh.Scale(local.Scale);
+				BoundingBox = BoundsUtil.Combined(BoundingBox, mesh);
+			}
+
+			public void Rescale() {
+				if (ReScale) {
+					var size = BoundingBox.Extents;
+					var largestSize = MathUtil.Max(size.x, size.y, size.z);
+					root.scale.Value *= new Vector3f(TargetSize / largestSize);
+				}
+			}
+
+			public void CalculateOptimumBounds(Entity entity) {
+				var localPoint = root.GlobalPointToLocal(entity.GlobalTrans.Translation);
+				BoundingBox = BoundsUtil.Combined(BoundingBox, new AxisAlignedBox3f { Max = localPoint, Min = localPoint });
 			}
 		}
 
@@ -109,7 +131,7 @@ namespace RhuEngine.Components
 			try {
 				Entity.rotation.Value *= Quaternionf.Pitched.Inverse;
 				_assimpContext ??= new AssimpContext {
-					Scale = 1f,
+					Scale = .001f,
 				};
 				Scene scene;
 				if (isUrl) {
@@ -132,6 +154,7 @@ namespace RhuEngine.Components
 				LoadMesh(AssimpHolder.assetEntity, AssimpHolder);
 				LoadNode(root, scene.RootNode, AssimpHolder);
 				LoadLights(AssimpHolder.assetEntity, AssimpHolder);
+				AssimpHolder.Rescale();
 				RLog.Info("Done Loading Model");
 				//LoadAnimations(AssimpHolder.assetEntity, AssimpHolder);
 				//LoadCameras(AssimpHolder.assetEntity, AssimpHolder);
@@ -154,6 +177,7 @@ namespace RhuEngine.Components
 					LoadNode(entity, item, scene);
 				}
 			}
+			scene.CalculateOptimumBounds(entity);
 			if (node.HasMeshes) {
 				LoadMeshNode(entity, node, scene);
 			}
@@ -293,6 +317,7 @@ namespace RhuEngine.Components
 			foreach (var item in node.MeshIndices) {
 				var rMesh = scene.meshes[item];
 				var amesh = scene.scene.Meshes[item];
+				scene.CalculateOptimumBounds(amesh,entity);
 				if (amesh.HasBones || amesh.HasMeshAnimationAttachments) {
 					var boneNames = amesh.Bones.Select((x) => x.Name).ToArray();
 					Armature armiturer;
