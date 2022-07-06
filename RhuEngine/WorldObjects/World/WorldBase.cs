@@ -208,8 +208,6 @@ namespace RhuEngine.WorldObjects
 		/// </summary>
 		public float stepTime = 0f;
 
-		public object RenderLock = new();
-
 
 		[NoSync]
 		[NoSave]
@@ -270,7 +268,7 @@ namespace RhuEngine.WorldObjects
 
 			try {
 				if (Engine.EngineLink.CanRender) {
-					lock (RenderLock) {
+					lock (_renderingComponents) {
 						foreach (var item in _renderingComponents) {
 							item.Render();
 						}
