@@ -177,7 +177,7 @@ namespace RNumerics
 			Colors = meshAnimationAttachment.VertexColorChannels.Select((x) => x.Select((y) => (Colorf)y).ToList()).ToArray();
 			TexCoords = meshAnimationAttachment.TextureCoordinateChannels.Select((x) => x.Select((y) => (Vector3f)y).ToList()).ToArray();
 			Weight = meshAnimationAttachment.Weight;
-			//Name = meshAnimationAttachment.Name; //Todo:UpdateAssimp
+			Name = meshAnimationAttachment.Name;
 		}
 		public RAnimationAttachment() {
 
@@ -302,7 +302,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public bool HasBones => Bones.Count > 0;
 		[IgnoreMember]
-		public bool HasMeshAttachments => MorphingMethod != RMeshMorphingMethod.None;
+		public bool HasMeshAttachments => MeshAttachments.Count > 0;
 		[IgnoreMember]
 		public bool IsBasicMesh => !(HasBones || HasMeshAttachments);
 

@@ -138,7 +138,7 @@ namespace RhuEngine.Components
 
 			}
 			catch (Exception e) {
-				RLog.Err($"failed to Load Model Error {e}");
+				RLog.Err($"Failed to Load Model Error {e}");
 			}
 		}
 
@@ -335,6 +335,7 @@ namespace RhuEngine.Components
 						var newShape = meshRender.BlendShapes.Add();
 						newShape.BlendName.Value = boneMesh.Name;
 						newShape.Weight.Value = boneMesh.Weight;
+						RLog.Info($"Added ShapeKey {newShape.BlendName.Value}");
 					}
 					meshRender.mesh.Target = rMesh;
 					meshRender.materials.Add().Target = scene.materials[amesh.MaterialIndex];
@@ -344,6 +345,7 @@ namespace RhuEngine.Components
 					meshRender.mesh.Target = rMesh;
 					meshRender.materials.Add().Target = scene.materials[amesh.MaterialIndex];
 				}
+				RLog.Info($"Added MeshNode {node.Name}");
 			}
 		}
 

@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="AssimpNet" Version="4.1.0" />
+	  <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
 	  <PackageReference Include="MessagePack" Version="2.4.35" />
 	  <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 	</ItemGroup>
