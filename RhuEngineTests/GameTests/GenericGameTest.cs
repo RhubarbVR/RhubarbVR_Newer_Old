@@ -192,7 +192,7 @@ namespace RhuEngine.GameTests.Tests
 							}
 						}
 						catch (Exception normalex) {
-							if(normalex.InnerException.GetType() != typeof(SyncObject.NotVailedGenaric)) {
+							if (normalex.InnerException.GetType() != typeof(SyncObject.NotVailedGenaric)) {
 								throw;
 							}
 							RLog.Warn("used Invailed Genaric Type");
@@ -423,13 +423,12 @@ namespace RhuEngine.GameTests.Tests
 			inttest.Inputs.Add().Target = one;
 
 			var two = inputs.Value.Add();
-			var valuetwo = two.Value = random.Next(-100, 100);
+			var valuetwo = two.Value = random.Next(1, 10000);
 			inttest.Inputs.Add().Target = two;
 
 			var three = inputs.Value.Add();
-			var valueThree = three.Value = random.Next(-100, 100);
+			var valueThree = three.Value = random.Next(1, 10000);
 			inttest.Inputs.Add().Target = three;
-
 			inttest.Operators.Value = Components.MultiOperators.Addition;
 			Assert.AreEqual(output.Value, valueone + valuetwo + valueThree);
 
@@ -453,7 +452,6 @@ namespace RhuEngine.GameTests.Tests
 
 			inttest.Operators.Value = Components.MultiOperators.LogicalAND;
 			Assert.AreEqual(output.Value, valueone & valuetwo & valueThree);
-
 			tester.RunForSteps();
 			tester.Dispose();
 		}
