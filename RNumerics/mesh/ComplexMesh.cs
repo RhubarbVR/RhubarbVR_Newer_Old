@@ -29,6 +29,11 @@ namespace RNumerics
 			VertexID = vertexWeight.VertexID;
 			Weight = vertexWeight.Weight;
 		}
+		public RVertexWeight() {
+			VertexID = 0;
+			Weight = 0;
+		}
+
 		[IgnoreMember]
 		int IVertexWeight.VertexID => VertexID;
 		[IgnoreMember]
@@ -233,7 +238,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public int MaxTriangleID => Faces.Count;
 		[IgnoreMember]
-		public bool HasVertexUVs => TexCoords.Length > 0;
+		public bool HasVertexUVs => (TexCoords.Length > 0) & TexCoords[0].Count > 0;
 		[IgnoreMember]
 		public bool HasTriangleGroups => PrimitiveType == RPrimitiveType.Triangle;
 		[IgnoreMember]
@@ -243,7 +248,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public bool HasVertexNormals => Normals.Count > 0;
 		[IgnoreMember]
-		public bool HasVertexColors => Colors.Length > 0;
+		public bool HasVertexColors => (Colors.Length > 0) & Colors[0].Count > 0;
 		[IgnoreMember]
 		public int Timestamp => int.MaxValue;
 		[IgnoreMember]
@@ -327,7 +332,13 @@ namespace RNumerics
 
 			if (HasVertexUVs) {
 				vi.bHaveUV = true;
-				vi.uv = new Vector2f[] { GetVertexUV(i) };
+				vi.uv = new Vector2f[TexCoords.Length];
+				for (var v = 0; v < TexCoords.Length; v++) {
+					if (TexCoords[v].Count > i) {
+						var uv = TexCoords[v][i].Xy;
+						vi.uv[v] = new Vector2f(uv.x, 1f - uv.y);
+					}
+				}
 			}
 			else {
 				vi.bHaveUV = false;
@@ -337,7 +348,8 @@ namespace RNumerics
 		}
 
 		public Index3i GetTriangle(int i) {
-			return new Index3i(Faces[i].Indices.ToArray());
+			var face = Faces[i];
+			return new Index3i(face.Indices[0], face.Indices[1], face.Indices[2]);			
 		}
 
 		public int GetTriangleGroup(int i) {
@@ -352,11 +364,20 @@ namespace RNumerics
 		}
 
 		public IEnumerable<int> RenderIndices() {
-			var N = TriangleCount;
-			for (var i = 0; i < N; ++i) {
-				yield return GetTriangle(i).a;
-				yield return GetTriangle(i).b;
-				yield return GetTriangle(i).c;
+			foreach (var item in Faces) {
+				if(item.Indices.Count == 3) {
+					yield return item.Indices[0];
+					yield return item.Indices[1];
+					yield return item.Indices[2];
+				}
+				else if (item.Indices.Count == 4) {
+					yield return item.Indices[0];
+					yield return item.Indices[1];
+					yield return item.Indices[2];
+					yield return item.Indices[0];
+					yield return item.Indices[2];
+					yield return item.Indices[3];
+				}
 			}
 		}
 
@@ -369,7 +390,7 @@ namespace RNumerics
 		}
 
 		public Vector3f GetVertexColor(int i) {
-			return Colors[0][i].ToRGB();
+			return Colors[0][i].ToRGB().IsAnyNan ? new Vector3f(1f) : Colors[0][i].ToRGB();
 		}
 
 		public bool IsVertex(int vID) {

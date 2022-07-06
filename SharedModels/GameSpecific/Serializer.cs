@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 
 using MessagePack;
@@ -7,7 +8,51 @@ using MessagePack.Formatters;
 
 namespace SharedModels.GameSpecific
 {
+	[Formatter]
+	public class MatrixSaver : IMessagePackFormatter<Matrix4x4>
+	{
+		public Matrix4x4 Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
+			return new Matrix4x4(
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle(),
+				reader.ReadSingle()
+				);
 
+
+		}
+
+		public void Serialize(ref MessagePackWriter writer, Matrix4x4 value, MessagePackSerializerOptions options) {
+			writer.Write(value.M11);
+			writer.Write(value.M12);
+			writer.Write(value.M13);
+			writer.Write(value.M14);
+			writer.Write(value.M21);
+			writer.Write(value.M22);
+			writer.Write(value.M23);
+			writer.Write(value.M24);
+			writer.Write(value.M31);
+			writer.Write(value.M32);
+			writer.Write(value.M33);
+			writer.Write(value.M34);
+			writer.Write(value.M41);
+			writer.Write(value.M42);
+			writer.Write(value.M43);
+			writer.Write(value.M44);
+		}
+	}
 	public class FormatterAttribute : Attribute
 	{
 	}

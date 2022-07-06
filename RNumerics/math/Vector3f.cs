@@ -121,7 +121,8 @@ namespace RNumerics
 		public float MaxAbs => Math.Max(Math.Abs(x), Math.Max(Math.Abs(y), Math.Abs(z)));
 		[IgnoreMember]
 		public float MinAbs => Math.Min(Math.Abs(x), Math.Min(Math.Abs(y), Math.Abs(z)));
-
+		[IgnoreMember]
+		public bool IsAnyNan => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z);
 
 		public float Normalize(float epsilon = MathUtil.EPSILONF) {
 			var length = Length;

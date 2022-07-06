@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
+using MessagePack;
+using MessagePack.Formatters;
 
 namespace RNumerics
 {
+	
+
 	/// <summary>A Matrix in StereoKit is a 4x4 grid of numbers that is used 
 	/// to represent a transformation for any sort of position or vector! 
 	/// This is an oversimplification of what a matrix actually is, but it's
@@ -17,11 +21,14 @@ namespace RNumerics
 	/// 
 	/// Matrices are prominently used within shaders for mesh transforms!
 	/// </summary>
-	public struct Matrix {
+	[MessagePackObject]
+	public struct Matrix
+	{
 		/// <summary>The internal, wrapped System.Numerics type. This can be
 		/// nice to have around so you can pass its fields as 'ref', which you
 		/// can't do with properties. You won't often need this, as implicit
 		/// conversions to System.Numerics types are also provided.</summary>
+		[Key(0)]
 		public Matrix4x4 m;
 
 		public Matrix(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31, float m32, float m33, float m34, float m41, float m42, float m43, float m44) {
@@ -54,24 +61,29 @@ namespace RNumerics
 		/// <summary>An identity Matrix is the matrix equivalent of '1'! 
 		/// Transforming anything by this will leave it at the exact same
 		/// place.</summary>
+		[IgnoreMember]
 		public static Matrix Identity => Matrix4x4.Identity;
 
 		/// <summary>A fast Property that will return or set the translation
 		/// component embedded in this transform matrix.</summary>
+		[IgnoreMember]
 		public Vector3f Translation { get => m.Translation; set => m.Translation = value; }
 		/// <summary>Returns the scale embedded in this transform matrix. Not
 		/// exactly cheap, requires 3 sqrt calls, but is cheaper than calling
 		/// Decompose.</summary>
-		public Vector3f Scale {
+		[IgnoreMember]
+		public Vector3f Scale
+		{
 			get {
-				Matrix4x4.Decompose(m, out var scale,out _,out _);
+				Matrix4x4.Decompose(m, out var scale, out _, out _);
 				return scale;
 			}
-			}
+		}
 		/// <summary>A slow function that returns the rotation quaternion 
 		/// embedded in this transform matrix. This is backed by Decompose,
 		/// so if you need any additional info, it's better to just call
 		/// Decompose instead.</summary>
+		[IgnoreMember]
 		public Quaternionf Rotation
 		{
 			get {
@@ -85,14 +97,15 @@ namespace RNumerics
 		/// from a -> b, then its inverse takes the point from b -> a.
 		/// </summary>
 		/// <returns>An inverse matrix of the current one.</returns>
+		[IgnoreMember]
 		public Matrix Inverse { get { Matrix4x4.Invert(m, out var result); return result; } }
-
+		[IgnoreMember]
 		public Matrix InvScale
 		{
 			get {
-				Decompose(out var pos,out var rot , out var scale);
+				Decompose(out var pos, out var rot, out var scale);
 				scale = 1 / scale;
-				return Matrix.TRS(pos,rot,scale);
+				return Matrix.TRS(pos, rot, scale);
 			}
 		}
 

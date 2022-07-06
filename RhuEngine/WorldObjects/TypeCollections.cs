@@ -100,6 +100,7 @@ namespace RhuEngine.WorldObjects
 			typeof(Vector2dTuple4),
 			typeof(Circle3d),
 			typeof(Cylinder3d),
+			typeof(Matrix),
 		};
 	}
 }

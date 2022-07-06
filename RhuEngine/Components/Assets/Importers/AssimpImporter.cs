@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System;
 using System.Collections.Generic;
+using RhuEngine.AssetSystem;
+using RNumerics;
+using System.Linq;
 
 namespace RhuEngine.Components
 {
@@ -57,6 +60,30 @@ namespace RhuEngine.Components
 		}
 
 		AssimpContext _assimpContext;
+		public class StringArrayEqualityComparer : IEqualityComparer<string[]>
+		{
+			public bool Equals(string[] x, string[] y) {
+				if (x.Length != y.Length) {
+					return false;
+				}
+				for (var i = 0; i < x.Length; i++) {
+					if (x[i] != y[i]) {
+						return false;
+					}
+				}
+				return true;
+			}
+
+			public int GetHashCode(string[] obj) {
+				var result = 17;
+				for (var i = 0; i < obj.Length; i++) {
+					unchecked {
+						result = (result * 23) + obj[i].GetHashCode();
+					}
+				}
+				return result;
+			}
+		}
 
 		private class AssimpHolder
 		{
@@ -65,8 +92,13 @@ namespace RhuEngine.Components
 			public Scene scene;
 
 			public List<AssetProvider<RTexture2D>> textures = new();
+			public List<AssetProvider<RMesh>> meshes = new();
+			public List<AssetProvider<RMaterial>> materials = new();
 
-			public AssimpHolder(Scene scene,Entity _root,Entity _assetEntity) {
+			public Dictionary<string, Entity> Nodes = new();
+			public Dictionary<string[], Armature> Armatures = new(new StringArrayEqualityComparer());
+
+			public AssimpHolder(Scene scene, Entity _root, Entity _assetEntity) {
 				this.scene = scene;
 				root = _root;
 				assetEntity = _assetEntity;
@@ -75,7 +107,10 @@ namespace RhuEngine.Components
 
 		public async Task ImportAsync(string path_url, bool isUrl, byte[] rawData) {
 			try {
-				_assimpContext ??= new AssimpContext();
+				Entity.rotation.Value *= Quaternionf.Pitched.Inverse;
+				_assimpContext ??= new AssimpContext {
+					Scale = 1f,
+				};
 				Scene scene;
 				if (isUrl) {
 					using var client = new HttpClient();
@@ -91,30 +126,37 @@ namespace RhuEngine.Components
 					return;
 				}
 				var root = Entity.AddChild("Root");
-				var AssimpHolder = new AssimpHolder(scene,root,root.AddChild("Assets"));
-				LoadMesh(AssimpHolder.assetEntity, AssimpHolder);
-				LoadMaterials(AssimpHolder.assetEntity, AssimpHolder);
-				Loadights(AssimpHolder.assetEntity, AssimpHolder);
+				var AssimpHolder = new AssimpHolder(scene, root, root.AddChild("Assets"));
 				LoadTextures(AssimpHolder.assetEntity, AssimpHolder);
-				LoadAnimations(AssimpHolder.assetEntity, AssimpHolder);
-				LoadCameras(AssimpHolder.assetEntity, AssimpHolder);
-				LoadLight(AssimpHolder.assetEntity, AssimpHolder);
-				LoadNode(root, scene.RootNode,AssimpHolder);
-			}catch(Exception e) {
+				LoadMaterials(AssimpHolder.assetEntity, AssimpHolder);
+				LoadMesh(AssimpHolder.assetEntity, AssimpHolder);
+				LoadNode(root, scene.RootNode, AssimpHolder);
+				LoadLights(AssimpHolder.assetEntity, AssimpHolder);
+				RLog.Info("Done Loading Model");
+				//LoadAnimations(AssimpHolder.assetEntity, AssimpHolder);
+				//LoadCameras(AssimpHolder.assetEntity, AssimpHolder);
+
+			}
+			catch (Exception e) {
 				RLog.Err($"failed to Load Model Error {e}");
 			}
 		}
 
-		private static void LoadNode(Entity ParrentEntity,Assimp.Node node, AssimpHolder scene) {
-			RLog.Info($"Loaded Node {node.Name} Parrent {node.Parent?.Name??"NULL"}");
+		private static void LoadNode(Entity ParrentEntity, Assimp.Node node, AssimpHolder scene) {
+			RLog.Info($"Loaded Node {node.Name} Parrent {node.Parent?.Name ?? "NULL"}");
 			var entity = ParrentEntity.AddChild(node.Name);
 			entity.LocalTrans = node.Transform.CastToNormal();
+			if (scene.Nodes.ContainsKey(node.Name)) {
+				scene.Nodes.Add(node.Name, entity);
+			}
 			if (node.HasChildren) {
 				foreach (var item in node.Children) {
 					LoadNode(entity, item, scene);
 				}
 			}
-			LoadMeshNode(entity, node, scene);
+			if (node.HasMeshes) {
+				LoadMeshNode(entity, node, scene);
+			}
 		}
 
 		private static void LoadMesh(Entity entity, AssimpHolder scene) {
@@ -123,6 +165,11 @@ namespace RhuEngine.Components
 				return;
 			}
 			foreach (var item in scene.scene.Meshes) {
+				var newuri = entity.World.LoadLocalAsset(CustomAssetManager.SaveAsset(new ComplexMesh(item), item.Name), item.Name);
+				var tex = entity.AttachComponent<StaticMesh>();
+				scene.meshes.Add(tex);
+				tex.url.Value = newuri.ToString();
+				RLog.Info($"Loaded Mesh {item.Name}");
 			}
 		}
 
@@ -132,17 +179,77 @@ namespace RhuEngine.Components
 				return;
 			}
 			foreach (var item in scene.scene.Materials) {
-				
+				if (item.IsPBRMaterial) {
+					var mat = entity.AttachComponent<PBRMaterial>();
+					scene.materials.Add(mat);
+					if (item.HasShininess) {
+						mat.Smoothness.Value = item.Shininess;
+					}
+					if (item.HasColorDiffuse) {
+						mat.AlbedoTint.Value = new Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, item.ColorDiffuse.A);
+					}
+					if (item.HasTextureDiffuse) {
+						try {
+							mat.DetailAlbedo.Target = scene.textures[item.TextureDiffuse.TextureIndex];
+						}
+						catch { }
+					}
+					if (item.HasTextureNormal) {
+						try {
+							mat.NormalMap.Target = scene.textures[item.TextureNormal.TextureIndex];
+						}
+						catch { }
+					}
+					if (item.HasTextureEmissive) {
+						try {
+							mat.EmissionTexture.Target = scene.textures[item.TextureEmissive.TextureIndex];
+						}
+						catch { }
+					}
+					if (item.HasColorDiffuse) {
+						mat.AlbedoTint.Value = new Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, item.ColorDiffuse.A);
+					}
+					if (item.HasTextureDiffuse) {
+						try {
+							mat.AlbedoTexture.Target = scene.textures[item.TextureDiffuse.TextureIndex];
+						}
+						catch { }
+					}
+					RLog.Info($"Loaded PBR Material");
+				}
+				else {
+					var mat = entity.AttachComponent<UnlitMaterial>();
+					scene.materials.Add(mat);
+					if (item.HasColorDiffuse) {
+						mat.Tint.Value = new Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, item.ColorDiffuse.A);
+					}
+					if (item.HasTextureDiffuse) {
+						try {
+							mat.MainTexture.Target = scene.textures[item.TextureDiffuse.TextureIndex];
+						}
+						catch { }
+					}
+					RLog.Info($"Loaded Unlit Material");
+				}
 			}
 		}
 
-		private static void Loadights(Entity entity, AssimpHolder scene) {
+		private static void LoadLights(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasLights) {
 				RLog.Info($"No lights");
 				return;
 			}
+			var lights = entity.AddChild("Lights");
 			foreach (var item in scene.scene.Lights) {
-				//Need to add light component
+				var ligh = scene.Nodes.ContainsKey(item.Name) ? scene.Nodes[item.Name] : lights.AddChild(item.Name);
+				var lightcomp = ligh.AttachComponent<Light>();
+				lightcomp.LightType.Value = item.LightType switch {
+					LightSourceType.Directional => RLightType.Directional,
+					LightSourceType.Spot => RLightType.Spot,
+					_ => RLightType.Point,
+				};
+				lightcomp.SpotAngle.Value = item.AngleInnerCone;
+				lightcomp.Color.Value = new RNumerics.Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, 1);
 			}
 		}
 		private static void LoadTextures(Entity entity, AssimpHolder scene) {
@@ -181,23 +288,67 @@ namespace RhuEngine.Components
 				return;
 			}
 		}
-		private static void LoadLight(Entity entity, AssimpHolder scene) {
-			if (!scene.scene.HasLights) {
-				RLog.Info("No Lights");
-				return;
-			}
-		}
 
 		private static void LoadMeshNode(Entity entity, Assimp.Node node, AssimpHolder scene) {
-			if (!node.HasMeshes) {
-				return;
-			}
 			foreach (var item in node.MeshIndices) {
+				var rMesh = scene.meshes[item];
+				var amesh = scene.scene.Meshes[item];
+				if (amesh.HasBones || amesh.HasMeshAnimationAttachments) {
+					var boneNames = amesh.Bones.Select((x) => x.Name).ToArray();
+					Armature armiturer;
+					if (!scene.Armatures.ContainsKey(boneNames)) {
+						armiturer = entity.AttachComponent<Armature>();
+						foreach (var bone in amesh.Bones) {
+							if (scene.Nodes.ContainsKey(bone.Name)) {
+								armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
+							}
+							else {
+								var ent = entity.AddChild(bone.Name);
+								armiturer.ArmatureEntitys.Add().Target = ent;
+								ent.GlobalTrans = new Matrix(
+									bone.OffsetMatrix.A1,
+									bone.OffsetMatrix.A2,
+									bone.OffsetMatrix.A3,
+									bone.OffsetMatrix.A4,
+									bone.OffsetMatrix.B1,
+									bone.OffsetMatrix.B2,
+									bone.OffsetMatrix.B3,
+									bone.OffsetMatrix.B4,
+									bone.OffsetMatrix.C1,
+									bone.OffsetMatrix.C2,
+									bone.OffsetMatrix.C3,
+									bone.OffsetMatrix.C4,
+									bone.OffsetMatrix.D1,
+									bone.OffsetMatrix.D2,
+									bone.OffsetMatrix.D3,
+									bone.OffsetMatrix.D4
+								);
+							}
+						}
+					}
+					else {
+						armiturer = scene.Armatures[boneNames];
+					}
+					var meshRender = entity.AttachComponent<SkinnedMeshRender>();
+					meshRender.Armature.Target = armiturer;
+					foreach (var boneMesh in amesh.MeshAnimationAttachments) {
+						var newShape = meshRender.BlendShapes.Add();
+						newShape.BlendName.Value = boneMesh.Name;
+						newShape.Weight.Value = boneMesh.Weight;
+					}
+					meshRender.mesh.Target = rMesh;
+					meshRender.materials.Add().Target = scene.materials[amesh.MaterialIndex];
+				}
+				else {
+					var meshRender = entity.AttachComponent<MeshRender>();
+					meshRender.mesh.Target = rMesh;
+					meshRender.materials.Add().Target = scene.materials[amesh.MaterialIndex];
+				}
 			}
 		}
 
 		public override void Import(string path_url, bool isUrl, byte[] rawData) {
-			ImportAsync(path_url,isUrl,rawData).ConfigureAwait(false);
+			ImportAsync(path_url, isUrl, rawData).ConfigureAwait(false);
 		}
 	}
 }

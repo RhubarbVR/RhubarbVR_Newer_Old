@@ -99,6 +99,7 @@ namespace RhuEngine.DataStructure
 	[Union(94, typeof(DataNode<Circle3d>))]
 	[Union(95, typeof(DataNode<Cylinder3d>))]
 	[Union(96, typeof(DataNode<ushort>))]
+	[Union(97, typeof(DataNode<Matrix>))]
 	[Union(100, typeof(DataNode<object>))]
 
 	public interface IDataNode
