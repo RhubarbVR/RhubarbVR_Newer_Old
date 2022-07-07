@@ -174,6 +174,9 @@ namespace RhuEngine.Components
 			RLog.Info($"Loaded Node {node.Name} Parrent {node.Parent?.Name ?? "NULL"}");
 			var entity = ParrentEntity.AddChild(node.Name);
 			entity.LocalTrans = Matrix.CreateFromAssimp(node.Transform);
+			entity.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>().Item1.Radius.Value = 0.05f;
+			entity.AttachComponent<Grabbable>();
+			entity.AttachComponent<SphereShape>().Radus.Value = 0.05f;
 			RLog.Info($"Node Pos:{entity.position.Value} Scale{entity.scale.Value} Rot{entity.rotation.Value}");
 			if (!scene.Nodes.ContainsKey(node.Name)) {
 				scene.Nodes.Add(node.Name, entity);

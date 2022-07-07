@@ -73,7 +73,25 @@ namespace RNumerics
 		}
 
 		public RBone(Bone asimp) {
-			OffsetMatrix = Matrix.CreateFromAssimp(asimp.OffsetMatrix);
+			var baseM = asimp.OffsetMatrix;
+			OffsetMatrix = new System.Numerics.Matrix4x4 {
+				M11 = baseM.A1,
+				M12 = baseM.A2,
+				M13 = baseM.A3,
+				M14 = baseM.A4,
+				M21 = baseM.B1,
+				M22 = baseM.B2,
+				M23 = baseM.B3,
+				M24 = baseM.B4,
+				M31 = baseM.C1,
+				M32 = baseM.C2,
+				M33 = baseM.C3,
+				M34 = baseM.C4,
+				M41 = baseM.D1,
+				M42 = baseM.D2,
+				M43 = baseM.D3,
+				M44 = baseM.D4,
+			};
 			BoneName = asimp.Name;
 			VertexWeights = asimp.VertexWeights.Select((x) => new RVertexWeight(x)).ToList();
 		}
