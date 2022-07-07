@@ -40,10 +40,8 @@ namespace RNumerics
 		}
 
 		public static Matrix CreateFromAssimp(Assimp.Matrix4x4 a) {
-			return new Matrix(a.A1, a.A2, a.A3, a.A4,
-							  a.B1, a.B2, a.B3, a.B4,
-							  a.C1, a.C2, a.C3, a.C4,
-							  a.D1, a.D2, a.D3, a.D4);
+			a.Decompose(out var scale, out var rotation, out var transfom);
+			return TRS(transfom, new Quaternionf(rotation.X, rotation.Y, rotation.Z, rotation.W), (Vector3f)scale);
 		}
 
 		public Matrix(Matrix4x4 matrix) {

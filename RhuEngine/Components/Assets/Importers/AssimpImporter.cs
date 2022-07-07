@@ -99,6 +99,8 @@ namespace RhuEngine.Components
 			public Dictionary<string, Entity> Nodes = new();
 			public Dictionary<string[], Armature> Armatures = new(new StringArrayEqualityComparer());
 			public AxisAlignedBox3f BoundingBox = AxisAlignedBox3f.CenterZero;
+			public List<(Entity,Node)> LoadMeshNodes = new();
+
 			public AssimpHolder(Scene scene, Entity _root, Entity _assetEntity) {
 				this.scene = scene;
 				root = _root;
@@ -154,6 +156,9 @@ namespace RhuEngine.Components
 				LoadMesh(AssimpHolder.assetEntity, AssimpHolder);
 				LoadNode(root, scene.RootNode, AssimpHolder);
 				LoadLights(AssimpHolder.assetEntity, AssimpHolder);
+				foreach (var item in AssimpHolder.LoadMeshNodes) {
+					LoadMeshNode(item.Item1, item.Item2, AssimpHolder);
+				}
 				AssimpHolder.Rescale();
 				RLog.Info("Done Loading Model");
 				//LoadAnimations(AssimpHolder.assetEntity, AssimpHolder);
@@ -168,8 +173,9 @@ namespace RhuEngine.Components
 		private static void LoadNode(Entity ParrentEntity, Assimp.Node node, AssimpHolder scene) {
 			RLog.Info($"Loaded Node {node.Name} Parrent {node.Parent?.Name ?? "NULL"}");
 			var entity = ParrentEntity.AddChild(node.Name);
-			entity.LocalTrans = node.Transform.CastToNormal();
-			if (scene.Nodes.ContainsKey(node.Name)) {
+			entity.LocalTrans = Matrix.CreateFromAssimp(node.Transform);
+			RLog.Info($"Node Pos:{entity.position.Value} Scale{entity.scale.Value} Rot{entity.rotation.Value}");
+			if (!scene.Nodes.ContainsKey(node.Name)) {
 				scene.Nodes.Add(node.Name, entity);
 			}
 			if (node.HasChildren) {
@@ -179,7 +185,7 @@ namespace RhuEngine.Components
 			}
 			scene.CalculateOptimumBounds(entity);
 			if (node.HasMeshes) {
-				LoadMeshNode(entity, node, scene);
+				scene.LoadMeshNodes.Add((entity, node));
 			}
 		}
 
@@ -328,26 +334,9 @@ namespace RhuEngine.Components
 								armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
 							}
 							else {
+								RLog.Info($"Didn't FindNode for {bone.Name}");
 								var ent = entity.AddChild(bone.Name);
 								armiturer.ArmatureEntitys.Add().Target = ent;
-								ent.GlobalTrans = new Matrix(
-									bone.OffsetMatrix.A1,
-									bone.OffsetMatrix.A2,
-									bone.OffsetMatrix.A3,
-									bone.OffsetMatrix.A4,
-									bone.OffsetMatrix.B1,
-									bone.OffsetMatrix.B2,
-									bone.OffsetMatrix.B3,
-									bone.OffsetMatrix.B4,
-									bone.OffsetMatrix.C1,
-									bone.OffsetMatrix.C2,
-									bone.OffsetMatrix.C3,
-									bone.OffsetMatrix.C4,
-									bone.OffsetMatrix.D1,
-									bone.OffsetMatrix.D2,
-									bone.OffsetMatrix.D3,
-									bone.OffsetMatrix.D4
-								);
 							}
 						}
 					}
