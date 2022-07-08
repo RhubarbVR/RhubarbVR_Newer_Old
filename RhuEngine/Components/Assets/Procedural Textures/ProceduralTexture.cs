@@ -33,6 +33,47 @@ namespace RhuEngine.Components
 			Value.SampleMode = sampleMode;
 		}
 
+		public void UpdateTexture(Colorf[][] colors) {
+			var fullcolors = new Colorb[colors[0].Length * colors.Length];
+			for (var y = 0; y < colors.Length; y++) {
+				for (var x = 0; x < colors[0].Length; x++) {
+					fullcolors[(y * colors[0].Length) + x] = colors[y][x].ToBytes();
+				}
+			}
+			if (Value is null) {
+				Load(RTexture2D.FromColors(fullcolors, colors[0].Length, colors.Length, true));
+				TextValueChanged();
+				return;
+			}
+			Value.SetColors(colors[0].Length, colors.Length, fullcolors);
+		}
+
+		public void UpdateTexture(Colorb[][] colors) {
+			var fullcolors = new Colorb[colors[0].Length * colors.Length];
+			for (var y = 0; y < colors.Length; y++) {
+				for (var x = 0; x < colors[0].Length; x++) {
+					fullcolors[(y * colors[0].Length) + x] = colors[y][x];
+				}
+			}
+			if (Value is null) {
+				Load(RTexture2D.FromColors(fullcolors, colors[0].Length, colors.Length, true));
+				TextValueChanged();
+				return;
+			}
+			Value.SetColors(colors[0].Length, colors.Length, fullcolors);
+		}
+		public void UpdateTexture(Colorf[] colors, int width, int hight) {
+			var fullColors = new Colorb[colors.Length];
+			for (var i = 0; i < colors.Length; i++) {
+				fullColors[i] = colors[i].ToBytes();
+			}
+			if (Value is null) {
+				Load(RTexture2D.FromColors(fullColors, width, hight, true));
+				TextValueChanged();
+				return;
+			}
+			Value.SetColors(width, hight, fullColors);
+		}
 
 		public void UpdateTexture(Colorb[] colors, int width,int hight) {
 			if(Value is null) {

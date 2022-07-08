@@ -322,11 +322,10 @@ namespace RhuEngine.Components
 			}
 		}
 
-		private static void LoadMeshNode(Entity entity, Assimp.Node node, AssimpHolder scene) {
+		private static void LoadMeshNode(Entity entity, Node node, AssimpHolder scene) {
 			foreach (var item in node.MeshIndices) {
 				var rMesh = scene.meshes[item];
 				var amesh = scene.scene.Meshes[item];
-				scene.CalculateOptimumBounds(amesh,entity);
 				if (amesh.HasBones || amesh.HasMeshAnimationAttachments) {
 					var boneNames = amesh.Bones.Select((x) => x.Name).ToArray();
 					Armature armiturer;
@@ -358,6 +357,7 @@ namespace RhuEngine.Components
 					meshRender.materials.Add().Target = scene.materials[amesh.MaterialIndex];
 				}
 				else {
+					scene.CalculateOptimumBounds(amesh, entity);
 					var meshRender = entity.AttachComponent<MeshRender>();
 					meshRender.mesh.Target = rMesh;
 					meshRender.materials.Add().Target = scene.materials[amesh.MaterialIndex];
