@@ -158,6 +158,16 @@ namespace RhuEngine
 			dfg3.AttachComponent<Grabbable>();
 			dfg3.AttachComponent<BoxShape>();
 
+			var dfg4 = textureStuff.AddChild("DFG-Edge");
+			dfg4.position.Value = new Vector3f(8, 0, 0);
+			var (dfgMesh4, dfgMat4, dfgRender4) = dfg4.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var edgeTexture = dfg4.AttachComponent<EdgeTexture>();
+			edgeTexture.BackgroundColor.Value = Colorf.Magenta;
+			edgeTexture.InnerColor.Value = Colorf.Orange;
+			dfgMat4.MainTexture.Target = edgeTexture;
+			dfg4.AttachComponent<Grabbable>();
+			dfg4.AttachComponent<BoxShape>();
+
 
 			//Build Debug Man
 			var debugMan = DebugStuff.AddChild("DebugMan");

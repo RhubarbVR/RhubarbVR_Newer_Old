@@ -62,26 +62,26 @@ namespace RhuEngine.Components
 			}
 			Value.SetColors(colors[0].Length, colors.Length, fullcolors);
 		}
-		public void UpdateTexture(Colorf[] colors, int width, int hight) {
+		public void UpdateTexture(Colorf[] colors, int width, int height) {
 			var fullColors = new Colorb[colors.Length];
 			for (var i = 0; i < colors.Length; i++) {
 				fullColors[i] = colors[i].ToBytes();
 			}
 			if (Value is null) {
-				Load(RTexture2D.FromColors(fullColors, width, hight, true));
+				Load(RTexture2D.FromColors(fullColors, width, height, true));
 				TextValueChanged();
 				return;
 			}
-			Value.SetColors(width, hight, fullColors);
+			Value.SetColors(width, height, fullColors);
 		}
 
-		public void UpdateTexture(Colorb[] colors, int width,int hight) {
+		public void UpdateTexture(Colorb[] colors, int width,int height) {
 			if(Value is null) {
-				Load(RTexture2D.FromColors(colors, width, hight,true));
+				Load(RTexture2D.FromColors(colors, width, height,true));
 				TextValueChanged();
 				return;
 			}
-			Value.SetColors(width, hight, colors);
+			Value.SetColors(width, height, colors);
 		}
 
 		[OnChanged(nameof(ComputeTexture))]
