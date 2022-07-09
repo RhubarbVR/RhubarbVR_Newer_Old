@@ -92,7 +92,7 @@ namespace RhuEngine.Components
 			public Scene scene;
 
 			public List<AssetProvider<RTexture2D>> textures = new();
-			public List<AssetProvider<RMesh>> meshes = new();
+			public List<ComplexMesh> meshes = new();
 			public List<AssetProvider<RMaterial>> materials = new();
 			public bool ReScale = true;
 			public float TargetSize = 0.5f;
@@ -107,7 +107,7 @@ namespace RhuEngine.Components
 				assetEntity = _assetEntity;
 			}
 
-			public void CalculateOptimumBounds(Mesh amesh,Entity entity) {
+			public void CalculateOptimumBounds(ComplexMesh amesh,Entity entity) {
 				var local = root.GlobalToLocal(entity.GlobalTrans);
 				var mesh = BoundsUtil.Bounds(amesh.Vertices, (x) => x);
 				mesh.Translate(local.Translation);
@@ -194,10 +194,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			foreach (var item in scene.scene.Meshes) {
-				var newuri = entity.World.LoadLocalAsset(CustomAssetManager.SaveAsset(new ComplexMesh(item), item.Name), item.Name);
-				var tex = entity.AttachComponent<StaticMesh>();
-				scene.meshes.Add(tex);
-				tex.url.Value = newuri.ToString();
+				scene.meshes.Add(new ComplexMesh(item));
 				RLog.Info($"Loaded Mesh {item.Name}");
 			}
 		}
@@ -317,48 +314,75 @@ namespace RhuEngine.Components
 				return;
 			}
 		}
-
 		private static void LoadMeshNode(Entity entity, Node node, AssimpHolder scene) {
+			ComplexMesh complexMesh = null;
+			var mits = new List<int>();
 			foreach (var item in node.MeshIndices) {
 				var rMesh = scene.meshes[item];
 				var amesh = scene.scene.Meshes[item];
-				if (amesh.HasBones || amesh.HasMeshAnimationAttachments) {
-					var boneNames = amesh.Bones.Select((x) => x.Name).ToArray();
-					Armature armiturer;
-					if (!scene.Armatures.ContainsKey(boneNames)) {
-						armiturer = entity.AttachComponent<Armature>();
-						foreach (var bone in amesh.Bones) {
-							if (scene.Nodes.ContainsKey(bone.Name)) {
-								armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
-							}
-							else {
-								RLog.Info($"Didn't FindNode for {bone.Name}");
-								var ent = entity.AddChild(bone.Name);
-								armiturer.ArmatureEntitys.Add().Target = ent;
-							}
-						}
+				if (complexMesh is not null) {
+					try {
+						complexMesh.AddSubMesh(rMesh);
+						mits.Add(amesh.MaterialIndex);
 					}
-					else {
-						armiturer = scene.Armatures[boneNames];
+					catch {
+						AddMeshRender(entity, node, scene, rMesh, new int[] { amesh.MaterialIndex });
 					}
-					var meshRender = entity.AttachComponent<SkinnedMeshRender>();
-					meshRender.Armature.Target = armiturer;
-					foreach (var boneMesh in amesh.MeshAnimationAttachments) {
-						var newShape = meshRender.BlendShapes.Add();
-						newShape.BlendName.Value = boneMesh.Name;
-						RLog.Info($"Added ShapeKey {newShape.BlendName.Value}");
-					}
-					meshRender.mesh.Target = rMesh;
-					meshRender.materials.Add().Target = scene.materials[amesh.MaterialIndex];
 				}
 				else {
-					scene.CalculateOptimumBounds(amesh, entity);
-					var meshRender = entity.AttachComponent<MeshRender>();
-					meshRender.mesh.Target = rMesh;
-					meshRender.materials.Add().Target = scene.materials[amesh.MaterialIndex];
+					mits.Add(amesh.MaterialIndex);
+					complexMesh = rMesh;
 				}
-				RLog.Info($"Added MeshNode {node.Name}");
 			}
+			if (complexMesh is not null) {
+				AddMeshRender(entity, node, scene, complexMesh, mits);
+			}
+		}
+
+		private static void AddMeshRender(Entity entity, Node node, AssimpHolder scene,ComplexMesh amesh, IEnumerable<int> mits) {
+			var newuri = entity.World.LoadLocalAsset(CustomAssetManager.SaveAsset(amesh,amesh.MeshName), amesh.MeshName);
+			var rmesh = scene.assetEntity.AttachComponent<StaticMesh>();
+			rmesh.url.Value = newuri.ToString();
+			if (amesh.HasBones || amesh.HasMeshAttachments) {
+				var boneNames = amesh.Bones.Select((x) => x.Name).ToArray();
+				Armature armiturer;
+				if (!scene.Armatures.ContainsKey(boneNames)) {
+					armiturer = entity.AttachComponent<Armature>();
+					foreach (var bone in amesh.Bones) {
+						if (scene.Nodes.ContainsKey(bone.Name)) {
+							armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
+						}
+						else {
+							RLog.Info($"Didn't FindNode for {bone.Name}");
+							var ent = entity.AddChild(bone.Name);
+							armiturer.ArmatureEntitys.Add().Target = ent;
+						}
+					}
+				}
+				else {
+					armiturer = scene.Armatures[boneNames];
+				}
+				var meshRender = entity.AttachComponent<SkinnedMeshRender>();
+				meshRender.Armature.Target = armiturer;
+				foreach (var boneMesh in amesh.MeshAttachments) {
+					var newShape = meshRender.BlendShapes.Add();
+					newShape.BlendName.Value = boneMesh.Name;
+					RLog.Info($"Added ShapeKey {newShape.BlendName.Value}");
+				}
+				meshRender.mesh.Target = rmesh;
+				foreach (var item in mits) {
+					meshRender.materials.Add().Target = scene.materials[item];
+				}
+			}
+			else {
+				scene.CalculateOptimumBounds(amesh, entity);
+				var meshRender = entity.AttachComponent<MeshRender>();
+				meshRender.mesh.Target = rmesh;
+				foreach (var item in mits) {
+					meshRender.materials.Add().Target = scene.materials[item];
+				}
+			}
+			RLog.Info($"Added MeshNode {node.Name}");
 		}
 
 		public override void Import(string path_url, bool isUrl, byte[] rawData) {

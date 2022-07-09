@@ -10,6 +10,46 @@ using MessagePack;
 namespace RNumerics
 {
 	[MessagePackObject]
+	public struct RSubMesh : ISubMesh
+	{
+		[Key(0)]
+		public RPrimitiveType rPrimitiveType;
+		[IgnoreMember]
+		public RPrimitiveType PrimitiveType => rPrimitiveType;
+		[Key(1)]
+		public List<RFace> rFaces;
+		[Key(2)]
+		public int rCount;
+		[IgnoreMember]
+		public int Count => rFaces.Count;
+
+		public RSubMesh() {
+			rPrimitiveType = RPrimitiveType.Triangle;
+			rFaces = new List<RFace>();
+			rCount = 0;
+		}
+		public RSubMesh(RPrimitiveType type) {
+			rPrimitiveType = type;
+			rFaces = new List<RFace>();
+			rCount = 0;
+		}
+		public RSubMesh(RPrimitiveType type, List<RFace> faces,int count) {
+			rPrimitiveType = type;
+			rFaces = faces;
+			rCount = count;
+		}
+		[IgnoreMember]
+		public IEnumerable<IFace> Faces
+		{
+			get {
+				foreach (var item in rFaces) {
+					yield return item;
+				}
+			}
+		}
+	}
+
+	[MessagePackObject]
 	public struct RVertexWeight : IVertexWeight
 	{
 		/// <summary>
@@ -151,6 +191,7 @@ namespace RNumerics
 		/// </summary>
 		Polygon = 0x8
 	}
+
 	[MessagePackObject]
 	public class RAnimationAttachment : IAnimationAttachment
 	{
@@ -234,6 +275,22 @@ namespace RNumerics
 		[Key(12)]
 		public RMeshMorphingMethod MorphingMethod = RMeshMorphingMethod.None;
 
+		[Key(13)]
+		public List<RSubMesh> SubMeshes = new();
+
+		[IgnoreMember]
+		bool IComplexMesh.HasSubMeshs => SubMeshes.Count > 0;
+
+		[IgnoreMember]
+		IEnumerable<ISubMesh> IComplexMesh.SubMeshes
+		{
+			get {
+				foreach (var item in SubMeshes) {
+					yield return item;
+				}
+			}
+		}
+
 		public void LoadFromAsimp(Mesh mesh) {
 			MeshName = mesh.Name;
 			PrimitiveType = (RPrimitiveType)(byte)(int)mesh.PrimitiveType;
@@ -249,6 +306,86 @@ namespace RNumerics
 			MeshAttachments = mesh.MeshAnimationAttachments.Select((x) => new RAnimationAttachment(x)).ToList();
 			MorphingMethod = (RMeshMorphingMethod)(byte)(int)mesh.MorphMethod;
 		}
+
+
+		public int AddSubMesh(IComplexMesh complexMesh) {
+			if (complexMesh.HasSubMeshs) {
+				throw new Exception("Adding Mesh Already Has a submesh");
+			}
+			var startingVert = Vertices.Count;
+			Vertices.AddRange(complexMesh.Vertices);
+			if (Normals.Count > 0) {
+				Normals.AddRange(complexMesh.Normals);
+			}
+			if (Tangents.Count > 0) {
+				Tangents.AddRange(complexMesh.Tangents);
+			}
+			if (BiTangents.Count > 0) {
+				BiTangents.AddRange(complexMesh.BiTangents);
+			}
+			for (var i = 0; i < Colors.Length; i++) {
+				if (Colors[i].Count > 0) {
+					if (complexMesh.Colors.Length > i) {
+						Colors[i].AddRange(complexMesh.Colors[i]);
+					}
+				}
+			}
+			for (var i = 0; i < TexCoords.Length; i++) {
+				if (TexCoords[i].Count > 0) {
+					if (complexMesh.TexCoords.Length > i) {
+						TexCoords[i].AddRange(complexMesh.TexCoords[i]);
+					}
+				}
+			}
+			foreach (var item in complexMesh.Bones) {
+				for (var i = 0; i < Bones.Count; i++) {
+					if(item.Name == Bones[i].Name) {
+						Bones[i].VertexWeights.AddRange(item.VertexWeights.Select((x) => new RVertexWeight { VertexID = x.VertexID + startingVert, Weight = x.Weight }));
+					}
+				}
+			}
+			foreach (var item in complexMesh.MeshAttachments) {
+				for (var i = 0; i < MeshAttachments.Count; i++) {
+					if (item.Name == MeshAttachments[i].Name) {
+						var selected = MeshAttachments[i];
+						if (selected is null) {
+							break;
+						}
+						selected.Vertices.AddRange(item.Vertices);
+						if (selected.Normals.Count > 0) {
+							selected.Normals.AddRange(item.Normals);
+						}
+						if (selected.Tangents.Count > 0) {
+							selected.Tangents.AddRange(item.Tangents);
+						}
+						if (selected.BiTangents.Count > 0) {
+							selected.BiTangents.AddRange(item.BiTangents);
+						}
+						for (var x = 0; x < selected.Colors.Length; x++) {
+							if (selected.Colors[x].Count > 0) {
+								if (item.Colors.Length > x) {
+									selected.Colors[x].AddRange(item.Colors[x]);
+								}
+							}
+						}
+						for (var x = 0; x < selected.TexCoords.Length; x++) {
+							if (selected.TexCoords[x].Count > 0) {
+								if (item.TexCoords.Length > x) {
+									selected.TexCoords[x].AddRange(complexMesh.TexCoords[x]);
+								}
+							}
+						}
+					}
+				}
+			}
+			var addedFaces = new List<RFace>();
+			foreach (var item in complexMesh.Faces) {
+				addedFaces.Add(item.CopyAndOffset(startingVert));
+			}
+			SubMeshes.Add(new RSubMesh(complexMesh.PrimitiveType, addedFaces, complexMesh.VertexCount));
+			return SubMeshes.Count - 1;
+		}
+
 		[IgnoreMember]
 		public bool IsTriangleMesh => PrimitiveType == RPrimitiveType.Triangle;
 		[IgnoreMember]
@@ -367,7 +504,7 @@ namespace RNumerics
 
 		public Index3i GetTriangle(int i) {
 			var face = Faces[i];
-			return new Index3i(face.Indices[0], face.Indices[1], face.Indices[2]);			
+			return new Index3i(face.Indices[0], face.Indices[1], face.Indices[2]);
 		}
 
 		public int GetTriangleGroup(int i) {
@@ -383,7 +520,7 @@ namespace RNumerics
 
 		public IEnumerable<int> RenderIndices() {
 			foreach (var item in Faces) {
-				if(item.Indices.Count == 3) {
+				if (item.Indices.Count == 3) {
 					yield return item.Indices[0];
 					yield return item.Indices[1];
 					yield return item.Indices[2];
@@ -401,6 +538,30 @@ namespace RNumerics
 						yield return item.Indices[i];
 						yield return item.Indices[i + 1];
 						yield return item.Indices[0];
+					}
+				}
+			}
+			foreach (var submesh in SubMeshes) {
+				foreach (var item in submesh.Faces) {
+					if (item.Indices.Count == 3) {
+						yield return item.Indices[0];
+						yield return item.Indices[1];
+						yield return item.Indices[2];
+					}
+					else if (item.Indices.Count == 4) {
+						yield return item.Indices[0];
+						yield return item.Indices[1];
+						yield return item.Indices[2];
+						yield return item.Indices[0];
+						yield return item.Indices[2];
+						yield return item.Indices[3];
+					}
+					else {
+						for (var i = 1; i < (item.Indices.Count - 1); i++) {
+							yield return item.Indices[i];
+							yield return item.Indices[i + 1];
+							yield return item.Indices[0];
+						}
 					}
 				}
 			}

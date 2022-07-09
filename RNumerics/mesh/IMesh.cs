@@ -23,6 +23,8 @@ namespace RNumerics
 		public float Weight { get; }
 	}
 
+
+
 	public interface IVertexWeight
 	{
 		/// <summary>
@@ -49,6 +51,28 @@ namespace RNumerics
 	public interface IFace
 	{
 		public List<int> Indices { get; }
+
+	}
+
+	public static class FaceHellper 
+	{
+		public static RFace CopyAndOffset(this IFace copyData,int startingVert) {
+			var indexs = new List<int>(copyData.Indices);
+			for (var i = 0; i < indexs.Count; i++) {
+				indexs[i] += startingVert;
+			}
+			return new RFace { Indices = indexs };
+		}
+
+	}
+
+	public interface ISubMesh
+	{
+		public RPrimitiveType PrimitiveType { get; }
+
+		public int Count { get; }
+
+		public IEnumerable<IFace> Faces { get; }
 	}
 
 	public interface IComplexMesh : IRawComplexMeshData, IMesh
@@ -60,6 +84,11 @@ namespace RNumerics
 		public bool HasBones { get; }
 		public IEnumerable<IFace> Faces { get; }
 		public int[] TexComponentCount { get; }
+
+		public IEnumerable<ISubMesh> SubMeshes { get; }
+
+		public bool HasSubMeshs { get; }
+
 		public IEnumerable<IAnimationAttachment> MeshAttachments { get; }
 		public bool HasMeshAttachments { get; }
 		public bool IsBasicMesh { get; }
