@@ -105,7 +105,7 @@ namespace RhuEngine.WorldObjects.ECS
 			_cachedLocalMatrix = newLocal;
 			GlobalTransformChange?.Invoke(this, false);
 			foreach (Entity item in children) {
-				item.GlobalTransMark();
+				item.GlobalTransMark(false);
 			}
 		}
 
@@ -474,7 +474,7 @@ namespace RhuEngine.WorldObjects.ECS
 			GlobalTransMark();
 		}
 
-		internal void GlobalTransMark() {
+		internal void GlobalTransMark(bool physics = true) {
 			if (IsRoot) {
 				return;
 			}
@@ -482,7 +482,7 @@ namespace RhuEngine.WorldObjects.ECS
 				foreach (Entity item in children) {
 					item.GlobalTransMark();
 				}
-				GlobalTransformChange?.Invoke(this, true);
+				GlobalTransformChange?.Invoke(this, physics);
 			}
 			_dirtyGlobal = true;
 		}
