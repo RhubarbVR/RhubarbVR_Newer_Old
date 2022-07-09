@@ -50,8 +50,8 @@ namespace RhuEngine.WorldObjects.ECS
 				foreach (Entity item in children) { 
 					var element = item.Bounds;
 					element.Translate(item.GlobalTrans.Translation);
-					element.Scale(GlobalTrans.Scale);
 					element.Rotate(item.GlobalTrans.Rotation);
+					element.Scale(GlobalTrans.Scale);
 					box = BoundsUtil.Combined(box, element);
 				}
 				return box;
