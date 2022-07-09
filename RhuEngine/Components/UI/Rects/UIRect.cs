@@ -441,12 +441,12 @@ namespace RhuEngine.Components
 				_uiRenderComponents.SafeOperation((list) => {
 					if (meshList.Count < list.Count) {
 						for (var i = 0; i < list.Count - meshList.Count; i++) {
-							meshList.Add(new RMesh(null));
+							meshList.Add(new RMesh(null, true));
 						}
 					}
 					if (meshList.Count > list.Count) {
 						for (var i = 0; i < meshList.Count - list.Count; i++) {
-							meshList.Remove(new RMesh(null));
+							meshList.Remove(new RMesh(null,true));
 						}
 					}
 					for (var i = 0; i < meshList.Count; i++) {

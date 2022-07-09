@@ -207,7 +207,7 @@ namespace RhuEngine.Components
 				}
 				else {
 					if(meshes[i].TriangleCount > 0) {
-						mainMeshes[i] = new RMesh(meshes[i]);
+						mainMeshes[i] = new RMesh(meshes[i],true);
 					}
 				}
 			}

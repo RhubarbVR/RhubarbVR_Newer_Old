@@ -7,7 +7,7 @@ using RhuEngine.Components;
 
 namespace RhuEngine.WorldObjects.ECS
 {
-	public class Entity : SyncObject, IOffsetableElement
+	public class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox
 	{
 		public uint Depth => (_internalParent?.Depth + 1) ?? 0;
 
@@ -34,6 +34,30 @@ namespace RhuEngine.WorldObjects.ECS
 		public int Offset => orderOffset.Value;
 		[OnChanged(nameof(OnComponentChange))]
 		public readonly SyncAbstractObjList<Component> components;
+
+		[Exposed]
+		public AxisAlignedBox3f Bounds
+		{
+			get {
+				var box = AxisAlignedBox3f.Zero;
+				foreach (var item in components) {
+					if (item is IWorldBoundingBox boundingBox) {
+						var scale = boundingBox.Bounds;
+						scale.Scale(GlobalTrans.Scale);
+						box = BoundsUtil.Combined(box, scale);
+					}
+				}
+				foreach (Entity item in children) { 
+					var element = item.Bounds;
+					element.Translate(item.GlobalTrans.Translation);
+					element.Scale(GlobalTrans.Scale);
+					element.Rotate(item.GlobalTrans.Rotation);
+					box = BoundsUtil.Combined(box, element);
+				}
+				return box;
+			}
+		}
+
 
 		public void DestroyChildren() {
 			children.Clear();

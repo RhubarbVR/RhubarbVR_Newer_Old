@@ -22,7 +22,7 @@ namespace RhuEngine.Components
 					return;
 				}
 				Load(null);
-				Load(new RMesh(CustomAssetManager.GetCustomAsset<ComplexMesh>(data)));
+				Load(new RMesh(CustomAssetManager.GetCustomAsset<ComplexMesh>(data), false));
 			}
 			catch(Exception err) {
 				RLog.Err($"Failed to load Static Mesh Error {err}");

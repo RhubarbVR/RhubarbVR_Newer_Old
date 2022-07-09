@@ -22,7 +22,11 @@ namespace RhuEngine.Components
 
 			public readonly Sync<float> Weight;
 		}
-		public readonly Sync<AxisAlignedBox3f> Bounds;
+
+		[Default(true)]
+		public readonly Sync<bool> AutoBounds;
+
+		public readonly Sync<AxisAlignedBox3f> BoundsBox;
 
 		public readonly SyncRef<Armature> Armature;
 
@@ -30,7 +34,7 @@ namespace RhuEngine.Components
 
 		public override void OnAttach() {
 			base.OnAttach();
-			Bounds.Value = AxisAlignedBox3f.CenterZero;
+			BoundsBox.Value = AxisAlignedBox3f.CenterZero;
 		}
 
 	}

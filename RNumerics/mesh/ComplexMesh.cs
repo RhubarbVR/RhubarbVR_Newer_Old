@@ -396,6 +396,13 @@ namespace RNumerics
 					yield return item.Indices[2];
 					yield return item.Indices[3];
 				}
+				else {
+					for (var i = 1; i < (item.Indices.Count - 1); i++) {
+						yield return item.Indices[i];
+						yield return item.Indices[i + 1];
+						yield return item.Indices[0];
+					}
+				}
 			}
 		}
 

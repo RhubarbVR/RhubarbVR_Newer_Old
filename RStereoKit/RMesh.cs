@@ -51,7 +51,7 @@ namespace RStereoKit
 
 	public class SKRMesh : IRMesh
 	{
-		public RMesh Quad => new RMesh(Mesh.Quad);
+		public RMesh Quad => new RMesh(Mesh.Quad,false);
 
 		public void Draw(string id, object mesh, RMaterial loadingLogo, RNumerics.Matrix p,Colorf colorf,int depth,RhuEngine.Linker.RenderLayer renderLayer) {
 			var mit = MitManager.GetMitWithOffset(loadingLogo, depth);

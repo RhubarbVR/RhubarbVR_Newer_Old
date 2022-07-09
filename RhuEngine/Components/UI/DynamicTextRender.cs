@@ -103,7 +103,7 @@ namespace RhuEngine.Components
 					foreach (var item in meshses) {
 						var rmesh = rendermeshes[item.Key];
 						if (rmesh is null) {
-							rendermeshes[item.Key] = new RMesh(item.Value);
+							rendermeshes[item.Key] = new RMesh(item.Value, true);
 						}
 						else {
 							rmesh.LoadMesh(item.Value);

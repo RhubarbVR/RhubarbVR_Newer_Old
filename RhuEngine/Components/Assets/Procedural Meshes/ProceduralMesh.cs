@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 		public RMesh loadedMesh = null;
 		public void GenMesh(IMesh mesh) {
 			if (loadedMesh == null) {
-				loadedMesh = new RMesh(mesh);
+				loadedMesh = new RMesh(mesh, false);
 				Load(loadedMesh);
 			}
 			else {

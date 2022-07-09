@@ -19,6 +19,10 @@ namespace RhuEngine.Linker
 
 	public class RMesh
 	{
+		public AxisAlignedBox3f BoundingBox { get; private set; }
+
+		public bool Dynamic { get; private set; }
+
 		public static IRMesh Instance { get; set; }
 
 		public static RMesh Quad => Instance.Quad;
@@ -27,17 +31,22 @@ namespace RhuEngine.Linker
 
 		public IMesh LoadedMesh { get; private set; }
 
-		public RMesh(object e) {
+		public RMesh(object e, bool dynamic) {
 			mesh = e;
+			Dynamic = dynamic;
 		}
 
-		public RMesh(IMesh mesh) {
+		public RMesh(IMesh mesh, bool dynamic) {
+			Dynamic = dynamic;
 			LoadMesh(mesh);
 		}
 
 		public void LoadMesh(IMesh mesh) {
 			LoadedMesh = mesh;
 			Instance.LoadMesh(this,mesh);
+			if (!Dynamic) {
+				BoundingBox = BoundsUtil.Bounds(mesh.VertexIndices(), (x) => (Vector3f)mesh.GetVertex(x));
+			}
 		}
 
 		public void Draw(string id,RMaterial loadingLogo, Matrix p,Colorf? tint = null, int zDepth = 0,RenderLayer layer = RenderLayer.UI) {

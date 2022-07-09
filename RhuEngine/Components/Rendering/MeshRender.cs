@@ -15,7 +15,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "Rendering" })]
-	public class MeshRender : RenderingComponent
+	public class MeshRender : RenderingComponent, IWorldBoundingBox
 	{
 		public readonly AssetRef<RMesh> mesh;
 		public readonly SyncObjList<AssetRef<RMaterial>> materials;
@@ -40,6 +40,8 @@ namespace RhuEngine.Components
 		[Default(false)]
 		[Supported(SupportedFancyFeatures.LightProbeGroup)]
 		public readonly Sync<bool> LightProbs;
+
+		public AxisAlignedBox3f Bounds => mesh.Asset?.BoundingBox??AxisAlignedBox3f.CenterZero;
 
 		public override void FirstCreation() {
 			base.FirstCreation();

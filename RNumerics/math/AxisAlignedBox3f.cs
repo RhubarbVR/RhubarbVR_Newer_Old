@@ -48,6 +48,12 @@ namespace RNumerics
 			Max = new Vector3f(Math.Max(vMin.x, vMax.x), Math.Max(vMin.y, vMax.y), Math.Max(vMin.z, vMax.z));
 		}
 
+		public void Rotate(Quaternionf rotation) {
+			var center = Center;
+			var e =  rotation * Extents;
+			Min = center - e;
+			Max = center + e;
+		}
 
 		public AxisAlignedBox3f(Vector3f vCenter, float fHalfWidth, float fHalfHeight, float fHalfDepth) {
 			Min = new Vector3f(vCenter.x - fHalfWidth, vCenter.y - fHalfHeight, vCenter.z - fHalfDepth);
