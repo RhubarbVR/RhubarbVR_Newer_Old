@@ -129,7 +129,7 @@ namespace RhuEngine
 				lists.Add(liet);
 			}
 			if (!string.IsNullOrWhiteSpace(settingsArg)) {
-				foreach (var item in settingsArg.Split('|')) {
+				foreach (var item in settingsArg.Split(';')) {
 					var text = File.Exists(item) ? File.ReadAllText(item) : item;
 					try {
 						var liet = SettingsManager.GetDataFromJson(text);
