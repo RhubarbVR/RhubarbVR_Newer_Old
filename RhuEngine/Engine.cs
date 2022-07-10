@@ -257,6 +257,7 @@ namespace RhuEngine
 				RRenderer.EnableSky = false;
 				LoadingLogo = StaticMaterialManager.GetMaterial<IUnlitMaterial>();
 				LoadingLogo.Transparency = Transparency.Blend;
+				LoadingLogo.DullSided = true;
 				LoadingLogo.Texture = staticResources.RhubarbLogoV2;
 			}
 			var startcode = () => {
@@ -290,7 +291,7 @@ namespace RhuEngine
 			};
 			if (RunStartThread) {
 				startingthread = new Thread(startcode.Invoke) {
-					Priority = ThreadPriority.Normal
+					Priority = ThreadPriority.BelowNormal
 				};
 				startingthread.Start();
 			}

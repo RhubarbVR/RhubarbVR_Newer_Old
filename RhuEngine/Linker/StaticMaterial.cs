@@ -130,6 +130,8 @@ namespace RhuEngine.Linker
 
 	public interface IUnlitMaterial : IStaticMaterial
 	{
+		public bool DullSided { set; }
+
 		public Transparency Transparency { set; }
 
 		public RTexture2D Texture { set; }

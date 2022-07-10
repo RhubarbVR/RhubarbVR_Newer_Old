@@ -79,6 +79,7 @@ namespace RhuEngine.Components
 		public (UIImage, UnlitMaterial) AddImg(IAssetProvider<RTexture2D> assetProvider) {
 			var img = AttachComponentToStack<UIImage>();
 			var imgmit = AttachComponentToStack<UnlitMaterial>();
+			imgmit.DullSided.Value = true;
 			img.Texture.Target = assetProvider;
 			img.Material.Target = imgmit;
 			imgmit.MainTexture.Target = assetProvider;

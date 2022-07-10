@@ -96,9 +96,11 @@ namespace RhuEngine.Components
 			sprite.Texture.Target = icons;
 			sprite.GridSize.Value = new Vector2i(26, 7);
 			IconMit.Target = Entity.AttachComponent<UnlitMaterial>();
+			IconMit.Target.DullSided.Value = true;
 			IconMit.Target.Transparency.Value = Transparency.Blend;
 			IconMit.Target.MainTexture.Target = icons;
 			var mit = MainMit.Target = Entity.AttachComponent<UnlitMaterial>();
+			mit.DullSided.Value = true;
 			mit.Transparency.Value = Transparency.Blend;
 			(Entity, UISprite) AddButton(Entity were, float PADDING, Vector2i iconindex, Action<ButtonEvent> action) {
 				var child = were.AddChild("childEliment");

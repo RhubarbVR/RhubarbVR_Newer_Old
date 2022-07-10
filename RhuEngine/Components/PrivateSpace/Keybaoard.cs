@@ -53,6 +53,7 @@ namespace RhuEngine.Components
 			uICanvas = Entity.AddChild("Canvas").AttachComponent<UICanvas>();
 			uICanvas.scale.Value = new Vector3f(10f, 3.3f, 1);
 			mit = Entity.AttachComponent<UnlitMaterial>();
+			mit.DullSided.Value = true;
 			mit.Transparency.Value = Transparency.Blend;
 			uICanvas.Entity.position.Value = new Vector3f(0, 1, -1);
 			grabable = uICanvas.Entity.AttachComponent<Grabbable>();

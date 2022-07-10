@@ -350,7 +350,6 @@ namespace RhuEngine.Components
 			colorassign.Alpha.Value = 0.9f;
 			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
-			img.FullBox.Value = true;
 		}
 
 		private void LoadAudio(Entity mainentity) {
@@ -363,7 +362,6 @@ namespace RhuEngine.Components
 			colorassign.Alpha.Value = 0.9f;
 			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
-			img.FullBox.Value = true;
 		}
 		private void LoadNotification(Entity mainentity) {
 			NotificationEntiy = mainentity.AddChild("Notify");
@@ -375,7 +373,6 @@ namespace RhuEngine.Components
 			colorassign.Alpha.Value = 0.9f;
 			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
-			img.FullBox.Value = true;
 		}
 		public void AddStartAndNotification() {
 			startCanvas = Entity.AddChild("TopOver").AttachComponent<UICanvas>();
@@ -398,8 +395,10 @@ namespace RhuEngine.Components
 			Engine.SettingsUpdate += Engine_SettingsUpdate;
 			uICanvas.scale.Value = new Vector3f(16, 1.25f, 1);
 			mit = Entity.AttachComponent<UnlitMaterial>();
+			mit.DullSided.Value = true;
 			mit.Transparency.Value = Transparency.Blend;
 			iconMit = Entity.AttachComponent<UnlitMaterial>();
+			iconMit.DullSided.Value = true;
 			var icons = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
 			iconMit.MainTexture.Target = icons;
 			iconMit.Transparency.Value = Transparency.Blend;

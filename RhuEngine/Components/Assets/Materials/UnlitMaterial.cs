@@ -17,6 +17,9 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(TintUpdate))]
 		public readonly Sync<Colorf> Tint;
 
+		[OnChanged(nameof (DullSidedUpdate))]
+		public readonly Sync<bool> DullSided;
+
 		[OnAssetLoaded(nameof(TextureUpdate))]
 		public readonly AssetRef<RTexture2D> MainTexture;
 
@@ -30,6 +33,15 @@ namespace RhuEngine.Components
 			TransparencyUpdate();
 			TextureUpdate();
 			TintUpdate();
+			DullSidedUpdate();
+		}
+
+		private void DullSidedUpdate() {
+			if (_material is null) {
+				return;
+			}
+			_material.DullSided = DullSided.Value;
+			_material.Material?.UpdatePrams();
 		}
 
 		private void TextureUpdate() {

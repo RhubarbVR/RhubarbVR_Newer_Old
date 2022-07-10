@@ -239,6 +239,7 @@ namespace RStereoKit
 
 			public RhuEngine.Linker.Transparency Transparency { set => YourData.Transparency = (StereoKit.Transparency)(int)value; }
 			public Colorf Tint { set => YourData[MatParamName.ColorTint] = new Color(value.r, value.g, value.b, value.a); }
+			public bool DullSided { set => YourData.FaceCull = (value) ? StereoKit.Cull.None : StereoKit.Cull.Back; }
 		}
 		public IPBRMaterial CreatePBRMaterial() {
 			return new PBRMaterial();

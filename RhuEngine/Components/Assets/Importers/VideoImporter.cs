@@ -120,6 +120,7 @@ namespace RhuEngine.Components
 				var attachComp = WinEntit.AttachComponent<UICanvas>();
 				attachComp.scale.Value = new Vector3f(2, 5, 1);
 				var uimit = WinEntit.AttachComponent<UnlitMaterial>();
+				uimit.DullSided.Value = true;
 				var uiBuilder = new UIBuilder(WinEntit, uimit);
 				uiBuilder.PushRect();
 				uiBuilder.AddRectangle(0,0.9f,true);
