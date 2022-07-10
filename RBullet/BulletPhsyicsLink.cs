@@ -11,8 +11,15 @@ namespace RBullet
 {
 	public class BulletPhsyicsLink : PhysicsHelper.Physics<BulletRigidBodyCollider, BulletPhysicsSim, BulletColliderShape>
 	{
+		public BulletPhsyicsLink() : this(false) {
 
-		public BulletPhsyicsLink() {
+		}
+
+
+		public BulletPhsyicsLink(bool loadlib) {
+			if (loadlib) {
+				return;
+			}
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
 				try {
 					//This works becases i have no idea where dlopen is in macos 
