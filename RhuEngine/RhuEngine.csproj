@@ -83,7 +83,8 @@
 
 	<ItemGroup>
 		<None Update="Locales\*.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
+
 </Project>

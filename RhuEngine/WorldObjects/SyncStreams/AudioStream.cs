@@ -79,7 +79,7 @@ namespace RhuEngine.WorldObjects
 			Load(null);
 			base.Dispose();
 		}
-		private RSound _input;
+		private IRMicReader _input;
 
 		private RSound _output;
 
@@ -94,20 +94,16 @@ namespace RhuEngine.WorldObjects
 			if (!Engine.EngineLink.CanAudio) {
 				return;
 			}
-			if (RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) {
-				RLog.Err("Android And mic is buggy");
-				return;
-			}
 			if (deviceName is null) {
 				deviceName = Engine.MainMic;
 				Engine.MicChanged += LoadInput;
 			}
-			if (!RMicrophone.Start(deviceName)) {
+			if (!RMicrophone.Start(deviceName,out var rMicReader)) {
 				RLog.Err($"Failed to load Mic {deviceName ?? "System Default"}");
 				return;
 			}
-			_input = RMicrophone.Sound;
-			Load(_input);
+			_input = rMicReader;
+			Load(_input.SoundClip);
 			_output = null;
 			_loadedDevice = true;
 		}
@@ -180,7 +176,7 @@ namespace RhuEngine.WorldObjects
 				if(_output is null) {
 					return;
 				}
-				var count = Math.Max(0, (int)(0.1f * 48000) - (_output.TotalSamples - _output.CursorSamples));
+				var count = Math.Max(0, (int)(0.1f * 48000) - (_output.TotalSamples - _output.CursorSamplesPos));
 				if (_samples.Length < count) {
 					_samples = new float[count];
 				}
@@ -193,9 +189,9 @@ namespace RhuEngine.WorldObjects
 				if (_input is null) {
 					return;
 				}
-				if (_input.UnreadSamples >= SampleCount) { 
+				if ((_input.SamplesAmount - _input.GetPosition) >= SampleCount) { 
 					var audioPacked = new float[SampleCount];
-					_input.ReadSamples(ref audioPacked);
+					_input.Read(ref audioPacked);
 					if (ShouldSendAudioPacked(audioPacked)) {
 						World.BroadcastDataToAllStream(this, new DataNode<byte[]>(SendAudioSamples(audioPacked)), LiteNetLib.DeliveryMethod.Unreliable);
 					}

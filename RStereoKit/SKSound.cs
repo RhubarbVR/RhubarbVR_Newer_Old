@@ -10,10 +10,32 @@ namespace RStereoKit
 {
 	public class SKMic : IRMicrophone
 	{
-		public RSound RSound => new RSound(Microphone.Sound);
+		public string[] Devices => Microphone.GetDevices();
 
-		public bool Start(string deviceName) {
-			return Microphone.Start(deviceName);
+		public class MicInst : IRMicReader
+		{
+			public MicInst(Sound sound) {
+				Sound = sound;
+				SoundClip = new RSound(sound);
+			}
+			public RSound SoundClip { get; set; }
+
+			public int SamplesAmount => Sound.TotalSamples;
+
+			public int GetPosition => Sound.CursorSamples;
+
+			public bool IsRecording => true;
+
+			public Sound Sound { get; }
+
+			public void Read(ref float[] ReadSamples) {
+				Sound.ReadSamples(ref ReadSamples);
+			}
+		}
+		public bool Start(string deviceName,out IRMicReader reader) {
+			var start = Microphone.Start(deviceName);
+			reader = new MicInst(Microphone.Sound);
+			return start;
 		}
 	}
 
@@ -70,24 +92,12 @@ namespace RStereoKit
 			return ((Sound)sou).TotalSamples;
 		}
 
-		public int GetUnreadSamples(object sou) {
-			return ((Sound)sou).UnreadSamples;
-		}
-
 		public RSoundInst Play(object sou, Vector3f translation, float value) {
 			return new RSoundInst(new MSoundInst(((Sound)sou).Play((Vector3)translation, value)));
 		}
 
-		public void ReadSamples(object sou, ref float[] audioPacked) {
-			((Sound)sou).ReadSamples(ref audioPacked);
-		}
-
 		public void WriteSamples(object sou, float[] audioSamps, int count) {
 			((Sound)sou).WriteSamples(audioSamps, count);
-		}
-
-		public void WriteSamples(object sou, float[] audioSamps) {
-			((Sound)sou).WriteSamples(audioSamps);
 		}
 	}
 }

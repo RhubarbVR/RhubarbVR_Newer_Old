@@ -43,8 +43,12 @@ namespace RhuEngine.Linker
 		}
 
 		public static RTexture2D White => Instance?.White;
-		public int Width => Instance?.GetWidth(Tex)??0;
-		public int Height => Instance?.GetHeight(Tex) ?? 0;
+		public int RenderWidth => Instance?.GetWidth(Tex)?? 0;
+		public int RenderHeight => Instance?.GetHeight(Tex) ?? 0;
+
+		public int Width { get; private set; }
+		public int Height { get; private set; }
+
 		public int Anisoptropy
 		{
 			set => Instance?.SetAnisoptropy(Tex, value);
@@ -66,17 +70,26 @@ namespace RhuEngine.Linker
 		}
 
 		public static RTexture2D FromColors(Colorb[] colors, int width, int height, bool srgb) {
-			return new RTexture2D(Instance.MakeFromColors(colors,width,height,srgb));
+			return new RTexture2D(Instance.MakeFromColors(colors, width, height, srgb)) {
+				Width = width,
+				Height = height,
+			};
 		}
 
 		public void SetSize(int width, int height) {
+			Width = width;
+			Height = height;
 			Instance.SetSize(Tex, width, height);
 		}
 
 		public void SetColors(int width, int height, byte[] rgbaData) {
+			Width = width;
+			Height = height;
 			Instance.SetColors(Tex, width, height, rgbaData);
 		}
 		public void SetColors(int width, int height, Colorb[] rgbaData) {
+			Width = width;
+			Height = height;
 			Instance.SetColors(Tex, width, height, rgbaData);
 		}
 
