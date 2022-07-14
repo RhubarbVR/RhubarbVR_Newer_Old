@@ -140,11 +140,11 @@ namespace RhuEngine
 			dfg.AttachComponent<Grabbable>();
 			dfg.AttachComponent<BoxShape>();
 
-			var dfg2 = textureStuff.AddChild("DFG-UV");
+			var dfg2 = textureStuff.AddChild("DFG-Checker");
 			dfg2.position.Value = new Vector3f(4, 0, 0);
 			var (dfgMesh2, dfgMat2, dfgRender2) = dfg2.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
-			var UVComp = dfg2.AttachComponent<UVTexture>();
-			dfgMat2.MainTexture.Target = UVComp;
+			var CheckerComp = dfg2.AttachComponent<CheckerboardTexture>();
+			dfgMat2.MainTexture.Target = CheckerComp;
 			dfg2.AttachComponent<Grabbable>();
 			dfg2.AttachComponent<BoxShape>();
 
