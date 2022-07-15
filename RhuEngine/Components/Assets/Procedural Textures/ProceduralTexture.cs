@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+using RNumerics;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
-
-using RNumerics;
 
 namespace RhuEngine.Components
 {
