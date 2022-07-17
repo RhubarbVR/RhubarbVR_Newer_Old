@@ -300,8 +300,7 @@ namespace RhuEngine.Managers
 		}
 
 		public Uri BaseAddress =>
-				//_httpClient?.BaseAddress ?? new Uri("http://localhost:5000/"); 
-				_httpClient?.BaseAddress ?? new Uri("https://rhubarbvr.net/");
+				_httpClient?.BaseAddress ?? new Uri("https://api.rhubarbvr.net/");
 		public NetApiManager(string path) {
 			_cookiePath = path is null ? Engine.BaseDir + "/RhuCookies" : path + "/RhuCookies";
 		}
@@ -422,18 +421,11 @@ namespace RhuEngine.Managers
 				}
 				_client.Options.ClientCertificates = cernts;
 				var dist = new Uri(BaseAddress, "/ws/userSession");
-				var uri = new UriBuilder(dist) {
-					//Check if Android so it can be insecure 
-					Scheme = ((dist.Scheme == Uri.UriSchemeHttps) && !RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) ? "wss" : "ws",
-					Port = RuntimeInformation.FrameworkDescription.StartsWith("Mono ") ? 80 : dist.Port
-				};
-				//this disgusts me i needed the auth cookie if android
+				var uri = new UriBuilder(dist);
 				if (RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) {
 					Cookies.SetCookies(uri.Uri, Cookies.GetCookieHeader(BaseAddress));
 				}
 				_client.Options.Cookies = Cookies;
-				//Its for the quest users aaaaaaa
-				RLog.Info($"Using {uri.Uri}");
 				var connection = _client.ConnectAsync(uri.Uri, CancellationToken.None);
 				connection.Wait();
 				RLog.Info($"WebSocket Client {connection.Status}");
