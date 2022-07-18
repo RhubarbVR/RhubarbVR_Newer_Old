@@ -20,6 +20,6 @@ namespace SharedModels.UserSession
 	{
 		public RequestType RequestType { get; set; }
 		public string RequestData { get; set; }
-		public string ID { get; set; }
+		public Guid ID { get; set; }
 	}
 }

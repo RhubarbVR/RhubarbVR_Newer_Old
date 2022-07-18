@@ -10,7 +10,7 @@ namespace SharedModels.UserSession
 	{
 		public SessionInfo SessionInfo { get; set; }
 
-		public string[] ForceJoin { get; set; }
+		public Guid[] ForceJoin { get; set; }
 		public UserConnectionInfo UserConnectionInfo { get; set; }
 	}
 }

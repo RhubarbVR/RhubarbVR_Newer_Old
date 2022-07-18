@@ -118,7 +118,7 @@ namespace RhuEngine.WorldObjects
 							GetLocalUser().isPresent.Value = true;
 						}
 						if (Engine.netApiManager.UserStatus is not null) {
-							Engine.netApiManager.UserStatus.CurrentSession = SessionID.Value;
+							Engine.netApiManager.UserStatus.CurrentSession = Guid.Parse(SessionID.Value);
 							Engine.netApiManager.UserStatus = Engine.netApiManager.UserStatus;
 						}
 					}
@@ -185,7 +185,7 @@ namespace RhuEngine.WorldObjects
 
 		[NoSave]
 		[OnChanged(nameof(SessionInfoChanged))]
-		public readonly SyncValueList<string> Admins;
+		public readonly SyncObjList<SyncRef<User>> Admins;
 
 		[NoSave]
 		public readonly Sync<DateTime> StartTime;
@@ -307,7 +307,7 @@ namespace RhuEngine.WorldObjects
 			catch { }
 			if (IsNetworked) {
 				if (!HasError) {
-					Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = SessionID.Value, RequestData = SessionID.Value, RequestType = RequestType.LeaveSession });
+					Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = Guid.Parse(SessionID.Value), RequestData = SessionID.Value, RequestType = RequestType.LeaveSession });
 				}
 			}
 			try {

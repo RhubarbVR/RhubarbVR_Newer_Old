@@ -25,11 +25,11 @@ namespace SharedModels.UserInfo
 
 		public string UserName { get; set; }
 
-		public string Id { get; set; }
+		public Guid Id { get; set; }
 
 		public DateTime DateOfBirth { get; set; }
 
-		public string[] Friends { get; set; }
+		public Guid[] Friends { get; set; }
 
 		public FriendRequest[] FriendRequests { get; set; }
 	}

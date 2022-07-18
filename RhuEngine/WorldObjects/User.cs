@@ -63,7 +63,7 @@ namespace RhuEngine.WorldObjects
 			base.OnLoaded();
 			if(CurrentPeer is null) {
 				try {
-					var foundPeer = World.peers.Where((val) => val.UserID == userID).First();
+					var foundPeer = World.peers.Where((val) => val.UserID.ToString() == userID).First();
 					if (foundPeer is not null) {
 						if (foundPeer.User is null) {
 							CurrentPeer = foundPeer;

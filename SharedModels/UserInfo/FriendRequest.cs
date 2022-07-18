@@ -10,7 +10,7 @@ namespace SharedModels.UserInfo
 
 		public bool Block { get; set; }
 
-		public string FromUser { get; set; }
+		public Guid FromUser { get; set; }
 
 		public DateTime TimeRequested { get; set; }
 

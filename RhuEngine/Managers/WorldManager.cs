@@ -86,10 +86,10 @@ namespace RhuEngine.Managers
 			});
 		}
 
-		public World GetWorldBySessionID(string sessionID) {
+		public World GetWorldBySessionID(Guid sessionID) {
 			for (var i = worlds.Count - 1; i >= 0; i--) {
 				try {
-					if (worlds[i].SessionID.Value == sessionID) {
+					if (worlds[i].SessionID.Value == sessionID.ToString()) {
 						return worlds[i];
 					}
 				}

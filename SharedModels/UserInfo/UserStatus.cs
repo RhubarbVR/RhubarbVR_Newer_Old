@@ -18,13 +18,13 @@ namespace SharedModels.UserInfo
 	{
 		public Status Status { get; set; }
 
-		public virtual string UserID { get; set; }
+		public virtual Guid UserID { get; set; }
 
 		public string CustomStatusMsg { get; set; }
 
-		public string CurrentSession { get; set; }
+		public Guid CurrentSession { get; set; }
 
-		public virtual string[] ActiveSessions { get; set; }
+		public virtual Guid[] ActiveSessions { get; set; }
 
 		public string ClientVersion { get; set; }
 

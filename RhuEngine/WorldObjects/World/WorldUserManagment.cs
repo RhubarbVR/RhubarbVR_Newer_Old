@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 using RhuEngine.Components;
 using RhuEngine.Datatypes;
@@ -17,9 +18,9 @@ namespace RhuEngine.WorldObjects
 		[NoSave]
 		public readonly SyncObjList<User> Users;
 		
-		public User GetUserFromID(string id) {
+		public User GetUserFromID(Guid id) {
 			foreach (User item in Users) {
-				if (item.userID.Value == id) {
+				if (item.userID.Value == id.ToString()) {
 					return item;
 				}
 			}
@@ -43,7 +44,7 @@ namespace RhuEngine.WorldObjects
 							return netPointer;
 						}
 					});
-					user.userID.Value = peer.UserID;
+					user.userID.Value = peer.UserID.ToString();
 					user.CurrentPeer = peer;
 					peer.User = user;
 				}

@@ -149,7 +149,7 @@ namespace RhuEngine.Managers
 			}
 		}
 
-		public async Task<UserStatus> GetUserStatus(string id) {
+		public async Task<UserStatus> GetUserStatus(Guid id) {
 			try {
 				var data = await SendGet<UserStatus>($"/api/userinfo/UserStatus?id={id}");
 				return data.Data;

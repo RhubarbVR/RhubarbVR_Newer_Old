@@ -23,7 +23,7 @@ namespace RhuEngine.Commads
 					Console.WriteLine(@$"=====---- EngineStatistics ----=====
 Is Login {Manager.Engine.netApiManager.IsLoggedIn}
 Username {Manager.Engine.netApiManager.User?.UserName ?? "Null"}
-UserID {Manager.Engine.netApiManager.User?.Id ?? "Null"}
+UserID {Manager.Engine.netApiManager.User?.Id ?? new Guid()}
 
 worldManager stepTime {Manager.Engine.worldManager.TotalStepTime * 1000f:f3}ms
 FPS {1 / RTime.Elapsedf:f3}

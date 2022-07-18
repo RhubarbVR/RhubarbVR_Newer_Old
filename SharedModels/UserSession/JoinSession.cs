@@ -8,7 +8,7 @@ namespace SharedModels.UserSession
 {
 	public class JoinSession
 	{
-		public string SessionID { get; set; }
+		public Guid SessionID { get; set; }
 
 		public UserConnectionInfo UserConnectionInfo { get; set; }
 	}

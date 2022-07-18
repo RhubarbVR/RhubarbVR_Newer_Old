@@ -25,10 +25,10 @@ namespace SharedModels
 			Message = FailMessage;
 		}
 
-		public LoginResponse(IRhubarbIdentity user) {
+		public LoginResponse(PrivateUser user) {
 			Login = true;
 			Message = $"Login as {user.UserName}";
-			User = new PrivateUser(user);
+			User = user;
 		}
 
 	}
@@ -39,7 +39,7 @@ namespace SharedModels
 		public PublicUser(IRhubarbIdentity user) {
 			EmailConfirmed = user?.EmailConfirmed??false;
 			UserName = user?.UserName;
-			Id = user?.Id;
+			Id = user.Id;
 			NormalizedUserName = user?.NormalizedUserName;
 		}
 
@@ -53,7 +53,7 @@ namespace SharedModels
 
 		public List<string> Roles { get; set; }
 
-		public string Id { get; set; }
+		public Guid Id { get; set; }
 	}
 
 	public class PrivateUser : IRhubarbIdentity
@@ -93,11 +93,11 @@ namespace SharedModels
 
 		public string UserName { get; set; }
 
-		public string Id { get; set; }
+		public Guid Id { get; set; }
 
 		public DateTime DateOfBirth { get; set; }
 
-		public string[] Friends { get; set; }
+		public Guid[] Friends { get; set; }
 		public FriendRequest[] FriendRequests { get; set; }
 	}
 }

@@ -53,7 +53,7 @@ namespace RhuEngine.WorldObjects
 			public byte[] Load(Uri uri) {
 				var path = uri.AbsolutePath;
 				var userID = path.Substring(0, path.IndexOf('/'));
-				var user = _world.GetUserFromID(userID);
+				var user = _world.GetUserFromID(Guid.Parse(userID));
 				if (user == null) {
 					RLog.Err($"User was null when loadeding LocalAsset UserID: {userID} Path {path}");
 					return null;

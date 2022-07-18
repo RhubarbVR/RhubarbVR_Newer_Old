@@ -67,8 +67,8 @@ namespace RhuEngine.WorldObjects
 			}
 			var sessionInfo = new SessionInfo {
 				ActiveUsers = Users.Select(user => (((User)user)?.isPresent?.Value??false) && (((User)user).IsConnected || ((User)user).IsLocalUser)).Where((val) => val).Count(),
-				Admins = Admins,
-				AssociatedGroup = AssociatedGroup.Value,
+				Admins = Admins.Select((x) => Guid.Parse(((SyncRef<User>)x).Target?.userID.Value)).ToArray(),
+				AssociatedGroup = Guid.Parse(AssociatedGroup.Value),
 				IsHidden = IsHidden.Value,
 				MaxUsers = MaxUserCount.Value,
 				ThumNail = ThumNail.Value,
@@ -76,12 +76,12 @@ namespace RhuEngine.WorldObjects
 				SessionAccessLevel = AccessLevel.Value,
 				SessionName = SessionName.Value,
 				NormalizedSessionName = SessionName.Value.Normalize(),
-				SessionId = SessionID.Value
+				SessionId = Guid.Parse(SessionID.Value)
 			};
 			var sessionConnection = new SessionCreation {
 				SessionInfo = sessionInfo,
 				UserConnectionInfo = null,
-				ForceJoin = Array.Empty<string>()
+				ForceJoin = Array.Empty<Guid>()
 			};
 			Engine.netApiManager.SendDataToSocked(new SessionRequest { RequestType = RequestType.UpdateSession, RequestData = JsonConvert.SerializeObject(sessionConnection), ID = sessionInfo.SessionId });
 		}
@@ -110,8 +110,8 @@ namespace RhuEngine.WorldObjects
 						SessionID.Value = Guid.NewGuid().ToString();
 						var sessionInfo = new SessionInfo {
 							ActiveUsers = 1,
-							Admins = Admins,
-							AssociatedGroup = AssociatedGroup.Value,
+							Admins = Admins.Select((x)=>Guid.Parse(((SyncRef<User>)x).Target?.userID.Value)).ToArray(),
+							AssociatedGroup = Guid.Parse(AssociatedGroup.Value),
 							IsHidden = IsHidden.Value,
 							MaxUsers = MaxUserCount.Value,
 							ThumNail = ThumNail.Value,
@@ -119,22 +119,22 @@ namespace RhuEngine.WorldObjects
 							SessionAccessLevel = AccessLevel.Value,
 							SessionName = SessionName.Value,
 							NormalizedSessionName = SessionName.Value.Normalize(),
-							SessionId = SessionID.Value
+							SessionId = Guid.Parse(SessionID.Value)
 						};
 						var sessionConnection = new SessionCreation {
 							SessionInfo = sessionInfo,
 							UserConnectionInfo = userConnection,
-							ForceJoin = Array.Empty<string>()
+							ForceJoin = Array.Empty<Guid>()
 						};
-						Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = SessionID.Value, RequestData = JsonConvert.SerializeObject(sessionConnection), RequestType = RequestType.CreateSession });
+						Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = Guid.Parse(SessionID.Value), RequestData = JsonConvert.SerializeObject(sessionConnection), RequestType = RequestType.CreateSession });
 
 					}
 					else {
 						var sessionConnection = new JoinSession {
-							SessionID = SessionID.Value,
+							SessionID = Guid.Parse(SessionID.Value),
 							UserConnectionInfo = userConnection,
 						};
-						Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = SessionID.Value, RequestData = JsonConvert.SerializeObject(sessionConnection), RequestType = RequestType.JoinSession });
+						Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = Guid.Parse(SessionID.Value), RequestData = JsonConvert.SerializeObject(sessionConnection), RequestType = RequestType.JoinSession });
 					}
 					IsLoadingNet = false;
 				}
@@ -152,7 +152,7 @@ namespace RhuEngine.WorldObjects
 
 		public ConcurrentDictionary<string, bool> NatIntroductionSuccessIsGood = new();
 		public ConcurrentDictionary<string, NetPeer> NatConnection = new();
-		public ConcurrentDictionary<string, string> NatUserIDS = new();
+		public ConcurrentDictionary<string, Guid> NatUserIDS = new();
 
 		private void FindNewMaster() {
 			for (var i = 0; i < Users.Count; i++) {
@@ -407,7 +407,7 @@ namespace RhuEngine.WorldObjects
 				relayServers.Add(relayPeer);
 				relayPeer.OnConnect();
 			}
-			else if (peer.Tag is string @string) {
+			else if (peer.Tag is Guid @string) {
 				RLog.Info("Normal Peer Loaded");
 				var newpeer = new Peer(peer, @string);
 				peer.Tag = newpeer;
@@ -588,14 +588,14 @@ namespace RhuEngine.WorldObjects
 
 		public void AddLocalUser() {
 			LoadMsg = "Adding LocalUser";
-			var Olduser = GetUserFromID(Engine.netApiManager.User?.Id ?? "Null");
+			var Olduser = GetUserFromID(Engine.netApiManager.User?.Id??new Guid());
 			if (Olduser is null) {
 				LoadMsg = "Building new LocalUser";
 				ItemIndex = 176;
 				LocalUserID = (ushort)(Users.Count + 1);
 				RLog.Info($"Built local User with id{LocalUserID}");
 				var user = Users.Add();
-				user.userID.Value = worldManager.Engine.netApiManager.User?.Id ?? "null";
+				user.userID.Value = (worldManager.Engine.netApiManager.User?.Id ?? new Guid()).ToString();
 				user.Platform.Value = Environment.OSVersion.Platform;
 				user.PlatformVersion.Value = Environment.OSVersion.Version.ToString();
 				user.BackendID.Value = Engine.EngineLink.BackendID;
