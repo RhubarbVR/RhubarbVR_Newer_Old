@@ -58,9 +58,23 @@ namespace RhuEngine.Components
 			uICanvas.Entity.position.Value = new Vector3f(0, 1, -1);
 			grabable = uICanvas.Entity.AttachComponent<Grabbable>();
 			Engine.SettingsUpdate += LoadKeyboard;
-			LoadKeyboard();
+			Entity.EnabledChanged += Entity_EnabledChanged;
 		}
+
+		bool _keyboardLoaded = false;	
+
+		private void Entity_EnabledChanged() {
+			if(!Entity.IsEnabled) {
+				return;
+			}
+			if (_keyboardLoaded) {
+				return;
+			}
+			Task.Run(LoadKeyboard);
+		}
+
 		public void LoadKeyboard() {
+			_keyboardLoaded = true;
 			var targetcode = CultureInfo.InstalledUICulture;
 			if (Engine.MainSettings.ThreeLetterLanguageName is not null) {
 				targetcode = new CultureInfo(Engine.MainSettings.ThreeLetterLanguageName, false);

@@ -49,8 +49,8 @@ namespace RhuEngine.Components
 			if (Engine.EngineLink.CanRender) {
 				RWorld.ExecuteOnStartOfFrame(() => RWorld.ExecuteOnEndOfFrame(() => {
 					KeyBoardHolder = LocalUser.userRoot.Target.Entity.AddChild("KeyBoardHolder");
-					keyBoard = KeyBoardHolder.AddChild("KeyBoard").AttachComponent<KeyBoard>();
 					KeyBoardHolder.enabled.Value = false;
+					keyBoard = KeyBoardHolder.AddChild("KeyBoard").AttachComponent<KeyBoard>();
 				}));
 			}
 		}

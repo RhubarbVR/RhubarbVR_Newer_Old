@@ -243,6 +243,7 @@ namespace RhuEngine.Components
 				}
 			}
 		}
+
 		[OnChanged(nameof(UpdateMinMax))]
 		public readonly Sync<Vector2f> OffsetLocalMin;
 		[OnChanged(nameof(UpdateMinMax))]
@@ -327,10 +328,19 @@ namespace RhuEngine.Components
 
 		public int CompZDepth => ((_rectDataOverride ?? ParentRect)?.ZDepth ?? 0) + 1;
 
+		public Vector2f AddedSize { get; set; }
+
+		public event Action AddedSizeCHange;
+
+		public void UpdateAddedSize(Vector2f size) {
+			AddedSize = size;
+			AddedSizeCHange?.Invoke();
+		}
+
 		public Vector2f Min => _cachedMin;
 
 		public Vector2f Max => _cachedMax;
-
+		
 		public Vector2f CompMin => TrueMin + (OffsetLocalMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 
 		public Vector2f CompMax => TrueMax + (OffsetLocalMax.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));

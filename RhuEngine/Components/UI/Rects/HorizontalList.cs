@@ -31,6 +31,12 @@ namespace RhuEngine.Components
 		public override void UpdateUIMeshes() {
 			UpdateMinMaxNoPross();
 			fakeRects.SafeOperation((list) => {
+				foreach (var item in list) {
+					try {
+						item.Child.AddedSizeCHange -= UpdateUIMeshes;
+					}
+					catch { }
+				}
 				list.Clear();
 				_childRects.SafeOperation((list) => {
 					foreach (var item in list) {
@@ -45,6 +51,7 @@ namespace RhuEngine.Components
 							AnchorMax = Vector2f.One,
 							AnchorMin = Vector2f.Zero,
 						};
+						item.AddedSizeCHange += UpdateUIMeshes;
 						item.SetOverride(fakeRec);
 						fakeRects.SafeAdd(fakeRec);
 					}
@@ -77,6 +84,7 @@ namespace RhuEngine.Components
 						var targetSize = item.Child.AnchorMaxValue - item.Child.AnchorMinValue;
 						item.AnchorMin = new Vector2f(xpos, 0);
 						item.AnchorMax = new Vector2f(xpos+1f,1);
+						targetSize += item.Child.AddedSize;
 						xpos += targetSize.x;
 						item.UpdateMinMax();
 						min ??= item.Child.Min;
