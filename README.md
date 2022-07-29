@@ -31,7 +31,6 @@
   </p>
 </p>
 
-
 <!-- TABLE OF CONTENTS -->
 <details open="open">
   <summary>Table of Contents</summary>
@@ -41,6 +40,9 @@
       <ul>
         <li><a href="#libraries">Libraries</a></li>
       </ul>
+    </li>
+    <li>
+      <a href="#preview">Preview</a>
     </li>
     <li>
       <a href="#getting-started">Getting Started</a>
@@ -56,30 +58,34 @@
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
-RhubarbVR is a networked VR game engine. What does this mean? Well, Rhubarb is a game engine that allows you to add custom shaders and allows you to program in it. It does all of this while synchronizing modifications of the world with everyone in a session so you can collaborate and socialize with people to create amazing things. It allows you to make extensive multiplayer VR games and social experiences. 
+RhubarbVR is a networked VR game engine. What does this mean? Well, Rhubarb is a game engine that allows you to add custom shaders and allows you to program in it. It does all of this while synchronizing modifications of the world with everyone in a session so you can collaborate and socialize with people to create amazing things. It allows you to make extensive multiplayer VR games and social experiences.
 
 ### Libraries
-* [StereoKit](https://github.com/maluoi/StereoKit)
-* [LiteNetLib](https://github.com/RevenantX/LiteNetLib)
-* [MessagePack](https://github.com/neuecc/MessagePack-CSharp)
-* [ImageSharp](https://github.com/SixLabors/ImageSharp)
 
+- [StereoKit](https://github.com/maluoi/StereoKit)
+- [LiteNetLib](https://github.com/RevenantX/LiteNetLib)
+- [MessagePack](https://github.com/neuecc/MessagePack-CSharp)
+- [ImageSharp](https://github.com/SixLabors/ImageSharp)
+
+## Preview
+
+![](./docs/preview.png)
 
 <!-- GETTING STARTED -->
+
 ## Getting Started
- 
+
 This is how to run the program and the standard problems you might encounter with trying to start or compile Rhubarb VR.
 
 ### Playing Normally
 
 You can get a compiled version of RhubarbVR through this GitHub repository or obtain it from Steam.
-But with either of these, you need to the net5 runtime installed.
-[Net5 Runtime](https://dotnet.microsoft.com/download/dotnet/5.0/runtime)
+But with either of these, you need to the net6 runtime installed.
+[Net6 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0/runtime)
 
 ### Compiling Windows
 
@@ -102,7 +108,7 @@ But with either of these, you need to the net5 runtime installed.
    ```sh
    git clone https://github.com/RhubarbVR/RhubarbVR.git
    ```
-3. Install Net5 SDK Ubuntu 21.04 for [OtherDistros](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
+2. Install Net6 SDK Ubuntu 21.04 for [OtherDistros](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
    ```sh
    wget https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
    sudo dpkg -i packages-microsoft-prod.deb
@@ -110,27 +116,30 @@ But with either of these, you need to the net5 runtime installed.
    sudo apt-get update; \
    sudo apt-get install -y apt-transport-https && \
    sudo apt-get update && \
-   sudo apt-get install -y dotnet-sdk-5.0
+   sudo apt-get install -y dotnet-sdk-6.0
    ```
-4. Build
+3. Build
    ```sh
-	dotnet build "Platforms/Rhubarb_VR_DotNet" /p:Configuration=Release
+   dotnet build "Platforms/Rhubarb_VR_DotNet" /p:Configuration=Release
    ```
 
 <!-- USAGE EXAMPLES -->
+
 ## Usage
 
 You can use this networked Engine for many things. For example, people can use it for socializing with others, making games, sharing their creativity with others, and educating people.
 
 <!-- ROADMAP -->
+
 ## Roadmap
-If you want info on where RhubarbVR is going you can join the [DiscordServer](https://discord.com/invite/GTQhxeq/) for info. 
+
+If you want info on where RhubarbVR is going you can join the [DiscordServer](https://discord.com/invite/GTQhxeq/) for info.
+
 1. See the [open issues](https://github.com/RhubarbVR/RhubarbVR//issues) for a list of proposed features (and known issues).
 2. See the [Milestones](https://github.com/RhubarbVR/RhubarbVR/milestones) for a list of major features that are actively being implemented.
 
-
-
 <!-- CONTRIBUTING -->
+
 ## Contributing
 
 Any contributions you make are **greatly appreciated**.
@@ -141,18 +150,15 @@ Any contributions you make are **greatly appreciated**.
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-
-
 <!-- LICENSE -->
+
 ## License
 
 Distributed under the GPL-3 License. See `LICENSE` for more information.
 
-
-
 <!-- CONTACT -->
-## Contact
 
+## Contact
 
 1. Project Link: [https://github.com/RhubarbVR/RhubarbVR](https://github.com/RhubarbVR/RhubarbVR)
 2. Website: [https://RhubarbVR.net](https://RhubarbVR.net)
@@ -160,9 +166,9 @@ Distributed under the GPL-3 License. See `LICENSE` for more information.
 
 4. Faolan Rad - Main Developer/Owner - Discord Faolan#0473
 
-
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
 [contributors-shield]: https://img.shields.io/github/contributors/RhubarbVR/RhubarbVR.svg?style=for-the-badge
 [contributors-url]: https://github.com/RhubarbVR/RhubarbVR/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/RhubarbVR/RhubarbVR.svg?style=for-the-badge
