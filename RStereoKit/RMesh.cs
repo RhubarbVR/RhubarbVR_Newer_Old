@@ -83,6 +83,28 @@ namespace RStereoKit
 			}
 			if (mesh is IComplexMesh complexMesh) {
 
+				var eloadedMesh = new Vertex[mesh.VertexCount];
+				Parallel.For(0, mesh.VertexCount, (i) => {
+					var vert = mesh.GetVertexAll(i);
+					var tuv = Vector2.Zero;
+					if (vert.bHaveUV && ((vert.uv?.Length ?? 0) > 0)) {
+						tuv = (Vector2)vert.uv[0];
+					}
+					var color = Color.White;
+					if (vert.bHaveC) {
+						color = new Color(vert.c.x, vert.c.y, vert.c.z, 1);
+					}
+					eloadedMesh[i] = new Vertex { col = color, norm = (Vector3)vert.n, uv = tuv, pos = (Vector3)vert.v };
+				});
+				vertices = eloadedMesh;
+				var subMeshCount = complexMesh.SubMeshes.Count() + 1;
+				inds = new uint[subMeshCount][];
+				LoadSubMesh(complexMesh.PrimitiveType, complexMesh.Faces, 0);
+				var currentIndex = 0;
+				foreach (var item in complexMesh.SubMeshes) {
+					currentIndex++;
+					LoadSubMesh(item.PrimitiveType, item.Faces, currentIndex);
+				}
 				return;
 			}
 			var loadedMesh = new Vertex[mesh.VertexCount];
@@ -101,6 +123,65 @@ namespace RStereoKit
 			vertices = loadedMesh;
 			inds = new uint[][] { mesh.RenderIndicesUint().ToArray() };
 		}
+
+		private void LoadSubMesh(RPrimitiveType primitiveType, IEnumerable<IFace> faces, int index) {
+			var indexs = LoadIndexs(primitiveType, faces).ToArray();
+			inds[index] = indexs;
+			RLog.Info($"Loaded SubMesh PrimitiveType{primitiveType} {index}");
+
+		}
+
+		private IEnumerable<uint> LoadIndexs(RPrimitiveType primitiveType, IEnumerable<IFace> faces) {
+			foreach (var item in faces) {
+				switch (primitiveType) {
+					case RPrimitiveType.Point:
+						if (item.Indices.Count > 0) {
+							yield return (uint)(item.Indices[0]);
+						}
+						break;
+					case RPrimitiveType.Line:
+						int? lastPoint = null;
+						foreach (var point in item.Indices) {
+							if (!(lastPoint is null)) {
+								yield return (uint)lastPoint;
+							}
+							yield return (uint)point;
+							lastPoint = point;
+						}
+						break;
+					case RPrimitiveType.Triangle:
+						if (item.Indices.Count == 3) {
+							yield return (uint)(item.Indices[0]);
+							yield return (uint)(item.Indices[1]);
+							yield return (uint)(item.Indices[2]);
+						}
+						else if (item.Indices.Count == 4) {
+							yield return (uint)(item.Indices[0]);
+							yield return (uint)(item.Indices[1]);
+							yield return (uint)(item.Indices[2]);
+							yield return (uint)(item.Indices[0]);
+							yield return (uint)(item.Indices[2]);
+							yield return (uint)(item.Indices[3]);
+						}
+						else {
+							for (var i = 1; i < (item.Indices.Count - 1); i++) {
+								yield return (uint)(item.Indices[i]);
+								yield return (uint)(item.Indices[i + 1]);
+								yield return (uint)(item.Indices[0]);
+							}
+						}
+						break;
+					case RPrimitiveType.Polygon:
+						foreach (var point in item.Indices) {
+							yield return (uint)point;
+						}
+						break;
+					default:
+						break;
+				}
+			}
+		}
+
 
 		public void LoadMeshToRender() {
 			var newMeshes = new Mesh[inds.Length];
