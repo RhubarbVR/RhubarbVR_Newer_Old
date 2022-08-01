@@ -51,21 +51,30 @@ namespace RStereoKit
 
 	public class SKRMesh : IRMesh
 	{
-		public RMesh Quad => new RMesh(Mesh.Quad,false);
+		public SKRMesh() { }
 
-		public void Draw(string id, object mesh, RMaterial loadingLogo, RNumerics.Matrix p,Colorf colorf,int depth,RhuEngine.Linker.RenderLayer renderLayer) {
+		public SKRMesh(Mesh mesh) { Meshs = new Mesh[] { mesh }; }
+
+		public Mesh[] Meshs = Array.Empty<Mesh>();
+		public Vertex[] vertices = Array.Empty<Vertex>();
+		public uint[][] inds = Array.Empty<uint[]>();
+
+		public void Draw(RMaterial loadingLogo, RNumerics.Matrix p,Colorf colorf,int depth,RhuEngine.Linker.RenderLayer renderLayer,int subMesh) {
 			var mit = MitManager.GetMitWithOffset(loadingLogo, depth);
-			((Mesh)mesh).Draw(mit, new StereoKit.Matrix(p.m),new Color(colorf.r, colorf.g, colorf.b, colorf.a), (StereoKit.RenderLayer)(int)renderLayer);
+			if(subMesh == -1) {
+				foreach (var item in Meshs) {
+					item.Draw(mit, new StereoKit.Matrix(p.m), new Color(colorf.r, colorf.g, colorf.b, colorf.a), (StereoKit.RenderLayer)(int)renderLayer);
+				}
+			}
+			else {
+				Meshs[subMesh].Draw(mit, new StereoKit.Matrix(p.m), new Color(colorf.r, colorf.g, colorf.b, colorf.a), (StereoKit.RenderLayer)(int)renderLayer);
+			}
 		}
 
-		public void LoadMesh(RMesh meshtarget, IMesh mesh) {
-			if (meshtarget.mesh == null) {
-				meshtarget.mesh = new Mesh();
-				((Mesh)meshtarget.mesh).KeepData = false;
-			}
+		public void LoadMeshData(IMesh mesh) {
 			if (mesh is null) {
-				((Mesh)meshtarget.mesh).SetVerts(new Vertex[1]);
-				((Mesh)meshtarget.mesh).SetInds(new uint[3]);
+				vertices = new Vertex[1];
+				inds = new uint[][] { new uint[3] };
 				return;
 			}
 			if (!mesh.IsTriangleMesh) {
@@ -73,9 +82,8 @@ namespace RStereoKit
 				return;
 			}
 			if (mesh is IComplexMesh complexMesh) {
-				if (!complexMesh.IsBasicMesh) {
-					RLog.Warn("StereoKit can only render Basic Meshes");
-				}
+
+				return;
 			}
 			var loadedMesh = new Vertex[mesh.VertexCount];
 			Parallel.For(0, mesh.VertexCount, (i) => {
@@ -90,8 +98,28 @@ namespace RStereoKit
 				}
 				loadedMesh[i] = new Vertex { col = color, norm = (Vector3)vert.n, uv = tuv, pos = (Vector3)vert.v };
 			});
-			((Mesh)meshtarget.mesh).SetVerts(loadedMesh);
-			((Mesh)meshtarget.mesh).SetInds(mesh.RenderIndicesUint().ToArray());
+			vertices = loadedMesh;
+			inds = new uint[][] { mesh.RenderIndicesUint().ToArray() };
+		}
+
+		public void LoadMeshToRender() {
+			var newMeshes = new Mesh[inds.Length];
+			for (var i = 0; i < Meshs.Length; i++) {
+				if(i >= newMeshes.Length) {
+					break;
+				}
+				newMeshes[i] = Meshs[i];
+			}
+			for (var i = Meshs.Length; i < inds.Length; i++) {
+				newMeshes[i] = new Mesh() {
+					KeepData = false
+				};
+			}
+			for (var i = 0; i < inds.Length; i++) {
+				newMeshes[i].SetVerts(vertices);
+				newMeshes[i].SetInds(inds[i]);
+			}
+			Meshs = newMeshes;
 		}
 	}
 }

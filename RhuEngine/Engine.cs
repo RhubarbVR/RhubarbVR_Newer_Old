@@ -304,6 +304,7 @@ namespace RhuEngine
 		private Vector3f _loadingPos = Vector3f.Zero;
 
 		public void Step() {
+			RenderThread.RunOnStartOfFrame();
 			if (EngineStarting) {
 				if (EngineLink.CanRender) {
 					try {
@@ -321,10 +322,10 @@ namespace RhuEngine
 						if (StartingText is not null) {
 							StartingText.Text = $"{localisationManager?.GetLocalString("Common.Loading")}\n{IntMsg}";
 							if (StartingTextMit is not null) {
-								RMesh.Quad.Draw("UIText", StartingTextMit?.Material, Matrix.TS(0, -0.2f, 0, new Vector3f(StartingText?.AspectRatio ?? 1, 1, 1) / 7) * rootMatrix);
+								RMesh.Quad.Draw(StartingTextMit?.Material, Matrix.TS(0, -0.2f, 0, new Vector3f(StartingText?.AspectRatio ?? 1, 1, 1) / 7) * rootMatrix);
 							}
 							if (LoadingLogo is not null) {
-								RMesh.Quad.Draw("LoadingUi", LoadingLogo?.Material, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
+								RMesh.Quad.Draw(LoadingLogo?.Material, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
 							}
 						}
 					}
@@ -333,19 +334,32 @@ namespace RhuEngine
 						throw ex;
 					}
 				}
+				RenderThread.RunOnEndOfFrame();
 				return;
 			}
-			RWorld.RunOnStartOfFrame();
-			foreach (var item in _managers) {
-				try {
-					item.Step();
+			var thra = new Thread(GameStep);
+			thra.Start();
+			thra.Join();
+			RenderThread.RunOnEndOfFrame();
+		}
+
+		public void GameStep() {
+			try {
+				RWorld.RunOnStartOfFrame();
+				foreach (var item in _managers) {
+					try {
+						item.Step();
+					}
+					catch (Exception ex) {
+						RLog.Err($"Failed to step {item.GetType().GetFormattedName()} Error: {ex}");
+						throw ex;
+					}
 				}
-				catch (Exception ex) {
-					RLog.Err($"Failed to step {item.GetType().GetFormattedName()} Error: {ex}");
-					throw ex;
-				}
+				RWorld.RunOnEndOfFrame();
 			}
-			RWorld.RunOnEndOfFrame();
+			catch (Exception wa) {
+				RLog.Err("GameStep Error" + wa.ToString());
+			}
 		}
 
 		public event Action OnCloseEngine;

@@ -169,7 +169,7 @@ namespace RhuEngine.Components
 		public override void Render(Matrix matrix) {
 			textRender.Render(textOffset,  Matrix.S((Rect.Canvas?.scale.Value ?? Vector3f.One) / 10) * matrix,RenderLayer.Text, OnCharRender);
 			for (var i = 0; i < mainMeshes.Length; i++) {
-				mainMeshes[i]?.Draw(textRender.ID + i, textRender.renderMits[i], matrix, null,0,RenderLayer.Text);
+				mainMeshes[i]?.Draw(textRender.renderMits[i], matrix, null,0,RenderLayer.Text);
 			}
 		}
 		private void MeshUpdate() {

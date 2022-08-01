@@ -131,7 +131,7 @@ namespace RhuEngine.Components
 			});
 			if (!UIText) {
 				for (var i = 0; i < renderMits.Count; i++) {
-					rendermeshes[i]?.Draw($"TextRender{ID}{i}", renderMits[i], offset * root,null,0,tar);
+					rendermeshes[i]?.Draw(renderMits[i], offset * root,null,0,tar);
 				}
 			}
 		}

@@ -451,12 +451,12 @@ namespace RhuEngine.Components
 				_uiRenderComponents.SafeOperation((list) => {
 					if (meshList.Count < list.Count) {
 						for (var i = 0; i < list.Count - meshList.Count; i++) {
-							meshList.Add(new RMesh(null, true));
+							meshList.Add(new RMesh((IMesh)null, true));
 						}
 					}
 					if (meshList.Count > list.Count) {
 						for (var i = 0; i < meshList.Count - list.Count; i++) {
-							meshList.Remove(new RMesh(null,true));
+							meshList.Remove(new RMesh((IMesh)null,true));
 						}
 					}
 					for (var i = 0; i < meshList.Count; i++) {
@@ -513,7 +513,7 @@ namespace RhuEngine.Components
 							list[i].PhysicsCollider.Matrix = list[i].PhysicsPose * mataddon * matrix;
 						}
 						if (list[i].RenderMaterial is not null) {
-							meshList[i].Draw(list[i].Pointer.ToString(), list[i].RenderMaterial, mataddon * matrix, list[i].RenderTint, ZDepth);
+							meshList[i].Draw(list[i].RenderMaterial, mataddon * matrix, list[i].RenderTint, ZDepth);
 						}
 					}
 				});
