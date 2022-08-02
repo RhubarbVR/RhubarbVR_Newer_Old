@@ -48,7 +48,7 @@ namespace RhuEngine.Components
 			_targetRotation = Entity.GlobalTrans.Rotation;
 		}
 
-		public override void Step() {
+		public override void RenderStep() {
 			if (targetUser.Target == LocalUser && LocalUser.userRoot.Target != null) {
 				var HeadPos = LocalUser.userRoot.Target.head.Target.GlobalTrans.Translation;
 				var HeadRot = LocalUser.userRoot.Target.head.Target.GlobalTrans.Rotation;

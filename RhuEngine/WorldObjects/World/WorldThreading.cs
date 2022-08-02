@@ -23,26 +23,6 @@ namespace RhuEngine.WorldObjects
 
 	public partial class World
 	{
-		private readonly List<Action> _actions = new();
-
-		public void AddCoroutineEnd(Action action) {
-			_actions.Add(action);
-		}
-		public void AddCoroutine(Action action) {
-			_actions.Add(Task.Run(action).Wait);
-		}
-		private void UpdateCoroutine() {
-			var e = _actions.GetEnumerator();
-			while (e.MoveNext()) {
-				try {
-					e.Current();
-				}
-				catch (Exception ex) 
-				{
-					RLog.Err("Failed to update Coroutine in " + WorldDebugName + " Error:" + ex.ToString());
-				}
-			}
-			_actions.Clear();
-		}
+		
 	}
 }

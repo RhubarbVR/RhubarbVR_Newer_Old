@@ -34,7 +34,7 @@ namespace RhuEngine.Linker
 		}
 
 		public void UpdatePrams() {
-			RWorld.ExecuteOnEndOfFrame(this, () =>
+			RenderThread.ExecuteOnEndOfFrame(this, () =>
 				PramChanged?.Invoke(this)
 			);
 		}

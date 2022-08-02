@@ -48,7 +48,7 @@ namespace RhuEngine.Managers
 		}
 
 		public string GetAssetFile(Uri asset) {
-			return $"{GetAssetDir(asset)}{asset.AbsolutePath.Replace('/','_').Replace('/','_').Replace('%', 'P')}.RAsset";
+			return $"{GetAssetDir(asset)}{asset.AbsolutePath.Replace('/', '_').Replace('/', '_').Replace('%', 'P')}.RAsset";
 		}
 
 		public string GetAssetDir(Uri asset) {
@@ -59,20 +59,20 @@ namespace RhuEngine.Managers
 			return File.Exists(GetAssetFile(asset));
 		}
 
-		public void CacheAsset(Uri asset,byte[] data) {
+		public void CacheAsset(Uri asset, byte[] data) {
 			if (IsCache(asset)) {
 				return;
 			}
 			try {
 				Directory.CreateDirectory(GetAssetDir(asset));
 			}
-			catch(Exception e) 
-			{
+			catch (Exception e) {
 				RLog.Err("Error creating Asset Cache Dir Error:" + e.ToString());
 			}
 			try {
 				File.WriteAllBytes(GetAssetFile(asset), data);
-			}catch(Exception e) {
+			}
+			catch (Exception e) {
 				RLog.Err("Error creating Asset Cache File Error:" + e.ToString());
 			}
 		}
@@ -94,5 +94,8 @@ namespace RhuEngine.Managers
 
 		public void Step() {
 		}
+		public void RenderStep() {
+		}
+
 	}
 }

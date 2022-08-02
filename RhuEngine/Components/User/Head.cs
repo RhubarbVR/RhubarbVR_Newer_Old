@@ -48,7 +48,7 @@ namespace RhuEngine.Components
 			mesh.SetPos(new Vector2i(16,2));
 		}
 
-		public override void Step() {
+		public override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}

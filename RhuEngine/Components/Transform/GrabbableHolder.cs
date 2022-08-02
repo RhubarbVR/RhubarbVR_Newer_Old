@@ -129,8 +129,7 @@ namespace RhuEngine.Components
 
 		bool _gripping = false;
 
-		public override void Step() {
-			base.Step();
+		public override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}

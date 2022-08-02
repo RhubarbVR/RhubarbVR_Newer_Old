@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 			user.Target = World.GetLocalUser();
 		}
 
-		public override void Step() {
+		public override void RenderStep() {
 			if (user.Target is null) {
 				return;
 			}

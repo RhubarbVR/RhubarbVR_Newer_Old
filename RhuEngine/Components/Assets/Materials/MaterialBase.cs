@@ -23,9 +23,11 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			_material = GetMaterialFromLinker();
-			Load(_material.Material);
-			UpdateAll();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				_material = GetMaterialFromLinker();
+				Load(_material.Material);
+				UpdateAll();
+			});
 		}
 
 		public override void Dispose() {

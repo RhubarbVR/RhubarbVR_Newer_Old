@@ -179,6 +179,5 @@ namespace RhuEngine.WorldObjects
 				});
 			}
 		}
-
 	}
 }

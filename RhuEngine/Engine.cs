@@ -337,10 +337,28 @@ namespace RhuEngine
 				RenderThread.RunOnEndOfFrame();
 				return;
 			}
-			var thra = new Thread(GameStep);
-			thra.Start();
-			thra.Join();
+			GameStep();
+			RenderStep();
 			RenderThread.RunOnEndOfFrame();
+		}
+
+		public void RenderStep() {
+			try {
+				RWorld.RunOnStartOfFrame();
+				foreach (var item in _managers) {
+					try {
+						item.RenderStep();
+					}
+					catch (Exception ex) {
+						RLog.Err($"Failed to step {item.GetType().GetFormattedName()} Error: {ex}");
+						throw ex;
+					}
+				}
+				RWorld.RunOnEndOfFrame();
+			}
+			catch (Exception wa) {
+				RLog.Err("GameStep Error" + wa.ToString());
+			}
 		}
 
 		public void GameStep() {

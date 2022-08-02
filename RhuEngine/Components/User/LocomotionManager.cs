@@ -23,7 +23,7 @@ namespace RhuEngine.Components
 
 		public LocomotionModule CurrentLocomotionModule => selectedModule.Value > (modules.Count - 1) ? null : modules[selectedModule.Value].Target;
 
-		public override void Step() {
+		public override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}

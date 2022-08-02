@@ -6,6 +6,7 @@ using RhuEngine.Linker;
 using RNumerics;
 using System.Runtime.InteropServices;
 using System.Numerics;
+using RhuEngine;
 
 namespace RStereoKit
 {

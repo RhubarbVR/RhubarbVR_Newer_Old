@@ -228,11 +228,10 @@ namespace RhuEngine.WorldObjects
 		[NoLoad]
 		public GrabbableHolder HeadGrabbableHolder;
 
-		public void Step() {
+		public void RenderStep() {
 			_netManager?.PollEvents();
 			_netManager?.NatPunchModule.PollEvents();
 			WorldThreadSafty.MethodCalls = 0;
-			UpdateCoroutine();
 			if (IsLoading | (_focus == FocusLevel.Background)) {
 				return;
 			}
@@ -245,9 +244,45 @@ namespace RhuEngine.WorldObjects
 				RLog.Err($"Failed to update global stepables for session {WorldDebugName}. Error: {e}");
 			}
 			try {
+				var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
+											 group ent by ent.CachedDepth;
+				var sorted = from groupe in sortedUpdatingEntities
+							 orderby groupe.Key ascending
+							 select groupe;
+				foreach (var item in sorted) {
+					foreach (var ent in item) {
+						ent.RenderStep();
+					}
+				}
+			}
+			catch (Exception e) {
+				RLog.Err($"Failed to update entities for session {WorldDebugName}. Error: {e}");
+			}
+			try {
+				if (Engine.EngineLink.CanRender) {
+					lock (_renderingComponents) {
+						foreach (var item in _renderingComponents) {
+							item.Render();
+						}
+					}
+				}
+			}
+			catch (Exception e) {
+				RLog.Err($"Failed to build render queue for session {WorldDebugName}. Error {e}");
+			}
+		}
+
+		public void Step() {
+			_netManager?.PollEvents();
+			_netManager?.NatPunchModule.PollEvents();
+			WorldThreadSafty.MethodCalls = 0;
+			if (IsLoading | (_focus == FocusLevel.Background)) {
+				return;
+			}
+			try {
 				PhysicsSim.UpdateSim(RTime.Elapsedf);
 			}
-			catch(Exception e) {
+			catch (Exception e) {
 				RLog.Err($"Failed To update PhysicsSim Error:{e}");
 			}
 			try {
@@ -264,19 +299,6 @@ namespace RhuEngine.WorldObjects
 			}
 			catch (Exception e) {
 				RLog.Err($"Failed to update entities for session {WorldDebugName}. Error: {e}");
-			}
-
-			try {
-				if (Engine.EngineLink.CanRender) {
-					lock (_renderingComponents) {
-						foreach (var item in _renderingComponents) {
-							item.Render();
-						}
-					}
-				}
-			}
-			catch (Exception e) {
-				RLog.Err($"Failed to build render queue for session {WorldDebugName}. Error {e}");
 			}
 		}
 
