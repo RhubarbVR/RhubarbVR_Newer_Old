@@ -103,10 +103,10 @@ namespace RhuEngine.WorldObjects
 						Value = new DataNode<ushort>((ushort)(object)value);
 					}
 					else if (unType == typeof(long)) {
-						Value = new DataNode<short>((short)(object)value);
+						Value = new DataNode<long>((long)(object)value);
 					}
 					else if (unType == typeof(ulong)) {
-						Value = new DataNode<ushort>((ushort)(object)value);
+						Value = new DataNode<ulong>((ulong)(object)value);
 					}
 					else {
 						throw new NotSupportedException();
