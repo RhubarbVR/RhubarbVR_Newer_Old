@@ -23,14 +23,14 @@ namespace RhuEngine.TextRendering
 		public ImageSharpTexture textureManager;
 		public RFont _font;
 		public FontAtlisPart(RFont font) {
-			RenderThread.ExecuteOnEndOfFrame(() => {
+			//RenderThread.ExecuteOnEndOfFrame(() => {
 				_image = new Image<Rgba32>(ATLISSIZE, ATLISSIZE);
 				textureManager = new ImageSharpTexture(_image);
 				_texture = textureManager.CreateTexture();
 				_material = StaticMaterialManager.GetMaterial<ITextMaterial>();
 				_material.Texture = _texture;
 				_font = font;
-			});
+			//});
 		}
 		public Dictionary<Rune, (Vector2f bottomleft, Vector2f topright)> runes = new();
 		public void UpdateMit() {
