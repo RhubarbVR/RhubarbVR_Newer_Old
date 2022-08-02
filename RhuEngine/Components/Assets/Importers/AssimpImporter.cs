@@ -386,7 +386,7 @@ namespace RhuEngine.Components
 		}
 
 		public override void Import(string path_url, bool isUrl, byte[] rawData) {
-			ImportAsync(path_url, isUrl, rawData).ConfigureAwait(false);
+			Task.Run(async () => await ImportAsync(path_url, isUrl, rawData));
 		}
 	}
 }
