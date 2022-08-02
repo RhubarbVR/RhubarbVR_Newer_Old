@@ -198,7 +198,7 @@ namespace RhuEngine.Managers
 					worlds[i].Step();
 				}
 				catch (Exception ex) {
-					RLog.Err($"Failed to step world {worlds[i].WorldDebugName}. Error: {ex}");
+					RLog.Err($"Failed to game step world {worlds[i].WorldDebugName}. Error: {ex}");
 				}
 				finally {
 					_stepStopwatch.Stop();
@@ -206,10 +206,19 @@ namespace RhuEngine.Managers
 					totalStep += (float)_stepStopwatch.Elapsed.TotalSeconds;
 				}
 			}
-
-			UpdateJoinMessage();
-
 			TotalStepTime = totalStep;
+		}
+
+		public void RenderStep() {
+			for (var i = worlds.Count - 1; i >= 0; i--) {
+				try {
+					worlds[i].RenderStep();
+				}
+				catch (Exception ex) {
+					RLog.Err($"Failed to render step world {worlds[i].WorldDebugName}. Error: {ex}");
+				}
+			}
+			UpdateJoinMessage();
 		}
 
 		private Vector3f _oldPlayerPos = Vector3f.Zero;

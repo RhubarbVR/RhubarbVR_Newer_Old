@@ -30,7 +30,7 @@ namespace RhuEngine.Components
 			scale.SetLinkerTarget(Entity.scale);
 		}
 
-		public override void Step() {
+		public override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}

@@ -493,6 +493,16 @@ namespace RhuEngine.WorldObjects.ECS
 			scale.Value = Vector3f.One;
 		}
 
+		public void RenderStep() {
+			foreach (var item in components) {
+				var comp = (Component)item;
+				comp.AlwaysRenderStep();
+				if (comp.Enabled.Value) {
+					comp.RenderStep();
+				}
+			}
+		}
+
 		public void Step() {
 			foreach (var item in components) {
 				var comp = (Component)item;

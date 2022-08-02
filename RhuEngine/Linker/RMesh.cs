@@ -9,12 +9,10 @@ namespace RhuEngine.Linker
 {
 	public interface IRMesh
 	{
-		public void LoadMesh(RMesh meshtarget, IMesh mesh);
+		public void LoadMeshData(IMesh mesh);
+		public void LoadMeshToRender();
 
-		public void Draw(string id,object mesh, RMaterial loadingLogo, Matrix p,Colorf tint, int zDepth, RenderLayer layer);
-
-		public RMesh Quad { get; }
-
+		public void Draw(RMaterial loadingLogo, Matrix p, Colorf tint, int zDepth, RenderLayer layer, int submesh);
 	}
 
 	public class RMesh
@@ -23,34 +21,34 @@ namespace RhuEngine.Linker
 
 		public bool Dynamic { get; private set; }
 
-		public static IRMesh Instance { get; set; }
+		public static Type Instance { get; set; }
 
-		public static RMesh Quad => Instance.Quad;
-
-		public object mesh;
+		public static RMesh Quad { get; set; }
 
 		public IMesh LoadedMesh { get; private set; }
 
-		public RMesh(object e, bool dynamic) {
-			mesh = e;
+		public IRMesh Inst { get; private set; }
+
+		public RMesh(IRMesh rMesh, bool dynamic) {
 			Dynamic = dynamic;
+			Inst = rMesh ?? (IRMesh)Activator.CreateInstance(Instance);
 		}
 
-		public RMesh(IMesh mesh, bool dynamic) {
-			Dynamic = dynamic;
+		public RMesh(IMesh mesh, bool dynamic) : this((IRMesh)null, dynamic) {
 			LoadMesh(mesh);
 		}
 
 		public void LoadMesh(IMesh mesh) {
 			LoadedMesh = mesh;
-			Instance.LoadMesh(this,mesh);
+			Inst.LoadMeshData(mesh);
 			if (!Dynamic) {
 				BoundingBox = BoundsUtil.Bounds(mesh.VertexIndices(), (x) => (Vector3f)mesh.GetVertex(x));
 			}
+			RenderThread.ExecuteOnStartOfFrame(Inst.LoadMeshToRender);
 		}
 
-		public void Draw(string id,RMaterial loadingLogo, Matrix p,Colorf? tint = null, int zDepth = 0,RenderLayer layer = RenderLayer.UI) {
-			Instance.Draw(id,mesh, loadingLogo, p,tint?? Colorf.White, zDepth, layer);
+		public void Draw(RMaterial loadingLogo, Matrix p, Colorf? tint = null, int zDepth = 0, RenderLayer layer = RenderLayer.UI,int subMesh = -1) {
+			Inst.Draw(loadingLogo, p, tint ?? Colorf.White, zDepth, layer, subMesh);
 		}
 	}
 }

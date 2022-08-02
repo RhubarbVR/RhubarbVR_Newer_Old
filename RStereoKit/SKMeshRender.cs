@@ -104,15 +104,14 @@ namespace RStereoKit
 
 		public override void Render() {
 			if (RenderingComponent.mesh.Asset != null) {
-				SKRender(RenderingComponent.mesh.Asset, RenderingComponent.materials, RenderingComponent.Entity.GlobalTrans, RenderingComponent.colorLinear.Value, RenderingComponent.renderLayer.Value);
+				SKRender(RenderingComponent.mesh.Asset, RenderingComponent.materials.ToArray(), RenderingComponent.Entity.GlobalTrans, RenderingComponent.colorLinear.Value, RenderingComponent.renderLayer.Value);
 			}
 		}
 
-		private void SKRender(RMesh rMesh, IEnumerable<ISyncObject> mits, RNumerics.Matrix globalTrans, Colorf color, RhuEngine.Linker.RenderLayer layer) {
-			foreach (AssetRef<RMaterial> item in mits) {
-				if (item.Asset != null) {
-					rMesh?.Draw("NUllNotNeeded", item.Asset, globalTrans, color, RenderingComponent.OrderOffset.Value, layer);
-				}
+		private void SKRender(RMesh rMesh, ISyncObject[] mits, RNumerics.Matrix globalTrans, Colorf color, RhuEngine.Linker.RenderLayer layer) {
+			var mesh = (SKRMesh)rMesh.Inst;
+			for (var i = 0; i < mesh.Meshs.Length; i++) {
+				mesh.Draw(((AssetRef<RMaterial>)mits[i% mits.Length]).Asset, globalTrans, color, RenderingComponent.OrderOffset.Value, layer, i);
 			}
 		}
 
@@ -137,18 +136,16 @@ namespace RStereoKit
 
 		public override void Render() {
 			if (RenderingComponent.mesh.Asset != null) {
-				SKRender(RenderingComponent.mesh.Asset, RenderingComponent.materials,RenderingComponent.Entity.GlobalTrans, RenderingComponent.colorLinear.Value, RenderingComponent.renderLayer.Value);
+				SKRender(RenderingComponent.mesh.Asset, RenderingComponent.materials.ToArray(), RenderingComponent.Entity.GlobalTrans, RenderingComponent.colorLinear.Value, RenderingComponent.renderLayer.Value);
 			}
 		}
 
-		private void SKRender(RMesh rMesh,IEnumerable<ISyncObject> mits, RNumerics.Matrix globalTrans,Colorf color,RhuEngine.Linker.RenderLayer layer) {
-			foreach (AssetRef<RMaterial> item in mits) {
-				if (item.Asset != null) {
-					rMesh?.Draw("NUllNotNeeded",item.Asset,globalTrans,color, RenderingComponent.OrderOffset.Value, layer);
-				}
+		private void SKRender(RMesh rMesh, ISyncObject[] mits, RNumerics.Matrix globalTrans, Colorf color, RhuEngine.Linker.RenderLayer layer) {
+			var mesh = (SKRMesh)rMesh.Inst;
+			for (var i = 0; i < mesh.Meshs.Length; i++) {
+				mesh.Draw(((AssetRef<RMaterial>)mits[i % mits.Length]).Asset, globalTrans, color, RenderingComponent.OrderOffset.Value, layer, i);
 			}
 		}
-
 		public override void Started() {
 			//Not needed for StereoKit
 		}

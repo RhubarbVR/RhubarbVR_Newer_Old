@@ -509,5 +509,8 @@ namespace RhuEngine.Managers
 		}
 		public void Step() {
 		}
+
+		public void RenderStep() {
+		}
 	}
 }

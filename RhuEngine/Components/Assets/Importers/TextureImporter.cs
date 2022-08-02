@@ -3,6 +3,7 @@
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 using RhuEngine.Linker;
+using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
@@ -23,7 +24,7 @@ namespace RhuEngine.Components
 				path.EndsWith(".webp");
 		}
 
-		public override void Import(string data, bool wasUri, byte[] rawdata) {
+		public void ImportAsync(string data, bool wasUri, byte[] rawdata) {
 			RLog.Info($"Loaded Texture Data {data} Uri{wasUri}");
 			if (wasUri) {
 				Entity.AttachComponent<BoxShape>();
@@ -42,7 +43,7 @@ namespace RhuEngine.Components
 				if (rawdata == null) {
 					if (File.Exists(data)) {
 						var newuri = World.LoadLocalAsset(File.ReadAllBytes(data), data);
-						Import(newuri.ToString(), true,null);
+						ImportAsync(newuri.ToString(), true, null);
 					}
 					else {
 						RLog.Err("Texture Load Uknown" + data);
@@ -50,9 +51,13 @@ namespace RhuEngine.Components
 				}
 				else {
 					var newuri = World.LoadLocalAsset(rawdata, data);
-					Import( newuri.ToString(), true,null);
+					ImportAsync(newuri.ToString(), true, null);
 				}
 			}
+		}
+
+		public override void Import(string data, bool wasUri, byte[] rawdata) {
+			Task.Run(() => ImportAsync(data, wasUri, rawdata));
 		}
 	}
 }

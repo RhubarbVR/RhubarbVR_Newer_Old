@@ -252,6 +252,9 @@ namespace RhuEngine.Managers
 
 		public ScreenInput screenInput;
 		public void Step() {
+
+		}
+		public void RenderStep() {
 			if ((!RWorld.IsInVR) && _engine.EngineLink.CanInput) {
 				screenInput.Step();
 			}

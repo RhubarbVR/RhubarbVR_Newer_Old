@@ -6,6 +6,7 @@ using RhuEngine.WorldObjects.ECS;
 
 using RhuEngine.Linker;
 using RNumerics;
+using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
@@ -87,7 +88,7 @@ namespace RhuEngine.Components
 || url.Host.Contains("nicovideo.") || url.Host.Contains("lbry.tv") || url.Host.Contains("nicovideo.jp");
 		}
 
-		public override void Import(string data, bool wasUri, byte[] rawdata) {
+		public void ImportAsync(string data, bool wasUri, byte[] rawdata) {
 			if (wasUri) {
 				RLog.Info("Building video");
 				Entity.AttachComponent<Grabbable>();
@@ -217,6 +218,10 @@ namespace RhuEngine.Components
 					Import(newuri.ToString(), true,null);
 				}
 			}
+		}
+
+		public override void Import(string data, bool wasUri, byte[] rawdata) {
+			Task.Run(() => ImportAsync(data, wasUri, rawdata));
 		}
 	}
 }

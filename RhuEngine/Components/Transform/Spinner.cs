@@ -23,7 +23,7 @@ namespace RhuEngine.Components
 			speed.Value = new Vector3f(35, 35, 0);
 		}
 
-		public override void Step() {
+		public override void RenderStep() {
 			var deltaSeconds = RTime.Elapsedf;
 			if (driver.Linked) {
 				var newval = Entity.LocalTrans * Matrix.R(offset.Value) * Matrix.R(Quaternionf.CreateFromEuler(speed.Value.x * deltaSeconds, speed.Value.y * deltaSeconds, speed.Value.z * deltaSeconds));

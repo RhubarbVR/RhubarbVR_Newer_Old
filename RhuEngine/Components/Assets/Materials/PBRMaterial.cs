@@ -87,136 +87,166 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(FullUVUpdate))]
 		public readonly Sync<Vector2f> UVOffset;
 		private void RenderModeChanged() {
-			if (_material is null) {
-				return;
-			}
-			_material.RenderMode = RenderMode;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.RenderMode = RenderMode;
+				_material.Material?.UpdatePrams();
+			});
 		}
 		private void BasicColorSettings() {
-			if (_material is null) {
-				return;
-			}
-			_material.AlbedoTexture = AlbedoTexture.Asset;
-			_material.AlbedoTint = AlbedoTint;
-			_material.AlphaCutOut = AlphaCutOut;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.AlbedoTexture = AlbedoTexture.Asset;
+				_material.AlbedoTint = AlbedoTint;
+				_material.AlphaCutOut = AlphaCutOut;
+				_material.Material?.UpdatePrams();
+			});
 		}
 		private void MetalicAndSmoothness() {
-			if (_material is null) {
-				return;
-			}
-			_material.MetallicTexture = MetallicTexture.Asset;
-			_material.Metallic = Metallic;
-			_material.Smoothness = Smoothness;
-			_material.SmoothnessFromAlbedo = SmoothnessFromAlbedo;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.MetallicTexture = MetallicTexture.Asset;
+				_material.Metallic = Metallic;
+				_material.Smoothness = Smoothness;
+				_material.SmoothnessFromAlbedo = SmoothnessFromAlbedo;
+				_material.Material?.UpdatePrams();
+			});
 		}
 		private void MapsUpdate() {
-			if (_material is null) {
-				return;
-			}
-			_material.NormalMap = NormalMap.Asset;
-			_material.HeightMap = HeightMap.Asset;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.NormalMap = NormalMap.Asset;
+				_material.HeightMap = HeightMap.Asset;
+				_material.Material?.UpdatePrams();
+			});
 		}
 		private void OtherTexturesUpdate() {
-			if (_material is null) {
-				return;
-			}
-			_material.Occlusion = Occlusion.Asset;
-			_material.DetailMask = DetailMask.Asset;
-			_material.DetailAlbedo = DetailAlbedo.Asset;
-			_material.DetailNormal = DetailNormal.Asset;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.Occlusion = Occlusion.Asset;
+				_material.DetailMask = DetailMask.Asset;
+				_material.DetailAlbedo = DetailAlbedo.Asset;
+				_material.DetailNormal = DetailNormal.Asset;
+				_material.Material?.UpdatePrams();
+			});
 		}
 		private void EmissionUpdate() {
-			if (_material is null) {
-				return;
-			}
-			_material.EmissionTexture = EmissionTexture.Asset;
-			_material.EmissionTint = EmissionTint;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.EmissionTexture = EmissionTexture.Asset;
+				_material.EmissionTint = EmissionTint;
+				_material.Material?.UpdatePrams();
+			});
 		}
 		private void AlbedoTextureUVUpdate() {
-			if (_material is null) {
-				return;
-			}
-			_material.AlbedoTextureOffset = UVOffset.Value + AlbedoTextureUVOffset;
-			_material.AlbedoTextureTilling = Tilling.Value * AlbedoTextureTilling;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.AlbedoTextureOffset = UVOffset.Value + AlbedoTextureUVOffset;
+				_material.AlbedoTextureTilling = Tilling.Value * AlbedoTextureTilling;
+				_material.Material?.UpdatePrams();
+			});
 		}
 
 		private void MetallicTextureUVUpdate() {
-			if (_material is null) {
-				return;
-			}
-			_material.MetallicTextureOffset = UVOffset.Value + MetallicTextureUVOffset;
-			_material.MetallicTextureTilling = Tilling.Value * MetallicTextureTilling;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.MetallicTextureOffset = UVOffset.Value + MetallicTextureUVOffset;
+				_material.MetallicTextureTilling = Tilling.Value * MetallicTextureTilling;
+				_material.Material?.UpdatePrams();
+			});
 		}
 
 		private void NormalMapUVUpdate() {
-			if (_material is null) {
-				return;
-			}
-			_material.NormalMapOffset = UVOffset.Value + NormalMapUVOffset;
-			_material.NormalMapTilling = Tilling.Value * NormalMapTilling;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.NormalMapOffset = UVOffset.Value + NormalMapUVOffset;
+				_material.NormalMapTilling = Tilling.Value * NormalMapTilling;
+				_material.Material?.UpdatePrams();
+			});
 		}
 
 		private void HeightMapUVUpdate() {
-			if (_material is null) {
-				return;
-			}
-			_material.HeightMapOffset = UVOffset.Value + HeightMapUVOffset;
-			_material.HeightMapTilling = Tilling.Value * HeightMapTilling;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.HeightMapOffset = UVOffset.Value + HeightMapUVOffset;
+				_material.HeightMapTilling = Tilling.Value * HeightMapTilling;
+				_material.Material?.UpdatePrams();
+			});
 		}
 
 		private void OcclusionUVUpdate() {
-			if (_material is null) {
-				return;
-			}
-			_material.OcclusionOffset = UVOffset.Value + OcclusionUVOffset;
-			_material.OcclusionTilling = Tilling.Value * OcclusionTilling;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.OcclusionOffset = UVOffset.Value + OcclusionUVOffset;
+				_material.OcclusionTilling = Tilling.Value * OcclusionTilling;
+				_material.Material?.UpdatePrams();
+			});
 		}
 
 		private void DetailMaskUVUpdate() {
-			if (_material is null) {
-				return;
-			}
-			_material.DetailMaskOffset = UVOffset.Value + DetailMaskUVOffset;
-			_material.DetailMaskTilling = Tilling.Value * DetailMaskTilling;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.DetailMaskOffset = UVOffset.Value + DetailMaskUVOffset;
+				_material.DetailMaskTilling = Tilling.Value * DetailMaskTilling;
+				_material.Material?.UpdatePrams();
+			});
 		}
 
 		private void DetailAlbedoUVUpdate() {
-			if (_material is null) {
-				return;
-			}
-			_material.DetailAlbedoOffset = UVOffset.Value + DetailAlbedoUVOffset;
-			_material.DetailAlbedoTilling = Tilling.Value * DetailAlbedoTilling;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.DetailAlbedoOffset = UVOffset.Value + DetailAlbedoUVOffset;
+				_material.DetailAlbedoTilling = Tilling.Value * DetailAlbedoTilling;
+				_material.Material?.UpdatePrams();
+			});
 		}
 
 		private void DetailNormalUVUpdate() {
-			if (_material is null) {
-				return;
-			}
-			_material.DetailNormalOffset = UVOffset.Value + DetailNormalUVOffset;
-			_material.DetailNormalTilling = Tilling.Value * DetailNormalTilling;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.DetailNormalOffset = UVOffset.Value + DetailNormalUVOffset;
+				_material.DetailNormalTilling = Tilling.Value * DetailNormalTilling;
+				_material.Material?.UpdatePrams();
+			});
 		}
 
 		private void EmissionTextureUVUpdate() {
-			if (_material is null) {
-				return;
-			}
-			_material.EmissionTextureOffset = UVOffset.Value + EmissionTextureUVOffset;
-			_material.EmissionTextureTilling = Tilling.Value * EmissionTextureTilling;
-			_material.Material?.UpdatePrams();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.EmissionTextureOffset = UVOffset.Value + EmissionTextureUVOffset;
+				_material.EmissionTextureTilling = Tilling.Value * EmissionTextureTilling;
+				_material.Material?.UpdatePrams();
+			});
 		}
 
 		private void FullUVUpdate() {
