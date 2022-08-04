@@ -13,10 +13,15 @@ namespace RhuEngine.Components
 		public DynamicTextRender TextRender { get; }
 	}
 
+	[NotLinkedRenderingComponent]
 	[Category(new string[] { "Rendering" })]
 	public class WorldText : RenderingComponent, ITextComp, IWorldBoundingBox
 	{
-		[Default("<color=hsv(240,100,100)>Hello<color=blue><size14>World \n <size5>Trains \n are cool man<size10>\nHello ")]
+		[Default(1f)]
+		public readonly Sync<float> Width;
+		[Default(1f)]
+		public readonly Sync<float> Height;
+		[Default("Text Here")]
 		[OnChanged(nameof(UpdateText))]
 		public readonly Sync<string> Text;
 		[OnAssetLoaded(nameof(UpdateText))]
@@ -42,10 +47,6 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(UpdateText))]
 		public readonly Sync<EHorizontalAlien> HorizontalAlien;
 
-		[Default(true)]
-		[OnChanged(nameof(UpdateText))]
-		public readonly Sync<bool> MiddleLines;
-
 		[Default(RenderLayer.Text)]
 		public readonly Sync<RenderLayer> TargetRenderLayer;
 
@@ -59,8 +60,44 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien, MiddleLines);
+			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien);
 		}
+
+		public override void Render() {
+			float y;
+			switch (VerticalAlien.Value) {
+				case EVerticalAlien.Bottom:
+					y = ((textRender.Height) * 0.1f) - (Height.Value / 2);
+					break;
+				case EVerticalAlien.Center:
+					y = (textRender.Height / 2) * 0.1f;
+					break;
+				case EVerticalAlien.Top:
+					y = Height.Value / 2;
+					break;
+				default:
+					y = 0;
+					break;
+			}
+			float x;
+			switch (HorizontalAlien.Value) {
+				case EHorizontalAlien.Left:
+					x = -(Width.Value / 2);
+					break;
+				case EHorizontalAlien.Middle:
+					x = -(textRender.Width / 2 * 0.1f);
+					break;
+				case EHorizontalAlien.Right:
+					x = (Width.Value / 2) - (textRender.Width * 0.1f);
+					break;
+				default:
+					x = 0;
+					break;
+			}
+			var offSet = Matrix.T(new Vector3f(x,y));
+			textRender.Render(Matrix.S(0.1f) * offSet, Entity.GlobalTrans, TargetRenderLayer);
+		}
+
 		public override void OnAttach() {
 			base.OnAttach();
 			Font.Target = World.RootEntity.GetFirstComponentOrAttach<MainFont>();

@@ -2,8 +2,14 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Reflection;
+
 namespace RhuEngine.WorldObjects.ECS
 {
+	public class NotLinkedRenderingComponentAttribute : Attribute {
+
+	}
+
 	public abstract class RenderingComponent : Component
 	{
 		public IRenderLink RenderLink { get; set; }
@@ -12,6 +18,9 @@ namespace RhuEngine.WorldObjects.ECS
 
 		private void BuildRenderLink() {
 			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
+			if(GetType().GetCustomAttribute<NotLinkedRenderingComponentAttribute>() is not null) {
 				return;
 			}
 			if (!loadedCasts.TryGetValue(GetType(), out var linker)) {
@@ -67,7 +76,7 @@ namespace RhuEngine.WorldObjects.ECS
 			base.Dispose();
 		}
 
-		public void Render() {
+		public virtual void Render() {
 			RenderLink?.Render();
 		}
 	}

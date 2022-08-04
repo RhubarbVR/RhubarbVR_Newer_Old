@@ -250,23 +250,6 @@ namespace RhuEngine.WorldObjects.ECS
 		[UnExsposed]
 		private Entity _internalParent;
 
-		[NoShow]
-		[NoSave]
-		[NoSync]
-		[NoLoad]
-		[UnExsposed]
-		public UIRect UIRect;
-
-		public void SetUIRect(UIRect newrect) {
-			var oldrec = UIRect;
-			UIRect = newrect;
-			UIRectUpdate?.Invoke(oldrec, UIRect);
-		}
-
-
-		public event Action<UIRect, UIRect> UIRectUpdate;
-
-
 		private Matrix _cachedGlobalMatrix = Matrix.S(1);
 
 		private Matrix _cachedLocalMatrix = Matrix.S(1);
@@ -526,7 +509,9 @@ namespace RhuEngine.WorldObjects.ECS
 		public override void Dispose() {
 			base.Dispose();
 			World.UnregisterEntity(this);
-			World.UnregisterUpdatingEntity(this);
+			if (HasUpdatingComponent) {
+				World.UnregisterUpdatingEntity(this);
+			}
 		}
 
 		public Entity() {

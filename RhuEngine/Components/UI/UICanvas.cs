@@ -6,6 +6,7 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
+	[NotLinkedRenderingComponent]
 	[Category(new string[] { "UI" })]
 	public class UICanvas : RenderingComponent
 	{
@@ -29,11 +30,8 @@ namespace RhuEngine.Components
 			scale.Value = new Vector3f(16, 9,1);
 		}
 
-		public void RenderUI() {
-			if (Entity.UIRect is null) {
-				return;
-			}
-			var uiRect = Entity.UIRect;
+		public override void Render() {
+
 		}
 	}
 }

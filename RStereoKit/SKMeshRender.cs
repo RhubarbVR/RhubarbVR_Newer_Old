@@ -32,48 +32,6 @@ namespace RStereoKit
 		}
 	}
 
-	public class UIRender : RenderLinkBase<UICanvas>
-	{
-		public override void Init() {
-		}
-
-		public override void Remove() {
-		}
-
-		public override void Render() {
-			RenderingComponent?.RenderUI();
-		}
-
-		public override void Started() {
-		}
-
-		public override void Stopped() {
-		}
-	}
-
-	public class SKTextRender : RenderLinkBase<WorldText>
-	{
-		public override void Init() {
-			//Not needed for StereoKit
-		}
-
-		public override void Remove() {
-			//Not needed for StereoKit
-		}
-
-		public override void Render() {
-			RenderingComponent.textRender.Render(RNumerics.Matrix.S(0.1f), RenderingComponent.Entity.GlobalTrans,RenderingComponent.TargetRenderLayer);
-		}
-
-		public override void Started() {
-			//Not needed for StereoKit
-		}
-
-		public override void Stopped() {
-			//Not needed for StereoKit
-		}
-	}
-
 	public class SKArmiturer : RenderLinkBase<Armature>
 	{
 		public override void Init() {

@@ -30,7 +30,7 @@ namespace RhuEngine.Components
 		public event Action<Matrix, TextChar,int> OnCharRender;
 		public DynamicTextRender TextRender => textRender;
 
-		[Default("<color=hsv(240,100,100)>Hello<color=blue><size14>World \n <size5>Trains \n are cool man<size10>\nHello ")]
+		[Default("Text Here")]
 		[OnChanged(nameof(UpdateText))]
 		public readonly Sync<string> Text;
 		[Default("")]
@@ -74,10 +74,6 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(UpdateText))]
 		public readonly Sync<EHorizontalAlien> HorizontalAlien;
 
-		[Default(true)]
-		[OnChanged(nameof(UpdateText))]
-		public readonly Sync<bool> MiddleLines;
-
 		public Matrix textOffset = Matrix.S(1);
 
 		private void UpdateText() {
@@ -96,7 +92,7 @@ namespace RhuEngine.Components
 			if (string.IsNullOrEmpty(newtext)) {
 				newtext = EmptyString.Value;
 			}
-			textRender.LoadText(Pointer.ToString(), newtext, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien, MiddleLines);
+			textRender.LoadText(Pointer.ToString(), newtext, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien);
 		}
 
 		public override void OnLoaded() {

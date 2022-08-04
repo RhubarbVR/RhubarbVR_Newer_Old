@@ -8,10 +8,6 @@ namespace RhuEngine.Components
 {
 	public abstract class UIComponent : Component
 	{
-		[NoShow]
-		[NoSave]
-		[NoSync]
-		[NoLoad]
-		public UIRect Rect => Entity.UIRect;
+		
 	}
 }

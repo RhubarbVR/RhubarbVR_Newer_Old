@@ -42,7 +42,6 @@ namespace RhuEngine
 			TempComps.position.Value = new Vector3f(0f, 3f, 4f);
 			TempComps.AttachComponent<Light>();
 			TempComps.AttachComponent<MeshRender>();
-			TempComps.AttachComponent<WorldText>();
 			TempComps.AttachComponent<Armature>();
 			TempComps.AttachComponent<SkinnedMeshRender>();
 
@@ -128,8 +127,28 @@ namespace RhuEngine
 			data.Item2.MainTexture.Target = fontAtlis.AttachComponent<FontAtlasTexture>();
 
 			var text = fontAtlis.AddChild("Text");
-			text.position.Value = new Vector3f(-0.5f, 1.5f, 0);
+			text.position.Value = new Vector3f(0, 1.5f, 0);
 			text.AttachComponent<WorldText>();
+
+			var text2 = fontAtlis.AddChild("Text2");
+			text2.position.Value = new Vector3f(0, 2.5f, 0);
+			text2.AttachComponent<WorldText>().Text.Value = "This is another\nBit of Text";
+
+			var text3 = fontAtlis.AddChild("Text3");
+			text3.position.Value = new Vector3f(0, 3.5f, 0);
+			text3.AttachComponent<WorldText>().VerticalAlien.Value = EVerticalAlien.Center;
+			var text4 = fontAtlis.AddChild("Text4");
+			text4.position.Value = new Vector3f(0, 4.5f, 0);
+			text4.AttachComponent<WorldText>().VerticalAlien.Value = EVerticalAlien.Top;
+			var text5 = fontAtlis.AddChild("Text5");
+			text5.position.Value = new Vector3f(0, 5.5f, 0);
+			text5.AttachComponent<WorldText>().VerticalAlien.Value = EVerticalAlien.Bottom;
+			var text6 = fontAtlis.AddChild("Text6");
+			text6.position.Value = new Vector3f(0, 6.5f, 0);
+			text6.AttachComponent<WorldText>().HorizontalAlien.Value = EHorizontalAlien.Left;
+			var text7 = fontAtlis.AddChild("Text7");
+			text7.position.Value = new Vector3f(0, 7.5f, 0);
+			text7.AttachComponent<WorldText>().HorizontalAlien.Value = EHorizontalAlien.Right;
 
 			var textureStuff = testCubes.AddChild("Texture Stuff");
 			var dfg = textureStuff.AddChild("DFG-Noise");
