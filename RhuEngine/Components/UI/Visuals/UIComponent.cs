@@ -13,11 +13,5 @@ namespace RhuEngine.Components
 		[NoSync]
 		[NoLoad]
 		public UIRect Rect => Entity.UIRect;
-
-		public abstract void Render(Matrix matrix);
-
-		public abstract void RenderTargetChange();
-
-		public abstract void CutElement(bool cut, bool update = true);
 	}
 }

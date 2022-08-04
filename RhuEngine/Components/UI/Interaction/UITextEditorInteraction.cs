@@ -141,7 +141,7 @@ namespace RhuEngine.Components
 
 		public abstract int RenderCurrsorLength { get; set; }
 
-		public Matrix WorldPos =>  Rect.WorldPos;
+		public Matrix WorldPos => Matrix.Identity;//Todo: change to rect pos Rect.WorldPos;
 
 		public abstract void KeyboardBind();
 

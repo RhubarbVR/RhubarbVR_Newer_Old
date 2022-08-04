@@ -41,35 +41,35 @@ namespace RhuEngine.Components
 
 		private bool _isHovering;
 
-		public override void Step() {
-			base.Step();
-			if (Rect is null) {
-				return;
-			}
-			var hoverThisFrame = false;
-			foreach (var item in Rect.HitPoses(!AllowOtherZones.Value)) {
-				if (item.Laser) {
-					if (Laserable) {
-						hoverThisFrame = true;
-						Hover();
-					}
-				}
-				else if (item.CustomTouch) {
-					if (CustomTochable) {
-						hoverThisFrame = true;
-						Hover();
-					}
-				}
-				else {
-					if (Touchable) {
-						hoverThisFrame = true;
-						Hover();
-					}
-				}
-			}
-			if (!hoverThisFrame && _isHovering) {
-				UnHover();
-			}
-		}
+		//public override void Step() {
+		//	base.Step();
+		//	if (Rect is null) {
+		//		return;
+		//	}
+		//	var hoverThisFrame = false;
+		//	foreach (var item in Rect.HitPoses(!AllowOtherZones.Value)) {
+		//		if (item.Laser) {
+		//			if (Laserable) {
+		//				hoverThisFrame = true;
+		//				Hover();
+		//			}
+		//		}
+		//		else if (item.CustomTouch) {
+		//			if (CustomTochable) {
+		//				hoverThisFrame = true;
+		//				Hover();
+		//			}
+		//		}
+		//		else {
+		//			if (Touchable) {
+		//				hoverThisFrame = true;
+		//				Hover();
+		//			}
+		//		}
+		//	}
+		//	if (!hoverThisFrame && _isHovering) {
+		//		UnHover();
+		//	}
+		//}
 	}
 }

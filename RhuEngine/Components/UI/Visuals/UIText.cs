@@ -97,65 +97,11 @@ namespace RhuEngine.Components
 				newtext = EmptyString.Value;
 			}
 			textRender.LoadText(Pointer.ToString(), newtext, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien, MiddleLines);
-			UpdateTextOffset();
 		}
 
 		public override void OnLoaded() {
 			base.OnLoaded();
-			textRender.UpdatedMeshses = MeshUpdate;
 			UpdateText();
-		}
-
-		public void UpdateTextOffset() {
-			if (Rect?.Canvas is null) {
-				return;
-			}
-			var startDepth = new Vector3f(0, 0, Entity.UIRect.StartPoint);
-			var depth = new Vector3f(0, 0, Entity.UIRect.Depth.Value);
-			var depthStart = startDepth + depth;
-			var upleft = depthStart;
-			var max = Rect.Max;
-			var min = Rect.Min;
-			var boxsize = max - min;
-			boxsize /= Math.Max(boxsize.x, boxsize.y);
-			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
-			var texture = new Vector2f(textRender.Width, textRender.Height) * 10;
-			texture /= canvassize;
-			texture /= boxsize;
-			texture /= Math.Max(texture.x, texture.y);
-			var maxmin = (max - min) * texture;
-			var maxoffset = maxmin + min;
-			var minoffset = min;
-			var offset = (max - min - maxmin) / 2;
-			if (HorizontalAlien == EHorizontalAlien.Middle) {
-				maxoffset = new Vector2f(maxoffset.x + offset.x, maxoffset.y);
-				minoffset = new Vector2f(minoffset.x + offset.x, minoffset.y);
-			}
-			if (VerticalAlien == EVerticalAlien.Center) {
-				maxoffset = new Vector2f(maxoffset.x, maxoffset.y + offset.y);
-				minoffset = new Vector2f(minoffset.x, minoffset.y + offset.y);
-			}
-			if (HorizontalAlien == EHorizontalAlien.Right) {
-				maxoffset = new Vector2f(max.x, maxoffset.y);
-				minoffset = new Vector2f(max.x - maxmin.x, minoffset.y);
-			}
-			if (VerticalAlien == EVerticalAlien.Top) {
-				maxoffset = new Vector2f(maxoffset.x, max.y);
-				minoffset = new Vector2f(minoffset.x, max.y - maxmin.y);
-			}
-			upleft += new Vector3f(minoffset.x, maxoffset.y);
-			var size = (max * canvassize) - (min * canvassize);
-			var largestscaleside = Math.Max(size.x, size.y);
-			var largestestside = Math.Max(textRender.Width, textRender.Height);
-			var small = Math.Min(size.y / textRender.Height, size.x / textRender.Width);
-
-
-			textOffset = Matrix.TS(new Vector3f(upleft.x, upleft.y, Rect.StartPoint + Entity.UIRect.Depth.Value + 0.01f), new Vector3f(small) / Rect.Canvas.scale.Value) * Matrix.T(Rect.ScrollOffset);
-			CutElement(true, true);
-		}
-
-		public override void RenderTargetChange() {
-			UpdateTextOffset();
 		}
 
 		public override void OnAttach() {
@@ -164,53 +110,6 @@ namespace RhuEngine.Components
 			StartingColor.Value = Colorf.White;
 			MinClamp.Value = Vector2f.MinValue;
 			MaxClamp.Value = Vector2f.MaxValue;
-		}
-
-		public override void Render(Matrix matrix) {
-			textRender.Render(textOffset,  Matrix.S((Rect.Canvas?.scale.Value ?? Vector3f.One) / 10) * matrix,RenderLayer.Text, OnCharRender);
-			for (var i = 0; i < mainMeshes.Length; i++) {
-				mainMeshes[i]?.Draw(textRender.renderMits[i], matrix, null,0,RenderLayer.Text);
-			}
-		}
-		private void MeshUpdate() {
-			UpdateTextOffset();
-		}
-
-		public RMesh[] mainMeshes = Array.Empty<RMesh>();
-
-		public override void CutElement(bool cut, bool update) {
-			var meshes = new SimpleMesh[textRender.simprendermeshes.Count];
-			for (var i = 0; i < meshes.Length; i++) {
-				meshes[i] = new SimpleMesh(TextRender.simprendermeshes[i]);
-				if(TextRender.simprendermeshes[i] is null) {
-					continue;
-				}
-				meshes[i].Translate(textOffset);
-				if (cut) {
-					meshes[i] = meshes[i].Cut(Rect.CutZonesMax, Rect.CutZonesMin);
-				}
-				if (Rect.Canvas.TopOffset.Value) {
-					meshes[i].OffsetTop(Rect.Canvas.TopOffsetValue.Value);
-				}
-				if (Rect.Canvas.FrontBind.Value) {
-					meshes[i] = meshes[i].UIBind(Rect.Canvas.FrontBindAngle.Value, Rect.Canvas.FrontBindRadus.Value, Rect.Canvas.FrontBindSegments.Value, Rect.Canvas.scale);
-				}
-				meshes[i].Scale(Rect.Canvas.scale.Value.x / 10, Rect.Canvas.scale.Value.y / 10, Rect.Canvas.scale.Value.z / 10);
-			}
-			if(mainMeshes.Length != meshes.Length) {
-				Array.Resize(ref mainMeshes,meshes.Length);
-			}
-			for (var i = 0; i < meshes.Length; i++) {
-				var mesh = mainMeshes[i];
-				if(mesh is not null) {
-					mesh.LoadMesh(meshes[i]);
-				}
-				else {
-					if(meshes[i].TriangleCount > 0) {
-						mainMeshes[i] = new RMesh(meshes[i],true);
-					}
-				}
-			}
 		}
 	}
 }

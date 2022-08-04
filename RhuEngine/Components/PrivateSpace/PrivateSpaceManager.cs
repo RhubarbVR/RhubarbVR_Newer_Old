@@ -102,7 +102,7 @@ namespace RhuEngine.Components
 						}
 						var pressForce = (poses[(int)handed] * pos.Inverse).Translation.z * 20;
 						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-						uIComponent.Rect.AddHitPoses(new HitData { Laser = false, HitPosWorld = hitpointworld, HitNormalWorld = hitnormal, PressForce = pressForce, Touchindex = handed, Handed = (handed == 2) ? Handed.Right : Handed.Left });
+						//uIComponent.Rect.AddHitPoses(new HitData { Laser = false, HitPosWorld = hitpointworld, HitNormalWorld = hitnormal, PressForce = pressForce, Touchindex = handed, Handed = (handed == 2) ? Handed.Right : Handed.Left });
 					}
 					if (collider.CustomObject is PhysicsObject physicsObject) {
 						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
@@ -141,7 +141,7 @@ namespace RhuEngine.Components
 
 				if (collider.CustomObject is RenderUIComponent uIComponent) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.005f), new Colorf(1, 1, 0, 0.5f));
-					uIComponent.Rect.AddHitPoses(new HitData { Touchindex = touchUndex, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = pressForce, GripForce = gripForces, Handed = side });
+					//uIComponent.Rect.AddHitPoses(new HitData { Touchindex = touchUndex, Laser = true, HitPosWorld = hitpointworld, HitNormalWorld = hitpointworld, PressForce = pressForce, GripForce = gripForces, Handed = side });
 				}
 				if (collider.CustomObject is PhysicsObject physicsObject) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));

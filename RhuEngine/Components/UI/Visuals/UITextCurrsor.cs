@@ -82,7 +82,7 @@ namespace RhuEngine.Components
 			if (!TextCurrsor.Target.RenderCurrsor) {
 				return;
 			}
-			CurrsorMesh.Asset.Draw(Material.Asset, Matrix.S(100f) * arg1, arg2.color * Tint.Value, (Entity.UIRect?.ZDepth ?? 0) + 1151);
+			//CurrsorMesh.Asset.Draw(Material.Asset, Matrix.S(100f) * arg1, arg2.color * Tint.Value, (Entity.UIRect?.ZDepth ?? 0) + 1151);
 		}
 
 	}
