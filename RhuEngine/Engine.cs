@@ -19,6 +19,10 @@ using System.Runtime;
 
 namespace RhuEngine
 {
+	public class RhuException : Exception {
+		public RhuException(string data):base(data) { }
+	}
+
 	public class Engine : IDisposable
 	{
 		public void DragAndDropAction(List<string> files) {

@@ -51,7 +51,7 @@ namespace RhuEngine.Components
 
 		public readonly Sync<RenderLayer> Culling;
 
-		public override void FirstCreation() {
+		protected override void FirstCreation() {
 			base.FirstCreation();
 			Color.Value = Colorf.White;
 		}

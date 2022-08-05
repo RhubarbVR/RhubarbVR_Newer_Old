@@ -14,6 +14,8 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
+	public delegate NetPointer NetPointerUpdateDelegate();
+
 	public abstract class SyncObject : ISyncObject
 	{
 		private readonly HashSet<IDisposable> _disposables = new();
@@ -104,11 +106,11 @@ namespace RhuEngine.WorldObjects
 			World.UnRegisterWorldObject(this);
 		}
 
-		public virtual void FirstCreation() {
+		protected virtual void FirstCreation() {
 
 		}
 
-		public virtual void OnInitialize() {
+		protected virtual void OnInitialize() {
 
 		}
 
@@ -117,7 +119,7 @@ namespace RhuEngine.WorldObjects
 			public override string Message => "Generic given is invalid";
 		}
 
-		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize, Func<NetPointer> netPointer = null) {
+		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer = null) {
 			if (GetType().GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && !world.IsPersonalSpace) {
 				throw new InvalidOperationException("This SyncObject is PrivateSpaceOnly");
 			}
@@ -179,7 +181,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 
-		public virtual void InitializeMembers(bool networkedObject, bool deserialize, Func<NetPointer> netPointer) {
+		protected virtual void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer) {
 			try {
 				var data = GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
 				foreach (var item in data) {
@@ -261,6 +263,10 @@ namespace RhuEngine.WorldObjects
 
 		public void ChangeName(string name) {
 			Name = name;
+		}
+
+		void ISyncObject.CallFirstCreation() {
+			FirstCreation();
 		}
 	}
 }

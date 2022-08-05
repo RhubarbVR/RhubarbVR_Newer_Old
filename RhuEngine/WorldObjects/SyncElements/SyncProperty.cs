@@ -39,8 +39,8 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 		public object Object { get => GetValue.Invoke(); set => SetValue.Invoke((T)value); }
-		
-		public override void InitializeMembers(bool networkedObject, bool deserializeFunc, Func<NetPointer> func) {
+
+		protected override void InitializeMembers(bool networkedObject, bool deserializeFunc, NetPointerUpdateDelegate func) {
 		}
 
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {

@@ -59,7 +59,6 @@ namespace RhuEngine.Components
 			grabable = uICanvas.Entity.AttachComponent<Grabbable>();
 			Engine.SettingsUpdate += LoadKeyboard;
 			Entity.EnabledChanged += Entity_EnabledChanged;
-			LoadKeyboard();
 		}
 
 		bool _keyboardLoaded = false;	
@@ -71,6 +70,7 @@ namespace RhuEngine.Components
 			if (_keyboardLoaded) {
 				return;
 			}
+			Task.Run(LoadKeyboard);
 		}
 
 		public void LoadKeyboard() {

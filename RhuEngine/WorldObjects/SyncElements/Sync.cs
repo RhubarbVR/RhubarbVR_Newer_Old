@@ -71,7 +71,7 @@ namespace RhuEngine.WorldObjects
 			}
 			UpdatedValue();
 		}
-		public override void InitializeMembers(bool networkedObject, bool deserializeFunc, Func<NetPointer> func) {
+		protected override void InitializeMembers(bool networkedObject, bool deserializeFunc, NetPointerUpdateDelegate func) {
 		}
 
 		public void Lerp(T targetpos,double time = 5f,bool removeOnDone = true) {

@@ -471,7 +471,7 @@ namespace RhuEngine.WorldObjects.ECS
 			_dirtyGlobal = true;
 		}
 
-		public override void FirstCreation() {
+		protected override void FirstCreation() {
 			base.FirstCreation();
 			rotation.Value = Quaternionf.Identity;
 			scale.Value = Vector3f.One;
@@ -504,7 +504,7 @@ namespace RhuEngine.WorldObjects.ECS
 			return entity;
 		}
 
-		public override void OnInitialize() {
+		protected override void OnInitialize() {
 			World.RegisterEntity(this);
 		}
 		public override void Dispose() {

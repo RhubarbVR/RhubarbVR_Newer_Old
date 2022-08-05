@@ -27,13 +27,13 @@ namespace RhuEngine.WorldObjects
 			if (!networkedObject) {
 				BroadcastAdd(newElement);
 				if (!deserialize) {
-					newElement.FirstCreation();
+					newElement.CallFirstCreation();
 				}
 			}
 			AddInternal(newElement);
 			return newElement;
 		}
-		public override void InitializeMembers(bool networkedObject, bool deserialize,Func<NetPointer> func) {
+		protected override void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate func) {
 		}
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
 			return syncObjectSerializerObject.CommonAbstractListSerialize(this, this);

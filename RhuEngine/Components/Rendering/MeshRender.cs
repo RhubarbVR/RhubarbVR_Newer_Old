@@ -43,7 +43,7 @@ namespace RhuEngine.Components
 
 		public AxisAlignedBox3f Bounds => mesh.Asset?.BoundingBox??AxisAlignedBox3f.CenterZero;
 
-		public override void FirstCreation() {
+		protected override void FirstCreation() {
 			base.FirstCreation();
 			colorLinear.Value = Colorf.White;
 		}

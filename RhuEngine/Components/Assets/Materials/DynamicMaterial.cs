@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 
 		public readonly SyncAbstractObjList<PramInfo> Prams;
 
-		[OnAssetLoaded(nameof(UpdateRenderOrder))]
+		[OnChanged(nameof(UpdateRenderOrder))]
 		public readonly Sync<int> RenderOrderOffset;
 
 		public void UpdateRenderOrder() {

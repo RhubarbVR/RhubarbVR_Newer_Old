@@ -36,6 +36,10 @@ namespace RhuEngine.WorldObjects
 
 		[NoSyncUpdate]
 		public readonly Sync<string> BackendID;
+		[BindProperty(nameof(UserName))]
+		public readonly SyncProperty<string> Username;
+		[BindProperty(nameof(NormalizedUserName))]
+		public readonly SyncProperty<string> NormalizedUsername;
 
 		public void UserIDLoad() {
 			Task.Run(async () => {

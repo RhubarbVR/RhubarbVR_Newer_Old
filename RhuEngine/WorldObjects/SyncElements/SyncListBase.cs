@@ -208,7 +208,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public override void InitializeMembers(bool networkedObject, bool deserialize, Func<NetPointer> func) {
+		protected override void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate func) {
 		}
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
 			throw new NotImplementedException();

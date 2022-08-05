@@ -114,7 +114,7 @@ namespace RhuEngine.WorldObjects
 			NetValue = new NetPointer(newID);
 		}
 
-		public override void InitializeMembers(bool networkedObject, bool deserialize, Func<NetPointer> func) {
+		protected override void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate func) {
 		}
 
 		public virtual void OnChanged() {

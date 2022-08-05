@@ -22,7 +22,7 @@ namespace RhuEngine.Components
 		[Default(32)]
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<int> Slices;
-		public override void FirstCreation() {
+		protected override void FirstCreation() {
 			base.FirstCreation();
 		}
 

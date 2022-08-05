@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 		public readonly Sync<Vector3f> seed;
 		public readonly Sync<Quaternionf> offset;
 
-		public override void OnInitialize() {
+		protected override void OnInitialize() {
 			base.OnInitialize();
 			offset.Value = Quaternionf.Identity;
 		}
