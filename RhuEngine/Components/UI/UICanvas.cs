@@ -35,7 +35,7 @@ namespace RhuEngine.Components
 			Entity.UIRect?.CanvasUpdate();
 		}
 		public override void Render() {
-
+			Entity.UIRect?.RenderRect(Entity.GlobalTrans);
 		}
 	}
 }

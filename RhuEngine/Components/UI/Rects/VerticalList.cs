@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 {
 
 	[Category(new string[] { "UI/Rects" })]
-	public class VerticalList : RawScrollUIRect
+	public class VerticalList : UIRect
 	{
 		[Default(false)]
 		public readonly Sync<bool> Fit;

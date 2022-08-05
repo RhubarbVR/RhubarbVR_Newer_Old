@@ -73,8 +73,9 @@ namespace RhuEngine.Components
 			var buttonColor = new Colorf(0.1f, 0.8f);
 			var scroller = uibuilder.AttachComponentToStack<UIScrollInteraction>();
 			uibuilder.AttachChildRect<CuttingUIRect>(new Vector2f(0), new Vector2f(0.5f, 1), 0);
+			var itemScroller = uibuilder.AttachChildRect<BasicScrollRect>(null, null, 0);
 			var itemslist = uibuilder.AttachChildRect<VerticalList>(null, null, 0);
-			scroller.OnScroll.Target = itemslist.Scroll;
+			scroller.OnScroll.Target = itemScroller.Scroll;
 			var programs =
 						 from assem in AppDomain.CurrentDomain.GetAssemblies().AsParallel()
 						 from t in assem.GetTypes().AsParallel()

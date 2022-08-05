@@ -24,13 +24,13 @@ namespace RhuEngine.UIProcessing
 				var orderList = rectsList.AsParallel().OrderBy((x) => x.Entity.Depth);
 				//Register Parrent Update Enum
 				foreach (var item in orderList) {
-					if ((item.Update & UIRect.UpdateType.Local) != UIRect.UpdateType.None) {
-						item.LocalRectUpdate();
-					}
+					var hasLocalUpdate =  (item.Update & UIRect.UpdateType.Local) != UIRect.UpdateType.None;
 					var parent = item.Entity.parent.Target;
 					if (((parent?.UIRect?.Update ?? UIRect.UpdateType.None) & (UIRect.UpdateType.Local | UIRect.UpdateType.Parrent)) != UIRect.UpdateType.None) {
 						item.RegesterRectUpdate(UIRect.UpdateType.Parrent);
 						item.ParrentRectUpdate();
+					}else if (hasLocalUpdate) {
+						item.LocalRectUpdate();
 					}
 				}
 				//Register Child Update Enum

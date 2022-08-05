@@ -11,6 +11,7 @@ namespace RhuEngine.Components
 {
 	public abstract class RenderUIComponent : UIComponent
 	{
+		public abstract Colorf RenderTint { get; }
 		public abstract RMaterial RenderMaterial { get; }
 		public RMesh mesh;
 
@@ -53,11 +54,9 @@ namespace RhuEngine.Components
 				FinalMesh.OffsetTop(UIRect.Canvas.TopOffsetValue.Value);
 			}
 			if (UIRect.Canvas.FrontBind.Value) {
-				FinalMesh.UIBind(UIRect.Canvas.FrontBindAngle.Value, UIRect.Canvas.FrontBindRadus.Value, UIRect.Canvas.FrontBindSegments.Value, UIRect.Canvas.scale);
+				FinalMesh = FinalMesh.UIBind(UIRect.Canvas.FrontBindAngle.Value, UIRect.Canvas.FrontBindRadus.Value, UIRect.Canvas.FrontBindSegments.Value, UIRect.Canvas.scale);
 			}
-			else {
-				FinalMesh.Scale(UIRect.Canvas.scale.Value.x, UIRect.Canvas.scale.Value.y, UIRect.Canvas.scale.Value.z);
-			}
+			FinalMesh.Scale(UIRect.Canvas.scale.Value.x / 10, UIRect.Canvas.scale.Value.y / 10, UIRect.Canvas.scale.Value.z / 10);
 		}
 
 		public void UpdateRMeshForRender() {

@@ -9,13 +9,17 @@ namespace RhuEngine.Components
 {
 	public abstract class RawScrollUIRect : UIRect
 	{
+		[OnChanged(nameof(ApplyScrollMovement))]
 		public readonly Sync<Vector2f> ScrollPos;
 
+		public void ApplyScrollMovement() {
+			ApplyMovement(ScrollPos.Value);
+		}
+
 		public readonly Sync<Vector2f> ScrollSpeed;
-		public virtual Vector2f MaxScroll => Vector2f.Inf;
 
-
-		public virtual Vector2f MinScroll => Vector2f.NInf;
+		public virtual Vector2f MaxScroll => CachedOverlapSize;
+		public virtual Vector2f MinScroll => -CachedOverlapSize;
 
 		public override void OnAttach() {
 			base.OnAttach();
@@ -24,7 +28,7 @@ namespace RhuEngine.Components
 
 		[Exposed]
 		public virtual void Scroll(Vector2f scrollpos) {
-			
+			ScrollPos.Value += scrollpos;
 		}
 	}
 }

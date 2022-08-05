@@ -17,9 +17,11 @@ namespace RhuEngine.Components
 		}
 
 		public readonly AssetRef<RMaterial> Material;
-		public override RMaterial RenderMaterial => Material.Asset;
 
 		public readonly Sync<Colorf> Tint;
+		public override RMaterial RenderMaterial => Material.Asset;
+		public override Colorf RenderTint => Tint;
+
 		[Default(5)]
 		public readonly Sync<int> RoundingSteps;
 		[Default(0f)]
@@ -32,9 +34,6 @@ namespace RhuEngine.Components
 		}
 
 		protected override void UpdateMesh() {
-			if(UIRect.Canvas is null) {
-				return;
-			}
 			var mesh = new SimpleMesh();
 			var startDepth = new Vector3f(0, 0, Entity.UIRect.CachedDepth);
 			var depth = new Vector3f(0, 0, Entity.UIRect.Depth.Value);

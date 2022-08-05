@@ -38,6 +38,7 @@ namespace RhuEngine.Managers
 						item.ProcessMeshUpdate();
 					}
 				});
+				rect.MarkRenderMeshUpdateAsDone();
 			});
 			UpdatedRects.Clear();
 		}
