@@ -10,6 +10,8 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI/Visuals" })]
 	public class UISprite : RenderUIComponent
 	{
+		public override RMaterial RenderMaterial => Material.Asset;
+
 		public readonly SyncRef<SpriteProvder> Sprite;
 
 		public readonly Sync<Vector2i> PosMin;

@@ -53,6 +53,12 @@ namespace RNumerics
 				List.Remove(value);
 			}
 		}
+
+		public void SafeAddRange(IEnumerable<T> enumerable) {
+			lock (List) {
+				List.AddRange(enumerable);
+			}
+		}
 	}
 
 

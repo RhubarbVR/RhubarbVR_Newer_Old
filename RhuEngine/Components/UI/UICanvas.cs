@@ -30,6 +30,10 @@ namespace RhuEngine.Components
 			scale.Value = new Vector3f(16, 9,1);
 		}
 
+		public override void OnLoaded() {
+			base.OnLoaded();
+			Entity.UIRect?.CanvasUpdate();
+		}
 		public override void Render() {
 
 		}

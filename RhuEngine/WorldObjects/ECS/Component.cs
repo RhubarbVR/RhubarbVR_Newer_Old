@@ -67,5 +67,13 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		public event Action OffsetChanged;
+
+		public override void Dispose() {
+			base.Dispose();
+			try {
+				RemoveListObject();
+			}
+			catch { }
+		}
 	}
 }

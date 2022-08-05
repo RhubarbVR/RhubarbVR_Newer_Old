@@ -131,6 +131,7 @@ namespace RhuEngine.WorldObjects.ECS
 				_hasUpdatingComponentSave = !_hasUpdatingComponentSave;
 				UpdateEnableList();
 			}
+			UIRect = GetFirstComponent<UIRect>();
 		}
 
 		private void OnOrderOffsetChange() {
@@ -513,6 +514,12 @@ namespace RhuEngine.WorldObjects.ECS
 				World.UnregisterUpdatingEntity(this);
 			}
 		}
+		[NoShow]
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[UnExsposed]
+		public UIRect UIRect { get; private set; }
 
 		public Entity() {
 		}

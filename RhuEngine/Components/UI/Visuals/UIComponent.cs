@@ -8,6 +8,7 @@ namespace RhuEngine.Components
 {
 	public abstract class UIComponent : Component
 	{
-		
+		public UIRect UIRect => Entity.UIRect;
+
 	}
 }

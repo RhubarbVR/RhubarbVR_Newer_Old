@@ -67,13 +67,6 @@ namespace RhuEngine.WorldObjects
 			get; private set;
 		}
 
-		public EditLevel LocalEditLevel
-		{
-			get; set;
-		}
-
-		public EditLevel EditLevel => (LocalEditLevel == EditLevel.None) ? Parent?.EditLevel ?? EditLevel.None : LocalEditLevel;
-
 		public virtual bool Persistence => true;
 
 		public event Action<object> OnDispose;

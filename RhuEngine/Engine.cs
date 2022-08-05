@@ -218,6 +218,8 @@ namespace RhuEngine
 
 		public AssetManager assetManager;
 
+		public UIManager uiManager = new();
+
 		public InputManager inputManager = new();
 
 		public LocalisationManager localisationManager = new();
@@ -265,7 +267,7 @@ namespace RhuEngine
 				netApiManager = new NetApiManager(_userDataPathOverRide);
 				IntMsg = "Building AssetManager";
 				assetManager = new AssetManager(_cachePathOverRide);
-				_managers = new IManager[] { localisationManager, inputManager, netApiManager, assetManager, worldManager };
+				_managers = new IManager[] { localisationManager, inputManager, netApiManager, assetManager, worldManager, uiManager };
 				foreach (var item in _managers) {
 					IntMsg = $"Starting {item.GetType().Name}";
 					try {

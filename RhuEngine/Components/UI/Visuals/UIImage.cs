@@ -14,6 +14,8 @@ namespace RhuEngine.Components
 
 		public readonly AssetRef<RMaterial> Material;
 
+		public override RMaterial RenderMaterial => Material.Asset;
+
 		public readonly Sync<Colorf> Tint;
 
 
