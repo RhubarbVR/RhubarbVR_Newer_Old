@@ -32,7 +32,7 @@ namespace RhuPostProcessor
 			return (AssemblyDefinition.ReadAssembly(targetDLL, new ReaderParameters {
 				AssemblyResolver = defaultAssemblyResolver,
 				ReadSymbols = pdbFileExists,
-				SymbolReaderProvider = (pdbFileExists ? new PdbReaderProvider() : null),
+				SymbolReaderProvider = pdbFileExists ? new PdbReaderProvider() : null,
 				ReadWrite = true
 			}), pdbFileExists);
 		}
@@ -65,27 +65,27 @@ namespace RhuPostProcessor
 		}
 		public class AddILJob
 		{
-			TypeDefinition typeDefinition;
-			List<FieldInfoForMethod> fieldInfos;
-			MethodDefinition newMethod;
+			readonly TypeDefinition _typeDefinition;
+			readonly List<FieldInfoForMethod> _fieldInfos;
+			readonly MethodDefinition _newMethod;
 			public AddILJob(TypeDefinition typeDefinition, List<FieldInfoForMethod> fieldInfos, MethodDefinition newMethod) {
-				this.typeDefinition = typeDefinition;
-				this.fieldInfos = fieldInfos;
-				this.newMethod = newMethod;
+				_typeDefinition = typeDefinition;
+				_fieldInfos = fieldInfos;
+				_newMethod = newMethod;
 			}
 
 			public void BuildIL(ModuleDefinition moduleDefinition,TypeReference actionWithChangeable,TypeReference voidType,TypeReference changableType, TypeReference action) {
-				Log($"Starting building IL for Type:{typeDefinition.Name}");
-				var iLProcessor = newMethod.Body.GetILProcessor();
-				if (typeDefinition.BaseType.FullName != "RhuEngine.WorldObjects.SyncObject") {
+				Log($"Starting building IL for Type:{_typeDefinition.Name}");
+				var iLProcessor = _newMethod.Body.GetILProcessor();
+				if (_typeDefinition.BaseType.FullName != "RhuEngine.WorldObjects.SyncObject") {
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_2));
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_3));
-					iLProcessor.Append(Instruction.Create(OpCodes.Call, typeDefinition.BaseType.Resolve().Methods.Where((x) => x.Name == "InitializeMembers").First()));
+					iLProcessor.Append(Instruction.Create(OpCodes.Call, _typeDefinition.BaseType.Resolve().Methods.Where((x) => x.Name == "InitializeMembers").First()));
 				}
-				foreach (var item in fieldInfos) {
-					Log($"Starting loading IL for Field {item.Field.Name} Type:{typeDefinition.Name}");
+				foreach (var item in _fieldInfos) {
+					Log($"Starting loading IL for Field {item.Field.Name} Type:{_typeDefinition.Name}");
 					var constructor = item.Field.FieldType.GetConstructor(moduleDefinition, out var methodCall);
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 					if (methodCall) {
@@ -100,19 +100,19 @@ namespace RhuPostProcessor
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldfld, item.Field));
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-					iLProcessor.Append(Instruction.Create(OpCodes.Call, typeDefinition.Resolve().AllMethods().Where((x) => x.Name == "get_World").First()));
+					iLProcessor.Append(Instruction.Create(OpCodes.Call, _typeDefinition.Resolve().AllMethods().Where((x) => x.Name == "get_World").First()));
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 					iLProcessor.Append(((object)item.Field.Name).GetInstructionForEvaluationStack());
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_2));
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_3));
-					iLProcessor.Append(Instruction.Create(OpCodes.Callvirt, typeDefinition.Resolve().AllMethods().Where((x) => x.Name == "Initialize").First()));
+					iLProcessor.Append(Instruction.Create(OpCodes.Callvirt, _typeDefinition.Resolve().AllMethods().Where((x) => x.Name == "Initialize").First()));
 
 					//AddDisposable
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldfld, item.Field));
-					iLProcessor.Append(Instruction.Create(OpCodes.Call, typeDefinition.Resolve().AllMethods().Where((x) => x.Name == "AddDisposable").First()));
+					iLProcessor.Append(Instruction.Create(OpCodes.Call, _typeDefinition.Resolve().AllMethods().Where((x) => x.Name == "AddDisposable").First()));
 
 					if (item.DefaultAttribute != null) {
 						if (item.DefaultAttribute.HasConstructorArguments) {
@@ -125,10 +125,10 @@ namespace RhuPostProcessor
 					}
 					if (item.OnChangedAttribute != null) {
 						if (item.OnChangedAttribute.HasConstructorArguments) {
-							var targetMethod = (string)(item.OnChangedAttribute.ConstructorArguments.First().Value);
-							var method = typeDefinition.AllMethods().Where((x) => x.Name == targetMethod).First();
+							var targetMethod = (string)item.OnChangedAttribute.ConstructorArguments.First().Value;
+							var method = _typeDefinition.AllMethods().Where((x) => x.Name == targetMethod).First();
 							if (method.Parameters.Count == 0) {
-								var addedmethod = typeDefinition.Methods.Where((x) => x.Name == method.Name + "_Gen_AddedPram").FirstOrDefault();
+								var addedmethod = _typeDefinition.Methods.Where((x) => x.Name == method.Name + "_Gen_AddedPram").FirstOrDefault();
 								if (addedmethod == null) {
 									addedmethod = new MethodDefinition(method.Name + "_Gen_AddedPram", MethodAttributes.Private, voidType);
 									addedmethod.Parameters.Add(new ParameterDefinition("temp", ParameterAttributes.None, changableType));
@@ -137,7 +137,7 @@ namespace RhuPostProcessor
 									iLProcessor2.Append(Instruction.Create(OpCodes.Ldarg_0));
 									iLProcessor2.Append(Instruction.Create(OpCodes.Call, method));
 									iLProcessor2.Append(Instruction.Create(OpCodes.Ret));
-									typeDefinition.Methods.Add(addedmethod);
+									_typeDefinition.Methods.Add(addedmethod);
 								}
 
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
@@ -162,10 +162,10 @@ namespace RhuPostProcessor
 					}
 					if (item.OnAssetLoadedAttribute != null) {
 						if (item.OnAssetLoadedAttribute.HasConstructorArguments) {
-							var targetMethod = (string)(item.OnAssetLoadedAttribute.ConstructorArguments.First().Value);
-							var method = typeDefinition.AllMethods().Where((x) => x.Name == targetMethod).First();
+							var targetMethod = (string)item.OnAssetLoadedAttribute.ConstructorArguments.First().Value;
+							var method = _typeDefinition.AllMethods().Where((x) => x.Name == targetMethod).First();
 							if (method.Parameters.Count == 0) {
-								var addedmethod = typeDefinition.Methods.Where((x) => x.Name == method.Name + "_Gen_AddedPram").FirstOrDefault();
+								var addedmethod = _typeDefinition.Methods.Where((x) => x.Name == method.Name + "_Gen_AddedPram").FirstOrDefault();
 								if (addedmethod == null) {
 									addedmethod = new MethodDefinition(method.Name + "_Gen_AddedPram", MethodAttributes.Private, voidType);
 									addedmethod.Parameters.Add(new ParameterDefinition("temp", ParameterAttributes.None, ((GenericInstanceType)item.Field.FieldType).GenericArguments[0]));
@@ -174,7 +174,7 @@ namespace RhuPostProcessor
 									iLProcessor2.Append(Instruction.Create(OpCodes.Ldarg_0));
 									iLProcessor2.Append(Instruction.Create(OpCodes.Call, method));
 									iLProcessor2.Append(Instruction.Create(OpCodes.Ret));
-									typeDefinition.Methods.Add(addedmethod);
+									_typeDefinition.Methods.Add(addedmethod);
 								}
 
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
@@ -216,7 +216,7 @@ namespace RhuPostProcessor
 				}
 
 				iLProcessor.Append(Instruction.Create(OpCodes.Ret));
-				Log($"Done With IL for Type:{typeDefinition.Name}");
+				Log($"Done With IL for Type:{_typeDefinition.Name}");
 			}
 		}
 
@@ -365,7 +365,7 @@ namespace RhuPostProcessor
 			ilProcess.Append(Instruction.Create(OpCodes.Throw));
 			assembly.Write(new WriterParameters {
 				WriteSymbols = pdbFileExists,
-				SymbolWriterProvider = (pdbFileExists ? new PdbWriterProvider() : null)
+				SymbolWriterProvider = pdbFileExists ? new PdbWriterProvider() : null
 			});
 			assembly.Dispose();
 		}
