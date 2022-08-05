@@ -144,13 +144,47 @@ namespace RhuPostProcessor
 			}
 			return genericInstanceType;
 		}
-		public static IEnumerable<MethodReference> AllMethods(this TypeReference self) {
+		public static IEnumerable<MethodDefinition> AllMethods(this TypeReference self) {
 			var resolvedSelf = self.Resolve();
 			foreach (var item in resolvedSelf.Methods) {
 				yield return item;
 			}
 			if(resolvedSelf.BaseType != null) {
 				foreach (var item in resolvedSelf.BaseType.AllMethods()) {
+					yield return item;
+				}
+			}
+		}
+
+		public static IEnumerable<PropertyDefinition> AllProperties(this TypeReference self) {
+			var resolvedSelf = self.Resolve();
+			foreach (var item in resolvedSelf.Properties) {
+				yield return item;
+			}
+			if (resolvedSelf.BaseType != null) {
+				foreach (var item in resolvedSelf.BaseType.AllProperties()) {
+					yield return item;
+				}
+			}
+		}
+		public static FieldReference GetGenericFieldReference(this FieldDefinition field) {
+			if (!field.DeclaringType.HasGenericParameters) {
+				return field;
+			}
+			var genericInstanceType = new GenericInstanceType(field.DeclaringType);
+			foreach (var genericParameter in field.DeclaringType.GenericParameters) {
+				genericInstanceType.GenericArguments.Add(genericParameter);
+			}
+			return new FieldReference(field.Name, field.FieldType, genericInstanceType);
+		}
+
+		public static IEnumerable<EventDefinition> AlleEvents(this TypeReference self) {
+			var resolvedSelf = self.Resolve();
+			foreach (var item in resolvedSelf.Events) {
+				yield return item;
+			}
+			if (resolvedSelf.BaseType != null) {
+				foreach (var item in resolvedSelf.BaseType.AlleEvents()) {
 					yield return item;
 				}
 			}

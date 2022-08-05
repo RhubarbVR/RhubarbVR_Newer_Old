@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using RhuEngine.Managers;
 using RhuEngine.Linker;
 using System.IO;
+using RNumerics;
 
 namespace RhuEngine.AssetSystem.AssetProtocals
 {
@@ -62,7 +63,7 @@ namespace RhuEngine.AssetSystem.AssetProtocals
 			return mem.ToArray();
 		}
 
-		private void TriggerProgressChanged(long? totalDownloadSize, long totalBytesRead,Action<float> ProgressChanged) {
+		private void TriggerProgressChanged(long? totalDownloadSize, long totalBytesRead, Action<float> ProgressChanged) {
 			if (ProgressChanged == null) {
 				return;
 			}

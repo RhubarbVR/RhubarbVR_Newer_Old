@@ -3,6 +3,8 @@
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public class SyncValueStream<T> : SyncStream, ILinkerMember<T>, ISync, INetworkedObject, IChangeable

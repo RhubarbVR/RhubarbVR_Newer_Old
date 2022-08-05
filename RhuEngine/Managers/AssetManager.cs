@@ -7,6 +7,7 @@ using RhuEngine.AssetSystem.AssetProtocals;
 using System.IO;
 using System.Threading.Tasks;
 using RhuEngine.Linker;
+using RNumerics;
 
 namespace RhuEngine.Managers
 {

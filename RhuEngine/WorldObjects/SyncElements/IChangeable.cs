@@ -1,5 +1,7 @@
 ﻿using System;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public interface IChangeable
