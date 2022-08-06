@@ -9,9 +9,9 @@ namespace RhuEngine.WorldObjects.ECS
 {
 	public class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox
 	{
-		public uint Depth => (_internalParent?.Depth + 1) ?? 0;
+		private uint CompDepth => (_internalParent?.Depth + 1) ?? 0;
 
-		public uint CachedDepth { get; private set; }
+		public uint Depth { get; private set; }
 
 		public readonly SyncObjList<Entity> children;
 		[OnChanged(nameof(ParentChanged))]
@@ -83,11 +83,14 @@ namespace RhuEngine.WorldObjects.ECS
 		internal void CallOnTouch(uint v, Vector3f hitnormal, Vector3f hitpointworld) {
 			OnTouchPyhsics?.Invoke(v, hitnormal, hitpointworld);
 		}
-
 		public void ParentDepthUpdate() {
-			CachedDepth = Depth;
-			foreach (var child in children) {
-				((Entity)child).ParentDepthUpdate();
+			var entitesToUpdate = new List<Entity> { this };
+			for (var i = 0; i < entitesToUpdate.Count; i++) {
+				var current = entitesToUpdate[i];
+				current.Depth = current.CompDepth;
+				foreach (Entity child in current.children) {
+					entitesToUpdate.Add(child);
+				}
 			}
 		}
 
@@ -255,9 +258,11 @@ namespace RhuEngine.WorldObjects.ECS
 
 		private Matrix _cachedLocalMatrix = Matrix.S(1);
 
+		//Todo: Replace with no while loop enermible and also check depths first
 		public bool CheckIfParented(Entity entity) {
 			return entity == this || (_internalParent?.CheckIfParented(entity) ?? false);
 		}
+
 		public bool parentEnabled = true;
 
 		public event Action EnabledChanged;
@@ -362,17 +367,20 @@ namespace RhuEngine.WorldObjects.ECS
 				RLog.Warn("tried to set parent from another world");
 				return;
 			}
-			if (!parent.Target.CheckIfParented(this)) {
-				parent.Target.children.AddInternal(this);
-				_internalParent.children.RemoveInternal(this);
-				_internalParent = parent.Target;
-				ParentDepthUpdate();
-				ParentEnabledChange(_internalParent.IsEnabled);
-				TransValueChange();
-			}
-			else {
-				parent.Target = _internalParent;
-			}
+			parent.Target.children.AddInternal(this);
+			_internalParent.children.RemoveInternal(this);
+			_internalParent = parent.Target;
+			ParentDepthUpdate();
+			ParentEnabledChange(_internalParent.IsEnabled);
+			TransValueChange();
+
+			//Todo: Add check to see if child of self
+			//if (!parent.Target.CheckIfParented(this)) {
+				
+			//}
+			//else {
+			//	parent.Target = _internalParent;
+			//}
 		}
 		[Exposed]
 		public void SetParent(Entity entity, bool preserverGlobal = true, bool resetPos = false) {
@@ -396,6 +404,13 @@ namespace RhuEngine.WorldObjects.ECS
 		{
 			get {
 				if (_dirtyGlobal) {
+					var checkParrents = new List<Entity> { this };
+					for (var i = 0; i < checkParrents.Count; i++) {
+						var current = checkParrents[i];
+						if (current._dirtyGlobal) {
+
+						}
+					}
 					_cachedGlobalMatrix = LocalTrans * _internalParent?.GlobalTrans ?? Matrix.Identity;
 					_dirtyGlobal = false;
 				}
@@ -462,13 +477,17 @@ namespace RhuEngine.WorldObjects.ECS
 			if (IsRoot) {
 				return;
 			}
-			if (!_dirtyGlobal) {
-				foreach (Entity item in children) {
-					item.GlobalTransMark();
+			var entitesToUpdate = new List<Entity> { this };
+			for (var i = 0; i < entitesToUpdate.Count; i++) {
+				var current = entitesToUpdate[i];
+				if (!current._dirtyGlobal) {
+					foreach (Entity child in current.children) {
+						entitesToUpdate.Add(child);
+					}
+					current.GlobalTransformChange?.Invoke(this, physics);
 				}
-				GlobalTransformChange?.Invoke(this, physics);
+				current._dirtyGlobal = true;
 			}
-			_dirtyGlobal = true;
 		}
 
 		protected override void FirstCreation() {

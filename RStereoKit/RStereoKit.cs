@@ -78,6 +78,7 @@ namespace RStereoKit
 		}
 
 		public void LoadStatics() {
+			World.RaycastEnabled = false;
 			RTexture2D.Instance = new SKTexture2d();
 			RMaterial.Instance = new SKRMaterial();
 			RMaterial.ConstInstance = new SKMitStactic();

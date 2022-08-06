@@ -245,7 +245,7 @@ namespace RhuEngine.WorldObjects
 			}
 			try {
 				var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
-											 group ent by ent.CachedDepth;
+											 group ent by ent.Depth;
 				var sorted = from groupe in sortedUpdatingEntities
 							 orderby groupe.Key ascending
 							 select groupe;
@@ -287,7 +287,7 @@ namespace RhuEngine.WorldObjects
 			}
 			try {
 				var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
-											 group ent by ent.CachedDepth;
+											 group ent by ent.Depth;
 				var sorted = from groupe in sortedUpdatingEntities
 							 orderby groupe.Key ascending
 							 select groupe;
