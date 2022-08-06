@@ -274,14 +274,14 @@ namespace RhuEngine
 				_managers = new IManager[] { localisationManager, inputManager, netApiManager, assetManager, worldManager, uiManager };
 				foreach (var item in _managers) {
 					IntMsg = $"Starting {item.GetType().Name}";
-					try {
+					//try {
 						item.Init(this);
-					}
-					catch (Exception ex) {
-						RLog.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
-						IntMsg = $"Failed to start {item.GetType().GetFormattedName()} Error:{ex}";
-						throw ex;
-					}
+					//}
+					//catch (Exception ex) {
+					//	RLog.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
+					//	IntMsg = $"Failed to start {item.GetType().GetFormattedName()} Error:{ex}";
+					//	throw ex;
+					//}
 				}
 				EngineStarting = false;
 				if (EngineLink.CanRender) {
