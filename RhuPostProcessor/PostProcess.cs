@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -357,9 +358,9 @@ namespace RhuPostProcessor
 		public TypeReference? syncObject;
 		public TypeReference? actionWithChangeable;
 
-		public void ProcessDLL(string targetDLL, string[] extraDlls) {
+		public bool ProcessDLL(string targetDLL, string[] extraDlls) {
 			if (!File.Exists(targetDLL)) {
-				return;
+				return false;
 			}
 			var (assembly, pdbFileExists) = GetAssemblyFromDLLPath(targetDLL, extraDlls);
 			var module = assembly.MainModule;
@@ -374,6 +375,19 @@ namespace RhuPostProcessor
 			funcNetPointerType = module.GetType("RhuEngine.WorldObjects.NetPointerUpdateDelegate", runtimeName: true);
 			Log($"LoadedType {funcNetPointerType.FullName}");
 			actionWithChangeable = actionType.MakeGenericInstanceType(changableType);
+			foreach (var item in assembly.MainModule.CustomAttributes) {
+				foreach (var constructorArgument in item.ConstructorArguments) {
+					if(constructorArgument.Value is string value) {
+						if (value == "RHU_OPTIMIZED") {
+							Log("Allready Has Been Prossed");
+							assembly.Dispose();
+							return false;
+						}
+					}
+				}
+			}
+			
+
 			foreach (var type in getTypes) {
 				if (type.BaseType is null) {
 					continue;
@@ -412,11 +426,15 @@ namespace RhuPostProcessor
 			ilProcess.Append(Instruction.Create(OpCodes.Newobj, module.GetType("RhuEngine.RhuException").Resolve().Methods.Where((x) => x.IsConstructor && x.Parameters.Count == 1).First()));
 			ilProcess.Append(Instruction.Create(OpCodes.Throw));
 			ilProcess.Body.Optimize();
+			var customAttribute = new CustomAttribute(module.ImportReference(typeof(DescriptionAttribute).GetConstructor(new Type[1] { typeof(string) })));
+			customAttribute.ConstructorArguments.Add(new CustomAttributeArgument(module.ImportReference(typeof(string)), "RHU_OPTIMIZED"));
+			module.CustomAttributes.Add(customAttribute);
 			assembly.Write(new WriterParameters {
 				WriteSymbols = pdbFileExists,
 				SymbolWriterProvider = pdbFileExists ? new PdbWriterProvider() : null
 			});
 			assembly.Dispose();
+			return true;
 		}
 
 	}
