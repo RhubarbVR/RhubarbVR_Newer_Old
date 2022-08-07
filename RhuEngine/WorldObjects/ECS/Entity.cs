@@ -84,13 +84,9 @@ namespace RhuEngine.WorldObjects.ECS
 			OnTouchPyhsics?.Invoke(v, hitnormal, hitpointworld);
 		}
 		public void ParentDepthUpdate() {
-			var entitesToUpdate = new List<Entity> { this };
-			for (var i = 0; i < entitesToUpdate.Count; i++) {
-				var current = entitesToUpdate[i];
-				current.Depth = current.CompDepth;
-				foreach (Entity child in current.children) {
-					entitesToUpdate.Add(child);
-				}
+			Depth = CompDepth;
+			foreach (Entity child in children) {
+				child.ParentDepthUpdate();
 			}
 		}
 
@@ -258,7 +254,6 @@ namespace RhuEngine.WorldObjects.ECS
 
 		private Matrix _cachedLocalMatrix = Matrix.S(1);
 
-		//Todo: Replace with no while loop enermible and also check depths first
 		public bool CheckIfParented(Entity entity) {
 			return entity == this || (_internalParent?.CheckIfParented(entity) ?? false);
 		}
@@ -470,16 +465,12 @@ namespace RhuEngine.WorldObjects.ECS
 			if (IsRoot) {
 				return;
 			}
-			var entitesToUpdate = new List<Entity> { this };
-			for (var i = 0; i < entitesToUpdate.Count; i++) {
-				var current = entitesToUpdate[i];
-				if (!current._dirtyGlobal) {
-					foreach (Entity child in current.children) {
-						entitesToUpdate.Add(child);
-					}
-					current.GlobalTransformChange?.Invoke(this, physics);
+			if (!_dirtyGlobal) {
+				foreach (Entity child in children) {
+					child.GlobalTransMark(physics);
 				}
-				current._dirtyGlobal = true;
+				GlobalTransformChange?.Invoke(this, physics);
+				_dirtyGlobal = true;
 			}
 		}
 
@@ -510,6 +501,9 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 		[Exposed]
 		public Entity AddChild(string name = "Entity") {
+			if(Depth > 16000) {
+				throw new Exception("Max Entity Depth Reached");
+			}
 			var entity = children.Add();
 			entity.parent.Target = this;
 			entity.name.Value = name;
