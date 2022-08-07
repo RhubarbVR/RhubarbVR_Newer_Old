@@ -114,7 +114,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public bool IsFinite
 		{
-			get { var f = x + y; return float.IsNaN(f) == false && float.IsInfinity(f) == false; }
+			get { var f = x + y; return !float.IsNaN(f) && !float.IsInfinity(f); }
 		}
 
 		public void Round(int nDecimals) {

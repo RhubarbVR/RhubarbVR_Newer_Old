@@ -501,17 +501,19 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 		[Exposed]
 		public Entity AddChild(string name = "Entity") {
-			if(Depth > 16000) {
-				throw new Exception("Max Entity Depth Reached");
-			}
 			var entity = children.Add();
-			entity.parent.Target = this;
 			entity.name.Value = name;
 			return entity;
 		}
 
 		protected override void OnInitialize() {
 			World.RegisterEntity(this);
+			if(Parent?.Parent is Entity par) {
+				parent.Target = par;
+				if (par.Depth >= 10000) {
+					throw new Exception("Max Entity Depth Reached");
+				}
+			}
 		}
 		public override void Dispose() {
 			base.Dispose();

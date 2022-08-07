@@ -14,15 +14,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(CuttingUpdate))]
 		public readonly Sync<bool> Inherent;
 
-		protected override void OnMarkedForRenderMeshUpdate(RenderMeshUpdateType renderMeshUpdateType) {
-			if (renderMeshUpdateType == RenderMeshUpdateType.BindAndCanvasScale) {
-				return;
-			}
-			CuttingUpdate();
-		}
-
-		public override void OnLoaded() {
-			base.OnLoaded();
+		protected override void CutZoneNotify() {
 			CuttingUpdate();
 		}
 
@@ -30,10 +22,14 @@ namespace RhuEngine.Components
 			var newMax = CachedMax;
 			var newMin = CachedMin;
 			if (Inherent) {
-				newMax = MathUtil.Max(CachedCutMin,newMax);
-				newMin = MathUtil.Min(CachedCutMin,newMin);
+				if (CachedCutMax.IsFinite) {
+					newMax = MathUtil.Min(CachedCutMax, newMax);
+				}
+				if(CachedCutMin.IsFinite) {
+					newMin = MathUtil.Max(CachedCutMin, newMin);
+				 }
 			}
-			UpdateCuttingZones(newMin, newMax);
+			UpdateCuttingZones(newMin, newMax,true);
 		}
 	}
 }

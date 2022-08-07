@@ -28,6 +28,7 @@ namespace RhuEngine.Components
 			Local = 1,
 			Parrent = 2,
 			Child = 4,
+			ForeParrentUpdate = 8,
 		}
 		[Default(0.05f)]
 		[OnChanged(nameof(RegisterRectUpdateEvent))]
@@ -53,7 +54,7 @@ namespace RhuEngine.Components
 		public UICanvas Canvas => CachedCanvas;
 
 		/// <summary>
-		/// Should only be ran on the MainThread/GameThread
+		/// Should only be ran on the GameThread
 		/// </summary>
 		public void AddAddedDepth(float addedDepth) {
 			if (AddedDepth == addedDepth) {
@@ -75,14 +76,23 @@ namespace RhuEngine.Components
 			base.OnLoaded();
 			RenderComponents.SafeAddRange(Entity.GetAllComponents<RenderUIComponent>());
 			CanvasUpdate();
-			CachedCutMin = Entity.parent.Target?.UIRect?.CachedCutMin ?? Vector2f.NInf;
-			CachedCutMax = Entity.parent.Target?.UIRect?.CachedCutMax ?? Vector2f.Inf;
+			CachedCutMin = ParentRect?.CachedCutMin ?? Vector2f.NInf;
+			CachedCutMax = ParentRect?.CachedCutMax ?? Vector2f.Inf;
 
+		}
+
+		public void RegisterNestedParentUpdate(bool doSelf = true) {
+			foreach (Entity item in Entity.children) {
+				item.UIRect?.RegisterNestedParentUpdate();
+			}
+			if (doSelf) {
+				RegesterRectUpdate(UpdateType.ForeParrentUpdate);
+			}
 		}
 
 		public UpdateType Update { get; private set; }
 		public RenderMeshUpdateType RenderMeshUpdate { get; private set; }
-		
+
 		internal void MarkRenderMeshUpdateAsDone() {
 			RenderMeshUpdate = RenderMeshUpdateType.None;
 		}
@@ -92,10 +102,12 @@ namespace RhuEngine.Components
 		public Vector2f CachedCutMax { get; private set; }
 		public bool cutsAreDirty;
 
-		public void UpdateCuttingZones(Vector2f NewMin, Vector2f NewMax) {
-			var updatedValues = (CachedCutMin == NewMin) | (CachedCutMax == NewMax);
-			CachedCutMin = NewMin;
-			CachedCutMax = NewMax;
+		public void UpdateCuttingZones(Vector2f NewMin, Vector2f NewMax,bool firstValue = false) {
+			var updatedValues = (CachedCutMin != NewMin) | (CachedCutMax != NewMax);
+			if (!firstValue) {
+				CachedCutMin = NewMin;
+				CachedCutMax = NewMax;
+			}
 			foreach (Entity item in Entity.children) {
 				item.UIRect?.UpdateCuttingZones(NewMin, NewMax);
 			}
@@ -108,20 +120,22 @@ namespace RhuEngine.Components
 		public Vector2f CachedMax { get; private set; }
 		public Vector2f CachedElementSize { get; private set; }
 		public Vector3f CachedMoveAmount { get; private set; }
-		public Vector2f CachedOverlapSize { get; private set; }
-
+		public Vector2f CachedOverlapSize { get; protected set; }
+		public Vector2f TotalMove { get; private set; }
 		public Vector2f MoveAmount { get; private set; }
 
-		public void ApplyMovement(Vector2f moveAmount) {
+		public void ApplyMovement(Vector2f moveAmount,bool Update = true) {
 			if (MoveAmount != moveAmount) {
 				MoveAmount = moveAmount;
-				RegisterRectUpdateEvent();
+				if (Update) { 
+					RegisterRectUpdateEvent();
+				}
 			}
 		}
 
 		public UIRect ParentRect => Entity.parent.Target?.UIRect;
 
-		protected virtual void OnMarkedForRenderMeshUpdate(RenderMeshUpdateType renderMeshUpdateType) {
+		protected virtual void CutZoneNotify() {
 
 		}
 
@@ -135,7 +149,6 @@ namespace RhuEngine.Components
 			RenderMeshUpdate = renderMeshUpdateType;
 			Engine.uiManager.AddUpdatedRectComponent(this);
 			CachedMoveAmount = new Vector3f(CachedMin.x, CachedMin.y, AddedDepth);
-			OnMarkedForRenderMeshUpdate(renderMeshUpdateType);
 		}
 
 		public void ComputeDepth() {
@@ -160,10 +173,12 @@ namespace RhuEngine.Components
 			CachedElementSize = newSize;
 			if (sizeUpdate) {
 				MarkForRenderMeshUpdate(RenderMeshUpdateType.FullResized);
+				CutZoneNotify();
 				return;
 			}
 			if (hasMoved) {
 				MarkForRenderMeshUpdate(RenderMeshUpdateType.Movment);
+				CutZoneNotify();
 				return;
 			}
 		}
@@ -172,21 +187,27 @@ namespace RhuEngine.Components
 		public Vector2f TrueMin;
 		public Vector2f BadMin;
 
-		public void StandardMinMaxCalculation() {
-			TrueMax = (((ParentRect?.TrueMax ?? Vector2f.One) - (ParentRect?.TrueMin ?? Vector2f.Zero)) * AnchorMax.Value) + (ParentRect?.TrueMin ?? Vector2f.Zero) + (OffsetMax.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
-			BadMin = (((ParentRect?.BadMin ?? Vector2f.One) - (Vector2f.One - (ParentRect?.TrueMax ?? Vector2f.One))) * (Vector2f.One - AnchorMin.Value)) + (Vector2f.One - (ParentRect?.TrueMax ?? Vector2f.One)) - (OffsetMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
+		public void StandardMinMaxCalculation(Vector2f ParentRectTrueMax, Vector2f ParentRectTrueMin, Vector2f ParentRectBadMin) {
+			TrueMax = ((ParentRectTrueMax - ParentRectTrueMin) * AnchorMax.Value) + ParentRectTrueMin + (OffsetMax.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
+			BadMin = ((ParentRectBadMin - (Vector2f.One - ParentRectTrueMax)) * (Vector2f.One - AnchorMin.Value)) + (Vector2f.One - ParentRectTrueMax) - (OffsetMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 			TrueMin = Vector2f.One - BadMin;
 			var compMin = TrueMin + (OffsetLocalMin.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
 			var compMax = TrueMax + (OffsetLocalMax.Value / (Canvas?.scale.Value.Xy ?? Vector2f.One));
-			UpdateMinMax(compMin + MoveAmount, compMax + MoveAmount);
+			UpdateMinMax(compMin + TotalMove, compMax + TotalMove);
+		}
+
+		public void StandardMinMaxCalculation() {
+			StandardMinMaxCalculation(ParentRect?.TrueMax ?? Vector2f.One, ParentRect?.TrueMin ?? Vector2f.Zero, ParentRect?.BadMin ?? Vector2f.One);
 		}
 
 		public virtual void LocalRectUpdate() {
+			TotalMove = (ParentRect?.TotalMove??Vector2f.Zero) + MoveAmount;
 			ComputeDepth();
 			StandardMinMaxCalculation();
 		}
 
 		public virtual void ParrentRectUpdate() {
+			TotalMove = (ParentRect?.TotalMove ?? Vector2f.Zero) + MoveAmount;
 			ComputeDepth();
 			StandardMinMaxCalculation();
 		}
@@ -222,10 +243,10 @@ namespace RhuEngine.Components
 			//Todo: Add culling check
 			RenderComponents.SafeOperation((renderComs) => {
 				foreach (var item in renderComs) {
-					if(item.RenderMaterial is null) {
+					if (item.RenderMaterial is null) {
 						continue;
 					}
-					item.mesh?.Draw(item.RenderMaterial, matrix,item.RenderTint,(int)Entity.Depth);
+					item.mesh?.Draw(item.RenderMaterial, matrix, item.RenderTint, (int)Entity.Depth);
 				}
 			});
 			foreach (Entity item in Entity.children) {

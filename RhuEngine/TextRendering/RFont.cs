@@ -84,7 +84,7 @@ namespace RhuEngine
 
 		public RFont(Font mainFont) {
 			TextOptions = new TextOptions(mainFont) {
-				Dpi = 96,
+				Dpi = FONTSIZE,
 			};
 		}
 

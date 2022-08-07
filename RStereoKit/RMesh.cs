@@ -197,8 +197,18 @@ namespace RStereoKit
 				};
 			}
 			for (var i = 0; i < inds.Length; i++) {
-				newMeshes[i].SetVerts(vertices);
-				newMeshes[i].SetInds(inds[i]);
+				if(vertices.Length >= 1) {
+					newMeshes[i].SetVerts(vertices);
+				}
+				else {
+					newMeshes[i].SetVerts(new Vertex[] { new Vertex() });
+				}
+				if(inds[i].Length >= 3) {
+					newMeshes[i].SetInds(inds[i]);
+				}
+				else {
+					newMeshes[i].SetInds(new uint[]{ 0,0,0 });
+				}
 			}
 			Meshs = newMeshes;
 		}

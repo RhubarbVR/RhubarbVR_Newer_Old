@@ -84,9 +84,7 @@ namespace RStereoKit
 			RMaterial.ConstInstance = new SKMitStactic();
 			RShader.Instance = new SKShader();
 			RMesh.Instance = typeof(SKRMesh);
-			RenderThread.ExecuteOnStartOfFrame(() => {
-				RMesh.Quad = new RMesh(new SKRMesh(Mesh.Quad), false);
-			});
+			RenderThread.ExecuteOnStartOfFrame(() => RMesh.Quad = new RMesh(new SKRMesh(Mesh.Quad), false));
 			RTime.Instance = new SKTime();
 			RRenderer.Instance = new SKRRenderer();
 			RInput.Instance = new SKInput();

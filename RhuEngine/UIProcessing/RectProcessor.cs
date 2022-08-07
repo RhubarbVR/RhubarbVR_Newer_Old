@@ -38,8 +38,15 @@ namespace RhuEngine.UIProcessing
 					foreach (Entity child in item.Entity.children) {
 						if (((child?.UIRect?.Update ?? UIRect.UpdateType.None) & (UIRect.UpdateType.Local | UIRect.UpdateType.Child)) != UIRect.UpdateType.None) {
 							item.RegesterRectUpdate(UIRect.UpdateType.Child);
-							item.ChildRectUpdate();
 						}
+					}
+					if (item.Update != UIRect.UpdateType.None) {
+						item.ChildRectUpdate();
+					}
+				}
+				foreach (var item in orderList) {
+					if((item.Update & UIRect.UpdateType.ForeParrentUpdate) != UIRect.UpdateType.None) {
+						item.ParrentRectUpdate();
 					}
 				}
 				//Apply rect Updates

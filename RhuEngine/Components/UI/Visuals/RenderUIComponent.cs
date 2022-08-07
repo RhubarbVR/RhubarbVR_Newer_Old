@@ -42,7 +42,7 @@ namespace RhuEngine.Components
 			}
 			MovedMesh.Translate(MoveAmount);
 			if (HasBeenCut) {
-				MovedMesh.Cut(CutMax, CutMin);
+				MovedMesh = MovedMesh.Cut(CutMax, CutMin);
 			}
 		}
 		protected virtual void FinalMeshUpdate() {
