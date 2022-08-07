@@ -404,13 +404,6 @@ namespace RhuEngine.WorldObjects.ECS
 		{
 			get {
 				if (_dirtyGlobal) {
-					var checkParrents = new List<Entity> { this };
-					for (var i = 0; i < checkParrents.Count; i++) {
-						var current = checkParrents[i];
-						if (current._dirtyGlobal) {
-
-						}
-					}
 					_cachedGlobalMatrix = LocalTrans * _internalParent?.GlobalTrans ?? Matrix.Identity;
 					_dirtyGlobal = false;
 				}

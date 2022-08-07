@@ -150,7 +150,9 @@ namespace RhuEngine
 			var text7 = fontAtlis.AddChild("Text7");
 			text7.position.Value = new Vector3f(0, 7.5f, 0);
 			text7.AttachComponent<WorldText>().HorizontalAlien.Value = EHorizontalAlien.Right;
-
+			var text8 = fontAtlis.AddChild("Text8");
+			text8.position.Value = new Vector3f(1, 0, 0);
+			text8.AttachComponent<WorldText>().Text.Value = "<color=red>Wa<colorblue>Trains<size=50>Trains";
 			var textureStuff = testCubes.AddChild("Texture Stuff");
 			var dfg = textureStuff.AddChild("DFG-Noise");
 			dfg.position.Value = new Vector3f(2, 0, 0);
@@ -335,28 +337,6 @@ namespace RhuEngine
 			bodyBone.MoveMentSpace.Target = debugMan;
 
 			RLog.Info("Built Debug Local World");
-
-			Task.Run(async() => {
-				await Task.Delay(5000);
-				var box = floor.AttachComponent<TrivialBox3Mesh>();
-				var size = 25;
-				var testCubes = DebugStuff.AddChild("Test cubes");
-				var LastpowerCube = testCubes;
-				for (var y = 0; y < size; y++) {
-					for (var a = 0; a < size; a++) {
-						for (var i = 0; i < size; i++) {
-							var PowerCube = DebugStuff.AddChild($"PowerCube{i}{a}{y}");
-							PowerCube.position.Value = new Vector3f((i * 0.3f) - (size * 0.15) + 5, (y * 0.3f) + 1, -(a * 0.3f) + 5);
-							PowerCube.scale.Value = new Vector3f(0.15);
-							PowerCube.SetParent(LastpowerCube);
-							AttachRender(box, mit, PowerCube, _random.Next(0,2)==1? Colorf.RhubarbGreen: Colorf.RhubarbRed);
-							PowerCube.AttachComponent<BoxShape>();
-							PowerCube.AttachComponent<Grabbable>();
-							LastpowerCube = PowerCube;
-						}
-					}
-				}
-			});
 
 #else
 			RLog.Info("Built Local World");
