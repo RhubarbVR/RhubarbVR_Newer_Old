@@ -39,7 +39,22 @@ namespace RhuEngine.Components
 				CachedOverlapSize = CachedElementSize;
 			}
 			else {
-
+				var recList = new Stack<UIRect>();
+				foreach (Entity item in Entity.children) {
+					var rect = item.UIRect;
+					if (rect is not null) {
+						recList.Push(rect);
+					}
+				}
+				var size = recList.Count;
+				var MoveVec = Vector2f.Zero;
+				for (var i = 0; i < size; i++) {
+					recList.Peek().StandardMinMaxCalculation(TrueMax + MoveVec, TrueMin + MoveVec, BadMin - MoveVec);
+					MoveVec -= recList.Peek().CachedOverlapSize * new Vector2f(0, 1);
+					recList.Peek().RegisterNestedParentUpdate(false);
+					recList.Pop();
+				}
+				CachedOverlapSize = MoveVec;
 			}
 		}
 	}

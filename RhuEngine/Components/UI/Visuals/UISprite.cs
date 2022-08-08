@@ -12,11 +12,11 @@ namespace RhuEngine.Components
 	{
 		public override RMaterial RenderMaterial => Material.Asset;
 		public override Colorf RenderTint => Tint;
-
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly SyncRef<SpriteProvder> Sprite;
-
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<Vector2i> PosMin;
-		
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<Vector2i> PosMax;
 		
 		[Exposed]
@@ -30,12 +30,15 @@ namespace RhuEngine.Components
 		public readonly Sync<Colorf> Tint;
 
 		[Default(EVerticalAlien.Center)]
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<EVerticalAlien> VerticalAlien;
 
 		[Default(EHorizontalAlien.Middle)]
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<EHorizontalAlien> HorizontalAlien;
 
 		[Default(true)]
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<bool> KeepAspectRatio;
 
 

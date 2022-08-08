@@ -46,7 +46,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(RegisterRectUpdateEvent))]
 		public readonly Sync<Vector2f> AnchorMax;
 
-		public readonly SafeList<RenderUIComponent> RenderComponents = new();
+		public readonly SafeList<BaseRenderUIComponent> RenderComponents = new();
 
 		public float AddedDepth { get; private set; }
 		public bool addedDepthIsDirty;
@@ -74,7 +74,7 @@ namespace RhuEngine.Components
 
 		public override void OnLoaded() {
 			base.OnLoaded();
-			RenderComponents.SafeAddRange(Entity.GetAllComponents<RenderUIComponent>());
+			RenderComponents.SafeAddRange(Entity.GetAllComponents<BaseRenderUIComponent>());
 			CanvasUpdate();
 			CachedCutMin = ParentRect?.CachedCutMin ?? Vector2f.NInf;
 			CachedCutMax = ParentRect?.CachedCutMax ?? Vector2f.Inf;
@@ -243,10 +243,7 @@ namespace RhuEngine.Components
 			//Todo: Add culling check
 			RenderComponents.SafeOperation((renderComs) => {
 				foreach (var item in renderComs) {
-					if (item.RenderMaterial is null) {
-						continue;
-					}
-					item.mesh?.Draw(item.RenderMaterial, matrix, item.RenderTint, (int)Entity.Depth);
+					item.Render(matrix, (int)Entity.Depth);
 				}
 			});
 			foreach (Entity item in Entity.children) {

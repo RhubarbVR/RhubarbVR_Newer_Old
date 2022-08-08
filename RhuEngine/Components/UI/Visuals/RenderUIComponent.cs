@@ -9,7 +9,7 @@ using RhuEngine.Physics;
 
 namespace RhuEngine.Components
 {
-	public abstract class RenderUIComponent : UIComponent
+	public abstract class RenderUIComponent : BaseRenderUIComponent
 	{
 		public abstract Colorf RenderTint { get; }
 		public abstract RMaterial RenderMaterial { get; }
@@ -19,13 +19,6 @@ namespace RhuEngine.Components
 		public SimpleMesh MovedMesh;
 		public SimpleMesh FinalMesh;
 
-		public Vector3f MoveAmount => UIRect.CachedMoveAmount;
-		public Vector2f Min => Vector2f.Zero;
-
-		public Vector2f Max => UIRect.CachedElementSize;
-		public Vector2f CutMax => UIRect.CachedCutMax;
-		public Vector2f CutMin => UIRect.CachedCutMin;
-		public bool HasBeenCut => (CutMax != Vector2f.Inf) | (CutMin != Vector2f.NInf);
 		public override void OnLoaded() {
 			base.OnLoaded();
 			UIRect?.RenderComponents?.SafeAdd(this);
@@ -64,7 +57,14 @@ namespace RhuEngine.Components
 			mesh.LoadMesh(FinalMesh);
 		}
 
-		public void ProcessMeshUpdate() {
+		public override void Render(Matrix pos, int Depth) {
+			if (RenderMaterial is null) {
+				return;
+			}
+			mesh?.Draw(RenderMaterial, pos, RenderTint, Depth);
+		}
+
+		public override void ProcessMeshUpdate() {
 			switch (UIRect.RenderMeshUpdate) {
 				case UIRect.RenderMeshUpdateType.FullResized:
 					UpdateMesh();

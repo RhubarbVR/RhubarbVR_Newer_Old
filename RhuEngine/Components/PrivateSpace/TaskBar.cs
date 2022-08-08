@@ -676,6 +676,7 @@ namespace RhuEngine.Components
 			var sysFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
 			var sysFormatTime = CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern;
 			var newTimeText = $"<size13>{date.ToString(sysFormatTime, CultureInfo.InvariantCulture)} \n<size10>{date.ToString(sysFormat, CultureInfo.InvariantCulture)}";
+			newTimeText += $"\nFPS:{1/RTime.Elapsedf:f0}";
 			if (TimeText.Linked) {
 				if (TimeText.LinkedValue != newTimeText) {
 					TimeText.LinkedValue = newTimeText;

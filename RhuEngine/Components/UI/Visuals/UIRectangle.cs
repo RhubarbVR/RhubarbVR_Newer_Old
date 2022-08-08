@@ -23,9 +23,12 @@ namespace RhuEngine.Components
 		public override Colorf RenderTint => Tint;
 
 		[Default(5)]
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<int> RoundingSteps;
 		[Default(0f)]
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<float> Rounding;
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<bool> FullBox;
 
 		public override void OnAttach() {

@@ -5,6 +5,7 @@ using RhuEngine.Linker;
 using RNumerics;
 using System.Linq;
 using SixLabors.Fonts;
+using System;
 
 namespace RhuEngine.Components
 {
@@ -17,6 +18,8 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Rendering" })]
 	public class WorldText : RenderingComponent, ITextComp, IWorldBoundingBox
 	{
+		[Default(false)]
+		public readonly Sync<bool> FitText;
 		[Default(1f)]
 		public readonly Sync<float> Width;
 		[Default(1f)]
@@ -60,41 +63,27 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			textRender.LoadText(Pointer.ToString(), Text, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, VerticalAlien, HorizontalAlien);
+			textRender.LoadText(Text, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, HorizontalAlien);
 		}
 
 		public override void Render() {
-			float y;
-			switch (VerticalAlien.Value) {
-				case EVerticalAlien.Bottom:
-					y = ((textRender.Height) * 0.1f) - (Height.Value / 2);
-					break;
-				case EVerticalAlien.Center:
-					y = (textRender.Height / 2) * 0.1f;
-					break;
-				case EVerticalAlien.Top:
-					y = Height.Value / 2;
-					break;
-				default:
-					y = 0;
-					break;
+			var scalerValue = 1f;
+			if (FitText) {
+				scalerValue = Math.Min(Width / (textRender.Width * 0.1f), Height/ (textRender.Height * 0.1f));
 			}
-			float x;
-			switch (HorizontalAlien.Value) {
-				case EHorizontalAlien.Left:
-					x = -(Width.Value / 2);
-					break;
-				case EHorizontalAlien.Middle:
-					x = -(textRender.Width / 2 * 0.1f);
-					break;
-				case EHorizontalAlien.Right:
-					x = (Width.Value / 2) - (textRender.Width * 0.1f);
-					break;
-				default:
-					x = 0;
-					break;
-			}
-			var offSet = Matrix.T(new Vector3f(x,y));
+			var y = VerticalAlien.Value switch {
+				EVerticalAlien.Bottom => (textRender.Height * 0.1f * scalerValue) - (Height.Value / 2),
+				EVerticalAlien.Center => textRender.Height / 2 * 0.1f * scalerValue,
+				EVerticalAlien.Top => Height.Value / 2 ,
+				_ => 0,
+			};
+			var x = HorizontalAlien.Value switch {
+				EHorizontalAlien.Left => -(Width.Value / 2),
+				EHorizontalAlien.Middle => -(textRender.Width / 2 * 0.1f * scalerValue),
+				EHorizontalAlien.Right => (Width.Value / 2) - (textRender.Width * 0.1f * scalerValue),
+				_ => 0,
+			};
+			var offSet = Matrix.TS(new Vector3f(x,y),new Vector3f(scalerValue, scalerValue));
 			textRender.Render(Matrix.S(0.1f) * offSet, Entity.GlobalTrans, TargetRenderLayer);
 		}
 

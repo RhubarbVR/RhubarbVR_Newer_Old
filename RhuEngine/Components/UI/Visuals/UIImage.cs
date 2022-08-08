@@ -8,8 +8,8 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/Visuals" })]
-	public class UIImage : RenderUIComponent
-	{
+	public class UIImage : RenderUIComponent {
+		[OnAssetLoaded(nameof(ForceUpdate))]
 		public readonly AssetRef<RTexture2D> Texture;
 
 		public readonly AssetRef<RMaterial> Material;
@@ -21,12 +21,15 @@ namespace RhuEngine.Components
 
 
 		[Default(EVerticalAlien.Center)]
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<EVerticalAlien> VerticalAlien;
 
 		[Default(EHorizontalAlien.Middle)]
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<EHorizontalAlien> HorizontalAlien;
 
 		[Default(true)]
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<bool> KeepAspectRatio;
 
 		public override void OnAttach() {

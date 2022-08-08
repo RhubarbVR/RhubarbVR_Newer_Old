@@ -22,32 +22,14 @@ namespace RhuEngine.Components
 		[Default(0.5f)]
 		public readonly Sync<float> FlashSpeed;
 
-		[OnChanged(nameof(BindToTextComp))]
 		public readonly SyncRef<UIText> TextComp;
 
 		public readonly SyncRef<ICurrsorTextProvider> TextCurrsor;
-
-		[NoLoad]
-		[NoSave]
-		[NoSync]
-		private UIText _lastUIText;
 
 		public override void OnAttach() {
 			base.OnAttach();
 			Tint.Value = new Colorf(0.5f, 0.5f, 0.5f, 0.5f);
 			CurrsorMesh.Target = World.RootEntity.GetFirstComponentOrAttach<TrivialBox3Mesh>();
-		}
-
-		public void BindToTextComp() {
-			if (_lastUIText is not null) {
-				_lastUIText.OnCharRender -= LastUIText_OnCharRender;
-			}
-			_lastUIText = null;
-			if (TextComp.Target is null) {
-				return;
-			}
-			_lastUIText = TextComp.Target;
-			_lastUIText.OnCharRender += LastUIText_OnCharRender;
 		}
 
 		public override void Step() {
