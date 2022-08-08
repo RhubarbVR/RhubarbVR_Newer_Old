@@ -5,6 +5,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RhuEngine.Components
 {
@@ -40,7 +41,7 @@ namespace RhuEngine.Components
 			}
 			else {
 				var recList = new Stack<UIRect>();
-				foreach (Entity item in Entity.children) {
+				foreach (Entity item in FlipOrder ? Entity.children.Reverse() : Entity.children) {
 					var rect = item.UIRect;
 					if (rect is not null) {
 						recList.Push(rect);
