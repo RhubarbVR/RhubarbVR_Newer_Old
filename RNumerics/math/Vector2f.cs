@@ -132,6 +132,11 @@ namespace RNumerics
 
 		[IgnoreMember]
 		public Vector2f Perp => new(y, -x);
+
+		public bool IsWithIn(Vector2f min, Vector2f max) {
+			return MathUtil.Clamp(this, min, max) == this;
+		}
+
 		[IgnoreMember]
 		public Vector2f UnitPerp => new Vector2f(y, -x).Normalized;
 

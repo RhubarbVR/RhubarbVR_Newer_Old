@@ -46,6 +46,11 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(RegisterRectUpdateEvent))]
 		public readonly Sync<Vector2f> AnchorMax;
 
+
+		public IEnumerable<UICanvas.HitData> GetRectHitData() {
+			return CachedCanvas?.HitDataInVolume(CachedMin, CachedMax);
+		}
+
 		public readonly SafeList<BaseRenderUIComponent> RenderComponents = new();
 
 		public float AddedDepth { get; private set; }
@@ -241,6 +246,9 @@ namespace RhuEngine.Components
 
 		public void RenderRect(Matrix matrix) {
 			//Todo: Add culling check
+			if (!Entity.IsEnabled) {
+				return;
+			}
 			RenderComponents.SafeOperation((renderComs) => {
 				foreach (var item in renderComs) {
 					item.Render(matrix, (int)Entity.Depth);

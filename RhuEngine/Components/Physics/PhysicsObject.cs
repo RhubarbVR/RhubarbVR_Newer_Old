@@ -72,8 +72,8 @@ namespace RhuEngine.Components
 			rigidBody.Matrix = obj.GlobalTrans;
 		}
 
-		public void Touch(uint handed, Vector3f hitnormal, Vector3f hitpointworld) {
-			Entity.CallOnTouch(handed, hitnormal, hitpointworld);
+		public void Touch(uint handed, Vector3f hitnormal, Vector3f hitpointworld,Handed handedSide) {
+			Entity.CallOnTouch(handed, hitnormal, hitpointworld, handedSide);
 		}
 
 		public void Lazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce,Handed hand) {

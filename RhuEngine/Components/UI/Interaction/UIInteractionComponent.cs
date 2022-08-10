@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	public abstract class UIInteractionComponent : Component
 	{
-
+		public UIRect UIRect => Entity.UIRect;
 
 	}
 }

@@ -5,10 +5,12 @@ using RNumerics;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
 using System;
+using System.Collections.Generic;
 
 namespace RhuEngine.Components
 {
 	[NotLinkedRenderingComponent]
+	[UpdateLevel(UpdateEnum.Normal)]
 	[Category(new string[] { "UI" })]
 	public class UICanvas : RenderingComponent
 	{
@@ -47,6 +49,7 @@ namespace RhuEngine.Components
 				var isJustBloxMesh = !(TopOffset.Value || FrontBind.Value);
 				if (isJustBloxMesh) {
 					var size = scale.Value / 10;
+					size *= new Vector3f(1, 1, 0.25);
 					PhysicsCollider = new RBoxShape(size / 2).GetCollider(World.PhysicsSim);
 					PhysicsCollider.CustomObject = this;
 					PhysicsCollider.Group = ECollisionFilterGroups.UI;
@@ -94,19 +97,100 @@ namespace RhuEngine.Components
 			}
 		}
 
+		public Matrix RenderLocation;
+
 		public override void Render() {
-			var transFormOfMesh = Entity.GlobalTrans;
+			RenderLocation = Entity.GlobalTrans;
 			if (PhysicsCollider is not null) {
-				PhysicsCollider.Matrix = transFormOfMesh;
+				PhysicsCollider.Matrix = PhysicsColliderOffset * RenderLocation;
 			}
-			Entity.UIRect?.RenderRect(transFormOfMesh);
+			Entity.UIRect?.RenderRect(RenderLocation);
 		}
 
-		public void ProcessHitTouch(uint handed, Vector3f hitnormal, Vector3f hitpointworld) {
-		
+		public override void AlwaysStep() {
+			RWorld.ExecuteOnEndOfFrame(ClearHitData);
+		}
+
+		public List<HitData> hitDatas = new(); 
+
+		public void ClearHitData() {
+			hitDatas.Clear();
+		}
+
+		public IEnumerable<HitData> HitDataInVolume(Vector2f min,Vector2f max) {
+			for (var i = 0; i < hitDatas.Count; i++) {
+				var hitData = hitDatas[i];
+				if (hitData.HitPointOnCanvas.IsWithIn(min, max)) {
+					yield return hitData;
+				}
+			}
+		}
+
+		public struct HitData
+		{
+			public bool Lazer;
+
+			public uint TouchUndex;
+			
+			public Vector3f Hitnormal;
+
+			public Vector3f Hitpointworld;
+
+			public float PressForce;
+			
+			public float GripForces;
+
+			public Handed Side;
+
+			public Vector2f HitPointOnCanvas;
+			public bool CustomTouch;
+
+			public HitData(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, Handed handed) {
+				CustomTouch = false;
+				HitPointOnCanvas = Vector2f.Zero;
+				Lazer = false;
+				TouchUndex = touchUndex;
+				Hitnormal = hitnormal;
+				Hitpointworld = hitpointworld;
+				PressForce = 0f;
+				GripForces = 0f;
+				Side = handed;
+			}
+			public HitData(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForces, Handed side) {
+				CustomTouch = false;
+				HitPointOnCanvas = Vector2f.Zero;
+				Lazer = true;
+				TouchUndex = touchUndex;
+				Hitnormal = hitnormal;
+				Hitpointworld = hitpointworld;
+				PressForce = pressForce;
+				GripForces = gripForces;
+				Side = side;
+			}
+		}
+
+		private void AddHitData(HitData hitData) {
+			var localPoint = RenderLocation.GetLocal(Matrix.T(hitData.Hitpointworld));
+			var isJustBloxMesh = !(TopOffset.Value || FrontBind.Value);
+			if (isJustBloxMesh) {
+				var pos = localPoint.Translation.Xy;
+				pos /= scale.Value.Xy / 10;
+				hitData.HitPointOnCanvas = pos;
+			}
+			else {
+				//Todo: Dont Think this is good enough 
+				var pos = localPoint.Translation.Xy;
+				pos /= scale.Value.Xy / 10;
+				hitData.HitPointOnCanvas = pos;
+			}
+			hitDatas.Add(hitData);
+		}
+
+		public void ProcessHitTouch(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld,Handed handed) {
+			AddHitData(new HitData(touchUndex, hitnormal, hitpointworld, handed));
 		}
 		public void ProcessHitLazer(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForces, Handed side) {
-
+			AddHitData(new HitData(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side));
 		}
 	}
 }

@@ -192,7 +192,6 @@ namespace RhuEngine.Components
 			if (action != null) {
 				var buttoninter = child.AttachComponent<UIButtonInteraction>();
 				buttoninter.ButtonEvent.Target = action;
-				buttoninter.AllowOtherZones.Value = false;
 			}
 			return (child, iconrect);
 		}
@@ -444,7 +443,6 @@ namespace RhuEngine.Components
 			var listentit = scroller.AddChild("list");
 			var list = listentit.AttachComponent<HorizontalList>();
 			var interaction = listentit.AttachComponent<UIScrollInteraction>();
-			interaction.AllowOtherZones.Value = true;
 			interaction.OnScroll.Target += scrollerrect.Scroll;
 			var img4 = listentit.AttachComponent<UIRectangle>();
 			var colorassign2 = listentit.AttachComponent<UIColorAssign>();

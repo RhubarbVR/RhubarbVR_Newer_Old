@@ -12,9 +12,6 @@ namespace RhuEngine.Components
 	[Category(new string[] { "UI/Interaction" })]
 	public class UIGrabInteraction : UIInteractionComponent
 	{
-		[Default(false)]
-		public readonly Sync<bool> AllowOtherZones;
-
 		[Default(0.5f)]
 		public readonly Sync<float> GrabForce;
 

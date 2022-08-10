@@ -78,10 +78,10 @@ namespace RhuEngine.WorldObjects.ECS
 			OnLazerPyhsics?.Invoke(v, hitnormal, hitpointworld, pressForce, gripForce, handed);
 		}
 
-		public event Action<uint, Vector3f, Vector3f> OnTouchPyhsics;
+		public event Action<uint, Vector3f, Vector3f,Handed> OnTouchPyhsics;
 
-		internal void CallOnTouch(uint v, Vector3f hitnormal, Vector3f hitpointworld) {
-			OnTouchPyhsics?.Invoke(v, hitnormal, hitpointworld);
+		internal void CallOnTouch(uint v, Vector3f hitnormal, Vector3f hitpointworld,Handed handedSide) {
+			OnTouchPyhsics?.Invoke(v, hitnormal, hitpointworld, handedSide);
 		}
 		public void ParentDepthUpdate() {
 			Depth = CompDepth;

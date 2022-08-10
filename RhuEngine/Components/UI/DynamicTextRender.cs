@@ -139,10 +139,7 @@ namespace RhuEngine.Components
 			if (Font is null) {
 				return;
 			}
-			var middleLines = true;
-			if (horizontalAlien == EHorizontalAlien.Middle) {
-				middleLines = true;
-			}
+			var middleLines = horizontalAlien == EHorizontalAlien.Middle;
 			renderMits.Clear();
 			var bounds = new List<Vector3f>();
 			Chars.SafeOperation((list) => list.Clear());

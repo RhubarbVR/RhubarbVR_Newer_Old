@@ -94,7 +94,6 @@ namespace RhuEngine.Components
 			try {
 				var uiBuilder = new UIBuilder(uICanvas.Entity, mit);
 				var grabber = uiBuilder.CurretRectEntity.AttachComponent<UIGrabInteraction>();
-				grabber.AllowOtherZones.Value = true;
 				grabber.Grabeded.Target = grabable.RemoteGrab;
 				uiBuilder.PushRect();
 				uiBuilder.AddRectangle(0, 0.9f, true);

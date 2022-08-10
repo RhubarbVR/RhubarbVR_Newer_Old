@@ -14,8 +14,6 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public readonly Sync<bool> AllowAltSwitch;
 
-		public readonly Sync<bool> AllowOtherZones;
-
 		public readonly Sync<Vector2f> MouseScrollSpeed;
 
 		public readonly SyncDelegate<Action<Vector2f>> OnScroll;

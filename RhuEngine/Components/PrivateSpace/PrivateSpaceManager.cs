@@ -78,13 +78,13 @@ namespace RhuEngine.Components
 					UpdateLazer(left, Handed.Left);
 					UpdateLazer(right, Handed.Right);
 				}
-				UpdateTouch(RInput.Hand(Handed.Right).Wrist, 2);
-				UpdateTouch(RInput.Hand(Handed.Left).Wrist, 1);
+				UpdateTouch(RInput.Hand(Handed.Right).Wrist, 2, Handed.Right);
+				UpdateTouch(RInput.Hand(Handed.Left).Wrist, 1, Handed.Left);
 			}
 		}
 
 
-		public bool RunTouchCastInWorld(uint handed, World world, Vector3f pos, ref Vector3f Frompos, ref Vector3f ToPos) {
+		public bool RunTouchCastInWorld(uint handed, World world, Vector3f pos, ref Vector3f Frompos, ref Vector3f ToPos, Handed handedSide) {
 			if (World is null) {
 				return false;
 			}
@@ -92,11 +92,11 @@ namespace RhuEngine.Components
 				if (world.PhysicsSim.RayTest(ref Frompos, ref ToPos, out var collider, out var hitnormal, out var hitpointworld)) {
 					if (collider.CustomObject is UICanvas uIComponent) {
 						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-						uIComponent.ProcessHitTouch(handed, hitnormal, hitpointworld);
+						uIComponent.ProcessHitTouch(handed, hitnormal, hitpointworld, handedSide);
 					}
 					if (collider.CustomObject is PhysicsObject physicsObject) {
 						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-						physicsObject.Touch(handed, hitnormal, hitpointworld);
+						physicsObject.Touch(handed, hitnormal, hitpointworld, handedSide);
 					}
 					return true;
 				}
@@ -107,7 +107,7 @@ namespace RhuEngine.Components
 		}
 
 
-		public void UpdateTouch(Matrix pos, uint handed) {
+		public void UpdateTouch(Matrix pos, uint handed, Handed handedSide) {
 			var Frompos = Matrix.T(Vector3f.AxisY * -0.07f) * pos;
 			var ToPos = Matrix.T(Vector3f.AxisY * 0.03f) * pos;
 			World.DrawDebugSphere(Frompos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
@@ -115,10 +115,10 @@ namespace RhuEngine.Components
 			var vpos = pos.Translation;
 			var vFrompos = Frompos.Translation;
 			var vToPos = ToPos.Translation;
-			if (RunTouchCastInWorld(handed, World, vpos, ref vFrompos, ref vToPos)) {
+			if (RunTouchCastInWorld(handed, World, vpos, ref vFrompos, ref vToPos, handedSide)) {
 
 			}
-			else if (RunTouchCastInWorld(handed, World.worldManager.FocusedWorld, vpos, ref vFrompos, ref vToPos)) {
+			else if (RunTouchCastInWorld(handed, World.worldManager.FocusedWorld, vpos, ref vFrompos, ref vToPos, handedSide)) {
 
 			}
 		}

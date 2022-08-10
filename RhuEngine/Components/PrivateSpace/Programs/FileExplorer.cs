@@ -154,7 +154,6 @@ namespace RhuEngine.Components.PrivateSpace
 		public void BuildMainAria(UIBuilder uIBuilder) {
 			uIBuilder.AttachChildRect<CuttingUIRect>(null, null, 0);
 			var scroller = uIBuilder.AttachComponentToStack<UIScrollInteraction>();
-			scroller.AllowOtherZones.Value = true;
 			var grid = uIBuilder.AttachChildRect<Grid>();
 			scroller.OnScroll.Target = grid.Scroll;
 

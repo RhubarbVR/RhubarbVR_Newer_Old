@@ -22,9 +22,6 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public readonly Sync<bool> CustomTochable;
 
-		[Default(true)]
-		public readonly Sync<bool> AllowOtherZones;
-
 		public readonly SyncDelegate OnHover;
 		public readonly SyncDelegate OnUnHover;
 

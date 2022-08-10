@@ -265,6 +265,7 @@ namespace RNumerics
 			this /= scale;
 		}
 
+
 		public static Vector3d operator /(Vector3d a, Vector3d b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
 
 

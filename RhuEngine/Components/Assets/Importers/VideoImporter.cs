@@ -127,7 +127,6 @@ namespace RhuEngine.Components
 				uiBuilder.AddRectangle(0,0.9f,true);
 
 				var grabAction = uiBuilder.AttachComponentToStack<UIGrabInteraction>();
-				grabAction.AllowOtherZones.Value = true;
 				grabAction.Grabeded.Target = gabable.RemoteGrab;
 
 				var list = uiBuilder.AttachChildRect<VerticalList>();
