@@ -488,7 +488,6 @@ namespace RhuEngine.Components
 			var child3 = RightSide.AddChild("childEliment");
 			rectTwo2 = child3.AttachComponent<UIRect>();
 			rectTwo2.AnchorMin.Value = new Vector2f(0.5f, 0);
-			var rectTwom = child3.AttachComponent<UIRect>();
 			var text = child3.AttachComponent<UIText>();
 			TimeText.SetLinkerTarget(text.Text);
 			colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
