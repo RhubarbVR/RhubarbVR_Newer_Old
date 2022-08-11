@@ -146,6 +146,12 @@ namespace RhuEngine.Components
 		public abstract void KeyboardBind();
 
 		public abstract void KeyboardUnBind();
+
+		public override void OnLoaded() {
+			base.OnLoaded();
+			KeyboardUnBind();
+		}
+
 		[Exposed]
 		public abstract void EditingClick();
 

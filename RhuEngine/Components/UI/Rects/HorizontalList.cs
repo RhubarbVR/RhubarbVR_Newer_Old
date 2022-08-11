@@ -29,11 +29,14 @@ namespace RhuEngine.Components
 					}
 				}
 				var size = recList.Count;
-				var sizer = CachedElementSize.x / size;
-				var fakeMax = new Vector2f(CachedElementSize.x / size, 1) + CachedMin;
+				var elmentySize = new Vector2f(CachedElementSize.x / size, CachedElementSize.y);
 				for (var i = 0; i < size; i++) {
 					var currenti = !FlipOrder ? size - i - 1 : i;
-					recList.Peek().StandardMinMaxCalculation(fakeMax + new Vector2f(sizer * currenti, 0), TrueMin + new Vector2f(sizer * currenti, 0), BadMin - new Vector2f(sizer * currenti, 0));
+					var MoveAmount = new Vector2f(elmentySize.x * currenti, 0);
+					var fakeMax = elmentySize + TrueMin + MoveAmount;
+					var fakeMin = TrueMin + MoveAmount;
+					var fakeBadMin = BadMin - MoveAmount;
+					recList.Peek().StandardMinMaxCalculation(fakeMax, fakeMin, fakeBadMin);
 					recList.Peek().RegisterNestedParentUpdate(false);
 					recList.Pop();
 				}

@@ -142,7 +142,7 @@ namespace RhuEngine.Components
 					EHorizontalAlien.Right => UIRect.CachedElementSize.x - SizeOnCavas.x,
 					_ => 0,
 				};
-				StandaredBaseMesh[i].Translate(new Vector3d(x, y, UIRect.CachedDepth + 0.001));
+				StandaredBaseMesh[i].Translate(new Vector3d(x, y, UIRect.CachedDepth + 0.01));
 			}
 			if (!FitText) {
 				//Todo: Tell uirect to have defrentCHildSize

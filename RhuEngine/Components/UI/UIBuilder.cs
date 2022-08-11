@@ -224,7 +224,7 @@ namespace RhuEngine.Components
 
 		public (UIText, UITextEditorInteraction, UITextCurrsor, Sync<string>) AddTextEditor(string emptytext = "This Is Input", float coloroffset = 0, float alpha = 1, string defaultString = "",float padding=0.1f, float? size = null, float textcoloroffset = 0, float textalpha = 1,bool autopop = true, FontStyle? fontStyle = null, Vector2f? min = null, Vector2f? max = null) {
 			var button = AddButtonEvent(null, null, null, false, coloroffset,alpha, null, min, max);
-			PushRect(new Vector2f(0), new Vector2f(1),0);
+			PushRect(new Vector2f(0), new Vector2f(1), 0.05f);
 			SetOffsetMinMax(new Vector2f(padding), new Vector2f(-padding));
 			var uitext = AddText(defaultString, size, textcoloroffset,textalpha, fontStyle, true);
 			uitext.EmptyString.Value = emptytext;

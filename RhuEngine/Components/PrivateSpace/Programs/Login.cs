@@ -167,7 +167,7 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(new Vector2f(0, 0), new Vector2f(0.5, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			uiBuilder.AddButton(false, 0.2f).ButtonEvent.Target = MainButton;
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0.05f);
 			ButtonOneText = uiBuilder.AddTextWithLocal("Programs.Login.LoginButton", 1.9f);
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
@@ -177,7 +177,7 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(new Vector2f(0.5, 0), new Vector2f(1, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			uiBuilder.AddButton(false, 0.2f).ButtonEvent.Target = ToggleButton;
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0.05f);
 			ButtonTwoText = uiBuilder.AddTextWithLocal("Programs.Login.Register",1.9f);
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
@@ -191,7 +191,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 
 			uiBuilder.PushRect();
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0f);
 			var Confirmpassword = uiBuilder.AddTextEditor("Programs.Login.ConfirmPassword", 0.2f, 1, "", 0.1f, null, 1.9f);
 			Confirmpassword.Item1.Password.Value = true;
 			ConfPassword = Confirmpassword.Item1;
@@ -203,7 +203,7 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PopRect();
 
 			uiBuilder.PushRect();
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0f);
 			var password = uiBuilder.AddTextEditor("Programs.Login.Password", 0.2f, 1, "", 0.1f, null, 1.9f);
 			password.Item1.Password.Value = true;
 			Password = password.Item1;
@@ -214,7 +214,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 
 			uiBuilder.PushRect();
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0f);
 			Email = uiBuilder.AddTextEditor("Programs.Login.Email", 0.2f,1,"",0.1f,null,1.9f).Item1;
 			Email.HorizontalAlien.Value = EHorizontalAlien.Left;
 			Email.MinClamp.Value = minclamp;
@@ -223,7 +223,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PushRect();
 
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0f);
 			UserName = uiBuilder.AddTextEditor("Programs.Login.Username", 0.2f, 1, "", 0.1f, null, 1.9f).Item1;
 			RegEntiyTwo = uiBuilder.CurretRectEntity;
 			RegEntiyTwo.enabled.Value = false;

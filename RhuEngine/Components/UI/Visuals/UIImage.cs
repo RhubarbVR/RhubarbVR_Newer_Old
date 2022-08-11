@@ -40,7 +40,7 @@ namespace RhuEngine.Components
 		protected override void UpdateMesh() {
 			var mesh = new SimpleMesh();
 			var startDepth = new Vector3f(0, 0, Entity.UIRect.CachedDepth);
-			var depth = new Vector3f(0, 0, Entity.UIRect.Depth.Value);
+			var depth = new Vector3f(0, 0, Entity.UIRect.Depth.Value + 0.01);
 			var depthStart = startDepth + depth;
 			Vector3f upleft, upright, downleft, downright = upleft = upright = downleft = depthStart;
 			var max = Max;

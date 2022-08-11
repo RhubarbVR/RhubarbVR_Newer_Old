@@ -29,11 +29,14 @@ namespace RhuEngine.Components
 					}
 				}
 				var size = recList.Count;
-				var sizer = CachedElementSize.y / size;
-				var fakeMax = new Vector2f(CachedElementSize.y / size, 1) + CachedMin;
+				var elmentySize = new Vector2f(CachedElementSize.x, CachedElementSize.y / size);
 				for (var i = 0; i < size; i++) {
 					var currenti = !FlipOrder ? size - i - 1 : i;
-					recList.Peek().StandardMinMaxCalculation(fakeMax + new Vector2f(0, sizer * currenti), TrueMin + new Vector2f(0, sizer * currenti), BadMin - new Vector2f(0, sizer * currenti));
+					var MoveAmount = new Vector2f(0, elmentySize.y * currenti);
+					var fakeMax = elmentySize + TrueMin + MoveAmount;
+					var fakeMin = TrueMin + MoveAmount;
+					var fakeBadMin = BadMin - MoveAmount;
+					recList.Peek().StandardMinMaxCalculation(fakeMax, fakeMin, fakeBadMin);
 					recList.Peek().RegisterNestedParentUpdate(false);
 					recList.Pop();
 				}
@@ -48,7 +51,7 @@ namespace RhuEngine.Components
 					}
 				}
 				var size = recList.Count;
-				var MoveVec = Vector2f.Zero;
+				var MoveVec = new Vector2f(0,1);
 				for (var i = 0; i < size; i++) {
 					recList.Peek().StandardMinMaxCalculation(TrueMax + MoveVec, TrueMin + MoveVec, BadMin - MoveVec);
 					MoveVec -= recList.Peek().CachedOverlapSize * new Vector2f(0, 1);

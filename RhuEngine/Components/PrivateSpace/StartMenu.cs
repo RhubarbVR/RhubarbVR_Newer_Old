@@ -115,6 +115,8 @@ namespace RhuEngine.Components
 			uibuilder.PopRect();
 
 			uibuilder.PopRect();
+			uibuilder.PopRect();
+
 			var list = uibuilder.AttachChildRect<VerticalList>(new Vector2f(0.5f, 0), new Vector2f(1), 0);
 			list.Fit.Value = true;
 
