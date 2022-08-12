@@ -54,7 +54,6 @@ namespace RhuEngine.Components
 		public readonly SafeList<BaseRenderUIComponent> RenderComponents = new();
 
 		public float AddedDepth { get; private set; }
-		public bool addedDepthIsDirty;
 		public UICanvas CachedCanvas { get; private set; }
 		public UICanvas Canvas => CachedCanvas;
 
@@ -66,12 +65,24 @@ namespace RhuEngine.Components
 				return;
 			}
 			AddedDepth = addedDepth;
-			addedDepthIsDirty = true;
+			foreach (Entity item in Entity.children) {
+				item.UIRect?.AddAddedDepth(addedDepth);
+			}
+			MarkForRenderMeshUpdate(RenderMeshUpdateType.Movment);
 		}
 
 		public void CanvasUpdate() {
+			if (CachedCanvas != null) {
+				OnRectUpdate -= CachedCanvas.RectUpdate;
+			}
 			CachedCanvas = Entity.GetFirstComponent<UICanvas>();
+			if(CachedCanvas != null) {
+				OnRectUpdate += CachedCanvas.RectUpdate;
+			}
 			CachedCanvas ??= Entity.parent.Target?.UIRect?.CachedCanvas;
+			if (Entity.parent.Target?.GetFirstComponent<UICanvas>() != null) {
+				OnRectUpdate += CachedCanvas.RectUpdate;
+			}
 			foreach (Entity item in Entity.children) {
 				item.UIRect?.CanvasUpdate();
 			}
@@ -129,12 +140,10 @@ namespace RhuEngine.Components
 		public Vector2f TotalMove { get; private set; }
 		public Vector2f MoveAmount { get; private set; }
 
-		public void ApplyMovement(Vector2f moveAmount,bool Update = true) {
+		public void ApplyMovement(Vector2f moveAmount) {
 			if (MoveAmount != moveAmount) {
 				MoveAmount = moveAmount;
-				if (Update) { 
-					RegisterRectUpdateEvent();
-				}
+				RegisterRectUpdateEvent();
 			}
 		}
 
@@ -169,8 +178,7 @@ namespace RhuEngine.Components
 
 		public void UpdateMinMax(Vector2f newMin, Vector2f newMax) {
 			var newSize = newMax - newMin;
-			var hasMoved = (CachedMin != newMin) | (CachedMax != newMax) | addedDepthIsDirty | cutsAreDirty;
-			addedDepthIsDirty = false;
+			var hasMoved = (CachedMin != newMin) | (CachedMax != newMax) | cutsAreDirty;
 			cutsAreDirty = false;
 			CachedMin = newMin;
 			CachedMax = newMax;
@@ -205,10 +213,13 @@ namespace RhuEngine.Components
 			StandardMinMaxCalculation(ParentRect?.TrueMax ?? Vector2f.One, ParentRect?.TrueMin ?? Vector2f.Zero, ParentRect?.BadMin ?? Vector2f.One);
 		}
 
+		public event Action OnRectUpdate;
+
 		public virtual void LocalRectUpdate() {
 			TotalMove = (ParentRect?.TotalMove??Vector2f.Zero) + MoveAmount;
 			ComputeDepth();
 			StandardMinMaxCalculation();
+			OnRectUpdate?.Invoke();
 		}
 
 		public virtual void ParrentRectUpdate() {

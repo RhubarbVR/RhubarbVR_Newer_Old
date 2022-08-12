@@ -44,22 +44,73 @@ namespace RhuEngine.Components
 
 		public RigidBodyCollider PhysicsCollider;
 		public Matrix PhysicsColliderOffset = Matrix.Identity;
+
+		private byte _updateLock;
+		private bool _tryUpdateWhenLocked;
+
+		public void LockPysics() {
+			_updateLock++;
+		}
+		public void UnLockPysics() {
+			_updateLock--;
+			if (_tryUpdateWhenLocked) {
+				_tryUpdateWhenLocked = false;
+				UpdatePyhsicsMesh();
+			}
+		}
+
 		public void UpdatePyhsicsMesh() {
 			RWorld.ExecuteOnEndOfFrame(this, () => {
+				if (_updateLock != 0) {
+					_tryUpdateWhenLocked = true;
+					return;
+				}
+				var uirect = Entity.UIRect;
+				PhysicsCollider?.Remove();
+				PhysicsCollider = null;
+				if (uirect is null) {
+					return;
+				}
+				var rectSize = uirect.CachedElementSize;
+				var rectMin = uirect.CachedMin;
+				if(uirect.GetType() == typeof(CuttingUIRect)) {
+					var serchEntity = Entity;
+					foreach (Entity item in Entity.children) {
+						if (item.UIRect != null) {
+							serchEntity = item;
+						}
+					}
+					Vector2f? tempMin = null;
+					Vector2f? tempMax = null;
+					foreach (Entity item in serchEntity.children) {
+						if(item.UIRect != null && item.IsEnabled) {
+							if (tempMin != null) {
+								tempMin = MathUtil.Max(tempMin ?? Vector2f.One, item.UIRect.CachedMin);
+							}
+							if (tempMax != null) {
+								tempMax = MathUtil.Max(tempMax ?? Vector2f.Zero, item.UIRect.CachedMax);
+							}
+							tempMin ??= item.UIRect.CachedMin;
+							tempMax ??= item.UIRect.CachedMax;
+						}
+					}
+					rectMin = tempMin ?? rectMin;
+					rectSize = (tempMax - tempMin) ?? rectSize;
+				}
 				var isJustBloxMesh = !(TopOffset.Value || FrontBind.Value);
 				if (isJustBloxMesh) {
 					var size = scale.Value / 10;
-					size *= new Vector3f(1, 1, 0.25);
+					size *= new Vector3f(rectSize.x, rectSize.y, 0.25);
 					PhysicsCollider = new RBoxShape(size / 2).GetCollider(World.PhysicsSim);
 					PhysicsCollider.CustomObject = this;
 					PhysicsCollider.Group = ECollisionFilterGroups.UI;
 					PhysicsCollider.Mask = ECollisionFilterGroups.UI;
 					PhysicsCollider.Active = Entity.IsEnabled;
-					PhysicsColliderOffset = Matrix.T(size / 2);
+					PhysicsColliderOffset = Matrix.T((size / 2) + (rectMin.XY_ * (scale.Value / 10)));
 				}
 				else {
 					var newMeshGen = new TrivialBox3Generator {
-						Box = new Box3d(Vector3d.One / 2, Vector3d.One / 2)
+						Box = new Box3d((rectSize.XY_ / 2) + rectMin.XY_, (rectSize.XY_ + new Vector3f(0, 0, 1)) / 2)
 					};
 					var NewMesh = newMeshGen.Generate().MakeSimpleMesh();
 					if (TopOffset.Value) {
@@ -77,6 +128,10 @@ namespace RhuEngine.Components
 					PhysicsColliderOffset = Matrix.Identity;
 				}
 			});
+		}
+
+		internal void RectUpdate() {
+			UpdatePyhsicsMesh();
 		}
 
 		public override void OnAttach() {
@@ -111,13 +166,13 @@ namespace RhuEngine.Components
 			RWorld.ExecuteOnEndOfFrame(ClearHitData);
 		}
 
-		public List<HitData> hitDatas = new(); 
+		public List<HitData> hitDatas = new();
 
 		public void ClearHitData() {
 			hitDatas.Clear();
 		}
 
-		public IEnumerable<HitData> HitDataInVolume(Vector2f min,Vector2f max) {
+		public IEnumerable<HitData> HitDataInVolume(Vector2f min, Vector2f max) {
 			for (var i = 0; i < hitDatas.Count; i++) {
 				var hitData = hitDatas[i];
 				if (hitData.HitPointOnCanvas.IsWithIn(min, max)) {
@@ -131,13 +186,13 @@ namespace RhuEngine.Components
 			public bool Lazer;
 
 			public uint TouchUndex;
-			
+
 			public Vector3f Hitnormal;
 
 			public Vector3f Hitpointworld;
 
 			public float PressForce;
-			
+
 			public float GripForces;
 
 			public Handed Side;
@@ -186,7 +241,7 @@ namespace RhuEngine.Components
 			hitDatas.Add(hitData);
 		}
 
-		public void ProcessHitTouch(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld,Handed handed) {
+		public void ProcessHitTouch(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, Handed handed) {
 			AddHitData(new HitData(touchUndex, hitnormal, hitpointworld, handed));
 		}
 		public void ProcessHitLazer(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForces, Handed side) {

@@ -44,7 +44,7 @@ namespace RhuEngine.Components
 			}
 			else {
 				var recList = new Stack<UIRect>();
-				foreach (Entity item in FlipOrder ? Entity.children.Reverse() : Entity.children) {
+				foreach (Entity item in FlipOrder ? Entity.children: Entity.children.Reverse()) {
 					var rect = item.UIRect;
 					if (rect is not null) {
 						recList.Push(rect);
@@ -53,8 +53,8 @@ namespace RhuEngine.Components
 				var size = recList.Count;
 				var MoveVec = new Vector2f(0,1);
 				for (var i = 0; i < size; i++) {
-					recList.Peek().StandardMinMaxCalculation(TrueMax + MoveVec, TrueMin + MoveVec, BadMin - MoveVec);
 					MoveVec -= recList.Peek().CachedOverlapSize * new Vector2f(0, 1);
+					recList.Peek().StandardMinMaxCalculation(TrueMax + MoveVec, TrueMin + MoveVec, BadMin - MoveVec);
 					recList.Peek().RegisterNestedParentUpdate(false);
 					recList.Pop();
 				}

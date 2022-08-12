@@ -44,7 +44,7 @@ namespace RhuEngine.Components
 			}
 			else {
 				var recList = new Stack<UIRect>();
-				foreach (Entity item in FlipOrder ? Entity.children.Reverse() : Entity.children) {
+				foreach (Entity item in FlipOrder ? Entity.children : Entity.children.Reverse()) {
 					var rect = item.UIRect;
 					if (rect is not null) {
 						recList.Push(rect);

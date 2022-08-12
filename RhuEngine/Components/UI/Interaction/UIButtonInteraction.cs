@@ -61,6 +61,7 @@ namespace RhuEngine.Components
 
 		private void RunButtonClickEvent(HitData hitData) {
 			_lastHitData = hitData;
+			UIRect?.Canvas?.LockPysics();
 			SendEvent(new ButtonEvent {
 				IsPressing = false,
 				IsClicked = true,
@@ -94,8 +95,8 @@ namespace RhuEngine.Components
 		private void RunButtonReleaseEvent(HitData hitData) {
 			_lastHitData = hitData;
 			IsClicking = false;
-			//AddDepthChange
-			//Rect.Scroll(new Vector3f(UIRect.ScrollOffset.x, Rect.ScrollOffset.y, Rect.ParentRect.ScrollOffset.z));
+			UIRect.AddAddedDepth(0f);
+			UIRect?.Canvas?.UnLockPysics();
 			SendEvent(new ButtonEvent {
 				IsPressing = false,
 				IsClicked = false,
@@ -148,8 +149,7 @@ namespace RhuEngine.Components
 				}
 			}
 			if (IsClicking) {
-				//
-				//Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, 0.005f + (-(Rect.Depth.Value * 0.999f * minPress))));
+				UIRect.AddAddedDepth(0.005f + (-(UIRect.Depth.Value * 0.999f * minPress)));
 			}
 			if (IsClicking && !StillClicking) {
 				RunButtonReleaseEvent(_lastHitData);
