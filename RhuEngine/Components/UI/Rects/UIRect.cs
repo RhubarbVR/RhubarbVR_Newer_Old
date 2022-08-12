@@ -72,16 +72,18 @@ namespace RhuEngine.Components
 		}
 
 		public void CanvasUpdate() {
-			if (CachedCanvas != null) {
+			if (CachedCanvas is not null) {
 				OnRectUpdate -= CachedCanvas.RectUpdate;
 			}
 			CachedCanvas = Entity.GetFirstComponent<UICanvas>();
-			if(CachedCanvas != null) {
+			if(CachedCanvas is not null) {
 				OnRectUpdate += CachedCanvas.RectUpdate;
 			}
 			CachedCanvas ??= Entity.parent.Target?.UIRect?.CachedCanvas;
 			if (Entity.parent.Target?.GetFirstComponent<UICanvas>() != null) {
-				OnRectUpdate += CachedCanvas.RectUpdate;
+				if (CachedCanvas is not null) {
+					OnRectUpdate += CachedCanvas.RectUpdate;
+				}
 			}
 			foreach (Entity item in Entity.children) {
 				item.UIRect?.CanvasUpdate();
