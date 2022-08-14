@@ -135,13 +135,18 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public void DrawDebugText(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf,string text, float drawTime = 1) {
+		public void DrawDebugText(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf,object text, float drawTime = 1,bool lookAtLocal = true) {
 			if (DebugVisuals) {
 				RWorld.ExecuteOnStartOfFrame(() => {
 					var debugcube = RootEntity.AddChild("DebugText");
+					if (lookAtLocal) {
+						var lookAt = debugcube.AttachComponent<LookAtValue>();
+						var userNodePos = debugcube.AttachComponent<UserBodyNodeTransform>();
+						userNodePos.Pos.SetLinkerTarget(lookAt.LookAtPoint);
+					}
 					var meshrender = debugcube.AttachComponent<WorldText>();
 					meshrender.StartingColor.Value = colorf;
-					meshrender.Text.Value = text;
+					meshrender.Text.Value = text.ToString();
 					meshrender.Entity.GlobalTrans = Matrix.TS(pos, scale) * matrix;
 					Task.Run(async () => {
 						await Task.Delay((int)(1000 * drawTime));

@@ -10,8 +10,38 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
+	public enum BodyNode
+	{
+		None,
+		UserRoot,
+		Head,
+		LeftController,
+		RightController,
+	}
 	public class User : SyncObject
 	{
+		public Matrix GetBodyNodeTrans(BodyNode bodyNode) {
+			if (bodyNode == BodyNode.None) {
+				return Matrix.Identity;
+			}
+			if (userRoot.Target is null) {
+				return Matrix.Identity;
+			}
+			switch (bodyNode) {
+				case BodyNode.UserRoot:
+					return userRoot.Target.Entity.GlobalTrans;
+				case BodyNode.Head:
+					return userRoot.Target.head.Target?.GlobalTrans ?? Matrix.Identity;
+				case BodyNode.LeftController:
+					return userRoot.Target.leftController.Target?.GlobalTrans ?? Matrix.Identity;
+				case BodyNode.RightController:
+					return userRoot.Target.rightController.Target?.GlobalTrans ?? Matrix.Identity;
+				default:
+					return Matrix.Identity;
+			}
+		}
+
+
 		public readonly SyncRef<UserRoot> userRoot;
 
 		public readonly SyncAbstractObjList<SyncStream> syncStreams;
@@ -20,7 +50,7 @@ namespace RhuEngine.WorldObjects
 		public string NormalizedUserName { get; private set; }
 		[Exposed]
 		[NoWriteExsposed]
-		public string UserName { get;private set; }
+		public string UserName { get; private set; }
 		[Exposed]
 		[NoWriteExsposed]
 		public string[] Roles { get; private set; }
@@ -47,7 +77,7 @@ namespace RhuEngine.WorldObjects
 				var e = await Engine.netApiManager.GetUserInfo(userID);
 				UserName = e?.UserName;
 				NormalizedUserName = e?.NormalizedUserName;
-				Roles = e?.Roles?.ToArray()??Array.Empty<string>();
+				Roles = e?.Roles?.ToArray() ?? Array.Empty<string>();
 			});
 		}
 
@@ -59,13 +89,13 @@ namespace RhuEngine.WorldObjects
 		}
 		public Peer CurrentPeer { get; set; }
 
-		public bool IsConnected  => (CurrentPeer?.NetPeer?.ConnectionState ?? LiteNetLib.ConnectionState.Disconnected) == LiteNetLib.ConnectionState.Connected;
+		public bool IsConnected => (CurrentPeer?.NetPeer?.ConnectionState ?? LiteNetLib.ConnectionState.Disconnected) == LiteNetLib.ConnectionState.Connected;
 
 		public bool IsLocalUser => World.GetLocalUser() == this;
 
 		public override void OnLoaded() {
 			base.OnLoaded();
-			if(CurrentPeer is null) {
+			if (CurrentPeer is null) {
 				try {
 					var foundPeer = World.peers.Where((val) => val.UserID.ToString() == userID).First();
 					if (foundPeer is not null) {

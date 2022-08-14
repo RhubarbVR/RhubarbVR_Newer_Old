@@ -323,6 +323,27 @@ namespace RNumerics
 			}
 		}
 
+		public static Vector2f GetUVPosOnTry(Vector3d p1, Vector2f p1uv, Vector3d p2, Vector2f p2uv, Vector3d p3, Vector2f p3uv, Vector3d point) {
+			// calculate vectors from point f to vertices p1, p2 and p3:
+			var f1 = p1 - point;
+			var f2 = p2 - point;
+			var f3 = p3 - point;
+			// calculate the areas (parameters order is essential in this case):
+			var va = Vector3d.Cross(p1 - p2, p1 - p3); // main triangle cross product
+			var va1 = Vector3d.Cross(f2, f3); // p1's triangle cross product
+			var va2 = Vector3d.Cross(f3, f1); // p2's triangle cross product
+			var va3 = Vector3d.Cross(f1, f2); // p3's triangle cross product
+			var a = va.Magnitude; // main triangle area
+								  // calculate barycentric coordinates with sign:
+			var a1 = va1.Magnitude / a * Math.Sign(Vector3d.Dot(va, va1));
+			var a2 = va2.Magnitude / a * Math.Sign(Vector3d.Dot(va, va2));
+			var a3 = va3.Magnitude / a * Math.Sign(Vector3d.Dot(va, va3));
+			// find the uv corresponding to point f (uv1/uv2/uv3 are associated to p1/p2/p3):
+			var uv = (p1uv * (float)a1) + (p2uv * (float)a2) + (p3uv * (float)a3);
+			return uv;
+		}
+
+
 		public static explicit operator Vector2(Vector2f b) => b.ToSystemNumric();
 
 		public static explicit operator Vector2f(Vector2 b) => ToRhuNumrics(ref b);

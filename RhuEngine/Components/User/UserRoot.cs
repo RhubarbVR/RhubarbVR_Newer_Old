@@ -14,9 +14,9 @@ namespace RhuEngine.Components
 
 		public readonly SyncRef<Entity> head;
 
-		public readonly SyncRef<Entity> leftHand;
+		public readonly SyncRef<Entity> leftController;
 
-		public readonly SyncRef<Entity> rightHand;
+		public readonly SyncRef<Entity> rightController;
 
 		public readonly Linker<Vector3f> pos;
 

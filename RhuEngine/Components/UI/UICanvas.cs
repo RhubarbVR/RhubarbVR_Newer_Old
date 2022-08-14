@@ -58,6 +58,7 @@ namespace RhuEngine.Components
 				UpdatePyhsicsMesh();
 			}
 		}
+		public SimpleMesh CollisionMesh;
 
 		public void UpdatePyhsicsMesh() {
 			RWorld.ExecuteOnEndOfFrame(this, () => {
@@ -109,10 +110,12 @@ namespace RhuEngine.Components
 					PhysicsColliderOffset = Matrix.T((size / 2) + (rectMin.XY_ * (scale.Value / 10)));
 				}
 				else {
-					var newMeshGen = new TrivialBox3Generator {
-						Box = new Box3d((rectSize.XY_ / 2) + rectMin.XY_, (rectSize.XY_ + new Vector3f(0, 0, 1)) / 2)
+					var newMeshGen = new TrivialRectGenerator {
+						IndicesMap = new Index2i(1, 2),
 					};
 					var NewMesh = newMeshGen.Generate().MakeSimpleMesh();
+					NewMesh.Translate(0.5f, 0.5f, 0);
+					NewMesh = NewMesh.Cut(rectSize + rectMin, rectMin);
 					if (TopOffset.Value) {
 						NewMesh.OffsetTop(TopOffsetValue.Value);
 					}
@@ -120,6 +123,7 @@ namespace RhuEngine.Components
 						NewMesh = NewMesh.UIBind(FrontBindAngle.Value, FrontBindRadus.Value, FrontBindSegments.Value, scale);
 					}
 					NewMesh.Scale(scale.Value.x / 10, scale.Value.y / 10, scale.Value.z / 10);
+					CollisionMesh = NewMesh;
 					PhysicsCollider = new RRawMeshShape(NewMesh).GetCollider(World.PhysicsSim);
 					PhysicsCollider.CustomObject = this;
 					PhysicsCollider.Group = ECollisionFilterGroups.UI;
@@ -233,10 +237,24 @@ namespace RhuEngine.Components
 				hitData.HitPointOnCanvas = pos;
 			}
 			else {
-				//Todo: Dont Think this is good enough 
-				var pos = localPoint.Translation.Xy;
-				pos /= scale.Value.Xy / 10;
-				hitData.HitPointOnCanvas = pos;
+				if(CollisionMesh is null) {
+					return;
+				}
+				var e = (PhysicsColliderOffset * RenderLocation).GetLocal(Matrix.T(hitData.Hitpointworld));
+				var hitPoint = e.Translation;
+				World.DrawDebugSphere(RenderLocation, (Vector3f)hitPoint, new Vector3d(0.01), Colorf.Red, 0.5f);
+				var mesh = CollisionMesh;
+				var hittry = mesh.InsideTry(hitPoint);
+				var tryangle = mesh.GetTriangle(hittry);
+				var p1 = mesh.GetVertexAll(tryangle.a);
+				var p2 = mesh.GetVertexAll(tryangle.b);
+				var p3 = mesh.GetVertexAll(tryangle.c);
+				World.DrawDebugSphere(RenderLocation, (Vector3f)p1.v, new Vector3d(0.01), Colorf.Red, 0.5f);
+				World.DrawDebugSphere(RenderLocation, (Vector3f)p2.v, new Vector3d(0.01), Colorf.Blue, 0.5f);
+				World.DrawDebugSphere(RenderLocation, (Vector3f)p3.v, new Vector3d(0.01), Colorf.Green, 0.5f);
+				var uvpos = Vector2f.GetUVPosOnTry(p1.v, p1.uv[0], p2.v, p2.uv[0], p3.v, p3.uv[0], hitPoint);
+				World.DrawDebugText(RenderLocation, (Vector3f)hitPoint + new Vector3f(0,0.1f, 0.1f), new Vector3f(0.1f),Colorf.BlueMetal, uvpos, 0.1f);
+				hitData.HitPointOnCanvas = uvpos;
 			}
 			hitDatas.Add(hitData);
 		}
@@ -246,6 +264,11 @@ namespace RhuEngine.Components
 		}
 		public void ProcessHitLazer(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForces, Handed side) {
 			AddHitData(new HitData(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side));
+		}
+
+		public override void Dispose() {
+			base.Dispose();
+			PhysicsCollider?.Remove();
 		}
 	}
 }

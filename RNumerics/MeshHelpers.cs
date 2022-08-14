@@ -31,6 +31,10 @@ public static class MeshHelpers
 			var point2 = mesh.GetVertex(e[i + 1]);
 			var point3 = mesh.GetVertex(e[i + 2]);
 
+			if(point1 == point2 || point1 == point3 || point2 == point3) {
+				continue;
+			}
+
 			var testPointStep1 = point - point1;
 			var point1Step1 = point1 - point1;
 			var point2Step1 = point2 - point1;

@@ -67,8 +67,8 @@ namespace RhuEngine.Components
 				return;
 			}
 			var head = LocalUser.userRoot.Target?.head.Target;
-			var left = LocalUser.userRoot.Target?.leftHand.Target;
-			var right = LocalUser.userRoot.Target?.rightHand.Target;
+			var left = LocalUser.userRoot.Target?.leftController.Target;
+			var right = LocalUser.userRoot.Target?.rightController.Target;
 
 			if (head != null) {
 				if (!RWorld.IsInVR && !Engine.inputManager.screenInput.MouseFree) {
