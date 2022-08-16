@@ -70,7 +70,8 @@ namespace RhuEngine.Components
 			if (_keyboardLoaded) {
 				return;
 			}
-			Task.Run(LoadKeyboard);
+			//Todo: Keyboard Update
+			//Task.Run(LoadKeyboard);
 		}
 
 		public void LoadKeyboard() {

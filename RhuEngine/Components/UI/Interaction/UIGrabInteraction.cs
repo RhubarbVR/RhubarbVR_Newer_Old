@@ -22,25 +22,24 @@ namespace RhuEngine.Components
 		}
 
 		public bool Grabed = true;
-		//public override void Step() {
-		//	base.Step();
-		//	if(Rect is null) {
-		//		return;
-		//	}
-		//	var gabbedthisframe = false;
-		//	foreach (var item in Rect.HitPoses(!AllowOtherZones.Value))
-		//	{
-		//		if (item.GripForce > GrabForce.Value) {
-		//			if (!Grabed) {
-		//				Grabed = true;
-		//				Grab(item.Handed);
-		//			}
-		//			gabbedthisframe = true;
-		//		}
-		//	}
-		//	if(!gabbedthisframe && Grabed) {
-		//		Grabed = false;
-		//	}
-		//}
+		public override void Step() {
+			base.Step();
+			if (UIRect is null) {
+				return;
+			}
+			var gabbedthisframe = false;
+			foreach (var item in UIRect.GetRectHitData()) {
+				if (item.GripForces > GrabForce.Value) {
+					if (!Grabed) {
+						Grabed = true;
+						Grab(item.Side);
+					}
+					gabbedthisframe = true;
+				}
+			}
+			if (!gabbedthisframe && Grabed) {
+				Grabed = false;
+			}
+		}
 	}
 }

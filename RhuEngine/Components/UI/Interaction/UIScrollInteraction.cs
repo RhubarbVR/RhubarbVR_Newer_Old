@@ -32,43 +32,43 @@ namespace RhuEngine.Components
 
 		public bool Hover = false;
 
-		//public override void Step() {
-		//	base.Step();
-		//	if(Rect is null) {
-		//		return;
-		//	}
-		//	var HasFirst = false;
-		//	var firstLazer = true;
-		//	var hitposes = Rect.HitPoses(!AllowOtherZones.Value);
-		//	foreach (var item in hitposes) {
-		//		HasFirst = true;
-		//		if (firstLazer && item.Laser) {
-		//			if (RInput.Mouse.ScrollChange != Vector2f.Zero) {
-		//				if(AllowAltSwitch && RInput.Key(Key.Alt).IsActive()) {
-		//					Scroll(new Vector2f(RInput.Mouse.ScrollChange.y, RInput.Mouse.ScrollChange.x) * MouseScrollSpeed * 5);
-		//				}
-		//				else {
-		//					Scroll(RInput.Mouse.ScrollChange * MouseScrollSpeed * 5);
-		//				}
+		public override void Step() {
+			base.Step();
+			if (UIRect is null) {
+				return;
+			}
+			var HasFirst = false;
+			var firstLazer = true;
+			var hitposes = UIRect.GetRectHitData();
+			foreach (var item in hitposes) {
+				HasFirst = true;
+				if (firstLazer && item.Lazer) {
+					if (RInput.Mouse.ScrollChange != Vector2f.Zero) {
+						if (AllowAltSwitch && RInput.Key(Key.Alt).IsActive()) {
+							Scroll(new Vector2f(RInput.Mouse.ScrollChange.y, RInput.Mouse.ScrollChange.x) * MouseScrollSpeed);
+						}
+						else {
+							Scroll(RInput.Mouse.ScrollChange * MouseScrollSpeed);
+						}
 
-		//			}
-		//			firstLazer = false;
-		//		}
-		//	}
-		//	if (HasFirst) {
-		//		//DragScroll 
-		//		var scroll = Rect.ClickGripChange(GripPressForce.Value, !AllowOtherZones.Value);
-		//		var scrollavrage = Vector2f.Zero;
-		//		foreach (var item in scroll) {
-		//			if (scrollavrage == Vector2f.Zero) {
-		//				scrollavrage += item.Xy;
-		//			}
-		//		}
+					}
+					firstLazer = false;
+				}
+			}
+			//if (HasFirst) {
+			//	//DragScroll 
+			//	var scroll = UIRect.ClickGripChange(GripPressForce.Value);
+			//	var scrollavrage = Vector2f.Zero;
+			//	foreach (var item in scroll) {
+			//		if (scrollavrage == Vector2f.Zero) {
+			//			scrollavrage += item.Xy;
+			//		}
+			//	}
 
-		//		if (scrollavrage != Vector2f.Zero) {
-		//			Scroll(scrollavrage * Rect.Canvas.scale.Value.Xy * -5);
-		//		}
-		//	}
-		//}
+			//	if (scrollavrage != Vector2f.Zero) {
+			//		Scroll(scrollavrage * UIRect.Canvas.scale.Value.Xy * -5);
+			//	}
+			//}
+		}
 	}
 }

@@ -163,12 +163,12 @@ namespace RhuEngine.Components.PrivateSpace
 				var button = uIBuilder.AttachComponentToStack<UIButtonInteraction>();
 				uIBuilder.AddRectangle(0.1f);
 				uIBuilder.PushRect(new Vector2f(0, 0.2f), new Vector2f(1));
-				uIBuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f), 0);
+				uIBuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f), 0.01f);
 				uIBuilder.AddRectangle(0.2f);
 				uIBuilder.PopRect();
 				uIBuilder.PopRect();
 				uIBuilder.PushRect(new Vector2f(0), new Vector2f(1, 0.2f),0);
-				uIBuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f), 0);
+				uIBuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f), 0.01f);
 				uIBuilder.AddText($"This is file {i + 1}/9", null, 1.9f, 1, null, true);
 				uIBuilder.PopRect();
 				uIBuilder.PopRect();

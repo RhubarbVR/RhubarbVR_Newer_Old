@@ -13,13 +13,20 @@ namespace RhuEngine.Components
 		public readonly Sync<Vector2f> ScrollPos;
 
 		public void ApplyScrollMovement() {
+			ScrollPos.Value = MathUtil.Clamp(ScrollPos.Value, MinScroll, MaxScroll);
 			ApplyMovement(ScrollPos.Value);
 		}
 
 		public readonly Sync<Vector2f> ScrollSpeed;
 
-		public virtual Vector2f MaxScroll => CachedOverlapSize;
-		public virtual Vector2f MinScroll => -CachedOverlapSize;
+		public Vector2f GetMaxScroll() {
+			return -new Vector2f(0, -CachedOverlapSize.y + CachedElementSize.y);
+		}
+		public Vector2f GetMinScroll() {
+			return -new Vector2f(CachedOverlapSize.x - CachedElementSize.x, 0);
+		}
+		public virtual Vector2f MaxScroll => GetMaxScroll();
+		public virtual Vector2f MinScroll => GetMinScroll();
 
 		public override void OnAttach() {
 			base.OnAttach();
