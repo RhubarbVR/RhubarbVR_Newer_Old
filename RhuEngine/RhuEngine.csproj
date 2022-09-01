@@ -75,6 +75,7 @@
 		<ProjectReference Include="..\OpusDotNet\OpusDotNet.csproj" />
 		<ProjectReference Include="..\RNumerics\RNumerics.csproj" />
 		<ProjectReference Include="..\SharedModels\SharedModels.csproj" />
+		<ProjectReference Include="D:\Projects\GitHub\LiteClient\RhubarbCloudClient\RhubarbCloudClient.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
