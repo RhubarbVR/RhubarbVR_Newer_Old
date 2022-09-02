@@ -493,7 +493,7 @@ namespace RhuEngine.Components
 			colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
 			colorassign.ColorShif.Value = 1.9f;
 			colorassign.TargetColor.Target = text.StartingColor;
-			if (!Engine.netApiManager.IsLoggedIn) {
+			if (!Engine.netApiManager.Client.IsLogin) {
 				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(LoginProgram)));
 			}
 			WorldManager.OnWorldUpdateTaskBar += RegTaskBarItemsUpdate;

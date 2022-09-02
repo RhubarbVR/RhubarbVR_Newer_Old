@@ -7,7 +7,6 @@ using RhuEngine.Linker;
 
 using SharedModels;
 using SharedModels.GameSpecific;
-using SharedModels.Session;
 
 
 namespace RhuEngine.WorldObjects
@@ -28,14 +27,14 @@ namespace RhuEngine.WorldObjects
 
 		public List<Peer> peers = new();
 		public Peer this[ushort id] => peers[id];
-		
-		public Peer LoadNewPeer(ConnectToUser user) {
-			var newpeer = new Peer(NetPeer,user.UserID, (ushort)(peers.Count + 1));
-			peers.Add(newpeer);
-			NetPeer.Send(Serializer.Save(new ConnectToAnotherUser(user.UserID.ToString())), 2, DeliveryMethod.ReliableSequenced);
-			World.ProcessUserConnection(newpeer);
-			return newpeer;
-		}
+		//TODO: loadPeer
+		//public Peer LoadNewPeer(ConnectToUser user) {
+		//	var newpeer = new Peer(NetPeer,user.UserID, (ushort)(peers.Count + 1));
+		//	peers.Add(newpeer);
+		//	NetPeer.Send(Serializer.Save(new ConnectToAnotherUser(user.UserID.ToString())), 2, DeliveryMethod.ReliableSequenced);
+		//	World.ProcessUserConnection(newpeer);
+		//	return newpeer;
+		//}
 		public void OnConnect() {
 			RLog.Info("PeerServerConnected");
 			peers.Clear();

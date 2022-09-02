@@ -1,0 +1,8 @@
+{
+  "name": "English US",
+  "languageName": "en-US",
+  "authors": [ "Faolan" ],
+  "sheet": {
+    "Common.Color": "Color"
+  }
+}

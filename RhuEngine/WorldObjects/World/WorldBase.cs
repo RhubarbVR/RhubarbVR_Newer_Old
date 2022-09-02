@@ -115,10 +115,11 @@ namespace RhuEngine.WorldObjects
 						if (GetLocalUser() is not null) {
 							GetLocalUser().isPresent.Value = true;
 						}
-						if (Engine.netApiManager.UserStatus is not null) {
-							Engine.netApiManager.UserStatus.CurrentSession = Guid.Parse(SessionID.Value);
-							Engine.netApiManager.UserStatus = Engine.netApiManager.UserStatus;
-						}
+						//ToDO: set focus on net api
+						//if (Engine.netApiManager.UserStatus is not null) {
+						//	Engine.netApiManager.UserStatus.CurrentSession = Guid.Parse(SessionID.Value);
+						//	Engine.netApiManager.UserStatus = Engine.netApiManager.UserStatus;
+						//}
 					}
 					else {
 						if (GetLocalUser() is not null) {
@@ -168,9 +169,9 @@ namespace RhuEngine.WorldObjects
 		public readonly Sync<string> AssociatedGroup;
 
 		[NoSave]
-		[Default(SessionAccessLevel.Public)]
+		[Default(DataModel.Enums.AccessLevel.Public)]
 		[OnChanged(nameof(SessionInfoChanged))]
-		public readonly Sync<SessionAccessLevel> AccessLevel;
+		public readonly Sync<DataModel.Enums.AccessLevel> AccessLevel;
 
 		[NoSave]
 		[Default(30)]
@@ -327,7 +328,8 @@ namespace RhuEngine.WorldObjects
 			catch { }
 			if (IsNetworked) {
 				if (!HasError) {
-					Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = Guid.Parse(SessionID.Value), RequestData = SessionID.Value, RequestType = RequestType.LeaveSession });
+					//ToDO: SessionRequest
+					//Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = Guid.Parse(SessionID.Value), RequestData = SessionID.Value, RequestType = RequestType.LeaveSession });
 				}
 			}
 			try {

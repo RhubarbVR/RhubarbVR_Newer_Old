@@ -522,17 +522,16 @@ namespace RhuEngine.GameTests.Tests
 			var userName = "AutoRemovedTestAcount" + Guid.NewGuid().ToString();
 			var email = $"{userName}@AutoRemovedTestAcount.rhubarbvr.net";
 			var password = "Password" + Guid.NewGuid().ToString();
-			var dateOfBirth = DateTime.Now.AddYears(-100);
-			var signup = await tester.app.netApiManager.SignUp(userName, email, password, dateOfBirth);
-			if (signup.Error) {
-				throw new Exception("Failed to createAcount" + signup.Message + $"\n{signup.ErrorDetails}");
+			var signup = await tester.app.netApiManager.Client.RegisterAccount(userName, email, password);
+			if (!signup.IsDataGood) {
+				throw new Exception("Failed to createAcount" + signup.Data);
 			}
-			var login = await tester.app.netApiManager.Login(email, password);
-			if (!login.Login) {
-				throw new Exception("Failed to login" + login.Message);
+			var login = await tester.app.netApiManager.Client.Login(email, password);
+			if (login.Error) {
+				throw new Exception("Failed to login" + login.MSG);
 			}
 			RLog.Info("Login as " + userName);
-			Assert.AreEqual(userName, tester.app.netApiManager.User.UserName);
+			Assert.AreEqual(userName, tester.app.netApiManager.Client?.User.UserName);
 			tester.RunForSteps();
 			tester.Dispose();
 		}

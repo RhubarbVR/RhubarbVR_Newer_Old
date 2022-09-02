@@ -21,9 +21,11 @@ namespace RhuEngine.Commads
 			switch (args[1].ToLower()) {
 				case "enginestatistics":
 					Console.WriteLine(@$"=====---- EngineStatistics ----=====
-Is Login {Manager.Engine.netApiManager.IsLoggedIn}
-Username {Manager.Engine.netApiManager.User?.UserName ?? "Null"}
-UserID {Manager.Engine.netApiManager.User?.Id ?? new Guid()}
+Is Online {Manager.Engine.netApiManager.Client.IsOnline}
+Server Ping {Manager.Engine.netApiManager.Client.Ping}
+Is Login {Manager.Engine.netApiManager.Client.IsLogin}
+Username {Manager.Engine.netApiManager.Client.User?.UserName ?? "Null"}
+UserID {Manager.Engine.netApiManager.Client.User?.Id ?? new Guid()}
 
 worldManager stepTime {Manager.Engine.worldManager.TotalStepTime * 1000f:f3}ms
 FPS {1 / RTime.Elapsedf:f3}

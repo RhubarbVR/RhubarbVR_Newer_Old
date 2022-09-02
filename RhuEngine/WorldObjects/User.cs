@@ -74,10 +74,11 @@ namespace RhuEngine.WorldObjects
 		public void UserIDLoad() {
 			Task.Run(async () => {
 				if (userID == null) { return; }
-				var e = await Engine.netApiManager.GetUserInfo(userID);
-				UserName = e?.UserName;
-				NormalizedUserName = e?.NormalizedUserName;
-				Roles = e?.Roles?.ToArray() ?? Array.Empty<string>();
+				//Todo: Get User INFO
+				//var e = await Engine.netApiManager.Client.GetUserInfo(userID);
+				//UserName = e?.UserName;
+				//NormalizedUserName = e?.NormalizedUserName;
+				//Roles = e?.Roles?.ToArray() ?? Array.Empty<string>();
 			});
 		}
 

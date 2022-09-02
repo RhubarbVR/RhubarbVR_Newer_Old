@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
+using RhubarbCloudClient;
+
 using RhuEngine.Linker;
 
 
@@ -24,7 +26,12 @@ namespace RhuEngine.Managers
 {
 	public class NetApiManager : IManager
 	{
-	
+		public RhubarbAPIClient Client { get; private set; }
+
+		public NetApiManager(string path) {
+			Client = new RhubarbAPIClient(RhubarbAPIClient.BaseUri,path);
+		}
+
 		public void Init(Engine engine) {
 		}
 

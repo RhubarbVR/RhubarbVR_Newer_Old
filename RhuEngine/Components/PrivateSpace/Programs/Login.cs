@@ -83,34 +83,35 @@ namespace RhuEngine.Components.PrivateSpace
 			if (!buttonEvent.IsClicked) {
 				return;
 			}
-			if (RegScreen) {
-				if(Password.Text.Value != ConfPassword.Text.Value) {
-					Error("Passwords Don't Match");
-					return;
-				}
+			//Todo: CleanUP
+			//if (RegScreen) {
+			//	if(Password.Text.Value != ConfPassword.Text.Value) {
+			//		Error("Passwords Don't Match");
+			//		return;
+			//	}
 
-				Task.Run(async () => {
-					var info = await Engine.netApiManager.SignUp(UserName.Text, Email.Text, Password.Text, new DateTime(1980, 9, 19));
-					if (info.Error || info.ErrorDetails == "Normal Error") {
-						Error(info.Message);
-					}
-					else {
-						Normal(info.Message);
-						SwitchReg();
-					}
-				});
-			}
-			else {
-				Task.Run(async () => {
-					var info = await Engine.netApiManager.Login(Email.Text, Password.Text);
-					if (!info.Login) {
-						Error(info.Message);
-					}
-					else {
-						Close();
-					}
-				});
-			}
+			//	Task.Run(async () => {
+			//		var info = await Engine.netApiManager.SignUp(UserName.Text, Email.Text, Password.Text);
+			//		if (info.Error || info.ErrorDetails == "Normal Error") {
+			//			Error(info.Message);
+			//		}
+			//		else {
+			//			Normal(info.Message);
+			//			SwitchReg();
+			//		}
+			//	});
+			//}
+			//else {
+			//	Task.Run(async () => {
+			//		var info = await Engine.netApiManager.Login(Email.Text, Password.Text);
+			//		if (!info.Login) {
+			//			Error(info.Message);
+			//		}
+			//		else {
+			//			Close();
+			//		}
+			//	});
+			//}
 		}
 
 		public bool RegScreen = false;

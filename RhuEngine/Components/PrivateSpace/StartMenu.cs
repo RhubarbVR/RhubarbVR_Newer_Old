@@ -204,7 +204,7 @@ namespace RhuEngine.Components
 			uibuilder.PopRect();
 			void OnLogin(bool login) {
 				if (login) {
-					text.Text.Value = Engine.netApiManager.User.UserName;
+					text.Text.Value = Engine.netApiManager.Client.User?.UserName;
 					imgasset.url.Value = "https://cataas.com/cat";
 				}
 				else {
@@ -212,8 +212,9 @@ namespace RhuEngine.Components
 					imgasset.url.Value = "https://cataas.com/cat";
 				}
 			};
-			Engine.netApiManager.OnLoginAndLoggout += OnLogin;
-			OnLogin(Engine.netApiManager.IsLoggedIn);
+			Engine.netApiManager.Client.OnLogin += (use) => OnLogin(true);
+			Engine.netApiManager.Client.OnLogout += () => OnLogin(false);
+			OnLogin(Engine.netApiManager.Client.IsLogin);
 			uibuilder.PopRect();
 			uibuilder.PopRect();
 			uibuilder.PopRect();

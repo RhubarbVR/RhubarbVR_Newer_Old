@@ -176,7 +176,7 @@ namespace RhuEngine.Managers
 				Engine.IntMsg = LocalWorld.LoadMsg;
 				Thread.Sleep(10);
 			}
-			engine.netApiManager.HasGoneOfline += NetApiManager_HasGoneOfline;
+			engine.netApiManager.Client.HasGoneOfline += NetApiManager_HasGoneOfline;
 		}
 
 		private void NetApiManager_HasGoneOfline() {

@@ -27,7 +27,6 @@ namespace RhuEngine.AssetSystem.AssetProtocals
 				AllowAutoRedirect = true,
 			};
 			using var client = new HttpClient(HttpClientHandler);
-			HttpClientHandler.ServerCertificateCustomValidationCallback = NetApiManager.ValidateRemoteCertificate;
 			using var response = await client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead);
 			response.EnsureSuccessStatusCode();
 			var totalBytes = response.Content.Headers.ContentLength;
