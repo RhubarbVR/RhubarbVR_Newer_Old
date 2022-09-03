@@ -67,6 +67,7 @@ namespace RhubarbCloudClient
 			"Fact.Sleep.Dark",
 			"Fact.Sleep.Week",
 		};
+
 		public static string GetRandomFunnyFact(Random random) {
 			return FunnyFacts[random.Next(FunnyFacts.Length - 1)];
 		}
@@ -103,7 +104,6 @@ namespace RhubarbCloudClient
 			var daySting = $"Fact.Month{currentTime.Month}.Day{currentTime.Day}";
 			var valueDayFact = loc.GetLocalString(daySting);
 			return daySting != valueDayFact ? (randomGen.Next(10) <= 3) ? valueDayFact : loc.GetLocalString(random) : loc.GetLocalString(random);
-
 		}
 	}
 }

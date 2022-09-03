@@ -240,7 +240,12 @@
     "Programs.CreateNewWorld.Name": "Create New World",
     "Programs.Terminal.Name": "Terminal",
     "Actions.ChangeVR.Enable": "Enter VR",
-    "Actions.ChangeVR.Disable": "Leave VR"
+    "Actions.ChangeVR.Disable": "Leave VR",
 
+
+    "Free.Of": "{0} free of {1}",
+    "Messaging.CreateDm": "Create DM",
+    "Messaging.CreateGroupDm": "Create Group DM",
+    "Messaging.Messages": "Messages"
   }
 }
