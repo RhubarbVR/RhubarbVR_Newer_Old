@@ -31,6 +31,9 @@ namespace RhuEngine.Managers
 		public Engine Engine { get; set; }
 
 		public void Step() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			RectProcessor.Step();
 			Parallel.ForEach(UpdatedRects, (rect) => {
 				rect.RenderComponents.SafeOperation((list) => {
@@ -40,7 +43,7 @@ namespace RhuEngine.Managers
 				});
 				rect.MarkRenderMeshUpdateAsDone();
 			});
-			UpdatedRects.Clear();
+			RemoveUpdatedRectComponents();
 		}
 
 		public void Dispose() {

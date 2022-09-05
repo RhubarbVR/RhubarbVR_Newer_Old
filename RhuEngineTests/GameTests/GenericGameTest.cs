@@ -22,6 +22,7 @@ using RNumerics;
 using SharedModels.GameSpecific;
 using System.Reflection;
 using RhuEngine.Datatypes;
+using RhuEngine.Components;
 
 namespace RhuEngine.GameTests.Tests
 {
@@ -105,6 +106,9 @@ namespace RhuEngine.GameTests.Tests
 					types.Add(typeof(Vector4d));
 					types.Add(typeof(RTexture2D));
 					types.Add(typeof(Type));
+					types.Add(typeof(Engine));
+					types.Add(typeof(WaitHandle));
+					types.Add(typeof(LogLevel));
 					types.Add(typeof(EditLevel));
 				}
 				else {
@@ -174,12 +178,20 @@ namespace RhuEngine.GameTests.Tests
 
 		[TestMethod()]
 		public void TestAllSyncObjects() {
-			var testEntity = AttachEntity();
+			var entity = AttachEntity();
+			entity.World.RootEntity.AttachComponent<MainFont>();
+			entity.World.RootEntity.AttachComponent<IconsTex>();
+			entity.World.RootEntity.AttachComponent<SpriteProvder>();
+			entity.World.RootEntity.AttachComponent<TrivialBox3Mesh>();
+			var Beofre = entity.World.AllWorldObjects;
+			tester.RunForSteps(100);
+			var testEntity = entity.AddChild("Test");
 			var SyncObjecs = GetAllTypes((type) => !type.IsAbstract && !type.IsInterface && typeof(ISyncObject).IsAssignableFrom(type) && !typeof(Component).IsAssignableFrom(type));
 			foreach (var item in SyncObjecs) {
 				if (item.IsGenericType) {
+					Console.WriteLine("Testing Gen SyncObjects " + item.GetFormattedName());
 					foreach (var testType in MakeTestGenerics(item)) {
-						Console.WriteLine("Testing SyncObjects " + testType.GetFormattedName());
+						Console.WriteLine("Testing SyncObject " + testType.GetFormattedName());
 						ITestSyncObject e = null;
 						try {
 							try {
@@ -205,7 +217,7 @@ namespace RhuEngine.GameTests.Tests
 					}
 				}
 				else {
-					Console.WriteLine("Testing SyncObjects " + item.GetFormattedName());
+					Console.WriteLine("Testing SyncObject " + item.GetFormattedName());
 					ITestSyncObject e = null;
 					try {
 						e = (ITestSyncObject)testEntity.AttachComponent<Component>(typeof(TestSyncObject<>).MakeGenericType(item));
@@ -220,6 +232,20 @@ namespace RhuEngine.GameTests.Tests
 					}
 					RunSyncObjectTest(e.GetObject());
 				}
+				testEntity.Dispose();
+				try {
+					Assert.AreEqual(Beofre.Length, entity.World.WorldObjectsCount);
+				}
+				catch {
+					var newArray = entity.World.AllWorldObjects;
+					for (var i = 0; i < newArray.Length; i++) {
+						if (!Beofre.Contains(newArray[i])) {
+							Console.WriteLine($"Element {newArray[i].GetType().GetFormattedName()} should be removed");
+						}
+					}
+					Assert.AreEqual(Beofre.Length, entity.World.WorldObjectsCount);
+				}
+				testEntity = entity.AddChild("Test");
 			}
 			tester.RunForSteps();
 			tester.Dispose();
@@ -329,6 +355,43 @@ namespace RhuEngine.GameTests.Tests
 			Assert.AreEqual("Trains", hitcollider.CustomObject);
 			tester.RunForSteps();
 			tester.Dispose();
+		}
+
+		[TestMethod]
+		public void ParentChildToSelf() {
+			var testWorld = StartNewTestWorld();
+			tester.RunForSteps();
+			var thing = testWorld.RootEntity.AddChild("THings");
+			var test = thing.AddChild("Test");
+			thing.parent.Target = test;
+			Assert.AreEqual(testWorld.RootEntity, thing.parent.Target);
+		}
+
+		[TestMethod]
+		public void ParentToSelf() {
+			var testWorld = StartNewTestWorld();
+			tester.RunForSteps();
+			var test = testWorld.RootEntity.AddChild("Test");
+			test.parent.Target = test;
+			Assert.AreEqual(testWorld.RootEntity, test.parent.Target);
+		}
+
+		[TestMethod]
+		public void WorldObjectManagementTest() {
+			var testWorld = StartNewTestWorld();
+			tester.RunForSteps();
+			var amountatstart = testWorld.WorldObjectsCount;
+			var rootEntity = testWorld.RootEntity.AddChild("AddedChild");
+			for (var i = 0; i < 1000; i++) {
+				var entity = rootEntity.AddChild($"TEst{i}");
+				entity.AttachComponent<MeshRender>();
+				entity.AttachComponent<Grabbable>();
+				entity.AttachComponent<UIRect>();
+				entity.AttachComponent<Spinner>();
+				entity.AttachComponent<ECMAScript>();
+			}
+			rootEntity.Dispose();
+			Assert.AreEqual(amountatstart, testWorld.WorldObjectsCount);
 		}
 
 
@@ -458,7 +521,14 @@ namespace RhuEngine.GameTests.Tests
 
 		[TestMethod()]
 		public void TestAllComponents() {
-			var testEntity = AttachEntity();
+			var entity = AttachEntity();
+			entity.World.RootEntity.AttachComponent<MainFont>();
+			entity.World.RootEntity.AttachComponent<IconsTex>();
+			entity.World.RootEntity.AttachComponent<SpriteProvder>();
+			entity.World.RootEntity.AttachComponent<TrivialBox3Mesh>();
+			var Beofre = entity.World.WorldObjectsCount;
+			tester.RunForSteps(100);
+			var testEntity = entity.AddChild("Test");
 			var components = GetAllTypes((type) => !type.IsAbstract && !type.IsInterface && typeof(Component).IsAssignableFrom(type));
 			foreach (var item in components) {
 				if (typeof(ITestSyncObject).IsAssignableFrom(item)) {
@@ -504,6 +574,9 @@ namespace RhuEngine.GameTests.Tests
 						throw new Exception("Loaded PrivateSpaceOnly object");
 					}
 				}
+				testEntity.Dispose();
+				Assert.AreEqual(Beofre, entity.World.WorldObjectsCount);
+				testEntity = entity.AddChild("Test");
 			}
 			tester.RunForSteps();
 			tester.Dispose();

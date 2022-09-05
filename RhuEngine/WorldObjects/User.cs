@@ -76,7 +76,6 @@ namespace RhuEngine.WorldObjects
 		public void UserIDLoad() {
 			Task.Run(async () => {
 				if (userID == null) { return; }
-				//Todo: Get User INFO
 				var e = await Engine.netApiManager.Client.GetUser(Guid.Parse(userID));
 				e?.BindDataUpdate((userdata) => {
 					UserName = userdata.UserName;

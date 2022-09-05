@@ -254,7 +254,7 @@ namespace RhuEngine.Components
 		}
 
 		public override void RemoveListObject() {
-			Engine.uiManager.AddRectComponent(this);
+			Engine.uiManager.RemoveRectComponent(this);
 		}
 
 		public void RenderRect(Matrix matrix) {

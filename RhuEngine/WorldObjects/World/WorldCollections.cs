@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 using RhuEngine.Datatypes;
 using RhuEngine.Linker;
@@ -35,6 +36,9 @@ namespace RhuEngine.WorldObjects
 		public int RenderingComponentsCount => _renderingComponents.Count;
 		[Exposed]
 		public int GlobalStepableCount => _globalStepables.Count;
+
+		public IWorldObject[] AllWorldObjects => _worldObjects.Values.ToArray();
+
 		[Exposed]
 		public int WorldObjectsCount => _worldObjects.Count;
 		[Exposed]

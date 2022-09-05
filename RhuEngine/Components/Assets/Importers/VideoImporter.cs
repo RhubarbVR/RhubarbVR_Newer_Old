@@ -180,26 +180,6 @@ namespace RhuEngine.Components
 				uiBuilder.PopRect();
 				uiBuilder.PopRect();
 				uiBuilder.PopRect();
-
-				// TODO
-				//var window = WinEntit.AttachComponent<UIWindow>();
-				//WinEntit.rotation.Value *= Quaternionf.CreateFromYawPitchRoll(90, 0, 180);
-				//WinEntit.position.Value = Vector3f.Forward * 0.1f;
-				//window.Text.Value = "Media Controls";
-				//window.WindowType.Value = UIWin.Normal;
-				//var UIE = WinEntit.AddChild("UI");
-				//var Play = UIE.AttachComponent<UIButton>();
-				//Play.Text.Value = "Play";
-				//Play.onClick.Target = textur.Playback.Play;
-				//var Stop = UIE.AttachComponent<UIButton>();
-				//Stop.Text.Value = "Stop";
-				//Stop.onClick.Target = textur.Playback.Stop;
-				//var Pause = UIE.AttachComponent<UIButton>();
-				//Pause.Text.Value = "Pause";
-				//Pause.onClick.Target = textur.Playback.Pause;
-				//var Resume = UIE.AttachComponent<UIButton>();
-				//Resume.Text.Value = "Resume";
-				//Resume.onClick.Target = textur.Playback.Resume;
 				Destroy();
 			}
 			else {

@@ -47,7 +47,7 @@ namespace RhuEngine.WorldObjects.ECS
 						box = BoundsUtil.Combined(box, scale);
 					}
 				}
-				foreach (Entity item in children) { 
+				foreach (Entity item in children) {
 					var element = item.Bounds;
 					element.Translate(item.GlobalTrans.Translation);
 					element.Rotate(item.GlobalTrans.Rotation);
@@ -70,17 +70,17 @@ namespace RhuEngine.WorldObjects.ECS
 
 		public event Action<GrabbableHolder, bool, float> OnGrip;
 		internal void CallOnGrip(GrabbableHolder obj, bool Laser, float gripForce) {
-			OnGrip?.Invoke(obj,Laser, gripForce);
+			OnGrip?.Invoke(obj, Laser, gripForce);
 		}
-		public event Action<uint, Vector3f, Vector3f, float, float,Handed> OnLazerPyhsics;
+		public event Action<uint, Vector3f, Vector3f, float, float, Handed> OnLazerPyhsics;
 
 		internal void CallOnLazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce, Handed handed) {
 			OnLazerPyhsics?.Invoke(v, hitnormal, hitpointworld, pressForce, gripForce, handed);
 		}
 
-		public event Action<uint, Vector3f, Vector3f,Handed> OnTouchPyhsics;
+		public event Action<uint, Vector3f, Vector3f, Handed> OnTouchPyhsics;
 
-		internal void CallOnTouch(uint v, Vector3f hitnormal, Vector3f hitpointworld,Handed handedSide) {
+		internal void CallOnTouch(uint v, Vector3f hitnormal, Vector3f hitpointworld, Handed handedSide) {
 			OnTouchPyhsics?.Invoke(v, hitnormal, hitpointworld, handedSide);
 		}
 		public void ParentDepthUpdate() {
@@ -282,6 +282,9 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		private void UpdateEnableList() {
+			if (IsRemoved || IsDestroying) {
+				return;
+			}
 			if (IsEnabled) {
 				foreach (var item in components) {
 					((Component)item).AddListObject();
@@ -337,9 +340,21 @@ namespace RhuEngine.WorldObjects.ECS
 			UpdateEnableList();
 		}
 		[Exposed]
-		public bool IsEnabled => parentEnabled && enabled.Value;
+		public bool IsEnabled => parentEnabled && enabled.Value && !IsDestroying && !IsRemoved;
+
+		private void GoBackToOld() {
+			if (parent.Target != _internalParent) {
+				parent.Target = _internalParent;
+			}
+		}
+
+		private bool IsParrent(Entity check) {
+			return (check == this) || (_internalParent?.IsParrent(check) ?? false);
+		}
+
 		private void ParentChanged() {
 			if (World.RootEntity == this) {
+				GoBackToOld();
 				return;
 			}
 
@@ -347,6 +362,15 @@ namespace RhuEngine.WorldObjects.ECS
 				return;
 			}
 
+			if (parent.Target.IsParrent(this)) {
+				GoBackToOld();
+				return;
+			}
+			if (World != parent.Target.World) {
+				RLog.Warn("tried to set parent from another world");
+				GoBackToOld();
+				return;
+			}
 			if (_internalParent == null) {
 				_internalParent = parent.Target;
 				ParentDepthUpdate();
@@ -358,24 +382,12 @@ namespace RhuEngine.WorldObjects.ECS
 				ParentDepthUpdate();
 				return;
 			}
-			if (World != parent.Target.World) {
-				RLog.Warn("tried to set parent from another world");
-				return;
-			}
 			parent.Target.children.AddInternal(this);
 			_internalParent.children.RemoveInternal(this);
 			_internalParent = parent.Target;
 			ParentDepthUpdate();
 			ParentEnabledChange(_internalParent.IsEnabled);
 			TransValueChange();
-
-			//Todo: Add check to see if child of self
-			//if (!parent.Target.CheckIfParented(this)) {
-				
-			//}
-			//else {
-			//	parent.Target = _internalParent;
-			//}
 		}
 		[Exposed]
 		public void SetParent(Entity entity, bool preserverGlobal = true, bool resetPos = false) {
@@ -508,7 +520,7 @@ namespace RhuEngine.WorldObjects.ECS
 
 		protected override void OnInitialize() {
 			World.RegisterEntity(this);
-			if(Parent?.Parent is Entity par) {
+			if (Parent?.Parent is Entity par) {
 				parent.Target = par;
 				if (par.Depth >= 10000) {
 					throw new Exception("Max Entity Depth Reached");

@@ -16,25 +16,30 @@ namespace RhuEngine.UIProcessing
 		public RectProcessor(UIManager uIManager) {
 			UIManager = uIManager;
 		}
-		
+
 		public UIManager UIManager { get; }
 		public SafeList<UIRect> Rects => UIManager.Rects;
 		public void Step() {
 			Rects.SafeOperation((rectsList) => {
-				var orderList = rectsList.AsParallel().OrderBy((x) => x.Entity.Depth);
+				//Todo: find where ther not being removed
+				rectsList.RemoveAll(x => x.IsRemoved);
+				var orderList = rectsList.OrderBy((x) => x.Entity.Depth).ToArray();
 				//Register Parrent Update Enum
-				foreach (var item in orderList) {
-					var hasLocalUpdate =  (item.Update & UIRect.UpdateType.Local) != UIRect.UpdateType.None;
+				for (var i = 0; i < orderList.Length; i++) {
+					var item = orderList[i];
+					var hasLocalUpdate = (item.Update & UIRect.UpdateType.Local) != UIRect.UpdateType.None;
 					var parent = item.Entity.parent.Target;
 					if (((parent?.UIRect?.Update ?? UIRect.UpdateType.None) & (UIRect.UpdateType.Local | UIRect.UpdateType.Parrent)) != UIRect.UpdateType.None) {
 						item.RegesterRectUpdate(UIRect.UpdateType.Parrent);
 						item.ParrentRectUpdate();
-					}else if (hasLocalUpdate) {
+					}
+					else if (hasLocalUpdate) {
 						item.LocalRectUpdate();
 					}
 				}
 				//Register Child Update Enum
-				foreach (var item in orderList.Reverse()) {
+				for (var i = orderList.Length - 1; i >= 0; i--) {
+					var item = orderList[i];
 					foreach (Entity child in item.Entity.children) {
 						if (((child?.UIRect?.Update ?? UIRect.UpdateType.None) & (UIRect.UpdateType.Local | UIRect.UpdateType.Child)) != UIRect.UpdateType.None) {
 							item.RegesterRectUpdate(UIRect.UpdateType.Child);
@@ -44,13 +49,11 @@ namespace RhuEngine.UIProcessing
 						item.ChildRectUpdate();
 					}
 				}
-				foreach (var item in orderList) {
-					if((item.Update & UIRect.UpdateType.ForeParrentUpdate) != UIRect.UpdateType.None) {
+				for (var i = 0; i < orderList.Length; i++) {
+					var item = orderList[i];
+					if ((item.Update & UIRect.UpdateType.ForeParrentUpdate) != UIRect.UpdateType.None) {
 						item.ParrentRectUpdate();
 					}
-				}
-				//Apply rect Updates
-				foreach (var item in rectsList) {
 					item.CompletedRectUpdate();
 				}
 			});
