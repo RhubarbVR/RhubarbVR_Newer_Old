@@ -83,35 +83,34 @@ namespace RhuEngine.Components.PrivateSpace
 			if (!buttonEvent.IsClicked) {
 				return;
 			}
-			//Todo: CleanUP
-			//if (RegScreen) {
-			//	if(Password.Text.Value != ConfPassword.Text.Value) {
-			//		Error("Passwords Don't Match");
-			//		return;
-			//	}
+			if (RegScreen) {
+				if (Password.Text.Value != ConfPassword.Text.Value) {
+					Error("Passwords Don't Match");
+					return;
+				}
 
-			//	Task.Run(async () => {
-			//		var info = await Engine.netApiManager.SignUp(UserName.Text, Email.Text, Password.Text);
-			//		if (info.Error || info.ErrorDetails == "Normal Error") {
-			//			Error(info.Message);
-			//		}
-			//		else {
-			//			Normal(info.Message);
-			//			SwitchReg();
-			//		}
-			//	});
-			//}
-			//else {
-			//	Task.Run(async () => {
-			//		var info = await Engine.netApiManager.Login(Email.Text, Password.Text);
-			//		if (!info.Login) {
-			//			Error(info.Message);
-			//		}
-			//		else {
-			//			Close();
-			//		}
-			//	});
-			//}
+				Task.Run(async () => {
+					var info = await Engine.netApiManager.Client.RegisterAccount(UserName.Text, Password.Text, Email.Text);
+					if (!info.IsDataGood) {
+						Error(info.Data);
+					}
+					else {
+						Normal(info.Data);
+						SwitchReg();
+					}
+				});
+			}
+			else {
+				Task.Run(async () => {
+					var info = await Engine.netApiManager.Client.Login(Email.Text, Password.Text);
+					if (info.Error) {
+						Error(info.MSG);
+					}
+					else {
+						Error(info.MSG);
+					}
+				});
+			}
 		}
 
 		public bool RegScreen = false;
@@ -146,6 +145,10 @@ namespace RhuEngine.Components.PrivateSpace
 		}
 		
 		public override void LoadUI(Entity uiRoot) {
+			Engine.netApiManager.Client.OnLogin += (user) => {
+				Close();
+			};
+
 			window.CloseButton.Value = false;
 			var ma = uiRoot.AttachComponent<UIRect>();
 			var mit = window.MainMit.Target;
@@ -192,16 +195,17 @@ namespace RhuEngine.Components.PrivateSpace
 
 
 			uiBuilder.PushRect();
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0f);
+			var rectee = uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0f);
 			var Confirmpassword = uiBuilder.AddTextEditor("Programs.Login.ConfirmPassword", 0.2f, 1, "", 0.1f, null, 1.9f);
 			Confirmpassword.Item1.Password.Value = true;
 			ConfPassword = Confirmpassword.Item1;
+			Confirmpassword.Item1.HorizontalAlien.Value = EHorizontalAlien.Left;
+			Confirmpassword.Item1.MinClamp.Value = minclamp;
 			uiBuilder.PopRect();
-			RegEntiyOne = uiBuilder.CurretRectEntity;
+			uiBuilder.PopRect();
+			RegEntiyOne = rectee.Entity;
 			RegEntiyOne.enabled.Value = false;
-			ConfPassword.HorizontalAlien.Value = EHorizontalAlien.Left;
-			ConfPassword.MinClamp.Value = minclamp;
-			uiBuilder.PopRect();
+
 
 			uiBuilder.PushRect();
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0f);
@@ -234,12 +238,8 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PopRect();
 
-			//uiBuilder.PushRect();
-			////DateOfBirth
-			//uiBuilder.PopRect();
 
 			uiBuilder.PushRect();
-			//Error
 			ErrorText = uiBuilder.AddText("<colorred>",null,0,1,null,true);
 			uiBuilder.PopRect();
 		}

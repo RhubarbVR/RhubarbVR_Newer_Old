@@ -24,7 +24,7 @@ namespace RhuEngine.Managers
 		public override string Three_Letter => _engine.MainSettings.ThreeLetterLanguageName;
 
 		public void Dispose() {
-			if(NeededKeys is null) {
+			if (NeededKeys is null) {
 				return;
 			}
 			if (!Directory.Exists(localDir)) {
@@ -55,8 +55,10 @@ namespace RhuEngine.Managers
 		}
 
 		public override IEnumerable<string> GetFiles() {
-			foreach (var item in Directory.GetFiles(localDir)) {
-				yield return item;
+			if (Directory.Exists(localDir)) {
+				foreach (var item in Directory.GetFiles(localDir)) {
+					yield return item;
+				}
 			}
 		}
 

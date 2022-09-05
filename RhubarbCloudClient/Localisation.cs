@@ -36,7 +36,7 @@ namespace RhubarbCloudClient
 		public abstract void Log(string data);
 
 		public abstract string Three_Letter { get; }
-		public IEnumerable<LocalInfo>  GetLocals() {
+		public IEnumerable<LocalInfo> GetLocals() {
 			foreach (var item in GetFiles()) {
 				LocalInfo? localInfo = null;
 				try {
@@ -89,13 +89,13 @@ namespace RhubarbCloudClient
 			return english;
 		}
 
-		public string GetLocalString(string key,params object[] prams) {
+		public string GetLocalString(string key, params object[] prams) {
 			return GetLocalString(key + ";" + string.Join(";", prams.Select((x) => x?.ToString() ?? "NULL")));
 		}
 
 
 		public string GetLocalString(string dataString) {
-			var prams = dataString.Split(';');
+			var prams = dataString?.Split(';') ?? Array.Empty<string>();
 			if (prams.Length == 0) {
 				return "";
 			}

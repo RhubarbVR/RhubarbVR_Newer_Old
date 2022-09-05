@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 
 using LiteNetLib;
 
+using RhubarbCloudClient.Model;
+
 using RhuEngine.Components;
 
 using RNumerics;
@@ -53,8 +55,7 @@ namespace RhuEngine.WorldObjects
 		public string UserName { get; private set; }
 		[Exposed]
 		[NoWriteExsposed]
-		public string[] Roles { get; private set; }
-
+		public Colorb UserColor { get; private set; }
 		[NoSyncUpdate]
 		[OnChanged(nameof(UserIDLoad))]
 		public readonly Sync<string> userID;
@@ -70,15 +71,20 @@ namespace RhuEngine.WorldObjects
 		public readonly SyncProperty<string> Username;
 		[BindProperty(nameof(NormalizedUserName))]
 		public readonly SyncProperty<string> NormalizedUsername;
-
+		[BindProperty(nameof(UserColor))]
+		public readonly SyncProperty<Colorb> UserColorProp;
 		public void UserIDLoad() {
 			Task.Run(async () => {
 				if (userID == null) { return; }
 				//Todo: Get User INFO
-				//var e = await Engine.netApiManager.Client.GetUserInfo(userID);
-				//UserName = e?.UserName;
-				//NormalizedUserName = e?.NormalizedUserName;
-				//Roles = e?.Roles?.ToArray() ?? Array.Empty<string>();
+				var e = await Engine.netApiManager.Client.GetUser(Guid.Parse(userID));
+				e?.BindDataUpdate((userdata) => {
+					UserName = userdata.UserName;
+					NormalizedUserName = userdata.NormalizedUserName;
+					var color = userdata.IconColor.GetColor();
+					UserColor = new Colorb(color.r, color.g, color.b, color.a);
+				});
+
 			});
 		}
 
