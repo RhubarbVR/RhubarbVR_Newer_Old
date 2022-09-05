@@ -246,6 +246,15 @@
     "Free.Of": "{0} free of {1}",
     "Messaging.CreateDm": "Create DM",
     "Messaging.CreateGroupDm": "Create Group DM",
-    "Messaging.Messages": "Messages"
+    "Messaging.Messages": "Messages",
+    "Messaging.UserRelations": "User Relations",
+    "Messaging.UserRelations.Blocked": "Blocked",
+    "Messaging.UserRelations.Friend": "Friend",
+    "Messaging.UserRelations.Follow": "Follow",
+    "Messaging.UserRelations.Add.Blocked": "Add Blocked",
+    "Messaging.UserRelations.Add.Friend": "Add Friend",
+    "Messaging.UserRelations.Add.Follow": "Add Follow",
+    "Messaging.UserRelations.All": "All",
+    "Messaging.UserRelations.Online": "Online"
   }
 }

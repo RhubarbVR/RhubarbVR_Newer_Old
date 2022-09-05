@@ -28,19 +28,22 @@ namespace RhubarbCloudClient
 		public event Action<PrivateUser> OnLogin;
 
 		public event Action OnLogout;
-		private void LogInPros(PrivateUser privateUser) {
+		private async Task LogInPros(PrivateUser privateUser) {
 			User = privateUser;
 			if (IsLogin) {
 				OnLogin?.Invoke(User);
-				InitSignlR();
-				LoadStartDM().ConfigureAwait(false);
+				await InitSignlR();
+				await LoadStartDM();
+				await LoadStartGroups();
+				await LoadStartUsers();
 			}
 			else {
 				LogOutPros();
 			}
 		}
+
 		HubConnection _hub;
-		private void InitSignlR() {
+		private async Task InitSignlR() {
 			try {
 				_hub = new HubConnectionBuilder()
 					.WithUrl(new Uri(HttpClient.BaseAddress, "hub"), (x) => x.Cookies = Cookies)
@@ -56,8 +59,9 @@ namespace RhubarbCloudClient
 			//_hub.On(nameof(MessageNotify), MessageNotify);
 			_hub.On<UserDM.MSG>(nameof(ReceivedMsg), ReceivedMsg);
 			_hub.On<PrivateUserStatus>(nameof(LoadInStatusInfo), LoadInStatusInfo);
+			_hub.On<Guid,bool>(nameof(UserDataUpdate), UserDataUpdate);
 			_hub.Closed += Hub_Closed;
-			_hub.StartAsync().ConfigureAwait(false);
+			await _hub.StartAsync();
 		}
 
 		private Task Hub_Closed(Exception arg) {
@@ -98,12 +102,12 @@ namespace RhubarbCloudClient
 
 		}
 
-		private void ProccessUserLoadin(ServerResponse<PrivateUser> res) {
+		private async Task ProccessUserLoadin(ServerResponse<PrivateUser> res) {
 			if (res.Error) {
 				LogOutPros();
 			}
 			else {
-				LogInPros(res.Data);
+				await LogInPros(res.Data);
 			}
 		}
 		public async Task<HttpDataResponse<string>> RegisterAccount(string userName, string Password, string Email) {
@@ -119,7 +123,7 @@ namespace RhubarbCloudClient
 
 		public async Task<ServerResponse<PrivateUser>> Login(RAccountLogin rUserLogin) {
 			var req = await SendPostServerResponses<PrivateUser, RAccountLogin>(API_PATH + AUTHPATH + "Login", rUserLogin);
-			ProccessUserLoadin(req);
+			await ProccessUserLoadin(req);
 			return req;
 		}
 
@@ -135,7 +139,7 @@ namespace RhubarbCloudClient
 
 		public async Task GetMe() {
 			var req = await SendGetServerResponses<PrivateUser>(API_PATH + AUTHPATH + "GetMe");
-			ProccessUserLoadin(req);
+			await ProccessUserLoadin(req);
 		}
 
 		public async Task LogOut() {

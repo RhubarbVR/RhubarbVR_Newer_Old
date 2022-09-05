@@ -26,8 +26,24 @@ namespace RhubarbCloudClient
 
 		public class DMManaged
 		{
+			public bool IsUserDm => !DM.IsGorupDM;
+
 			public Guid DMid => DM.Id;
 			public UserDM DM { get; private set; }
+
+			public async Task<ManagedUser> GetUser() {
+				return await Client.GetUser(DM.Users.Where((x) => x != Client.User.Id).FirstOrDefault());
+			}
+
+			public async Task<Uri> DMAsset() {
+				if(IsUserDm) {
+					var user = await Client.GetUser(DM.Users.Where((x) => x != Client.User.Id).FirstOrDefault());
+					return await Client.GetRecordDownloadURL(Guid.Parse(user.UserData.ProfileIcon));
+				}
+				else {
+					return await Client.GetRecordDownloadURL(Guid.Parse(DM.Thumbnail));
+				}
+			}
 
 			public RhubarbAPIClient Client { get; private set; }
 
@@ -51,6 +67,12 @@ namespace RhubarbCloudClient
 
 		private readonly Dictionary<Guid, DMManaged> _dms = new();
 
+		public IEnumerable<DMManaged> GetDms() {
+			foreach (var item in _dms.Values) {
+				yield return item;
+			}
+		}
+
 		public DMManaged GetDM(Guid targetDM) {
 			return _dms[targetDM];
 		}
@@ -62,7 +84,6 @@ namespace RhubarbCloudClient
 				foreach (var item in req.Data) {
 					var newDm = new DMManaged(item, this);
 					_dms.Add(item.Id, newDm);
-					await newDm.LoadMsgs();
 				}
 			}
 			else {
@@ -74,7 +95,6 @@ namespace RhubarbCloudClient
 			if (!res.Error) {
 				var newDm = new DMManaged(res.Data, this);
 				_dms.Add(res.Data.Id, newDm);
-				await newDm.LoadMsgs();
 				return newDm;
 			}
 			return null;
@@ -91,47 +111,11 @@ namespace RhubarbCloudClient
 		public async Task LoadMsgs(Guid targetDM, int start = 0) {
 			var data = await SendGetServerResponses<UserDM.MSG[]>(API_PATH + DMSPATH + "Messages/" + targetDM.ToString() + $"?start={start}");
 			if (!data.Error) {
-				AddMsgsToStart(targetDM, data.Data);
-			}
-		}
 
-		private void AddMsgsToStart(Guid targetDM, params UserDM.MSG[] mSGs) {
-			try {
-				var field = _dms[targetDM].DM.Msgs;
-				field ??= Array.Empty<UserDM.MSG>();
-				var startSize = _dms[targetDM].DM.Msgs?.Length ?? 0;
-				Array.Resize(ref field, startSize + mSGs.Length);
-				for (var i = 0; i < mSGs.Length; i++) {
-					field[i] = mSGs[i];
-				}
-				for (var i = mSGs.Length; i < startSize + mSGs.Length; i++) {
-					field[i] = _dms[targetDM].DM.Msgs[i - mSGs.Length];
-				}
-				_dms[targetDM].DM.Msgs = field;
-			}
-			catch {
-				Console.WriteLine("Error Loading in DM MSG to start" + targetDM);
 			}
 		}
-		private void AddMsgs(Guid targetDM, params UserDM.MSG[] mSGs) {
-			try {
-				var field = _dms[targetDM].DM.Msgs;
-				field ??= Array.Empty<UserDM.MSG>();
-				var startSize = _dms[targetDM].DM.Msgs?.Length ?? 0;
-				Array.Resize(ref field, startSize + mSGs.Length);
-				for (var i = 0; i < mSGs.Length; i++) {
-					var curentIndex = i + startSize;
-					field[curentIndex] = mSGs[i];
-				}
-				_dms[targetDM].DM.Msgs = field;
-			}
-			catch {
-				Console.WriteLine("Error Loading in DM MSG " + targetDM);
-			}
-		}
-
 		private void ReceivedMsg(UserDM.MSG mSG) {
-			AddMsgs(mSG.DMId, mSG);
+
 		}
 	}
 }
