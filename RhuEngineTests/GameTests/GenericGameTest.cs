@@ -388,7 +388,7 @@ namespace RhuEngine.GameTests.Tests
 				entity.AttachComponent<Grabbable>();
 				entity.AttachComponent<UIRect>();
 				entity.AttachComponent<Spinner>();
-				entity.AttachComponent<ECMAScript>();
+				entity.AttachComponent<RawECMAScript>();
 			}
 			rootEntity.Dispose();
 			Assert.AreEqual(amountatstart, testWorld.WorldObjectsCount);

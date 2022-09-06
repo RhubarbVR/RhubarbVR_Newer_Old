@@ -50,8 +50,8 @@ namespace RhuEngine.GameTests.Tests
 			return newEntity;
 		}
 
-		public ECMAScript AttachTestScript() {
-			return AttachEntity().AttachComponent<ECMAScript>();
+		public RawECMAScript AttachTestScript() {
+			return AttachEntity().AttachComponent<RawECMAScript>();
 		}
 
 		[TestMethod()]
@@ -60,7 +60,7 @@ namespace RhuEngine.GameTests.Tests
 			var value = script.Entity.AttachComponent<ValueField<string>>();
 			value.Value.Value = "FirstValue";
 			script.Targets.Add().Target = value;
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					script.GetTarget(0).Value.Value = script.OnLoad;
 				}
@@ -100,7 +100,7 @@ namespace RhuEngine.GameTests.Tests
 			var script = AttachTestScript();
 			var value = script.Entity.AttachComponent<TestComp>();
 			script.Targets.Add().Target = value;
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					script.GetTarget(0).IfIrunICrash();
 				}
@@ -118,7 +118,7 @@ namespace RhuEngine.GameTests.Tests
 			var script = AttachTestScript();
 			var value = script.Entity.AttachComponent<TestComp>();
 			script.Targets.Add().Target = value;
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					script.GetTarget(0).IfIrunIAlsoRunICrash();
 				}
@@ -136,7 +136,7 @@ namespace RhuEngine.GameTests.Tests
 			var script = AttachTestScript();
 			var value = script.Entity.AttachComponent<TestComp>();
 			script.Targets.Add().Target = value;
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					script.GetTarget(0).IfIrunISetValueToTrue();
 				}
@@ -148,34 +148,14 @@ namespace RhuEngine.GameTests.Tests
 			Assert.AreEqual(true, value.IGoTrue);
 			tester.Dispose();
 		}
-#if DEBUG
-		[TestMethod()]
-		public void TestUnexposed() {
-			var script = AttachTestScript();
-			script.World.FocusedScriptBuilder = script.Entity.AttachComponent<NullScriptBuilder>();
-			var value = script.Entity.AttachComponent<ValueField<string>>();
-			value.Value.Value = "FirstValue";
-			script.Targets.Add().Target = value;
-			script.Script.Value = @"
-				function RunCode()	{
-					script.GetTarget(0).Value.Value = world.FocusedScriptBuilder;
-				}
-			";
-			if (!script.ScriptLoaded) {
-				throw new Exception("Script not loaded");
-			}
-			script.Invoke("RunCode");
-			Assert.AreEqual(null, value.Value.Value);
-			tester.Dispose();
-		}
-#endif
+
 		[TestMethod()]
 		public void TestRemoveOfValue() {
 			var script = AttachTestScript();
 			var value = script.Entity.AttachComponent<ValueField<string>>();
 			value.Value.Value = "FirstValue";
 			script.Targets.Add().Target = value;
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					script.GetTarget(0).Value = null;
 				}
@@ -194,7 +174,7 @@ namespace RhuEngine.GameTests.Tests
 			var script = AttachTestScript();
 			var value = script.Entity.AttachComponent<ValueField<Type>>();
 			script.Targets.Add().Target = value;
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					script.GetTarget(0).Value.Value = getType(""RhuEngine.Components.CapsuleMesh"")
 				}
@@ -210,7 +190,7 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void TryToMakeSyncWorldTest() {
 			var script = AttachTestScript();
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					script.Entity.AttachComponent(getType(""ValueField<World>""));
 					var e = new Vector3f(1,1,1);
@@ -227,7 +207,7 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void AttachComponentTest() {
 			var script = AttachTestScript();
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					script.Entity.AttachComponent(getType(""RhuEngine.Components.Spinner""));
 				}
@@ -243,7 +223,7 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void AttachEntityTest() {
 			var script = AttachTestScript();
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					script.Entity.AddChild();
 					script.Entity.AddChild();
@@ -261,7 +241,7 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void AttachEntityTest2() {
 			var script = AttachTestScript();
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					script.Entity.AddChild(""IHaveAName"");
 					script.Entity.AddChild(""IalsoHaveName"");
@@ -280,7 +260,7 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void TestOverFlowStopTwo() {
 			var script = AttachTestScript();
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 						script.RunCode();
 				}
@@ -295,7 +275,7 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void TestOverFlowStop() {
 			var script = AttachTestScript();
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					while(true){
 						script.RunCode();
@@ -312,7 +292,7 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void TestWhileStop() {
 			var script = AttachTestScript();
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					while(true){
 					}
@@ -333,7 +313,7 @@ namespace RhuEngine.GameTests.Tests
 			var testNumber = 10232;
 			script.Targets.Add().Target = value;
 			tester.Step();
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode()	{
 					log(""StartingValue"" + script.GetTarget(0).Value.Value);
 					script.GetTarget(0).Value.Value = 10232;
@@ -353,7 +333,7 @@ namespace RhuEngine.GameTests.Tests
 			var script = AttachTestScript();
 			var value = script.Entity.AttachComponent<ValueField<int>>();
 			script.Targets.Add().Target = value;
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				function RunCode(arg1)	{
 					script.GetTarget(0).Value.Value = arg1;
 				}
@@ -369,7 +349,7 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void TestBlankCode() {
 			var script = AttachTestScript();
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				
 			";
 			if (!script.ScriptLoaded) {
@@ -382,7 +362,7 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void TestBadCode() {
 			var script = AttachTestScript();
-			script.Script.Value = @"
+			script.ScriptCode.Value = @"
 				adwdhaiudhnsk nfse fse fse fhsui s()Fesfse-fds s-= fsef se9f se fs}awd [[] awd\a 
 Awdawdad aw d es ;;s;ef ;sef sf s67576576 5aw 7^&^% 67da 656 7a6d %76d7 adlwa l()dawd a ()d aD()d ad()
 function dwad daw da
@@ -409,7 +389,7 @@ function dwad daw da
 				scriptcode += $"\nfunction FunctionNum{i}() {{ script.GetTarget(0).Value.Value = {i};  }}";
 			}
 			RLog.Info("loading script");
-			script.Script.Value = scriptcode;
+			script.ScriptCode.Value = scriptcode;
 			if (!script.ScriptLoaded) {
 				throw new Exception("Script loaded");
 			}

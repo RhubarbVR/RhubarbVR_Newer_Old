@@ -132,12 +132,6 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 		}
-		[NoSync]
-		[NoSave]
-		[NoShow]
-		[UnExsposed]
-		[NoLoad]
-		public ScriptBuilder FocusedScriptBuilder = null;
 		
 		[Exposed]
 		[NoShow]

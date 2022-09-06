@@ -14,7 +14,27 @@ using System.Threading;
 
 namespace RhuEngine.Components
 {
-	public class ECMAScript : Component
+
+	public abstract class ProceduralECMAScript : ECMAScript
+	{
+	}
+
+
+	public class RawECMAScript: ECMAScript
+	{
+
+		[Default(@"
+		function RunCode()	{
+			
+		}
+		")]
+		[OnChanged(nameof(InitECMA))]
+		public readonly Sync<string> ScriptCode;
+
+		protected override string Script => ScriptCode;
+	}
+
+	public abstract class ECMAScript : Component
 	{
 		public class ECMAScriptFunction : SyncObject
 		{
@@ -53,14 +73,6 @@ namespace RhuEngine.Components
 		public bool ScriptLoaded => _ecma is not null;
 
 		public readonly SyncObjList<SyncRef<IWorldObject>> Targets;
-
-		[Default(@"
-		function RunCode()	{
-			
-		}
-		")]
-		[OnChanged(nameof(InitECMA))]
-		public readonly Sync<string> Script;
 
 		private Jint.Engine _ecma;
 
@@ -106,7 +118,9 @@ namespace RhuEngine.Components
 		}
 
 
-		private void InitECMA() {
+		protected abstract string Script { get; }
+
+		protected void InitECMA() {
 			_ecma = new Jint.Engine(options => {
 				options.LimitMemory(1_000_000); // alocate 1 MB
 				options.TimeoutInterval(TimeSpan.FromSeconds(1));
@@ -126,7 +140,7 @@ namespace RhuEngine.Components
 			_ecma.SetValue("typeOf", (object a) => a?.GetType());
 			_ecma.SetValue("toString", new Func<object, string>((object a) => (a.GetType() == typeof(Type)) ? ((Type)a).GetFormattedName() : a?.ToString()));
 			try {
-				_ecma.Execute(Script.Value);
+				_ecma.Execute(Script);
 
 			}
 			catch (Exception ex) {
