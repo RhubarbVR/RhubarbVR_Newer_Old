@@ -68,6 +68,13 @@ namespace RhuEngine.Components
 			if(UIRect?.CachedCanvas is null) {
 				return;
 			}
+			if(StandaredBaseMesh is null) {
+				UpdateMesh();
+				MovedMeshUpdate();
+				FinalMeshUpdate();
+				UpdateRMeshForRender();
+				return;
+			}
 			switch (UIRect.RenderMeshUpdate) {
 				case UIRect.RenderMeshUpdateType.FullResized:
 					UpdateMesh();

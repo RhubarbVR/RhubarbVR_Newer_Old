@@ -146,6 +146,8 @@ namespace RhuEngine.Components
 			if (string.IsNullOrEmpty(Text)) {
 				Text = " ";
 			}
+			//Fixes Bug 
+			Text += " ";
 			var textXpos = 0f;
 			var textsizeY = 0f;
 			var textYpos = 0f;

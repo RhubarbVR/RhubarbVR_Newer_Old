@@ -6,6 +6,7 @@ using RhuEngine.Linker;
 using System;
 using System.Collections.Generic;
 using RhuEngine.Physics;
+using System.Linq;
 
 namespace RhuEngine.Components
 {
@@ -93,6 +94,13 @@ namespace RhuEngine.Components
 
 		public override void ProcessMeshUpdate() {
 			if (UIRect?.Canvas is null) {
+				return;
+			}
+			if (StandaredBaseMesh.Length == 0) {
+				UpdateMesh();
+				MovedMeshUpdate();
+				FinalMeshUpdate();
+				UpdateRMeshForRender();
 				return;
 			}
 			switch (UIRect.RenderMeshUpdate) {

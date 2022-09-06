@@ -17,6 +17,8 @@ namespace RhuEngine.WorldObjects
 
 		public void SetValueForce(object value);
 		public object GetValue();
+
+		public Type GetValueType();
 	}
 	[GenericTypeConstraint()]
 	public class Sync<T> : SyncObject, ILinkerMember<T>, ISync, INetworkedObject, IChangeable, ISyncMember
@@ -154,6 +156,10 @@ namespace RhuEngine.WorldObjects
 
 		public object GetValue() {
 			return Value;
+		}
+
+		public Type GetValueType() {
+			return typeof(T);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

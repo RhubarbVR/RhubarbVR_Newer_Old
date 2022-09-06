@@ -109,7 +109,9 @@ namespace RhuEngine.WorldObjects
 		public object GetValue() {
 			return _value;
 		}
-
+		public Type GetValueType() {
+			return typeof(T);
+		}
 		public void SetValue(object data) {
 			Value = (T)data;
 		}

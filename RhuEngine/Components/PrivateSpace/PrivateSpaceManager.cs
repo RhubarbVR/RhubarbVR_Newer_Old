@@ -135,7 +135,7 @@ namespace RhuEngine.Components
 					physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
 				}
 				if (collider.CustomObject is IWorldObject syncObject) {
-					if (RInput.Key(Key.I).IsJustActive()) {
+					if (RInput.Key(Key.I).IsJustActive() && !Engine.HasKeyboard) {
 						if (syncObject.World.IsPersonalSpace) {
 							return true;
 						}

@@ -24,7 +24,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			ui.PushRectNoDepth(null, new Vector2f(0.25f, 1));
-			ui.AddText(TargetElement.Name, null, 2, 1, null, true);
+			ui.AddText(TargetElement.Name, null, 2, 1, null, true).HorizontalAlien.Value = EHorizontalAlien.Right;
 			ui.PopRect();
 			ui.PushRectNoDepth(new Vector2f(0.26f, 0.1f), new Vector2f(0.9f, 0.9f));
 			LoadSideUI(ui);

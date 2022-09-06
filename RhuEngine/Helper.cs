@@ -34,6 +34,23 @@ namespace RhuEngine
 			}
 			return newstring.ToNormalString();
 		}
+		public static string AutoBrakeLine(this string value,int amount = 155) {
+			var newSTreing = "";
+			var currentAmount = 0;
+			foreach (var item in value) {
+				newSTreing += item;
+				currentAmount++;
+				if (item == '\n') {
+					currentAmount = 0;
+				}
+				if (currentAmount >= amount) {
+					newSTreing += '\n';
+					currentAmount = 0;
+				}
+			}
+			return newSTreing;
+		}
+
 		public static string ApplyStringFunctions(this string value) {
 			var newstring = new List<Rune>();
 			foreach (var currentchar in value.EnumerateRunes()) {

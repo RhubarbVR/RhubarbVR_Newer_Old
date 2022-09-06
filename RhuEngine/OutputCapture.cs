@@ -45,6 +45,7 @@ namespace RhuEngine
 		}
 
 		public void WriteText(string data) {
+			data = data.AutoBrakeLine();
 			var amountOfnewLines = data.Count((car) => car == '\n');
 			AmountOfNewLines += amountOfnewLines;
 			var consoleColor = RhuConsole.ForegroundColor;
