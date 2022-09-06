@@ -16,13 +16,13 @@ namespace RhuEngine.Components
 		public readonly Linker<string> TargetValue;
 		[OnChanged(nameof(LoadLocale))]
 		public readonly Sync<string> Append;
-		public void LoadLocale() {
+		private void LoadLocale() {
 			if (TargetValue.Linked) {
 				TargetValue.LinkedValue = Engine.localisationManager.GetLocalString(Key) + Append.Value;
 			}
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			Engine.localisationManager.LocalReload += LoadLocale;
 		}

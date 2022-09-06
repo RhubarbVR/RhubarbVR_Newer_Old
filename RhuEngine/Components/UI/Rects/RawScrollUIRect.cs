@@ -28,7 +28,7 @@ namespace RhuEngine.Components
 		public virtual Vector2f MaxScroll => GetMaxScroll();
 		public virtual Vector2f MinScroll => GetMinScroll();
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			ScrollSpeed.Value = Vector2f.One;
 		}

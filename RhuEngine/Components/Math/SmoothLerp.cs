@@ -23,7 +23,7 @@ namespace RhuEngine.Components
 			Multiply.Value = Multiplyf;
 		}
 
-		public override void Step() {
+		protected override void Step() {
 			if (driver.Linked) {
 				try {
 					driver.LinkedValue = MathUtil.DynamicLerp(driver.LinkedValue, to.Value, Multiply.Value * RTime.Elapsedf);

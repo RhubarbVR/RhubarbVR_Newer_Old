@@ -157,12 +157,7 @@ namespace RNumerics
 				var v = vertices[i];
 
 				Vector2d textureCoordinates;
-				if ((v.x == 0f) && (i < uvLimit)) {
-					textureCoordinates.x = 1f;
-				}
-				else {
-					textureCoordinates.x = (float) (Math.Atan2(v.x, v.z) / -2f * Math.PI);
-				}
+				textureCoordinates.x = (v.x == 0f) && (i < uvLimit) ? (double)1f : (double)(float) (Math.Atan2(v.x, v.z) / -2f * Math.PI);
 
 				if (textureCoordinates.x < 0f) {
 					textureCoordinates.x += 1f;

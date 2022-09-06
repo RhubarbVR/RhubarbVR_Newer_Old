@@ -58,9 +58,7 @@ namespace RNumerics
 					var j = r.Next() % (i + 1);
 					if (j != i)
 					{
-						var save = permutation[i];
-						permutation[i] = permutation[j];
-						permutation[j] = save;
+						(permutation[j], permutation[i]) = (permutation[i], permutation[j]);
 					}
 				}
 

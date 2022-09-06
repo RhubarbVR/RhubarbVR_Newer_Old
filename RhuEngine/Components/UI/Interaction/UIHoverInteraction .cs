@@ -38,7 +38,7 @@ namespace RhuEngine.Components
 
 		private bool _isHovering;
 
-		public override void Step() {
+		protected override void Step() {
 			base.Step();
 			if (UIRect is null) {
 				return;

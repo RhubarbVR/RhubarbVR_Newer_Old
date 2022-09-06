@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 			_font = Engine.staticResources.MainFont;
 			Load(_font);
 		}
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			LoadFont();
 		}

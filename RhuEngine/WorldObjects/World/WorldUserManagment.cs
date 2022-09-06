@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using RhuEngine.Components;
@@ -19,7 +20,8 @@ namespace RhuEngine.WorldObjects
 		public readonly SyncObjList<User> Users;
 		
 		public User GetUserFromID(Guid id) {
-			foreach (User item in Users) {
+			//Todo: make forLoop
+			foreach (var item in Users.Cast<User>()) {
 				if (item.userID.Value == id.ToString()) {
 					return item;
 				}

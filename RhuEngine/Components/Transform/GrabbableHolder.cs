@@ -33,7 +33,7 @@ namespace RhuEngine.Components
 		[NoSync]
 		private PhysicsObject _physicsObject;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			PhysicsObjectChanged();
 		}
@@ -67,7 +67,7 @@ namespace RhuEngine.Components
 			obj.Overlap += RigidBody_Overlap;
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			holder.Target = Entity.AddChild("Holder");
 		}
@@ -129,7 +129,7 @@ namespace RhuEngine.Components
 
 		bool _gripping = false;
 
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}

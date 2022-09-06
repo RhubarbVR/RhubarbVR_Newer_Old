@@ -66,7 +66,7 @@ namespace RhuEngine.Components
 			textRender.LoadText(Text, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, HorizontalAlien);
 		}
 
-		public override void Render() {
+		protected override void Render() {
 			var scalerValue = 1f;
 			if (FitText) {
 				scalerValue = Math.Min(Width / (textRender.Width * 0.1f), Height/ (textRender.Height * 0.1f));
@@ -87,7 +87,7 @@ namespace RhuEngine.Components
 			textRender.Render(Matrix.S(0.1f) * offSet, Entity.GlobalTrans, TargetRenderLayer);
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			Font.Target = World.RootEntity.GetFirstComponentOrAttach<MainFont>();
 		}

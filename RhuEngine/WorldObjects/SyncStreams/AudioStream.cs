@@ -84,8 +84,8 @@ namespace RhuEngine.WorldObjects
 		private RSound _output;
 
 		private bool _loadedDevice = false;
-		
-		public override void OnLoaded() {
+
+		protected override void OnLoaded() {
 			UpdateFrameSize();
 			Load(_output);
 		}

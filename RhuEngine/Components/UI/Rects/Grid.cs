@@ -21,7 +21,8 @@ namespace RhuEngine.Components
 
 		public override void ChildRectUpdate() {
 			var recList = new Stack<UIRect>();
-			foreach (Entity item in !FlipOrder? Entity.children.Reverse(): Entity.children) {
+			//Todo: UseForLoop
+			foreach (var item in (!FlipOrder? Entity.children.Reverse(): Entity.children).Cast<Entity>()) {
 				var rect = item.UIRect;
 				if (rect is not null && item.IsEnabled && !item.IsDestroying) {
 					recList.Push(rect);

@@ -52,13 +52,11 @@ namespace RhuPostProcessor
 			if (obj.GetType() == typeof(sbyte)) {
 				return Instruction.Create(OpCodes.Ldc_I4_S, (uint)obj);
 			}
-			if (obj.GetType() == typeof(short)) {
-				return Instruction.Create(OpCodes.Ldc_I4_S, (uint)obj);
-			}
-			if (obj.GetType() == typeof(ushort)) {
-				return Instruction.Create(OpCodes.Ldc_I4, (int)obj);
-			}
-			throw new Exception($"Type {obj.GetType().Name} is not set up to be added to evaluationStack");
+			return obj.GetType() == typeof(short)
+				? Instruction.Create(OpCodes.Ldc_I4_S, (uint)obj)
+				: obj.GetType() == typeof(ushort)
+				? Instruction.Create(OpCodes.Ldc_I4, (int)obj)
+				:         throw new Exception($"Type {obj.GetType().Name} is not set up to be added to evaluationStack");
 		}
 		public static MethodReference MakeHostInstanceGeneric(this MethodReference self, TypeReference genericType) {
 			var methodReference = new MethodReference(self.Name, self.ReturnType, genericType) {
@@ -79,10 +77,7 @@ namespace RhuPostProcessor
 			if (self == null) {
 				throw new ArgumentNullException("self");
 			}
-			if (!self.HasMethods) {
-				return Array.Empty<MethodDefinition>();
-			}
-			return self.Methods.Where((MethodDefinition method) => method.IsConstructor);
+			return !self.HasMethods ? (IEnumerable<MethodDefinition>)Array.Empty<MethodDefinition>() : self.Methods.Where((MethodDefinition method) => method.IsConstructor);
 		}
 
 		public static MethodReference GetConstructor(this TypeReference type, ModuleDefinition module, out bool isMethodCall,bool AllowPrams = false) {

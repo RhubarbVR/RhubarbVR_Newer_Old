@@ -17,13 +17,13 @@ namespace RhuEngine.Components
 
 		public readonly SyncObjList<SyncRef<LocomotionModule>> modules;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			modules.Add().Target = Entity.AttachComponent<NoClipLocomotion>();
 		}
 
 		public LocomotionModule CurrentLocomotionModule => selectedModule.Value > (modules.Count - 1) ? null : modules[selectedModule.Value].Target;
 
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}

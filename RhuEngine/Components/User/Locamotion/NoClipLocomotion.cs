@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public readonly Sync<bool> AllowMultiplier;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			locmotionName.Value = "No Clip";
 		}

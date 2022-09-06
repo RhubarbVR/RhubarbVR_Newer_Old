@@ -49,7 +49,7 @@ namespace RhuEngine.Components
 
 		[OnChanged(nameof(LoadKeyboard))]
 		public readonly Sync<KeyBoardLayOutSelection> CurrentLayout;
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			uICanvas = Entity.AddChild("Canvas").AttachComponent<UICanvas>();
 			uICanvas.scale.Value = new Vector3f(10f, 3.3f, 1);
 			mit = Entity.AttachComponent<UnlitMaterial>();

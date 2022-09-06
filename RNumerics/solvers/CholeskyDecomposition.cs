@@ -173,9 +173,7 @@ namespace RNumerics
 		/// </summary>
 		public void Solve(double[] B, double[] X, double[] Y) {
 			var N = A.Rows;
-			if (Y == null) {
-				Y = new double[N];
-			}
+			Y ??= new double[N];
 
 			// first solve L * Y = B  (store Y in X)   via forward substitution
 			Y[0] = B[0] / L[0, 0];

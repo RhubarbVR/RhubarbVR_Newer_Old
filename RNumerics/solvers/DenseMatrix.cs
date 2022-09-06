@@ -262,9 +262,7 @@ namespace RNumerics
 				throw new Exception("DenseMatrix.Multiply: matrices have incompatible dimensions");
 			}
 
-			if (R == null) {
-				R = new DenseMatrix(Rows, M2.Columns);
-			}
+			R ??= new DenseMatrix(Rows, M2.Columns);
 
 			if (R.Rows != rows1 || R.Columns != cols2) {
 				throw new Exception("DenseMatrix.Multiply: Result matrix has incorrect dimensions");

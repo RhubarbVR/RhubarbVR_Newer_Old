@@ -181,19 +181,13 @@ namespace RNumerics
 			}
 
 			if (order >= 1) {
-				if (mBD1 == null) {
-					mBD1 = Allocate();
-				}
+				mBD1 ??= Allocate();
 
 				if (order >= 2) {
-					if (mBD2 == null) {
-						mBD2 = Allocate();
-					}
+					mBD2 ??= Allocate();
 
 					if (order >= 3) {
-						if (mBD3 == null) {
-							mBD3 = Allocate();
-						}
+						mBD3 ??= Allocate();
 					}
 				}
 			}

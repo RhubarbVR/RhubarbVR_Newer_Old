@@ -23,13 +23,13 @@ namespace RhuEngine.Components
 		[OnAssetLoaded(nameof(TextureUpdate))]
 		public readonly AssetRef<RTexture2D> MainTexture;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			Tint.Value = Colorf.White;
 			Transparency.Value = Linker.Transparency.None;
 		}
 
-		public override void UpdateAll() {
+		protected override void UpdateAll() {
 			TransparencyUpdate();
 			TextureUpdate();
 			TintUpdate();

@@ -210,11 +210,11 @@ namespace RhuEngine.Components
 					}
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
 					var ew = new Vector2f((textsize.x + 0.01f) * (fontSize.Peek() / 10), textsize.y * (fontSize.Peek() / 10));
-					var data = Font.GetGlygh(item);
-					if (!renderMits.Contains(data.mit)) {
-						renderMits.Add(data.mit);
+					var (mit, texture, bottomleft, topright) = Font.GetGlygh(item);
+					if (!renderMits.Contains(mit)) {
+						renderMits.Add(mit);
 					}
-					var chare = new TextChar(item, Matrix.TR(textpos, Quaternionf.Yawed180), color.Peek(), ew, fontSize.Peek() / 10, leaded.Peek() / 10, renderMits.IndexOf(data.mit), data.bottomleft, data.topright);
+					var chare = new TextChar(item, Matrix.TR(textpos, Quaternionf.Yawed180), color.Peek(), ew, fontSize.Peek() / 10, leaded.Peek() / 10, renderMits.IndexOf(mit), bottomleft, topright);
 					Chars.SafeAdd(chare);
 					thisrow.Push(chare);
 					bounds.Add(textpos - new Vector3f(0, chare.Leading, 0));

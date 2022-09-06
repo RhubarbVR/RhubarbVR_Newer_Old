@@ -14,12 +14,10 @@ namespace Rhubarb_VR_HeadLess
 
 	public static class Program
 	{
-#pragma warning disable CA2211 // Non-constant fields should not be visible
-		public static bool _isRunning = true;
-		public static Engine _app;
+		internal static bool _isRunning = true;
+		internal static Engine _app;
 		static OutputCapture _cap;
 		static NullLinker _rhu;
-#pragma warning restore CA2211 // Non-constant fields should not be visible
 		static void Main(string[] args) {
 			AppDomain.CurrentDomain.ProcessExit += (_, _) => _isRunning = false;
 			Console.WriteLine("Starting Rhubarb HeadLess!");

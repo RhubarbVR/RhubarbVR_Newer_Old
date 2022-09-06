@@ -15,11 +15,13 @@ namespace RhuEngine.WorldObjects
 
 		public void ChangeName(string name);
 		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer = null);
-		public void OnSave();
 		public void Destroy();
-		public void OnLoaded();
 		public IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject);
 		public void Deserialize(IDataNode data, SyncObjectDeserializerObject syncObjectSerializerObject);
 		internal void CallFirstCreation();
+
+		internal void RunOnLoad();
+		internal void RunOnSave();
+		
 	}
 }

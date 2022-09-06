@@ -9,9 +9,9 @@ namespace RNumerics
 	public struct AxisAlignedBox2f
 	{
 		[Key(0)]
-		public Vector2f Min = new Vector2f(float.MaxValue, float.MaxValue);
+		public Vector2f Min = new(float.MaxValue, float.MaxValue);
 		[Key(1)]
-		public Vector2f Max = new Vector2f(float.MinValue, float.MinValue);
+		public Vector2f Max = new(float.MinValue, float.MinValue);
 		[IgnoreMember]
 		public static readonly AxisAlignedBox2f Empty = new();
 		[IgnoreMember]

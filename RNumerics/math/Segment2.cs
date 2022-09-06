@@ -88,11 +88,7 @@ namespace RNumerics
 		public Vector2d NearestPoint(Vector2d p)
 		{
 			double t = (p - Center).Dot(Direction);
-			if (t >= Extent)
-				return P1;
-			if (t <= -Extent)
-				return P0;
-			return Center + t * Direction;
+			return t >= Extent ? P1 : t <= -Extent ? P0 : Center + t * Direction;
 		}
 
 		public double Project(Vector2d p)
@@ -257,9 +253,7 @@ namespace RNumerics
 				double tmin = t1 - seg2.Extent;
 				double tmax = t1 + seg2.Extent;
 				Interval1d extents = new Interval1d(-Extent, Extent);
-				if (extents.Overlaps(new Interval1d(tmin, tmax)))
-					return true;
-				return false;
+				return extents.Overlaps(new Interval1d(tmin, tmax));
 			}
 
 			// lines are parallel but not collinear
@@ -342,11 +336,7 @@ namespace RNumerics
 		public Vector2f NearestPoint(Vector2f p)
 		{
 			float t = (p - Center).Dot(Direction);
-			if (t >= Extent)
-				return P1;
-			if (t <= -Extent)
-				return P0;
-			return Center + t * Direction;
+			return t >= Extent ? P1 : t <= -Extent ? P0 : Center + t * Direction;
 		}
 
 		public float Project(Vector2f p)

@@ -40,7 +40,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			AudioChannels.Add();
 		}
@@ -49,7 +49,7 @@ namespace RhuEngine.Components
 			LoadVideoPlayer();
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			Playback.StateChange += Playback_StateChange;
 			Load(null);
 			UpdateVideo();

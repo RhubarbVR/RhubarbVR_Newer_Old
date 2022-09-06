@@ -55,11 +55,11 @@ namespace RhuEngine.Components
 			_soundInst?.Stop();
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			LoadAudio();
 		}
 
-		public override void Step() {
+		protected override void Step() {
 			if (!Engine.EngineLink.CanAudio) {
 				return;
 			}

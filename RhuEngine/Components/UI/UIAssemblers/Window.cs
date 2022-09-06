@@ -89,7 +89,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			var icons = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
 			var sprite = IconSprite.Target = World.RootEntity.GetFirstComponentOrAttach<SpriteProvder>();

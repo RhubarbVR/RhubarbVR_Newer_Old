@@ -22,7 +22,8 @@ namespace RhuEngine.Components
 		public override void ChildRectUpdate() {
 			if (Fit) {
 				var recList = new Stack<UIRect>();
-				foreach (Entity item in Entity.children) {
+				//Todo: make forLoop
+				foreach (var item in Entity.children.Cast<Entity>()) {
 					var rect = item.UIRect;
 					if (rect is not null && item.IsEnabled && !item.IsDestroying) {
 						recList.Push(rect);
@@ -44,7 +45,8 @@ namespace RhuEngine.Components
 			}
 			else {
 				var recList = new Stack<UIRect>();
-				foreach (Entity item in FlipOrder ? Entity.children: Entity.children.Reverse()) {
+				//Todo: make forLoop
+				foreach (var item in (FlipOrder ? Entity.children: Entity.children.Reverse()).Cast<Entity>()) {
 					var rect = item.UIRect;
 					if (rect is not null && item.IsEnabled && !item.IsDestroying) {
 						recList.Push(rect);

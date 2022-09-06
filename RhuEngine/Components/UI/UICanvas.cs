@@ -138,12 +138,12 @@ namespace RhuEngine.Components
 			UpdatePyhsicsMesh();
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			scale.Value = new Vector3f(16, 9, 1);
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			Entity.UIRect?.CanvasUpdate();
 			UpdatePyhsicsMesh();
@@ -158,7 +158,7 @@ namespace RhuEngine.Components
 
 		public Matrix RenderLocation;
 
-		public override void Render() {
+		protected override void Render() {
 			RenderLocation = Entity.GlobalTrans;
 			if (PhysicsCollider is not null) {
 				PhysicsCollider.Matrix = PhysicsColliderOffset * RenderLocation;
@@ -166,7 +166,7 @@ namespace RhuEngine.Components
 			Entity.UIRect?.RenderRect(RenderLocation);
 		}
 
-		public override void AlwaysStep() {
+		protected override void AlwaysStep() {
 			RWorld.ExecuteOnEndOfFrame(ClearHitData);
 		}
 

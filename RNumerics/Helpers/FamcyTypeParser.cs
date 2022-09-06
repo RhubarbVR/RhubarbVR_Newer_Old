@@ -8,9 +8,7 @@ namespace RNumerics
 	public static class FamcyTypeParser
 	{
 		public static Type PraseType(string type, Assembly[] asm = null) {
-			if (asm == null) {
-				asm = AppDomain.CurrentDomain.GetAssemblies();
-			}
+			asm ??= AppDomain.CurrentDomain.GetAssemblies();
 			return type.Contains("<") && type.Contains(">") ? PraseGeneric(type,asm) : SingleTypeParse(type,asm);
 		}
 		public static string[] ExtraNameSpaces = new string[] {

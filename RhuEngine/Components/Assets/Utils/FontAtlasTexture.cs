@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(UpdateTexture))]
 		public readonly Sync<int> AtlasIndex;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			font.Target = World.RootEntity.GetFirstComponentOrAttach<MainFont>();
 		}

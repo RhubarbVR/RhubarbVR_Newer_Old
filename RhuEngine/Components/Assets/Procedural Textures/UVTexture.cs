@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Assets/Procedural Textures" })]
 	public class UVTexture : ProceduralTexture
 	{
-		public override void Generate() 
+		protected override void Generate() 
 		{
 			var _clampedSizeX = MathUtil.Clamp(Size.Value.x, 2, int.MaxValue);
 			var _clampedSizeY = MathUtil.Clamp(Size.Value.y, 2, int.MaxValue);

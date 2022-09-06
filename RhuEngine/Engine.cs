@@ -64,9 +64,7 @@ namespace RhuEngine
 		public CommandManager commandManager;
 
 		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null, bool PassErrors = false) : base() {
-			if (baseDir is null) {
-				baseDir = AppDomain.CurrentDomain.BaseDirectory;
-			}
+			baseDir ??= AppDomain.CurrentDomain.BaseDirectory;
 			BaseDir = baseDir;
 			RhuConsole.ForegroundColor = ConsoleColor.White;
 			this.PassErrors = PassErrors;

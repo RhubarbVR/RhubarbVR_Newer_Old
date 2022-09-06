@@ -143,7 +143,7 @@ namespace RhuEngine.WorldObjects
 					if (typeof(ISyncObject).IsAssignableFrom(@object.GetType())) {
 						var castObject = @object as ISyncObject;
 						try {
-							castObject.OnSave();
+							castObject.RunOnSave();
 						}
 						catch (Exception e) {
 							RLog.Warn($"Failed to save {@object.GetType().GetFormattedName()} Error: {e}");
@@ -157,7 +157,7 @@ namespace RhuEngine.WorldObjects
 							if (!@object.IsRemoved) {
 								_serializeFunctions.Add(new SerializeFunction {
 									_parrentData = obj,
-									_syncObject = ((ISyncObject)field.GetValue(@object)),
+									_syncObject = (ISyncObject)field.GetValue(@object),
 									_name = field.Name
 								});
 							}

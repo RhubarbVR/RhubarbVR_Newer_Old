@@ -46,7 +46,7 @@ namespace RhuEngine.Components
 			AddedData?.Invoke(rigidBody);
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			Entity.GlobalTransformChange += Entity_GlobalTransformChange;
 			Entity.enabled.Changed += Enabled_Changed;

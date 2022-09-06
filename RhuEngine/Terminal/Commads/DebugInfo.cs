@@ -77,7 +77,8 @@ stepTime { (Manager.Engine.worldManager.FocusedWorld?.stepTime * 1000f).Value:f3
 			var returnstring = "";
 			var currentUserID = 0;
 			if (Manager.Engine.worldManager.FocusedWorld != null) {
-				foreach (User item in Manager.Engine.worldManager.FocusedWorld.Users) {
+				//Todo: make forLoop
+				foreach (var item in Manager.Engine.worldManager.FocusedWorld.Users.Cast<User>()) {
 					returnstring += $"User: {currentUserID + 1} UserRef: {item.Pointer} UserName: {item.UserName} PeerLoaded: {item.CurrentPeer != null} UserID: {item.userID.Value} IsLocal: {Manager.Engine.worldManager.FocusedWorld?.GetLocalUser() == item} SyncStreamsCount: {item.syncStreams.Count} isPresent: {item.isPresent.Value} isConnected: {item.IsConnected} peerID: {item.CurrentPeer?.ID.ToString() ?? "null"}  latency{item.CurrentPeer?.latency ?? -1}\n";
 					currentUserID++;
 				}

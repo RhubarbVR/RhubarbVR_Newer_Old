@@ -64,7 +64,7 @@ namespace RhuEngine.Components
 
 		public readonly SyncObjList<ECMAScriptFunction> Functions;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			Functions.Add();
 		}
@@ -150,7 +150,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			InitECMA();
 		}
 	}

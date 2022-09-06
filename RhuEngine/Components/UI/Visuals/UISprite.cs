@@ -42,7 +42,7 @@ namespace RhuEngine.Components
 		public readonly Sync<bool> KeepAspectRatio;
 
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			Tint.Value = Colorf.White;
 		}

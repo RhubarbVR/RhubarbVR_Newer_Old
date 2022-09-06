@@ -19,7 +19,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ComputeTexture))]
 		public readonly Sync<int> Seed;
 
-		public override void Generate() 
+		protected override void Generate() 
 		{
 			var _noise = new FastNoiseLite(Seed);
 			var _clampedSizeX = MathUtil.Clamp(Size.Value.x, 2, int.MaxValue);

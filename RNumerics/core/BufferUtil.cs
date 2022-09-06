@@ -577,8 +577,8 @@ namespace RNumerics
 
 		public T this[int i]
 		{
-			get { return Source[Index + i]; }
-			set { Source[Index + i] = value; }
+			get => Source[Index + i];
+			set => Source[Index + i] = value;
 		}
 	}
 

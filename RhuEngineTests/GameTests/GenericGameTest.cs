@@ -37,7 +37,7 @@ namespace RhuEngine.GameTests.Tests
 			tester.Start(Array.Empty<string>());
 			tester.RunForSteps(20);
 			tester.app.startingthread.Join();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		private void SetUpForNormalTest() {
@@ -50,6 +50,10 @@ namespace RhuEngine.GameTests.Tests
 			SetUpForNormalTest();
 			var world = tester.app.worldManager.CreateNewWorld(World.FocusLevel.Focused, true);
 			Assert.IsNotNull(world);
+			world.RootEntity.AttachComponent<MainFont>();
+			world.RootEntity.AttachComponent<IconsTex>();
+			world.RootEntity.AttachComponent<SpriteProvder>();
+			world.RootEntity.AttachComponent<TrivialBox3Mesh>();
 			return world;
 		}
 
@@ -62,13 +66,13 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void StartNewTestWorldTest() {
 			StartNewTestWorld();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
 		public void AttachEntityTest() {
 			AttachEntity();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -77,7 +81,7 @@ namespace RhuEngine.GameTests.Tests
 			var TestEntity = newworld.RootEntity.AddChild("TestEntity");
 			var TestEntity2 = newworld.RootEntity.GetChildByName("TestEntity");
 			Assert.AreEqual(TestEntity, TestEntity2);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		public IEnumerable<Type> GetAllTypes(Func<Type, bool> func) {
@@ -157,7 +161,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsNotNull(component);
 		}
 		public void RunSyncObjectTest(SyncObject syncObject) {
-			syncObject.OnSave();
+			syncObject.RunOnSave();
 			var serlize = syncObject.Serialize(new SyncObjectSerializerObject(true));
 			syncObject.Deserialize(serlize, new SyncObjectDeserializerObject(true));
 			Assert.IsNotNull(syncObject);
@@ -179,10 +183,6 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void TestAllSyncObjects() {
 			var entity = AttachEntity();
-			entity.World.RootEntity.AttachComponent<MainFont>();
-			entity.World.RootEntity.AttachComponent<IconsTex>();
-			entity.World.RootEntity.AttachComponent<SpriteProvder>();
-			entity.World.RootEntity.AttachComponent<TrivialBox3Mesh>();
 			var Beofre = entity.World.AllWorldObjects;
 			tester.RunForSteps(100);
 			var testEntity = entity.AddChild("Test");
@@ -248,7 +248,7 @@ namespace RhuEngine.GameTests.Tests
 				testEntity = entity.AddChild("Test");
 			}
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -270,7 +270,7 @@ namespace RhuEngine.GameTests.Tests
 			synclist.SyncObject.DisposeAtIndex(0);
 			Assert.AreEqual(7, synclist.SyncObject.Count);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -283,7 +283,7 @@ namespace RhuEngine.GameTests.Tests
 			t.Deserialize(data, new SyncObjectDeserializerObject(true));
 			Assert.AreEqual(t.SyncObject[0][0].Value, e.SyncObject[0][0].Value);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 
@@ -317,7 +317,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsTrue(hashit);
 			Assert.AreEqual("Trains", hitcollider.CustomObject);
 			tester.RunForSteps(2);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod]
@@ -336,7 +336,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsTrue(hashit);
 			Assert.AreEqual("Trains", hitcollider.CustomObject);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 		[TestMethod]
 		public void RayTestWithRawMesh() {
@@ -354,7 +354,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsTrue(hashit);
 			Assert.AreEqual("Trains", hitcollider.CustomObject);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod]
@@ -407,7 +407,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsTrue(hashit);
 			Assert.AreEqual("Trains", hitcollider.CustomObject);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -434,7 +434,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.AreNotEqual(output.Value, new NetPointer(valueone.id + valuetwo.id + valueThree.id));
 
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -470,7 +470,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.AreEqual(output.Value, valueone / valuetwo / valueThree);
 
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -516,16 +516,13 @@ namespace RhuEngine.GameTests.Tests
 			inttest.Operators.Value = Components.MultiOperators.LogicalAND;
 			Assert.AreEqual(output.Value, valueone & valuetwo & valueThree);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
 		public void TestAllComponents() {
 			var entity = AttachEntity();
-			entity.World.RootEntity.AttachComponent<MainFont>();
-			entity.World.RootEntity.AttachComponent<IconsTex>();
-			entity.World.RootEntity.AttachComponent<SpriteProvder>();
-			entity.World.RootEntity.AttachComponent<TrivialBox3Mesh>();
+
 			var Beofre = entity.World.WorldObjectsCount;
 			tester.RunForSteps(100);
 			var testEntity = entity.AddChild("Test");
@@ -579,7 +576,7 @@ namespace RhuEngine.GameTests.Tests
 				testEntity = entity.AddChild("Test");
 			}
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		public static bool RunAcountLoginAndCreation = false;
@@ -589,7 +586,7 @@ namespace RhuEngine.GameTests.Tests
 			SetUpForNormalTest();
 			if (!RunAcountLoginAndCreation) {
 				tester.RunForSteps();
-				tester.Dispose();
+				((IDisposable)tester).Dispose();
 				return;
 			}
 			var userName = "AutoRemovedTestAcount" + Guid.NewGuid().ToString();
@@ -606,7 +603,7 @@ namespace RhuEngine.GameTests.Tests
 			RLog.Info("Login as " + userName);
 			Assert.AreEqual(userName, tester.app.netApiManager.Client?.User.UserName);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 	}
 }

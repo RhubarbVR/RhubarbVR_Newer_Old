@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 
 		public readonly Linker<Vector3f> scale;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);
 			rot.SetLinkerTarget(Entity.rotation);
 			scale.SetLinkerTarget(Entity.scale);
@@ -48,7 +48,7 @@ namespace RhuEngine.Components
 			mesh.SetPos(new Vector2i(16,2));
 		}
 
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}

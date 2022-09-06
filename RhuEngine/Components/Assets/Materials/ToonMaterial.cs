@@ -632,10 +632,10 @@ namespace RhuEngine.Components
 			});
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 		}
-		public override void UpdateAll() {
+		protected override void UpdateAll() {
 
 			RenderModeChanged();
 			CullModeChanged();

@@ -174,9 +174,7 @@ namespace RNumerics
 				throw new Exception("SymmetricSparseMatrix.Multiply: matrices have incompatible dimensions");
 			}
 
-			if (Rin == null) {
-				Rin = new SymmetricSparseMatrix();
-			}
+			Rin ??= new SymmetricSparseMatrix();
 
 			var R = Rin;      // require alias for use in lambda below
 

@@ -255,7 +255,7 @@ namespace RhuEngine.WorldObjects
 				if (Engine.EngineLink.CanRender) {
 					lock (_renderingComponents) {
 						foreach (var item in _renderingComponents) {
-							item.Render();
+							item.RunRender();
 						}
 					}
 				}

@@ -77,7 +77,7 @@ namespace RNumerics
 				var v2PastPlane = (planeSetting.plane.DistanceTo(v2.v) > 0) == planeSetting.switchSide;
 				var v3PastPlane = (planeSetting.plane.DistanceTo(v3.v) > 0) == planeSetting.switchSide;
 				if (!(v1PastPlane || v2PastPlane || v3PastPlane)) {
-					trys[i] = ((v1, v2, v3));
+					trys[i] = (v1, v2, v3);
 					continue;
 				}
 				if (v1PastPlane && v2PastPlane && v3PastPlane) {
@@ -88,7 +88,7 @@ namespace RNumerics
 						continue;
 					}
 					else {
-						trys[i] = ((v1, v2, v3));
+						trys[i] = (v1, v2, v3);
 						continue;
 					}
 				}
@@ -99,7 +99,7 @@ namespace RNumerics
 					var newvert1 = new NewVertexInfo { c = calulationone.Item2, v = newtry1, uv = calulationone.Item1, bHaveUV = true, bHaveC = true };
 					var calctwo = CalcNewUV(v1.c, v3.c, newtry2, v1.v, v3.v, v1.uv, v3.uv);
 					var newvert2 = new NewVertexInfo { c = calulationone.Item2, v = newtry2, uv = calctwo.Item1, bHaveUV = true, bHaveC = true };
-					trys[i] = ((v3, newvert2, newvert1));
+					trys[i] = (v3, newvert2, newvert1);
 					trys.Add((newvert1, v2, v3));
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((newvert1, newvert2, v1));
@@ -113,7 +113,7 @@ namespace RNumerics
 					var newvert1 = new NewVertexInfo { c = calcone.Item2, v = newtry1, uv = calcone.Item1, bHaveUV = true, bHaveC = true };
 					var calcTwo = CalcNewUV(v1.c, v3.c, newtry2, v1.v, v3.v, v1.uv, v3.uv);
 					var newvert2 = new NewVertexInfo { c = calcTwo.Item2, v = newtry2, uv = calcTwo.Item1, bHaveUV = true, bHaveC = true };
-					trys[i] = ((newvert1, newvert2, v1));
+					trys[i] = (newvert1, newvert2, v1);
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((v3, newvert2, newvert1));
 						trys.Add((newvert1, v2, v3));
@@ -128,7 +128,7 @@ namespace RNumerics
 					var newvert1 = new NewVertexInfo { c = calc.Item2, v = newtry1, uv = calc.Item1, bHaveUV = true, bHaveC = true };
 					var calc2 = CalcNewUV(v2.c, v1.c, newtry2, v2.v, v1.v, v2.uv, v1.uv);
 					var newvert2 = new NewVertexInfo { c = calc2.Item2, v = newtry2, uv = calc2.Item1, bHaveUV = true, bHaveC = true };
-					trys[i] = ((newvert2, newvert1, v3));
+					trys[i] = (newvert2, newvert1, v3);
 					trys.Add((v1, newvert2, v3));
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((v2, newvert1, newvert2));
@@ -142,7 +142,7 @@ namespace RNumerics
 					var newvert1 = new NewVertexInfo { c = calc.Item2, v = newtry1, uv = calc.Item1, bHaveUV = true, bHaveC = true };
 					var calc2 = CalcNewUV(v2.c, v1.c, newtry2, v2.v, v1.v, v2.uv, v1.uv);
 					var newvert2 = new NewVertexInfo { c = calc2.Item2, v = newtry2, uv = calc2.Item1, bHaveUV = true, bHaveC = true };
-					trys[i] = ((v2, newvert1, newvert2));
+					trys[i] = (v2, newvert1, newvert2);
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((newvert2, newvert1, v3));
 						trys.Add((v1, newvert2, v3));
@@ -157,7 +157,7 @@ namespace RNumerics
 					var newvert1 = new NewVertexInfo { c = calc.Item2, v = newtry1, uv = calc.Item1, bHaveUV = true, bHaveC = true };
 					var calc2 = CalcNewUV(v3.c, v2.c, newtry2, v3.v, v2.v, v3.uv, v2.uv);
 					var newvert2 = new NewVertexInfo { c = calc2.Item2, v = newtry2, uv = calc2.Item1, bHaveUV = true, bHaveC = true };
-					trys[i] = ((v2, newvert2, newvert1));
+					trys[i] = (v2, newvert2, newvert1);
 					trys.Add((v2, newvert1, v1));
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((v3, newvert1, newvert2));
@@ -171,7 +171,7 @@ namespace RNumerics
 					var newvert1 = new NewVertexInfo { c = calc.Item2, v = newtry1, uv = calc.Item1, bHaveUV = true, bHaveC = true };
 					var calc2 = CalcNewUV(v3.c, v2.c, newtry2, v3.v, v2.v, v3.uv, v2.uv);
 					var newvert2 = new NewVertexInfo { c = calc2.Item2, v = newtry2, uv = calc2.Item1, bHaveUV = true, bHaveC = true };
-					trys[i] = ((v3, newvert1, newvert2));
+					trys[i] = (v3, newvert1, newvert2);
 					if (!planeSetting.removeOtherSide) {
 						trys.Add((v2, newvert2, newvert1));
 						trys.Add((v2, newvert1, v1));

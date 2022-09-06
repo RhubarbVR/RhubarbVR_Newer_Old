@@ -13,7 +13,7 @@ namespace RhuEngine.Components
 			}
 			Load(Engine.staticResources.Grid);
 		}
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			LoadTexture();
 		}

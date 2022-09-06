@@ -55,17 +55,13 @@ namespace RNumerics
 				_numJacobiIterations = jacobiIters;
 			}
 
-			if (_aTA == null) {
-				_aTA = new SymmetricMatrix3d();
-			}
+			_aTA ??= new SymmetricMatrix3d();
 
 			_aTA.SetATA(ref matrix);
 
 			var v = JacobiDiagonalize(_aTA);
 
-			if (_aV == null) {
-				_aV = new double[9];
-			}
+			_aV ??= new double[9];
 
 			ComputeAV(ref matrix, ref v, _aV);
 

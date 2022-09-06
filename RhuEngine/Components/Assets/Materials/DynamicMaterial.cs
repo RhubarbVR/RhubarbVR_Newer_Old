@@ -384,7 +384,7 @@ namespace RhuEngine.Components
 			_material = null;
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			LoadMaterial();
 		}

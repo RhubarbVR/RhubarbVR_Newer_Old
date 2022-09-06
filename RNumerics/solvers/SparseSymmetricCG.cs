@@ -40,9 +40,7 @@ namespace RNumerics
 
 			if (X == null || UseXAsInitialGuess == false)
 			{
-				if (X == null) {
-					X = new double[size];
-				}
+				X ??= new double[size];
 
 				Array.Clear(X, 0, X.Length);
 				Array.Copy(B, _r, B.Length);
@@ -288,9 +286,7 @@ namespace RNumerics
 
 			if (X == null || UseXAsInitialGuess == false)
 			{
-				if (X == null) {
-					X = BufferUtil.AllocNxM(NRHS, size);
-				}
+				X ??= BufferUtil.AllocNxM(NRHS, size);
 
 				for (var j = 0; j < NRHS; ++j)
 				{
@@ -454,9 +450,7 @@ namespace RNumerics
 
 			if (X == null || UseXAsInitialGuess == false)
 			{
-				if (X == null) {
-					X = BufferUtil.AllocNxM(NRHS, n);
-				}
+				X ??= BufferUtil.AllocNxM(NRHS, n);
 
 				for (var j = 0; j < NRHS; ++j)
 				{

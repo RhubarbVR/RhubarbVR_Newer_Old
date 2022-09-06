@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 			Engine_SettingsUpdate();
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			Engine.SettingsUpdate += Engine_SettingsUpdate;
 		}
 

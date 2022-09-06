@@ -388,7 +388,7 @@ namespace RhuEngine.Components
 		}
 
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			ProgramsHolder = World.RootEntity.AddChild("Programms");
 			uICanvas = Entity.AddChild("Canvas").AttachComponent<UICanvas>();
 			Engine.SettingsUpdate += Engine_SettingsUpdate;
@@ -600,7 +600,7 @@ namespace RhuEngine.Components
 		private float _newvalue = 0;
 
 		public bool OpenedLastFrame = false;
-		public override void Step() {
+		protected override void Step() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}

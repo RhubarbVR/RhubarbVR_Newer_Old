@@ -44,7 +44,7 @@ namespace RhuEngine.Components
 
 
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			offset.Value = Entity.rotation.Value;
 			Driver.SetLinkerTarget(Entity.rotation);
@@ -67,7 +67,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			offset.Value = Entity.rotation.Value;
 			Driver.SetLinkerTarget(Entity.rotation);

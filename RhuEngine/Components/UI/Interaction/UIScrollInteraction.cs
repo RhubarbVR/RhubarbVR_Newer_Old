@@ -21,7 +21,7 @@ namespace RhuEngine.Components
 		[Default(0.5f)]
 		public readonly Sync<float> GripPressForce;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			MouseScrollSpeed.Value = Vector2f.One;
 		}
@@ -32,16 +32,14 @@ namespace RhuEngine.Components
 
 		public bool Hover = false;
 
-		public override void Step() {
+		protected override void Step() {
 			base.Step();
 			if (UIRect is null) {
 				return;
 			}
-			var HasFirst = false;
 			var firstLazer = true;
 			var hitposes = UIRect.GetRectHitData();
 			foreach (var item in hitposes) {
-				HasFirst = true;
 				if (firstLazer && item.Lazer) {
 					if (RInput.Mouse.ScrollChange != Vector2f.Zero) {
 						if (AllowAltSwitch && RInput.Key(Key.Alt).IsActive()) {

@@ -15,7 +15,7 @@ namespace RhuEngine.Components
 	{
 		public IKSolver iKSolver;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			iKSolver = new IKSolver();
 			iKSolver.ActiveSet.UseAutomass = true;

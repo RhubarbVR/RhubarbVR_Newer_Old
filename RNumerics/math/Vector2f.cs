@@ -62,7 +62,9 @@ namespace RNumerics
 
 
 		[IgnoreMember]
+#pragma warning disable IDE1006 // Naming Styles
 		public Vector3f _Y_ => new(0, y,0);
+#pragma warning restore IDE1006 // Naming Styles
 
 		[IgnoreMember]
 		public Vector3f XY_ => new(x,y);

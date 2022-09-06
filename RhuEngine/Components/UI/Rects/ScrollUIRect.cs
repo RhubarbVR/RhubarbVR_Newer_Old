@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 		public override Vector2f MaxScroll => Max_Scroll;
 		public override Vector2f MinScroll => Min_Scroll;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			Max_Scroll.Value = Vector2f.Inf;
 			Min_Scroll.Value = Vector2f.NInf;

@@ -32,9 +32,7 @@ namespace RhuEngine.Components
 			AddLocal = addLocal;
 			Root = entity;
 			CurretRectEntity = entity;
-			if (firstRect is null) {
-				firstRect = CurretRectEntity.AttachComponent<UIRect>();
-			}
+			firstRect ??= CurretRectEntity.AttachComponent<UIRect>();
 			CurrentRect = firstRect;
 			MainMit = mainMit;
 		}

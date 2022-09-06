@@ -30,7 +30,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(UpdateColor))]
 		public readonly Sync<float> Alpha;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			Engine.SettingsUpdate += UpdateColor;
 			UpdateColor();

@@ -45,8 +45,8 @@ namespace RhuEngine.TextRendering
 
 		public (RMaterial mit, RTexture2D texture, Vector2f bottomleft, Vector2f topright)? GetGlygh(Rune rune) {
 			if (HasRune(rune)) {
-				var target = runes[rune];
-				return (_material.Material, _texture, target.bottomleft, target.topright);
+				var (bottomleft, topright) = runes[rune];
+				return (_material.Material, _texture, bottomleft, topright);
 			}
 			var size = _font.GetSizeOfRune(rune);
 			if(size.Width + _xpos > ATLISSIZE) {

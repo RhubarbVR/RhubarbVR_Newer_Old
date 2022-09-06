@@ -44,7 +44,7 @@ namespace RhuEngine.Components
 			grabbableHolder.Target = null;
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			Entity.OnLazerPyhsics += Entity_OnLazerPyhsics;
 			Entity.OnGrip += GripProcess;

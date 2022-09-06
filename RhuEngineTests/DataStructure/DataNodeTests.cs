@@ -41,8 +41,8 @@ namespace RhuEngine.DataStructure.Tests
 				throw new Exception("Failed to load data at all");
 			}
 			Assert.AreEqual("Trains", ((DataNode<string>)((DataNodeGroup)loaded.Data).GetValue("Name")).Value);
-			Assert.AreEqual("Trains2", ((DataNode<string>)((DataNodeGroup)(((DataNodeGroup)loaded.Data).GetValue("ew"))).GetValue("Name")).Value);
-			Assert.AreEqual(1, ((DataNode<int>)((DataNodeList)((DataNodeGroup)(((DataNodeGroup)loaded.Data).GetValue("ew"))).GetValue("testlist"))[0]).Value);
+			Assert.AreEqual("Trains2", ((DataNode<string>)((DataNodeGroup)((DataNodeGroup)loaded.Data).GetValue("ew")).GetValue("Name")).Value);
+			Assert.AreEqual(1, ((DataNode<int>)((DataNodeList)((DataNodeGroup)((DataNodeGroup)loaded.Data).GetValue("ew")).GetValue("testlist"))[0]).Value);
 		}
 	}
 }

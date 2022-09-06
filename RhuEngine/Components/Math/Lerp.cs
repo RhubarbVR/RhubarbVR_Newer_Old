@@ -29,7 +29,7 @@ namespace RhuEngine.Components
 			playback.Play();
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			playback.StateChange += Playback_StateChange;
 		}
@@ -38,7 +38,7 @@ namespace RhuEngine.Components
 			return time.Value;
 		}
 
-		public override void Step() {
+		protected override void Step() {
 			if (driver.Linked) {
 				try {
 					var pos = playback.Position / playback.ClipLength;

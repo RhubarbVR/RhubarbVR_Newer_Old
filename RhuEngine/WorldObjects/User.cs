@@ -99,7 +99,7 @@ namespace RhuEngine.WorldObjects
 
 		public bool IsLocalUser => World.GetLocalUser() == this;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			if (CurrentPeer is null) {
 				try {

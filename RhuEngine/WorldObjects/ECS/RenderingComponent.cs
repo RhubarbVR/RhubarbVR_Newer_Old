@@ -41,7 +41,7 @@ namespace RhuEngine.WorldObjects.ECS
 			RenderLink.RenderingComponentGen = this;
 			RenderLink.Init();
 		}
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			BuildRenderLink();
 			World.FoucusChanged += World_FoucusChanged;
@@ -56,7 +56,7 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 
-		public override void AddListObject() {
+		protected override void AddListObject() {
 			World.RegisterRenderObject(this);
 			if (World.Focus == World.FocusLevel.Background) {
 				RenderLink?.Stopped();
@@ -65,7 +65,7 @@ namespace RhuEngine.WorldObjects.ECS
 				RenderLink?.Started();
 			}
 		}
-		public override void RemoveListObject() {
+		protected override void RemoveListObject() {
 			World.UnregisterRenderObject(this);
 			RenderLink?.Stopped();
 		}
@@ -76,7 +76,11 @@ namespace RhuEngine.WorldObjects.ECS
 			base.Dispose();
 		}
 
-		public virtual void Render() {
+		internal void RunRender() {
+			Render();
+		}
+
+		protected virtual void Render() {
 			RenderLink?.Render();
 		}
 	}

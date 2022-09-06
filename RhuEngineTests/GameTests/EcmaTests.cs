@@ -70,7 +70,7 @@ namespace RhuEngine.GameTests.Tests
 			}
 			script.Invoke("RunCode");
 			Assert.AreEqual(null, value.Value.Value);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		public class TestComp : Component
@@ -110,7 +110,7 @@ namespace RhuEngine.GameTests.Tests
 			}
 			script.Invoke("RunCode");
 			Assert.AreEqual(false, value.IShowFail);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -128,7 +128,7 @@ namespace RhuEngine.GameTests.Tests
 			}
 			script.Invoke("RunCode");
 			Assert.AreEqual(false, value.IShowFail);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -146,7 +146,7 @@ namespace RhuEngine.GameTests.Tests
 			}
 			script.Invoke("RunCode");
 			Assert.AreEqual(true, value.IGoTrue);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -165,7 +165,7 @@ namespace RhuEngine.GameTests.Tests
 			}
 			script.Invoke("RunCode");
 			Assert.AreNotEqual(null, value.Value);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 
@@ -184,7 +184,7 @@ namespace RhuEngine.GameTests.Tests
 			}
 			script.Invoke("RunCode");
 			Assert.AreEqual(typeof(CapsuleMesh), value.Value.Value);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -201,7 +201,7 @@ namespace RhuEngine.GameTests.Tests
 			}
 			script.Invoke("RunCode");
 			Assert.IsNull(script.Entity.GetFirstComponent<ValueField<World>>());
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -217,7 +217,7 @@ namespace RhuEngine.GameTests.Tests
 			}
 			script.Invoke("RunCode");
 			Assert.IsNotNull(script.Entity.GetFirstComponent<Spinner>());
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -236,7 +236,7 @@ namespace RhuEngine.GameTests.Tests
 			}
 			script.Invoke("RunCode");
 			Assert.AreEqual(4, script.Entity.children.Count);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 		[TestMethod()]
 		public void AttachEntityTest2() {
@@ -254,7 +254,7 @@ namespace RhuEngine.GameTests.Tests
 			}
 			script.Invoke("RunCode");
 			Assert.AreEqual(4, script.Entity.children.Count);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -269,7 +269,7 @@ namespace RhuEngine.GameTests.Tests
 				throw new Exception("Script not loaded");
 			}
 			script.Invoke("RunCode");
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -286,7 +286,7 @@ namespace RhuEngine.GameTests.Tests
 				throw new Exception("Script not loaded");
 			}
 			script.Invoke("RunCode");
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -302,7 +302,7 @@ namespace RhuEngine.GameTests.Tests
 				throw new Exception("Script not loaded");
 			}
 			script.Invoke("RunCode");
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -326,7 +326,7 @@ namespace RhuEngine.GameTests.Tests
 			tester.Step();
 			script.Invoke("RunCode");
 			Assert.AreEqual(testNumber, value.Value.Value);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 		[TestMethod()]
 		public void TestArguments() {
@@ -344,7 +344,7 @@ namespace RhuEngine.GameTests.Tests
 			var testNumber = 10232;
 			script.Invoke("RunCode", testNumber);
 			Assert.AreEqual(testNumber, value.Value.Value);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 		[TestMethod()]
 		public void TestBlankCode() {
@@ -356,7 +356,7 @@ namespace RhuEngine.GameTests.Tests
 				throw new Exception("Script not loaded");
 			}
 			script.Invoke("RunCode");
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -371,7 +371,7 @@ function dwad daw da
 				throw new Exception("Script loaded");
 			}
 			script.Invoke("RunCode");
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -405,7 +405,7 @@ function dwad daw da
 				Assert.AreEqual(i, value.Value.Value);
 			}
 			Assert.AreEqual(script.Functions.Count, functionAmount);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 	}
 }

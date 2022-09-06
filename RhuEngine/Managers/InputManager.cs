@@ -184,7 +184,7 @@ namespace RhuEngine.Managers
 
 		public class ScreenInput
 		{
-			public Vector3f pos = new Vector3f(0, 1.84f, 0);
+			public Vector3f pos = new(0, 1.84f, 0);
 
 			public Vector2f yawpitch;
 			public const float PITCH = 85.5f;

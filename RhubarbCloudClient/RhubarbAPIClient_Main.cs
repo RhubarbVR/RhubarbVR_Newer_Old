@@ -24,7 +24,7 @@ namespace RhubarbCloudClient
 		public HttpClient HttpClient;
 		//public static Uri LocalUri => new Uri("http://LocalHost:5000/");
 
-		public static Uri LocalUri => new Uri("http://192.168.1.120:5000/");
+		public static Uri LocalUri => new("http://192.168.1.120:5000/");
 		public static Uri BaseUri => LocalUri;
 		public RhubarbAPIClient(Uri baseAdress, Func<CookieContainer> onRead, Action<CookieContainer> onWrite) {
 			HttpClientHandler = new HttpClientHandler {

@@ -75,9 +75,7 @@ namespace RNumerics
 
 
 		override public MeshGenerator Generate() {
-			if (Polygon == null) {
-				Polygon = Polygon2d.MakeCircle(1.0f, 8);
-			}
+			Polygon ??= Polygon2d.MakeCircle(1.0f, 8);
 
 			var NV = Vertices.Count;
 			var Slices = Polygon.VertexCount;

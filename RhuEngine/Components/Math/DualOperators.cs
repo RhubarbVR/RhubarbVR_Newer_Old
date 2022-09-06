@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ComputeOutput))]
 		public readonly Sync<DualOperators> Operators;
 
-		public override Out Compute(In a, In b) {
+		protected override Out Compute(In a, In b) {
 			switch (Operators.Value) {
 				case DualOperators.Equal:
 					return ((dynamic)a) == ((dynamic)b);

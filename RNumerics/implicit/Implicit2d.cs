@@ -53,13 +53,7 @@ namespace RNumerics
 				return fDist2 * fDist2 * fDist2;
 		}
 
-		public AxisAlignedBox2f Bounds
-		{
-			get
-			{
-				return new AxisAlignedBox2f(LowX, LowY, HighX, HighY);
-			}
-		}
+		public AxisAlignedBox2f Bounds => new AxisAlignedBox2f(LowX, LowY, HighX, HighY);
 
 		public void Gradient(float fX, float fY, ref float fGX, ref float fGY)
 		{
@@ -91,10 +85,7 @@ namespace RNumerics
 			get { return m_vCenter.x - radius; }
 		}
 
-		public float LowY
-		{
-			get { return m_vCenter.y - radius; }
-		}
+		public float LowY => m_vCenter.y - radius;
 
 		public float HighX
 		{

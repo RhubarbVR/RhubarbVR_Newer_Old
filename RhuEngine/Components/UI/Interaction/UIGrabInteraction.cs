@@ -22,7 +22,7 @@ namespace RhuEngine.Components
 		}
 
 		public bool Grabed = true;
-		public override void Step() {
+		protected override void Step() {
 			base.Step();
 			if (UIRect is null) {
 				return;

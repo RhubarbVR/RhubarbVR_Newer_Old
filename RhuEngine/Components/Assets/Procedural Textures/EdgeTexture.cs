@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ComputeTexture))]
 		public readonly Sync<Colorf> InnerColor;
 
-		public override void Generate() {
+		protected override void Generate() {
 
 			if (EdgeWidth.Value * 2 >= Size.Value.x || EdgeWidth.Value * 2 >= Size.Value.y) {
 				throw new Exception($"Edge width {EdgeWidth.Value} cannot be larger than texture size {Size.Value.x}x {Size.Value.y}y.");

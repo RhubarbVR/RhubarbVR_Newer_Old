@@ -32,7 +32,7 @@ namespace RhuEngine.Components
 
 		public readonly SyncObjList<BlendShape> BlendShapes;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			BoundsBox.Value = AxisAlignedBox3f.CenterZero;
 		}

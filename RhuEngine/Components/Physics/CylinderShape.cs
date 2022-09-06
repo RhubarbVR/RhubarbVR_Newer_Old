@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 		public readonly Sync<Vector3d> boxHalfExtent;
 		[OnChanged(nameof(RebuildPysics))]
 		public readonly Sync<Dir> Direction;
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			boxHalfExtent.Value = new Vector3d(0.5f);
 		}

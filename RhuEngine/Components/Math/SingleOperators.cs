@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ComputeOutput))]
 		public readonly Sync<SingleOperators> Operators;
 
-		public override Out Compute(In a) {
+		protected override Out Compute(In a) {
 			switch (Operators.Value) {
 				case SingleOperators.Cast:
 					return (dynamic)a;

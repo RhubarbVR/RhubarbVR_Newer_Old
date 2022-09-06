@@ -21,7 +21,7 @@ namespace RhuEngine.Components
 			offset.Value = Quaternionf.Identity;
 		}
 
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			if (driver.Linked) {
 				var time = (float)World.WorldTime;
 				var noiseValue = SimplexNoise.Generate3D(time, speed.Value, magnitude.Value, seed.Value);

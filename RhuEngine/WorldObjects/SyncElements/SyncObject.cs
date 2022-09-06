@@ -185,7 +185,11 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public virtual void OnSave() {
+		public void RunOnSave() {
+			OnSave();
+		}
+
+		protected virtual void OnSave() {
 		}
 
 
@@ -266,7 +270,7 @@ namespace RhuEngine.WorldObjects
 			syncObjectSerializerObject.Deserialize((DataNodeGroup)data, this);
 		}
 
-		public virtual void OnLoaded() {
+		protected virtual void OnLoaded() {
 		}
 
 		public void ChangeName(string name) {
@@ -275,6 +279,10 @@ namespace RhuEngine.WorldObjects
 
 		void ISyncObject.CallFirstCreation() {
 			FirstCreation();
+		}
+
+		void ISyncObject.RunOnLoad() {
+			OnLoaded();
 		}
 	}
 }

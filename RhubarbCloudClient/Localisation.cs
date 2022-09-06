@@ -125,10 +125,7 @@ namespace RhubarbCloudClient
 				return dataString;
 			}
 			returnobj = fallBack[key];
-			if (returnobj is not null) {
-				return string.Format((string)returnobj, prams);
-			}
-			return dataString;
+			return returnobj is not null ? string.Format((string)returnobj, prams) : dataString;
 		}
 
 		public void LoadLocal() {

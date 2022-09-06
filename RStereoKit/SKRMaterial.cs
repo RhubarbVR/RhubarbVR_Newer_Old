@@ -294,10 +294,7 @@ namespace RStereoKit
 		}
 
 		public object Make(RShader rShader) {
-			if (rShader == null) {
-				return null;
-			}
-			return new Material((Shader)rShader.e);
+			return rShader == null ? null : (object)new Material((Shader)rShader.e);
 		}
 
 		public void Pram(object ex, string tex, object value) {

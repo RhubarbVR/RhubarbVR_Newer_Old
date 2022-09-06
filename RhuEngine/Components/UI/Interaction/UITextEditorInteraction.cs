@@ -147,7 +147,7 @@ namespace RhuEngine.Components
 
 		public abstract void KeyboardUnBind();
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			KeyboardUnBind();
 		}
@@ -155,7 +155,7 @@ namespace RhuEngine.Components
 		[Exposed]
 		public abstract void EditingClick();
 
-		public override void Step() {
+		protected override void Step() {
 			if (!Value.Linked) {
 				return;
 			}

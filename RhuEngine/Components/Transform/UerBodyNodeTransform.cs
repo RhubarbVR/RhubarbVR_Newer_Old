@@ -24,8 +24,8 @@ namespace RhuEngine.Components
 		public readonly SyncRef<User> TargetUser;
 		
 		private User GetUser => LocalUserDefault ? TargetUser.Target??LocalUser : TargetUser.Target;
-		
-		public override void Step() {
+
+		protected override void Step() {
 			base.Step();
 			var targetUser = GetUser;
 			if(targetUser == null) {

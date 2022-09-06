@@ -28,7 +28,7 @@ namespace RhuEngine.WorldObjects.ECS
 		[OnChanged(nameof(OnOrderOffsetChanged))]
 		public readonly Sync<int> OrderOffset;
 
-		public void OnOrderOffsetChanged() {
+		protected void OnOrderOffsetChanged() {
 			OffsetChanged?.Invoke();
 		}
 
@@ -40,29 +40,55 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 
-		public virtual void AddListObject() {
+		internal void ListObjectUpdate(bool add) {
+			if (add && !IsDestroying) {
+				AddListObject();
+			}
+			else {
+				RemoveListObject();
+			}
+		}
+
+		protected virtual void AddListObject() {
 
 		}
 
-		public virtual void RemoveListObject() {
+		protected virtual void RemoveListObject() {
 
 		}
 
-		public virtual void OnAttach() {
+		internal void RunAttach() {
+			OnAttach();
+		}
+
+		protected virtual void OnAttach() {
 
 		}
 
-		public virtual void RenderStep() {
+		internal void RunRenderStep(bool isEnabled) {
+			AlwaysRenderStep();
+			if (isEnabled) {
+				RenderStep();
+			}
+		}
+		internal void RunStep(bool isEnabled) {
+			AlwaysStep();
+			if (isEnabled) {
+				Step();
+			}
+		}
+
+		protected virtual void RenderStep() {
 
 		}
-		public virtual void AlwaysRenderStep() {
+		protected virtual void AlwaysRenderStep() {
 
 		}
 
-		public virtual void Step() {
+		protected virtual void Step() {
 
 		}
-		public virtual void AlwaysStep() {
+		protected virtual void AlwaysStep() {
 
 		}
 

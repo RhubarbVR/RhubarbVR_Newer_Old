@@ -12,11 +12,11 @@ namespace RhuEngine.Components
 
 		public readonly Linker<float> audioVolume;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			user.Target = World.GetLocalUser();
 		}
 
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			if (user.Target is null) {
 				return;
 			}

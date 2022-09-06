@@ -19,7 +19,6 @@ using System.Reflection;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	[UpdateLevel(UpdateEnum.Normal)]
 	public class StartMenu : Component
 	{
 		[NoLoad]
@@ -221,10 +220,6 @@ namespace RhuEngine.Components
 			uibuilder.PopRect();
 
 			uibuilder.PopRect();
-		}
-
-
-		public override void Step() {
 		}
 
 	}

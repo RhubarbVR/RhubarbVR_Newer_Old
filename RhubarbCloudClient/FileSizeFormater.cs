@@ -12,7 +12,7 @@ namespace RhubarbCloudClient
 			var counter = 0;
 			var number = (decimal)bytes;
 			while (Math.Round(number / 1024) >= 1) {
-				number = number / 1024;
+				number /= 1024;
 				counter++;
 			}
 			return string.Format("{0:n2}{1}", number, _suffixes[counter]);

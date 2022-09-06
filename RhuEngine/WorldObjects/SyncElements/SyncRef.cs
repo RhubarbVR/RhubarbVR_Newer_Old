@@ -7,9 +7,8 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public interface ISyncRef : IWorldObject
+	public interface ISyncRef : ISyncObject
 	{
-		void OnLoaded();
 		NetPointer NetValue { get; set; }
 	}
 
@@ -40,7 +39,7 @@ namespace RhuEngine.WorldObjects
 				OnChanged();
 			}
 		}
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			NetValue = _targetPointer;
 		}
 		[Exposed]

@@ -47,7 +47,7 @@ namespace RhuEngine.WorldObjects.ECS
 						box = BoundsUtil.Combined(box, scale);
 					}
 				}
-				foreach (Entity item in children) {
+				foreach (Entity item in children.Cast<Entity>()) {
 					var element = item.Bounds;
 					element.Translate(item.GlobalTrans.Translation);
 					element.Rotate(item.GlobalTrans.Rotation);
@@ -85,7 +85,7 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 		public void ParentDepthUpdate() {
 			Depth = CompDepth;
-			foreach (Entity child in children) {
+			foreach (Entity child in children.Cast<Entity>()) {
 				child.ParentDepthUpdate();
 			}
 		}
@@ -103,7 +103,7 @@ namespace RhuEngine.WorldObjects.ECS
 			_cachedGlobalMatrix = matrix;
 			_cachedLocalMatrix = newLocal;
 			GlobalTransformChange?.Invoke(this, false);
-			foreach (Entity item in children) {
+			foreach (Entity item in children.Cast<Entity>()) {
 				item.GlobalTransMark(false);
 			}
 		}
@@ -117,7 +117,7 @@ namespace RhuEngine.WorldObjects.ECS
 
 		[Exposed]
 		public Entity GetChildByName(string v) {
-			foreach (var child in children) {
+			foreach (var child in children.Cast<Entity>()) {
 				if (((Entity)child).name.Value == v) {
 					return (Entity)child;
 				}
@@ -142,7 +142,7 @@ namespace RhuEngine.WorldObjects.ECS
 				throw new ArgumentException($"Type {type.GetFormattedName()} is not assignable to {typeof(Component).GetFormattedName()}");
 			}
 			var comp = components.Add(type);
-			comp.OnAttach();
+			comp.RunAttach();
 			return comp;
 		}
 		[Exposed]
@@ -151,20 +151,20 @@ namespace RhuEngine.WorldObjects.ECS
 				throw new ArgumentException($"Type {type.GetFormattedName()} is not assignable to {typeof(T).GetFormattedName()}");
 			}
 			var comp = components.Add(type);
-			comp.OnAttach();
+			comp.RunAttach();
 			return (T)comp;
 		}
 
 		[Exposed]
 		public T AttachComponent<T>() where T : Component, new() {
 			var comp = components.Add<T>();
-			comp.OnAttach();
+			comp.RunAttach();
 			return comp;
 		}
 		public T AttachComponent<T>(Action<T> beforeAttach) where T : Component, new() {
 			var comp = components.Add<T>();
 			beforeAttach.Invoke(comp);
-			comp.OnAttach();
+			comp.RunAttach();
 			return comp;
 		}
 
@@ -285,15 +285,8 @@ namespace RhuEngine.WorldObjects.ECS
 			if (IsRemoved || IsDestroying) {
 				return;
 			}
-			if (IsEnabled) {
-				foreach (var item in components) {
-					((Component)item).AddListObject();
-				}
-			}
-			else {
-				foreach (var item in components) {
-					((Component)item).RemoveListObject();
-				}
+			foreach (var item in components) {
+				((Component)item).ListObjectUpdate(IsEnabled);
 			}
 			if (IsEnabled && _hasUpdatingComponentSave) {
 				try {
@@ -309,7 +302,7 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			UpdateEnableList();
 			TransValueChange();
@@ -322,7 +315,7 @@ namespace RhuEngine.WorldObjects.ECS
 
 			if (_parentEnabled != parentEnabled) {
 				parentEnabled = _parentEnabled;
-				foreach (var entity in children) {
+				foreach (var entity in children.Cast<Entity>()) {
 					((Entity)entity).ParentEnabledChange(_parentEnabled);
 				}
 			}
@@ -333,7 +326,7 @@ namespace RhuEngine.WorldObjects.ECS
 			if (!enabled.Value && (World.RootEntity == this)) {
 				enabled.Value = true;
 			};
-			foreach (var entity in children) {
+			foreach (var entity in children.Cast<Entity>()) {
 				((Entity)entity).ParentEnabledChange(enabled.Value);
 			}
 			EnabledChanged?.Invoke();
@@ -429,7 +422,7 @@ namespace RhuEngine.WorldObjects.ECS
 				_cachedGlobalMatrix = value;
 				_cachedLocalMatrix = newLocal;
 				GlobalTransformChange?.Invoke(this, true);
-				foreach (Entity item in children) {
+				foreach (Entity item in children.Cast<Entity>()) {
 					item.GlobalTransMark();
 				}
 			}
@@ -456,7 +449,7 @@ namespace RhuEngine.WorldObjects.ECS
 				_cachedGlobalMatrix = value * parentMatrix;
 				_cachedLocalMatrix = value;
 				GlobalTransformChange?.Invoke(this, true);
-				foreach (Entity item in children) {
+				foreach (var item in children.Cast<Entity>()) {
 					item.GlobalTransMark();
 				}
 			}
@@ -478,7 +471,7 @@ namespace RhuEngine.WorldObjects.ECS
 				return;
 			}
 			if (!_dirtyGlobal) {
-				foreach (Entity child in children) {
+				foreach (var child in children.Cast<Entity>()) {
 					child.GlobalTransMark(physics);
 				}
 				GlobalTransformChange?.Invoke(this, physics);
@@ -495,20 +488,14 @@ namespace RhuEngine.WorldObjects.ECS
 		public void RenderStep() {
 			foreach (var item in components) {
 				var comp = (Component)item;
-				comp.AlwaysRenderStep();
-				if (comp.Enabled.Value) {
-					comp.RenderStep();
-				}
+				comp.RunRenderStep(comp.Enabled.Value && IsEnabled);
 			}
 		}
 
 		public void Step() {
 			foreach (var item in components) {
 				var comp = (Component)item;
-				comp.AlwaysStep();
-				if (comp.Enabled.Value && IsEnabled) {
-					comp.Step();
-				}
+				comp.RunStep(comp.Enabled.Value && IsEnabled);
 			}
 		}
 		[Exposed]

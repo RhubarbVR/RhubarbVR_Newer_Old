@@ -31,7 +31,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<bool> FullBox;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			Tint.Value = Colorf.White;
 		}

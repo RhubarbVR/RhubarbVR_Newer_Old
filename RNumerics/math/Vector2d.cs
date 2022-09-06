@@ -25,7 +25,7 @@ namespace RNumerics
 			}
 		}
 		[IgnoreMember]
-		public Vector2d Clean => new Vector2d(double.IsNaN(x)?0:x, double.IsNaN(y) ? 0 : y);
+		public Vector2d Clean => new(double.IsNaN(x)?0:x, double.IsNaN(y) ? 0 : y);
 
 		public Vector2d(double f) { x = y = f; }
 		public Vector2d(double x, double y) { this.x = x; this.y = y; }

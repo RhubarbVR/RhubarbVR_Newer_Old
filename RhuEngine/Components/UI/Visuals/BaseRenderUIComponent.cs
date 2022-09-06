@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 		public Vector2f CutMax => UIRect.CachedCutMax;
 		public Vector2f CutMin => UIRect.CachedCutMin;
 		public bool HasBeenCut => (CutMax != Vector2f.Inf) | (CutMin != Vector2f.NInf);
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			UIRect?.RenderComponents?.SafeAdd(this);
 		}

@@ -16,14 +16,14 @@ namespace RhuEngine.Components
 
 		public readonly Sync<Quaternionf> offset;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			offset.Value = Entity.rotation.Value;
 			driver.SetLinkerTarget(Entity.rotation);
 			speed.Value = new Vector3f(35, 35, 0);
 		}
 
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			var deltaSeconds = RTime.Elapsedf;
 			if (driver.Linked) {
 				var newval = Entity.LocalTrans * Matrix.R(offset.Value) * Matrix.R(Quaternionf.CreateFromEuler(speed.Value.x * deltaSeconds, speed.Value.y * deltaSeconds, speed.Value.z * deltaSeconds));

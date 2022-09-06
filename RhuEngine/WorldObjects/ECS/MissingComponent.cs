@@ -15,7 +15,7 @@ namespace RhuEngine.WorldObjects.ECS
 
 		public DataNodeGroup tempData;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			type.Value = tempType;
 		}
 

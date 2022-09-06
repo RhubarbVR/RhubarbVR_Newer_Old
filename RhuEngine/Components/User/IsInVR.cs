@@ -16,12 +16,12 @@ namespace RhuEngine.Components
 
 		public readonly Linker<bool> isNotVR;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			user.Target = LocalUser;
 		}
 
-		public override void Step() {
+		protected override void Step() {
 			if(user.Target != LocalUser) {
 				return;
 			}

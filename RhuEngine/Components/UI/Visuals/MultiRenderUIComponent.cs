@@ -21,7 +21,7 @@ namespace RhuEngine.Components
 		public SimpleMesh[] MovedMesh = Array.Empty<SimpleMesh>();
 		public SimpleMesh[] FinalMesh = Array.Empty<SimpleMesh>();
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			UIRect?.RenderComponents?.SafeAdd(this);
 		}

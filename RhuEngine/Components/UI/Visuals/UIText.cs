@@ -108,7 +108,7 @@ namespace RhuEngine.Components
 			textRender.LoadText(newtext, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, HorizontalAlien);
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			Font.Target = World.RootEntity.GetFirstComponentOrAttach<MainFont>();
 			StartingColor.Value = Colorf.White;

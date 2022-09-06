@@ -90,7 +90,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			RenderComponents.SafeAddRange(Entity.GetAllComponents<BaseRenderUIComponent>());
 			CanvasUpdate();
@@ -249,11 +249,11 @@ namespace RhuEngine.Components
 			Update = UpdateType.None;
 		}
 
-		public override void AddListObject() {
+		protected override void AddListObject() {
 			Engine.uiManager.AddRectComponent(this);
 		}
 
-		public override void RemoveListObject() {
+		protected override void RemoveListObject() {
 			Engine.uiManager.RemoveRectComponent(this);
 		}
 
@@ -272,7 +272,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			AnchorMin.Value = Vector2f.Zero;
 			AnchorMax.Value = Vector2f.One;

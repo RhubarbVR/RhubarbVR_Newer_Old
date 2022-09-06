@@ -59,25 +59,13 @@ namespace RNumerics
 			set { vertices[key] = value; Timestamp++; }
 		}
 
-		public Vector2d Start
-		{
-			get { return vertices[0]; }
-		}
-		public Vector2d End
-		{
-			get { return vertices[vertices.Count - 1]; }
-		}
+		public Vector2d Start => vertices[0];
+		public Vector2d End => vertices[vertices.Count - 1];
 
 
-		public ReadOnlyCollection<Vector2d> Vertices
-		{
-			get { return vertices.AsReadOnly(); }
-		}
+		public ReadOnlyCollection<Vector2d> Vertices => vertices.AsReadOnly();
 
-		public int VertexCount
-		{
-			get { return vertices.Count; }
-		}
+		public int VertexCount => vertices.Count;
 
 		public virtual void AppendVertex(Vector2d v)
 		{
@@ -124,10 +112,7 @@ namespace RNumerics
 				box.Contain(vertices[i]);
 			return box;
 		}
-		public AxisAlignedBox2d Bounds
-		{
-			get { return GetBounds(); }
-		}
+		public AxisAlignedBox2d Bounds => GetBounds();
 
 
 		public double DistanceSquared(Vector2d point)
@@ -166,7 +151,7 @@ namespace RNumerics
 
 
 		[System.Obsolete("This method name is confusing. Will remove in future. Use ArcLength instead")]
-		public double Length { get { return ArcLength; } }
+		public double Length => ArcLength;
 		public double ArcLength
 		{
 			get
@@ -410,10 +395,10 @@ namespace RNumerics
 	{
 		public PolyLine2d Polyline;
 
-		public bool IsClosed { get { return false; } }
+		public bool IsClosed => false;
 
 		// can call SampleT in range [0,ParamLength]
-		public double ParamLength { get { return Polyline.VertexCount; } }
+		public double ParamLength => Polyline.VertexCount;
 		public Vector2d SampleT(double t)
 		{
 			int i = (int)t;
@@ -429,11 +414,8 @@ namespace RNumerics
 			throw new NotImplementedException("Polygon2dCurve.TangentT");
 		}
 
-		public bool HasArcLength { get { return true; } }
-		public double ArcLength
-		{
-			get { return Polyline.ArcLength; }
-		}
+		public bool HasArcLength => true;
+		public double ArcLength => Polyline.ArcLength;
 
 		public Vector2d SampleArcLength(double a)
 		{
@@ -450,7 +432,7 @@ namespace RNumerics
 			return new PolyLine2DCurve() { Polyline = new PolyLine2d(this.Polyline) };
 		}
 
-		public bool IsTransformable { get { return true; } }
+		public bool IsTransformable => true;
 		public void Transform(ITransform2 xform)
 		{
 			Polyline.Transform(xform);

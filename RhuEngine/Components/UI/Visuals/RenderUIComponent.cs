@@ -19,7 +19,7 @@ namespace RhuEngine.Components
 		public SimpleMesh MovedMesh;
 		public SimpleMesh FinalMesh;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			UIRect?.RenderComponents?.SafeAdd(this);
 		}

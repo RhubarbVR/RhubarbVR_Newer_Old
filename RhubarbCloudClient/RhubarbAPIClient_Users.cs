@@ -99,7 +99,7 @@ namespace RhubarbCloudClient
 		}
 
 
-		private readonly Dictionary<Guid, ManagedUser> _loadedUsers = new Dictionary<Guid, ManagedUser>();
+		private readonly Dictionary<Guid, ManagedUser> _loadedUsers = new();
 
 		private async Task LoadStartUsers() {
 			_loadedUsers.Clear();

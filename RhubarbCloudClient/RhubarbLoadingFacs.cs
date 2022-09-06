@@ -85,10 +85,7 @@ namespace RhubarbCloudClient
 			if (ran <= 1) {
 				return GetRandomFunnyFact(random);
 			}
-			if (ran <= 3) {
-				return GetRandomFact(random);
-			}
-			return GetRandomRhubarbFact(random);
+			return ran <= 3 ? GetRandomFact(random) : GetRandomRhubarbFact(random);
 		}
 
 		public static string GetRandomFact(Localisation loc) {

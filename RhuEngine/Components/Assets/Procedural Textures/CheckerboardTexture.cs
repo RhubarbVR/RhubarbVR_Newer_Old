@@ -17,13 +17,13 @@ namespace RhuEngine.Components
 
 		[OnChanged(nameof(ComputeTexture))]
 		public readonly Sync<Colorf> CheckerTwo;
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			CheckerOne.Value = Colorf.Black;
 			CheckerTwo.Value = Colorf.White;
 		}
 
-		public override void Generate() {
+		protected override void Generate() {
 			if (tileWidth.Value * 2 >= Size.Value.x || tileWidth.Value * 2 >= Size.Value.y) {
 				throw new Exception($"tileWidth {tileWidth.Value} cannot be larger than texture size {Size.Value.x}x {Size.Value.y}y.");
 			}

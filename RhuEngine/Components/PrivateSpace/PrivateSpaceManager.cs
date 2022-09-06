@@ -40,7 +40,7 @@ namespace RhuEngine.Components
 		[NoSyncUpdate]
 		public Entity KeyBoardHolder;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			var TaskBarHoldermover = World.RootEntity.AddChild("TaskBarMover");
 			TaskBarHoldermover.AttachComponent<UserInterfacePositioner>();
@@ -58,11 +58,11 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			WorldManager.PrivateSpaceManager = this;
 		}
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}

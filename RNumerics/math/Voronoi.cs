@@ -42,11 +42,5 @@ namespace RNumerics.Voronoi
 			var n = distance / width;
 			return new Colorf(n, n, n) * tint;
 		}
-
-		private static void StrokeCellPixel(ref Colorb[] _tex, ref Vector2i[] _cell) {
-			for (var i = 0; i < _cell.Length; i++) {
-				_tex[(byte)_cell[i].x + (byte)_cell[i].y] = new Colorb(0, 1, 0);
-			}
-		}
 	}
 }

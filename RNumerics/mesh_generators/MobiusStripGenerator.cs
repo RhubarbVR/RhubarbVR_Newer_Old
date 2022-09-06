@@ -12,7 +12,7 @@ namespace RNumerics
 
 		// TODO Make this in-place with base.triangles
 		// No, do not make this readonly. It will only result in suffering
-		private List<int> tris = new List<int>();
+		private readonly List<int> _tris = new();
 
 		override public MeshGenerator Generate() {
 			base.vertices = new VectorArray3d(planeResolution * planeResolution);
@@ -61,22 +61,22 @@ namespace RNumerics
 						index3 = planeResolution - index3 - 1;
 					}
 
-					tris.Add(i);
-					tris.Add(index1);
-					tris.Add(index2);
+					_tris.Add(i);
+					_tris.Add(index1);
+					_tris.Add(index2);
 
-					tris.Add(index2);
-					tris.Add(index1);
-					tris.Add(index3);
+					_tris.Add(index2);
+					_tris.Add(index1);
+					_tris.Add(index3);
 				}
 			}
 
-			base.triangles = new IndexArray3i(tris.Count);
-			for (var i = 0; i < tris.Count; i += 3) {
+			base.triangles = new IndexArray3i(_tris.Count);
+			for (var i = 0; i < _tris.Count; i += 3) {
 				base.triangles[i] = new Index3i(
-					tris[i],
-					tris[i + 1],
-					tris[i + 2]
+					_tris[i],
+					_tris[i + 1],
+					_tris[i + 2]
 				);
 			}
 

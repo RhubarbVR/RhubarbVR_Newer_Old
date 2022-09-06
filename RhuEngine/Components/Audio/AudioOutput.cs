@@ -30,7 +30,7 @@ namespace RhuEngine.Components
 
 		public RSound audio;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			if (!Engine.EngineLink.CanAudio) {
 				return;
 			}

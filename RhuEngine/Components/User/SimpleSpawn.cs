@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "User" })]
 	public class SimpleSpawn : Component
 	{
-		public override void Step() {
+		protected override void Step() {
 			if (!Engine.EngineLink.SpawnPlayer) {
 				return;
 			}

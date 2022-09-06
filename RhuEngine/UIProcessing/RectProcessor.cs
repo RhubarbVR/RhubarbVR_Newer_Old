@@ -40,7 +40,8 @@ namespace RhuEngine.UIProcessing
 				//Register Child Update Enum
 				for (var i = orderList.Length - 1; i >= 0; i--) {
 					var item = orderList[i];
-					foreach (Entity child in item.Entity.children) {
+					//Todo: make forLoop
+					foreach (var child in item.Entity.children.Cast<Entity>()) {
 						if (((child?.UIRect?.Update ?? UIRect.UpdateType.None) & (UIRect.UpdateType.Local | UIRect.UpdateType.Child)) != UIRect.UpdateType.None) {
 							item.RegesterRectUpdate(UIRect.UpdateType.Child);
 						}

@@ -15,7 +15,7 @@ namespace RhuEngine.Components
 		public readonly Sync<T> seed;
 		public readonly Sync<T> offset;
 
-		public override void Step() {
+		protected override void Step() {
 			if (driver.Linked) {
 				try {
 					var time = (float)World.WorldTime;

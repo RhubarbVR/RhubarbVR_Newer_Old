@@ -17,9 +17,9 @@ namespace RhuEngine.Components
 			return StaticMaterialManager.GetMaterial<T>();
 		}
 
-		public abstract void UpdateAll();
+		protected abstract void UpdateAll();
 
-		public void LoadMaterial() {
+		protected void LoadMaterial() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
@@ -36,7 +36,7 @@ namespace RhuEngine.Components
 			_material = default;
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			LoadMaterial();
 		}

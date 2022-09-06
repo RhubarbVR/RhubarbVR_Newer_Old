@@ -71,7 +71,7 @@ namespace RhuEngine.WorldObjects
 				@object.Pointer = ((DataNode<NetPointer>)data.GetValue("Pointer")).Value;
 				@object.World.RegisterWorldObject(@object);
 			}
-			onLoaded.Add(@object.OnLoaded);
+			onLoaded.Add(@object.RunOnLoad);
 		}
 
 		public T ValueDeserialize<T>(DataNodeGroup data, IWorldObject @object) {
@@ -80,7 +80,7 @@ namespace RhuEngine.WorldObjects
 			}
 			BindPointer(data, @object);
 			if (typeof(ISyncObject).IsAssignableFrom(@object.GetType())) {
-				onLoaded.Add(((ISyncObject)@object).OnLoaded);
+				onLoaded.Add(((ISyncObject)@object).RunOnLoad);
 			}
 			if (typeof(T) == typeof(Type)) {
 				if(((DataNode<string>)data.GetValue("Value")).Value is null) {
@@ -137,7 +137,7 @@ namespace RhuEngine.WorldObjects
 				@object.Add(!hasNewRefIDs, true).Deserialize(val, this);
 			}
 			if (typeof(ISyncObject).IsAssignableFrom(@object.GetType())) {
-				onLoaded.Add(@object.OnLoaded);
+				onLoaded.Add(@object.RunOnLoad);
 			}
 		}
 
@@ -179,7 +179,7 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			if (typeof(ISyncObject).IsAssignableFrom(@object.GetType())) {
-				onLoaded.Add(((ISyncObject)@object).OnLoaded);
+				onLoaded.Add(((ISyncObject)@object).RunOnLoad);
 			}
 		}
 
@@ -211,7 +211,7 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			if (typeof(ISyncObject).IsAssignableFrom(@object.GetType())) {
-				onLoaded.Add(((ISyncObject)@object).OnLoaded);
+				onLoaded.Add(((ISyncObject)@object).RunOnLoad);
 			}
 		}
 	}
