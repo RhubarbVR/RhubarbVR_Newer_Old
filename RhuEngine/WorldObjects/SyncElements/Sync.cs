@@ -10,10 +10,13 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public interface ISync
+	public interface ISync : ISyncMember
 	{
 		public void SetStartingObject();
 		public void SetValue(object value);
+
+		public void SetValueForce(object value);
+		public object GetValue();
 	}
 	[GenericTypeConstraint()]
 	public class Sync<T> : SyncObject, ILinkerMember<T>, ISync, INetworkedObject, IChangeable, ISyncMember
@@ -62,7 +65,7 @@ namespace RhuEngine.WorldObjects
 
 		public event Action<IChangeable> Changed;
 
-		public void SetValue(object value) {
+		public void SetValueForce(object value) {
 			lock (_locker) {
 				try {
 					_value = (T)value;
@@ -143,6 +146,14 @@ namespace RhuEngine.WorldObjects
 		public void SetStartingObject() {
 			_value = StartingValue;
 			UpdatedValue();
+		}
+
+		public void SetValue(object data) {
+			Value = (T)data;
+		}
+
+		public object GetValue() {
+			return Value;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -198,14 +198,14 @@ namespace RhuEngine.Components
 							var ewe = charitem.textsize;
 							bounds.Remove(charitem.p.Translation - new Vector3f(0, charitem.Leading, 0));
 							bounds.Remove(charitem.p.Translation + ewe.X__ - new Vector3f(0, charitem.Leading, 0));
-							bounds.Remove(charitem.p.Translation + ewe.XY_);
-							bounds.Remove(charitem.p.Translation + ewe._Y_);
+							bounds.Remove(charitem.p.Translation + ewe.XY_ - new Vector3f(0, charitem.Leading, 0));
+							bounds.Remove(charitem.p.Translation + ewe._Y_ - new Vector3f(0, charitem.Leading, 0));
 							var old = charitem.p.Translation;
 							charitem.p.Translation = new Vector3f(old.x, old.y - def, old.z);
 							bounds.Add(charitem.p.Translation - new Vector3f(0, charitem.Leading, 0));
 							bounds.Add(charitem.p.Translation + ewe.X__ - new Vector3f(0, charitem.Leading, 0));
-							bounds.Add(charitem.p.Translation + ewe.XY_);
-							bounds.Add(charitem.p.Translation + ewe._Y_);
+							bounds.Add(charitem.p.Translation + ewe.XY_ - new Vector3f(0, charitem.Leading, 0));
+							bounds.Add(charitem.p.Translation + ewe._Y_ - new Vector3f(0, charitem.Leading, 0));
 						}
 					}
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
@@ -219,8 +219,8 @@ namespace RhuEngine.Components
 					thisrow.Push(chare);
 					bounds.Add(textpos - new Vector3f(0, chare.Leading, 0));
 					bounds.Add(textpos + ew.X__ - new Vector3f(0, chare.Leading, 0));
-					bounds.Add(textpos + ew.XY_);
-					bounds.Add(textpos + ew._Y_);
+					bounds.Add(textpos + ew.XY_ - new Vector3f(0, chare.Leading, 0));
+					bounds.Add(textpos + ew._Y_ - new Vector3f(0, chare.Leading, 0));
 					index++;
 				}
 			}

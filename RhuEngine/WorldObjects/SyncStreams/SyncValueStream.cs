@@ -44,7 +44,7 @@ namespace RhuEngine.WorldObjects
 
 		public event Action<IChangeable> Changed;
 
-		public void SetValue(object value) {
+		public void SetValueForce(object value) {
 			lock (_locker) {
 				try {
 					Value = (T)value;
@@ -104,6 +104,14 @@ namespace RhuEngine.WorldObjects
 
 		public override void Deserialize(IDataNode data, SyncObjectDeserializerObject syncObjectSerializerObject) {
 			_value = syncObjectSerializerObject.ValueDeserialize<T>((DataNodeGroup)data, this);
+		}
+
+		public object GetValue() {
+			return _value;
+		}
+
+		public void SetValue(object data) {
+			Value = (T)data;
 		}
 	}
 }

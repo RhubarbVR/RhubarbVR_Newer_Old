@@ -65,6 +65,9 @@ namespace RhuEngine.Components
 		}
 
 		public override void ProcessMeshUpdate() {
+			if(UIRect?.CachedCanvas is null) {
+				return;
+			}
 			switch (UIRect.RenderMeshUpdate) {
 				case UIRect.RenderMeshUpdateType.FullResized:
 					UpdateMesh();

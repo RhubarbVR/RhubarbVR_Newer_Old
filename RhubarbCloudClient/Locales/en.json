@@ -190,6 +190,7 @@
     "Editor.Entity.AddPivot": "Add Pivot",
     "Editor.Entity.AddParent": "Add Parent",
     "Editor.Pivot": "Pivot",
+    "Editor.Observer": "Observer",
 
     "Editor.Entities": "Entities",
     "Editor.Component": "Component",

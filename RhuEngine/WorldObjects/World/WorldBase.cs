@@ -42,7 +42,7 @@ namespace RhuEngine.WorldObjects
 					if (typeof(ISync).IsAssignableFrom(item.FieldType)) {
 						var startValue = item.GetCustomAttribute<DefaultAttribute>();
 						if (startValue != null) {
-							((ISync)instance).SetValue(startValue.Data);
+							((ISync)instance).SetValueForce(startValue.Data);
 						}
 					}
 					if (typeof(IAssetRef).IsAssignableFrom(item.FieldType)) {

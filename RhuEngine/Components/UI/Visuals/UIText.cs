@@ -122,7 +122,7 @@ namespace RhuEngine.Components
 			StandaredBaseMesh = new SimpleMesh[textRender.simprendermeshes.Count];
 			for (var i = 0; i < textRender.simprendermeshes.Count; i++) {
 				StandaredBaseMesh[i] = textRender.simprendermeshes[i];
-				StandaredBaseMesh[i].Translate(-textRender.axisAlignedBox3F.Min.x, -textRender.axisAlignedBox3F.Min.y, 0.5f);
+				StandaredBaseMesh[i].Translate(-textRender.axisAlignedBox3F.Min.x, -textRender.axisAlignedBox3F.Min.y, 0.05f);
 				StandaredBaseMesh[i].Scale(1 / UIRect.Canvas.scale.Value.x, 1 / UIRect.Canvas.scale.Value.y, 1 / UIRect.Canvas.scale.Value.z);
 				var SizeOnCavas = new Vector2f(textRender.Width / UIRect.Canvas.scale.Value.x, textRender.Height / UIRect.Canvas.scale.Value.y);
 				if (FitText) {

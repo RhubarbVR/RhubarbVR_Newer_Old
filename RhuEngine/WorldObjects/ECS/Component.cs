@@ -2,7 +2,15 @@
 using System.Reflection;
 namespace RhuEngine.WorldObjects.ECS
 {
-	public abstract class Component : SyncObject, IOffsetableElement
+	public interface IComponent : ISyncObject
+	{
+		Entity Entity { get; }
+		int Offset { get; }
+
+		void RunAttach();
+	}
+
+	public abstract class Component : SyncObject, IComponent, IOffsetableElement
 	{
 		[NoSave]
 		[NoShow]
@@ -57,7 +65,7 @@ namespace RhuEngine.WorldObjects.ECS
 
 		}
 
-		internal void RunAttach() {
+		public void RunAttach() {
 			OnAttach();
 		}
 

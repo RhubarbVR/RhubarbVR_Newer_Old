@@ -33,7 +33,7 @@ namespace RhuEngine.WorldObjects.ECS
 		public readonly Sync<int> orderOffset;
 		public int Offset => orderOffset.Value;
 		[OnChanged(nameof(OnComponentChange))]
-		public readonly SyncAbstractObjList<Component> components;
+		public readonly SyncAbstractObjList<IComponent> components;
 
 		[Exposed]
 		public AxisAlignedBox3f Bounds
@@ -137,7 +137,7 @@ namespace RhuEngine.WorldObjects.ECS
 			OffsetChanged?.Invoke();
 		}
 		[Exposed]
-		public Component AttachComponent(Type type) {
+		public IComponent AttachComponent(Type type) {
 			if (!typeof(Component).IsAssignableFrom(type)) {
 				throw new ArgumentException($"Type {type.GetFormattedName()} is not assignable to {typeof(Component).GetFormattedName()}");
 			}
@@ -146,7 +146,7 @@ namespace RhuEngine.WorldObjects.ECS
 			return comp;
 		}
 		[Exposed]
-		public T AttachComponent<T>(Type type) where T : Component {
+		public T AttachComponent<T>(Type type) where T : class, IComponent {
 			if (!typeof(T).IsAssignableFrom(type)) {
 				throw new ArgumentException($"Type {type.GetFormattedName()} is not assignable to {typeof(T).GetFormattedName()}");
 			}

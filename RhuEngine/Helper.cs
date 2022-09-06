@@ -9,6 +9,7 @@ using System.Reflection;
 using RhuEngine.WorldObjects.ECS;
 using System.Text;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace RhuEngine
 {
@@ -21,7 +22,7 @@ namespace RhuEngine
 			return string.Join(string.Empty, value.Select((x) => x.ToString()).ToArray());
 		}
 
-		public static string RuneSubstring(this string value,int startIndex, int endlength = int.MaxValue) {
+		public static string RuneSubstring(this string value, int startIndex, int endlength = int.MaxValue) {
 			var newstring = new List<Rune>();
 			var runeIndex = 0;
 			var endIndex = startIndex + endlength;
@@ -36,11 +37,11 @@ namespace RhuEngine
 		public static string ApplyStringFunctions(this string value) {
 			var newstring = new List<Rune>();
 			foreach (var currentchar in value.EnumerateRunes()) {
-				if(currentchar == new Rune('\r')) {
+				if (currentchar == new Rune('\r')) {
 					newstring.Add(new Rune('\n'));
 				}
-				else if(currentchar == new Rune('\b')) {
-					if(newstring.Count != 0) {
+				else if (currentchar == new Rune('\b')) {
+					if (newstring.Count != 0) {
 						newstring.RemoveAt(newstring.Count - 1);
 					}
 				}
@@ -56,9 +57,9 @@ namespace RhuEngine
 			var r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
 			return r.Replace(path, "");
 		}
-		
+
 		public static string TouchUpPath(this string path) {
-			return path.Replace("\\","/");
+			return path.Replace("\\", "/");
 		}
 
 		public static Matrix RotNormalized(this Matrix oldmatrix) {
@@ -71,7 +72,7 @@ namespace RhuEngine
 		}
 
 		public static string GetFormattedName(this Type type) {
-			if(type == null) {
+			if (type == null) {
 				return "Null";
 			}
 			if (type.IsGenericType) {
@@ -106,11 +107,17 @@ namespace RhuEngine
 
 		public static Colorf GetHashHue(this string str) {
 			var hashCode = str.GetHashCodeSafe();
-			var h = (float)(int)(ushort)hashCode%360f;
+			var h = (float)(int)(ushort)hashCode % 360f;
 			var s = (float)(int)(byte)(hashCode >> 16) / 255f / 2f;
 			var v = 0.5f + ((float)(int)(byte)(hashCode >> 24) / 255f * 0.5f);
 			return new ColorHSV(h, s, v).RGBA;
 		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsAssignableTo(this Type type,Type type1) {
+			return type1.IsAssignableFrom(type);
+		}
+
 		public static Type MemberInnerType(this MemberInfo data) {
 			switch (data.MemberType) {
 				case MemberTypes.Field:
@@ -122,24 +129,24 @@ namespace RhuEngine
 			}
 			return null;
 		}
-			public static Colorf GetTypeColor(this Type type) {
-			if(type is null) {
+		public static Colorf GetTypeColor(this Type type) {
+			if (type is null) {
 				return Colorf.Black;
 			}
 			if (type == typeof(bool)) {
 				return new Colorf(0.25f, 0.25f, 0.25f);
 			}
 			if (type == typeof(string)) {
-				return new Colorf(0.5f,0f,0f);
+				return new Colorf(0.5f, 0f, 0f);
 			}
 			if (type == typeof(Colorf)) {
 				return new Colorf(0.75f, 0.4f, 0f);
 			}
 			if (type == typeof(Colorb)) {
-				return new Colorf(0.75f,0.5f,0f);
+				return new Colorf(0.75f, 0.5f, 0f);
 			}
 			if (type == typeof(Action)) {
-				return new Colorf(1,1,1);
+				return new Colorf(1, 1, 1);
 			}
 			if (type == typeof(object)) {
 				return new Colorf(0.68f, 0.82f, 0.3137254901960784f);
@@ -157,7 +164,7 @@ namespace RhuEngine
 				return new Colorf(0, 0.1f, 1) + new Colorf(0, 1f, 0.4f);
 			}
 			if (type == typeof(sbyte)) {
-				return new Colorf(1f, 0.7f, 0) + new Colorf(0.7f, 1f,0f);
+				return new Colorf(1f, 0.7f, 0) + new Colorf(0.7f, 1f, 0f);
 			}
 			if (type == typeof(short)) {
 				return new Colorf(1f, 0.7f, 0) + new Colorf(0.6f, 1f, 0f);
@@ -183,7 +190,7 @@ namespace RhuEngine
 				}
 			}
 			var hashCode = type.GetFormattedName().GetHashCodeSafe();
-			var h = (float)(int)(ushort)hashCode%360f;
+			var h = (float)(int)(ushort)hashCode % 360f;
 			var s = (float)(int)(byte)(hashCode >> 16) / 255f / 2f;
 			var v = 0.5f + ((float)(int)(byte)(hashCode >> 24) / 255f * 0.5f);
 			return new ColorHSV(h, s, v).RGBA;
@@ -200,7 +207,7 @@ namespace RhuEngine
 		public static float DistSquared(this Vector3f start, Vector3f end) {
 			return System.Numerics.Vector3.DistanceSquared(start, end);
 		}
-
+		
 		public static IWorldObject GetClosedSyncObject(this IWorldObject worldObject, bool allowSyncVals = false) {
 			allowSyncVals = allowSyncVals || typeof(SyncStream).IsAssignableFrom(worldObject.GetType());
 			try {

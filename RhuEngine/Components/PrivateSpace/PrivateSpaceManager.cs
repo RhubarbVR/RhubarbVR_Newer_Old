@@ -141,7 +141,7 @@ namespace RhuEngine.Components
 						}
 						var ReletiveEntity = syncObject.World.GetLocalUser()?.userRoot.Target?.head.Target ?? syncObject.World.RootEntity;
 						var observer = (syncObject.World.GetLocalUser()?.userRoot.Target?.Entity.parent.Target ?? syncObject.World.RootEntity).AddChild("Observer");
-						observer.AttachComponent<ObserverWindow>().Observerd.Target = syncObject;
+						observer.AttachComponent<ObserverWindow>().Observerd.Target = syncObject.GetClosedEntity();
 						observer.GlobalTrans = Matrix.T(-0.5f, -0.5f, -1) * ReletiveEntity.GlobalTrans;
 					}
 				}

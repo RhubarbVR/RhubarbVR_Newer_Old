@@ -14,11 +14,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Locales\de.json" />
-		<EmbeddedResource Include="Locales\en-us.json" />
-		<EmbeddedResource Include="Locales\en.json" />
-		<EmbeddedResource Include="Locales\KeyQwerty.json" />
-		<EmbeddedResource Include="Locales\nl.json" />
+		<EmbeddedResource Include="Locales\de.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Locales\en-us.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Locales\en.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Locales\KeyQwerty.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Locales\nl.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
 	</ItemGroup>
 	
   <ItemGroup>

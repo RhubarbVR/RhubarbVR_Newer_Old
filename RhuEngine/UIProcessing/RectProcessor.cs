@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using RhuEngine.Components;
+using RhuEngine.Linker;
 using RhuEngine.Managers;
 using RhuEngine.WorldObjects.ECS;
 
@@ -27,6 +28,10 @@ namespace RhuEngine.UIProcessing
 				//Register Parrent Update Enum
 				for (var i = 0; i < orderList.Length; i++) {
 					var item = orderList[i];
+					if (RInput.Key(Key.F10).IsActive()) {
+						//Reloads all ui
+						item.MarkForRenderMeshUpdate(UIRect.RenderMeshUpdateType.FullResized);
+					}
 					var hasLocalUpdate = (item.Update & UIRect.UpdateType.Local) != UIRect.UpdateType.None;
 					var parent = item.Entity.parent.Target;
 					if (((parent?.UIRect?.Update ?? UIRect.UpdateType.None) & (UIRect.UpdateType.Local | UIRect.UpdateType.Parrent)) != UIRect.UpdateType.None) {

@@ -438,13 +438,13 @@ namespace RhuEngine.Components
 			var listentitHolderrect = listentitHolder.AttachComponent<CuttingUIRect>();
 			listentitHolderrect.AnchorMin.Value = new Vector2f(0.20f, 0.1f);
 			listentitHolderrect.AnchorMax.Value = new Vector2f(0.8f, 0.9f);
+			var interaction = mainentity.AttachComponent<UIScrollInteraction>();
+			var img4 = listentitHolder.AttachComponent<UIRectangle>();
 			var scroller = listentitHolder.AddChild("Scroller");
 			var scrollerrect = scroller.AttachComponent<BasicScrollRect>();
 			var listentit = scroller.AddChild("list");
 			var list = listentit.AttachComponent<HorizontalList>();
-			var interaction = listentit.AttachComponent<UIScrollInteraction>();
 			interaction.OnScroll.Target += scrollerrect.Scroll;
-			var img4 = listentit.AttachComponent<UIRectangle>();
 			var colorassign2 = listentit.AttachComponent<UIColorAssign>();
 			colorassign2.Alpha.Value = 0.5f;
 			colorassign2.ColorShif.Value = 0.3f;

@@ -82,10 +82,4 @@
 		<Folder Include="ClipBoard\" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Update="Locales\*.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
 </Project>

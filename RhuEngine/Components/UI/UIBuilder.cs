@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 {
 	public class UIBuilder
 	{
-		public AssetProvider<RMaterial> MainMit;
+		public IAssetProvider<RMaterial> MainMat;
 
 		public Stack<Entity> RectEntityStack = new();
 		public Stack<UIRect> RectStack = new();
@@ -28,21 +28,31 @@ namespace RhuEngine.Components
 
 		public bool AddLocal;
 
-		public UIBuilder(Entity entity, AssetProvider<RMaterial> mainMit, UIRect firstRect = null, bool addLocal = false) {
+		public UIBuilder(Entity entity, IAssetProvider<RMaterial> mainMit, UIRect firstRect = null, bool addLocal = false,bool noFirstUIRect = false) {
 			AddLocal = addLocal;
 			Root = entity;
 			CurretRectEntity = entity;
-			firstRect ??= CurretRectEntity.AttachComponent<UIRect>();
+			if (!noFirstUIRect) {
+				firstRect ??= CurretRectEntity.AttachComponent<UIRect>();
+			}
 			CurrentRect = firstRect;
-			MainMit = mainMit;
+			MainMat = mainMit;
 		}
 
 		public T AttachComponentToStack<T>() where T : Component, new() {
 			return CurretRectEntity.AttachComponent<T>();
 		}
 
+		public UIRect PushRectNoDepth(Vector2f? min = null, Vector2f? max = null) {
+			return PushRect(min, max, 0);
+		}
+
 		public UIRect PushRect(Vector2f? min = null, Vector2f? max = null, float? Depth = null) {
 			return AttachChildRect<UIRect>(min, max, Depth);
+		}
+
+		public Entity AddChildEntity() {
+			return CurretRectEntity.AddChild("ChildRect");
 		}
 
 		public T AttachChildRect<T>(Vector2f? min = null, Vector2f? max = null, float? Depth = null) where T : UIRect, new() {
@@ -172,7 +182,7 @@ namespace RhuEngine.Components
 
 		public void AddRectangle(float coloroffset = 0, float alpha = 1, bool? fullbox = null) {
 			var rectangle = AttachComponentToStack<UIRectangle>();
-			rectangle.Material.Target = MainMit;
+			rectangle.Material.Target = MainMat;
 			rectangle.AddRoundingSettings();
 			var colorassing = AttachComponentToStack<UIColorAssign>();
 			colorassing.ColorShif.Value = coloroffset;
@@ -237,7 +247,7 @@ namespace RhuEngine.Components
 			var currsor = AttachComponentToStack<UITextCurrsor>();
 			currsor.TextCurrsor.Target = editor;
 			currsor.TextComp.Target = uitext;
-			currsor.Material.Target = MainMit;
+			currsor.Material.Target = MainMat;
 			if (autopop) {
 				PopRect();
 				PopRect();

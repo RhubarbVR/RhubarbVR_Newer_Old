@@ -143,10 +143,8 @@ namespace RhuEngine.Components
 		public Vector2f MoveAmount { get; private set; }
 
 		public void ApplyMovement(Vector2f moveAmount) {
-			if (MoveAmount != moveAmount) {
-				MoveAmount = moveAmount;
-				RegisterRectUpdateEvent();
-			}
+			MoveAmount = moveAmount;
+			RegisterRectUpdateEvent();
 		}
 
 		public UIRect ParentRect => Entity.parent.Target?.UIRect;
