@@ -68,7 +68,7 @@ namespace RhuEngine.WorldObjects
 		}
 		[Exposed]
 		public User GetMasterUser() {
-			return Users[MasterUser];
+			return IsNetworked ? Users[MasterUser] : Users[0];
 		}
 		[Exposed]
 		public User GetHostUser() {

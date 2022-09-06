@@ -103,7 +103,7 @@ namespace RhuEngine.WorldObjects.ECS
 			_cachedGlobalMatrix = matrix;
 			_cachedLocalMatrix = newLocal;
 			GlobalTransformChange?.Invoke(this, false);
-			foreach (Entity item in children.Cast<Entity>()) {
+			foreach (var item in children.Cast<Entity>()) {
 				item.GlobalTransMark(false);
 			}
 		}

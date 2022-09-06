@@ -33,6 +33,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public User LocalUser => World.GetLocalUser();
+		public User MasterUser => World.GetMasterUser();
 
 		public bool IsDestroying
 		{

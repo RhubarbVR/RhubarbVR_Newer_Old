@@ -48,7 +48,7 @@ namespace RhuEngine.Components
 			taskBar = TaskBarHolder.AddChild("TaskBar").AttachComponent<TaskBar>();
 			if (Engine.EngineLink.CanRender) {
 				RWorld.ExecuteOnStartOfFrame(() => RWorld.ExecuteOnEndOfFrame(() => {
-					if(LocalUser.userRoot.Target is null) {
+					if (LocalUser.userRoot.Target is null) {
 						return;
 					}
 					KeyBoardHolder = LocalUser.userRoot.Target.Entity.AddChild("KeyBoardHolder");
@@ -101,7 +101,7 @@ namespace RhuEngine.Components
 					return true;
 				}
 			}
-			catch { 
+			catch {
 			}
 			return false;
 		}
@@ -123,7 +123,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public bool RunLaserCastInWorld(World world, ref Vector3f headFrompos, ref Vector3f headToPos, uint touchUndex, float pressForce,float gripForces,Handed side) {
+		public bool RunLaserCastInWorld(World world, ref Vector3f headFrompos, ref Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side) {
 			if (world.PhysicsSim.RayTest(ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
 
 				if (collider.CustomObject is UICanvas uIComponent) {
@@ -133,6 +133,17 @@ namespace RhuEngine.Components
 				if (collider.CustomObject is PhysicsObject physicsObject) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
 					physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
+				}
+				if (collider.CustomObject is IWorldObject syncObject) {
+					if (RInput.Key(Key.I).IsJustActive()) {
+						if (syncObject.World.IsPersonalSpace) {
+							return true;
+						}
+						var ReletiveEntity = syncObject.World.GetLocalUser()?.userRoot.Target?.head.Target ?? syncObject.World.RootEntity;
+						var observer = (syncObject.World.GetLocalUser()?.userRoot.Target?.Entity.parent.Target ?? syncObject.World.RootEntity).AddChild("Observer");
+						observer.AttachComponent<ObserverWindow>().Observerd.Target = syncObject;
+						observer.GlobalTrans = Matrix.T(-0.5f, -0.5f, -1) * ReletiveEntity.GlobalTrans;
+					}
 				}
 				return true;
 			}
@@ -182,7 +193,7 @@ namespace RhuEngine.Components
 			World.DrawDebugSphere(headToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
 			var vheadFrompos = headFrompos.Translation;
 			var vheadToPos = headToPos.Translation;
-			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10,PressForce,GripForce, Handed.Max)) {
+			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max)) {
 
 			}
 			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max)) {
@@ -195,7 +206,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			KeyBoardHolder.enabled.Value = Engine.HasKeyboard;
-			keyBoard.uICanvas.Entity.GlobalTrans = Matrix.T(new Vector3f(0,-0.25f,0.1f)) * openLocation;
+			keyBoard.uICanvas.Entity.GlobalTrans = Matrix.T(new Vector3f(0, -0.25f, 0.1f)) * openLocation;
 		}
 	}
 }

@@ -39,7 +39,7 @@ namespace RhubarbCloudClient
 					return;
 				}
 				if (!value) {
-					IsGoneOfline();
+					IsGoneOffline();
 					HasGoneOfline?.Invoke();
 				}
 				if (value) {
@@ -50,11 +50,13 @@ namespace RhubarbCloudClient
 			}
 		}
 
-		private void IsGoneOfline() {
+		private void IsGoneOffline() {
+			Console.WriteLine("Has gone offline");
 			LogOutPros();
 		}
 
 		private void IsGoneOnline() {
+			Console.WriteLine("Has gone Online");
 			GetMe().ConfigureAwait(false);
 		}
 
@@ -66,7 +68,6 @@ namespace RhubarbCloudClient
 				return (int)sw.ElapsedMilliseconds;
 			}
 			catch {
-				Console.WriteLine("Is Offline");
 				return -1;
 			}
 		}
@@ -83,10 +84,6 @@ namespace RhubarbCloudClient
 		private async Task CheckForInternetConnectionLoop() {
 			Ping = await CheckForInternetConnection();
 			IsOnline = Ping != -1;
-			await Task.Delay(5000);
-			if (!IsOnline) {
-				await CheckForInternetConnectionLoop();
-			}
 		}
 	}
 }
