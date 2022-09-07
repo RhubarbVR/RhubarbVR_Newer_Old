@@ -26,15 +26,20 @@ namespace RhuEngine.WorldObjects.ECS
 		public readonly Sync<Quaternionf> rotation;
 		[OnChanged(nameof(TransValueChange))]
 		public readonly Sync<Vector3f> scale;
-		[Default(true)]
-		[OnChanged(nameof(OnEnableChange))]
-		public readonly Sync<bool> enabled;
 		[OnChanged(nameof(OnOrderOffsetChange))]
 		public readonly Sync<int> orderOffset;
 		public int Offset => orderOffset.Value;
+		[Default(true)]
+		[OnChanged(nameof(OnEnableChange))]
+		public readonly Sync<bool> enabled;
+
+		[Default(true)]
+		public readonly Sync<bool> persistence;
+
+		public override bool Persistence => persistence.Value;
+
 		[OnChanged(nameof(OnComponentChange))]
 		public readonly SyncAbstractObjList<IComponent> components;
-
 		[Exposed]
 		public AxisAlignedBox3f Bounds
 		{
@@ -63,10 +68,7 @@ namespace RhuEngine.WorldObjects.ECS
 			children.Clear();
 		}
 
-		[Default(true)]
-		public readonly Sync<bool> persistence;
 
-		public override bool Persistence => persistence.Value;
 
 		public event Action<GrabbableHolder, bool, float> OnGrip;
 		internal void CallOnGrip(GrabbableHolder obj, bool Laser, float gripForce) {
