@@ -7,6 +7,7 @@ using MessagePack.Formatters;
 
 namespace SharedModels.GameSpecific
 {
+
 	[Formatter]
 	public class StreamDataPackedformat : IMessagePackFormatter<StreamDataPacked>
 	{

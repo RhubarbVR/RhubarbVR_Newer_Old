@@ -28,9 +28,18 @@ namespace RhuEngine.Components.PrivateSpace
 			if (!buttonEvent.IsClicked) {
 				return;
 			}
-			var world = WorldManager.CreateNewWorld(World.FocusLevel.Focused, false, "NewWorld");
-			world.WorldName.Value = "New World";
-			Close();
+			var isLogin = Engine.netApiManager.Client.IsLogin;
+			if (isLogin) {
+				var user = Engine.netApiManager.Client.User;
+				var world = WorldManager.CreateNewWorld(World.FocusLevel.Focused, false, $"{user.UserName}'s World");
+				world.WorldName.Value = $"{user.UserName}'s World";
+				Close();
+			}
+			else {
+				var world = WorldManager.CreateNewWorld(World.FocusLevel.Focused, true, "Local World");
+				world.WorldName.Value = "New Local World";
+				Close();
+			}
 		}
 
 		public override void LoadUI(Entity uiRoot) {

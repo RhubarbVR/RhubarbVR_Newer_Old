@@ -11,13 +11,15 @@ using RhuEngine.Components;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
 using RNumerics;
+using System.Threading.Tasks;
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World : IWorldObject {
+	public partial class World : IWorldObject
+	{
 		public PhysicsSim PhysicsSim { get; set; }
 
-		public bool IsLoading => IsDeserializing || IsLoadingNet;
+		public bool IsLoading => (IsDeserializing || IsLoadingNet) & !HasError;
 
 		public bool IsPersonalSpace { get; private set; }
 
@@ -91,7 +93,8 @@ namespace RhuEngine.WorldObjects
 		}
 
 
-		public enum FocusLevel {
+		public enum FocusLevel
+		{
 			Background,
 			Focused,
 			Overlay,
@@ -132,7 +135,7 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 		}
-		
+
 		[Exposed]
 		[NoShow]
 		public readonly Entity RootEntity;
@@ -299,7 +302,7 @@ namespace RhuEngine.WorldObjects
 				RLog.Err($"Failed to update entities for session {WorldDebugName}. Error: {e}");
 			}
 		}
-
+		public event Action<World> IsDisposeing;
 		public bool IsDisposed { get; private set; }
 		public bool HasError { get; internal set; }
 
@@ -308,34 +311,39 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			IsDisposed = true;
-			assetSession.Dispose();
-			try {
-				worldManager.RemoveWorld(this);
-			}
-			catch { }
-			try {
-				if (!IsLoading) {
-					GetLocalUser()?.userRoot.Target?.Entity.Dispose();
-					if (_netManager is not null) {
-						for (var i = 0; i < 3; i++) {
-							_netManager.PollEvents();
-							Thread.Sleep(100);
+			IsDisposeing?.Invoke(this);
+			Task.Run(async () => {
+				assetSession.Dispose();
+				try {
+					worldManager.RemoveWorld(this);
+				}
+				catch { }
+				try {
+					if (!IsLoading) {
+						GetLocalUser()?.userRoot.Target?.Entity.Dispose();
+						if (_netManager is not null) {
+							for (var i = 0; i < 10; i++) {
+								_netManager.PollEvents();
+								await Task.Delay(100);
+							}
 						}
 					}
 				}
-			}
-			catch { }
-			if (IsNetworked) {
-				if (!HasError) {
-					//ToDO: SessionRequest
-					//Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = Guid.Parse(SessionID.Value), RequestData = SessionID.Value, RequestType = RequestType.LeaveSession });
+				catch { }
+				if (IsNetworked) {
+					if (!HasError) {
+						try {
+							await Engine.netApiManager.Client.LeaveSession(Guid.Parse(SessionID.Value));
+						}
+						catch { }
+					}
 				}
-			}
-			try {
-				_netManager?.DisconnectAll();
-			}
-			catch { }
-			GC.Collect();
+				try {
+					_netManager?.DisconnectAll();
+				}
+				catch { }
+				GC.Collect();
+			});
 		}
 	}
 }

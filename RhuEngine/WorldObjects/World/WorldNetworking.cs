@@ -87,8 +87,11 @@ namespace RhuEngine.WorldObjects
 			//Engine.netApiManager.SendDataToSocked(new SessionRequest { RequestType = RequestType.UpdateSession, RequestData = JsonConvert.SerializeObject(sessionConnection), ID = sessionInfo.SessionId });
 		}
 
+		public bool IsJoiningSession { get; private set; }
+
 		private async Task ConnectedToSession(bool joiningSession) {
 			IsLoadingNet = true;
+			IsJoiningSession = joiningSession;
 			LoadNatManager();
 			try {
 				var Pings = new Dictionary<string, int>();
@@ -265,7 +268,8 @@ namespace RhuEngine.WorldObjects
 							LoadMsg = "World state Found";
 							// Wait for everyone
 							while (ActiveConnections.Count > 0) {
-								Thread.Sleep(1000);
+								LoadMsg = "Waiting for connections";
+								await Task.Delay(1000);
 							}
 							_worldObjects.Clear();
 							var deserializer = new SyncObjectDeserializerObject(false);
@@ -280,10 +284,11 @@ namespace RhuEngine.WorldObjects
 									LoadUserIn(contpeer);
 								}
 							}
+							FindNewMaster();
+							AddLocalUser();
 							IsDeserializing = false;
 							WaitingForWorldStartState = false;
-							AddLocalUser();
-							FindNewMaster();
+							
 						}
 						catch (Exception ex) {
 							RLog.Err("Failed to load world state" + ex);
@@ -300,7 +305,14 @@ namespace RhuEngine.WorldObjects
 						throw new Exception();
 					}
 					try {
-						_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
+						if (_networkedObjects.ContainsKey(target.Value)) {
+							_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
+						}
+						else {
+							if (deliveryMethod == DeliveryMethod.ReliableOrdered && peer.User is not null) {
+								RLog.Err($"Failed to Process NetData target:{target.Value.HexString()} Error: _networkedObjects Not loaded");
+							}
+						}
 					}
 					catch (Exception ex) {
 #if DEBUG
@@ -314,6 +326,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
+
 		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod) {
 			if (IsDisposed) {
 				return;
@@ -322,33 +335,66 @@ namespace RhuEngine.WorldObjects
 				var data = reader.GetRemainingBytes();
 				if (peer.Tag is Peer) {
 					var tag = peer.Tag as Peer;
-					if (Serializer.TryToRead<BlockStore>(data, out var keyValuePairs)) {
-						ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
-					}
-					else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
-						AssetResponses(assetRequest, tag, deliveryMethod);
-					}
-					else if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
-						ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
+					if(deliveryMethod == DeliveryMethod.Unreliable) {
+						if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
+							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
+						}
+						else if (Serializer.TryToRead<BlockStore>(data, out var keyValuePairs)) {
+							ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
+						}
+						else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
+							AssetResponses(assetRequest, tag, deliveryMethod);
+						}
+						else {
+							throw new Exception("Uknown Data from User");
+						}
 					}
 					else {
-						throw new Exception("Uknown Data from User");
+						if (Serializer.TryToRead<BlockStore>(data, out var keyValuePairs)) {
+							ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
+						}
+						else if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
+							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
+						}
+						else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
+							AssetResponses(assetRequest, tag, deliveryMethod);
+						}
+						else {
+							throw new Exception("Uknown Data from User");
+						}
 					}
+
 				}
 				else if (peer.Tag is RelayPeer) {
 					var tag = peer.Tag as RelayPeer;
 					if (Serializer.TryToRead<DataPacked>(data, out var packed)) {
-						if (Serializer.TryToRead<BlockStore>(packed.Data, out var keyValuePairs)) {
-							ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
-						}
-						else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
-							AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
-						}
-						else if (Serializer.TryToRead<StreamDataPacked>(packed.Data, out var streamDataPacked)) {
-							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
+						if (deliveryMethod == DeliveryMethod.Unreliable) {
+							if (Serializer.TryToRead<StreamDataPacked>(packed.Data, out var streamDataPacked)) {
+								ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
+							}
+							else if (Serializer.TryToRead<BlockStore>(packed.Data, out var keyValuePairs)) {
+								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
+							}
+							else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
+								AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+							}
+							else {
+								throw new Exception("Uknown Data from relay");
+							}
 						}
 						else {
-							throw new Exception("Uknown Data from relay");
+							if (Serializer.TryToRead<BlockStore>(packed.Data, out var keyValuePairs)) {
+								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
+							}
+							else if (Serializer.TryToRead<StreamDataPacked>(packed.Data, out var streamDataPacked)) {
+								ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
+							}
+							else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
+								AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+							}
+							else {
+								throw new Exception("Uknown Data from relay");
+							}
 						}
 					}
 					else if (Serializer.TryToRead<OtherUserLeft>(data, out var otherUserLeft)) {

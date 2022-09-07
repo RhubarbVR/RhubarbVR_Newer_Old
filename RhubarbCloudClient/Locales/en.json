@@ -17,7 +17,10 @@
     "Common.Color.value": "Value",
 
     "Common.Failed": "<color=red>FAILED",
+    "Common.LoadedWorld": "Loaded World",
+    "Common.LoadingWorld": "Loading World:",
     "Common.FailedToJoinWorld": "<color=red>FAILED</color> to join world",
+    "Common.FailedToLoadWorld": "<color=red>FAILED</color> to load world",
     "Common.Open": "Open",
     "Common.Close": "Close",
     "Common.WorldOpen": "Open World",
@@ -105,6 +108,8 @@
     "Common.Sessions": "Sessions",
     "Common.Exit": "Exit",
     "Common.Logout": "Logout",
+    "Common.Refresh": "refresh",
+    "Common.Refreshing": "Refreshing..",
 
     "Fact.Month1.Day16": "Jan 16th is Appreciate a Dragon Day",
     "Fact.Month2.Day13": "Feb 13th is World Radio Day",
@@ -242,7 +247,7 @@
     "Programs.Terminal.Name": "Terminal",
     "Actions.ChangeVR.Enable": "Enter VR",
     "Actions.ChangeVR.Disable": "Leave VR",
-
+    "Programs.PublicSessions.Name": "Public Sessions",
 
     "Free.Of": "{0} free of {1}",
     "Messaging.CreateDm": "Create DM",

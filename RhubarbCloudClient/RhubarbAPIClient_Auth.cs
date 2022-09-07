@@ -47,7 +47,7 @@ namespace RhubarbCloudClient
 			Console.WriteLine("Starting SignelR");
 			try {
 				_hub = new HubConnectionBuilder()
-					.WithUrl(new Uri(HttpClient.BaseAddress, "hub"), (x) => { x.Cookies = Cookies;  } )
+					.WithUrl(new Uri(HttpClient.BaseAddress, "hub"), (x) => x.Cookies = Cookies)
 					.WithAutomaticReconnect()
 					.Build();
 			}

@@ -33,6 +33,9 @@ namespace RhuEngine.Components.PrivateSpace
 		public bool CanCloses => target != target.worldManager.LocalWorld;
 
 		public void Clicked() {
+			if (target.IsLoading) {
+				return;
+			}
 			if (target.Focus != World.FocusLevel.Focused) {
 				target.Focus = World.FocusLevel.Focused;
 			}

@@ -32,7 +32,7 @@ namespace RhuEngine.Components.PrivateSpace
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public UIText ErrorText;
+		public StandardLocale ErrorTextLoc;
 
 		[NoSave]
 		[NoSync]
@@ -51,10 +51,12 @@ namespace RhuEngine.Components.PrivateSpace
 		public Entity RegEntiyThree;
 
 		public void Error(string error) {
-			ErrorText.Text.Value = $"<colorred>{error}";
+			ErrorTextLoc.Key.Value = error;
+			ErrorTextLoc.AppendFront.Value = "<colorred>";
 		}
 		public void Normal(string n) {
-			ErrorText.Text.Value = $"{n}";
+			ErrorTextLoc.Key.Value = n;
+			ErrorTextLoc.AppendFront.Value = "";
 		}
 		[NoSave]
 		[NoSync]
@@ -238,7 +240,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 
 			uiBuilder.PushRect();
-			ErrorText = uiBuilder.AddText("<colorred>",null,0,1,null,true);
+			ErrorTextLoc = uiBuilder.AddTextWithLocal("",0,1,null);
 			uiBuilder.PopRect();
 		}
 	}

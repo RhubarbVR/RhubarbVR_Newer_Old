@@ -163,6 +163,8 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void Step() {
+			//Opus disable
+			return;
 			if (!Engine.EngineLink.CanAudio) {
 				return;
 			}

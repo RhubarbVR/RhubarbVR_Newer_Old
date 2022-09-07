@@ -18,7 +18,9 @@ namespace RhubarbCloudClient
 {
 	public partial class RhubarbAPIClient : IDisposable
 	{
-		
+		public const string SESSION_PATH = "Sessions/";
+
+
 		public async Task<string[]> GetRelayHoleServers() {
 			var data = await SendGet<string[]>(API_PATH + "Relays/GetRelays");
 			return data.IsDataGood ? data.Data : Array.Empty<string>();
@@ -44,6 +46,18 @@ namespace RhubarbCloudClient
 
 		public async Task CreateSession(SessionCreation sessionCreation) {
 			await _hub.InvokeAsync("CreateSession", sessionCreation);
+		}
+		public async Task LeaveSession(Guid id) {
+			await _hub.InvokeAsync("LeaveSession", id);
+		}
+		public async Task<SessionInfo[]> GetTopPublicSessions() {
+			var data = await SendGet<SessionInfo[]>(API_PATH + SESSION_PATH + "GetTopPublicSessions");
+			if (data.IsDataGood) {
+				return data.Data;
+			}
+			else {
+				return Array.Empty<SessionInfo>();
+			}
 		}
 	}
 }

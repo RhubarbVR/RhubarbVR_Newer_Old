@@ -254,5 +254,14 @@ namespace RhuEngine.Components
 			}
 			return (uitext, editor, currsor, uitext.Text);
 		}
+
+		public (UIText,UIButtonInteraction, ButtonEventManager) AddButtonEventLabled(string text, float? size = null, float textcoloroffset = 2, float textalpha = 1,  Action onClick = null, Action onPressing = null, Action onReleases = null, bool autoPop = true, float coloroffset = 0, float alpha = 1, bool? fullbox = null, Vector2f? min = null, Vector2f? max = null) {
+			var buttonEvent = AddButtonEvent(onClick, onPressing, onReleases, false, coloroffset, alpha, fullbox, min, max);
+			var uitext = AddText(text, size, textcoloroffset, textalpha);
+			if (autoPop) {
+				PopRect();
+			}
+			return (uitext, buttonEvent.Item1, buttonEvent.Item2);
+		}
 	}
 }

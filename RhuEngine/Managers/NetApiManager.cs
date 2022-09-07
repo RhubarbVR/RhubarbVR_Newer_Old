@@ -42,13 +42,12 @@ namespace RhuEngine.Managers
 		public void SessionError(string data, Guid session) {
 			var targetWorld = WorldManager.GetWorldBySessionID(session);
 			RLog.Info($"Error With session {session} MSG:{data}");
-			if(targetWorld is null) {
+			if (targetWorld is null) {
 				RLog.Info($"Failed To find session {session}");
 				return;
 			}
 			targetWorld.HasError = true;
 			targetWorld.LoadMsg = data;
-
 		}
 		public async Task UserConnection(ConnectToUser connectToUser, Guid session) {
 			var targetWorld = WorldManager.GetWorldBySessionID(session);
