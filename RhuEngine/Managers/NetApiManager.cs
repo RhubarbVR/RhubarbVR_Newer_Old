@@ -18,21 +18,67 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 using RhubarbCloudClient;
+using RhubarbCloudClient.Model;
 
 using RhuEngine.Linker;
+using RhuEngine.WorldObjects;
 
 
 namespace RhuEngine.Managers
 {
 	public class NetApiManager : IManager
 	{
+		public WorldManager WorldManager { get; private set; }
 		public RhubarbAPIClient Client { get; private set; }
 
 		public NetApiManager(string path) {
-			Client = new RhubarbAPIClient(RhubarbAPIClient.BaseUri,path);
+			Client = new RhubarbAPIClient(RhubarbAPIClient.BaseUri, path) {
+				UserConnectionBind = UserConnection,
+				SessionErrorBind = SessionError,
+				SessionIDBind = SessionIDupdate
+			};
+
+		}
+		public void SessionError(string data, Guid session) {
+			var targetWorld = WorldManager.GetWorldBySessionID(session);
+			RLog.Info($"Error With session {session} MSG:{data}");
+			if(targetWorld is null) {
+				RLog.Info($"Failed To find session {session}");
+				return;
+			}
+			targetWorld.HasError = true;
+			targetWorld.LoadMsg = data;
+
+		}
+		public async Task UserConnection(ConnectToUser connectToUser, Guid session) {
+			var targetWorld = WorldManager.GetWorldBySessionID(session);
+			RLog.Info($"UserConnection {session} ConnectToUser:{connectToUser.UserID}");
+			if (targetWorld is null) {
+				RLog.Info($"Failed To find session {session}");
+				return;
+			}
+			await targetWorld.ConnectToUser(connectToUser);
 		}
 
+		public void SessionIDupdate(Guid newID, Guid session) {
+			var targetWorld = WorldManager.GetWorldBySessionID(session);
+			RLog.Info($"LoadedSessionID {session} NewID:{newID}");
+			if (targetWorld is null) {
+				RLog.Info($"Failed To find session {session}");
+				return;
+			}
+			if (targetWorld.SessionID.Value != newID.ToString()) {
+				targetWorld.SessionID.Value = newID.ToString();
+				RLog.Info("Loaded Session ID");
+			}
+			else {
+				targetWorld.IsDeserializing = true;
+				targetWorld.IsLoadingNet = false;
+				RLog.Info("Already Loaded Session ID");
+			}
+		}
 		public void Init(Engine engine) {
+			WorldManager = engine.worldManager;
 		}
 
 		public void Step() {
@@ -42,6 +88,7 @@ namespace RhuEngine.Managers
 		}
 
 		public void Dispose() {
+			Client?.Dispose();
 		}
 	}
 }

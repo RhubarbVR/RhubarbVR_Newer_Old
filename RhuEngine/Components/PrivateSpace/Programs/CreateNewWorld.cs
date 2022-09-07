@@ -28,8 +28,8 @@ namespace RhuEngine.Components.PrivateSpace
 			if (!buttonEvent.IsClicked) {
 				return;
 			}
-			var world = WorldManager.CreateNewWorld(World.FocusLevel.Focused, true, "NewWorld");
-			world.WorldName.Value = "New LocalWorld";
+			var world = WorldManager.CreateNewWorld(World.FocusLevel.Focused, false, "NewWorld");
+			world.WorldName.Value = "New World";
 			Close();
 		}
 

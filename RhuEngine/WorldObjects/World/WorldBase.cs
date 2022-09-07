@@ -142,6 +142,11 @@ namespace RhuEngine.WorldObjects
 		[NoSyncUpdate]
 		public readonly Sync<string> SessionID;
 
+		[NoSync]
+		[NoSave]
+		[NoSyncUpdate]
+		public readonly Sync<string> WorldID;
+
 		[NoSave]
 		[Default("New Session")]
 		[OnChanged(nameof(SessionInfoChanged))]

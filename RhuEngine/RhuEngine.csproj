@@ -41,10 +41,10 @@
 		<PackageReference Include="LiteNetLib" Version="0.9.5.2" />
 		<PackageReference Include="MessagePack" Version="2.4.35" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="NAudio.Asio" Version="2.1.0" />
 		<PackageReference Include="NAudio.Core" Version="2.1.0" />
 		<PackageReference Include="NAudio.Midi" Version="2.1.0" />
-		<PackageReference Include="NAudio.Wasapi" Version="2.1.0" />
+		<PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
+		<PackageReference Include="NAudio.WaveFormRenderer" Version="2.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="Shim.System.Text.Rune" Version="6.0.2" />
 		<PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta17" />

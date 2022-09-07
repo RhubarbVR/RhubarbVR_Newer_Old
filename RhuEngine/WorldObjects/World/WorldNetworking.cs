@@ -12,6 +12,8 @@ using LiteNetLib;
 
 using Newtonsoft.Json;
 
+using RhubarbCloudClient.Model;
+
 using RhuEngine.AssetSystem.RequestStructs;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
@@ -39,19 +41,19 @@ namespace RhuEngine.WorldObjects
 		private NetManager _netManager;
 		private readonly EventBasedNatPunchListener _natPunchListener = new();
 		private readonly EventBasedNetListener _clientListener = new();
-		public void StartNetworking(bool newWorld) {
+		public async Task StartNetworking(bool newWorld) {
 			IsNetworked = true;
 			if (newWorld) {
 				IsDeserializing = false;
 				AddLocalUser();
-				ConnectedToSession(false);
+				await ConnectedToSession(false);
 				WaitingForWorldStartState = false;
 			}
 			else {
 				LocalUserID = 0;
 				IsLoadingNet = true;
 				IsDeserializing = true;
-				ConnectedToSession(true);
+				await ConnectedToSession(true);
 			}
 		}
 
@@ -85,63 +87,56 @@ namespace RhuEngine.WorldObjects
 			//Engine.netApiManager.SendDataToSocked(new SessionRequest { RequestType = RequestType.UpdateSession, RequestData = JsonConvert.SerializeObject(sessionConnection), ID = sessionInfo.SessionId });
 		}
 
-		private void ConnectedToSession(bool joiningSession) {
-			Task.Run(async () => {
-				IsLoadingNet= true;
-				LoadNatManager();
-				try {
-					var Pings = new Dictionary<string, int>();
-					//ToDO: SessionRequest
-					//var servers = await Engine.netApiManager.GetRelayHoleServers();
-					//foreach (var item in servers) {
-					//	var pingSender = new Ping();
-					//	var e = pingSender.Send(new Uri(item.IP).Host, 500);
-					//	if ((e?.Status ?? IPStatus.Unknown) == IPStatus.Success) {
-					//		Pings.Add(item.IP, (int)e.RoundtripTime);
-					//	}
-					//}
-					////TODO: add support for changeing on connection info 
-					//var userConnection = new UserConnectionInfo {
-					//	ConnectionType = ConnectionType.HolePunch,
-					//	ServerPingLevels = Pings,
-					//	Data = null
-					//};
-					//if (!joiningSession) {
-					//	SessionID.Value = Guid.NewGuid().ToString();
-					//	var sessionInfo = new SessionInfo {
-					//		ActiveUsers = 1,
-					//		Admins = Admins.Select((x)=>Guid.Parse(((SyncRef<User>)x).Target?.userID.Value)).ToArray(),
-					//		AssociatedGroup = Guid.Parse(AssociatedGroup.Value),
-					//		IsHidden = IsHidden.Value,
-					//		MaxUsers = MaxUserCount.Value,
-					//		ThumNail = ThumNail.Value,
-					//		SessionTags = SessionTags,
-					//		SessionAccessLevel = AccessLevel.Value,
-					//		SessionName = SessionName.Value,
-					//		NormalizedSessionName = SessionName.Value.Normalize(),
-					//		SessionId = Guid.Parse(SessionID.Value)
-					//	};
-					//	var sessionConnection = new SessionCreation {
-					//		SessionInfo = sessionInfo,
-					//		UserConnectionInfo = userConnection,
-					//		ForceJoin = Array.Empty<Guid>()
-					//	};
-					//	Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = Guid.Parse(SessionID.Value), RequestData = JsonConvert.SerializeObject(sessionConnection), RequestType = RequestType.CreateSession });
+		private async Task ConnectedToSession(bool joiningSession) {
+			IsLoadingNet = true;
+			LoadNatManager();
+			try {
+				var Pings = new Dictionary<string, int>();
+				var servers = await Engine.netApiManager.Client.GetRelayHoleServers();
+				foreach (var item in servers) {
+					var pingSender = new Ping();
+					var e = pingSender.Send(item, 500);
+					if ((e?.Status ?? IPStatus.Unknown) == IPStatus.Success) {
+						Pings.Add(item, (int)e.RoundtripTime);
+					}
+				}
+				////TODO: add support for changeing on connection info 
+				var userConnection = new UserConnectionInfo {
+					ConnectionType = ConnectionType.HolePunch,
+					ServerPingLevels = Pings,
+					Data = null
+				};
+				if (!joiningSession) {
+					var newGUId = Guid.NewGuid();
+					SessionID.Value = newGUId.ToString();
+					var sessionConnection = new SessionCreation {
+						TempSessionID = newGUId,
+						UserConnectionInfo = userConnection,
+						SessionName = SessionName.Value,
+						SessionTags = SessionTags,
+						SessionAccessLevel = AccessLevel.Value,
+						MaxUsers = MaxUserCount.Value,
+						IsHidden = IsHidden.Value,
+						ThumNail = ThumNail.Value,
+						WorldID = WorldID.Value,
+						IsAssociatedToGroup = Guid.TryParse(AssociatedGroup.Value, out var gorupID),
+						AssociatedGroup = gorupID,
+					};
+					await Engine.netApiManager.Client.CreateSession(sessionConnection);
 
-					//}
-					//else {
-					//	var sessionConnection = new JoinSession {
-					//		SessionID = Guid.Parse(SessionID.Value),
-					//		UserConnectionInfo = userConnection,
-					//	};
-					//	Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = Guid.Parse(SessionID.Value), RequestData = JsonConvert.SerializeObject(sessionConnection), RequestType = RequestType.JoinSession });
-					//}
-					IsLoadingNet = false;
 				}
-				catch (Exception ex) {
-					LoadMsg = "Failed to Connected To Session" + ex.Message;
+				else {
+					var sessionConnection = new JoinSession {
+						SessionID = Guid.Parse(SessionID.Value),
+						UserConnectionInfo = userConnection,
+					};
+					await Engine.netApiManager.Client.JoinSession(sessionConnection);
 				}
-			});
+				IsLoadingNet = false;
+			}
+			catch (Exception ex) {
+				LoadMsg = "Failed to Connected To Session " + ex.Message;
+			}
 		}
 
 #if DEBUG
@@ -265,13 +260,13 @@ namespace RhuEngine.WorldObjects
 					if (worldData == null) {
 						throw new Exception();
 					}
-					Task.Run(() => {
+					Task.Run(async () => {
 						try {
 							LoadMsg = "World state Found";
 							// Wait for everyone
-							//while (ActiveConnections.Count > 0) {
-							//	Thread.Sleep(1000);
-							//}
+							while (ActiveConnections.Count > 0) {
+								Thread.Sleep(1000);
+							}
 							_worldObjects.Clear();
 							var deserializer = new SyncObjectDeserializerObject(false);
 							Deserialize((DataNodeGroup)worldData, deserializer);
@@ -418,134 +413,129 @@ namespace RhuEngine.WorldObjects
 				RLog.Err("Peer had no tag noidea what to do");
 			}
 		}
-		//ToDO: SessionRequest
 
-		//public List<ConnectToUser> ActiveConnections = new();
+		public List<ConnectToUser> ActiveConnections = new();
 
-		//public void ConnectToUser(ConnectToUser user) {
-		//	Task.Run(() => {
-		//		lock (ActiveConnections) {
-		//			ActiveConnections.Add(user);
-		//		}
-		//		if (user is null) {
-		//			return;
-		//		}
-		//		RLog.Info("Connecting to user " + user.ConnectionType.ToString() + " Token:" + user.Data + " UserID:" + user.UserID);
-		//		LoadMsg = "Connecting to user";
-		//		switch (user.ConnectionType) {
-		//			case ConnectionType.Direct:
-		//				LoadMsg = "Direct Connected to User";
-		//				var idUri = new Uri(user.Data);
-		//				var dpeer = _netManager.Connect(idUri.Host, idUri.Port, KEY);
-		//				dpeer.Tag = user.UserID;
-		//				lock (ActiveConnections) {
-		//					ActiveConnections.Remove(user);
-		//				}
-		//				break;
-		//			case ConnectionType.HolePunch:
-		//				try {
-		//					LoadMsg = "Trying to HolePunch to User";
-		//					var peerCount = _netManager.ConnectedPeersCount;
-		//					RLog.Info("Server: " + worldManager.Engine.netApiManager.BaseAddress.Host);
-		//					NatUserIDS.TryAdd(user.Data, user.UserID);
-		//					var eidUri = new Uri(user.Server);
-		//					_netManager.NatPunchModule.SendNatIntroduceRequest(eidUri.Host,eidUri.Port, user.Data);
-		//					for (var i = 0; i < 60; i++) {
-		//						if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
-		//							if (NatConnection.TryGetValue(user.Data, out var peer)) {
-		//								if ((peer?.ConnectionState ?? ConnectionState.Disconnected) == ConnectionState.Connected) {
-		//									break;
-		//								}
-		//							}
-		//						}
-		//						LoadMsg = $"HolePuch Try{(uint)(i / 10)}";
-		//						//Like this so i can add update Msgs
-		//						Thread.Sleep(100);
-		//					}
-		//					if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var value) && value) {
-		//						if (NatConnection.TryGetValue(user.Data, out var peer)) {
-		//							if ((peer?.ConnectionState ?? ConnectionState.Disconnected) != ConnectionState.Connected) {
-		//								try {
-		//									if (peer is not null) {
-		//										peer.Disconnect();
-		//									}
-		//								}
-		//								catch {
-		//									return;
-		//								}
-		//								RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
-		//								RelayConnect(user);
-		//								lock (ActiveConnections) {
-		//									ActiveConnections.Remove(user);
-		//								}
-		//							}
-		//							else {
-		//								RLog.Info(LoadMsg = "HolePunch succeeded");
-		//								lock (ActiveConnections) {
-		//									ActiveConnections.Remove(user);
-		//								}
-		//							}
-		//						}
-		//						else {
-		//							RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
-		//							RelayConnect(user);
-		//							lock (ActiveConnections) {
-		//								ActiveConnections.Remove(user);
-		//							}
-		//						}
-		//					}
-		//					else {
-		//						RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
-		//						RelayConnect(user);
-		//						lock (ActiveConnections) {
-		//							ActiveConnections.Remove(user);
-		//						}
-		//					}
-		//					NatIntroductionSuccessIsGood.TryRemove(user.Data, out _);
-		//					NatConnection.TryRemove(user.Data, out _);
-		//					NatUserIDS.TryRemove(user.Data, out _);
-		//				}
-		//				catch (Exception e) {
-		//					RLog.Err($"Excerption when trying to hole punch {e}");
-		//					return;
-		//				}
-		//				break;
-		//			case ConnectionType.Relay:
-		//				LoadMsg = "Relay connecting to user";
-		//				NatUserIDS.TryAdd(user.Data, user.UserID);
-		//				RelayConnect(user);
-		//				lock (ActiveConnections) {
-		//					ActiveConnections.Remove(user);
-		//				}
-		//				break;
-		//			default:
-		//				break;
-		//		}
-		//		LoadMsg = "Waiting for world state";
-		//	});
-		//}
+		public async Task ConnectToUser(ConnectToUser user) {
+			lock (ActiveConnections) {
+				ActiveConnections.Add(user);
+			}
+			if (user is null) {
+				return;
+			}
+			RLog.Info("Connecting to user " + user.ConnectionType.ToString() + " Token:" + user.Data + " UserID:" + user.UserID);
+			LoadMsg = "Connecting to user";
+			switch (user.ConnectionType) {
+				case ConnectionType.Direct:
+					LoadMsg = "Direct Connected to User";
+					var idUri = new Uri(user.Data);
+					var dpeer = _netManager.Connect(idUri.Host, idUri.Port, KEY);
+					dpeer.Tag = user.UserID;
+					lock (ActiveConnections) {
+						ActiveConnections.Remove(user);
+					}
+					break;
+				case ConnectionType.HolePunch:
+					try {
+						LoadMsg = "Trying to HolePunch to User";
+						var peerCount = _netManager.ConnectedPeersCount;
+						NatUserIDS.TryAdd(user.Data, user.UserID);
+						_netManager.NatPunchModule.SendNatIntroduceRequest(user.Server, 7856, user.Data);
+						for (var i = 0; i < 60; i++) {
+							if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
+								if (NatConnection.TryGetValue(user.Data, out var peer)) {
+									if ((peer?.ConnectionState ?? ConnectionState.Disconnected) == ConnectionState.Connected) {
+										break;
+									}
+								}
+							}
+							LoadMsg = $"HolePuch Try{(uint)(i / 10)}";
+							//Like this so i can add update Msgs
+							await Task.Delay(100);
+						}
+						if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var value) && value) {
+							if (NatConnection.TryGetValue(user.Data, out var peer)) {
+								if ((peer?.ConnectionState ?? ConnectionState.Disconnected) != ConnectionState.Connected) {
+									try {
+										if (peer is not null) {
+											peer.Disconnect();
+										}
+									}
+									catch {
+										return;
+									}
+									RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
+									RelayConnect(user);
+									lock (ActiveConnections) {
+										ActiveConnections.Remove(user);
+									}
+								}
+								else {
+									RLog.Info(LoadMsg = "HolePunch succeeded");
+									lock (ActiveConnections) {
+										ActiveConnections.Remove(user);
+									}
+								}
+							}
+							else {
+								RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
+								RelayConnect(user);
+								lock (ActiveConnections) {
+									ActiveConnections.Remove(user);
+								}
+							}
+						}
+						else {
+							RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
+							RelayConnect(user);
+							lock (ActiveConnections) {
+								ActiveConnections.Remove(user);
+							}
+						}
+						NatIntroductionSuccessIsGood.TryRemove(user.Data, out _);
+						NatConnection.TryRemove(user.Data, out _);
+						NatUserIDS.TryRemove(user.Data, out _);
+					}
+					catch (Exception e) {
+						RLog.Err($"Excerption when trying to hole punch {e}");
+						return;
+					}
+					break;
+				case ConnectionType.Relay:
+					LoadMsg = "Relay connecting to user";
+					NatUserIDS.TryAdd(user.Data, user.UserID);
+					RelayConnect(user);
+					lock (ActiveConnections) {
+						ActiveConnections.Remove(user);
+					}
+					break;
+				default:
+					break;
+			}
+			LoadMsg = "Waiting for world state";
 
-		//private void RelayConnect(ConnectToUser user) {
-		//	RLog.Info("Relay Connect Client");
-		//	try {
-		//		var eidUri = new Uri(user.Server);
-		//		var peer = _netManager.Connect(eidUri.Host, eidUri.Port + 1, user.Data);
-		//		if (peer.Tag is not null) {
-		//			RLog.Info(LoadMsg = "Adding another Relay Client");
-		//			var relay = peer.Tag as RelayPeer;
-		//			relay.LoadNewPeer(user);
-		//		}
-		//		else {
-		//			RLog.Info(LoadMsg = "Start New Relay Server");
-		//			var relay = new RelayPeer(peer, this, user.UserID);
-		//			peer.Tag = relay;
-		//		}
-		//	}
-		//	catch (Exception e) {
-		//		RLog.Err(LoadMsg = "Relay Connect Error:" + e.ToString());
-		//		throw new Exception("Failed to use relay");
-		//	}
-		//}
+		}
+
+		private void RelayConnect(ConnectToUser user) {
+			RLog.Info("Relay Connect Client");
+			try {
+				var peer = _netManager.Connect(user.Server, 7857, user.Data);
+				if (peer.Tag is not null) {
+					RLog.Info(LoadMsg = "Adding another Relay Client");
+					var relay = peer.Tag as RelayPeer;
+					relay.LoadNewPeer(user);
+				}
+				else {
+					RLog.Info(LoadMsg = "Start New Relay Server");
+					var relay = new RelayPeer(peer, this, user.UserID);
+					peer.Tag = relay;
+				}
+			}
+			catch (Exception e) {
+				RLog.Err(LoadMsg = "Relay Connect Error:" + e.ToString());
+				throw new Exception("Failed to use relay");
+			}
+		}
 
 		public void BroadcastDataToAll(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
 			if (target.IsRemoved) {
@@ -590,7 +580,7 @@ namespace RhuEngine.WorldObjects
 
 		public void AddLocalUser() {
 			LoadMsg = "Adding LocalUser";
-			var Olduser = GetUserFromID(Engine.netApiManager.Client.User?.Id??new Guid());
+			var Olduser = GetUserFromID(Engine.netApiManager.Client.User?.Id ?? new Guid());
 			if (Olduser is null) {
 				LoadMsg = "Building new LocalUser";
 				ItemIndex = 176;

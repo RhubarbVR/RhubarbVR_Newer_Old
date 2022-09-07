@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using LiteNetLib;
 
+using RhubarbCloudClient.Model;
+
 using RhuEngine.Linker;
 
 using SharedModels;
@@ -27,14 +29,13 @@ namespace RhuEngine.WorldObjects
 
 		public List<Peer> peers = new();
 		public Peer this[ushort id] => peers[id];
-		//TODO: loadPeer
-		//public Peer LoadNewPeer(ConnectToUser user) {
-		//	var newpeer = new Peer(NetPeer,user.UserID, (ushort)(peers.Count + 1));
-		//	peers.Add(newpeer);
-		//	NetPeer.Send(Serializer.Save(new ConnectToAnotherUser(user.UserID.ToString())), 2, DeliveryMethod.ReliableSequenced);
-		//	World.ProcessUserConnection(newpeer);
-		//	return newpeer;
-		//}
+		public Peer LoadNewPeer(ConnectToUser user) {
+			var newpeer = new Peer(NetPeer, user.UserID, (ushort)(peers.Count + 1));
+			peers.Add(newpeer);
+			NetPeer.Send(Serializer.Save(new ConnectToAnotherUser(user.UserID.ToString())), 2, DeliveryMethod.ReliableSequenced);
+			World.ProcessUserConnection(newpeer);
+			return newpeer;
+		}
 		public void OnConnect() {
 			RLog.Info("PeerServerConnected");
 			peers.Clear();

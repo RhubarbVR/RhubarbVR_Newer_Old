@@ -44,9 +44,10 @@ namespace RhubarbCloudClient
 
 		HubConnection _hub;
 		private async Task InitSignlR() {
+			Console.WriteLine("Starting SignelR");
 			try {
 				_hub = new HubConnectionBuilder()
-					.WithUrl(new Uri(HttpClient.BaseAddress, "hub"), (x) => x.Cookies = Cookies)
+					.WithUrl(new Uri(HttpClient.BaseAddress, "hub"), (x) => { x.Cookies = Cookies;  } )
 					.WithAutomaticReconnect()
 					.Build();
 			}
@@ -60,14 +61,16 @@ namespace RhubarbCloudClient
 			_hub.On<UserDM.MSG>(nameof(ReceivedMsg), ReceivedMsg);
 			_hub.On<PrivateUserStatus>(nameof(LoadInStatusInfo), LoadInStatusInfo);
 			_hub.On<Guid,bool>(nameof(UserDataUpdate), UserDataUpdate);
+			_hub.On<string,Guid>(nameof(SessionError), SessionError);
+			_hub.On<ConnectToUser, Guid>(nameof(UserConnection), UserConnection);
+			_hub.On<Guid, Guid>(nameof(SessionIDupdate), SessionIDupdate);
 			_hub.Closed += Hub_Closed;
 			await _hub.StartAsync();
+			Console.WriteLine("SignelR started");
 		}
 
 		private Task Hub_Closed(Exception arg) {
-			if (IsOnline) {
-				UpdateCheckForInternetConnection();
-			}
+			Console.WriteLine($"SignelR Closed {arg?.Message??"null"}");
 			return Task.CompletedTask;
 		}
 

@@ -256,6 +256,12 @@
     "Messaging.UserRelations.Add.Friend": "Add Friend",
     "Messaging.UserRelations.Add.Follow": "Add Follow",
     "Messaging.UserRelations.All": "All",
-    "Messaging.UserRelations.Online": "Online"
+    "Messaging.UserRelations.Online": "Online",
+    "JoinSessionError.SessionNotFound": "Session Closed or never existed",
+    "JoinSessionError.SessionOwnerNotFound": "Session Owner not Found",
+    "JoinSessionError.NoAccess": "Session Access not permited",
+    "JoinSessionError.AlreadyInSession": "Already In Session",
+    "JoinSessionError.NotCompatible": "Session not compatible with your client",
+    "JoinSessionError.HasMaxPlayers": "Session has to many users"
   }
 }

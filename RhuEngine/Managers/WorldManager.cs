@@ -15,6 +15,7 @@ using SharedModels.GameSpecific;
 
 using RNumerics;
 using RhuEngine.Linker;
+using DataModel.Enums;
 
 namespace RhuEngine.Managers
 {
@@ -111,11 +112,31 @@ namespace RhuEngine.Managers
 			}
 			world.SessionName.Value = sessionName;
 			if ((focusLevel != World.FocusLevel.PrivateOverlay) && !localWorld) {
-				Task.Run(() => world.StartNetworking(true));
+				Task.Run(async () => await world.StartNetworking(true));
 			}
 			else {
 				world.WaitingForWorldStartState = false;
 			}
+			worlds.Add(world);
+			OnWorldUpdateTaskBar?.Invoke();
+			ShowLoadingFeedback(world, focusLevel);
+			return world;
+		}
+
+		public World CreateNewWorld(World.FocusLevel focusLevel,string sessionName,AccessLevel accessLevel,int maxUsers,bool isHiden,Guid? assosiatedGroup = null) {
+			var world = new World(this) {
+				Focus = World.FocusLevel.Background
+			};
+			world.Initialize(true, false, false, false);
+			world.RootEntity.name.Value = "Root";
+			world.RootEntity.AttachComponent<SimpleSpawn>();
+			world.RootEntity.AttachComponent<ClipBoardImport>();
+			world.SessionName.Value = sessionName;
+			world.AssociatedGroup.Value = assosiatedGroup?.ToString();
+			world.AccessLevel.Value = accessLevel;
+			world.MaxUserCount.Value = maxUsers;
+			world.IsHidden.Value = isHiden;
+			Task.Run(async () => await world.StartNetworking(true));
 			worlds.Add(world);
 			OnWorldUpdateTaskBar?.Invoke();
 			ShowLoadingFeedback(world, focusLevel);
