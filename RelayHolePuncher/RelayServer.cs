@@ -95,7 +95,7 @@ namespace RelayHolePuncher
 			_relay.Start(port);
 			_relay.MaxConnectAttempts = 15;
 			_relay.ChannelsCount = 3;
-			_relay.DisconnectTimeout = 10000;
+			_relay.DisconnectTimeout = 1000000;
 			_relay.ReuseAddress = true;
 			_relay.UpdateTime = 120;
 			Console.WriteLine($"Started Relay Server on port {port}");

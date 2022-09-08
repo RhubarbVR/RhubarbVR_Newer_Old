@@ -510,7 +510,7 @@ namespace RhuEngine.WorldObjects.ECS
 		protected override void OnInitialize() {
 			World.RegisterEntity(this);
 			if (Parent?.Parent is Entity par) {
-				parent.Target = par;
+				parent.NetValue = par.Pointer;
 				if (par.Depth >= 10000) {
 					throw new Exception("Max Entity Depth Reached");
 				}

@@ -68,13 +68,13 @@ namespace RhuEngine.WorldObjects
 		public T Add(bool networkedObject = false, bool deserialize = false) {
 			var newElement = new T();
 			newElement.Initialize(World, this, "List Elemenet", networkedObject, deserialize);
+			AddInternal(newElement);
 			if (!networkedObject) {
 				BroadcastAdd(newElement);
 				if (!deserialize) {
 					newElement.CallFirstCreation();
 				}
 			}
-			AddInternal(newElement);
 			return newElement;
 		}
 

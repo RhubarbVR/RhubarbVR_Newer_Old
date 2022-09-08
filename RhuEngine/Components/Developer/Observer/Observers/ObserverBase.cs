@@ -14,6 +14,12 @@ namespace RhuEngine.Components
 			if (!typeof(IWorldObject).IsAssignableFrom(checktype)) {
 				return null;
 			}
+			if (typeof(Entity).IsAssignableFrom(checktype)) { 
+				return typeof(ObserverEnity);
+			}
+			if (typeof(Component).IsAssignableFrom(checktype)) {
+				return typeof(ObserverComponent);
+			}
 			if (typeof(ISyncMember).IsAssignableFrom(checktype)) {
 				if (typeof(ILinkerMember<bool>).IsAssignableFrom(checktype)) {
 					return typeof(BoolSyncObserver);
@@ -41,7 +47,7 @@ namespace RhuEngine.Components
 
 	public abstract class ObserverBase<T> : Component, IObserver where T : class, IWorldObject
 	{
-		public const float ELMENTHIGHTSIZE = 1;
+		public const float ELMENTHIGHTSIZE = 0.65f;
 		public T TargetElement => Observerd.Target;
 
 		[OnChanged(nameof(ChangeObserverd))]

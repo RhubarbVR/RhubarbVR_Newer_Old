@@ -275,9 +275,6 @@ namespace RhuEngine.WorldObjects
 							var deserializer = new SyncObjectDeserializerObject(false);
 							Deserialize((DataNodeGroup)worldData, deserializer);
 							LocalUserID = (ushort)(Users.Count + 1);
-							foreach (var item in deserializer.onLoaded) {
-								item?.Invoke();
-							}
 							RLog.Info(LoadMsg = "World state loaded");
 							foreach (var peer1 in _netManager.ConnectedPeerList) {
 								if (peer1.Tag is Peer contpeer) {
@@ -286,9 +283,11 @@ namespace RhuEngine.WorldObjects
 							}
 							FindNewMaster();
 							AddLocalUser();
+							foreach (var item in deserializer.onLoaded) {
+								item?.Invoke();
+							}
 							IsDeserializing = false;
 							WaitingForWorldStartState = false;
-							
 						}
 						catch (Exception ex) {
 							RLog.Err("Failed to load world state" + ex);
@@ -305,12 +304,18 @@ namespace RhuEngine.WorldObjects
 						throw new Exception();
 					}
 					try {
-						if (_networkedObjects.ContainsKey(target.Value)) {
-							_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
+						if (deliveryMethod == DeliveryMethod.ReliableOrdered && peer.User is not null) {
+							RLog.Info($"Packed to Process NetData target:{target.Value.HexString()}");
 						}
-						else {
-							if (deliveryMethod == DeliveryMethod.ReliableOrdered && peer.User is not null) {
-								RLog.Err($"Failed to Process NetData target:{target.Value.HexString()} Error: _networkedObjects Not loaded");
+
+						lock (_networkedObjects) {
+							if (_networkedObjects.ContainsKey(target.Value)) {
+								_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
+							}
+							else {
+								if (deliveryMethod == DeliveryMethod.ReliableOrdered && peer.User is not null) {
+									RLog.Err($"Failed to Process NetData target:{target.Value.HexString()} Error: _networkedObjects Not loaded");
+								}
 							}
 						}
 					}
@@ -487,7 +492,7 @@ namespace RhuEngine.WorldObjects
 						var peerCount = _netManager.ConnectedPeersCount;
 						NatUserIDS.TryAdd(user.Data, user.UserID);
 						_netManager.NatPunchModule.SendNatIntroduceRequest(user.Server, 7856, user.Data);
-						for (var i = 0; i < 60; i++) {
+						for (var i = 0; i < 6; i++) {
 							if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
 								if (NatConnection.TryGetValue(user.Data, out var peer)) {
 									if ((peer?.ConnectionState ?? ConnectionState.Disconnected) == ConnectionState.Connected) {
@@ -495,9 +500,9 @@ namespace RhuEngine.WorldObjects
 									}
 								}
 							}
-							LoadMsg = $"HolePuch Try{(uint)(i / 10)}";
+							LoadMsg = $"HolePunch Try {i}";
 							//Like this so i can add update Msgs
-							await Task.Delay(100);
+							await Task.Delay(1000);
 						}
 						if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var value) && value) {
 							if (NatConnection.TryGetValue(user.Data, out var peer)) {
