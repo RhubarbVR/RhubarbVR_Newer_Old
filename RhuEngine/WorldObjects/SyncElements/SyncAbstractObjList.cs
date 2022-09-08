@@ -24,13 +24,13 @@ namespace RhuEngine.WorldObjects
 			}
 			var newElement = (T)Activator.CreateInstance(type);
 			newElement.Initialize(World, this, "List element", networkedObject, deserialize);
+			AddInternal(newElement);
 			if (!networkedObject) {
 				BroadcastAdd(newElement);
 				if (!deserialize) {
 					newElement.CallFirstCreation();
 				}
 			}
-			AddInternal(newElement);
 			return newElement;
 		}
 		protected override void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate func) {

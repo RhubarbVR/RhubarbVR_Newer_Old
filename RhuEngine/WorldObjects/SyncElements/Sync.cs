@@ -59,10 +59,13 @@ namespace RhuEngine.WorldObjects
 			}
 			var newValue = typeof(T).IsEnum ? (T)(object)((DataNode<int>)data).Value : ((DataNode<T>)data).Value;
 			lock (_locker) {
+				var lastVal = _value;
 				_value = newValue;
-				Changed?.Invoke(this);
+				UpdatedValue();
+				if (!EqualityComparer<T>.Default.Equals(lastVal, _value)) {
+					Changed?.Invoke(this);
+				}
 			}
-			UpdatedValue();
 		}
 
 		public event Action<IChangeable> Changed;

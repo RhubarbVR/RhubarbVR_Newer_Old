@@ -27,16 +27,14 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
-			if (user.Target is null) {
+			if (user.Target is null || user.Target != World.GetLocalUser()) {
 				return;
 			}
-			if (user.Target == World.GetLocalUser()) {
-				var locModule = CurrentLocomotionModule;
-				if (locModule is null) {
-					return;
-				}
-				locModule.ProcessMovement();
+			var locModule = CurrentLocomotionModule;
+			if (locModule is null) {
+				return;
 			}
+			locModule.ProcessMovement();
 		}
 
 	}

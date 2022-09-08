@@ -157,14 +157,10 @@ namespace RhuEngine.WorldObjects
 				sum += samples[i];
 			}
 			var average = sum / samples.Length;
-
-
 			return true;
 		}
 
 		public void Step() {
-			//Opus disable
-			return;
 			if (!Engine.EngineLink.CanAudio) {
 				return;
 			}

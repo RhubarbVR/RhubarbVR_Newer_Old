@@ -245,6 +245,9 @@ namespace RhuEngine.Components
 				World.DrawDebugSphere(RenderLocation, (Vector3f)hitPoint, new Vector3d(0.01), Colorf.Red, 0.5f);
 				var mesh = CollisionMesh;
 				var hittry = mesh.InsideTry(hitPoint);
+				if(hittry < 0 || hittry >= mesh.MaxTriangleID) {
+					return;
+				}
 				var tryangle = mesh.GetTriangle(hittry);
 				var p1 = mesh.GetVertexAll(tryangle.a);
 				var p2 = mesh.GetVertexAll(tryangle.b);

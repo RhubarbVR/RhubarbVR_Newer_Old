@@ -236,10 +236,9 @@ namespace RhuEngine.WorldObjects
 			_netManager.Start();
 			_netManager.EnableStatistics = true;
 			_netManager.MaxConnectAttempts = 15;
-			_netManager.DisconnectTimeout = 10000;
-			_netManager.UpdateTime = 10;
+			_netManager.DisconnectTimeout = 100000;
+			_netManager.UpdateTime = 45;
 			_netManager.ChannelsCount = 3;
-			_netManager.UpdateTime = 120;
 			//0 is main
 			//1 is syncStreams
 			//2 is assetPackeds
@@ -304,10 +303,6 @@ namespace RhuEngine.WorldObjects
 						throw new Exception();
 					}
 					try {
-						if (deliveryMethod == DeliveryMethod.ReliableOrdered && peer.User is not null) {
-							RLog.Info($"Packed to Process NetData target:{target.Value.HexString()}");
-						}
-
 						lock (_networkedObjects) {
 							if (_networkedObjects.ContainsKey(target.Value)) {
 								_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));

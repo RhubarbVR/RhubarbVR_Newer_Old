@@ -98,14 +98,6 @@ namespace RhuEngine.WorldObjects
 			return _value;
 		}
 
-		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
-			return SyncObjectSerializerObject.CommonValueSerialize(this, OnSave(syncObjectSerializerObject));
-		}
-
-		public override void Deserialize(IDataNode data, SyncObjectDeserializerObject syncObjectSerializerObject) {
-			_value = syncObjectSerializerObject.ValueDeserialize<T>((DataNodeGroup)data, this);
-		}
-
 		public object GetValue() {
 			return _value;
 		}

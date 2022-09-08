@@ -41,8 +41,8 @@ namespace RhuEngine.Components
 				var userScale = user.Target.FindSyncStream<SyncValueStream<Vector3f>>("UserScale");
 				var userPos = user.Target.FindSyncStream<SyncValueStream<Vector3f>>("UserPos");
 				var userRot = user.Target.FindSyncStream<SyncValueStream<Quaternionf>>("UserRot");
-				Entity.position.Value = userPos?.Value ?? Vector3f.Zero;
 				Entity.scale.Value = userScale?.Value ?? Vector3f.Zero;
+				Entity.position.Value = userPos?.Value ?? Vector3f.Zero;
 				Entity.rotation.Value = userRot?.Value ?? Quaternionf.Identity;
 				return;
 			}
