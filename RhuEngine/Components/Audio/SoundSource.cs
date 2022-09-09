@@ -1,71 +1,16 @@
 ﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using RhuEngine.Linker;
+using NAudio.Wave;
 
 namespace RhuEngine.Components
 {
-	[UpdateLevel(UpdateEnum.Rendering)]
-	public class SoundSource : Component
+	public class SoundSource : LinkedWorldComponent
 	{
-		[OnAssetLoaded(nameof(LoadAudio))]
-		public readonly AssetRef<RSound> sound;
+		public readonly AssetRef<IWaveProvider> sound;
 
 		[Default(1f)]
-		[OnChanged(nameof(ChangeVolume))]
 		public readonly Sync<float> volume;
 
-		private RSoundInst _soundInst;
-
-		public void LoadAudio() {
-			if (!Engine.EngineLink.CanAudio) {
-				return;
-			}
-			if (_soundInst?.IsPlaying??false) {
-				_soundInst.Stop();
-			}
-			if (volume.Value > 0) {
-				if (sound.Asset is not null) {
-					_soundInst = sound.Asset.Play(Entity.GlobalTrans.Translation, volume.Value);
-				}
-			}
-		}
-
-		public void ChangeVolume() {
-			if (!Engine.EngineLink.CanAudio) {
-				return;
-			}
-			if (_soundInst?.IsPlaying??false) {
-				_soundInst.Volume = volume.Value;
-				if (volume.Value <= 0) {
-					_soundInst.Stop();
-				}
-			}
-			else {
-				if (volume.Value > 0) {
-					if (sound.Asset is not null) {
-						_soundInst = sound.Asset.Play(Entity.GlobalTrans.Translation, volume.Value);
-					}
-				}
-			}
-		}
-
-		public override void Dispose() {
-			base.Dispose();
-			_soundInst?.Stop();
-		}
-
-		protected override void OnLoaded() {
-			LoadAudio();
-		}
-
-		protected override void Step() {
-			if (!Engine.EngineLink.CanAudio) {
-				return;
-			}
-			if (_soundInst?.IsPlaying??false) {
-				_soundInst.Position = Entity.GlobalTrans.Translation;
-			}
-		}
 	}
 }

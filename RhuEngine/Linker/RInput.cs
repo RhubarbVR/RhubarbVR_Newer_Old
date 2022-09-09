@@ -94,7 +94,7 @@ namespace RhuEngine.Linker
 		}
 		public static ScreenHead screenHead = new();
 
-		public static IRHead Head => RWorld.IsInVR?Instance?.Head:screenHead;
+		public static IRHead Head => Engine.MainEngine.IsInVR?Instance?.Head:screenHead;
 
 		public static IRMouse Mouse => Instance?.Mouse;
 

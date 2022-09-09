@@ -102,7 +102,7 @@ namespace RhuEngine.Components
 				return;
 			}
 
-			RWorld.ExecuteOnEndOfFrame(this, () => {
+			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
 				try {
 					Generate();
 				}

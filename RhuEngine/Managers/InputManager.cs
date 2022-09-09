@@ -255,7 +255,7 @@ namespace RhuEngine.Managers
 
 		}
 		public void RenderStep() {
-			if ((!RWorld.IsInVR) && _engine.EngineLink.CanInput) {
+			if ((!_engine.IsInVR) && _engine.EngineLink.CanInput) {
 				screenInput.Step();
 			}
 			_engine.MainSettings.InputSettings.MainControllerInputSettings.UpdateController(GetController(true));

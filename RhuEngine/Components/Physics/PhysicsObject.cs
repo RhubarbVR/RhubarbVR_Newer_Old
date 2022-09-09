@@ -24,7 +24,7 @@ namespace RhuEngine.Components
 
 		public abstract ColliderShape PysicsBuild();
 		public void RebuildPysics() {
-			RWorld.ExecuteOnEndOfFrame(this, () => {
+			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
 				var shape = PysicsBuild();
 				if (shape is not null) {
 					BuildPhysics(shape);

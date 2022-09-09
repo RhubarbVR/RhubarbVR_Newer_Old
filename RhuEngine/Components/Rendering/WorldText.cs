@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 
 	[NotLinkedRenderingComponent]
 	[Category(new string[] { "Rendering" })]
-	public class WorldText : RenderingComponent, ITextComp, IWorldBoundingBox
+	public class WorldText : LinkedWorldComponent, ITextComp, IWorldBoundingBox
 	{
 		[Default(false)]
 		public readonly Sync<bool> FitText;

@@ -48,7 +48,7 @@ namespace RhuEngine.Components
 			}
 			if (World.IsPersonalSpace) {
 				if (WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target is not null) {
-					RWorld.ExecuteOnStartOfFrame(() => {
+					RUpdateManager.ExecuteOnStartOfFrame(() => {
 						if (WorldManager.FocusedWorld is null) {
 							return;
 						}
@@ -59,11 +59,11 @@ namespace RhuEngine.Components
 					});
 				}
 				if (Engine.EngineLink.CanRender) {
-					if (RWorld.IsInVR) {
-						RWorld.ExecuteOnEndOfFrame(() => RRenderer.CameraRoot = Entity.GlobalTrans);
+					if (Engine.IsInVR) {
+						RUpdateManager.ExecuteOnEndOfFrame(() => RRenderer.CameraRoot = Entity.GlobalTrans);
 					}
 					else {
-						RWorld.ExecuteOnEndOfFrame(() => Engine.inputManager.screenInput.CamPos = Entity.GlobalTrans);
+						RUpdateManager.ExecuteOnEndOfFrame(() => Engine.inputManager.screenInput.CamPos = Entity.GlobalTrans);
 					}
 				}
 			}

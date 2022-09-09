@@ -88,7 +88,7 @@ namespace RhuEngine.WorldObjects
 
 		public void DrawDebugMesh(IMesh mesha,Matrix matrix,Colorf colorf, float drawTime = 1) {
 			if (DebugVisuals) {
-				RWorld.ExecuteOnStartOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					var mesh = RootEntity.GetFirstComponentOrAttach<RawMeshAsset>();
 					var comp = RootEntity.GetFirstComponent<UnlitMaterial>();
 					if (comp is null) {
@@ -116,7 +116,7 @@ namespace RhuEngine.WorldObjects
 		}
 		public void DrawDebugCube(Matrix matrix,Vector3f pos,Vector3f scale,Colorf colorf, float drawTime = 1) {
 			if (DebugVisuals) {
-				RWorld.ExecuteOnStartOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					var mesh = RootEntity.GetFirstComponentOrAttach<TrivialBox3Mesh>();
 					var comp = RootEntity.GetFirstComponent<UnlitMaterial>();
 					if (comp is null) {
@@ -139,7 +139,7 @@ namespace RhuEngine.WorldObjects
 
 		public void DrawDebugText(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf,object text, float drawTime = 1,bool lookAtLocal = true) {
 			if (DebugVisuals) {
-				RWorld.ExecuteOnStartOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					var debugcube = RootEntity.AddChild("DebugText");
 					if (lookAtLocal) {
 						var lookAt = debugcube.AttachComponent<LookAtValue>();
@@ -166,7 +166,7 @@ namespace RhuEngine.WorldObjects
 
 		public void DrawDebugSphere(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf, float drawTime = 1) {
 			if (DebugVisuals) {
-				RWorld.ExecuteOnStartOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					var mesh = worldManager.PrivateOverlay.RootEntity.GetFirstComponentOrAttach<Sphere3NormalizedCubeMesh>();
 					var comp = worldManager.PrivateOverlay.RootEntity.GetFirstComponent<UnlitMaterial>();
 					if (comp is null) {

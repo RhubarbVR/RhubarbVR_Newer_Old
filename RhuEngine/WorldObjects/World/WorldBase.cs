@@ -261,8 +261,8 @@ namespace RhuEngine.WorldObjects
 			}
 			try {
 				if (Engine.EngineLink.CanRender) {
-					lock (_renderingComponents) {
-						foreach (var item in _renderingComponents) {
+					lock (_worldLinkComponents) {
+						foreach (var item in _worldLinkComponents) {
 							item.RunRender();
 						}
 					}

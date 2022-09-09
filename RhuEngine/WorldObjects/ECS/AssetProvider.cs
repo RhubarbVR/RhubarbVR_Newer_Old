@@ -8,8 +8,6 @@ namespace RhuEngine.WorldObjects.ECS
 
 		public A Value { get; }
 
-		public void Load(A data);
-
 		public bool Loaded { get; }
 
 	}

@@ -27,6 +27,9 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
+			if (World.IsPersonalSpace) {
+				return;
+			}
 			if (user.Target is null || user.Target != World.GetLocalUser()) {
 				return;
 			}

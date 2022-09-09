@@ -244,6 +244,7 @@ namespace RhuEngine
 
 		public RText StartingText;
 		public ITextMaterial StartingTextMit;
+		public bool IsInVR => EngineLink.InVR;
 
 		public void Init(bool RunStartThread = true) {
 			Thread.CurrentThread.Priority = ThreadPriority.Highest;
@@ -313,7 +314,7 @@ namespace RhuEngine
 				if (EngineLink.CanRender) {
 					try {
 						var headMat = RInput.Head.HeadMatrix;
-						if (!RWorld.IsInVR) {
+						if (!IsInVR) {
 							RRenderer.CameraRoot = Matrix.Identity;
 							headMat = Matrix.T(Vector3f.Forward / 10);
 						}
@@ -348,7 +349,6 @@ namespace RhuEngine
 
 		public void RenderStep() {
 			try {
-				RWorld.RunOnStartOfFrame();
 				foreach (var item in _managers) {
 					try {
 						item.RenderStep();
@@ -358,7 +358,6 @@ namespace RhuEngine
 						throw ex;
 					}
 				}
-				RWorld.RunOnEndOfFrame();
 			}
 			catch (Exception wa) {
 				RLog.Err("GameStep Error" + wa.ToString());
@@ -367,7 +366,7 @@ namespace RhuEngine
 
 		public void GameStep() {
 			try {
-				RWorld.RunOnStartOfFrame();
+				RUpdateManager.RunOnStartOfFrame();
 				foreach (var item in _managers) {
 					try {
 						item.Step();
@@ -377,7 +376,7 @@ namespace RhuEngine
 						throw ex;
 					}
 				}
-				RWorld.RunOnEndOfFrame();
+				RUpdateManager.RunOnEndOfFrame();
 			}
 			catch (Exception wa) {
 				RLog.Err("GameStep Error" + wa.ToString());

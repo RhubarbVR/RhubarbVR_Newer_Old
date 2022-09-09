@@ -47,7 +47,7 @@ namespace RhuEngine.Components
 			TaskBarHolder = TaskBarHoldermover.AddChild("TaskBarHolder");
 			taskBar = TaskBarHolder.AddChild("TaskBar").AttachComponent<TaskBar>();
 			if (Engine.EngineLink.CanRender) {
-				RWorld.ExecuteOnStartOfFrame(() => RWorld.ExecuteOnEndOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => RUpdateManager.ExecuteOnEndOfFrame(() => {
 					if (LocalUser.userRoot.Target is null) {
 						return;
 					}
@@ -71,10 +71,10 @@ namespace RhuEngine.Components
 			var right = LocalUser.userRoot.Target?.rightController.Target;
 
 			if (head != null) {
-				if (!RWorld.IsInVR && !Engine.inputManager.screenInput.MouseFree) {
+				if (!Engine.IsInVR && !Engine.inputManager.screenInput.MouseFree) {
 					UpdateHeadLazer(head);
 				}
-				if (RWorld.IsInVR) {
+				if (Engine.IsInVR) {
 					UpdateLazer(left, Handed.Left);
 					UpdateLazer(right, Handed.Right);
 				}

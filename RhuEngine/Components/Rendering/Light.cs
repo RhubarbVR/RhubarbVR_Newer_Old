@@ -22,7 +22,7 @@ namespace RhuEngine.Components
 
 	[Supported(SupportedFancyFeatures.Lighting)]
 	[Category(new string[] { "Rendering" })]
-	public class Light : RenderingComponent
+	public class Light : LinkedWorldComponent
 	{
 		[Default(RLightType.Point)]
 		public readonly Sync<RLightType> LightType;

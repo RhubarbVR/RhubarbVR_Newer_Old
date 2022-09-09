@@ -14,7 +14,7 @@ using RhuEngine.WorldObjects;
 namespace RStereoKit
 {
 	//NotSupprted
-	public class BasicLight : RenderLinkBase<Light>
+	public class BasicLight : EngineWorldLinkBase<Light>
 	{
 		public override void Init() {
 		}
@@ -32,7 +32,7 @@ namespace RStereoKit
 		}
 	}
 
-	public class SKArmiturer : RenderLinkBase<Armature>
+	public class SKArmiturer : EngineWorldLinkBase<Armature>
 	{
 		public override void Init() {
 		}
@@ -50,7 +50,7 @@ namespace RStereoKit
 		}
 	}
 
-	public class SKTempMeshRender : RenderLinkBase<SkinnedMeshRender>
+	public class SKTempMeshRender : EngineWorldLinkBase<SkinnedMeshRender>
 	{
 		public override void Init() {
 			//Not needed for StereoKit
@@ -61,15 +61,15 @@ namespace RStereoKit
 		}
 
 		public override void Render() {
-			if (RenderingComponent.mesh.Asset != null) {
-				SKRender(RenderingComponent.mesh.Asset, RenderingComponent.materials.ToArray(), RenderingComponent.Entity.GlobalTrans, RenderingComponent.colorLinear.Value, RenderingComponent.renderLayer.Value);
+			if (LinkedComp.mesh.Asset != null) {
+				SKRender(LinkedComp.mesh.Asset, LinkedComp.materials.ToArray(), LinkedComp.Entity.GlobalTrans, LinkedComp.colorLinear.Value, LinkedComp.renderLayer.Value);
 			}
 		}
 
 		private void SKRender(RMesh rMesh, ISyncObject[] mits, RNumerics.Matrix globalTrans, Colorf color, RhuEngine.Linker.RenderLayer layer) {
 			var mesh = (SKRMesh)rMesh.Inst;
 			for (var i = 0; i < mesh.Meshs.Length; i++) {
-				mesh.Draw(((AssetRef<RMaterial>)mits[i% mits.Length]).Asset, globalTrans, color, RenderingComponent.OrderOffset.Value, layer, i);
+				mesh.Draw(((AssetRef<RMaterial>)mits[i% mits.Length]).Asset, globalTrans, color, LinkedComp.OrderOffset.Value, layer, i);
 			}
 		}
 
@@ -82,7 +82,7 @@ namespace RStereoKit
 		}
 	}
 
-	public class SKMeshRender : RenderLinkBase<MeshRender>
+	public class SKMeshRender : EngineWorldLinkBase<MeshRender>
 	{
 		public override void Init() {
 			//Not needed for StereoKit
@@ -93,15 +93,15 @@ namespace RStereoKit
 		}
 
 		public override void Render() {
-			if (RenderingComponent.mesh.Asset != null) {
-				SKRender(RenderingComponent.mesh.Asset, RenderingComponent.materials.ToArray(), RenderingComponent.Entity.GlobalTrans, RenderingComponent.colorLinear.Value, RenderingComponent.renderLayer.Value);
+			if (LinkedComp.mesh.Asset != null) {
+				SKRender(LinkedComp.mesh.Asset, LinkedComp.materials.ToArray(), LinkedComp.Entity.GlobalTrans, LinkedComp.colorLinear.Value, LinkedComp.renderLayer.Value);
 			}
 		}
 
 		private void SKRender(RMesh rMesh, ISyncObject[] mits, RNumerics.Matrix globalTrans, Colorf color, RhuEngine.Linker.RenderLayer layer) {
 			var mesh = (SKRMesh)rMesh.Inst;
 			for (var i = 0; i < mesh.Meshs.Length; i++) {
-				mesh.Draw(((AssetRef<RMaterial>)mits[i % mits.Length]).Asset, globalTrans, color, RenderingComponent.OrderOffset.Value, layer, i);
+				mesh.Draw(((AssetRef<RMaterial>)mits[i % mits.Length]).Asset, globalTrans, color, LinkedComp.OrderOffset.Value, layer, i);
 			}
 		}
 		public override void Started() {

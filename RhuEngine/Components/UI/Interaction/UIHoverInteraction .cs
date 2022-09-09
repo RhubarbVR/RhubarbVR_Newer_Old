@@ -27,13 +27,13 @@ namespace RhuEngine.Components
 
 		private void Hover() {
 			if (!_isHovering) {
-				RWorld.ExecuteOnEndOfFrame(this, () => OnHover.Target?.Invoke());
+				RUpdateManager.ExecuteOnEndOfFrame(this, () => OnHover.Target?.Invoke());
 			}
 			_isHovering = true;
 		}
 		private void UnHover() {
 			_isHovering = false;
-			RWorld.ExecuteOnEndOfFrame(this, () => OnUnHover.Target?.Invoke());
+			RUpdateManager.ExecuteOnEndOfFrame(this, () => OnUnHover.Target?.Invoke());
 		}
 
 		private bool _isHovering;

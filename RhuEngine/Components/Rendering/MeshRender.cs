@@ -15,7 +15,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "Rendering" })]
-	public class MeshRender : RenderingComponent, IWorldBoundingBox
+	public class MeshRender : LinkedWorldComponent, IWorldBoundingBox
 	{
 		public readonly AssetRef<RMesh> mesh;
 		public readonly SyncObjList<AssetRef<RMaterial>> materials;

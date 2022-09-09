@@ -140,7 +140,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			if(source.Value == Handed.Max) {
-				if (RWorld.IsInVR) {
+				if (Engine.IsInVR) {
 					return;
 				}
 			}
@@ -158,7 +158,7 @@ namespace RhuEngine.Components
 					}
 				}
 				//StartGabbing
-				RWorld.ExecuteOnStartOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					switch (source.Value) {
 						case Handed.Left:
 							break;
@@ -175,7 +175,7 @@ namespace RhuEngine.Components
 			}
 			if (_gripping && !isGrab) {
 				//DoneGrabbing
-				RWorld.ExecuteOnStartOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					switch (source.Value) {
 						case Handed.Left:
 							WorldManager.PrivateSpaceManager.DisableLeftLaser = false;

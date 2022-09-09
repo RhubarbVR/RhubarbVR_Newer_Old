@@ -5,17 +5,18 @@ using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
 using RhuEngine.Linker;
+using NAudio.Wave;
+using System.IO;
 
 namespace RhuEngine.Components
 {
-	public class AudioOutput : SyncObject, IAssetProvider<RSound>
+	public class RawAudioOutput : SyncObject, IAssetProvider<IWaveProvider>
 	{
+		public event Action<IWaveProvider> OnAssetLoaded;
 
-		public event Action<RSound> OnAssetLoaded;
+		public IWaveProvider Value { get; private set; }
 
-		public RSound Value { get; private set; }
-
-		public void Load(RSound data) {
+		public void Load(IWaveProvider data) {
 			Value = data;
 			Loaded = data != null;
 			OnAssetLoaded?.Invoke(data);
@@ -28,21 +29,22 @@ namespace RhuEngine.Components
 			base.Dispose();
 		}
 
-		public RSound audio;
+		public BufferedWaveProvider audio;
+
 
 		protected override void OnLoaded() {
 			if (!Engine.EngineLink.CanAudio) {
 				return;
 			}
-			audio = RSound.CreateStream(1f);
+			audio = new BufferedWaveProvider(new WaveFormat(44100, 32, 1));
 			Load(audio);
 		}
 
-		public void WriteAudio(float[] data) {
+		public void WriteAudio(byte[] data) {
 			if(audio is null) {
 				return;
 			}
-			audio.WriteSamples(data);
+			audio.AddSamples(data,0,data.Length);
 		}
 
 	}

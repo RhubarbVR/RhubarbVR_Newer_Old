@@ -39,7 +39,7 @@ namespace RhuEngine.Components
 			if (!buttonEvent.IsClicked) {
 				return;
 			}
-			Engine.EngineLink.ChangeVR(!RWorld.IsInVR);
+			Engine.EngineLink.ChangeVR(!Engine.IsInVR);
 		}
 
 		[Exposed]
@@ -176,7 +176,7 @@ namespace RhuEngine.Components
 				var vrText = uibuilder.AddTextWithLocal("Actions.ChangeVR.Enable", 1.9f, 1);
 				Action<bool> action = (mode) => vrText.Key.Value = mode ? "Actions.ChangeVR.Disable" : "Actions.ChangeVR.Enable";
 				Engine.EngineLink.VRChange += action;
-				action.Invoke(RWorld.IsInVR);
+				action.Invoke(Engine.IsInVR);
 				uibuilder.PopRect();
 				uibuilder.PopRect();
 				uibuilder.PopRect();

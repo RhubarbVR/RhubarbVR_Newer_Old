@@ -7,7 +7,7 @@ using System.Linq;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Rendering" })]
-	public class Armature : RenderingComponent
+	public class Armature : LinkedWorldComponent
 	{
 		public readonly SyncObjList<SyncRef<Entity>> ArmatureEntitys;
 	}

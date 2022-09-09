@@ -226,7 +226,7 @@ namespace RhuEngine.Components
 		}
 
 		public void RegTaskBarItemsUpdate() {
-			RWorld.ExecuteOnEndOfFrame(this, TaskBarItemsUpdate);
+			RUpdateManager.ExecuteOnEndOfFrame(this, TaskBarItemsUpdate);
 		}
 
 		public void TaskBarItemsUpdate() {

@@ -181,7 +181,7 @@ namespace RhuEngine.Components
 				PressingKeys.Add(code, DateTime.UtcNow);
 				void CheckIfStillPressing() {
 					if (PressingKeys.ContainsKey(code)) {
-						RWorld.ExecuteOnEndOfFrame(CheckIfStillPressing);
+						RUpdateManager.ExecuteOnEndOfFrame(CheckIfStillPressing);
 						if ((DateTime.UtcNow - PressingKeys[code]).TotalSeconds >= 1) {
 							RInput.InjectedTypeDelta += code;
 							PressingKeys.Remove(code);
@@ -189,7 +189,7 @@ namespace RhuEngine.Components
 						}
 					}
 				}
-				RWorld.ExecuteOnEndOfFrame(() => {
+				RUpdateManager.ExecuteOnEndOfFrame(() => {
 					RInput.InjectedTypeDelta = RInput.InjectedTypeDelta.Replace(code, string.Empty);
 					CheckIfStillPressing();
 				});

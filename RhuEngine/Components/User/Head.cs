@@ -53,14 +53,14 @@ namespace RhuEngine.Components
 				return;
 			}
 			if (World.IsPersonalSpace) {
-				Entity.LocalTrans = RWorld.IsInVR ? RInput.Head.HeadMatrix * RRenderer.CameraRoot.Inverse : RInput.Head.HeadMatrix;
+				Entity.LocalTrans = Engine.IsInVR ? RInput.Head.HeadMatrix * RRenderer.CameraRoot.Inverse : RInput.Head.HeadMatrix;
 			}
 			else {
 				if (user.Target is null) {
 					return;
 				}
 				if (user.Target == LocalUser) {
-					Entity.LocalTrans = RWorld.IsInVR ? RInput.Head.HeadMatrix * RRenderer.CameraRoot.Inverse : RInput.Head.HeadMatrix;
+					Entity.LocalTrans = Engine.IsInVR ? RInput.Head.HeadMatrix * RRenderer.CameraRoot.Inverse : RInput.Head.HeadMatrix;
 					user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("HeadPos").Value = Entity.position.Value;
 					user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>("HeadRot").Value = Entity.rotation.Value;
 				}

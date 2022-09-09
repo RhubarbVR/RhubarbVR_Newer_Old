@@ -66,7 +66,7 @@ namespace RhuEngine.Components
 			if (UserRootEnity is null) {
 				return;
 			}
-			if (!RWorld.IsInVR) {
+			if (!Engine.IsInVR) {
 				ProcessHeadBased();
 			}
 			else {

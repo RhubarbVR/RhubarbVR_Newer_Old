@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 	[NotLinkedRenderingComponent]
 	[UpdateLevel(UpdateEnum.Normal)]
 	[Category(new string[] { "UI" })]
-	public class UICanvas : RenderingComponent
+	public class UICanvas : LinkedWorldComponent
 	{
 
 		[OnChanged(nameof(UpdatePyhsicsMesh))]
@@ -61,7 +61,7 @@ namespace RhuEngine.Components
 		public SimpleMesh CollisionMesh;
 
 		public void UpdatePyhsicsMesh() {
-			RWorld.ExecuteOnEndOfFrame(this, () => {
+			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
 				if (_updateLock != 0) {
 					_tryUpdateWhenLocked = true;
 					return;
@@ -167,7 +167,7 @@ namespace RhuEngine.Components
 		}
 
 		protected override void AlwaysStep() {
-			RWorld.ExecuteOnEndOfFrame(ClearHitData);
+			RUpdateManager.ExecuteOnEndOfFrame(ClearHitData);
 		}
 
 		public List<HitData> hitDatas = new();

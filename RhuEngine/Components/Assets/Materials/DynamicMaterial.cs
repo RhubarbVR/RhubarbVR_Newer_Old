@@ -243,12 +243,6 @@ namespace RhuEngine.Components
 									pram = null;
 								}
 								break;
-							case MaterialParam.DepthTest:
-								if (pram.GetType() != typeof(ValuePramInfo<DepthTest>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
 							case MaterialParam.Cull:
 								if (pram.GetType() != typeof(ValuePramInfo<Cull>)) {
 									Prams.DisposeAtIndex(index);
@@ -325,9 +319,6 @@ namespace RhuEngine.Components
 								break;
 							case MaterialParam.UInt4:
 								Prams.Add<ValuePramInfo<Vector4u>>().name.Value = item.name;
-								break;
-							case MaterialParam.DepthTest:
-								Prams.Add<ValuePramInfo<DepthTest>>().name.Value = item.name;
 								break;
 							case MaterialParam.Cull:
 								Prams.Add<ValuePramInfo<Cull>>().name.Value = item.name;

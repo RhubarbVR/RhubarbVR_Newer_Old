@@ -38,7 +38,6 @@ namespace RhuEngine.WorldObjects
 			_packedSize = (BitRate.Value / 8 / TimeScale) + 1;
 		}
 
-		public override bool IsRunning => (_encoder is not null) && (_decoder is not null);
 
 		private void LoadOpus() {
 			if (_encoder is not null) {
@@ -67,17 +66,6 @@ namespace RhuEngine.WorldObjects
 			LoadOpus();
 		}
 
-		public override byte[] SendAudioSamples(float[] audio) {
-			var outpack = new byte[_packedSize];
-			var amount = _encoder.Encode(audio, SampleCount, outpack, outpack.Length);
-			Array.Resize(ref outpack, amount);
-			return outpack;
-		}
-
-		public override float[] ProssesAudioSamples(byte[] data) {
-			var audio = new float[SampleCount];
-			_decoder.Decode(data, data?.Length??0, audio, audio.Length);
-			return audio;
-		}
+		
 	}
 }

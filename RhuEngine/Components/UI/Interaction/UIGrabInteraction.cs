@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 		public readonly SyncDelegate<Action<Handed>> Grabeded;
 
 		public void Grab(Handed handed) {
-			RWorld.ExecuteOnEndOfFrame(() => Grabeded.Target?.Invoke(handed));
+			RUpdateManager.ExecuteOnEndOfFrame(() => Grabeded.Target?.Invoke(handed));
 		}
 
 		public bool Grabed = true;

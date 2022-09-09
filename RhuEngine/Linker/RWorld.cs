@@ -5,10 +5,8 @@ using System.Text;
 
 namespace RhuEngine.Linker
 {
-	public static class RWorld
+	public static class RUpdateManager
 	{
-		public static bool IsInVR => Engine.MainEngine.EngineLink.InVR;
-
 		public static Dictionary<object, Action> StartOfFrameExecute = new();
 		public static List<Action> StartOfFrameList = new();
 
