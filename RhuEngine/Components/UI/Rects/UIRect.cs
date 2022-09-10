@@ -100,6 +100,9 @@ namespace RhuEngine.Components
 		}
 
 		public void RegisterNestedParentUpdate(bool doSelf = true) {
+			if((Update & UpdateType.ForeParrentUpdate) != UpdateType.None) {
+				return;
+			}
 			foreach (Entity item in Entity.children) {
 				item.UIRect?.RegisterNestedParentUpdate();
 			}
@@ -226,6 +229,10 @@ namespace RhuEngine.Components
 			TotalMove = (ParentRect?.TotalMove ?? Vector2f.Zero) + MoveAmount;
 			ComputeDepth();
 			StandardMinMaxCalculation();
+		}
+
+		public virtual void FowParrentRectUpdate() {
+			ParrentRectUpdate();
 		}
 
 		public virtual void ChildRectUpdate() {

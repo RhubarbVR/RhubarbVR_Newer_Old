@@ -19,6 +19,15 @@ namespace RhuEngine.Components
 		[Default(false)]
 		public readonly Sync<bool> FlipOrder;
 
+		[Default(0f)]
+		public readonly Sync<float> Padding;
+
+
+		public override void FowParrentRectUpdate() {
+			base.FowParrentRectUpdate();
+			ChildRectUpdate();
+		}
+
 		public override void ChildRectUpdate() {
 			if (Fit) {
 				var recList = new Stack<UIRect>();
@@ -56,6 +65,7 @@ namespace RhuEngine.Components
 				var MoveVec = new Vector2f(0,1);
 				for (var i = 0; i < size; i++) {
 					MoveVec -= recList.Peek().CachedOverlapSize * new Vector2f(0, 1);
+					MoveVec -= new Vector2f(0, Padding.Value);
 					recList.Peek().StandardMinMaxCalculation(TrueMax + MoveVec, TrueMin + MoveVec, BadMin - MoveVec);
 					recList.Peek().RegisterNestedParentUpdate(false);
 					recList.Pop();

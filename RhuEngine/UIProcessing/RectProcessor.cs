@@ -58,7 +58,7 @@ namespace RhuEngine.UIProcessing
 				for (var i = 0; i < orderList.Length; i++) {
 					var item = orderList[i];
 					if ((item.Update & UIRect.UpdateType.ForeParrentUpdate) != UIRect.UpdateType.None) {
-						item.ParrentRectUpdate();
+						item.FowParrentRectUpdate();
 					}
 					item.CompletedRectUpdate();
 				}

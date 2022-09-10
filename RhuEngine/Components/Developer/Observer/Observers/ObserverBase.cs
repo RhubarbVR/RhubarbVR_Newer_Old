@@ -42,7 +42,7 @@ namespace RhuEngine.Components
 	{
 		public void SetObserverd(IWorldObject target);
 
-		public void SetUIRectAndMat(IAssetProvider<RMaterial> mat);
+		public IObserver SetUIRectAndMat(IAssetProvider<RMaterial> mat);
 	}
 
 	public abstract class ObserverBase<T> : Component, IObserver where T : class, IWorldObject
@@ -74,8 +74,9 @@ namespace RhuEngine.Components
 			Observerd.TargetIWorldObject = target;
 		}
 
-		public void SetUIRectAndMat(IAssetProvider<RMaterial> mat) {
+		public IObserver SetUIRectAndMat(IAssetProvider<RMaterial> mat) {
 			Mat.Target = mat;
+			return this;
 		}
 	}
 }
