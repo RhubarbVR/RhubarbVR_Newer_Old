@@ -7,9 +7,10 @@ using RhuEngine.Components;
 using NAudio.Wave;
 using StereoKit;
 using NAudio.Wave.SampleProviders;
-
 namespace RStereoKit
 {
+	
+
 	public class AudioSources : EngineWorldLinkBase<SoundSource>
 	{
 		public Sound sound;

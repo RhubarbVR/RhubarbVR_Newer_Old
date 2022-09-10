@@ -135,7 +135,7 @@ namespace RhuEngine.Components
 				return int.MinValue;
 			}
 			if (codec.Contains("mp4a")) {
-				return 100;
+				return 200;
 			}
 			return 100;
 		}
@@ -220,15 +220,15 @@ namespace RhuEngine.Components
 						}
 						// This is a bad thing
 						FormatDownloadInfo formatDownloadInfo = null;
-						var lastRateing = 0l;
+						var lastRateing = 0L;
 						foreach (var item in videoDownloadInfo.Formats) {
 							var audioCodec = item.Acodec;
 							var videoCodec = item.Vcodec;
-							var currentRating = 0l;
+							var currentRating = 0L;
 							currentRating += RateVideoCodec(videoCodec);
 							currentRating += RateAudioCodec(audioCodec);
 							currentRating += (item?.Width??int.MinValue)/1000;
-							if(currentRating >= lastRateing) {
+							if(currentRating >= lastRateing | formatDownloadInfo is null) {
 								formatDownloadInfo = item;
 								lastRateing = currentRating;
 							}
@@ -242,7 +242,6 @@ namespace RhuEngine.Components
 
 						RLog.Info($"Loaded youtubedl {formatDownloadInfo.Url}");
 						media = new Media(_libVLC, new Uri(formatDownloadInfo.Url));
-
 					}
 					else {
 						media = new Media(_libVLC, uri);
