@@ -72,7 +72,7 @@ namespace RhuPostProcessor
 			}
 			return methodReference;
 		}
-
+	
 		public static IEnumerable<MethodDefinition> GetConstructors(this TypeDefinition self) {
 			if (self == null) {
 				throw new ArgumentNullException("self");

@@ -99,7 +99,7 @@ namespace RhuEngine.WorldObjects
 				World.UnregisterGlobalStepable((IGlobalStepable)this);
 			}
 			foreach (var item in _disposables.ToArray()) {
-				if(item is SyncObject @object) {
+				if (item is SyncObject @object) {
 					@object.IsDestroying = true;
 				}
 				item?.Dispose();
@@ -115,7 +115,7 @@ namespace RhuEngine.WorldObjects
 
 		}
 
-		public class NotVailedGenaric:Exception
+		public class NotVailedGenaric : Exception
 		{
 			public override string Message => "Generic given is invalid";
 		}
@@ -177,7 +177,8 @@ namespace RhuEngine.WorldObjects
 				if (typeof(IGlobalStepable).IsAssignableFrom(GetType())) {
 					world.RegisterGlobalStepable((IGlobalStepable)this);
 				}
-			}catch(Exception e) {
+			}
+			catch (Exception e) {
 				try {
 					Dispose();
 				}
@@ -198,7 +199,7 @@ namespace RhuEngine.WorldObjects
 			try {
 				var data = GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
 				foreach (var item in data) {
-					if((item.Attributes & FieldAttributes.InitOnly) == 0) {
+					if ((item.Attributes & FieldAttributes.InitOnly) == 0) {
 						continue;
 					}
 					if ((item.GetCustomAttribute<NoLoadAttribute>() == null) && typeof(SyncObject).IsAssignableFrom(item.FieldType) && !((item.GetCustomAttribute<NoSaveAttribute>() != null) && (item.GetCustomAttribute<NoSyncAttribute>() != null))) {

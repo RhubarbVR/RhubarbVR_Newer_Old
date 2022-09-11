@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text;
 
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -13,6 +15,7 @@ namespace RhuPostProcessor
 {
 	public class PostProcess
 	{
+
 		public static Action<string>? logAction;
 
 		public static void Log(string logstring) {
@@ -78,6 +81,8 @@ namespace RhuPostProcessor
 
 			public void BuildIL(ModuleDefinition moduleDefinition, TypeReference actionWithChangeable, TypeReference voidType, TypeReference changableType, TypeReference action) {
 				Log($"Starting building IL for Type:{_typeDefinition.Name}");
+
+
 				_newMethod.Body.InitLocals = true;
 				_newMethod.Body.SimplifyMacros();
 				var iLProcessor = _newMethod.Body.GetILProcessor();
@@ -91,7 +96,7 @@ namespace RhuPostProcessor
 					var baseCHildMethod = (MethodReference)_typeDefinition.BaseType.Resolve().Methods.Where((x) => x.Name == "InitializeMembers").First();
 					var fialMethod = moduleDefinition.ImportReference(baseCHildMethod, _typeDefinition);
 					if (_typeDefinition.BaseType is GenericInstanceType genericInstanceType) {
-						fialMethod = moduleDefinition.ImportReference(baseCHildMethod.MakeHostInstanceGeneric(genericInstanceType),_typeDefinition);
+						fialMethod = moduleDefinition.ImportReference(baseCHildMethod.MakeHostInstanceGeneric(genericInstanceType), _typeDefinition);
 					}
 					iLProcessor.Append(Instruction.Create(OpCodes.Call, fialMethod));
 				}
@@ -108,12 +113,6 @@ namespace RhuPostProcessor
 					}
 					iLProcessor.Append(Instruction.Create(OpCodes.Stfld, filedRef));
 
-					//AddDisposable
-					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-					iLProcessor.Append(Instruction.Create(OpCodes.Ldfld, filedRef));
-					iLProcessor.Append(Instruction.Create(OpCodes.Call, moduleDefinition.ImportReference(_typeDefinition.Resolve().AllMethods().Where((x) => x.Name == "AddDisposable").First(), _typeDefinition)));
-
 					//Initialize
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldfld, filedRef));
@@ -126,6 +125,11 @@ namespace RhuPostProcessor
 					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_3));
 					iLProcessor.Append(Instruction.Create(OpCodes.Callvirt, moduleDefinition.ImportReference((MethodReference)_typeDefinition.Resolve().AllMethods().Where((x) => x.Name == "Initialize").First().Resolve(), _typeDefinition)));
 
+					//AddDisposable
+					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
+					iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
+					iLProcessor.Append(Instruction.Create(OpCodes.Ldfld, filedRef));
+					iLProcessor.Append(Instruction.Create(OpCodes.Call, moduleDefinition.ImportReference(_typeDefinition.Resolve().AllMethods().Where((x) => x.Name == "AddDisposable").First(), _typeDefinition)));
 
 					if (item.DefaultAttribute != null) {
 						if (item.DefaultAttribute.HasConstructorArguments) {
@@ -135,7 +139,7 @@ namespace RhuPostProcessor
 							iLProcessor.Append(data.GetInstructionForEvaluationStack());
 							var fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AllProperties().Where((x) => x.Name == "Value").First().SetMethod.Resolve(), _typeDefinition);
 							if (item.Field.FieldType is GenericInstanceType genericInstanceType) {
-								fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AllProperties().Where((x) => x.Name == "Value").First().SetMethod.Resolve().MakeHostInstanceGeneric(genericInstanceType),_typeDefinition);
+								fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AllProperties().Where((x) => x.Name == "Value").First().SetMethod.Resolve().MakeHostInstanceGeneric(genericInstanceType), _typeDefinition);
 							}
 							iLProcessor.Append(Instruction.Create(OpCodes.Callvirt, fialMethod));
 						}
@@ -153,7 +157,7 @@ namespace RhuPostProcessor
 									addedmethod.Body.SimplifyMacros();
 									var iLProcessor2 = addedmethod.Body.GetILProcessor();
 									iLProcessor2.Append(Instruction.Create(OpCodes.Ldarg_0));
-									iLProcessor2.Append(Instruction.Create(OpCodes.Call, moduleDefinition.ImportReference(method.MakeHostInstanceGeneric(_typeDefinition), _typeDefinition)));
+									iLProcessor2.Append(Instruction.Create(OpCodes.Call, moduleDefinition.ImportReference(method.MakeHostInstanceGeneric(filedRef.DeclaringType), _typeDefinition)));
 									iLProcessor2.Append(Instruction.Create(OpCodes.Ret));
 									_typeDefinition.Methods.Add(addedmethod);
 									addedmethod.Body.Optimize();
@@ -162,11 +166,11 @@ namespace RhuPostProcessor
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldfld, filedRef));
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-								iLProcessor.Append(Instruction.Create(OpCodes.Ldftn, moduleDefinition.ImportReference(addedmethod.MakeHostInstanceGeneric(_typeDefinition), _typeDefinition)));
+								iLProcessor.Append(Instruction.Create(OpCodes.Ldftn, moduleDefinition.ImportReference(addedmethod.MakeHostInstanceGeneric(filedRef.DeclaringType), _typeDefinition)));
 								iLProcessor.Append(Instruction.Create(OpCodes.Newobj, moduleDefinition.ImportReference(actionWithChangeable.GetConstructor(moduleDefinition, out _, true), _typeDefinition)));
-								var fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "Changed").First().AddMethod.Resolve(),_typeDefinition);
+								var fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "Changed").First().AddMethod.Resolve(), _typeDefinition);
 								if (item.Field.FieldType is GenericInstanceType genericInstanceType) {
-									fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "Changed").First().AddMethod.Resolve().Resolve().MakeHostInstanceGeneric(genericInstanceType),_typeDefinition);
+									fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "Changed").First().AddMethod.Resolve().Resolve().MakeHostInstanceGeneric(genericInstanceType), _typeDefinition);
 								}
 								iLProcessor.Append(Instruction.Create(OpCodes.Callvirt, fialMethod));
 							}
@@ -174,11 +178,13 @@ namespace RhuPostProcessor
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldfld, filedRef));
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
+
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldftn, moduleDefinition.ImportReference(method, _typeDefinition)));
+
 								iLProcessor.Append(Instruction.Create(OpCodes.Newobj, moduleDefinition.ImportReference(actionWithChangeable.GetConstructor(moduleDefinition, out _, true), _typeDefinition)));
 								var fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "Changed").First().AddMethod.Resolve(), _typeDefinition);
 								if (item.Field.FieldType is GenericInstanceType genericInstanceType) {
-									fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "Changed").First().AddMethod.Resolve().Resolve().MakeHostInstanceGeneric(genericInstanceType),_typeDefinition);
+									fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "Changed").First().AddMethod.Resolve().Resolve().MakeHostInstanceGeneric(genericInstanceType), _typeDefinition);
 								}
 								iLProcessor.Append(Instruction.Create(OpCodes.Callvirt, fialMethod));
 							}
@@ -197,11 +203,11 @@ namespace RhuPostProcessor
 									addedmethod = new MethodDefinition(method.Name + "_Gen_AddedPram", MethodAttributes.Private | MethodAttributes.Family, voidType);
 									addedmethod.Parameters.Add(new ParameterDefinition("temp", ParameterAttributes.None, ((GenericInstanceType)item.Field.FieldType).GenericArguments[0]));
 									addedmethod.Body.InitLocals = true;
-									
+
 									addedmethod.Body.SimplifyMacros();
 									var iLProcessor2 = addedmethod.Body.GetILProcessor();
 									iLProcessor2.Append(Instruction.Create(OpCodes.Ldarg_0));
-									iLProcessor2.Append(Instruction.Create(OpCodes.Call, moduleDefinition.ImportReference(method.MakeHostInstanceGeneric(_typeDefinition), _typeDefinition)));
+									iLProcessor2.Append(Instruction.Create(OpCodes.Call, moduleDefinition.ImportReference(method.MakeHostInstanceGeneric(filedRef.DeclaringType), _typeDefinition)));
 									iLProcessor2.Append(Instruction.Create(OpCodes.Ret));
 									addedmethod.Body.Optimize();
 
@@ -209,13 +215,13 @@ namespace RhuPostProcessor
 								}
 
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-								iLProcessor.Append(Instruction.Create(OpCodes.Ldfld, filedRef));
+								iLProcessor.Append(Instruction.Create(OpCodes.Ldfld, moduleDefinition.ImportReference(filedRef, _typeDefinition)));
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-								iLProcessor.Append(Instruction.Create(OpCodes.Ldftn, moduleDefinition.ImportReference(addedmethod.MakeHostInstanceGeneric(_typeDefinition), _typeDefinition)));
+								iLProcessor.Append(Instruction.Create(OpCodes.Ldftn, moduleDefinition.ImportReference(addedmethod.MakeHostInstanceGeneric(filedRef.DeclaringType), _typeDefinition)));
 								iLProcessor.Append(Instruction.Create(OpCodes.Newobj, moduleDefinition.ImportReference(action.MakeGenericInstanceType(((GenericInstanceType)item.Field.FieldType).GenericArguments[0]).GetConstructor(moduleDefinition, out _, true), _typeDefinition)));
 								var fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "LoadChange").First().AddMethod.Resolve(), _typeDefinition);
 								if (item.Field.FieldType is GenericInstanceType genericInstanceType) {
-									fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "LoadChange").First().AddMethod.Resolve().Resolve().MakeHostInstanceGeneric(genericInstanceType),_typeDefinition);
+									fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "LoadChange").First().AddMethod.Resolve().Resolve().MakeHostInstanceGeneric(genericInstanceType), _typeDefinition);
 								}
 								iLProcessor.Append(Instruction.Create(OpCodes.Callvirt, fialMethod));
 							}
@@ -223,11 +229,11 @@ namespace RhuPostProcessor
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldfld, filedRef));
 								iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-								iLProcessor.Append(Instruction.Create(OpCodes.Ldftn, moduleDefinition.ImportReference(method, _typeDefinition)));
+								iLProcessor.Append(Instruction.Create(OpCodes.Ldftn, moduleDefinition.ImportReference(method.MakeHostInstanceGeneric(filedRef.DeclaringType), _typeDefinition)));
 								iLProcessor.Append(Instruction.Create(OpCodes.Newobj, moduleDefinition.ImportReference(action.MakeGenericInstanceType(((GenericInstanceType)item.Field.FieldType).GenericArguments[0]).GetConstructor(moduleDefinition, out _, true), _typeDefinition)));
 								var fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "LoadChange").First().AddMethod.Resolve(), _typeDefinition);
 								if (item.Field.FieldType is GenericInstanceType genericInstanceType) {
-									fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "LoadChange").First().AddMethod.Resolve().Resolve().MakeHostInstanceGeneric(genericInstanceType),_typeDefinition);
+									fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AlleEvents().Where((x) => x.Name == "LoadChange").First().AddMethod.Resolve().Resolve().MakeHostInstanceGeneric(genericInstanceType), _typeDefinition);
 								}
 								iLProcessor.Append(Instruction.Create(OpCodes.Callvirt, fialMethod));
 							}
@@ -244,7 +250,7 @@ namespace RhuPostProcessor
 							iLProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 							var fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AllMethods().Where((x) => x.Name == "Bind").First(), _typeDefinition);
 							if (item.Field.FieldType is GenericInstanceType genericInstanceType) {
-								fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AllMethods().Where((x) => x.Name == "Bind").First().MakeHostInstanceGeneric(genericInstanceType),_typeDefinition);
+								fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AllMethods().Where((x) => x.Name == "Bind").First().MakeHostInstanceGeneric(genericInstanceType), _typeDefinition);
 							}
 							iLProcessor.Append(Instruction.Create(OpCodes.Callvirt, fialMethod));
 						}
@@ -255,7 +261,7 @@ namespace RhuPostProcessor
 						iLProcessor.Append(((object)true).GetInstructionForEvaluationStack());
 						var fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AllProperties().Where((x) => x.Name == "NoSync").First().SetMethod.Resolve(), _typeDefinition);
 						if (item.Field.FieldType is GenericInstanceType genericInstanceType) {
-							fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AllProperties().Where((x) => x.Name == "NoSync").First().SetMethod.Resolve().MakeHostInstanceGeneric(genericInstanceType),_typeDefinition);
+							fialMethod = moduleDefinition.ImportReference(item.Field.FieldType.Resolve().AllProperties().Where((x) => x.Name == "NoSync").First().SetMethod.Resolve().MakeHostInstanceGeneric(genericInstanceType), _typeDefinition);
 						}
 						iLProcessor.Append(Instruction.Create(OpCodes.Callvirt, fialMethod));
 					}
@@ -360,6 +366,7 @@ namespace RhuPostProcessor
 
 		public bool ProcessDLL(string targetDLL, string[] extraDlls) {
 			if (!File.Exists(targetDLL)) {
+				Log("targetDLL did not exists");
 				return false;
 			}
 			var (assembly, pdbFileExists) = GetAssemblyFromDLLPath(targetDLL, extraDlls);
@@ -377,16 +384,16 @@ namespace RhuPostProcessor
 			actionWithChangeable = actionType.MakeGenericInstanceType(changableType);
 			foreach (var item in assembly.MainModule.CustomAttributes) {
 				foreach (var constructorArgument in item.ConstructorArguments) {
-					if(constructorArgument.Value is string value) {
+					if (constructorArgument.Value is string value) {
 						if (value == "RHU_OPTIMIZED") {
 							Log("Allready Has Been Prossed");
 							assembly.Dispose();
-							return false;
+							return true;
 						}
 					}
 				}
 			}
-			
+
 
 			foreach (var type in getTypes) {
 				if (type.BaseType is null) {
