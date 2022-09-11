@@ -196,12 +196,22 @@ namespace RhuEngine.Components
 					StopLoad = false;
 					Media media;
 					if (VideoImporter.IsVideoStreaming(uri)) {
-						RLog.Info($"Loadedingvideo");
+						RLog.Info($"Loadeding youtubeDL");
 						if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-							_youtubeDL ??= new YoutubeDL("./yt-dlp.exe");
+							RLog.Info($"YoutubeDL Loading Windows");
+							_youtubeDL ??= new YoutubeDL("./YT-DLP/Windows/yt-dlp-win.exe");
 						}
-						else {
-							_youtubeDL ??= new YoutubeDL();
+						if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+							RLog.Info($"YoutubeDL Loading Linux");
+							_youtubeDL ??= new YoutubeDL("./YT-DLP/Linux/yt-dlp_linux");
+						}
+						if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+							RLog.Info($"YoutubeDL Loading OSX");
+							_youtubeDL ??= new YoutubeDL("./YT-DLP/MacOS/yt-dlp_macos");
+						}
+						if (_youtubeDL is null) {
+							RLog.Info($"YoutubeDL is not loaded");
+							return;
 						}
 						// Would like to add playlist support could not get it working every playlest video was null
 						_youtubeDL.Options.VideoSelectionOptions.NoPlaylist = true;

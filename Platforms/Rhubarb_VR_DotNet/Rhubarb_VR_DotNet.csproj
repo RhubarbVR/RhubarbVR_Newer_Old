@@ -55,5 +55,16 @@
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>
+	<ItemGroup>
+	  <None Update="YT-DLP\Linux\yt-dlp_linux">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="YT-DLP\MacOS\yt-dlp_macos">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="YT-DLP\Windows\yt-dlp-win.exe">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 
 </Project>
