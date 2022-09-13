@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 	public sealed class DynamicTextRender
 	{
 		public Action UpdatedMeshses;
-		public DynamicTextRender(bool uiText = false, Action update = null) {
+		public DynamicTextRender(in bool uiText = false, in Action update = null) {
 			UpdatedMeshses = update;
 			UIText = uiText;
 		}
@@ -41,7 +41,7 @@ namespace RhuEngine.Components
 			public float Leading = 0f;
 			public bool NullChar = false;
 			public int mitIndex = 0;
-			public TextChar(Rune c, Matrix p, Colorf color, Vector2f textsize, float fontSize, float Leading, int mitIndex) {
+			public TextChar(in Rune c, in Matrix p, in Colorf color, in Vector2f textsize, in float fontSize, in float Leading, in int mitIndex) {
 				this.fontSize = fontSize;
 				this.c = c;
 				this.p = p;
@@ -50,7 +50,7 @@ namespace RhuEngine.Components
 				this.Leading = Leading;
 				this.mitIndex = mitIndex;
 			}
-			public TextChar(Rune c, Matrix p, Colorf color, Vector2f textsize, float Leading, float fontSize, int mitIndex, Vector2f bottomleft, Vector2f topright) {
+			public TextChar(in Rune c, in Matrix p, in Colorf color, in Vector2f textsize, in float Leading, in float fontSize, in int mitIndex, in Vector2f bottomleft, in Vector2f topright) {
 				this.fontSize = fontSize;
 				this.c = c;
 				this.p = Matrix.T(new Vector3f(0, -0.25, 0)) * p;
@@ -135,7 +135,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public void LoadText(string Text, RFont Font, float leading, Colorf StartingColor, FontStyle StartingStyle = FontStyle.Regular, float StatingSize = 10f, EHorizontalAlien horizontalAlien = EHorizontalAlien.Middle) {
+		public void LoadText(string Text, RFont Font, in float leading, in Colorf StartingColor, in FontStyle StartingStyle = FontStyle.Regular, in float StatingSize = 10f, in EHorizontalAlien horizontalAlien = EHorizontalAlien.Middle) {
 			if (Font is null) {
 				return;
 			}
@@ -163,7 +163,7 @@ namespace RhuEngine.Components
 			color.Push(StartingColor);
 			var index = 0;
 			Rune? lastRune = null;
-			void AddNullText(int first) {
+			void AddNullText(in int first) {
 				for (var i = 0; i < first; i++) {
 					var textpos = new Vector3f(textXpos, textYpos - textsizeY, 0);
 					var chare = new TextChar(Rune.GetRuneAt("\0", 0), Matrix.TRS(textpos, Quaternionf.Yawed180, 0.01f), color.Peek(), Vector2f.One, fontSize.Peek() / 10, leaded.Peek() / 10, -1) {
@@ -172,7 +172,7 @@ namespace RhuEngine.Components
 					Chars.SafeAdd(chare);
 				}
 			}
-			void RenderText(string text) {
+			void RenderText(in string text) {
 				foreach (var item in text.EnumerateRunes()) {
 					var textsize = FontManager.Size(Font, item);
 					if (item == Rune.GetRuneAt("\n", 0)) {
@@ -226,7 +226,7 @@ namespace RhuEngine.Components
 					index++;
 				}
 			}
-			void Loop(string segment) {
+			void Loop(in string segment) {
 				var first = segment.IndexOf('<');
 				if (first <= -1) {
 					RenderText(segment);
