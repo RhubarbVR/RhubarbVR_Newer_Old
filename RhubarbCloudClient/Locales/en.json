@@ -203,6 +203,8 @@
     "Editor.RemoveComponent": "Remove Component",
     "Editor.Components": "Components",
 
+    "Programs.Offline.Name": "Offline",
+    "Programs.Offline.GoOnline": "Go Online",
 
     "Programs.Login.Name": "Login",
     "Programs.Login.Login": "Login",

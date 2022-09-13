@@ -148,6 +148,7 @@ namespace RhuEngine.Components.PrivateSpace
 		
 		public override void LoadUI(Entity uiRoot) {
 			Engine.netApiManager.Client.OnLogin += (user) => Close();
+			Engine.netApiManager.Client.HasGoneOfline += () => Close();
 
 			window.CloseButton.Value = false;
 			var ma = uiRoot.AttachComponent<UIRect>();

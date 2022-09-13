@@ -78,6 +78,9 @@ namespace RhuEngine.Components.PrivateSpace
 			if (programLink == typeof(LoginProgram)) {
 				CanCloses = false;
 			}
+			if (programLink == typeof(IsOnlineProgram)) {
+				CanCloses = false;
+			}
 			TaskBar = taskBar;
 			if (typeof(Program).IsAssignableFrom(programLink)) {
 				var program = (Program)Activator.CreateInstance(programLink);

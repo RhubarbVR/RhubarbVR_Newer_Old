@@ -83,6 +83,10 @@ namespace RhuEngine
 
 
 		public RFont(Font mainFont) {
+			if (mainFont is null) {
+				TextOptions = null;
+				return;
+			}
 			TextOptions = new TextOptions(mainFont) {
 				Dpi = FONTSIZE,
 			};
@@ -90,7 +94,11 @@ namespace RhuEngine
 
 		public readonly List<FontAtlisPart> fontAtlisParts = new();
 
+
 		public (RMaterial mit, RTexture2D texture, Vector2f bottomleft, Vector2f topright) GetGlygh(Rune rune) {
+			if (TextOptions is null) {
+				return (null, RTexture2D.White, Vector2f.Zero, Vector2f.Zero);
+			}
 			lock (this) {
 				foreach (var item in fontAtlisParts) {
 					var glyih = item.GetGlygh(rune);
@@ -107,6 +115,9 @@ namespace RhuEngine
 		}
 
 		public FontRectangle GetSizeOfText(string text) {
+			if (TextOptions is null) {
+				return new FontRectangle();
+			}
 			lock (this) {
 				return TextMeasurer.Measure(text, TextOptions);
 			}
@@ -117,6 +128,9 @@ namespace RhuEngine
 		public Dictionary<(Rune, Rune), float> CachedXAdvancesSize = new();
 
 		public float GetXAdvances(Rune item, Rune nextitem) {
+			if (TextOptions is null) {
+				return 0f;
+			}
 			lock (this) {
 				if (CachedXAdvancesSize.ContainsKey((item, nextitem))) {
 					return CachedXAdvancesSize[(item, nextitem)];
@@ -130,6 +144,9 @@ namespace RhuEngine
 		}
 
 		public FontRectangle GetSizeOfRune(Rune rune) {
+			if (TextOptions is null) {
+				return new FontRectangle();
+			}
 			lock (this) {
 				if (CachedRuneSize.ContainsKey(rune)) {
 					return CachedRuneSize[rune];
@@ -144,6 +161,9 @@ namespace RhuEngine
 
 
 		public RTexture2D RenderText(string text) {
+			if(TextOptions is null) {
+				return RTexture2D.White;
+			}
 			lock (this) {
 				var size = TextMeasurer.Measure(text, TextOptions);
 				if (size == FontRectangle.Empty) {

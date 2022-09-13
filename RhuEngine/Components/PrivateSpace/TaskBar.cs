@@ -493,10 +493,26 @@ namespace RhuEngine.Components
 			colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
 			colorassign.ColorShif.Value = 1.9f;
 			colorassign.TargetColor.Target = text.StartingColor;
+			WorldManager.OnWorldUpdateTaskBar += RegTaskBarItemsUpdate;
+
+			Engine.netApiManager.Client.HasGoneOfline += () => {
+				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(IsOnlineProgram)));
+			};
+
+			Engine.netApiManager.Client.HasGoneOfline += () => {
+				if (!Engine.netApiManager.Client.IsOnline) {
+					return;
+				}
+				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(LoginProgram)));
+			};
+
+			if (!Engine.netApiManager.Client.IsOnline) {
+				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(IsOnlineProgram)));
+				return;
+			}
 			if (!Engine.netApiManager.Client.IsLogin) {
 				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(LoginProgram)));
 			}
-			WorldManager.OnWorldUpdateTaskBar += RegTaskBarItemsUpdate;
 		}
 		public Program HasProgramOpen(Type ProGramType) {
 			foreach (var item in programs) {

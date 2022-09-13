@@ -16,6 +16,7 @@ namespace RhuEngine.Components
 		public readonly AssetRef<RTexture2D> texture;
 
 		[OnChanged(nameof(TextScale))]
+		[Default(1f)]
 		public readonly Sync<float> scaleMultiplier;
 
 		public readonly Linker<Vector2f> scale;
