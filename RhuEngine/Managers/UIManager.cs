@@ -14,6 +14,7 @@ namespace RhuEngine.Managers
 	public sealed class UIManager : IManager
 	{
 		public readonly SafeList<UIRect> Rects = new();
+		public bool ReOrder;
 		public RectProcessor RectProcessor;
 		public readonly HashSet<UIRect> UpdatedRects = new();
 		public void AddUpdatedRectComponent(UIRect comp) {
@@ -24,6 +25,7 @@ namespace RhuEngine.Managers
 		}
 		public void AddRectComponent(UIRect comp) {
 			Rects.SafeAdd(comp);
+			ReOrder = true;
 		}
 		public void RemoveRectComponent(UIRect comp) {
 			Rects.SafeRemove(comp);
@@ -31,6 +33,16 @@ namespace RhuEngine.Managers
 
 		public Engine Engine { get; set; }
 		public bool SingleThread;
+		private static void RectRenderUpdate(List<BaseRenderUIComponent> list) {
+			foreach (var item in list) {
+				item.ProcessMeshUpdate();
+			}
+		}
+
+		private static void RectUpdate(UIRect uIRect) {
+			uIRect.RenderComponents.SafeOperation(RectRenderUpdate);
+			uIRect.MarkRenderMeshUpdateAsDone();
+		}
 
 		public void Step() {
 			if (!Engine.EngineLink.CanRender) {
@@ -39,23 +51,11 @@ namespace RhuEngine.Managers
 			RectProcessor.Step();
 			if (SingleThread) {
 				foreach (var item in UpdatedRects) {
-					item.RenderComponents.SafeOperation((list) => {
-						foreach (var item in list) {
-							item.ProcessMeshUpdate();
-						}
-					});
-					item.MarkRenderMeshUpdateAsDone();
+					RectUpdate(item);
 				}
 			}
 			else {
-				Parallel.ForEach(UpdatedRects, (rect) => {
-					rect.RenderComponents.SafeOperation((list) => {
-						foreach (var item in list) {
-							item.ProcessMeshUpdate();
-						}
-					});
-					rect.MarkRenderMeshUpdateAsDone();
-				});
+				Parallel.ForEach(UpdatedRects, RectUpdate);
 			}
 			RemoveUpdatedRectComponents();
 		}

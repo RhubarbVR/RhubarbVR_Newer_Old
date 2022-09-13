@@ -20,14 +20,31 @@ namespace RhuEngine.UIProcessing
 
 		public UIManager UIManager { get; }
 		public SafeList<UIRect> Rects => UIManager.Rects;
+
+		private readonly RextComp _cop = new();
+
+		public sealed class RextComp : IComparer<UIRect>
+		{
+			public int Compare(UIRect x, UIRect y) {
+				return x.Entity.Depth < y.Entity.Depth ? -1 : x.Entity.Depth > y.Entity.Depth ? 1 : 0;
+			}
+		}
+
+		public static bool Remove(UIRect uIRect) {
+			return uIRect.IsRemoved;
+		}
+
 		public void Step() {
 			Rects.SafeOperation((rectsList) => {
 				//Todo: find where ther not being removed
-				rectsList.RemoveAll(x => x.IsRemoved);
-				var orderList = rectsList.OrderBy((x) => x.Entity.Depth).ToArray();
+				if (UIManager.ReOrder) {
+					rectsList.RemoveAll(Remove);
+					rectsList.Sort(_cop);
+					UIManager.ReOrder = false;
+				}
+
 				//Register Parrent Update Enum
-				for (var i = 0; i < orderList.Length; i++) {
-					var item = orderList[i];
+				foreach (var item in rectsList) {
 					if (RInput.Key(Key.F10).IsActive()) {
 						//Reloads all ui
 						item.MarkForRenderMeshUpdate(UIRect.RenderMeshUpdateType.FullResized);
@@ -43,8 +60,8 @@ namespace RhuEngine.UIProcessing
 					}
 				}
 				//Register Child Update Enum
-				for (var i = orderList.Length - 1; i >= 0; i--) {
-					var item = orderList[i];
+				for (var i = rectsList.Count - 1; i >= 0; i--) {
+					var item = rectsList[i];
 					//Todo: make forLoop
 					foreach (var child in item.Entity.children.Cast<Entity>()) {
 						if (((child?.UIRect?.Update ?? UIRect.UpdateType.None) & (UIRect.UpdateType.Local | UIRect.UpdateType.Child)) != UIRect.UpdateType.None) {
@@ -55,8 +72,7 @@ namespace RhuEngine.UIProcessing
 						item.ChildRectUpdate();
 					}
 				}
-				for (var i = 0; i < orderList.Length; i++) {
-					var item = orderList[i];
+				foreach (var item in rectsList) {
 					if ((item.Update & UIRect.UpdateType.ForeParrentUpdate) != UIRect.UpdateType.None) {
 						item.FowParrentRectUpdate();
 					}

@@ -91,7 +91,7 @@ namespace RhuEngine
 		public readonly List<FontAtlisPart> fontAtlisParts = new();
 
 
-		public (RMaterial mit, RTexture2D texture, Vector2f bottomleft, Vector2f topright) GetGlygh(Rune rune) {
+		public (RMaterial mit, RTexture2D texture, Vector2f bottomleft, Vector2f topright) GetGlygh(in Rune rune) {
 			lock (this) {
 				foreach (var item in fontAtlisParts) {
 					var glyih = item.GetGlygh(rune);
@@ -107,7 +107,7 @@ namespace RhuEngine
 			}
 		}
 
-		public FontRectangle GetSizeOfText(string text) {
+		public FontRectangle GetSizeOfText(in string text) {
 			lock (this) {
 				return TextMeasurer.Measure(text, TextOptions);
 			}
@@ -117,7 +117,7 @@ namespace RhuEngine
 
 		public Dictionary<(Rune, Rune), float> CachedXAdvancesSize = new();
 
-		public float GetXAdvances(Rune item, Rune nextitem) {
+		public float GetXAdvances(in Rune item, in Rune nextitem) {
 			lock (this) {
 				if (CachedXAdvancesSize.ContainsKey((item, nextitem))) {
 					return CachedXAdvancesSize[(item, nextitem)];
@@ -130,7 +130,7 @@ namespace RhuEngine
 			}
 		}
 
-		public FontRectangle GetSizeOfRune(Rune rune) {
+		public FontRectangle GetSizeOfRune(in Rune rune) {
 			lock (this) {
 				if (CachedRuneSize.ContainsKey(rune)) {
 					return CachedRuneSize[rune];
