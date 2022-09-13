@@ -7,7 +7,7 @@ using RhuEngine;
 using RhuEngine.Linker;
 namespace Rhubarb_VR_HeadLess.Commads
 {
-	public class Exit : Command
+	public sealed class Exit : Command
 	{
 		public override string HelpMsg => "Close RhubarbVR";
 

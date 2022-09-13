@@ -29,7 +29,7 @@ namespace RNumerics
 		public UVModes UVMode = UVModes.FullUVSquare;
 
 
-		virtual protected Vector3d Make_vertex(float x, float y) {
+		virtual protected Vector3d Make_vertex(in float x, in float y) {
 			var v = Vector3d.Zero;
 			v[Math.Abs(IndicesMap.a) - 1] = (IndicesMap.a < 0) ? -x : x;
 			v[Math.Abs(IndicesMap.b) - 1] = (IndicesMap.b < 0) ? -y : y;
@@ -117,7 +117,7 @@ namespace RNumerics
 		public float uvtop = 1.0f;
 		public float uvbottom = 1.0f;
 
-		virtual protected Vector3d Make_vertex(float x, float y) {
+		virtual protected Vector3d Make_vertex(in float x, in float y) {
 			var v = Vector3d.Zero;
 			v[Math.Abs(IndicesMap.a) - 1] = (IndicesMap.a < 0) ? -x : x;
 			v[Math.Abs(IndicesMap.b) - 1] = (IndicesMap.b < 0) ? -y : y;
@@ -166,7 +166,7 @@ namespace RNumerics
 	/// with EdgeVertices verts along each edge.
 	/// [TODO] allow varying EdgeVertices in each dimension (tricky...)
 	/// </summary>
-	public class GriddedRectGenerator : TrivialRectGenerator
+	public sealed class GriddedRectGenerator : TrivialRectGenerator
 	{
 		public int EdgeVertices = 8;
 
@@ -230,8 +230,8 @@ namespace RNumerics
 				for (var xi = 0; xi < N; ++xi) {
 					var tx = (double)xi / (double)(N - 1);
 					normals[vi] = Normal;
-					uv[vi] = Bilerp(ref uv00, ref uv01, ref uv11, ref uv10, (float)tx, (float)ty);
-					vertices[vi++] = Bilerp(ref v00, ref v01, ref v11, ref v10, tx, ty);
+					uv[vi] = Bilerp( uv00,  uv01,  uv11,  uv10, (float)tx, (float)ty);
+					vertices[vi++] = Bilerp( v00,  v01,  v11,  v10, tx, ty);
 				}
 			}
 
@@ -266,7 +266,7 @@ namespace RNumerics
 
 	// Generate a rounded rect centered at origin.
 	// Force individual corners to be sharp using the SharpCorners flags field.
-	public class RoundRectGenerator : MeshGenerator
+	public sealed class RoundRectGenerator : MeshGenerator
 	{
 		public float Width = 1.0f;
 		public float Height = 1.0f;

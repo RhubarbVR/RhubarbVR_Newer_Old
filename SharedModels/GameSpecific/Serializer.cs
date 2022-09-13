@@ -9,7 +9,7 @@ using MessagePack.Formatters;
 namespace SharedModels.GameSpecific
 {
 	[Formatter]
-	public class MatrixSaver : IMessagePackFormatter<Matrix4x4>
+	public sealed class MatrixSaver : IMessagePackFormatter<Matrix4x4>
 	{
 		public Matrix4x4 Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
 			return new Matrix4x4(

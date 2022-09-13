@@ -12,7 +12,7 @@ using RNumerics;
 namespace RhuEngine.Components.PrivateSpace
 {
 	[OpenMany]
-	public class FileExplorerProgram : Program
+	public sealed class FileExplorerProgram : Program
 	{
 		public override string ProgramID => "FileExplorer";
 

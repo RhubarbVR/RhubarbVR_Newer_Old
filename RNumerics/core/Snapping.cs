@@ -2,10 +2,10 @@
 
 namespace RNumerics
 {
-	public class Snapping
+	public static class Snapping
 	{
 
-		public static double SnapToIncrement(double fValue, double fIncrement, double offset = 0) {
+		public static double SnapToIncrement(double fValue, in double fIncrement, in double offset = 0) {
 			if (!MathUtil.IsFinite(fValue)) {
 				return 0;
 			}
@@ -25,12 +25,12 @@ namespace RNumerics
 
 
 
-		public static double SnapToNearbyIncrement(double fValue, double fIncrement, double fTolerance) {
+		public static double SnapToNearbyIncrement(in double fValue, in double fIncrement, in double fTolerance) {
 			var snapped = SnapToIncrement(fValue, fIncrement);
 			return Math.Abs(snapped - fValue) < fTolerance ? snapped : fValue;
 		}
 
-		private static double SnapToIncrementSigned(double fValue, double fIncrement, bool low) {
+		private static double SnapToIncrementSigned(double fValue, in double fIncrement, in bool low) {
 			if (!MathUtil.IsFinite(fValue)) {
 				return 0;
 			}
@@ -50,11 +50,11 @@ namespace RNumerics
 
 		}
 
-		public static double SnapToIncrementLow(double fValue, double fIncrement, double offset = 0) {
+		public static double SnapToIncrementLow(in double fValue, in double fIncrement, in double offset = 0) {
 			return SnapToIncrementSigned(fValue - offset, fIncrement, true) + offset;
 		}
 
-		public static double SnapToIncrementHigh(double fValue, double fIncrement, double offset = 0) {
+		public static double SnapToIncrementHigh(in double fValue, in double fIncrement, in double offset = 0) {
 			return SnapToIncrementSigned(fValue - offset, fIncrement, false) + offset;
 		}
 	}

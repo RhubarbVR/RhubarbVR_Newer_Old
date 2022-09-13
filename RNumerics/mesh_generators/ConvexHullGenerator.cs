@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RNumerics
 {
-	public class ConvexHullGenerator : MeshGenerator
+	public sealed class ConvexHullGenerator : MeshGenerator
 	{
 		// [ThreadStatic]
 		public Vector3f[] points;
@@ -64,7 +64,7 @@ namespace RNumerics
 
 			public Vector3f Normal;
 
-			public Face(int v0, int v1, int v2, int o0, int o1, int o2, Vector3f normal) {
+			public Face(in int v0, in int v1, in int v2, in int o0, in int o1, in int o2, in Vector3f normal) {
 				Vertex0 = v0;
 				Vertex1 = v1;
 				Vertex2 = v2;
@@ -74,7 +74,7 @@ namespace RNumerics
 				Normal = normal;
 			}
 
-			public bool Equals(Face other) {
+			public bool Equals(in Face other) {
 				return (Vertex0 == other.Vertex0)
 					&& (Vertex1 == other.Vertex1)
 					&& (Vertex2 == other.Vertex2)
@@ -99,7 +99,7 @@ namespace RNumerics
 			public int Face;
 			public float Distance;
 
-			public PointFace(int p, int f, float d) {
+			public PointFace(in int p, in int f, in float d) {
 				Point = p;
 				Face = f;
 				Distance = d;
@@ -213,8 +213,8 @@ namespace RNumerics
 		///   used for more than one triangle.
 		/// </summary>
 		public void GenerateHull(
-			Vector3f[] points,
-			bool splitVerts,
+			in Vector3f[] points,
+			in bool splitVerts,
 			ref VectorArray3d verts,
 			ref IndexArray3i tris,
 			ref VectorArray3f normals) {
@@ -238,7 +238,7 @@ namespace RNumerics
 		///   Make sure all the buffers and variables needed for the algorithm
 		///   are initialized.
 		/// </summary>
-		void Initialize(Vector3f[] points, bool splitVerts) {
+		void Initialize(in Vector3f[] points, in bool splitVerts) {
 			_faceCount = 0;
 			_openSetTail = -1;
 
@@ -283,7 +283,7 @@ namespace RNumerics
 		/// <summary>
 		///   Create initial seed hull.
 		/// </summary>
-		void GenerateInitialHull(Vector3f[] points) {
+		void GenerateInitialHull(in Vector3f[] points) {
 			// Find points suitable for use as the seed hull. Some varieties of
 			// this algorithm pick extreme points here, but I'm not convinced
 			// you gain all that much from that. Currently what it does is just
@@ -423,7 +423,7 @@ namespace RNumerics
 		///   Find four points in the point cloud that are not coplanar for the
 		///   seed hull
 		/// </summary>
-		void FindInitialHullIndices(Vector3f[] points, out int b0, out int b1, out int b2, out int b3) {
+		void FindInitialHullIndices(in Vector3f[] points, out int b0, out int b1, out int b2, out int b3) {
 			var count = points.Length;
 
 			for (var i0 = 0; i0 < count - 3; i0++) {
@@ -467,7 +467,7 @@ namespace RNumerics
 		///   to encompass the point in openSet with the point furthest away
 		///   from its face.
 		/// </summary>
-		void GrowHull(Vector3f[] points) {
+		void GrowHull(in Vector3f[] points) {
 			if (!(_openSetTail >= 0)) {
 				throw new ArgumentException("!(openSetTail >= 0)");
 			}
@@ -521,7 +521,7 @@ namespace RNumerics
 		///   only has to visit two (because one of them has already been
 		///   visited, the one you came from).
 		/// </summary>
-		void FindHorizon(Vector3f[] points, Vector3f point, int fi, Face face) {
+		void FindHorizon(in Vector3f[] points, in Vector3f point, in int fi, in Face face) {
 			// TODO should I use epsilon in the PointFaceDistance comparisons?
 
 			_litFaces.Clear();
@@ -602,7 +602,7 @@ namespace RNumerics
 		/// <summary>
 		///   Recursively search to find the horizon or lit set.
 		/// </summary>
-		void SearchHorizon(Vector3f[] points, Vector3f point, int prevFaceIndex, int faceCount, Face face) {
+		void SearchHorizon(in Vector3f[] points, in Vector3f point, in int prevFaceIndex, in int faceCount, in Face face) {
 			if (!(prevFaceIndex >= 0)) {
 				throw new ArgumentException("prevFaceIndex >= 0");
 			}
@@ -710,7 +710,7 @@ namespace RNumerics
 		///   on the other side of the horizon to reflect it's new neighbor from
 		///   the cone.
 		/// </summary>
-		void ConstructCone(Vector3f[] points, int farthestPoint) {
+		void ConstructCone(in Vector3f[] points, in int farthestPoint) {
 			foreach (var fi in _litFaces) {
 				if (!_faces.ContainsKey(fi)) {
 					throw new ArgumentException("!faces.ContainsKey(fi)");
@@ -787,7 +787,7 @@ namespace RNumerics
 		///   doing that to make this loop shorter, a straight for-loop through
 		///   a list is pretty darn fast. Still, it might be worth trying
 		/// </summary>
-		void ReassignPoints(Vector3f[] points) {
+		void ReassignPoints(in Vector3f[] points) {
 			for (var i = 0; i <= _openSetTail; i++) {
 				var fp = _openSet[i];
 
@@ -842,8 +842,8 @@ namespace RNumerics
 		///   leaves the normal array empty.
 		/// </summary>
 		void ExportMesh(
-			Vector3f[] points,
-			bool splitVerts,
+			in Vector3f[] points,
+			in bool splitVerts,
 			ref VectorArray3d re_verts,
 			ref IndexArray3i re_tris,
 			ref VectorArray3f re_normals) {
@@ -922,7 +922,7 @@ namespace RNumerics
 		///   the point is above the face)
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		float PointFaceDistance(Vector3f point, Vector3f pointOnFace, Face face) {
+		float PointFaceDistance(in Vector3f point, in Vector3f pointOnFace, in Face face) {
 			return Dot(face.Normal, point - pointOnFace);
 		}
 
@@ -930,7 +930,7 @@ namespace RNumerics
 		///   Calculate normal for triangle
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		Vector3f Normal(Vector3f v0, Vector3f v1, Vector3f v2) {
+		Vector3f Normal(in Vector3f v0, in Vector3f v1, in Vector3f v2) {
 			return Cross(v1 - v0, v2 - v0).Normalized;
 		}
 
@@ -938,7 +938,7 @@ namespace RNumerics
 		///   Dot product, for convenience.
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		static float Dot(Vector3f a, Vector3f b) {
+		static float Dot(in Vector3f a, in Vector3f b) {
 			return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 		}
 
@@ -948,7 +948,7 @@ namespace RNumerics
 		///   difference here.
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		static Vector3f Cross(Vector3f a, Vector3f b) {
+		static Vector3f Cross(in Vector3f a, in Vector3f b) {
 			return new Vector3f(
 				(a.y * b.z) - (a.z * b.y),
 				(a.z * b.x) - (a.x * b.z),
@@ -959,7 +959,7 @@ namespace RNumerics
 		///   Check if two points are coincident
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		bool AreCoincident(Vector3f a, Vector3f b) {
+		bool AreCoincident(in Vector3f a, in Vector3f b) {
 			return (a - b).Magnitude <= EPSILON;
 		}
 
@@ -967,7 +967,7 @@ namespace RNumerics
 		///   Check if three points are collinear
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		bool AreCollinear(Vector3f a, Vector3f b, Vector3f c) {
+		bool AreCollinear(in Vector3f a, in Vector3f b, in Vector3f c) {
 			return Cross(c - a, c - b).Magnitude <= EPSILON;
 		}
 
@@ -975,7 +975,7 @@ namespace RNumerics
 		///   Check if four points are coplanar
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		bool AreCoplanar(Vector3f a, Vector3f b, Vector3f c, Vector3f d) {
+		bool AreCoplanar(in Vector3f a, in Vector3f b, in Vector3f c, in Vector3f d) {
 			var n1 = Cross(c - a, c - b);
 			var n2 = Cross(d - a, d - b);
 

@@ -28,7 +28,7 @@ namespace RNumerics
 		/// <summary>
 		/// Decompose graph into simple polylines and polygons. 
 		/// </summary>
-		public static Curves ExtractCurves(DGraph3 graph,
+		public static Curves ExtractCurves(in DGraph3 graph,
 			bool bWantLoopIndices = false,
 			Func<int, bool> CurveOrientationF = null) {
 			var c = new Curves {
@@ -249,7 +249,7 @@ namespace RNumerics
 		/// and return pair [next_edge, shared_vtx]
 		/// Returns [int.MaxValue, shared_vtx] if shared_vtx is not valence=2   (ie stops at boundaries and complex junctions)
 		/// </summary>
-		public static Index2i NextEdgeAndVtx(int eid, int prev_vid, DGraph3 graph) {
+		public static Index2i NextEdgeAndVtx(in int eid, in int prev_vid, in DGraph3 graph) {
 			var ev = graph.GetEdgeV(eid);
 			if (ev.a == DGraph3.INVALID_ID) {
 				return Index2i.Max;
@@ -275,7 +275,7 @@ namespace RNumerics
 		/// <summary>
 		/// walk through graph from fromVtx, in direction of eid, until we hit the next junction vertex
 		/// </summary>
-		public static List<int> WalkToNextNonRegularVtx(DGraph3 graph, int fromVtx, int eid) {
+		public static List<int> WalkToNextNonRegularVtx(in DGraph3 graph, in int fromVtx, in int eid) {
 			var path = new List<int> {
 				fromVtx
 			};

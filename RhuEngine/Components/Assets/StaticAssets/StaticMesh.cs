@@ -14,7 +14,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/StaticAssets" })]
-	public class StaticMesh : StaticAsset<RMesh>
+	public sealed class StaticMesh : StaticAsset<RMesh>
 	{
 		public override void LoadAsset(byte[] data) {
 			try {

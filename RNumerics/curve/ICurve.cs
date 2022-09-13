@@ -13,12 +13,12 @@ namespace RNumerics
 
 		// can call SampleT in range [0,ParamLength]
 		double ParamLength { get; }
-		Vector3d SampleT(double t);
-		Vector3d TangentT(double t);        // returns normalized vector
+		Vector3d SampleT(in double t);
+		Vector3d TangentT(in double t);        // returns normalized vector
 
 		bool HasArcLength { get; }
 		double ArcLength { get; }
-		Vector3d SampleArcLength(double a);
+		Vector3d SampleArcLength(in double a);
 
 		void Reverse();
 
@@ -34,8 +34,8 @@ namespace RNumerics
 		int SegmentCount { get; }
 		bool Closed { get; }
 
-		Vector3d GetVertex(int i);
-		Segment3d GetSegment(int i);
+		Vector3d GetVertex(in int i);
+		Segment3d GetSegment(in int i);
 
 		IEnumerable<Vector3d> Vertices { get; }
 	}
@@ -50,17 +50,17 @@ namespace RNumerics
 
 		// can call SampleT in range [0,ParamLength]
 		double ParamLength { get; }
-		Vector2d SampleT(double t);
-		Vector2d TangentT(double t);        // returns normalized vector
+		Vector2d SampleT(in double t);
+		Vector2d TangentT(in double t);        // returns normalized vector
 
 		bool HasArcLength { get; }
 		double ArcLength { get; }
-		Vector2d SampleArcLength(double a);
+		Vector2d SampleArcLength(in double a);
 
 		void Reverse();
 
 		bool IsTransformable { get; }
-		void Transform(ITransform2 xform);
+		void Transform(in ITransform2 xform);
 
 		IParametricCurve2d Clone();
 	}

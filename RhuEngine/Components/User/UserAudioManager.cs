@@ -6,7 +6,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "User" })]
-	public class UserAudioManager : Component
+	public sealed class UserAudioManager : Component
 	{
 		public readonly SyncRef<User> user;
 

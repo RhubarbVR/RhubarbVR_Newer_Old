@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RhubarbCloudClient.Model
 {
-	public class RAccountLogin
+	public sealed class RAccountLogin
 	{
 		[Required]
 		[EmailAddress]

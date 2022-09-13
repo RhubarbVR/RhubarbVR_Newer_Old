@@ -6,7 +6,7 @@ using System.Text;
 namespace RNumerics
 {
 
-	public class InPlaceIterativeCurveSmooth
+	public sealed class InPlaceIterativeCurveSmooth
 	{
 		DCurve3 _curve;
 		public DCurve3 Curve
@@ -29,7 +29,7 @@ namespace RNumerics
 			Start = End = -1;
 			Alpha = 0.25f;
 		}
-		public InPlaceIterativeCurveSmooth(DCurve3 curve, float alpha = 0.25f) {
+		public InPlaceIterativeCurveSmooth(in DCurve3 curve, in float alpha = 0.25f) {
 			Curve = curve;
 			Start = 0;
 			End = Curve.VertexCount;
@@ -37,7 +37,7 @@ namespace RNumerics
 		}
 
 
-		public void UpdateDeformation(int nIterations = 1) {
+		public void UpdateDeformation(in int nIterations = 1) {
 			if (Curve.Closed) {
 				UpdateDeformation_Closed(nIterations);
 			}
@@ -47,7 +47,7 @@ namespace RNumerics
 		}
 
 
-		public void UpdateDeformation_Closed(int nIterations = 1) {
+		public void UpdateDeformation_Closed(in int nIterations = 1) {
 			if (Start < 0 || Start > Curve.VertexCount || End > Curve.VertexCount) {
 				throw new ArgumentOutOfRangeException("InPlaceIterativeCurveSmooth.UpdateDeformation: range is invalid");
 			}
@@ -66,7 +66,7 @@ namespace RNumerics
 		}
 
 
-		public void UpdateDeformation_Open(int nIterations = 1) {
+		public void UpdateDeformation_Open(in int nIterations = 1) {
 			if (Start < 0 || Start > Curve.VertexCount || End > Curve.VertexCount) {
 				throw new ArgumentOutOfRangeException("InPlaceIterativeCurveSmooth.UpdateDeformation: range is invalid");
 			}
@@ -94,7 +94,7 @@ namespace RNumerics
 
 
 
-	public class ArcLengthSoftTranslation
+	public sealed class ArcLengthSoftTranslation
 	{
 		DCurve3 _curve;
 		public DCurve3 Curve
@@ -162,7 +162,7 @@ namespace RNumerics
 			}
 		}
 
-		public void UpdateDeformation(Vector3d newHandlePos) {
+		public void UpdateDeformation(in Vector3d newHandlePos) {
 			var dv = newHandlePos - _start_handle;
 			for (var i = 0; i < roi_index.Length; ++i) {
 				var vNew = start_positions[i] + (roi_weights[i] * dv);
@@ -185,7 +185,7 @@ namespace RNumerics
 			return _roi_valid != false && Curve.Timestamp == _curve_timestamp;
 		}
 
-		public void UpdateROI(int nNearVertexHint = -1) {
+		public void UpdateROI(in int nNearVertexHint = -1) {
 			if (Check_roi_valid()) {
 				return;
 			}

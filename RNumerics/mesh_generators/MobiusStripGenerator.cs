@@ -6,7 +6,7 @@ using System.Text;
 namespace RNumerics
 {
 	// https://github.com/JPBotelho/Mobius-Strip
-	public class MobiusStripGenerator : MeshGenerator
+	public sealed class MobiusStripGenerator : MeshGenerator
 	{
 		public int planeResolution = 100;
 

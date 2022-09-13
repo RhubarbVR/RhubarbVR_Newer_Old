@@ -20,41 +20,43 @@ namespace RNumerics
 		public static readonly AxisAlignedBox2f UnitPositive = new(1);
 		[IgnoreMember]
 		public static readonly AxisAlignedBox2f Infinite = new(float.MinValue, float.MinValue, float.MaxValue, float.MaxValue);
+		public AxisAlignedBox2f() {
 
-		public AxisAlignedBox2f(float xmin, float ymin, float xmax, float ymax) {
+		}
+		public AxisAlignedBox2f(in float xmin, in float ymin, in float xmax, in float ymax) {
 			Min = new Vector2f(xmin, ymin);
 			Max = new Vector2f(xmax, ymax);
 		}
 
-		public AxisAlignedBox2f(float fSquareSize) {
+		public AxisAlignedBox2f(in float fSquareSize) {
 			Min = new Vector2f(0, 0);
 			Max = new Vector2f(fSquareSize, fSquareSize);
 		}
 
-		public AxisAlignedBox2f(float fWidth, float fHeight) {
+		public AxisAlignedBox2f(in float fWidth, in float fHeight) {
 			Min = new Vector2f(0, 0);
 			Max = new Vector2f(fWidth, fHeight);
 		}
 
-		public AxisAlignedBox2f(Vector2f vMin, Vector2f vMax) {
+		public AxisAlignedBox2f(in Vector2f vMin, in Vector2f vMax) {
 			Min = new Vector2f(Math.Min(vMin.x, vMax.x), Math.Min(vMin.y, vMax.y));
 			Max = new Vector2f(Math.Max(vMin.x, vMax.x), Math.Max(vMin.y, vMax.y));
 		}
 
-		public AxisAlignedBox2f(Vector2f vCenter, float fHalfWidth, float fHalfHeight) {
+		public AxisAlignedBox2f(in Vector2f vCenter, in float fHalfWidth, in float fHalfHeight) {
 			Min = new Vector2f(vCenter.x - fHalfWidth, vCenter.y - fHalfHeight);
 			Max = new Vector2f(vCenter.x + fHalfWidth, vCenter.y + fHalfHeight);
 		}
-		public AxisAlignedBox2f(Vector2f vCenter, float fHalfWidth) {
+		public AxisAlignedBox2f(in Vector2f vCenter, in float fHalfWidth) {
 			Min = new Vector2f(vCenter.x - fHalfWidth, vCenter.y - fHalfWidth);
 			Max = new Vector2f(vCenter.x + fHalfWidth, vCenter.y + fHalfWidth);
 		}
 
-		public AxisAlignedBox2f(Vector2f vCenter) {
+		public AxisAlignedBox2f(in Vector2f vCenter) {
 			Min = Max = vCenter;
 		}
 
-		public AxisAlignedBox2f(AxisAlignedBox2f o) {
+		public AxisAlignedBox2f(in AxisAlignedBox2f o) {
 			Min = new Vector2f(o.Min);
 			Max = new Vector2f(o.Max);
 		}
@@ -92,26 +94,26 @@ namespace RNumerics
 
 
 		//! 0 == bottom-left, 1 = bottom-right, 2 == top-right, 3 == top-left
-		public Vector2f GetCorner(int i) {
+		public Vector2f GetCorner(in int i) {
 			return new((i % 3 == 0) ? Min.x : Max.x, (i < 2) ? Min.y : Max.y);
 		}
 
 		//! value is subtracted from min and added to max
-		public void Expand(float fRadius) {
+		public void Expand(in float fRadius) {
 			Min.x -= fRadius;
 			Min.y -= fRadius;
 			Max.x += fRadius;
 			Max.y += fRadius;
 		}
 		//! value is added to min and subtracted from max
-		public void Contract(float fRadius) {
+		public void Contract(in float fRadius) {
 			Min.x += fRadius;
 			Min.y += fRadius;
 			Max.x -= fRadius;
 			Max.y -= fRadius;
 		}
 
-		public void Add(float left, float right, float bottom, float top) {
+		public void Add(in float left, in float right, in float bottom, in float top) {
 			Min.x += left;
 			Min.y += bottom;
 			Max.x += right;
@@ -127,7 +129,7 @@ namespace RNumerics
 			ScaleDown,
 			ScaleCenter
 		}
-		public void SetWidth(float fNewWidth, ScaleMode eScaleMode) {
+		public void SetWidth(in float fNewWidth, in ScaleMode eScaleMode) {
 			switch (eScaleMode) {
 				case ScaleMode.ScaleLeft:
 					Min.x = Max.x - fNewWidth;
@@ -144,7 +146,7 @@ namespace RNumerics
 					throw new Exception("Invalid scale mode...");
 			}
 		}
-		public void SetHeight(float fNewHeight, ScaleMode eScaleMode) {
+		public void SetHeight(in float fNewHeight, in ScaleMode eScaleMode) {
 			switch (eScaleMode) {
 				case ScaleMode.ScaleDown:
 					Min.y = Max.y - fNewHeight;
@@ -162,21 +164,21 @@ namespace RNumerics
 			}
 		}
 
-		public void Contain(Vector2f v) {
+		public void Contain(in Vector2f v) {
 			Min.x = Math.Min(Min.x, v.x);
 			Min.y = Math.Min(Min.y, v.y);
 			Max.x = Math.Max(Max.x, v.x);
 			Max.y = Math.Max(Max.y, v.y);
 		}
 
-		public void Contain(AxisAlignedBox2f box) {
+		public void Contain(in AxisAlignedBox2f box) {
 			Min.x = Math.Min(Min.x, box.Min.x);
 			Min.y = Math.Min(Min.y, box.Min.y);
 			Max.x = Math.Max(Max.x, box.Max.x);
 			Max.y = Math.Max(Max.y, box.Max.y);
 		}
 
-		public AxisAlignedBox2f Intersect(AxisAlignedBox2f box) {
+		public AxisAlignedBox2f Intersect(in AxisAlignedBox2f box) {
 			var intersect = new AxisAlignedBox2f(
 				Math.Max(Min.x, box.Min.x), Math.Max(Min.y, box.Min.y),
 				Math.Min(Max.x, box.Max.x), Math.Min(Max.y, box.Max.y));
@@ -185,16 +187,16 @@ namespace RNumerics
 
 
 
-		public bool Contains(Vector2f v) {
+		public bool Contains(in Vector2f v) {
 			return (Min.x < v.x) && (Min.y < v.y) && (Max.x > v.x) && (Max.y > v.y);
 		}
-		public bool Intersects(AxisAlignedBox2f box) {
+		public bool Intersects(in AxisAlignedBox2f box) {
 			return !((box.Max.x < Min.x) || (box.Min.x > Max.x) || (box.Max.y < Min.y) || (box.Min.y > Max.y));
 		}
 
 
 
-		public float Distance(Vector2f v) {
+		public float Distance(in Vector2f v) {
 			var dx = (float)Math.Abs(v.x - Center.x);
 			var dy = (float)Math.Abs(v.y - Center.y);
 			var fWidth = Width * 0.5f;
@@ -208,17 +210,17 @@ namespace RNumerics
 
 
 		//! relative translation
-		public void Translate(Vector2f vTranslate) {
+		public void Translate(in Vector2f vTranslate) {
 			Min.Add(vTranslate);
 			Max.Add(vTranslate);
 		}
 
-		public void MoveMin(Vector2f vNewMin) {
+		public void MoveMin(in Vector2f vNewMin) {
 			Max.x = vNewMin.x + (Max.x - Min.x);
 			Max.y = vNewMin.y + (Max.y - Min.y);
 			Min.Set(vNewMin);
 		}
-		public void MoveMin(float fNewX, float fNewY) {
+		public void MoveMin(in float fNewX, in float fNewY) {
 			Max.x = fNewX + (Max.x - Min.x);
 			Max.y = fNewY + (Max.y - Min.y);
 			Min.Set(fNewX, fNewY);

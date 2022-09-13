@@ -19,10 +19,10 @@ namespace RNumerics
 		//
 		// the inertia tensor is row-major
 		public static void MassProperties(
-			IEnumerable<Index3i> triangle_indices,
-			Func<int, Vector3d> getVertexF,
+			in IEnumerable<Index3i> triangle_indices,
+			in Func<int, Vector3d> getVertexF,
 			out double mass, out Vector3d center, out double[,] inertia3x3,
-			bool bodyCoords = false) {
+			in bool bodyCoords = false) {
 			const double ONE_DIV_6 = 1.0 / 6.0;
 			const double ONE_DIV_24 = 1.0 / 24.0;
 			const double ONE_DIV_60 = 1.0 / 60.0;
@@ -138,7 +138,7 @@ namespace RNumerics
 
 
 
-		public static Vector3d Centroid(IEnumerable<Vector3d> vertices) {
+		public static Vector3d Centroid(in IEnumerable<Vector3d> vertices) {
 			var centroid = Vector3d.Zero;
 			var N = 0;
 			foreach (var v in vertices) {
@@ -148,7 +148,7 @@ namespace RNumerics
 			return centroid / (double)N;
 		}
 
-		public static Vector3d Centroid<T>(IEnumerable<T> values, Func<T, Vector3d> PositionF) {
+		public static Vector3d Centroid<T>(in IEnumerable<T> values, in Func<T, Vector3d> PositionF) {
 			var centroid = Vector3d.Zero;
 			var N = 0;
 			foreach (var t in values) {
@@ -159,7 +159,7 @@ namespace RNumerics
 		}
 
 
-		public static AxisAlignedBox3d Bounds(IMesh mesh, Func<Vector3d, Vector3d> TransformF) {
+		public static AxisAlignedBox3d Bounds(in IMesh mesh, in Func<Vector3d, Vector3d> TransformF) {
 			var bounds = AxisAlignedBox3d.Empty;
 			if (TransformF == null) {
 				foreach (var vID in mesh.VertexIndices()) {
@@ -169,14 +169,14 @@ namespace RNumerics
 			else {
 				foreach (var vID in mesh.VertexIndices()) {
 					var vT = TransformF(mesh.GetVertex(vID));
-					bounds.Contain(ref vT);
+					bounds.Contain( vT);
 				}
 			}
 			return bounds;
 		}
 
 
-		public static AxisAlignedBox3d BoundsV(IMesh mesh, IEnumerable<int> vertexIndices, Func<Vector3d, Vector3d> TransformF = null) {
+		public static AxisAlignedBox3d BoundsV(in IMesh mesh, in IEnumerable<int> vertexIndices, in Func<Vector3d, Vector3d> TransformF = null) {
 			var bounds = AxisAlignedBox3d.Empty;
 			if (TransformF == null) {
 				foreach (var vid in vertexIndices) {
@@ -193,7 +193,7 @@ namespace RNumerics
 
 
 
-		public static AxisAlignedBox3d BoundsT(IMesh mesh, IEnumerable<int> triangleIndices, Func<Vector3d, Vector3d> TransformF = null) {
+		public static AxisAlignedBox3d BoundsT(in IMesh mesh, in IEnumerable<int> triangleIndices, in Func<Vector3d, Vector3d> TransformF = null) {
 			var bounds = AxisAlignedBox3d.Empty;
 			if (TransformF == null) {
 				foreach (var tid in triangleIndices) {
@@ -219,17 +219,17 @@ namespace RNumerics
 		/// <summary>
 		/// Calculate extents of mesh along an axis, with optional transform
 		/// </summary>
-		public static Interval1d ExtentsOnAxis(IMesh mesh, Vector3d axis, Func<Vector3d, Vector3d> TransformF = null) {
+		public static Interval1d ExtentsOnAxis(in IMesh mesh, in Vector3d axis, in Func<Vector3d, Vector3d> TransformF = null) {
 			var extent = Interval1d.Empty;
 			if (TransformF == null) {
 				foreach (var vid in mesh.VertexIndices()) {
-					extent.Contain(mesh.GetVertex(vid).Dot(ref axis));
+					extent.Contain(mesh.GetVertex(vid).Dot(axis));
 				}
 			}
 			else {
 				foreach (var vid in mesh.VertexIndices()) {
 					var vT = TransformF(mesh.GetVertex(vid));
-					extent.Contain(vT.Dot(ref axis));
+					extent.Contain(vT.Dot(axis));
 				}
 			}
 			return extent;

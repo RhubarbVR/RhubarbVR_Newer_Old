@@ -8,14 +8,14 @@ namespace RNumerics
 	// extents are the eigenvalues of the covariance matrix and are returned in
 	// increasing order.  The quantites are stored in a Box3<Real> just to have a
 	// single container.
-	public class GaussPointsFit3
+	public sealed class GaussPointsFit3
 	{
 
 		public Box3d Box;
 
 		public bool ResultValid = false;
 
-		public GaussPointsFit3(IEnumerable<Vector3d> points) {
+		public GaussPointsFit3(in IEnumerable<Vector3d> points) {
 			Box = new Box3d(Vector3d.Zero, Vector3d.One);
 
 			// Compute the mean of the points.
@@ -47,7 +47,7 @@ namespace RNumerics
 
 
 
-		public GaussPointsFit3(IEnumerable<Vector3d> points, IEnumerable<double> weights) {
+		public GaussPointsFit3(in IEnumerable<Vector3d> points, in IEnumerable<double> weights) {
 			Box = new Box3d(Vector3d.Zero, Vector3d.One);
 
 			// Compute the mean of the points.
@@ -86,7 +86,7 @@ namespace RNumerics
 
 
 
-		void Do_solve(double sumXX, double sumXY, double sumXZ, double sumYY, double sumYZ, double sumZZ, double invSumMultiplier) {
+		void Do_solve(double sumXX, double sumXY, double sumXZ, double sumYY, double sumYZ, double sumZZ, in double invSumMultiplier) {
 			sumXX *= invSumMultiplier;
 			sumXY *= invSumMultiplier;
 			sumXZ *= invSumMultiplier;

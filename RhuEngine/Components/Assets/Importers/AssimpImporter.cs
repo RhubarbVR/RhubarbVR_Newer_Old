@@ -14,7 +14,7 @@ using System.Linq;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Importers" })]
-	public class AssimpImporter : Importer
+	public sealed class AssimpImporter : Importer
 	{
 		public static bool IsValidImport(string path) {
 			path = path.ToLower();

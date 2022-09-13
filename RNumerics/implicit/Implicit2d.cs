@@ -6,119 +6,102 @@ namespace RNumerics
 	/// <summary>
 	/// Summary description for ImplicitField2D.
 	/// </summary>
-	public interface ImplicitField2d
+	public interface IImplicitField2d
 	{
-		float Value(float fX, float fY);
+		float Value(in float fX, in float fY);
 
-		void Gradient(float fX, float fY, ref float fGX, ref float fGY);
+		void Gradient(in float fX, in float fY, ref float fGX, ref float fGY);
 
 		AxisAlignedBox2f Bounds { get; }
 	}
 
-	public interface ImplicitOperator2d : ImplicitField2d
+	public interface IImplicitOperator2d : IImplicitField2d
 	{
-		void AddChild(ImplicitField2d field);
+		void AddChild(IImplicitField2d field);
 	}
 
 
 
 
-	public class ImplicitPoint2d : ImplicitField2d
+	public sealed class ImplicitPoint2d : IImplicitField2d
 	{
-		Vector2f m_vCenter;
-		private float m_radius;
+		Vector2f _vCenter;
 
-		public ImplicitPoint2d(float x, float y)
+		public ImplicitPoint2d(in float x, in float y)
 		{
-			m_vCenter = new Vector2f(x, y);
-			m_radius = 1;
+			_vCenter = new Vector2f(x, y);
+			Radius = 1;
 		}
-		public ImplicitPoint2d(float x, float y, float radius)
+		public ImplicitPoint2d(in float x, in float y, in float radius)
 		{
-			m_vCenter = new Vector2f(x, y);
-			m_radius = radius;
+			_vCenter = new Vector2f(x, y);
+			Radius = radius;
 		}
 
-		public float Value(float fX, float fY)
+		public float Value(in float fX, in float fY)
 		{
 
-			float tx = (fX - m_vCenter.x);
-			float ty = (fY - m_vCenter.y);
-			float fDist2 = tx * tx + ty * ty;
-			fDist2 /= (m_radius * m_radius);
+			var tx = (fX - _vCenter.x);
+			var ty = (fY - _vCenter.y);
+			var fDist2 = (tx * tx) + (ty * ty);
+			fDist2 /= (Radius * Radius);
 			fDist2 = 1.0f - fDist2;
-			if (fDist2 < 0.0f)
-				return 0.0f;
-			else
-				return fDist2 * fDist2 * fDist2;
+			return fDist2 < 0.0f ? 0.0f : fDist2 * fDist2 * fDist2;
 		}
 
 		public AxisAlignedBox2f Bounds => new AxisAlignedBox2f(LowX, LowY, HighX, HighY);
 
-		public void Gradient(float fX, float fY, ref float fGX, ref float fGY)
+		public void Gradient(in float fX, in float fY, ref float fGX, ref float fGY)
 		{
-			float tx = (fX - m_vCenter.x);
-			float ty = (fY - m_vCenter.y);
-			float fDist2 = (tx * tx + ty * ty);
-			float fTmp = 1.0f - fDist2;
+			var tx = (fX - _vCenter.x);
+			var ty = (fY - _vCenter.y);
+			var fDist2 = (tx * tx) + (ty * ty);
+			var fTmp = 1.0f - fDist2;
 			if (fTmp < 0.0f)
 			{
 				fGX = fGY = 0;
 			}
 			else
 			{
-				float fSqrt = (float)Math.Sqrt(fDist2);
-				float fGradMag = -6.0f * fSqrt * fTmp * fTmp;
+				var fSqrt = (float)Math.Sqrt(fDist2);
+				var fGradMag = -6.0f * fSqrt * fTmp * fTmp;
 				fGradMag /= fSqrt;
 				fGX = tx * fGradMag;
 				fGY = ty * fGradMag;
 			}
 		}
 
-		public bool InBounds(float x, float y)
+		public bool InBounds(in float x, in float y)
 		{
-			return (x >= LowX && x <= HighX && x >= LowY && x <= HighY);
+			return x >= LowX && x <= HighX && x >= LowY && x <= HighY;
 		}
 
-		public float LowX
+		public float LowX => _vCenter.x - Radius;
+
+		public float LowY => _vCenter.y - Radius;
+
+		public float HighX => _vCenter.x + Radius;
+
+		public float HighY => _vCenter.y + Radius;
+
+		public float Radius { get; set; }
+
+		public float X
 		{
-			get { return m_vCenter.x - radius; }
+			get => _vCenter.x;
+			set => _vCenter.x = value;
 		}
 
-		public float LowY => m_vCenter.y - radius;
-
-		public float HighX
+		public float Y
 		{
-			get { return m_vCenter.x + radius; }
-		}
-
-		public float HighY
-		{
-			get { return m_vCenter.y + radius; }
-		}
-
-		public float radius
-		{
-			get { return m_radius; }
-			set { m_radius = value; }
-		}
-
-		public float x
-		{
-			get { return m_vCenter.x; }
-			set { m_vCenter.x = value; }
-		}
-
-		public float y
-		{
-			get { return m_vCenter.y; }
-			set { m_vCenter.y = value; }
+			get => _vCenter.y;
+			set => _vCenter.y = value;
 		}
 
 		public Vector2f Center
 		{
-			get { return m_vCenter; }
-			set { m_vCenter = value; }
+			get => _vCenter;
+			set => _vCenter = value;
 		}
 	}
 

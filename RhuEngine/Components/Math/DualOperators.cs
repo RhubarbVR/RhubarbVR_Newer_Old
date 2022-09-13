@@ -4,7 +4,7 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category("Math")]
-	public class DualOperators<In,Out> : AbDualOperation<Out,In> where In : struct where Out : struct
+	public sealed class DualOperators<In,Out> : AbDualOperation<Out,In> where In : struct where Out : struct
 	{
 		[OnChanged(nameof(ComputeOutput))]
 		public readonly Sync<DualOperators> Operators;

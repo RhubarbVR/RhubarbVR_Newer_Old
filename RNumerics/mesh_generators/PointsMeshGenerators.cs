@@ -8,7 +8,7 @@ namespace RNumerics
 	/// Create a mesh that contains a planar element for each point and normal
 	/// (currently only triangles)
 	/// </summary>
-	public class PointSplatsGenerator : MeshGenerator
+	public sealed class PointSplatsGenerator : MeshGenerator
 	{
 		public IEnumerable<int> PointIndices;
 		public int PointIndicesCount = -1;      // you can set this to avoid calling Count() on enumerable
@@ -54,8 +54,8 @@ namespace RNumerics
 		/// <summary>
 		/// shortcut utility
 		/// </summary>
-		public static SimpleMesh Generate(IList<int> indices,
-			Func<int, Vector3d> PointF, Func<int, Vector3d> NormalF,
+		public static SimpleMesh Generate(in IList<int> indices,
+			in Func<int, Vector3d> PointF, in Func<int, Vector3d> NormalF,
 			double radius) {
 			var gen = new PointSplatsGenerator() {
 				PointIndices = indices,

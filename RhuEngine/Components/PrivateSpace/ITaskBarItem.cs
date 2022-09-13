@@ -9,7 +9,7 @@ using RNumerics;
 
 namespace RhuEngine.Components.PrivateSpace
 {
-	public class WorldTaskBarItem: ITaskBarItem {
+	public sealed class WorldTaskBarItem: ITaskBarItem {
 		public string ExtraText { get; set; }
 
 		public World target;
@@ -46,7 +46,7 @@ namespace RhuEngine.Components.PrivateSpace
 		}
 	}
 
-	public class ProgramTaskBarItem:ITaskBarItem
+	public sealed class ProgramTaskBarItem:ITaskBarItem
 	{
 		public string ExtraText { get; set; }
 

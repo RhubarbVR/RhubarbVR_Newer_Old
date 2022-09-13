@@ -8,7 +8,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Transform" })]
-	public class Spinner : Component
+	public sealed class Spinner : Component
 	{
 		public readonly Linker<Quaternionf> driver;
 

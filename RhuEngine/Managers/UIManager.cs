@@ -11,7 +11,7 @@ using RNumerics;
 
 namespace RhuEngine.Managers
 {
-	public class UIManager : IManager
+	public sealed class UIManager : IManager
 	{
 		public readonly SafeList<UIRect> Rects = new();
 		public RectProcessor RectProcessor;

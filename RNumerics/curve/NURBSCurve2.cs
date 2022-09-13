@@ -6,7 +6,7 @@ using System.Linq;
 namespace RNumerics
 {
 	// ported from WildMagic5 NURBSCurve2
-	public class NURBSCurve2 : BaseCurve2, IParametricCurve2d
+	public sealed class NURBSCurve2 : BaseCurve2, IParametricCurve2d
 	{
 		// Construction and destruction. Internal copies of the
 		// input arrays are made, so to dynamically change control points,
@@ -39,7 +39,7 @@ namespace RNumerics
 		//   be refactored into several subclasses w/ different constructors, so that
 		//   the naming makes sense?
 
-		public NURBSCurve2(int numCtrlPoints, Vector2d[] ctrlPoint, double[] ctrlWeight, int degree, bool loop, bool open)
+		public NURBSCurve2(in int numCtrlPoints, in Vector2d[] ctrlPoint, in double[] ctrlWeight, in int degree, in bool loop, in bool open)
 			: base(0, 1) {
 			if (numCtrlPoints < 2) {
 				throw new Exception("NURBSCurve2(): only received " + numCtrlPoints + " control points!");
@@ -49,11 +49,11 @@ namespace RNumerics
 				throw new Exception("NURBSCurve2(): invalid degree " + degree);
 			}
 
-			mLoop = loop;
-			mNumCtrlPoints = numCtrlPoints;
-			mReplicate = loop ? (open ? 1 : degree) : 0;
+			_mLoop = loop;
+			_mNumCtrlPoints = numCtrlPoints;
+			_mReplicate = loop ? (open ? 1 : degree) : 0;
 			CreateControl(ctrlPoint, ctrlWeight);
-			mBasis = new BSplineBasis(mNumCtrlPoints + mReplicate, degree, open);
+			_mBasis = new BSplineBasis(_mNumCtrlPoints + _mReplicate, degree, open);
 		}
 
 		// Open, nonuniform spline, that takes external knot vector. 
@@ -78,8 +78,8 @@ namespace RNumerics
 		//
 		// Currently to create a closed NURBS curve, the caller must handle this duplication
 		//   themselves. 
-		public NURBSCurve2(int numCtrlPoints, Vector2d[] ctrlPoint, double[] ctrlWeight, int degree, bool loop,
-						   double[] knot, bool bIsInteriorKnot = true)
+		public NURBSCurve2(in int numCtrlPoints, in Vector2d[] ctrlPoint, in double[] ctrlWeight, in int degree, in bool loop,
+						   in double[] knot, in bool bIsInteriorKnot = true)
 			: base(0, 1) {
 			if (numCtrlPoints < 2) {
 				throw new Exception("NURBSCurve2(): only received " + numCtrlPoints + " control points!");
@@ -94,26 +94,26 @@ namespace RNumerics
 				throw new Exception("NURBSCUrve2(): loop mode is broken?");
 			}
 
-			mLoop = loop;
-			mNumCtrlPoints = numCtrlPoints;
-			mReplicate = loop ? 1 : 0;
+			_mLoop = loop;
+			_mNumCtrlPoints = numCtrlPoints;
+			_mReplicate = loop ? 1 : 0;
 			CreateControl(ctrlPoint, ctrlWeight);
-			mBasis = new BSplineBasis(mNumCtrlPoints + mReplicate, degree, knot, bIsInteriorKnot);
+			_mBasis = new BSplineBasis(_mNumCtrlPoints + _mReplicate, degree, knot, bIsInteriorKnot);
 		}
 
 
 		// used in Clone()
-		protected NURBSCurve2() : base(0, 1) {
+		private NURBSCurve2() : base(0, 1) {
 		}
 
 
 		//virtual ~NURBSCurve2();
 
 		public int GetNumCtrlPoints() {
-			return mNumCtrlPoints;
+			return _mNumCtrlPoints;
 		}
 		public int GetDegree() {
-			return mBasis.GetDegree();
+			return _mBasis.GetDegree();
 		}
 
 		// [RMS] this is only applicable to Uniform curves, confusing to have in API
@@ -124,7 +124,7 @@ namespace RNumerics
 		//}
 
 		public bool IsUniform() {
-			return mBasis.IsUniform();
+			return _mBasis.IsUniform();
 		}
 
 		// [RMS] loop mode is broken for non-uniform curves. And "non-open" curve
@@ -137,56 +137,56 @@ namespace RNumerics
 		// should be valid (0 <= i <= n).  If it is invalid, the return value of
 		// GetControlPoint is a vector whose components are all double.MaxValue, and the
 		// return value of GetControlWeight is double.MaxValue. 
-		public void SetControlPoint(int i, Vector2d ctrl) {
-			if (0 <= i && i < mNumCtrlPoints) {
+		public void SetControlPoint(in int i, in Vector2d ctrl) {
+			if (0 <= i && i < _mNumCtrlPoints) {
 				// Set the control point.
-				mCtrlPoint[i] = ctrl;
+				_mCtrlPoint[i] = ctrl;
 				// Set the replicated control point.
-				if (i < mReplicate) {
-					mCtrlPoint[mNumCtrlPoints + i] = ctrl;
+				if (i < _mReplicate) {
+					_mCtrlPoint[_mNumCtrlPoints + i] = ctrl;
 				}
 			}
 		}
-		public Vector2d GetControlPoint(int i) {
-			return 0 <= i && i < mNumCtrlPoints ? mCtrlPoint[i] : new Vector2d(double.MaxValue, double.MaxValue);
+		public Vector2d GetControlPoint(in int i) {
+			return 0 <= i && i < _mNumCtrlPoints ? _mCtrlPoint[i] : new Vector2d(double.MaxValue, double.MaxValue);
 		}
-		public void SetControlWeight(int i, double weight) {
-			if (0 <= i && i < mNumCtrlPoints) {
+		public void SetControlWeight(in int i, in double weight) {
+			if (0 <= i && i < _mNumCtrlPoints) {
 				// Set the control weight.
-				mCtrlWeight[i] = weight;
+				_mCtrlWeight[i] = weight;
 				// Set the replicated control weight.
-				if (i < mReplicate) {
-					mCtrlWeight[mNumCtrlPoints + i] = weight;
+				if (i < _mReplicate) {
+					_mCtrlWeight[_mNumCtrlPoints + i] = weight;
 				}
 			}
 		}
-		public double GetControlWeight(int i) {
-			return 0 <= i && i < mNumCtrlPoints ? mCtrlWeight[i] : double.MaxValue;
+		public double GetControlWeight(in int i) {
+			return 0 <= i && i < _mNumCtrlPoints ? _mCtrlWeight[i] : double.MaxValue;
 		}
 
 		// The knot values can be changed only if the basis function is nonuniform
 		// and the input index is valid (0 <= i <= n-d-1).  If these conditions
 		// are not satisfied, GetKnot returns double.MaxValue.
-		public void SetKnot(int i, double value) {
-			mBasis.SetInteriorKnot(i, value);
+		public void SetKnot(in int i, in double value) {
+			_mBasis.SetInteriorKnot(i, value);
 		}
-		public double GetKnot(int i) {
-			return mBasis.GetInteriorKnot(i);
+		public double GetKnot(in int i) {
+			return _mBasis.GetInteriorKnot(i);
 		}
 
 		// The spline is defined for 0 <= t <= 1.  If a t-value is outside [0,1],
 		// an open spline clamps t to [0,1].  That is, if t > 1, t is set to 1;
 		// if t < 0, t is set to 0.  A periodic spline wraps to to [0,1].  That
 		// is, if t is outside [0,1], then t is set to t-floor(t).
-		public override Vector2d GetPosition(double t) {
+		public override Vector2d GetPosition(in double t) {
 			int i, imin = 0, imax = 0;
-			mBasis.Compute(t, 0, ref imin, ref imax);
+			_mBasis.Compute(t, 0, ref imin, ref imax);
 
 			// [RMS] clamp imax to valid range in mCtrlWeight/Point. 
 			// Have only seen this happen in one file w/curve coming from DXF.
 			// Possibly actually a bug in how we construct curve? Not sure though.
-			if (imax >= mCtrlWeight.Length) {
-				imax = mCtrlWeight.Length - 1;
+			if (imax >= _mCtrlWeight.Length) {
+				imax = _mCtrlWeight.Length - 1;
 			}
 
 			// Compute position.
@@ -194,22 +194,22 @@ namespace RNumerics
 			var X = Vector2d.Zero;
 			var w = (double)0;
 			for (i = imin; i <= imax; ++i) {
-				tmp = mBasis.GetD0(i) * mCtrlWeight[i];
-				X += tmp * mCtrlPoint[i];
+				tmp = _mBasis.GetD0(i) * _mCtrlWeight[i];
+				X += tmp * _mCtrlPoint[i];
 				w += tmp;
 			}
 			var invW = 1.0 / w;
 			return invW * X;
 		}
 
-		public override Vector2d GetFirstDerivative(double t) {
+		public override Vector2d GetFirstDerivative(in double t) {
 			int i, imin = 0, imax = 0;
-			mBasis.Compute(t, 0, ref imin, ref imax);
-			mBasis.Compute(t, 1, ref imin, ref imax);
+			_mBasis.Compute(t, 0, ref imin, ref imax);
+			_mBasis.Compute(t, 1, ref imin, ref imax);
 
 			// [RMS] clamp imax to valid range in mCtrlWeight/Point. See comment in GetPosition()
-			if (imax >= mCtrlWeight.Length) {
-				imax = mCtrlWeight.Length - 1;
+			if (imax >= _mCtrlWeight.Length) {
+				imax = _mCtrlWeight.Length - 1;
 			}
 
 			// Compute position.
@@ -217,8 +217,8 @@ namespace RNumerics
 			var X = Vector2d.Zero;
 			var w = (double)0;
 			for (i = imin; i <= imax; ++i) {
-				tmp = mBasis.GetD0(i) * mCtrlWeight[i];
-				X += tmp * mCtrlPoint[i];
+				tmp = _mBasis.GetD0(i) * _mCtrlWeight[i];
+				X += tmp * _mCtrlPoint[i];
 				w += tmp;
 			}
 			var invW = 1.0 / w;
@@ -228,21 +228,21 @@ namespace RNumerics
 			var XDer1 = Vector2d.Zero;
 			var wDer1 = (double)0;
 			for (i = imin; i <= imax; ++i) {
-				tmp = mBasis.GetD1(i) * mCtrlWeight[i];
-				XDer1 += tmp * mCtrlPoint[i];
+				tmp = _mBasis.GetD1(i) * _mCtrlWeight[i];
+				XDer1 += tmp * _mCtrlPoint[i];
 				wDer1 += tmp;
 			}
 			return invW * (XDer1 - (wDer1 * P));
 		}
 
-		public override Vector2d GetSecondDerivative(double t) {
+		public override Vector2d GetSecondDerivative(in double t) {
 			var cd = new CurveDerivatives();
 			cd.Init(false, false, true, false);
 			Get(t, ref cd);
 			return cd.d2;
 		}
 
-		public override Vector2d GetThirdDerivative(double t) {
+		public override Vector2d GetThirdDerivative(in double t) {
 			var cd = new CurveDerivatives();
 			cd.Init(false, false, false, true);
 			Get(t, ref cd);
@@ -265,31 +265,31 @@ namespace RNumerics
 				bDer3 = der3;
 			}
 		}
-		public void Get(double t, ref CurveDerivatives result) {
+		public void Get(in double t, ref CurveDerivatives result) {
 			int i, imin = 0, imax = 0;
 			if (result.bDer3) {
-				mBasis.Compute(t, 0, ref imin, ref imax);
-				mBasis.Compute(t, 1, ref imin, ref imax);
-				mBasis.Compute(t, 2, ref imin, ref imax);
-				mBasis.Compute(t, 3, ref imin, ref imax);
+				_mBasis.Compute(t, 0, ref imin, ref imax);
+				_mBasis.Compute(t, 1, ref imin, ref imax);
+				_mBasis.Compute(t, 2, ref imin, ref imax);
+				_mBasis.Compute(t, 3, ref imin, ref imax);
 			}
 			else if (result.bDer2) {
-				mBasis.Compute(t, 0, ref imin, ref imax);
-				mBasis.Compute(t, 1, ref imin, ref imax);
-				mBasis.Compute(t, 2, ref imin, ref imax);
+				_mBasis.Compute(t, 0, ref imin, ref imax);
+				_mBasis.Compute(t, 1, ref imin, ref imax);
+				_mBasis.Compute(t, 2, ref imin, ref imax);
 			}
 			else if (result.bDer1) {
-				mBasis.Compute(t, 0, ref imin, ref imax);
-				mBasis.Compute(t, 1, ref imin, ref imax);
+				_mBasis.Compute(t, 0, ref imin, ref imax);
+				_mBasis.Compute(t, 1, ref imin, ref imax);
 			}
 			else  // pos
 			{
-				mBasis.Compute(t, 0, ref imin, ref imax);
+				_mBasis.Compute(t, 0, ref imin, ref imax);
 			}
 
 			// [RMS] clamp imax to valid range in mCtrlWeight/Point. See comment in GetPosition()
-			if (imax >= mCtrlWeight.Length) {
-				imax = mCtrlWeight.Length - 1;
+			if (imax >= _mCtrlWeight.Length) {
+				imax = _mCtrlWeight.Length - 1;
 			}
 
 			double tmp;
@@ -298,8 +298,8 @@ namespace RNumerics
 			var X = Vector2d.Zero;
 			var w = (double)0;
 			for (i = imin; i <= imax; ++i) {
-				tmp = mBasis.GetD0(i) * mCtrlWeight[i];
-				X += tmp * mCtrlPoint[i];
+				tmp = _mBasis.GetD0(i) * _mCtrlWeight[i];
+				X += tmp * _mCtrlPoint[i];
 				w += tmp;
 			}
 			var invW = 1.0 / w;
@@ -315,8 +315,8 @@ namespace RNumerics
 			var XDer1 = Vector2d.Zero;
 			var wDer1 = (double)0;
 			for (i = imin; i <= imax; ++i) {
-				tmp = mBasis.GetD1(i) * mCtrlWeight[i];
-				XDer1 += tmp * mCtrlPoint[i];
+				tmp = _mBasis.GetD1(i) * _mCtrlWeight[i];
+				XDer1 += tmp * _mCtrlPoint[i];
 				wDer1 += tmp;
 			}
 			var PDer1 = invW * (XDer1 - (wDer1 * P));
@@ -331,8 +331,8 @@ namespace RNumerics
 			var XDer2 = Vector2d.Zero;
 			var wDer2 = (double)0;
 			for (i = imin; i <= imax; ++i) {
-				tmp = mBasis.GetD2(i) * mCtrlWeight[i];
-				XDer2 += tmp * mCtrlPoint[i];
+				tmp = _mBasis.GetD2(i) * _mCtrlWeight[i];
+				XDer2 += tmp * _mCtrlPoint[i];
 				wDer2 += tmp;
 			}
 			var PDer2 = invW * (XDer2 - (2 * wDer1 * PDer1) - (wDer2 * P));
@@ -347,8 +347,8 @@ namespace RNumerics
 			var XDer3 = Vector2d.Zero;
 			var wDer3 = (double)0;
 			for (i = imin; i <= imax; i++) {
-				tmp = mBasis.GetD3(i) * mCtrlWeight[i];
-				XDer3 += tmp * mCtrlPoint[i];
+				tmp = _mBasis.GetD3(i) * _mCtrlWeight[i];
+				XDer3 += tmp * _mCtrlPoint[i];
 				wDer3 += tmp;
 			}
 			result.d3 = invW * (XDer3 - (3 * wDer1 * PDer2) -
@@ -358,37 +358,35 @@ namespace RNumerics
 		// Access the basis function to compute it without control points.  This
 		// is useful for least squares fitting of curves.
 		public BSplineBasis GetBasis() {
-			return mBasis;
+			return _mBasis;
 		}
 
 		// Replicate the necessary number of control points when the Create
 		// function has loop equal to true, in which case the spline curve must
 		// be a closed curve.
-		protected void CreateControl(Vector2d[] ctrlPoint, double[] ctrlWeight) {
-			var newNumCtrlPoints = mNumCtrlPoints + mReplicate;
+		private void CreateControl(in Vector2d[] ctrlPoint, in double[] ctrlWeight) {
+			var newNumCtrlPoints = _mNumCtrlPoints + _mReplicate;
 
-			mCtrlPoint = new Vector2d[newNumCtrlPoints];
-			Array.Copy(ctrlPoint, mCtrlPoint, mNumCtrlPoints);
+			_mCtrlPoint = new Vector2d[newNumCtrlPoints];
+			Array.Copy(ctrlPoint, _mCtrlPoint, _mNumCtrlPoints);
 			//memcpy(mCtrlPoint, ctrlPoint, mNumCtrlPoints * sizeof(Vector2d));
 
-			mCtrlWeight = new double[newNumCtrlPoints];
-			Array.Copy(ctrlWeight, mCtrlWeight, mNumCtrlPoints);
+			_mCtrlWeight = new double[newNumCtrlPoints];
+			Array.Copy(ctrlWeight, _mCtrlWeight, _mNumCtrlPoints);
 			//memcpy(mCtrlWeight, ctrlWeight, mNumCtrlPoints * sizeof(double));
 
-			for (var i = 0; i < mReplicate; ++i) {
-				mCtrlPoint[mNumCtrlPoints + i] = ctrlPoint[i];
-				mCtrlWeight[mNumCtrlPoints + i] = ctrlWeight[i];
+			for (var i = 0; i < _mReplicate; ++i) {
+				_mCtrlPoint[_mNumCtrlPoints + i] = ctrlPoint[i];
+				_mCtrlWeight[_mNumCtrlPoints + i] = ctrlWeight[i];
 			}
 		}
 
-		protected int mNumCtrlPoints;
-		protected Vector2d[] mCtrlPoint;  // ctrl[n+1]
-		protected double[] mCtrlWeight;           // weight[n+1]
-		protected bool mLoop;
-		protected BSplineBasis mBasis;
-		protected int mReplicate;  // the number of replicated control points
-
-		protected bool is_closed = false;       // added by RMS, used in RNumerics
+		private int _mNumCtrlPoints;
+		private Vector2d[] _mCtrlPoint;  // ctrl[n+1]
+		private double[] _mCtrlWeight;           // weight[n+1]
+		private bool _mLoop;
+		private BSplineBasis _mBasis;
+		private int _mReplicate;  // the number of replicated control points
 
 
 
@@ -400,25 +398,21 @@ namespace RNumerics
 		// [RMS] original NURBSCurve2 WildMagic5 code does not explicitly support "closed" NURBS curves.
 		//   However you can create a closed NURBS curve yourself by setting appropriate control points.
 		//   So, this value is independent of IsOpen/IsLoop above
-		public bool IsClosed
-		{
-			get => is_closed;
-			set => is_closed = value;
-		}
+		public bool IsClosed { get; set; } = false;
 
 		// can call SampleT in range [0,ParamLength]
 		public double ParamLength => mTMax - mTMin;
-		public Vector2d SampleT(double t) {
+		public Vector2d SampleT(in double t) {
 			return GetPosition(t);
 		}
 
-		public Vector2d TangentT(double t) {
+		public Vector2d TangentT(in double t) {
 			return GetFirstDerivative(t).Normalized;
 		}
 
 		public bool HasArcLength => true;
 		public double ArcLength => GetTotalLength();
-		public Vector2d SampleArcLength(double a) {
+		public Vector2d SampleArcLength(in double a) {
 			var t = GetTime(a);
 			return GetPosition(t);
 		}
@@ -429,22 +423,22 @@ namespace RNumerics
 
 		public IParametricCurve2d Clone() {
 			var c2 = new NURBSCurve2 {
-				mNumCtrlPoints = mNumCtrlPoints,
-				mCtrlPoint = (Vector2d[])mCtrlPoint.Clone(),
-				mCtrlWeight = (double[])mCtrlWeight.Clone(),
-				mLoop = mLoop,
-				mBasis = mBasis.Clone(),
-				mReplicate = mReplicate,
-				is_closed = is_closed
+				_mNumCtrlPoints = _mNumCtrlPoints,
+				_mCtrlPoint = (Vector2d[])_mCtrlPoint.Clone(),
+				_mCtrlWeight = (double[])_mCtrlWeight.Clone(),
+				_mLoop = _mLoop,
+				_mBasis = _mBasis.Clone(),
+				_mReplicate = _mReplicate,
+				IsClosed = IsClosed
 			};
 			return c2;
 		}
 
 
 		public bool IsTransformable => true;
-		public void Transform(ITransform2 xform) {
-			for (var k = 0; k < mCtrlPoint.Length; ++k) {
-				mCtrlPoint[k] = xform.TransformP(mCtrlPoint[k]);
+		public void Transform(in ITransform2 xform) {
+			for (var k = 0; k < _mCtrlPoint.Length; ++k) {
+				_mCtrlPoint[k] = xform.TransformP(_mCtrlPoint[k]);
 			}
 		}
 
@@ -455,8 +449,8 @@ namespace RNumerics
 			var l = new List<double> {
 				0
 			};
-			for (var i = 0; i < mBasis.KnotCount; ++i) {
-				var k = mBasis.GetKnot(i);
+			for (var i = 0; i < _mBasis.KnotCount; ++i) {
+				var k = _mBasis.GetKnot(i);
 				if (k != l.Last()) {
 					l.Add(k);
 				}
@@ -481,8 +475,8 @@ namespace RNumerics
 			//l.Add(0);
 			double cur_knot = -1;
 			var cur_knot_count = 0;
-			for (var i = 0; i < mBasis.KnotCount; ++i) {
-				var k = mBasis.GetKnot(i);
+			for (var i = 0; i < _mBasis.KnotCount; ++i) {
+				var k = _mBasis.GetKnot(i);
 				if (k == cur_knot) {
 					cur_knot_count++;
 				}

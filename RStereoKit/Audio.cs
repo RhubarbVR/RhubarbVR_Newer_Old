@@ -11,7 +11,7 @@ namespace RStereoKit
 {
 	
 
-	public class AudioSources : EngineWorldLinkBase<SoundSource>
+	public sealed class AudioSources : EngineWorldLinkBase<SoundSource>
 	{
 		public Sound sound;
 		public SoundInst soundInst;

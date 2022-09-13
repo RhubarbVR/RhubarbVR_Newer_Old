@@ -15,7 +15,7 @@ namespace RNumerics
 	/// Each list stores its count, so list-size operations are constant time.
 	/// All the internal "pointers" are 32-bit.
 	/// </summary>
-	public class SmallListSet
+	public sealed class SmallListSet
 	{
 		const int NULL = -1;
 
@@ -44,7 +44,7 @@ namespace RNumerics
 		}
 
 
-		public SmallListSet(SmallListSet copy) {
+		public SmallListSet(in SmallListSet copy) {
 			_linked_store = new DVector<int>(copy._linked_store);
 			_free_head_ptr = copy._free_head_ptr;
 			_list_heads = new DVector<int>(copy._list_heads);
@@ -61,7 +61,7 @@ namespace RNumerics
 		/// <summary>
 		/// resize the list-of-lists
 		/// </summary>
-		public void Resize(int new_size) {
+		public void Resize(in int new_size) {
 			var cur_size = _list_heads.Size;
 			if (new_size > cur_size) {
 				_list_heads.Resize(new_size);
@@ -75,7 +75,7 @@ namespace RNumerics
 		/// <summary>
 		/// create a new list at list_index
 		/// </summary>
-		public void AllocateAt(int list_index) {
+		public void AllocateAt(in int list_index) {
 			if (list_index >= _list_heads.Size) {
 				var j = _list_heads.Size;
 				_list_heads.Insert(NULL, list_index);
@@ -96,7 +96,7 @@ namespace RNumerics
 		/// <summary>
 		/// insert val into list at list_index. 
 		/// </summary>
-		public void Insert(int list_index, int val) {
+		public void Insert(in int list_index, in int val) {
 			var block_ptr = _list_heads[list_index];
 			if (block_ptr == NULL) {
 				block_ptr = Allocate_block();
@@ -138,7 +138,7 @@ namespace RNumerics
 		/// <summary>
 		/// remove val from the list at list_index. return false if val was not in list.
 		/// </summary>
-		public bool Remove(int list_index, int val) {
+		public bool Remove(in int list_index, in int val) {
 			var block_ptr = _list_heads[list_index];
 			var N = _block_store[block_ptr];
 
@@ -182,7 +182,7 @@ namespace RNumerics
 		/// <summary>
 		/// move list at from_index to to_index
 		/// </summary>
-		public void Move(int from_index, int to_index) {
+		public void Move(in int from_index, in int to_index) {
 			if (_list_heads[to_index] != NULL) {
 				throw new Exception("SmallListSet.MoveTo: list at " + to_index + " is not empty!");
 			}
@@ -203,7 +203,7 @@ namespace RNumerics
 		/// <summary>
 		/// remove all elements from list at list_index
 		/// </summary>
-		public void Clear(int list_index) {
+		public void Clear(in int list_index) {
 			var block_ptr = _list_heads[list_index];
 			if (block_ptr != NULL) {
 				var N = _block_store[block_ptr];
@@ -231,7 +231,7 @@ namespace RNumerics
 		/// <summary>
 		/// return size of list at list_index
 		/// </summary>
-		public int Count(int list_index) {
+		public int Count(in int list_index) {
 			var block_ptr = _list_heads[list_index];
 			return (block_ptr == NULL) ? 0 : _block_store[block_ptr];
 		}
@@ -240,7 +240,7 @@ namespace RNumerics
 		/// <summary>
 		/// search for val in list at list_index
 		/// </summary>
-		public bool Contains(int list_index, int val) {
+		public bool Contains(in int list_index, in int val) {
 			var block_ptr = _list_heads[list_index];
 			if (block_ptr != NULL) {
 				var N = _block_store[block_ptr];
@@ -277,7 +277,7 @@ namespace RNumerics
 		/// <summary>
 		/// return the first item in the list at list_index (no zero-size-list checking)
 		/// </summary>
-		public int First(int list_index) {
+		public int First(in int list_index) {
 			var block_ptr = _list_heads[list_index];
 			return _block_store[block_ptr + 1];
 		}
@@ -316,7 +316,7 @@ namespace RNumerics
 		/// <summary>
 		/// search for findF(list_value) == true, of list at list_index, and return list_value
 		/// </summary>
-		public int Find(int list_index, Func<int, bool> findF, int invalidValue = -1) {
+		public int Find(in int list_index, in Func<int, bool> findF, in int invalidValue = -1) {
 			var block_ptr = _list_heads[list_index];
 			if (block_ptr != NULL) {
 				var N = _block_store[block_ptr];
@@ -360,7 +360,7 @@ namespace RNumerics
 		/// search for findF(list_value) == true, of list at list_index, and replace with new_value.
 		/// returns false if not found
 		/// </summary>
-		public bool Replace(int list_index, Func<int, bool> findF, int new_value) {
+		public bool Replace(in int list_index, in Func<int, bool> findF, in int new_value) {
 			var block_ptr = _list_heads[list_index];
 			if (block_ptr != NULL) {
 				var N = _block_store[block_ptr];
@@ -401,7 +401,7 @@ namespace RNumerics
 
 
 		// grab a block from the free list, or allocate a new one
-		protected int Allocate_block() {
+		private int Allocate_block() {
 			var nfree = _free_blocks.Size;
 			if (nfree > 0) {
 				var ptr = _free_blocks[nfree - 1];
@@ -417,14 +417,14 @@ namespace RNumerics
 
 
 		// push a link-node onto the free list
-		void Add_free_link(int ptr) {
+		void Add_free_link(in int ptr) {
 			_linked_store[ptr + 1] = _free_head_ptr;
 			_free_head_ptr = ptr;
 		}
 
 
 		// remove val from the linked-list attached to block_ptr
-		bool Remove_from_linked_list(int block_ptr, int val) {
+		bool Remove_from_linked_list(in int block_ptr, in int val) {
 			var cur_ptr = _block_store[block_ptr + BLOCK_LIST_OFFSET];
 			var prev_ptr = NULL;
 			while (cur_ptr != NULL) {

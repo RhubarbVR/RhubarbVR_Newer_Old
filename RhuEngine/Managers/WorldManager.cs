@@ -20,7 +20,7 @@ using Esprima;
 
 namespace RhuEngine.Managers
 {
-	public class WorldManager : IManager
+	public sealed class WorldManager : IManager
 	{
 		public Action OnWorldUpdateTaskBar;
 		public Engine Engine { get; private set; }

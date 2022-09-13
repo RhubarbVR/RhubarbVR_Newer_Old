@@ -11,7 +11,7 @@ using RNumerics;
 
 namespace RhuEngine.Components.PrivateSpace
 {
-	public class SettingsProgram : Program
+	public sealed class SettingsProgram : Program
 	{
 		public override string ProgramID => "Settings";
 

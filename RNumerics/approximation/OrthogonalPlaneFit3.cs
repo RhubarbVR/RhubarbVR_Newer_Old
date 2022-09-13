@@ -7,13 +7,13 @@ namespace RNumerics
 	// Ported from WildMagic5 Wm5ApprPlaneFit3
 	// Least-squares fit of a plane to (x,y,z) data by using distance measurements
 	// orthogonal to the proposed plane.
-	public class OrthogonalPlaneFit3
+	public sealed class OrthogonalPlaneFit3
 	{
 		public Vector3d Origin;
 		public Vector3d Normal;
 		public bool ResultValid = false;
 
-		public OrthogonalPlaneFit3(IEnumerable<Vector3d> points) {
+		public OrthogonalPlaneFit3(in IEnumerable<Vector3d> points) {
 			// Compute the mean of the points.
 			Origin = Vector3d.Zero;
 			var numPoints = 0;

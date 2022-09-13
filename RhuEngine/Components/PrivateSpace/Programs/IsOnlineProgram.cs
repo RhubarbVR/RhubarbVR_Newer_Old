@@ -13,7 +13,7 @@ namespace RhuEngine.Components.PrivateSpace
 {
 	[RemoveFromProgramList]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public class IsOnlineProgram : Program
+	public sealed class IsOnlineProgram : Program
 	{
 		public override string ProgramID => "OnlineScreen";
 

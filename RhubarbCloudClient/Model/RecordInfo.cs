@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RhubarbCloudClient.Model
 {
-    public class RecordInfo
+    public sealed class RecordInfo
     {
         public Guid RecordID { get; set; }
     }

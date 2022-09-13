@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Mesh Operations" })]
-	public class MeshCutter : ProceduralMesh
+	public sealed class MeshCutter : ProceduralMesh
 	{
 		[OnAssetLoaded(nameof(ComputeMesh))]
 		public readonly AssetRef<RMesh> TargetMesh;

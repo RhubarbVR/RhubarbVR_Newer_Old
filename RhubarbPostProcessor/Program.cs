@@ -2,7 +2,7 @@
 
 namespace RhubarbPostProcessor
 {
-	public class RhubarbPostProcessor
+	public sealed class RhubarbPostProcessor
 	{
 		static void Main(string[] args) {
 			if (args.Length == 0) {

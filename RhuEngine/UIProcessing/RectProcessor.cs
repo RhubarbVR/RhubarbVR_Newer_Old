@@ -12,7 +12,7 @@ using RNumerics;
 
 namespace RhuEngine.UIProcessing
 {
-	public class RectProcessor
+	public sealed class RectProcessor
 	{
 		public RectProcessor(UIManager uIManager) {
 			UIManager = uIManager;

@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class TrivialBox3Mesh : ProceduralMesh
+	public sealed class TrivialBox3Mesh : ProceduralMesh
 	{
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<Vector3f> Extent;

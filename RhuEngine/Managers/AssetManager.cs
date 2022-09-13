@@ -11,7 +11,7 @@ using RNumerics;
 
 namespace RhuEngine.Managers
 {
-	public class AssetManager : IManager
+	public sealed class AssetManager : IManager
 	{
 		public AssetManager(string cachePath) {
 			CacheDir = cachePath is null ? Engine.BaseDir + "/Cache" : cachePath;

@@ -8,7 +8,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "User" })]
-	public class IsInVR : Component
+	public sealed class IsInVR : Component
 	{
 		public readonly SyncRef<User> user;
 

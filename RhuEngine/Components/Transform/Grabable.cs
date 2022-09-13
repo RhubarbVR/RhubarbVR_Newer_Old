@@ -7,7 +7,7 @@ using RhuEngine.Linker;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Interaction" })]
-	public class Grabbable : Component
+	public sealed class Grabbable : Component
 	{
 		public readonly SyncRef<Entity> lastParent;
 

@@ -8,7 +8,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.Normal)]
 	[Category(new string[] { "User" })]
-	public class SimpleSpawn : Component
+	public sealed class SimpleSpawn : Component
 	{
 		protected override void Step() {
 			if (!Engine.EngineLink.SpawnPlayer) {

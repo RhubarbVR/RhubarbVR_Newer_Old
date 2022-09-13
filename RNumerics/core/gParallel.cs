@@ -10,12 +10,12 @@ namespace RNumerics
 	public class GParallel
 	{
 
-		public static void ForEach_Sequential<T>(IEnumerable<T> source, Action<T> body) {
+		public static void ForEach_Sequential<T>(in IEnumerable<T> source, in Action<T> body) {
 			foreach (var v in source) {
 				body(v);
 			}
 		}
-		public static void ForEach<T>(IEnumerable<T> source, Action<T> body) {
+		public static void ForEach<T>(in IEnumerable<T> source, in Action<T> body) {
 			Parallel.ForEach<T>(source, body);
 		}
 
@@ -87,7 +87,7 @@ namespace RNumerics
 	//
 	// Perhaps an alternative would be to use a fixed buffer of T?
 	// However, if T is a class (eg by-reference), then this doesn't help as they still have to be allocated....
-	public class ParallelStream<V, T>
+	public sealed class ParallelStream<V, T>
 	{
 		public Func<V, T> ProducerF = null;
 		//public List<Action<T>> Operators = new List<Action<T>>();
@@ -97,7 +97,7 @@ namespace RNumerics
 
 
 		// this is the non-threaded variant. useful for comparing/etc.
-		public void Run_NoThreads(IEnumerable<V> sourceIn) {
+		public void Run_NoThreads(in IEnumerable<V> sourceIn) {
 			foreach (var v in sourceIn) {
 				var product = ProducerF(v);
 				//foreach (var op in Operators)
@@ -112,7 +112,7 @@ namespace RNumerics
 
 		//int max_queue_size = 0;
 
-		public void Run(IEnumerable<V> sourceIn) {
+		public void Run(in IEnumerable<V> sourceIn) {
 			_source = sourceIn;
 			_producer_done = false;
 			_consumer_done_event = new AutoResetEvent(false);
@@ -170,7 +170,7 @@ namespace RNumerics
 
 
 	// locking queue - provides thread-safe sequential add/remove/count to Queue<T>
-	public class LockingQueue<T>
+	public sealed class LockingQueue<T>
 	{
 		readonly Queue<T> _queue;
 		readonly object _queue_lock;
@@ -192,7 +192,7 @@ namespace RNumerics
 			}
 		}
 
-		public void Add(T obj) {
+		public void Add(in T obj) {
 			lock (_queue_lock) {
 				_queue.Enqueue(obj);
 			}

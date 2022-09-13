@@ -26,7 +26,7 @@ using RhuEngine.WorldObjects;
 
 namespace RhuEngine.Managers
 {
-	public class NetApiManager : IManager
+	public sealed class NetApiManager : IManager
 	{
 		public WorldManager WorldManager { get; private set; }
 		public RhubarbAPIClient Client { get; private set; }

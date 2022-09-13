@@ -10,7 +10,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Utils" })]
-	public class FontAtlasTexture : AssetProvider<RTexture2D>
+	public sealed class FontAtlasTexture : AssetProvider<RTexture2D>
 	{
 		[OnAssetLoaded(nameof(UpdateFont))]
 		public readonly AssetRef<RFont> font;

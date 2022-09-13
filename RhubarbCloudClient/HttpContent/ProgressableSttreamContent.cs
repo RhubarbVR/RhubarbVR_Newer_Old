@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace RhubarbCloudClient.HttpContent
 {
-	public class ProgressableStreamContent : System.Net.Http.HttpContent
+	public sealed class ProgressableStreamContent : System.Net.Http.HttpContent
 	{
 		private const int DEFAULT_BUFFER_SIZE = 4096;
 		private readonly Stream _content;

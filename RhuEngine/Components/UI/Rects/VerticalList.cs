@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 {
 
 	[Category(new string[] { "UI/Rects" })]
-	public class VerticalList : UIRect
+	public sealed class VerticalList : UIRect
 	{
 		[Default(false)]
 		public readonly Sync<bool> Fit;

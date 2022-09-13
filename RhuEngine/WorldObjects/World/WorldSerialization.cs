@@ -2,7 +2,7 @@
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World
+	public sealed partial class World
 	{
 		public bool IsDeserializing { get; internal set; } = true;
 

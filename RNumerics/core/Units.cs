@@ -35,12 +35,12 @@ namespace RNumerics
 
 
 
-		public static bool IsMetric(Linear t) {
+		public static bool IsMetric(in Linear t) {
 			return t > 0 && (int)t < 50;     // based on enum above
 		}
 
 
-		public static double GetMetricPower(Linear t) {
+		public static double GetMetricPower(in Linear t) {
 			if (t > 0 && (int)t < 50) {
 				return (double)t - 20.0;        // based on enum values above
 			}
@@ -49,7 +49,7 @@ namespace RNumerics
 		}
 
 
-		public static double ToMeters(Linear t) {
+		public static double ToMeters(in Linear t) {
 			if (t > 0 && (int)t < 50) {
 				var d = GetMetricPower(t);
 				return Math.Pow(10, d);
@@ -82,7 +82,7 @@ namespace RNumerics
 		}
 
 
-		public static double MetersTo(Linear t) {
+		public static double MetersTo(in Linear t) {
 			if (t > 0 && (int)t < 50) {
 				var d = GetMetricPower(t);
 				return Math.Pow(10, -d);
@@ -115,7 +115,7 @@ namespace RNumerics
 		}
 
 
-		public static double Convert(Linear from, Linear to) {
+		public static double Convert(in Linear from, in Linear to) {
 			if (from == to) {
 				return 1.0;
 			}
@@ -132,7 +132,7 @@ namespace RNumerics
 
 
 
-		public static Linear ParseLinear(string units) {
+		public static Linear ParseLinear(in string units) {
 			// [TODO] could switch on first character? would be more efficient
 			if (units == "nm") {
 				return Linear.Nanometers;
@@ -169,7 +169,7 @@ namespace RNumerics
 
 
 
-		public static string GetShortString(Linear unit) {
+		public static string GetShortString(in Linear unit) {
 			switch (unit) {
 				case Linear.UnknownUnits:
 					return "??";

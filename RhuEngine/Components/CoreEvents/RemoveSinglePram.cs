@@ -8,7 +8,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreEvents" })]
-	public class RemoveSinglePram<T> : Component
+	public sealed class RemoveSinglePram<T> : Component
 	{
 		public readonly Linker<T> Linker;
 

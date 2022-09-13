@@ -5,7 +5,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class CircleMesh : ProceduralMesh
+	public sealed class CircleMesh : ProceduralMesh
 	{
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]

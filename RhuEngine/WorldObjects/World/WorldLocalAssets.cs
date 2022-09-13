@@ -17,7 +17,7 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World
+	public sealed partial class World
 	{
 		public const DeliveryMethod ASSET_DELIVERY_METHOD = DeliveryMethod.ReliableUnordered;
 

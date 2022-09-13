@@ -9,7 +9,7 @@ using System.Reflection;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Observer/Observers" })]
-	public class ObserverWorldObject : ObserverBase<IWorldObject>
+	public sealed class ObserverWorldObject : ObserverBase<IWorldObject>
 	{
 		protected override UIRect BuildMainUIRect() {
 			return Entity.AttachComponent<VerticalList>();

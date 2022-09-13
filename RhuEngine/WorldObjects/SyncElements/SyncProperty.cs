@@ -13,7 +13,7 @@ namespace RhuEngine.WorldObjects
 	{
 		void Bind(string value, object from);
 	}
-	public class SyncProperty<T> : SyncObject, ILinkerMember<T>,ISyncProperty, ISyncMember
+	public sealed class SyncProperty<T> : SyncObject, ILinkerMember<T>,ISyncProperty, ISyncMember
 	{
 		public Action<T> SetValue;
 		public Func<T> GetValue;

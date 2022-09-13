@@ -8,7 +8,7 @@ using RhuEngine.Physics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public class RawMeshShape : PhysicsObject
+	public sealed class RawMeshShape : PhysicsObject
 	{
 		[OnAssetLoaded(nameof(RebuildPysics))]
 		public readonly AssetRef<RMesh> TargetMesh;

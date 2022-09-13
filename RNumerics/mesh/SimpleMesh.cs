@@ -7,7 +7,7 @@ using System.Text;
 
 namespace RNumerics
 {
-	public class SimpleMesh : IDeformableMesh
+	public sealed class SimpleMesh : IDeformableMesh
 	{
 		public IEnumerable<Vector3f> VertexPos() {
 			for (var i = 0; i < VertexCount; i++) {
@@ -38,7 +38,7 @@ namespace RNumerics
 		public SimpleMesh Copy() {
 			return new SimpleMesh(this);
 		}
-		private (Vector2f[], Colorf) CalcNewUV(Colorf colorOne, Colorf colorTwo, Vector3d newtry1, Vector3d v1, Vector3d v2, Vector2f[] uv1, Vector2f[] uv2) {
+		private (Vector2f[], Colorf) CalcNewUV(in Colorf colorOne, in Colorf colorTwo, in Vector3d newtry1, in Vector3d v1, in Vector3d v2, in Vector2f[] uv1, in Vector2f[] uv2) {
 			var newUvs = new Vector2f[uv1.Length];
 			//TODO: Try to remove sqrt from this
 			var disttwo = v1.Distance(v2);
@@ -58,7 +58,7 @@ namespace RNumerics
 			public bool removeOtherSide;
 			public bool Cap;
 
-			public PlaneSetting(Plane3d plane, bool switchSide, bool removeOtherSide, bool cap) {
+			public PlaneSetting(in Plane3d plane, in bool switchSide, in bool removeOtherSide, in bool cap) {
 				this.plane = plane;
 				this.switchSide = switchSide;
 				this.removeOtherSide = removeOtherSide;
@@ -67,7 +67,7 @@ namespace RNumerics
 
 		}
 
-		public List<(NewVertexInfo, NewVertexInfo, NewVertexInfo)> MakeCutTriangles(List<(NewVertexInfo, NewVertexInfo, NewVertexInfo)> trys, PlaneSetting planeSetting) {
+		public List<(NewVertexInfo, NewVertexInfo, NewVertexInfo)> MakeCutTriangles(in List<(NewVertexInfo, NewVertexInfo, NewVertexInfo)> trys, in PlaneSetting planeSetting) {
 			var savedCount = trys.Count;
 			for (var i = 0; i < savedCount; i++) {
 				var v1 = trys[i].Item1;
@@ -183,7 +183,7 @@ namespace RNumerics
 			return trys;
 		}
 
-		public void AppendUVRectangle(Matrix offset, Vector2f bottomleft, Vector2f topright, Vector2f size, float yoffset, Colorf color) {
+		public void AppendUVRectangle(in Matrix offset, in Vector2f bottomleft, in Vector2f topright, in Vector2f size, in float yoffset, in Colorf color) {
 			var ftopLeft = new Vector2f(bottomleft.x, topright.y);
 			var fbottomLeft = bottomleft;
 			var ftopRight = topright;
@@ -217,7 +217,7 @@ namespace RNumerics
 			}
 			return cutMesh;
 		}
-		private void BindVerterts(float angle, float radus, Vector3f scale, int splits) {
+		private void BindVerterts(in float angle, in float radus, in Vector3f scale, in int splits) {
 			for (var i = 0; i < VertexCount; ++i) {
 				var v = new Vector3d(Vertices[3 * i], Vertices[(3 * i) + 1], Vertices[(3 * i) + 2]);
 				v.Bind(angle, radus, scale, splits);
@@ -227,7 +227,7 @@ namespace RNumerics
 			}
 			UpdateTimeStamp();
 		}
-		public SimpleMesh UIBind(float angle, float radus, int segments, Vector3f scale) {
+		public SimpleMesh UIBind(in float angle, in float radus, in int segments, in Vector3f scale) {
 
 			var settings = new PlaneSetting[segments];
 			for (var i = 0; i < segments; i++) {
@@ -241,7 +241,7 @@ namespace RNumerics
 			return lastmesh;
 		}
 
-		public void AttachCap(List<Vector3d> points) {
+		public void AttachCap(in List<Vector3d> points) {
 			if (points.Count == 0) {
 				return;
 			}
@@ -261,12 +261,12 @@ namespace RNumerics
 			}
 		}
 
-		public SimpleMesh Cut(Vector2f cutmax, Vector2f cutmin) {
+		public SimpleMesh Cut(in Vector2f cutmax, in Vector2f cutmin) {
 			return CutOnPlane(new PlaneSetting(new Plane3d(Vector3d.AxisY, cutmin.y - 0.00001f), false, true, true), new PlaneSetting(new Plane3d(Vector3d.AxisY, cutmax.y + 0.00001f), true, true, true)
 				, new PlaneSetting(new Plane3d(Vector3d.AxisX, cutmin.x - 0.00001f), false, true, true), new PlaneSetting(new Plane3d(Vector3d.AxisX, cutmax.x + 0.00001f), true, true, true));
 		}
 
-		public SimpleMesh(IMesh copy) {
+		public SimpleMesh(in IMesh copy) {
 			Initialize(copy.HasVertexNormals, copy.HasVertexColors, copy.HasVertexUVs, copy.HasTriangleGroups);
 			var mapV = new int[copy.MaxVertexID];
 			foreach (var vid in copy.VertexIndices()) {
@@ -289,7 +289,7 @@ namespace RNumerics
 		}
 
 
-		public void Initialize(bool bWantNormals = true, bool bWantColors = true, bool bWantUVs = true, bool bWantFaceGroups = true) {
+		public void Initialize(in bool bWantNormals = true, in bool bWantColors = true, in bool bWantUVs = true, in bool bWantFaceGroups = true) {
 			Vertices = new DVector<double>();
 			Normals = bWantNormals ? new DVector<float>() : null;
 			Colors = bWantColors ? new DVector<float>() : null;
@@ -298,7 +298,7 @@ namespace RNumerics
 			FaceGroups = bWantFaceGroups ? new DVector<int>() : null;
 		}
 
-		public void Initialize(VectorArray3d v, VectorArray3i t,
+		public void Initialize(in VectorArray3d v, in VectorArray3i t,
 			VectorArray3f n = null, VectorArray3f c = null, VectorArray2f uv = null, int[] g = null) {
 			Vertices = new DVector<double>(v);
 			Triangles = new DVector<int>(t);
@@ -321,7 +321,7 @@ namespace RNumerics
 			}
 		}
 
-		public void Initialize(IEnumerable<double> v, int[] t,
+		public void Initialize(in IEnumerable<double> v, in int[] t,
 			float[] n = null, float[] c = null, float[] uv = null, int[] g = null) {
 			Vertices = new DVector<double>(v);
 			Triangles = new DVector<int>(t);
@@ -357,7 +357,7 @@ namespace RNumerics
 		/*
          * Construction
          */
-		public int AppendVertex(double x, double y, double z) {
+		public int AppendVertex(in double x, in double y, in double z) {
 			var i = Vertices.Length / 3;
 			if (HasVertexNormals) {
 				Normals.Add(0);
@@ -379,7 +379,7 @@ namespace RNumerics
 			UpdateTimeStamp();
 			return i;
 		}
-		public int AppendVertex(NewVertexInfo info) {
+		public int AppendVertex(in NewVertexInfo info) {
 			var i = Vertices.Length / 3;
 
 			if (info.bHaveN && HasVertexNormals) {
@@ -418,14 +418,14 @@ namespace RNumerics
 			return i;
 		}
 
-		public int AppendTriangle(NewVertexInfo a, NewVertexInfo b, NewVertexInfo c) {
+		public int AppendTriangle(in NewVertexInfo a, in NewVertexInfo b, in NewVertexInfo c) {
 			var va = AppendVertex(a);
 			var vb = AppendVertex(b);
 			var vc = AppendVertex(c);
 			return AppendTriangle(va, vb, vc);
 		}
 
-		public void AppendVertices(VectorArray3d v, VectorArray3f n = null, VectorArray3f c = null, VectorArray2f uv = null) {
+		public void AppendVertices(in VectorArray3d v, in VectorArray3f n = null, in VectorArray3f c = null, in VectorArray2f uv = null) {
 			Vertices.Add(v.array);
 			if (n != null && HasVertexNormals) {
 				Normals.Add(n.array);
@@ -453,7 +453,7 @@ namespace RNumerics
 
 
 
-		public int AppendTriangle(int i, int j, int k, int g = -1) {
+		public int AppendTriangle(in int i, in int j, in int k, in int g = -1) {
 			var ti = Triangles.Length / 3;
 			if (HasTriangleGroups) {
 				FaceGroups.Add((g == -1) ? 0 : g);
@@ -467,7 +467,7 @@ namespace RNumerics
 		}
 
 
-		public void AppendTriangles(int[] vTriangles, int[] vertexMap, int g = -1) {
+		public void AppendTriangles(in int[] vTriangles, in int[] vertexMap, in int g = -1) {
 			for (var ti = 0; ti < vTriangles.Length; ++ti) {
 				Triangles.Add(vertexMap[vTriangles[ti]]);
 			}
@@ -479,7 +479,7 @@ namespace RNumerics
 			UpdateTimeStamp();
 		}
 
-		public void AppendTriangles(IndexArray3i t, int[] groups = null) {
+		public void AppendTriangles(in IndexArray3i t, in int[] groups = null) {
 			Triangles.Add(t.array);
 			if (HasTriangleGroups) {
 				if (groups != null) {
@@ -498,7 +498,7 @@ namespace RNumerics
          */
 
 		// [RMS] this is convenience stuff...
-		public void Translate(double tx, double ty, double tz) {
+		public void Translate(in double tx, in double ty, in double tz) {
 			var c = VertexCount;
 			for (var i = 0; i < c; ++i) {
 				Vertices[3 * i] += tx;
@@ -507,7 +507,7 @@ namespace RNumerics
 			}
 			UpdateTimeStamp();
 		}
-		public void Translate(Matrix matrix) {
+		public void Translate(in Matrix matrix) {
 			var c = VertexCount;
 			for (var i = 0; i < c; ++i) {
 				var transform = matrix.Transform(new Vector3f(Vertices[3 * i], Vertices[(3 * i) + 1], Vertices[(3 * i) + 2]));
@@ -517,7 +517,7 @@ namespace RNumerics
 			}
 			UpdateTimeStamp();
 		}
-		public void OffsetTop(double offset) {
+		public void OffsetTop(in double offset) {
 			var c = VertexCount;
 			for (var i = 0; i < c; ++i) {
 				Vertices[(3 * i) + 2] -= Vertices[(3 * i) + 1] * offset;
@@ -525,11 +525,11 @@ namespace RNumerics
 			UpdateTimeStamp();
 		}
 
-		public void Translate(Vector3d vector3D) {
+		public void Translate(in Vector3d vector3D) {
 			Translate(vector3D.x, vector3D.y, vector3D.z);
 		}
 
-		public void Scale(double sx, double sy, double sz) {
+		public void Scale(in double sx, in double sy, in double sz) {
 			var c = VertexCount;
 			for (var i = 0; i < c; ++i) {
 				Vertices[3 * i] *= sx;
@@ -538,7 +538,7 @@ namespace RNumerics
 			}
 			UpdateTimeStamp();
 		}
-		public void Scale(double s) {
+		public void Scale(in double s) {
 			Scale(s, s, s);
 			UpdateTimeStamp();
 		}
@@ -555,10 +555,10 @@ namespace RNumerics
 		public int MaxTriangleID => TriangleCount;
 
 
-		public bool IsVertex(int vID) {
+		public bool IsVertex(in int vID) {
 			return vID * 3 < Vertices.Length;
 		}
-		public bool IsTriangle(int tID) {
+		public bool IsTriangle(in int tID) {
 			return tID * 3 < Triangles.Length;
 		}
 
@@ -568,23 +568,23 @@ namespace RNumerics
 
 		public bool HasVertexUVs => UVs != null && UVs.Length / 2 == Vertices.Length / 3;
 
-		public Vector3d GetVertex(int i) {
+		public Vector3d GetVertex(in int i) {
 			return new Vector3d(Vertices[3 * i], Vertices[(3 * i) + 1], Vertices[(3 * i) + 2]);
 		}
 
-		public Vector3f GetVertexNormal(int i) {
+		public Vector3f GetVertexNormal(in int i) {
 			return new Vector3f(Normals[3 * i], Normals[(3 * i) + 1], Normals[(3 * i) + 2]);
 		}
 
-		public Vector3f GetVertexColor(int i) {
+		public Vector3f GetVertexColor(in int i) {
 			return new Vector3f(Colors[3 * i], Colors[(3 * i) + 1], Colors[(3 * i) + 2]);
 		}
 
-		public Vector2f GetVertexUV(int i, int channel = 1) {
+		public Vector2f GetVertexUV(in int i, in int channel = 1) {
 			return new Vector2f(UVs[2 * i], UVs[(2 * i) + 1]);
 		}
 
-		public NewVertexInfo GetVertexAll(int i) {
+		public NewVertexInfo GetVertexAll(in int i) {
 			var vi = new NewVertexInfo {
 				v = GetVertex(i)
 			};
@@ -620,11 +620,11 @@ namespace RNumerics
 
 		public bool IsTriangleMesh => true;
 
-		public Index3i GetTriangle(int i) {
+		public Index3i GetTriangle(in int i) {
 			return new Index3i(Triangles[3 * i], Triangles[(3 * i) + 1], Triangles[(3 * i) + 2]);
 		}
 
-		public int GetTriangleGroup(int i) {
+		public int GetTriangleGroup(in int i) {
 			return FaceGroups[i];
 		}
 
@@ -695,28 +695,28 @@ namespace RNumerics
 
 		// setters
 
-		public void SetVertex(int i, Vector3d v) {
+		public void SetVertex(in int i, in Vector3d v) {
 			Vertices[3 * i] = v.x;
 			Vertices[(3 * i) + 1] = v.y;
 			Vertices[(3 * i) + 2] = v.z;
 			UpdateTimeStamp();
 		}
 
-		public void SetVertexNormal(int i, Vector3f n) {
+		public void SetVertexNormal(in int i, in Vector3f n) {
 			Normals[3 * i] = n.x;
 			Normals[(3 * i) + 1] = n.y;
 			Normals[(3 * i) + 2] = n.z;
 			UpdateTimeStamp();
 		}
 
-		public void SetVertexColor(int i, Vector3f c) {
+		public void SetVertexColor(in int i, in Vector3f c) {
 			Colors[3 * i] = c.x;
 			Colors[(3 * i) + 1] = c.y;
 			Colors[(3 * i) + 2] = c.z;
 			UpdateTimeStamp();
 		}
 
-		public void SetVertexUV(int i, Vector2f uv) {
+		public void SetVertexUV(in int i, in Vector2f uv) {
 			UVs[2 * i] = uv.x;
 			UVs[(2 * i) + 1] = uv.y;
 			UpdateTimeStamp();
@@ -765,33 +765,33 @@ namespace RNumerics
          * copy internal data into buffers. Assumes that buffers are big enough!!
          */
 
-		public unsafe void GetVertexBuffer(double* pBuffer) {
+		public unsafe void GetVertexBuffer(in double* pBuffer) {
 			DVector<double>.FastGetBuffer(Vertices, pBuffer);
 		}
 
-		public unsafe void GetVertexNormalBuffer(float* pBuffer) {
+		public unsafe void GetVertexNormalBuffer(in float* pBuffer) {
 			if (HasVertexNormals) {
 				DVector<float>.FastGetBuffer(Normals, pBuffer);
 			}
 		}
 
-		public unsafe void GetVertexColorBuffer(float* pBuffer) {
+		public unsafe void GetVertexColorBuffer(in float* pBuffer) {
 			if (HasVertexColors) {
 				DVector<float>.FastGetBuffer(Colors, pBuffer);
 			}
 		}
 
-		public unsafe void GetVertexUVBuffer(float* pBuffer) {
+		public unsafe void GetVertexUVBuffer(in float* pBuffer) {
 			if (HasVertexUVs) {
 				DVector<float>.FastGetBuffer(UVs, pBuffer);
 			}
 		}
 
-		public unsafe void GetTriangleBuffer(int* pBuffer) {
+		public unsafe void GetTriangleBuffer(in int* pBuffer) {
 			DVector<int>.FastGetBuffer(Triangles, pBuffer);
 		}
 
-		public unsafe void GetFaceGroupsBuffer(int* pBuffer) {
+		public unsafe void GetFaceGroupsBuffer(in int* pBuffer) {
 			if (HasTriangleGroups) {
 				DVector<int>.FastGetBuffer(FaceGroups, pBuffer);
 			}
@@ -804,7 +804,7 @@ namespace RNumerics
 
 
 
-	public class SimpleMeshBuilder : IMeshBuilder
+	public sealed class SimpleMeshBuilder : IMeshBuilder
 	{
 		public List<SimpleMesh> Meshes;
 		public List<int> MaterialAssignment;
@@ -817,7 +817,7 @@ namespace RNumerics
 			_nActiveMesh = -1;
 		}
 
-		public int AppendNewMesh(bool bHaveVtxNormals, bool bHaveVtxColors, bool bHaveVtxUVs, bool bHaveFaceGroups) {
+		public int AppendNewMesh(in bool bHaveVtxNormals, in bool bHaveVtxColors, in bool bHaveVtxUVs, in bool bHaveFaceGroups) {
 			var index = Meshes.Count;
 			var m = new SimpleMesh();
 			m.Initialize(bHaveVtxNormals, bHaveVtxColors, bHaveVtxUVs, bHaveFaceGroups);
@@ -827,27 +827,27 @@ namespace RNumerics
 			return index;
 		}
 
-		public void SetActiveMesh(int id) {
+		public void SetActiveMesh(in int id) {
 			_nActiveMesh = id >= 0 && id < Meshes.Count ? id : throw new ArgumentOutOfRangeException("active mesh id is out of range");
 		}
 
-		public int AppendTriangle(int i, int j, int k) {
+		public int AppendTriangle(in int i, in int j, in int k) {
 			return Meshes[_nActiveMesh].AppendTriangle(i, j, k);
 		}
 
-		public int AppendTriangle(int i, int j, int k, int g) {
+		public int AppendTriangle(in int i, in int j, in int k, in int g) {
 			return Meshes[_nActiveMesh].AppendTriangle(i, j, k, g);
 		}
 
-		public int AppendVertex(double x, double y, double z) {
+		public int AppendVertex(in double x, in double y, in double z) {
 			return Meshes[_nActiveMesh].AppendVertex(x, y, z);
 		}
-		public int AppendVertex(NewVertexInfo info) {
+		public int AppendVertex(in NewVertexInfo info) {
 			return Meshes[_nActiveMesh].AppendVertex(info);
 		}
 
 		public bool SupportsMetaData => false;
-		public void AppendMetaData(string identifier, object data) {
+		public void AppendMetaData(in string identifier, in object data) {
 			throw new NotImplementedException("SimpleMeshBuilder: metadata not supported");
 		}
 

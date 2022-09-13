@@ -7,7 +7,7 @@ using RhuEngine.Physics;
 
 namespace RStereoKit
 {
-	public class RhuStereoKit : IEngineLink
+	public sealed class RhuStereoKit : IEngineLink
 	{
 		public string BackendID => "StereoKit";
 

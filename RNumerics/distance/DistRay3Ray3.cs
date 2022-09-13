@@ -8,7 +8,7 @@ namespace RNumerics
 	// ported from WildMagic 5 
 	// https://www.geometrictools.com/Downloads/Downloads.html
 
-	public class DistRay3Ray3
+	public sealed class DistRay3Ray3
 	{
 		Ray3d _ray1;
 		public Ray3d Ray1
@@ -32,15 +32,15 @@ namespace RNumerics
 		public double Ray2Parameter;
 
 
-		public DistRay3Ray3(Ray3d ray1, Ray3d ray2) {
+		public DistRay3Ray3(in Ray3d ray1, in Ray3d ray2) {
 			_ray1 = ray1;
 			_ray2 = ray2;
 		}
 
-		static public double MinDistance(Ray3d r1, Ray3d r2) {
+		static public double MinDistance(in Ray3d r1, in Ray3d r2) {
 			return new DistRay3Ray3(r1, r2).Get();
 		}
-		static public double MinDistanceRay2Param(Ray3d r1, Ray3d r2) {
+		static public double MinDistanceRay2Param(in Ray3d r1, in Ray3d r2) {
 			return new DistRay3Ray3(r1, r2).Compute().Ray2Parameter;
 		}
 

@@ -9,7 +9,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Observer/Observers/SyncElements" })]
-	public class PrimitiveSyncObserver : ObserverSyncElement<ISync>
+	public sealed class PrimitiveSyncObserver : ObserverSyncElement<ISync>
 	{
 		public readonly SyncRef<ILinkerMember<string>> editorValue;
 		IChangeable _changeable;

@@ -7,7 +7,7 @@ using DataModel.Enums;
 
 namespace RhubarbCloudClient.Model
 {
-	public class SessionInfo
+	public sealed class SessionInfo
 	{
 		public Guid ID { get; set; }
 		public string SessionName { get; set; }

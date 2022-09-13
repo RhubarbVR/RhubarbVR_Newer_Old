@@ -23,7 +23,7 @@ namespace RNumerics
 	/// Use the Append() functions to add different transform types, and the TransformX()
 	/// to apply the sequence
 	/// </summary>
-	public class TransformSequence2 : ITransform2
+	public sealed class TransformSequence2 : ITransform2
 	{
 		enum XFormType
 		{
@@ -64,7 +64,7 @@ namespace RNumerics
 
 
 
-		public TransformSequence2 Translation(Vector2d dv)
+		public TransformSequence2 Translation(in Vector2d dv)
 		{
 			_operations.Add(new XForm()
 			{
@@ -73,7 +73,7 @@ namespace RNumerics
 			});
 			return this;
 		}
-		public TransformSequence2 Translation(double dx, double dy)
+		public TransformSequence2 Translation(in double dx, in double dy)
 		{
 			_operations.Add(new XForm()
 			{
@@ -83,7 +83,7 @@ namespace RNumerics
 			return this;
 		}
 
-		public TransformSequence2 RotationRad(double angle)
+		public TransformSequence2 RotationRad(in double angle)
 		{
 			_operations.Add(new XForm()
 			{
@@ -92,13 +92,13 @@ namespace RNumerics
 			});
 			return this;
 		}
-		public TransformSequence2 RotationDeg(double angle)
+		public TransformSequence2 RotationDeg(in double angle)
 		{
 			return RotationRad(angle * MathUtil.DEG_2_RAD);
 		}
 
 
-		public TransformSequence2 RotationRad(double angle, Vector2d aroundPt)
+		public TransformSequence2 RotationRad(in double angle, in Vector2d aroundPt)
 		{
 			_operations.Add(new XForm()
 			{
@@ -107,12 +107,12 @@ namespace RNumerics
 			});
 			return this;
 		}
-		public TransformSequence2 RotationDeg(double angle, Vector2d aroundPt)
+		public TransformSequence2 RotationDeg(in double angle, in Vector2d aroundPt)
 		{
 			return RotationRad(angle * MathUtil.DEG_2_RAD, aroundPt);
 		}
 
-		public TransformSequence2 Scale(Vector2d s)
+		public TransformSequence2 Scale(in Vector2d s)
 		{
 			_operations.Add(new XForm()
 			{
@@ -122,7 +122,7 @@ namespace RNumerics
 			return this;
 		}
 
-		public TransformSequence2 Scale(Vector2d s, Vector2d aroundPt)
+		public TransformSequence2 Scale(in Vector2d s, in Vector2d aroundPt)
 		{
 			_operations.Add(new XForm()
 			{
@@ -132,7 +132,7 @@ namespace RNumerics
 			return this;
 		}
 
-		public TransformSequence2 Append(ITransform2 t2)
+		public TransformSequence2 Append(in ITransform2 t2)
 		{
 			_operations.Add(new XForm()
 			{

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RhubarbCloudClient.Model
 {
-	public class ConnectToUser
+	public sealed class ConnectToUser
 	{
 		public ConnectionType ConnectionType { get; set; }
 		public string Data { get; set; }

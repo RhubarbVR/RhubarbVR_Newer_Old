@@ -14,9 +14,9 @@ using RhubarbCloudClient.Model;
 
 namespace RhubarbCloudClient
 {
-	public partial class RhubarbAPIClient : IDisposable
+	public sealed partial class RhubarbAPIClient : IDisposable
 	{
-		public class HttpDataResponse<T>
+		public sealed class HttpDataResponse<T>
 		{
 			public T Data { get; set; }
 

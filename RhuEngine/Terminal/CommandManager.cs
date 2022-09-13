@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RhuEngine
 {
-	public class CommandManager
+	public sealed class CommandManager
 	{
 		internal readonly Type[] _commands;
 

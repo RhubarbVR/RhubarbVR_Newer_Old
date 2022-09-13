@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 {
 	[Category("Transform/IK")]
 	[UpdateLevel(UpdateEnum.Movement)]
-	public class IKBone : Component
+	public sealed class IKBone : Component
 	{
 		[OnChanged(nameof(ReloadBone))]
 		public readonly Sync<Vector3f> StartingPosistion;

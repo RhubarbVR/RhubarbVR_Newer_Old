@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category("Math")]
-	public class Clamp<T> : Component where T : struct
+	public sealed class Clamp<T> : Component where T : struct
 	{
 		public readonly Linker<T> Output;
 

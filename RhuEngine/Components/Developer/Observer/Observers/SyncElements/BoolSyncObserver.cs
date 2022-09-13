@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Observer/Observers/SyncElements" })]
-	public class BoolSyncObserver : ValueObserverBase<bool>
+	public sealed class BoolSyncObserver : ValueObserverBase<bool>
 	{
 		public readonly SyncRef<CheckBox> CheckBox;
 
@@ -32,7 +32,7 @@ namespace RhuEngine.Components
 			ui.PopRect();
 		}
 		[Exposed]
-		protected void ValueUpdate(bool data) {
+		private void ValueUpdate(bool data) {
 			if(TargetElement is null) {
 				return;
 			}

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RhubarbCloudClient.Model
 {
-	public class RUserRegistration
+	public sealed class RUserRegistration
 	{
 		[Required]
 		public string UserName { get; set; }

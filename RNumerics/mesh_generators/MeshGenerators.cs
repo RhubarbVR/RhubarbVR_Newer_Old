@@ -22,7 +22,7 @@ namespace RNumerics
 		abstract public MeshGenerator Generate();
 
 
-		public virtual void MakeMesh(SimpleMesh m) {
+		public virtual void MakeMesh(in SimpleMesh m) {
 			m.AppendVertices(vertices, WantNormals ? normals : null, null, WantUVs ? uv : null);
 			m.AppendTriangles(triangles);
 		}
@@ -32,7 +32,7 @@ namespace RNumerics
 			return m;
 		}
 
-		public virtual void MakeMesh(NTMesh3 m) {
+		public virtual void MakeMesh(in NTMesh3 m) {
 			var nV = vertices.Count;
 			for (var i = 0; i < nV; ++i) {
 				var vID = m.AppendVertex(vertices[i]);
@@ -68,14 +68,14 @@ namespace RNumerics
 		{
 			public float Radius;
 			public float SectionY;
-			public CircularSection(float r, float y) {
+			public CircularSection(in float r, in float y) {
 				Radius = r;
 				SectionY = y;
 			}
 		}
 
 
-		protected void Duplicate_vertex_span(int nStart, int nCount) {
+		protected void Duplicate_vertex_span(in int nStart, in int nCount) {
 			for (var i = 0; i < nCount; ++i) {
 				vertices[nStart + nCount + i] = vertices[nStart + i];
 				normals[nStart + nCount + i] = normals[nStart + i];
@@ -84,7 +84,7 @@ namespace RNumerics
 		}
 
 
-		protected void Append_disc(int Slices, int nCenterV, int nRingStart, bool bClosed, bool bCycle, ref int tri_counter, int groupid = -1) {
+		protected void Append_disc(in int Slices, in int nCenterV, in int nRingStart, in bool bClosed, in bool bCycle, ref int tri_counter, in int groupid = -1) {
 			var nLast = nRingStart + Slices;
 			for (var k = nRingStart; k < nLast - 1; ++k) {
 				if (groupid >= 0) {
@@ -103,7 +103,7 @@ namespace RNumerics
 		}
 
 		// assumes order would be [v0,v1,v2,v3], ccw
-		protected void Append_rectangle(int v0, int v1, int v2, int v3, bool bCycle, ref int tri_counter, int groupid = -1) {
+		protected void Append_rectangle(in int v0, in int v1, in int v2, in int v3, in bool bCycle, ref int tri_counter, in int groupid = -1) {
 			if (groupid >= 0) {
 				groups[tri_counter] = groupid;
 			}
@@ -118,7 +118,7 @@ namespace RNumerics
 
 
 		// append "disc" verts/tris between vEnd1 and vEnd2
-		protected void Append_2d_disc_segment(int iCenter, int iEnd1, int iEnd2, int nSteps, bool bCycle, ref int vtx_counter, ref int tri_counter, int groupid = -1, double force_r = 0) {
+		protected void Append_2d_disc_segment(in int iCenter, in int iEnd1, in int iEnd2, in int nSteps, in bool bCycle, ref int vtx_counter, ref int tri_counter, in int groupid = -1, in double force_r = 0) {
 			var c = vertices[iCenter];
 			var e0 = vertices[iEnd1];
 			var e1 = vertices[iEnd2];
@@ -170,7 +170,7 @@ namespace RNumerics
 			triangles.Set(tri_counter++, iCenter, iPrev, iEnd2, bCycle);
 		}
 
-		protected Vector3f Estimate_normal(int v0, int v1, int v2) {
+		protected Vector3f Estimate_normal(in int v0, in int v1, in int v2) {
 			var a = vertices[v0];
 			var b = vertices[v1];
 			var c = vertices[v2];
@@ -180,31 +180,31 @@ namespace RNumerics
 		}
 
 
-		protected Vector3d Bilerp(ref Vector3d v00, ref Vector3d v10, ref Vector3d v11, ref Vector3d v01, double tx, double ty) {
-			var a = Vector3d.Lerp(ref v00, ref v01, ty);
-			var b = Vector3d.Lerp(ref v10, ref v11, ty);
+		protected Vector3d Bilerp(in Vector3d v00, in Vector3d v10, in Vector3d v11, in Vector3d v01, in double tx, in double ty) {
+			var a = Vector3d.Lerp( v00, v01, ty);
+			var b = Vector3d.Lerp( v10, v11, ty);
 			return Vector3d.Lerp(a, b, tx);
 		}
 
-		protected Vector2d Bilerp(ref Vector2d v00, ref Vector2d v10, ref Vector2d v11, ref Vector2d v01, double tx, double ty) {
-			var a = Vector2d.Lerp(ref v00, ref v01, ty);
-			var b = Vector2d.Lerp(ref v10, ref v11, ty);
+		protected Vector2d Bilerp(in Vector2d v00, in Vector2d v10, in Vector2d v11, in Vector2d v01, in double tx, in double ty) {
+			var a = Vector2d.Lerp( v00,  v01, ty);
+			var b = Vector2d.Lerp( v10,  v11, ty);
 			return Vector2d.Lerp(a, b, tx);
 		}
-		protected Vector2f Bilerp(ref Vector2f v00, ref Vector2f v10, ref Vector2f v11, ref Vector2f v01, float tx, float ty) {
-			var a = Vector2f.Lerp(ref v00, ref v01, ty);
-			var b = Vector2f.Lerp(ref v10, ref v11, ty);
+		protected Vector2f Bilerp(in Vector2f v00, in Vector2f v10, in Vector2f v11, in Vector2f v01, in float tx, in float ty) {
+			var a = Vector2f.Lerp( v00, v01, ty);
+			var b = Vector2f.Lerp( v10, v11, ty);
 			return Vector2f.Lerp(a, b, tx);
 		}
 
-		protected Vector3i Bilerp(ref Vector3i v00, ref Vector3i v10, ref Vector3i v11, ref Vector3i v01, double tx, double ty) {
+		protected Vector3i Bilerp(in Vector3i v00, in Vector3i v10, in Vector3i v11, in Vector3i v01, in double tx, in double ty) {
 			var a = Vector3d.Lerp((Vector3d)v00, (Vector3d)v01, ty);
 			var b = Vector3d.Lerp((Vector3d)v10, (Vector3d)v11, ty);
 			var c = Vector3d.Lerp(a, b, tx);
 			return new Vector3i((int)Math.Round(c.x), (int)Math.Round(c.y), (int)Math.Round(c.z));
 		}
 
-		protected Vector3i Lerp(ref Vector3i a, ref Vector3i b, double t) {
+		protected Vector3i Lerp(in Vector3i a, in Vector3i b, in double t) {
 			var c = Vector3d.Lerp((Vector3d)a, (Vector3d)b, t);
 			return new Vector3i((int)Math.Round(c.x), (int)Math.Round(c.y), (int)Math.Round(c.z));
 		}

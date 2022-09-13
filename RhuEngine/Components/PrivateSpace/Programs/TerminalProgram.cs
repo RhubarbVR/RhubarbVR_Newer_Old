@@ -12,7 +12,7 @@ using RNumerics;
 
 namespace RhuEngine.Components.PrivateSpace
 {
-	public class TerminalProgram : Program
+	public sealed class TerminalProgram : Program
 	{
 		public override string ProgramID => "Terminal";
 

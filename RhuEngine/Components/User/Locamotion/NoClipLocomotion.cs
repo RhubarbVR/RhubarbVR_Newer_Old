@@ -7,7 +7,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "User" })]
-	public class NoClipLocomotion : LocomotionModule
+	public sealed class NoClipLocomotion : LocomotionModule
 	{
 		[Default(1f)]
 		public readonly Sync<float> MovementSpeed;

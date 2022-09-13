@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RhubarbCloudClient
 {
-	public class Base32Encoding
+	public sealed class Base32Encoding
 	{
 		public static byte[] ToBytes(string input) {
 			if (string.IsNullOrEmpty(input)) {

@@ -7,7 +7,7 @@ using RhuEngine.Linker;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Transform" })]
-	public class LookAtRef : Component
+	public sealed class LookAtRef : Component
 	{
 		[OnChanged(nameof(BindAtPoint))]
 		public readonly SyncRef<IValueSource<Vector3f>> LookAtPoint;
@@ -52,7 +52,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "Transform" })]
-	public class LookAtValue : Component
+	public sealed class LookAtValue : Component
 	{
 		[OnChanged(nameof(Compute))]
 		public readonly Sync<Vector3f> LookAtPoint;

@@ -8,12 +8,12 @@ using System.Collections.Generic;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/Rects" })]
-	public class BasicScrollRect : RawScrollUIRect
+	public sealed class BasicScrollRect : RawScrollUIRect
 	{
 	}
 
 	[Category(new string[] { "UI/Rects" })]
-	public class CustomScrollUIRect : RawScrollUIRect
+	public sealed class CustomScrollUIRect : RawScrollUIRect
 	{
 		public readonly Sync<Vector2f> Max_Scroll;
 		public readonly Sync<Vector2f> Min_Scroll;

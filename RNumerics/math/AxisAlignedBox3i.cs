@@ -23,37 +23,39 @@ namespace RNumerics
 		public static readonly AxisAlignedBox3i Infinite =
 			new(int.MinValue, int.MinValue, int.MinValue, int.MaxValue, int.MaxValue, int.MaxValue);
 
+		public AxisAlignedBox3i() {
 
-		public AxisAlignedBox3i(int xmin, int ymin, int zmin, int xmax, int ymax, int zmax) {
+		}
+		public AxisAlignedBox3i(in int xmin, in int ymin, in int zmin, in int xmax, in int ymax, in int zmax) {
 			Min = new Vector3i(xmin, ymin, zmin);
 			Max = new Vector3i(xmax, ymax, zmax);
 		}
 
-		public AxisAlignedBox3i(int fCubeSize) {
+		public AxisAlignedBox3i(in int fCubeSize) {
 			Min = new Vector3i(0, 0, 0);
 			Max = new Vector3i(fCubeSize, fCubeSize, fCubeSize);
 		}
 
-		public AxisAlignedBox3i(int fWidth, int fHeight, int fDepth) {
+		public AxisAlignedBox3i(in int fWidth, in int fHeight, in int fDepth) {
 			Min = new Vector3i(0, 0, 0);
 			Max = new Vector3i(fWidth, fHeight, fDepth);
 		}
 
-		public AxisAlignedBox3i(Vector3i vMin, Vector3i vMax) {
+		public AxisAlignedBox3i(in Vector3i vMin, in Vector3i vMax) {
 			Min = new Vector3i(Math.Min(vMin.x, vMax.x), Math.Min(vMin.y, vMax.y), Math.Min(vMin.z, vMax.z));
 			Max = new Vector3i(Math.Max(vMin.x, vMax.x), Math.Max(vMin.y, vMax.y), Math.Max(vMin.z, vMax.z));
 		}
 
-		public AxisAlignedBox3i(Vector3i vCenter, int fHalfWidth, int fHalfHeight, int fHalfDepth) {
+		public AxisAlignedBox3i(in Vector3i vCenter, in int fHalfWidth, in int fHalfHeight, in int fHalfDepth) {
 			Min = new Vector3i(vCenter.x - fHalfWidth, vCenter.y - fHalfHeight, vCenter.z - fHalfDepth);
 			Max = new Vector3i(vCenter.x + fHalfWidth, vCenter.y + fHalfHeight, vCenter.z + fHalfDepth);
 		}
-		public AxisAlignedBox3i(Vector3i vCenter, int fHalfSize) {
+		public AxisAlignedBox3i(in Vector3i vCenter, in int fHalfSize) {
 			Min = new Vector3i(vCenter.x - fHalfSize, vCenter.y - fHalfSize, vCenter.z - fHalfSize);
 			Max = new Vector3i(vCenter.x + fHalfSize, vCenter.y + fHalfSize, vCenter.z + fHalfSize);
 		}
 
-		public AxisAlignedBox3i(Vector3i vCenter) {
+		public AxisAlignedBox3i(in Vector3i vCenter) {
 			Min = Max = vCenter;
 		}
 
@@ -85,8 +87,8 @@ namespace RNumerics
 		public Vector3i Center => new((Min.x + Max.x) / 2, (Min.y + Max.y) / 2, (Min.z + Max.z) / 2);
 
 
-		public static bool operator ==(AxisAlignedBox3i a, AxisAlignedBox3i b) => a.Min == b.Min && a.Max == b.Max;
-		public static bool operator !=(AxisAlignedBox3i a, AxisAlignedBox3i b) => a.Min != b.Min || a.Max != b.Max;
+		public static bool operator ==(in AxisAlignedBox3i a, in AxisAlignedBox3i b) => a.Min == b.Min && a.Max == b.Max;
+		public static bool operator !=(in AxisAlignedBox3i a, in AxisAlignedBox3i b) => a.Min != b.Min || a.Max != b.Max;
 		public override bool Equals(object obj) {
 			return this == (AxisAlignedBox3i)obj;
 		}
@@ -114,7 +116,7 @@ namespace RNumerics
 		//}
 
 		//! value is subtracted from min and added to max
-		public void Expand(int nRadius) {
+		public void Expand(in int nRadius) {
 			Min.x -= nRadius;
 			Min.y -= nRadius;
 			Min.z -= nRadius;
@@ -123,7 +125,7 @@ namespace RNumerics
 			Max.z += nRadius;
 		}
 		//! value is added to min and subtracted from max
-		public void Contract(int nRadius) {
+		public void Contract(in int nRadius) {
 			Min.x += nRadius;
 			Min.y += nRadius;
 			Min.z += nRadius;
@@ -132,7 +134,7 @@ namespace RNumerics
 			Max.z -= nRadius;
 		}
 
-		public void Scale(int sx, int sy, int sz) {
+		public void Scale(in int sx, in int sy, in int sz) {
 			var c = Center;
 			var e = Extents;
 			e.x *= sx;
@@ -142,7 +144,7 @@ namespace RNumerics
 			Max = new Vector3i(c.x + e.x, c.y + e.y, c.z + e.z);
 		}
 
-		public void Contain(Vector3i v) {
+		public void Contain(in Vector3i v) {
 			Min.x = Math.Min(Min.x, v.x);
 			Min.y = Math.Min(Min.y, v.y);
 			Min.z = Math.Min(Min.z, v.z);
@@ -151,7 +153,7 @@ namespace RNumerics
 			Max.z = Math.Max(Max.z, v.z);
 		}
 
-		public void Contain(AxisAlignedBox3i box) {
+		public void Contain(in AxisAlignedBox3i box) {
 			Min.x = Math.Min(Min.x, box.Min.x);
 			Min.y = Math.Min(Min.y, box.Min.y);
 			Min.z = Math.Min(Min.z, box.Min.z);
@@ -161,7 +163,7 @@ namespace RNumerics
 		}
 
 
-		public void Contain(Vector3d v) {
+		public void Contain(in Vector3d v) {
 			Min.x = Math.Min(Min.x, (int)v.x);
 			Min.y = Math.Min(Min.y, (int)v.y);
 			Min.z = Math.Min(Min.z, (int)v.z);
@@ -170,7 +172,7 @@ namespace RNumerics
 			Max.z = Math.Max(Max.z, (int)v.z);
 		}
 
-		public void Contain(AxisAlignedBox3d box) {
+		public void Contain(in AxisAlignedBox3d box) {
 			Min.x = Math.Min(Min.x, (int)box.Min.x);
 			Min.y = Math.Min(Min.y, (int)box.Min.y);
 			Min.z = Math.Min(Min.z, (int)box.Min.z);
@@ -181,7 +183,7 @@ namespace RNumerics
 		}
 
 
-		public AxisAlignedBox3i Intersect(AxisAlignedBox3i box) {
+		public AxisAlignedBox3i Intersect(in AxisAlignedBox3i box) {
 			var intersect = new AxisAlignedBox3i(
 				Math.Max(Min.x, box.Min.x), Math.Max(Min.y, box.Min.y), Math.Max(Min.z, box.Min.z),
 				Math.Min(Max.x, box.Max.x), Math.Min(Max.y, box.Max.y), Math.Min(Max.z, box.Max.z));
@@ -190,29 +192,29 @@ namespace RNumerics
 
 
 
-		public bool Contains(Vector3i v) {
+		public bool Contains(in Vector3i v) {
 			return (Min.x <= v.x) && (Min.y <= v.y) && (Min.z <= v.z)
 				&& (Max.x >= v.x) && (Max.y >= v.y) && (Max.z >= v.z);
 		}
-		public bool Intersects(AxisAlignedBox3i box) {
+		public bool Intersects(in AxisAlignedBox3i box) {
 			return !((box.Max.x <= Min.x) || (box.Min.x >= Max.x)
 				|| (box.Max.y <= Min.y) || (box.Min.y >= Max.y)
 				|| (box.Max.z <= Min.z) || (box.Min.z >= Max.z));
 		}
 
 
-		public double DistanceSquared(Vector3i v) {
+		public double DistanceSquared(in Vector3i v) {
 			var dx = (v.x < Min.x) ? Min.x - v.x : (v.x > Max.x ? v.x - Max.x : 0);
 			var dy = (v.y < Min.y) ? Min.y - v.y : (v.y > Max.y ? v.y - Max.y : 0);
 			var dz = (v.z < Min.z) ? Min.z - v.z : (v.z > Max.z ? v.z - Max.z : 0);
 			return (dx * dx) + (dy * dy) + (dz * dz);
 		}
-		public int Distance(Vector3i v) {
+		public int Distance(in Vector3i v) {
 			return (int)Math.Sqrt(DistanceSquared(v));
 		}
 
 
-		public Vector3i NearestPoint(Vector3i v) {
+		public Vector3i NearestPoint(in Vector3i v) {
 			var x = (v.x < Min.x) ? Min.x : (v.x > Max.x ? Max.x : v.x);
 			var y = (v.y < Min.y) ? Min.y : (v.y > Max.y ? Max.y : v.y);
 			var z = (v.z < Min.z) ? Min.z : (v.z > Max.z ? Max.z : v.z);
@@ -223,7 +225,7 @@ namespace RNumerics
 		/// <summary>
 		/// Clamp v to grid bounds [min, max]
 		/// </summary>
-		public Vector3i ClampInclusive(Vector3i v) {
+		public Vector3i ClampInclusive(in Vector3i v) {
 			return new Vector3i(
 				MathUtil.Clamp(v.x, Min.x, Max.x),
 				MathUtil.Clamp(v.y, Min.y, Max.y),
@@ -233,7 +235,7 @@ namespace RNumerics
 		/// <summary>
 		/// clamp v to grid bounds [min,max)
 		/// </summary>
-		public Vector3i ClampExclusive(Vector3i v) {
+		public Vector3i ClampExclusive(in Vector3i v) {
 			return new Vector3i(
 				MathUtil.Clamp(v.x, Min.x, Max.x - 1),
 				MathUtil.Clamp(v.y, Min.y, Max.y - 1),
@@ -243,18 +245,18 @@ namespace RNumerics
 
 
 		//! relative translation
-		public void Translate(Vector3i vTranslate) {
+		public void Translate(in Vector3i vTranslate) {
 			Min.Add(vTranslate);
 			Max.Add(vTranslate);
 		}
 
-		public void MoveMin(Vector3i vNewMin) {
+		public void MoveMin(in Vector3i vNewMin) {
 			Max.x = vNewMin.x + (Max.x - Min.x);
 			Max.y = vNewMin.y + (Max.y - Min.y);
 			Max.z = vNewMin.z + (Max.z - Min.z);
 			Min.Set(vNewMin);
 		}
-		public void MoveMin(int fNewX, int fNewY, int fNewZ) {
+		public void MoveMin(in int fNewX, in int fNewY, in int fNewZ) {
 			Max.x = fNewX + (Max.x - Min.x);
 			Max.y = fNewY + (Max.y - Min.y);
 			Max.z = fNewZ + (Max.z - Min.z);

@@ -11,7 +11,7 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World
+	public sealed partial class World
 	{
 		private readonly ConcurrentDictionary<NetPointer, IWorldObject> _worldObjects = new();
 

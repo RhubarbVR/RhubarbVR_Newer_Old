@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "Interaction" })]
-	public class GrabbableHolder : Component
+	public sealed class GrabbableHolder : Component
 	{
 		public readonly SyncRef<Entity> holder;
 

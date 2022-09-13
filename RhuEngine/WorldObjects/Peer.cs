@@ -13,7 +13,7 @@ using SharedModels.GameSpecific;
 
 namespace RhuEngine.WorldObjects
 {
-	public class RelayPeer
+	public sealed class RelayPeer
 	{
 		public int latency = 0;
 		public NetPeer NetPeer { get; private set; }
@@ -48,7 +48,7 @@ namespace RhuEngine.WorldObjects
 		}
 	}
 
-	public class Peer
+	public sealed class Peer
 	{
 		public User User { get; set; }
 		public Guid UserID { get;private set; }

@@ -7,7 +7,7 @@ namespace RhuEngine.Components
 	[GenericTypeConstraint()]
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Math" })]
-	public class Wobbler<T> : Component where T : struct
+	public sealed class Wobbler<T> : Component where T : struct
 	{
 		public readonly Linker<T> driver;
 		public readonly Sync<T> speed;

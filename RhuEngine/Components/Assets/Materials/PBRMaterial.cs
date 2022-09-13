@@ -9,7 +9,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Materials" })]
-	public class PBRMaterial : MaterialBase<IPBRMaterial>
+	public sealed class PBRMaterial : MaterialBase<IPBRMaterial>
 	{
 		[Default(BasicRenderMode.Opaque)]
 		[OnChanged(nameof(RenderModeChanged))]

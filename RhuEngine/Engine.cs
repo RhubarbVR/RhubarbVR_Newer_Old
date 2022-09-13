@@ -23,7 +23,7 @@ namespace RhuEngine
 		public RhuException(string data):base(data) { }
 	}
 
-	public class Engine : IDisposable
+	public sealed class Engine : IDisposable
 	{
 		public void DragAndDropAction(List<string> files) {
 			DragAndDrop?.Invoke(files);

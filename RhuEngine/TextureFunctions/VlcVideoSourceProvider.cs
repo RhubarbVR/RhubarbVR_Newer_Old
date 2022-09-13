@@ -12,7 +12,7 @@ using LibVLCSharp.Shared;
 using NAudio.Wave;
 namespace RhuEngine.VLC
 {
-	public class VlcVideoSourceProvider : INotifyPropertyChanged, IDisposable
+	public sealed class VlcVideoSourceProvider : INotifyPropertyChanged, IDisposable
 	{
 		public VlcVideoSourceProvider() {
 			VideoSource = new RTexture2D(TexType.Dynamic, TexFormat.Rgba32Linear);
@@ -189,7 +189,7 @@ namespace RhuEngine.VLC
 		/// Disposes the control.
 		/// </summary>
 		/// <param name="disposing">The parameter is not used.</param>
-		protected virtual void Dispose(bool disposing) {
+		private void Dispose(bool disposing) {
 			if (!_disposedValue) {
 				_disposedValue = true;
 				MediaPlayer?.Dispose();
@@ -214,7 +214,7 @@ namespace RhuEngine.VLC
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		protected virtual void OnPropertyChanged(string propertyName) {
+		private void OnPropertyChanged(string propertyName) {
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 	}

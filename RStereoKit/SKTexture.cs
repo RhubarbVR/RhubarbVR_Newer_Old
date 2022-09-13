@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace RStereoKit
 {
-	public class SKTexture2d : IRTexture2D
+	public sealed class SKTexture2d : IRTexture2D
 	{
 		public RTexture2D White { get; set; } = new RTexture2D(Tex.White);
 

@@ -9,7 +9,7 @@ namespace RNumerics
 	// 2D Biarc fitting ported from http://www.ryanjuckett.com/programming/biarc-interpolation/
 	//
 	//
-	public class BiArcFit2
+	public sealed class BiArcFit2
 	{
 		public Vector2d Point1;
 		public Vector2d Point2;
@@ -32,7 +32,7 @@ namespace RNumerics
 
 
 		// compute standard biarc fit with d1==d2
-		public BiArcFit2(Vector2d point1, Vector2d tangent1, Vector2d point2, Vector2d tangent2) {
+		public BiArcFit2(in Vector2d point1, in Vector2d tangent1, in Vector2d point2, in Vector2d tangent2) {
 			Point1 = point1;
 			Tangent1 = tangent1;
 			Point2 = point2;
@@ -46,7 +46,7 @@ namespace RNumerics
 		// strategy is to compute the default fit first (d1==d2), then it seems like d1 can safely be in
 		// the range [0,2*first_d1]. This will vary the length of the two arcs, and for some d1 you
 		// will almost always get a better fit.
-		public BiArcFit2(Vector2d point1, Vector2d tangent1, Vector2d point2, Vector2d tangent2, double d1) {
+		public BiArcFit2(in Vector2d point1, in Vector2d tangent1, in Vector2d point2, in Vector2d tangent2, in double d1) {
 			Point1 = point1;
 			Tangent1 = tangent1;
 			Point2 = point2;
@@ -78,14 +78,14 @@ namespace RNumerics
 
 
 
-		public double Distance(Vector2d point) {
+		public double Distance(in Vector2d point) {
 			var d0 = Arc1IsSegment ?
 				Math.Sqrt(Segment1.DistanceSquared(point)) : Arc1.Distance(point);
 			var d1 = Arc2IsSegment ?
 				Math.Sqrt(Segment2.DistanceSquared(point)) : Arc2.Distance(point);
 			return Math.Min(d0, d1);
 		}
-		public Vector2d NearestPoint(Vector2d point) {
+		public Vector2d NearestPoint(in Vector2d point) {
 			var n1 = Arc1IsSegment ?
 				Segment1.NearestPoint(point) : Arc1.NearestPoint(point);
 			var n2 = Arc2IsSegment ?
@@ -116,7 +116,7 @@ namespace RNumerics
 			public Vector2d P0;
 			public Vector2d P1;
 
-			public Arc(Vector2d c, double r, double startR, double endR, bool posRotation) {
+			public Arc(in Vector2d c, in double r, in double startR, in double endR, in bool posRotation) {
 				Center = c;
 				Radius = r;
 				AngleStartR = startR;
@@ -126,7 +126,7 @@ namespace RNumerics
 				P0 = P1 = Vector2d.Zero;
 			}
 
-			public Arc(Vector2d p0, Vector2d p1) {
+			public Arc(in Vector2d p0, in Vector2d p1) {
 				Center = Vector2d.Zero;
 				Radius = AngleStartR = AngleEndR = 0;
 				PositiveRotation = false;
@@ -139,7 +139,7 @@ namespace RNumerics
 		Arc _arc1;
 		Arc _arc2;
 
-		void Set_arc(int i, Arc a) {
+		void Set_arc(in int i, in Arc a) {
 			if (i == 0) {
 				_arc1 = a;
 			}
@@ -149,7 +149,7 @@ namespace RNumerics
 		}
 
 
-		Arc2d Get_arc(int i) {
+		Arc2d Get_arc(in int i) {
 			var a = (i == 0) ? _arc1 : _arc2;
 			var start_deg = a.AngleStartR * MathUtil.RAD_2_DEG;
 			var end_deg = a.AngleEndR * MathUtil.RAD_2_DEG;
@@ -261,7 +261,7 @@ namespace RNumerics
 		// This is a variant of Fit() where the d1 value is specified.
 		// Note: has not been tested extensively, particularly the special case
 		// where one of the arcs beomes a semi-circle...
-		void Fit(double d1) {
+		void Fit(in double d1) {
 
 			var p1 = Point1;
 			var p2 = Point2;
@@ -320,7 +320,7 @@ namespace RNumerics
 
 
 
-		void SetArcFromEdge(int i, Vector2d p1, Vector2d t1, Vector2d p2, bool fromP1) {
+		void SetArcFromEdge(in int i, in Vector2d p1, in Vector2d t1, in Vector2d p2, in bool fromP1) {
 			var chord = p2 - p1;
 			var n1 = new Vector2d(-t1.y, t1.x);
 			var chordDotN1 = chord.Dot(n1);

@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Transform" })]
-	public class UserBodyNodeTransform : Component
+	public sealed class UserBodyNodeTransform : Component
 	{
 		public readonly Linker<Vector3f> Pos;
 

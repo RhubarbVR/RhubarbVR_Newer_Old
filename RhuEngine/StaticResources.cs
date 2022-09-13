@@ -8,7 +8,7 @@ using SixLabors.Fonts;
 
 namespace RhuEngine
 {
-	public class StaticResources {
+	public sealed class StaticResources {
 		public static Stream GetStaticResourceStream(string name) {
 			return Assembly.GetCallingAssembly().GetManifestResourceStream("RhuEngine.Res." + name);
 		}

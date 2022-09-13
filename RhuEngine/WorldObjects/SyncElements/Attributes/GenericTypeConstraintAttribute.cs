@@ -6,7 +6,7 @@ namespace RhuEngine.WorldObjects
 		None,
 		Serializable,
 	}
-	public class GenericTypeConstraintAttribute : Attribute
+	public sealed class GenericTypeConstraintAttribute : Attribute
 	{
 		public Type[] Data { get; private set; }
 

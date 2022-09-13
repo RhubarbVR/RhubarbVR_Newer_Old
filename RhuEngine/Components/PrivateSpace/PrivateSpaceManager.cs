@@ -17,7 +17,7 @@ namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public class PrivateSpaceManager : Component
+	public sealed class PrivateSpaceManager : Component
 	{
 		[NoSave]
 		[NoSync]

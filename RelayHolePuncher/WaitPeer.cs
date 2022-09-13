@@ -3,7 +3,7 @@ using System.Net;
 
 namespace RelayHolePuncher
 {
-	public class WaitPeer
+	public sealed class WaitPeer
 	{
 		public IPEndPoint InternalAddr { get; }
 		public IPEndPoint ExternalAddr { get; }

@@ -14,7 +14,7 @@ using RhubarbCloudClient.Model;
 
 namespace RhubarbCloudClient
 {
-	public partial class RhubarbAPIClient : IDisposable
+	public sealed partial class RhubarbAPIClient : IDisposable
 	{
 		public bool _isOnline = false;
 

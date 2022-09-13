@@ -56,7 +56,7 @@ namespace RNumerics
 	// VERSION: 1.0.1
 	// https://github.com/Auburn/FastNoise
 
-	public class FastNoiseLite
+	public sealed class FastNoiseLite
 	{
 		private const short INLINE = 256; // MethodImplOptions.AggressiveInlining;
 		private const short OPTIMISE = 512; // MethodImplOptions.AggressiveOptimization;
@@ -148,7 +148,7 @@ namespace RNumerics
 		/// <summary>
 		/// Create new FastNoise object with optional seed
 		/// </summary>
-		public FastNoiseLite(int seed = 1337) {
+		public FastNoiseLite(in int seed = 1337) {
 			SetSeed(seed);
 		}
 
@@ -158,7 +158,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: 1337
 		/// </remarks>
-		public void SetSeed(int seed) { _mSeed = seed; }
+		public void SetSeed(in int seed) { _mSeed = seed; }
 
 		/// <summary>
 		/// Sets frequency for all noise types
@@ -166,7 +166,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: 0.01
 		/// </remarks>
-		public void SetFrequency(float frequency) { _mFrequency = frequency; }
+		public void SetFrequency(in float frequency) { _mFrequency = frequency; }
 
 		/// <summary>
 		/// Sets noise algorithm used for GetNoise(...)
@@ -174,7 +174,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: OpenSimplex2
 		/// </remarks>
-		public void SetNoiseType(NoiseType noiseType) {
+		public void SetNoiseType(in NoiseType noiseType) {
 			_mNoiseType = noiseType;
 			UpdateTransformType3D();
 		}
@@ -186,7 +186,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: None
 		/// </remarks>
-		public void SetRotationType3D(RotationType3D rotationType3D) {
+		public void SetRotationType3D(in RotationType3D rotationType3D) {
 			_mRotationType3D = rotationType3D;
 			UpdateTransformType3D();
 			UpdateWarpTransformType3D();
@@ -199,7 +199,7 @@ namespace RNumerics
 		/// Default: None
 		/// Note: FractalType.DomainWarp... only affects DomainWarp(...)
 		/// </remarks>
-		public void SetFractalType(FractalType fractalType) { _mFractalType = fractalType; }
+		public void SetFractalType(in FractalType fractalType) { _mFractalType = fractalType; }
 
 		/// <summary>
 		/// Sets octave count for all fractal noise types 
@@ -207,7 +207,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: 3
 		/// </remarks>
-		public void SetFractalOctaves(int octaves) {
+		public void SetFractalOctaves(in int octaves) {
 			_mOctaves = octaves;
 			CalculateFractalBounding();
 		}
@@ -218,7 +218,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: 2.0
 		/// </remarks>
-		public void SetFractalLacunarity(float lacunarity) { _mLacunarity = lacunarity; }
+		public void SetFractalLacunarity(in float lacunarity) { _mLacunarity = lacunarity; }
 
 		/// <summary>
 		/// Sets octave gain for all fractal noise types
@@ -226,7 +226,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: 0.5
 		/// </remarks>
-		public void SetFractalGain(float gain) {
+		public void SetFractalGain(in float gain) {
 			_mGain = gain;
 			CalculateFractalBounding();
 		}
@@ -238,7 +238,7 @@ namespace RNumerics
 		/// Default: 0.0
 		/// Note: Keep between 0...1 to maintain -1...1 output bounding
 		/// </remarks>
-		public void SetFractalWeightedStrength(float weightedStrength) { _mWeightedStrength = weightedStrength; }
+		public void SetFractalWeightedStrength(in float weightedStrength) { _mWeightedStrength = weightedStrength; }
 
 		/// <summary>
 		/// Sets strength of the fractal ping pong effect
@@ -246,7 +246,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: 2.0
 		/// </remarks>
-		public void SetFractalPingPongStrength(float pingPongStrength) { _mPingPongStrength = pingPongStrength; }
+		public void SetFractalPingPongStrength(in float pingPongStrength) { _mPingPongStrength = pingPongStrength; }
 
 
 		/// <summary>
@@ -255,7 +255,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: Distance
 		/// </remarks>
-		public void SetCellularDistanceFunction(CellularDistanceFunction cellularDistanceFunction) { _mCellularDistanceFunction = cellularDistanceFunction; }
+		public void SetCellularDistanceFunction(in CellularDistanceFunction cellularDistanceFunction) { _mCellularDistanceFunction = cellularDistanceFunction; }
 
 		/// <summary>
 		/// Sets return type from cellular noise calculations
@@ -263,7 +263,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: EuclideanSq
 		/// </remarks>
-		public void SetCellularReturnType(CellularReturnType cellularReturnType) { _mCellularReturnType = cellularReturnType; }
+		public void SetCellularReturnType(in CellularReturnType cellularReturnType) { _mCellularReturnType = cellularReturnType; }
 
 		/// <summary>
 		/// Sets the maximum distance a cellular point can move from it's grid position
@@ -272,7 +272,7 @@ namespace RNumerics
 		/// Default: 1.0
 		/// Note: Setting this higher than 1 will cause artifacts
 		/// </remarks> 
-		public void SetCellularJitter(float cellularJitter) { _mCellularJitterModifier = cellularJitter; }
+		public void SetCellularJitter(in float cellularJitter) { _mCellularJitterModifier = cellularJitter; }
 
 
 		/// <summary>
@@ -281,7 +281,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: OpenSimplex2
 		/// </remarks>
-		public void SetDomainWarpType(DomainWarpType domainWarpType) {
+		public void SetDomainWarpType(in DomainWarpType domainWarpType) {
 			_mDomainWarpType = domainWarpType;
 			UpdateWarpTransformType3D();
 		}
@@ -293,7 +293,7 @@ namespace RNumerics
 		/// <remarks>
 		/// Default: 1.0
 		/// </remarks>
-		public void SetDomainWarpAmp(float domainWarpAmp) { _mDomainWarpAmp = domainWarpAmp; }
+		public void SetDomainWarpAmp(in float domainWarpAmp) { _mDomainWarpAmp = domainWarpAmp; }
 
 
 		/// <summary>
@@ -303,7 +303,7 @@ namespace RNumerics
 		/// Noise output bounded between -1...1
 		/// </returns>
 		[MethodImpl(OPTIMISE)]
-		public float GetNoise(FNLfloat x, FNLfloat y) {
+		public float GetNoise(ref FNLfloat x, ref FNLfloat y) {
 			TransformNoiseCoordinate(ref x, ref y);
 
 			return _mFractalType switch {
@@ -321,7 +321,7 @@ namespace RNumerics
 		/// Noise output bounded between -1...1
 		/// </returns>
 		[MethodImpl(OPTIMISE)]
-		public float GetNoise(FNLfloat x, FNLfloat y, FNLfloat z) {
+		public float GetNoise(ref FNLfloat x, ref FNLfloat y, ref FNLfloat z) {
 			TransformNoiseCoordinate(ref x, ref y, ref z);
 
 			return _mFractalType switch {
@@ -510,34 +510,34 @@ namespace RNumerics
 
 
 		[MethodImpl(INLINE)]
-		private static float FastMin(float a, float b) { return a < b ? a : b; }
+		private static float FastMin(in float a, in float b) { return a < b ? a : b; }
 
 		[MethodImpl(INLINE)]
-		private static float FastMax(float a, float b) { return a > b ? a : b; }
+		private static float FastMax(in float a, in float b) { return a > b ? a : b; }
 
 		[MethodImpl(INLINE)]
-		private static float FastAbs(float f) { return f < 0 ? -f : f; }
+		private static float FastAbs(in float f) { return f < 0 ? -f : f; }
 
 		[MethodImpl(INLINE)]
-		private static float FastSqrt(float f) { return (float)Math.Sqrt(f); }
+		private static float FastSqrt(in float f) { return (float)Math.Sqrt(f); }
 
 		[MethodImpl(INLINE)]
-		private static int FastFloor(FNLfloat f) { return f >= 0 ? (int)f : (int)f - 1; }
+		private static int FastFloor(in FNLfloat f) { return f >= 0 ? (int)f : (int)f - 1; }
 
 		[MethodImpl(INLINE)]
-		private static int FastRound(FNLfloat f) { return f >= 0 ? (int)(f + 0.5f) : (int)(f - 0.5f); }
+		private static int FastRound(in FNLfloat f) { return f >= 0 ? (int)(f + 0.5f) : (int)(f - 0.5f); }
 
 		[MethodImpl(INLINE)]
-		private static float Lerp(float a, float b, float t) { return a + (t * (b - a)); }
+		private static float Lerp(in float a, in float b, in float t) { return a + (t * (b - a)); }
 
 		[MethodImpl(INLINE)]
-		private static float InterpHermite(float t) { return t * t * (3 - (2 * t)); }
+		private static float InterpHermite(in float t) { return t * t * (3 - (2 * t)); }
 
 		[MethodImpl(INLINE)]
-		private static float InterpQuintic(float t) { return t * t * t * ((t * ((t * 6) - 15)) + 10); }
+		private static float InterpQuintic(in float t) { return t * t * t * ((t * ((t * 6) - 15)) + 10); }
 
 		[MethodImpl(INLINE)]
-		private static float CubicLerp(float a, float b, float c, float d, float t) {
+		private static float CubicLerp(in float a, in float b, in float c, in float d, in float t) {
 			var p = d - c - (a - b);
 			return (t * t * t * p) + (t * t * (a - b - p)) + (t * (c - a)) + b;
 		}
@@ -565,7 +565,7 @@ namespace RNumerics
 		private const int PRIME_Z = 1720413743;
 
 		[MethodImpl(INLINE)]
-		private static int Hash(int seed, int xPrimed, int yPrimed) {
+		private static int Hash(in int seed, in int xPrimed, in int yPrimed) {
 			var hash = seed ^ xPrimed ^ yPrimed;
 
 			hash *= 0x27d4eb2d;
@@ -573,7 +573,7 @@ namespace RNumerics
 		}
 
 		[MethodImpl(INLINE)]
-		private static int Hash(int seed, int xPrimed, int yPrimed, int zPrimed) {
+		private static int Hash(in int seed, in int xPrimed, in int yPrimed, in int zPrimed) {
 			var hash = seed ^ xPrimed ^ yPrimed ^ zPrimed;
 
 			hash *= 0x27d4eb2d;
@@ -581,7 +581,7 @@ namespace RNumerics
 		}
 
 		[MethodImpl(INLINE)]
-		private static float ValCoord(int seed, int xPrimed, int yPrimed) {
+		private static float ValCoord(in int seed, in int xPrimed, in int yPrimed) {
 			var hash = Hash(seed, xPrimed, yPrimed);
 
 			hash *= hash;
@@ -590,7 +590,7 @@ namespace RNumerics
 		}
 
 		[MethodImpl(INLINE)]
-		private static float ValCoord(int seed, int xPrimed, int yPrimed, int zPrimed) {
+		private static float ValCoord(in int seed, in int xPrimed, in int yPrimed, in int zPrimed) {
 			var hash = Hash(seed, xPrimed, yPrimed, zPrimed);
 
 			hash *= hash;
@@ -599,7 +599,7 @@ namespace RNumerics
 		}
 
 		[MethodImpl(INLINE)]
-		private static float GradCoord(int seed, int xPrimed, int yPrimed, float xd, float yd) {
+		private static float GradCoord(in int seed, in int xPrimed, in int yPrimed, in float xd, in float yd) {
 			var hash = Hash(seed, xPrimed, yPrimed);
 			hash ^= hash >> 15;
 			hash &= 127 << 1;
@@ -611,7 +611,7 @@ namespace RNumerics
 		}
 
 		[MethodImpl(INLINE)]
-		private static float GradCoord(int seed, int xPrimed, int yPrimed, int zPrimed, float xd, float yd, float zd) {
+		private static float GradCoord(in int seed, in int xPrimed, in int yPrimed, in int zPrimed, in float xd, in float yd, in float zd) {
 			var hash = Hash(seed, xPrimed, yPrimed, zPrimed);
 			hash ^= hash >> 15;
 			hash &= 63 << 2;
@@ -624,7 +624,7 @@ namespace RNumerics
 		}
 
 		[MethodImpl(INLINE)]
-		private static void GradCoordOut(int seed, int xPrimed, int yPrimed, out float xo, out float yo) {
+		private static void GradCoordOut(in int seed, in int xPrimed, in int yPrimed, out float xo, out float yo) {
 			var hash = Hash(seed, xPrimed, yPrimed) & (255 << 1);
 
 			xo = _randVecs2D[hash];
@@ -632,7 +632,7 @@ namespace RNumerics
 		}
 
 		[MethodImpl(INLINE)]
-		private static void GradCoordOut(int seed, int xPrimed, int yPrimed, int zPrimed, out float xo, out float yo, out float zo) {
+		private static void GradCoordOut(in int seed, in int xPrimed, in int yPrimed, in int zPrimed, out float xo, out float yo, out float zo) {
 			var hash = Hash(seed, xPrimed, yPrimed, zPrimed) & (255 << 2);
 
 			xo = _randVecs3D[hash];
@@ -641,7 +641,7 @@ namespace RNumerics
 		}
 
 		[MethodImpl(INLINE)]
-		private static void GradCoordDual(int seed, int xPrimed, int yPrimed, float xd, float yd, out float xo, out float yo) {
+		private static void GradCoordDual(in int seed, in int xPrimed, in int yPrimed, in float xd, in float yd, out float xo, out float yo) {
 			var hash = Hash(seed, xPrimed, yPrimed);
 			var index1 = hash & (127 << 1);
 			var index2 = (hash >> 7) & (255 << 1);
@@ -658,7 +658,7 @@ namespace RNumerics
 		}
 
 		[MethodImpl(INLINE)]
-		private static void GradCoordDual(int seed, int xPrimed, int yPrimed, int zPrimed, float xd, float yd, float zd, out float xo, out float yo, out float zo) {
+		private static void GradCoordDual(in int seed, in int xPrimed, in int yPrimed, in int zPrimed, in float xd, in float yd, in float zd, out float xo, out float yo, out float zo) {
 			var hash = Hash(seed, xPrimed, yPrimed, zPrimed);
 			var index1 = hash & (63 << 2);
 			var index2 = (hash >> 6) & (255 << 2);
@@ -680,7 +680,7 @@ namespace RNumerics
 
 		// Generic noise gen
 
-		private float GenNoiseSingle(int seed, FNLfloat x, FNLfloat y) {
+		private float GenNoiseSingle(in int seed, in FNLfloat x, in FNLfloat y) {
 			return _mNoiseType switch {
 				NoiseType.OpenSimplex2 => SingleSimplex(seed, x, y),
 				NoiseType.OpenSimplex2S => SingleOpenSimplex2S(seed, x, y),
@@ -692,7 +692,7 @@ namespace RNumerics
 			};
 		}
 
-		private float GenNoiseSingle(int seed, FNLfloat x, FNLfloat y, FNLfloat z) {
+		private float GenNoiseSingle(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
 			return _mNoiseType switch {
 				NoiseType.OpenSimplex2 => SingleOpenSimplex2(seed, x, y, z),
 				NoiseType.OpenSimplex2S => SingleOpenSimplex2S(seed, x, y, z),
@@ -964,7 +964,7 @@ namespace RNumerics
 
 		// Simplex/OpenSimplex2 Noise
 
-		private float SingleSimplex(int seed, FNLfloat x, FNLfloat y) {
+		private float SingleSimplex(in int seed, in FNLfloat x, in FNLfloat y) {
 			// 2D OpenSimplex2 case uses the same algorithm as ordinary Simplex.
 
 			const float SQRT3 = 1.7320508075688772935274463415059f;
@@ -1020,7 +1020,7 @@ namespace RNumerics
 			return (n0 + n1 + n2) * 99.83685446303647f;
 		}
 
-		private float SingleOpenSimplex2(int seed, FNLfloat x, FNLfloat y, FNLfloat z) {
+		private float SingleOpenSimplex2(int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
 			// 3D OpenSimplex2 case uses two offset rotated cube grids.
 
 			/*
@@ -1110,7 +1110,7 @@ namespace RNumerics
 
 		// OpenSimplex2S Noise
 
-		private float SingleOpenSimplex2S(int seed, FNLfloat x, FNLfloat y) {
+		private float SingleOpenSimplex2S(in int seed, in FNLfloat x, in FNLfloat y) {
 			// 2D OpenSimplex2S case is a modified 2D simplex noise.
 
 			const FNLfloat SQRT3 = (FNLfloat)1.7320508075688772935274463415059;
@@ -1221,7 +1221,7 @@ namespace RNumerics
 			return value * 18.24196194486065f;
 		}
 
-		private float SingleOpenSimplex2S(int seed, FNLfloat x, FNLfloat y, FNLfloat z) {
+		private float SingleOpenSimplex2S(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
 			// 3D OpenSimplex2S case uses two offset rotated cube grids.
 
 			/*
@@ -1397,7 +1397,7 @@ namespace RNumerics
 
 		// Cellular Noise
 
-		private float SingleCellular(int seed, FNLfloat x, FNLfloat y) {
+		private float SingleCellular(in int seed, in FNLfloat x, in FNLfloat y) {
 			var xr = FastRound(x);
 			var yr = FastRound(y);
 
@@ -1504,7 +1504,7 @@ namespace RNumerics
 			};
 		}
 
-		private float SingleCellular(int seed, FNLfloat x, FNLfloat y, FNLfloat z) {
+		private float SingleCellular(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
 			var xr = FastRound(x);
 			var yr = FastRound(y);
 			var zr = FastRound(z);
@@ -1635,7 +1635,7 @@ namespace RNumerics
 
 		// Perlin Noise
 
-		private float SinglePerlin(int seed, FNLfloat x, FNLfloat y) {
+		private float SinglePerlin(in int seed, in FNLfloat x, in FNLfloat y) {
 			var x0 = FastFloor(x);
 			var y0 = FastFloor(y);
 
@@ -1658,7 +1658,7 @@ namespace RNumerics
 			return Lerp(xf0, xf1, ys) * 1.4247691104677813f;
 		}
 
-		private float SinglePerlin(int seed, FNLfloat x, FNLfloat y, FNLfloat z) {
+		private float SinglePerlin(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
 			var x0 = FastFloor(x);
 			var y0 = FastFloor(y);
 			var z0 = FastFloor(z);
@@ -1695,7 +1695,7 @@ namespace RNumerics
 
 		// Value Cubic Noise
 
-		private float SingleValueCubic(int seed, FNLfloat x, FNLfloat y) {
+		private float SingleValueCubic(in int seed, in FNLfloat x, in FNLfloat y) {
 			var x1 = FastFloor(x);
 			var y1 = FastFloor(y);
 
@@ -1723,7 +1723,7 @@ namespace RNumerics
 				ys) * (1 / (1.5f * 1.5f));
 		}
 
-		private float SingleValueCubic(int seed, FNLfloat x, FNLfloat y, FNLfloat z) {
+		private float SingleValueCubic(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
 			var x1 = FastFloor(x);
 			var y1 = FastFloor(y);
 			var z1 = FastFloor(z);
@@ -1778,7 +1778,7 @@ namespace RNumerics
 
 		// Value Noise
 
-		private float SingleValue(int seed, FNLfloat x, FNLfloat y) {
+		private float SingleValue(in int seed, in FNLfloat x, in FNLfloat y) {
 			var x0 = FastFloor(x);
 			var y0 = FastFloor(y);
 
@@ -1796,7 +1796,7 @@ namespace RNumerics
 			return Lerp(xf0, xf1, ys);
 		}
 
-		private float SingleValue(int seed, FNLfloat x, FNLfloat y, FNLfloat z) {
+		private float SingleValue(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
 			var x0 = FastFloor(x);
 			var y0 = FastFloor(y);
 			var z0 = FastFloor(z);
@@ -1826,7 +1826,7 @@ namespace RNumerics
 
 		// Domain Warp
 
-		private void DoSingleDomainWarp(int seed, float amp, float freq, FNLfloat x, FNLfloat y, ref FNLfloat xr, ref FNLfloat yr) {
+		private void DoSingleDomainWarp(in int seed, in float amp, in float freq, in FNLfloat x, in FNLfloat y, ref FNLfloat xr, ref FNLfloat yr) {
 			switch (_mDomainWarpType) {
 				case DomainWarpType.OpenSimplex2:
 					SingleDomainWarpSimplexGradient(seed, amp * 38.283687591552734375f, freq, x, y, ref xr, ref yr, false);
@@ -1840,7 +1840,7 @@ namespace RNumerics
 			}
 		}
 
-		private void DoSingleDomainWarp(int seed, float amp, float freq, FNLfloat x, FNLfloat y, FNLfloat z, ref FNLfloat xr, ref FNLfloat yr, ref FNLfloat zr) {
+		private void DoSingleDomainWarp(in int seed, in float amp, in float freq, in FNLfloat x, in FNLfloat y, in FNLfloat z, ref FNLfloat xr, ref FNLfloat yr, ref FNLfloat zr) {
 			switch (_mDomainWarpType) {
 				case DomainWarpType.OpenSimplex2:
 					SingleDomainWarpOpenSimplex2Gradient(seed, amp * 32.69428253173828125f, freq, x, y, z, ref xr, ref yr, ref zr, false);
@@ -1964,7 +1964,7 @@ namespace RNumerics
 
 		// Domain Warp Basic Grid
 
-		private void SingleDomainWarpBasicGrid(int seed, float warpAmp, float frequency, FNLfloat x, FNLfloat y, ref FNLfloat xr, ref FNLfloat yr) {
+		private void SingleDomainWarpBasicGrid(in int seed, in float warpAmp, in float frequency, in FNLfloat x, in FNLfloat y, ref FNLfloat xr, ref FNLfloat yr) {
 			var xf = x * frequency;
 			var yf = y * frequency;
 
@@ -1996,7 +1996,7 @@ namespace RNumerics
 			yr += Lerp(ly0x, ly1x, ys) * warpAmp;
 		}
 
-		private void SingleDomainWarpBasicGrid(int seed, float warpAmp, float frequency, FNLfloat x, FNLfloat y, FNLfloat z, ref FNLfloat xr, ref FNLfloat yr, ref FNLfloat zr) {
+		private void SingleDomainWarpBasicGrid(in int seed, in float warpAmp, in float frequency, in FNLfloat x, in FNLfloat y, in FNLfloat z, ref FNLfloat xr, ref FNLfloat yr, ref FNLfloat zr) {
 			var xf = x * frequency;
 			var yf = y * frequency;
 			var zf = z * frequency;
@@ -2055,7 +2055,7 @@ namespace RNumerics
 
 
 		// Domain Warp Simplex/OpenSimplex2
-		private void SingleDomainWarpSimplexGradient(int seed, float warpAmp, float frequency, FNLfloat x, FNLfloat y, ref FNLfloat xr, ref FNLfloat yr, bool outGradOnly) {
+		private void SingleDomainWarpSimplexGradient(in int seed, in float warpAmp, in float frequency,  FNLfloat x, FNLfloat y, ref FNLfloat xr, ref FNLfloat yr, in bool outGradOnly) {
 			const float SQRT3 = 1.7320508075688772935274463415059f;
 			const float G2 = (3 - SQRT3) / 6;
 
@@ -2157,7 +2157,7 @@ namespace RNumerics
 			yr += vy * warpAmp;
 		}
 
-		private void SingleDomainWarpOpenSimplex2Gradient(int seed, float warpAmp, float frequency, FNLfloat x, FNLfloat y, FNLfloat z, ref FNLfloat xr, ref FNLfloat yr, ref FNLfloat zr, bool outGradOnly) {
+		private void SingleDomainWarpOpenSimplex2Gradient(int seed, in float warpAmp, in float frequency, FNLfloat x, FNLfloat y, FNLfloat z, ref FNLfloat xr, ref FNLfloat yr, ref FNLfloat zr, in bool outGradOnly) {
 			x *= frequency;
 			y *= frequency;
 			z *= frequency;

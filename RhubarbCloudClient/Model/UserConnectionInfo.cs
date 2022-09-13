@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RhubarbCloudClient.Model
 {
-	public class UserConnectionInfo
+	public sealed class UserConnectionInfo
 	{
 		public ConnectionType ConnectionType { get; set; }
 		public Dictionary<string, int> ServerPingLevels { get; set; }

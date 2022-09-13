@@ -11,7 +11,7 @@ namespace RNumerics
 	//
 	// So, it is strongly recommended that this be constructed alongside a GeneralPolygon2d,
 	// which can be used for checking everything.
-	public class PlanarSolid2d
+	public sealed class PlanarSolid2d
 	{
 		//bool bOuterIsCW;
 
@@ -24,13 +24,13 @@ namespace RNumerics
 
 
 		public IParametricCurve2d Outer { get; private set; }
-		public void SetOuter(IParametricCurve2d loop) {
+		public void SetOuter(in IParametricCurve2d loop) {
 			Debug.Assert(loop.IsClosed);
 			Outer = loop;
 		}
 
 
-		public void AddHole(IParametricCurve2d hole)
+		public void AddHole(in IParametricCurve2d hole)
 		{
 			if (Outer == null) {
 				throw new Exception("PlanarSolid2d.AddHole: outer polygon not set!");
@@ -80,7 +80,7 @@ namespace RNumerics
 		/// <summary>
 		/// Resample parametric solid into polygonal solid
 		/// </summary>
-		public GeneralPolygon2d Convert(double fSpacingLength, double fSpacingT, double fDeviationTolerance)
+		public GeneralPolygon2d Convert(in double fSpacingLength, in double fSpacingT, in double fDeviationTolerance)
 		{
 			var poly = new GeneralPolygon2d {
 				Outer = new Polygon2d(

@@ -9,7 +9,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Materials" })]
-	public class UnlitMaterial : MaterialBase<IUnlitMaterial>
+	public sealed class UnlitMaterial : MaterialBase<IUnlitMaterial>
 	{
 		[OnChanged(nameof(TransparencyUpdate))]
 		public readonly Sync<Transparency> Transparency;

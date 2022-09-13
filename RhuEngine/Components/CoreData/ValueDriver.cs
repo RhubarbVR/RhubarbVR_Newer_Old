@@ -7,7 +7,7 @@ namespace RhuEngine.Components
 {
 	[UpdatingComponent]
 	[Category(new string[] { "CoreData" })]
-	public class ValueDriver<T> : Component
+	public sealed class ValueDriver<T> : Component
 	{
 		public readonly Linker<T> driver;
 

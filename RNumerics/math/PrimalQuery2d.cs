@@ -8,12 +8,12 @@ namespace RNumerics
 
 	// Queries about the relation of a point to various geometric objects.  
 	// Ported from https://www.geometrictools.com/GTEngine/Include/Mathematics/GtePrimalQuery2.h
-	class PrimalQuery2d
+	sealed class PrimalQuery2d
 	{
 		readonly Func<int, Vector2d> _pointF;
 
 
-		public PrimalQuery2d(Func<int, Vector2d> PositionFunc) {
+		public PrimalQuery2d(in Func<int, Vector2d> PositionFunc) {
 			_pointF = PositionFunc;
 		}
 
@@ -25,10 +25,10 @@ namespace RNumerics
 		//   +1, P on right of line
 		//   -1, P on left of line
 		//    0, P on the line
-		public int ToLine(int i, int v0, int v1) {
+		public int ToLine(in int i, in int v0, in int v1) {
 			return ToLine(_pointF(i), v0, v1);
 		}
-		public int ToLine(Vector2d test, int v0, int v1) {
+		public int ToLine(in Vector2d test, in int v0, in int v1) {
 			var vec0 = _pointF(v0);
 			var vec1 = _pointF(v1);
 
@@ -57,11 +57,11 @@ namespace RNumerics
 		//   +2, P strictly right of V0 on the line
 		// This is the same as the first-listed ToLine calls because the worst-case
 		// path has the same computational complexity.
-		public int ToLine(int i, int v0, int v1, out int order) {
+		public int ToLine(in int i, in int v0, in int v1, out int order) {
 			return ToLine(_pointF(i), v0, v1, out order);
 
 		}
-		public int ToLine(Vector2d test, int v0, int v1, out int order) {
+		public int ToLine(in Vector2d test, in int v0, in int v1, out int order) {
 			var vec0 = _pointF(v0);
 			var vec1 = _pointF(v1);
 
@@ -110,11 +110,11 @@ namespace RNumerics
 		//    0, P on triangle
 		// The query involves three calls to ToLine, so the numbers match those
 		// of ToLine.
-		public int ToTriangle(int i, int v0, int v1, int v2) {
+		public int ToTriangle(in int i, in int v0, in int v1, in int v2) {
 			return ToTriangle(_pointF(i), v0, v1, v2);
 
 		}
-		public int ToTriangle(Vector2d test, int v0, int v1, int v2) {
+		public int ToTriangle(in Vector2d test, in int v0, in int v1, in int v2) {
 			var sign0 = ToLine(test, v1, v2);
 			if (sign0 > 0) {
 				return +1;
@@ -139,11 +139,11 @@ namespace RNumerics
 		//    0, P on triangle
 		// The query involves three calls to ToLine, so the numbers match those
 		// of ToLine.
-		public int ToTriangleUnsigned(int i, int v0, int v1, int v2) {
+		public int ToTriangleUnsigned(in int i, in int v0, in int v1, in int v2) {
 			return ToTriangleUnsigned(_pointF(i), v0, v1, v2);
 
 		}
-		public int ToTriangleUnsigned(Vector2d test, int v0, int v1, int v2) {
+		public int ToTriangleUnsigned(in Vector2d test, in int v0, in int v1, in int v2) {
 			var sign0 = ToLine(test, v1, v2);
 			var sign1 = ToLine(test, v0, v2);
 			var sign2 = ToLine(test, v0, v1);
@@ -165,10 +165,10 @@ namespace RNumerics
 		//    0, P on circumcircle of triangle
 		// The query involves three calls of ToLine, so the numbers match those
 		// of ToLine.
-		public int ToCircumcircle(int i, int v0, int v1, int v2) {
+		public int ToCircumcircle(in int i, in int v0, in int v1, in int v2) {
 			return ToCircumcircle(_pointF(i), v0, v1, v2);
 		}
-		public int ToCircumcircle(Vector2d test, int v0, int v1, int v2) {
+		public int ToCircumcircle(in Vector2d test, in int v0, in int v1, in int v2) {
 			var vec0 = _pointF(v0);
 			var vec1 = _pointF(v1);
 			var vec2 = _pointF(v2);
@@ -245,7 +245,7 @@ namespace RNumerics
 		//    double     | BSRational   | 1587
 		// This is the same as the first-listed ToLine calls because the worst-case
 		// path has the same computational complexity.
-		public OrderType ToLineExtended(Vector2d P, Vector2d Q0, Vector2d Q1) {
+		public OrderType ToLineExtended(in Vector2d P, in Vector2d Q0, in Vector2d Q1) {
 			const double ZERO = 0.0;
 
 			var x0 = Q1[0] - Q0[0];

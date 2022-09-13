@@ -11,7 +11,7 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World
+	public sealed partial class World
 	{
 		public ushort LocalUserID { get; private set; } = 1;
 

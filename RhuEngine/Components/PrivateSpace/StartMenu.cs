@@ -19,7 +19,7 @@ using System.Reflection;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	public class StartMenu : Component
+	public sealed class StartMenu : Component
 	{
 		[NoLoad]
 		[NoSave]

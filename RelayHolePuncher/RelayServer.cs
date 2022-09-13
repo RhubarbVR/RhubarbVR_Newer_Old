@@ -10,7 +10,7 @@ using SharedModels.GameSpecific;
 
 namespace RelayHolePuncher
 {
-	public class UserConnection
+	public sealed class UserConnection
 	{
 		public ushort index;
 		public NetPeer Peer { get; set; }

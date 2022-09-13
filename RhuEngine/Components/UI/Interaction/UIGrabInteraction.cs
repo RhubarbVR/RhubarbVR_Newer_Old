@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 {
 
 	[Category(new string[] { "UI/Interaction" })]
-	public class UIGrabInteraction : UIInteractionComponent
+	public sealed class UIGrabInteraction : UIInteractionComponent
 	{
 		[Default(0.5f)]
 		public readonly Sync<float> GrabForce;

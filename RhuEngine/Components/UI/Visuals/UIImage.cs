@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/Visuals" })]
-	public class UIImage : RenderUIComponent {
+	public sealed class UIImage : RenderUIComponent {
 		[OnAssetLoaded(nameof(ForceUpdate))]
 		public readonly AssetRef<RTexture2D> Texture;
 

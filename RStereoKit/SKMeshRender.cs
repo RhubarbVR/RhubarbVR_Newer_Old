@@ -14,7 +14,7 @@ using RhuEngine.WorldObjects;
 namespace RStereoKit
 {
 	//NotSupprted
-	public class BasicLight : EngineWorldLinkBase<Light>
+	public sealed class BasicLight : EngineWorldLinkBase<Light>
 	{
 		public override void Init() {
 		}
@@ -32,7 +32,7 @@ namespace RStereoKit
 		}
 	}
 
-	public class SKArmiturer : EngineWorldLinkBase<Armature>
+	public sealed class SKArmiturer : EngineWorldLinkBase<Armature>
 	{
 		public override void Init() {
 		}
@@ -50,7 +50,7 @@ namespace RStereoKit
 		}
 	}
 
-	public class SKTempMeshRender : EngineWorldLinkBase<SkinnedMeshRender>
+	public sealed class SKTempMeshRender : EngineWorldLinkBase<SkinnedMeshRender>
 	{
 		public override void Init() {
 			//Not needed for StereoKit
@@ -82,7 +82,7 @@ namespace RStereoKit
 		}
 	}
 
-	public class SKMeshRender : EngineWorldLinkBase<MeshRender>
+	public sealed class SKMeshRender : EngineWorldLinkBase<MeshRender>
 	{
 		public override void Init() {
 			//Not needed for StereoKit

@@ -8,7 +8,7 @@ using RhuEngine.Linker;
 
 namespace RhuEngine
 {
-	public class OutputCapture : TextWriter, IDisposable
+	public sealed class OutputCapture : TextWriter, IDisposable
 	{
 		public string LogsPath = null;
 

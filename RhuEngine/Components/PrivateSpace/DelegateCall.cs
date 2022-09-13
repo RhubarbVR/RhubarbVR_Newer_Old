@@ -10,7 +10,7 @@ using RNumerics;
 namespace RhuEngine.Components.PrivateSpace
 {
 	[PrivateSpaceOnly]
-	public class DelegateCall:Component
+	public sealed class DelegateCall:Component
 	{
 		public Action action;
 		[Exposed]

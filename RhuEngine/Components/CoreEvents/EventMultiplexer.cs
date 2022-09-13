@@ -8,7 +8,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreEvents" })]
-	public class EventMultiplexer : Component
+	public sealed class EventMultiplexer : Component
 	{
 		public readonly Sync<int> Index;
 

@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class CylinderMesh : ProceduralMesh
+	public sealed class CylinderMesh : ProceduralMesh
 	{
 
 		[Default(1.0f)]

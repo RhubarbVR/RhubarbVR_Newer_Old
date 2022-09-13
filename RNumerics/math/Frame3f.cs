@@ -16,32 +16,37 @@ namespace RNumerics
 		[IgnoreMember]
 		static readonly public Frame3f Identity = new(Vector3f.Zero, Quaternionf.Identity);
 
-		public Frame3f(Frame3f copy) {
+		public Frame3f() {
+			_origin = new Vector3f();
+			_rotation = new Quaternionf();
+		}
+
+		public Frame3f(in Frame3f copy) {
 			_rotation = copy._rotation;
 			_origin = copy._origin;
 		}
 
-		public Frame3f(Vector3f origin) {
+		public Frame3f(in Vector3f origin) {
 			_rotation = Quaternionf.Identity;
 			_origin = origin;
 		}
-		public Frame3f(Vector3d origin) {
+		public Frame3f(in Vector3d origin) {
 			_rotation = Quaternionf.Identity;
 			_origin = (Vector3f)origin;
 		}
 
-		public Frame3f(Vector3f origin, Vector3f setZ) {
+		public Frame3f(in Vector3f origin, in Vector3f setZ) {
 			_rotation = Quaternionf.FromTo(Vector3f.AxisZ, setZ);
 			_origin = origin;
 		}
 
-		public Frame3f(Vector3d origin, Vector3d setZ) {
+		public Frame3f(in Vector3d origin, in Vector3d setZ) {
 			_rotation = Quaternionf.FromTo(Vector3f.AxisZ, (Vector3f)setZ);
 			_origin = (Vector3f)origin;
 		}
 
 
-		public Frame3f(Vector3f origin, Vector3f setAxis, int nAxis) {
+		public Frame3f(in Vector3f origin, in Vector3f setAxis, in int nAxis) {
 			_rotation = nAxis == 0
 				? Quaternionf.FromTo(Vector3f.AxisX, setAxis)
 				: nAxis == 1 ? Quaternionf.FromTo(Vector3f.AxisY, setAxis) : Quaternionf.FromTo(Vector3f.AxisZ, setAxis);
@@ -49,12 +54,12 @@ namespace RNumerics
 			_origin = origin;
 		}
 
-		public Frame3f(Vector3f origin, Quaternionf orientation) {
+		public Frame3f(in Vector3f origin, in Quaternionf orientation) {
 			_rotation = orientation;
 			_origin = origin;
 		}
 
-		public Frame3f(Vector3f origin, Vector3f x, Vector3f y, Vector3f z) {
+		public Frame3f(in Vector3f origin, in Vector3f x, in Vector3f y, in Vector3f z) {
 			_origin = origin;
 			var m = new Matrix3f(x, y, z, false);
 			_rotation = m.ToQuaternion();
@@ -82,7 +87,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public Vector3f Z => _rotation.AxisZ;
 
-		public Vector3f GetAxis(int nAxis) {
+		public Vector3f GetAxis(in int nAxis) {
 			return nAxis == 0
 				? _rotation * Vector3f.AxisX
 				: nAxis == 1
@@ -91,36 +96,36 @@ namespace RNumerics
 		}
 
 
-		public void Translate(Vector3f v) {
+		public void Translate(in Vector3f v) {
 			_origin += v;
 		}
-		public Frame3f Translated(Vector3f v) {
+		public Frame3f Translated(in Vector3f v) {
 			return new Frame3f(_origin + v, _rotation);
 		}
-		public Frame3f Translated(float fDistance, int nAxis) {
+		public Frame3f Translated(in float fDistance, in int nAxis) {
 			return new Frame3f(_origin + (fDistance * GetAxis(nAxis)), _rotation);
 		}
 
-		public void Scale(float f) {
+		public void Scale(in float f) {
 			_origin *= f;
 		}
-		public void Scale(Vector3f scale) {
+		public void Scale(in Vector3f scale) {
 			_origin *= scale;
 		}
-		public Frame3f Scaled(float f) {
+		public Frame3f Scaled(in float f) {
 			return new Frame3f(f * _origin, _rotation);
 		}
-		public Frame3f Scaled(Vector3f scale) {
+		public Frame3f Scaled(in Vector3f scale) {
 			return new Frame3f(scale * _origin, _rotation);
 		}
 
-		public void Rotate(Quaternionf q) {
+		public void Rotate(in Quaternionf q) {
 			_rotation = q * _rotation;
 		}
-		public Frame3f Rotated(Quaternionf q) {
+		public Frame3f Rotated(in Quaternionf q) {
 			return new Frame3f(_origin, q * _rotation);
 		}
-		public Frame3f Rotated(float fAngle, int nAxis) {
+		public Frame3f Rotated(in float fAngle, in int nAxis) {
 			return Rotated(new Quaternionf(GetAxis(nAxis), fAngle));
 		}
 
@@ -129,25 +134,25 @@ namespace RNumerics
 		/// which is what Rotate() does. So, RotateAroundAxis(AxisAngleD(Z,180)) is equivalent
 		/// to Rotate(AxisAngleD(My_AxisZ,180)). 
 		/// </summary>
-		public void RotateAroundAxes(Quaternionf q) {
+		public void RotateAroundAxes(in Quaternionf q) {
 			_rotation *= q;
 		}
 
-		public void RotateAround(Vector3f point, Quaternionf q) {
+		public void RotateAround(in Vector3f point, in Quaternionf q) {
 			var dv = q * (_origin - point);
 			_rotation = q * _rotation;
 			_origin = point + dv;
 		}
-		public Frame3f RotatedAround(Vector3f point, Quaternionf q) {
+		public Frame3f RotatedAround(in Vector3f point, in Quaternionf q) {
 			var dv = q * (_origin - point);
 			return new Frame3f(point + dv, q * _rotation);
 		}
 
-		public void AlignAxis(int nAxis, Vector3f vTo) {
+		public void AlignAxis(in int nAxis, in Vector3f vTo) {
 			var rot = Quaternionf.FromTo(GetAxis(nAxis), vTo);
 			Rotate(rot);
 		}
-		public void ConstrainedAlignAxis(int nAxis, Vector3f vTo, Vector3f vAround) {
+		public void ConstrainedAlignAxis(in int nAxis, in Vector3f vTo, in Vector3f vAround) {
 			var axis = GetAxis(nAxis);
 			var fAngle = MathUtil.PlaneAngleSignedD(axis, vTo, vAround);
 			var rot = Quaternionf.AxisAngleD(vAround, fAngle);
@@ -157,7 +162,7 @@ namespace RNumerics
 		/// <summary>
 		/// 3D projection of point p onto frame-axis plane orthogonal to normal axis
 		/// </summary>
-		public Vector3f ProjectToPlane(Vector3f p, int nNormal) {
+		public Vector3f ProjectToPlane(in Vector3f p, in int nNormal) {
 			var d = p - _origin;
 			var n = GetAxis(nNormal);
 			return _origin + (d - (d.Dot(n) * n));
@@ -167,7 +172,7 @@ namespace RNumerics
 		/// map from 2D coordinates in frame-axes plane perpendicular to normal axis, to 3D
 		/// [TODO] check that mapping preserves orientation?
 		/// </summary>
-		public Vector3f FromPlaneUV(Vector2f v, int nPlaneNormalAxis) {
+		public Vector3f FromPlaneUV(in Vector2f v, in int nPlaneNormalAxis) {
 			var dv = new Vector3f(v[0], v[1], 0);
 			if (nPlaneNormalAxis == 0) {
 				dv[0] = 0;
@@ -185,7 +190,7 @@ namespace RNumerics
 		/// Project p onto plane axes
 		/// [TODO] check that mapping preserves orientation?
 		/// </summary>
-		public Vector2f ToPlaneUV(Vector3f p, int nNormal) {
+		public Vector2f ToPlaneUV(in Vector3f p, in int nNormal) {
 			int nAxis0 = 0, nAxis1 = 1;
 			if (nNormal == 0) {
 				nAxis0 = 2;
@@ -202,53 +207,33 @@ namespace RNumerics
 
 
 		///<summary> distance from p to frame-axes-plane perpendicular to normal axis </summary>
-		public float DistanceToPlane(Vector3f p, int nNormal) {
+		public float DistanceToPlane(in Vector3f p, in int nNormal) {
 			return Math.Abs((p - _origin).Dot(GetAxis(nNormal)));
 		}
 		///<summary> signed distance from p to frame-axes-plane perpendicular to normal axis </summary>
-		public float DistanceToPlaneSigned(Vector3f p, int nNormal) {
+		public float DistanceToPlaneSigned(in Vector3f p, in int nNormal) {
 			return (p - _origin).Dot(GetAxis(nNormal));
 		}
 
 
 		///<summary> Map point *into* local coordinates of Frame </summary>
-		public Vector3f ToFrameP(Vector3f v) {
-			v.x -= _origin.x;
-			v.y -= _origin.y;
-			v.z -= _origin.z;
-			return _rotation.InverseMultiply(ref v);
-		}
-		///<summary> Map point *into* local coordinates of Frame </summary>
-		public Vector3f ToFrameP(ref Vector3f v) {
+		public Vector3f ToFrameP(in Vector3f v) {
 			var x = new Vector3f(v.x - _origin.x, v.y - _origin.y, v.z - _origin.z);
 			return _rotation.InverseMultiply(ref x);
 		}
 		///<summary> Map point *into* local coordinates of Frame </summary>
-		public Vector3d ToFrameP(Vector3d v) {
-			v.x -= _origin.x;
-			v.y -= _origin.y;
-			v.z -= _origin.z;
-			return _rotation.InverseMultiply(ref v);
-		}
-		///<summary> Map point *into* local coordinates of Frame </summary>
-		public Vector3d ToFrameP(ref Vector3d v) {
+		public Vector3d ToFrameP(in Vector3d v) {
 			var x = new Vector3d(v.x - _origin.x, v.y - _origin.y, v.z - _origin.z);
 			return _rotation.InverseMultiply(ref x);
 		}
+
 		/// <summary> Map point *from* local frame coordinates into "world" coordinates </summary>
-		public Vector3f FromFrameP(Vector3f v) {
+		public Vector3f FromFrameP(in Vector3f v) {
 			return (_rotation * v) + _origin;
 		}
+
 		/// <summary> Map point *from* local frame coordinates into "world" coordinates </summary>
-		public Vector3f FromFrameP(ref Vector3f v) {
-			return (_rotation * v) + _origin;
-		}
-		/// <summary> Map point *from* local frame coordinates into "world" coordinates </summary>
-		public Vector3d FromFrameP(Vector3d v) {
-			return (_rotation * v) + _origin;
-		}
-		/// <summary> Map point *from* local frame coordinates into "world" coordinates </summary>
-		public Vector3d FromFrameP(ref Vector3d v) {
+		public Vector3d FromFrameP(in Vector3d v) {
 			return (_rotation * v) + _origin;
 		}
 
@@ -308,43 +293,43 @@ namespace RNumerics
 
 		///<summary> Map ray *into* local coordinates of Frame </summary>
 		public Ray3f ToFrame(Ray3f r) {
-			return new Ray3f(ToFrameP(ref r.Origin), ToFrameV(ref r.Direction));
+			return new Ray3f(ToFrameP(r.Origin), ToFrameV(ref r.Direction));
 		}
 		///<summary> Map ray *into* local coordinates of Frame </summary>
 		public Ray3f ToFrame(ref Ray3f r) {
-			return new Ray3f(ToFrameP(ref r.Origin), ToFrameV(ref r.Direction));
+			return new Ray3f(ToFrameP(r.Origin), ToFrameV(ref r.Direction));
 		}
 		/// <summary> Map ray *from* local frame coordinates into "world" coordinates </summary>
 		public Ray3f FromFrame(Ray3f r) {
-			return new Ray3f(FromFrameP(ref r.Origin), FromFrameV(ref r.Direction));
+			return new Ray3f(FromFrameP(r.Origin), FromFrameV(ref r.Direction));
 		}
 		/// <summary> Map ray *from* local frame coordinates into "world" coordinates </summary>
 		public Ray3f FromFrame(ref Ray3f r) {
-			return new Ray3f(FromFrameP(ref r.Origin), FromFrameV(ref r.Direction));
+			return new Ray3f(FromFrameP(r.Origin), FromFrameV(ref r.Direction));
 		}
 
 
 		///<summary> Map frame *into* local coordinates of Frame </summary>
 		public Frame3f ToFrame(Frame3f f) {
-			return new Frame3f(ToFrameP(ref f._origin), ToFrame(ref f._rotation));
+			return new Frame3f(ToFrameP(f._origin), ToFrame(ref f._rotation));
 		}
 		///<summary> Map frame *into* local coordinates of Frame </summary>
 		public Frame3f ToFrame(ref Frame3f f) {
-			return new Frame3f(ToFrameP(ref f._origin), ToFrame(ref f._rotation));
+			return new Frame3f(ToFrameP(f._origin), ToFrame(ref f._rotation));
 		}
 		/// <summary> Map frame *from* local frame coordinates into "world" coordinates </summary>
 		public Frame3f FromFrame(Frame3f f) {
-			return new Frame3f(FromFrameP(ref f._origin), FromFrame(ref f._rotation));
+			return new Frame3f(FromFrameP(f._origin), FromFrame(ref f._rotation));
 		}
 		/// <summary> Map frame *from* local frame coordinates into "world" coordinates </summary>
 		public Frame3f FromFrame(ref Frame3f f) {
-			return new Frame3f(FromFrameP(ref f._origin), FromFrame(ref f._rotation));
+			return new Frame3f(FromFrameP(f._origin), FromFrame(ref f._rotation));
 		}
 
 
 		///<summary> Map box *into* local coordinates of Frame </summary>
 		public Box3f ToFrame(ref Box3f box) {
-			box.Center = ToFrameP(ref box.Center);
+			box.Center = ToFrameP(box.Center);
 			box.AxisX = ToFrameV(ref box.AxisX);
 			box.AxisY = ToFrameV(ref box.AxisY);
 			box.AxisZ = ToFrameV(ref box.AxisZ);
@@ -352,7 +337,7 @@ namespace RNumerics
 		}
 		/// <summary> Map box *from* local frame coordinates into "world" coordinates </summary>
 		public Box3f FromFrame(ref Box3f box) {
-			box.Center = FromFrameP(ref box.Center);
+			box.Center = FromFrameP(box.Center);
 			box.AxisX = FromFrameV(ref box.AxisX);
 			box.AxisY = FromFrameV(ref box.AxisY);
 			box.AxisZ = FromFrameV(ref box.AxisZ);
@@ -360,7 +345,7 @@ namespace RNumerics
 		}
 		///<summary> Map box *into* local coordinates of Frame </summary>
 		public Box3d ToFrame(ref Box3d box) {
-			box.Center = ToFrameP(ref box.Center);
+			box.Center = ToFrameP(box.Center);
 			box.AxisX = ToFrameV(ref box.AxisX);
 			box.AxisY = ToFrameV(ref box.AxisY);
 			box.AxisZ = ToFrameV(ref box.AxisZ);
@@ -368,7 +353,7 @@ namespace RNumerics
 		}
 		/// <summary> Map box *from* local frame coordinates into "world" coordinates </summary>
 		public Box3d FromFrame(ref Box3d box) {
-			box.Center = FromFrameP(ref box.Center);
+			box.Center = FromFrameP(box.Center);
 			box.AxisX = FromFrameV(ref box.AxisX);
 			box.AxisY = FromFrameV(ref box.AxisY);
 			box.AxisZ = FromFrameV(ref box.AxisZ);
@@ -382,7 +367,7 @@ namespace RNumerics
 		/// If the ray is parallel to the plane, no intersection can be found, and
 		/// we return Vector3f.Invalid
 		/// </summary>
-		public Vector3f RayPlaneIntersection(Vector3f ray_origin, Vector3f ray_direction, int nAxisAsNormal) {
+		public Vector3f RayPlaneIntersection(in Vector3f ray_origin, in Vector3f ray_direction, in int nAxisAsNormal) {
 			var N = GetAxis(nAxisAsNormal);
 			var d = -Vector3f.Dot(Origin, N);
 			var div = Vector3f.Dot(ray_direction, N);
@@ -398,7 +383,7 @@ namespace RNumerics
 		/// <summary>
 		/// Interpolate between two frames - Lerp for origin, Slerp for rotation
 		/// </summary>
-		public static Frame3f Interpolate(Frame3f f1, Frame3f f2, float t) {
+		public static Frame3f Interpolate(in Frame3f f1, in Frame3f f2, in float t) {
 			return new Frame3f(
 				Vector3f.Lerp(f1._origin, f2._origin, t),
 				Quaternionf.Slerp(f1._rotation, f2._rotation, t));
@@ -406,7 +391,7 @@ namespace RNumerics
 
 
 
-		public bool EpsilonEqual(Frame3f f2, float epsilon) {
+		public bool EpsilonEqual(in Frame3f f2, in float epsilon) {
 			return _origin.EpsilonEqual(f2._origin, epsilon) &&
 				_rotation.EpsilonEqual(f2._rotation, epsilon);
 		}
@@ -415,7 +400,7 @@ namespace RNumerics
 		public override string ToString() {
 			return ToString("F4");
 		}
-		public string ToString(string fmt) {
+		public string ToString(in string fmt) {
 			return string.Format("[Frame3f: Origin={0}, X={1}, Y={2}, Z={3}]", Origin.ToString(fmt), X.ToString(fmt), Y.ToString(fmt), Z.ToString(fmt));
 		}
 
@@ -426,7 +411,7 @@ namespace RNumerics
 		//   1) find smallest angle(axis_source, axis_target), considering all sign permutations
 		//   2) rotate source to align axis_source with sign*axis_target
 		//   3) now rotate around alined_axis_source to align second-best pair of axes
-		public static Frame3f SolveMinRotation(Frame3f source, Frame3f target) {
+		public static Frame3f SolveMinRotation(in Frame3f source, in Frame3f target) {
 			int best_i = -1, best_j = -1;
 			double fMaxAbsDot = 0, fMaxSign = 0;
 			for (var i = 0; i < 3; ++i) {

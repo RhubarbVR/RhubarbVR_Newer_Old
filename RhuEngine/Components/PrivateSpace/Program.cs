@@ -16,12 +16,12 @@ using RhuEngine.Components.PrivateSpace;
 
 namespace RhuEngine.Components
 {
-	public class OpenManyAttribute : Attribute
+	public sealed class OpenManyAttribute : Attribute
 	{
 
 	}
 
-	public class RemoveFromProgramListAttribute : Attribute {
+	public sealed class RemoveFromProgramListAttribute : Attribute {
 
 	}
 

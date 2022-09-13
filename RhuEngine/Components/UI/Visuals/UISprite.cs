@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/Visuals" })]
-	public class UISprite : RenderUIComponent
+	public sealed class UISprite : RenderUIComponent
 	{
 		public override RMaterial RenderMaterial => Material.Asset;
 		public override Colorf RenderTint => Tint;

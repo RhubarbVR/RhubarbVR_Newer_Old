@@ -5,7 +5,7 @@ namespace OpusDotNet
 	/// <summary>
 	/// Provides audio encoding with Opus.
 	/// </summary>
-	public class OpusEncoder : IDisposable
+	public sealed class OpusEncoder : IDisposable
 	{
 		private readonly SafeEncoderHandle _handle;
 

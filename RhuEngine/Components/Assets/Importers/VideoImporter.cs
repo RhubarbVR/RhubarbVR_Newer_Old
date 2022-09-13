@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Importers" })]
-	public class VideoImporter : Importer
+	public sealed class VideoImporter : Importer
 	{
 		public static bool IsValidImport(string path) {
 			path = path.ToLower();

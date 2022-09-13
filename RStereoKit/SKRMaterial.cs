@@ -12,7 +12,7 @@ namespace RStereoKit
 {
 	public class StaticMitsManager : IStaticMaterialManager
 	{
-		public class TextMaterial : StaticMaterialBase<Material>, ITextMaterial
+		public sealed class TextMaterial : StaticMaterialBase<Material>, ITextMaterial
 		{
 			public TextMaterial() {
 				UpdateMaterial(StereoKit.Material.Unlit.Copy());
@@ -37,7 +37,7 @@ namespace RStereoKit
 				}
 			}
 		}
-		public class PBRMaterial : StaticMaterialBase<Material>, IPBRMaterial
+		public sealed class PBRMaterial : StaticMaterialBase<Material>, IPBRMaterial
 		{
 			public PBRMaterial() {
 				UpdateMaterial(StereoKit.Material.PBR.Copy());
@@ -258,11 +258,11 @@ namespace RStereoKit
 		}
 	}
 
-	public class SKShader : IRShader
+	public sealed class SKShader : IRShader
 	{
 	}
 
-	public class SKMitStactic : IRMitConsts
+	public sealed class SKMitStactic : IRMitConsts
 	{
 		public string FaceCull => "FaceCall";
 
@@ -275,7 +275,7 @@ namespace RStereoKit
 		public string MainColor => "color";
 	}
 
-	public class SKRMaterial : IRMaterial
+	public sealed class SKRMaterial : IRMaterial
 	{
 		public IEnumerable<RMaterial.RMatParamInfo> GetAllParamInfo(object tex) {
 			yield return new RMaterial.RMatParamInfo { name = "FACECULL_RHUBARB_CUSTOM", type = RhuEngine.Linker.MaterialParam.Cull };

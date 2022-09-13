@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RhubarbCloudClient.Model
 {
-    public class CreateRecordResponses
+    public sealed class CreateRecordResponses
     {
         public string TempUploadURL { get; set; }
 

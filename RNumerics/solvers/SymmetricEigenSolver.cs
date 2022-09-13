@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace RNumerics
@@ -38,14 +39,14 @@ namespace RNumerics
 	// vectors in the lower-triangular portion of the matrix to save memory.  The
 	// implementation uses both suggestions.
 
-	public class SymmetricEigenSolver
+	public sealed class SymmetricEigenSolver
 	{
 		// The solver processes NxN symmetric matrices, where N > 1 ('size' is N)
 		// and the matrix is stored in row-major order.  The maximum number of
 		// iterations ('maxIterations') must be specified for the reduction of a
 		// tridiagonal matrix to a diagonal matrix.  The goal is to compute
 		// NxN orthogonal Q and NxN diagonal D for which Q^T*A*Q = D.
-		public SymmetricEigenSolver(int size, int maxIterations) {
+		public SymmetricEigenSolver(in int size,in int maxIterations) {
 			_mSize = _mMaxIterations = 0;
 			_mIsRotation = -1;
 			if (size > 1 && maxIterations > 0) {
@@ -76,7 +77,7 @@ namespace RNumerics
 			Increasing = 1
 		}
 		public const int NO_CONVERGENCE = int.MaxValue;
-		public int Solve(double[] input, SortType eSort) {
+		public int Solve(in double[] input, in SortType eSort) {
 			var sortType = (int)eSort;
 			if (_mSize > 0) {
 				Array.Copy(input, _mMatrix, _mSize * _mSize);
@@ -125,7 +126,7 @@ namespace RNumerics
 
 		// Get the eigenvalues of the matrix passed to Solve(...).  The input
 		// 'eigenvalues' must have N elements.
-		public void GetEigenvalues(double[] eigenvalues) {
+		public void GetEigenvalues(in double[] eigenvalues) {
 			if (eigenvalues != null && _mSize > 0) {
 				if (_mPermutation[0] >= 0) {
 					// Sorting was requested.
@@ -145,7 +146,7 @@ namespace RNumerics
 			GetEigenvalues(eigenvalues);
 			return eigenvalues;
 		}
-		public double GetEigenvalue(int c) {
+		public double GetEigenvalue(in int c) {
 			if (_mSize > 0) {
 				if (_mPermutation[0] >= 0) {
 					// Sorting was requested.
@@ -164,7 +165,7 @@ namespace RNumerics
 		// Accumulate the Householder reflections and Givens rotations to produce
 		// the orthogonal matrix Q for which Q^T*A*Q = D.  The input
 		// 'eigenvectors' must be NxN and stored in row-major order.
-		public void GetEigenvectors(double[] eigenvectors) {
+		public void GetEigenvectors(in double[] eigenvectors) {
 			if (eigenvectors != null && _mSize > 0) {
 				// Start with the identity matrix.
 				Array.Clear(eigenvectors, 0, _mSize * _mSize);
@@ -290,7 +291,7 @@ namespace RNumerics
 		// Compute a single eigenvector, which amounts to computing column c
 		// of matrix Q.  The reflections and rotations are applied incrementally.
 		// This is useful when you want only a small number of the eigenvectors.
-		public void GetEigenvector(int c, double[] eigenvector) {
+		public void GetEigenvector(in int c, in double[] eigenvector) {
 			if (0 <= c && c < _mSize) {
 				// y = H*x, then x and y are swapped for the next H
 				var x = eigenvector;
@@ -354,7 +355,7 @@ namespace RNumerics
 				}
 			}
 		}
-		public double[] GetEigenvector(int c) {
+		public double[] GetEigenvector(in int c) {
 			var eigenvector = new double[_mSize];
 			GetEigenvector(c, eigenvector);
 			return eigenvector;
@@ -449,7 +450,7 @@ namespace RNumerics
 		}
 
 		// A helper for generating Givens rotation sine and cosine robustly.
-		private void GetSinCos(double x, double y, ref double cs, ref double sn) {
+		private void GetSinCos(in double x,in double y, ref double cs, ref double sn) {
 			// Solves sn*x + cs*y = 0 robustly.
 			double tau;
 			if (y != 0) {
@@ -478,7 +479,7 @@ namespace RNumerics
 		// of the algorithm.  The inputs imin and imax identify the subblock of T
 		// to be processed.   That block has upper-left element T(imin,imin) and
 		// lower-right element T(imax,imax).
-		private void DoQRImplicitShift(int imin, int imax) {
+		private void DoQRImplicitShift(in int imin, in int imax) {
 			// The implicit shift.  Compute the eigenvalue u of the lower-right 2x2
 			// block that is closer to a11.
 			var a00 = _mDiagonal[imax];
@@ -544,7 +545,7 @@ namespace RNumerics
 		// indices of the array storing the eigenvalues.  The permutation is used
 		// for reordering the eigenvalues and eigenvectors in the calls to
 		// GetEigenvalues(...) and GetEigenvectors(...).
-		private void ComputePermutation(int sortType) {
+		private void ComputePermutation(in int sortType) {
 			_mIsRotation = -1;
 
 			if (sortType == 0) {
@@ -621,7 +622,7 @@ namespace RNumerics
 		// is allocated to store these.
 		private struct GivensRotation
 		{
-			public GivensRotation(int inIndex, double inCs, double inSn) {
+			public GivensRotation(in int inIndex, in double inCs, in double inSn) {
 				index = inIndex;
 				cs = inCs;
 				sn = inSn;

@@ -8,7 +8,7 @@ namespace RNumerics
 	// ported from WildMagic 5 
 	// https://www.geometrictools.com/Downloads/Downloads.html
 
-	public class DistLine3Triangle3
+	public sealed class DistLine3Triangle3
 	{
 		Line3d _line;
 		public Line3d Line
@@ -32,7 +32,7 @@ namespace RNumerics
 		public Vector3d TriangleBaryCoords;
 
 
-		public DistLine3Triangle3(Line3d LineIn, Triangle3d TriangleIn) {
+		public DistLine3Triangle3(in Line3d LineIn, in Triangle3d TriangleIn) {
 			_triangle = TriangleIn;
 			_line = LineIn;
 		}

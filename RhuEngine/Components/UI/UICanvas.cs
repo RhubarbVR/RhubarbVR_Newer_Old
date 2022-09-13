@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 	[NotLinkedRenderingComponent]
 	[UpdateLevel(UpdateEnum.Normal)]
 	[Category(new string[] { "UI" })]
-	public class UICanvas : LinkedWorldComponent
+	public sealed class UICanvas : LinkedWorldComponent
 	{
 
 		[OnChanged(nameof(UpdatePyhsicsMesh))]

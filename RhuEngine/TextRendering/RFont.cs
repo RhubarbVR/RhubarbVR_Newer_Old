@@ -16,7 +16,7 @@ using SixLabors.ImageSharp.Processing;
 
 namespace RhuEngine
 {
-	public class RText : IDisposable
+	public sealed class RText : IDisposable
 	{
 		public RText(RFont rFont) {
 			TargetFont = rFont;
@@ -64,7 +64,7 @@ namespace RhuEngine
 	}
 
 
-	public class RFont
+	public sealed class RFont
 	{
 		public const float FONTSIZE = 96f;
 		public FontCollection Collection { get; set; }

@@ -16,11 +16,11 @@ namespace RNumerics
 	/// Uses more memory than BitArray, but each tree level is divided by 32, so
 	/// it is better than NlogN
 	/// </summary>
-	public class HBitArray : IEnumerable<int>
+	public sealed class HBitArray : IEnumerable<int>
 	{
 		struct MyBitVector32
 		{
-			public bool this[int i]
+			public bool this[in int i]
 			{
 				get => (Data & (1 << i)) != 0;
 				set {
@@ -45,7 +45,7 @@ namespace RNumerics
 		readonly Layer[] _layers;
 		readonly int _layerCount;
 
-		public HBitArray(int maxIndex) {
+		public HBitArray(in int maxIndex) {
 			Count = maxIndex;
 			var base_count = maxIndex / 32;
 			if (maxIndex % 32 != 0) {
@@ -71,7 +71,7 @@ namespace RNumerics
 		}
 
 
-		public bool this[int i]
+		public bool this[in int i]
 		{
 			get => Get(i);
 			set => Set(i, value);
@@ -83,15 +83,15 @@ namespace RNumerics
 		public int TrueCount { get; private set; }
 
 
-		public bool Contains(int i) {
+		public bool Contains(in int i) {
 			return Get(i) == true;
 		}
 
-		public void Add(int i) {
+		public void Add(in int i) {
 			Set(i, true);
 		}
 
-		public void Set(int i, bool value) {
+		public void Set(in int i, in bool value) {
 			var byte_i = i / 32;
 			var byte_o = i - (32 * byte_i);
 
@@ -132,7 +132,7 @@ namespace RNumerics
 		}
 
 
-		public bool Get(int i) {
+		public bool Get(in int i) {
 			var byte_i = i / 32;
 			var byte_o = i - (32 * byte_i);
 			return _bits[byte_i][byte_o];

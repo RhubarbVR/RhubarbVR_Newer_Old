@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RNumerics
 {
-	public class CurvedPlaneMeshGenerator : MeshGenerator
+	public sealed class CurvedPlaneMeshGenerator : MeshGenerator
 	{
 		public float bRadius = 1f;
 		public float tRadius = 1f;
@@ -63,7 +63,7 @@ namespace RNumerics
 
 	// generate a triangle fan, no subdvisions
 	// it has NO HOLE in the middle -dfg
-	public class TrivialDiscGenerator : MeshGenerator
+	public sealed class TrivialDiscGenerator : MeshGenerator
 	{
 		public float Radius = 1.0f;
 		public float StartAngleDeg = 0.0f;
@@ -113,7 +113,7 @@ namespace RNumerics
 
 	// generate a triangle fan, no subdvisions
 	// it has a HOLE in the middle -dfg
-	public class PuncturedDiscGenerator : MeshGenerator
+	public sealed class PuncturedDiscGenerator : MeshGenerator
 	{
 		public float OuterRadius = 1.0f;
 		public float InnerRadius = 0.5f;

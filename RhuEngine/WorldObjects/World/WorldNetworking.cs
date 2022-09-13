@@ -26,7 +26,7 @@ using SharedModels.GameSpecific;
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World : IWorldObject
+	public sealed partial class World : IWorldObject
 	{
 
 		public bool IsNetworked { get; internal set; } = false;

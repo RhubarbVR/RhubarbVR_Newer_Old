@@ -20,7 +20,7 @@ using Newtonsoft.Json.Linq;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	public class KeyBoard : Component
+	public sealed class KeyBoard : Component
 	{
 		[NoSave]
 		[NoSync]

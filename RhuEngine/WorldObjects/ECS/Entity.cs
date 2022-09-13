@@ -7,7 +7,7 @@ using RhuEngine.Components;
 
 namespace RhuEngine.WorldObjects.ECS
 {
-	public class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox
+	public sealed class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox
 	{
 		private uint CompDepth => (_internalParent?.Depth + 1) ?? 0;
 

@@ -8,7 +8,7 @@ using SharedModels.GameSpecific;
 namespace RhuEngine.DataStructure
 {
 	[MessagePackObject]
-	public class DataNodeList : IDataNode
+	public sealed class DataNodeList : IDataNode
 	{
 		public void SaveAction(DataSaver DataSaver) {
 			foreach (var item in _nodeGroup) {

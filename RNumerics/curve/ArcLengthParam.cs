@@ -17,17 +17,17 @@ namespace RNumerics
 	public interface IArcLengthParam
 	{
 		double ArcLength { get; }
-		CurveSample Sample(double fArcLen);
+		CurveSample Sample(in double fArcLen);
 	}
 
 
 
-	public class SampledArcLengthParam : IArcLengthParam
+	public sealed class SampledArcLengthParam : IArcLengthParam
 	{
 		readonly double[] _arc_len;
 		readonly Vector3d[] _positions;
 
-		public SampledArcLengthParam(IEnumerable<Vector3d> samples, int nCountHint = -1) {
+		public SampledArcLengthParam(in IEnumerable<Vector3d> samples, in int nCountHint = -1) {
 			var N = (nCountHint == -1) ? samples.Count() : nCountHint;
 			_arc_len = new double[N];
 			_arc_len[0] = 0;
@@ -51,7 +51,7 @@ namespace RNumerics
 		public double ArcLength => _arc_len[_arc_len.Length - 1];
 
 
-		public CurveSample Sample(double f) {
+		public CurveSample Sample(in double f) {
 			if (f <= 0) {
 				return new CurveSample(new Vector3d(_positions[0]), Tangent(0));
 			}
@@ -80,7 +80,7 @@ namespace RNumerics
 		}
 
 
-		protected Vector3d Tangent(int i) {
+		private Vector3d Tangent(in int i) {
 			var N = _arc_len.Length;
 			return i == 0
 				? (_positions[1] - _positions[0]).Normalized
@@ -107,16 +107,16 @@ namespace RNumerics
 	public interface IArcLengthParam2d
 	{
 		double ArcLength { get; }
-		CurveSample2d Sample(double fArcLen);
+		CurveSample2d Sample(in double fArcLen);
 	}
 
 
-	public class SampledArcLengthParam2d : IArcLengthParam2d
+	public sealed class SampledArcLengthParam2d : IArcLengthParam2d
 	{
 		readonly double[] _arc_len;
 		readonly Vector2d[] _positions;
 
-		public SampledArcLengthParam2d(IEnumerable<Vector2d> samples, int nCountHint = -1) {
+		public SampledArcLengthParam2d(in IEnumerable<Vector2d> samples, in int nCountHint = -1) {
 			var N = (nCountHint == -1) ? samples.Count() : nCountHint;
 			_arc_len = new double[N];
 			_arc_len[0] = 0;
@@ -138,7 +138,7 @@ namespace RNumerics
 
 		public double ArcLength => _arc_len[_arc_len.Length - 1];
 
-		public CurveSample2d Sample(double f) {
+		public CurveSample2d Sample(in double f) {
 			if (f <= 0) {
 				return new CurveSample2d(new Vector2d(_positions[0]), Tangent(0));
 			}
@@ -167,7 +167,7 @@ namespace RNumerics
 		}
 
 
-		protected Vector2d Tangent(int i) {
+		private Vector2d Tangent(in int i) {
 			var N = _arc_len.Length;
 			return i == 0
 				? (_positions[1] - _positions[0]).Normalized

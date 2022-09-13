@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 {
 	[UpdatingComponent]
 	[Category(new string[] { "Assets/Utils" })]
-	public class ClipBoardImport :Component
+	public sealed class ClipBoardImport :Component
 	{
 		protected override void OnLoaded() {
 			base.OnLoaded();

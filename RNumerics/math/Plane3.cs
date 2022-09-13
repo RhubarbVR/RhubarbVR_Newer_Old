@@ -12,20 +12,25 @@ namespace RNumerics
 		[Key(1)]
 		public double Constant;
 
-		public Plane3d(Vector3d normal, double constant) {
+		public Plane3d() {
+			Normal = Vector3d.Zero;
+			Constant = 0;
+		}
+
+		public Plane3d(in Vector3d normal, in double constant) {
 			Normal = normal;
 			Constant = constant;
 		}
 
 		// N is specified, c = Dot(N,P) where P is a point on the plane.
-		public Plane3d(Vector3d normal, Vector3d point) {
+		public Plane3d(in Vector3d normal, in Vector3d point) {
 			Normal = normal;
 			Constant = Normal.Dot(point);
 		}
 
 		// N = Cross(P1-P0,P2-P0)/Length(Cross(P1-P0,P2-P0)), c = Dot(N,P0) where
 		// P0, P1, P2 are points on the plane.
-		public Plane3d(Vector3d p0, Vector3d p1, Vector3d p2) {
+		public Plane3d(in Vector3d p0, in Vector3d p1, in Vector3d p2) {
 			var edge1 = p1 - p0;
 			var edge2 = p2 - p0;
 			Normal = edge1.UnitCross(edge2);
@@ -38,7 +43,7 @@ namespace RNumerics
 		// positive if the point is on the positive side of the plane, negative if
 		// the point is on the negative side, and zero if the point is on the
 		// plane.
-		public double DistanceTo(Vector3d p) {
+		public double DistanceTo(in Vector3d p) {
 			return Normal.Dot(p) - Constant;
 		}
 
@@ -46,16 +51,16 @@ namespace RNumerics
 		// normal points.  The "negative side" is the other half space.  The
 		// function returns +1 when P is on the positive side, -1 when P is on the
 		// the negative side, or 0 when P is on the plane.
-		public int WhichSide(Vector3d p) {
+		public int WhichSide(in Vector3d p) {
 			var distance = DistanceTo(p);
 			return distance < 0 ? -1 : distance > 0 ? +1 : 0;
 		}
-		public Vector3d ClosestPointOnPlane(Vector3d point) {
+		public Vector3d ClosestPointOnPlane(in Vector3d point) {
 			var num = Vector3d.Dot(Normal, point) + Constant;
 			return point - (Normal * num);
 		}
 
-		public Vector3d IntersectLine(Vector3d a, Vector3d b) {
+		public Vector3d IntersectLine(in Vector3d a, in Vector3d b) {
 			var ba = b - a;
 			var nDotA = Normal.Dot(a);
 			var nDotBA = Normal.Dot(ba);
@@ -73,20 +78,20 @@ namespace RNumerics
 		[Key(1)]
 		public float Constant;
 
-		public Plane3f(Vector3f normal, float constant) {
+		public Plane3f(in Vector3f normal, in float constant) {
 			Normal = normal;
 			Constant = constant;
 		}
 
 		// N is specified, c = Dot(N,P) where P is a point on the plane.
-		public Plane3f(Vector3f normal, Vector3f point) {
+		public Plane3f(in Vector3f normal, in Vector3f point) {
 			Normal = normal;
 			Constant = Normal.Dot(point);
 		}
 
 		// N = Cross(P1-P0,P2-P0)/Length(Cross(P1-P0,P2-P0)), c = Dot(N,P0) where
 		// P0, P1, P2 are points on the plane.
-		public Plane3f(Vector3f p0, Vector3f p1, Vector3f p2) {
+		public Plane3f(in Vector3f p0, in Vector3f p1, in Vector3f p2) {
 			var edge1 = p1 - p0;
 			var edge2 = p2 - p0;
 			Normal = edge1.UnitCross(edge2);
@@ -99,7 +104,7 @@ namespace RNumerics
 		// positive if the point is on the positive side of the plane, negative if
 		// the point is on the negative side, and zero if the point is on the
 		// plane.
-		public float DistanceTo(Vector3f p) {
+		public float DistanceTo(in Vector3f p) {
 			return Normal.Dot(p) - Constant;
 		}
 
@@ -107,16 +112,16 @@ namespace RNumerics
 		// normal points.  The "negative side" is the other half space.  The
 		// function returns +1 when P is on the positive side, -1 when P is on the
 		// the negative side, or 0 when P is on the plane.
-		public int WhichSide(Vector3f p) {
+		public int WhichSide(in Vector3f p) {
 			var distance = DistanceTo(p);
 			return distance < 0 ? -1 : distance > 0 ? +1 : 0;
 		}
-		public Vector3f ClosestPointOnPlane(Vector3f point) {
+		public Vector3f ClosestPointOnPlane(in Vector3f point) {
 			var num = Vector3f.Dot(Normal, point) + Constant;
 			return point - (Normal * num);
 		}
 
-		public Vector3f IntersectLine(Vector3f a, Vector3f b) {
+		public Vector3f IntersectLine(in Vector3f a, Vector3f b) {
 			var ba = b - a;
 			var nDotA = Normal.Dot(a);
 			var nDotBA = Normal.Dot(ba);

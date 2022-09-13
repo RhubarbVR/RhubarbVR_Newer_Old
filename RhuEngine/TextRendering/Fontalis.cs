@@ -14,7 +14,7 @@ using SixLabors.ImageSharp.Processing;
 
 namespace RhuEngine.TextRendering
 {
-	public class FontAtlisPart
+	public sealed class FontAtlisPart
 	{
 		public const int ATLISSIZE = 2048;
 		public Image<Rgba32> _image;

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RhubarbCloudClient.Model
 {
-	public class ServerResponse<T>
+	public sealed class ServerResponse<T>
 	{
 		public T Data { get; set; }
 		public bool Error { get; set; }

@@ -9,7 +9,7 @@ using SixLabors.Fonts;
 
 namespace RhuEngine.Components
 {
-	public class UIBuilder
+	public sealed class UIBuilder
 	{
 		public IAssetProvider<RMaterial> MainMat;
 

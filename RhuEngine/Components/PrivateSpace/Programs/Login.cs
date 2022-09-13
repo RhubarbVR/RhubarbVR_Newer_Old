@@ -12,7 +12,7 @@ using RNumerics;
 namespace RhuEngine.Components.PrivateSpace
 {
 	[RemoveFromProgramList]
-	public class LoginProgram : Program
+	public sealed class LoginProgram : Program
 	{
 		public override string ProgramID => "LoginScreen";
 

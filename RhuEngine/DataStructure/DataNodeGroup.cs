@@ -11,7 +11,7 @@ namespace RhuEngine.DataStructure
 {
 
 	[MessagePackObject]
-	public class DataNodeGroup : IDataNode,IMessagePackSerializationCallbackReceiver
+	public sealed class DataNodeGroup : IDataNode,IMessagePackSerializationCallbackReceiver
 	{
 		public void SaveAction(DataSaver DataSaver) {
 			foreach (var item in _nodeGroup) {

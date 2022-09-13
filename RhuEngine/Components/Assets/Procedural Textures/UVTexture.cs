@@ -7,7 +7,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Textures" })]
-	public class UVTexture : ProceduralTexture
+	public sealed class UVTexture : ProceduralTexture
 	{
 		protected override void Generate() 
 		{

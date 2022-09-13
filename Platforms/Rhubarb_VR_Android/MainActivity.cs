@@ -26,7 +26,7 @@ namespace RhuEngine
 	// https://github.com/MonoGame/MonoGame/blob/31dca640482bc0c27aec8e51d6369612ce8577a2/MonoGame.Framework/Platform/Android/MonoGameAndroidGameView.cs
 	[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
 	[IntentFilter(new[] { Intent.ActionMain }, Categories = new[] { "com.oculus.intent.category.VR", Intent.CategoryLauncher })]
-	public class MainActivity : AppCompatActivity, ISurfaceHolderCallback2
+	public sealed class MainActivity : AppCompatActivity, ISurfaceHolderCallback2
 	{
 		Engine _app;
 		View _surface;

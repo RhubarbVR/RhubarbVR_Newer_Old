@@ -7,14 +7,14 @@ namespace RNumerics
 	/// <summary>
 	/// Summary description for PolyLine.
 	/// </summary>
-	public class DPolyLine2f
+	public sealed class DPolyLine2f
 	{
 		public struct Edge
 		{
 			public int v1;
 			public int v2;
 
-			public Edge(int vertex1, int vertex2) { v1 = vertex1; v2 = vertex2; }
+			public Edge(in int vertex1, in int vertex2) { v1 = vertex1; v2 = vertex2; }
 		}
 
 		public struct Vertex
@@ -23,7 +23,7 @@ namespace RNumerics
 			public float x;
 			public float y;
 
-			public Vertex(float fX, float fY, int nIndex) { x = fX; y = fY; index = nIndex; }
+			public Vertex(in float fX, in float fY, in int nIndex) { x = fX; y = fY; index = nIndex; }
 		}
 
 		public DPolyLine2f() {
@@ -31,7 +31,7 @@ namespace RNumerics
 			Edges = new List<Edge>();
 		}
 
-		public DPolyLine2f(DPolyLine2f copy) {
+		public DPolyLine2f(in DPolyLine2f copy) {
 			Vertices = new List<Vertex>(copy.Vertices);
 			Edges = new List<Edge>(copy.Edges);
 		}
@@ -49,18 +49,18 @@ namespace RNumerics
 		}
 
 
-		public Vertex GetVertex(int i) {
+		public Vertex GetVertex(in int i) {
 			return Vertices[i];
 		}
 
 
-		public int AddVertex(float fX, float fY) {
+		public int AddVertex(in float fX, in float fY) {
 			var nIndex = Vertices.Count;
 			Vertices.Add(new Vertex(fX, fY, nIndex));
 			return nIndex;
 		}
 
-		public int AddEdge(int v1, int v2) {
+		public int AddEdge(in int v1, in int v2) {
 			var nIndex = Edges.Count;
 			Edges.Add(new Edge(v1, v2));
 			return nIndex;

@@ -157,7 +157,7 @@ namespace RNumerics
 		}
 	}
 
-	public class Curve3Curve3RevolveGenerator : MeshGenerator
+	public sealed class Curve3Curve3RevolveGenerator : MeshGenerator
 	{
 		public Vector3d[] Curve;
 		public Vector3d[] Axis;

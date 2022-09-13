@@ -5,7 +5,7 @@ namespace RNumerics
 {
 	// some functions ported from WildMagic5 Matrix2
 	[MessagePackObject]
-	public class Matrix2f
+	public sealed class Matrix2f
 	{
 		[Key(0)]
 		public float m00;
@@ -16,7 +16,8 @@ namespace RNumerics
 		[Key(3)]
 		public float m11;
 
-
+		public Matrix2f() {
+		}
 		[IgnoreMember]
 		public static readonly Matrix2f Identity = new (true);
 		[IgnoreMember]
@@ -25,7 +26,7 @@ namespace RNumerics
 		public static readonly Matrix2f One = new (1, 1, 1, 1);
 
 
-		public Matrix2f(bool bIdentity)
+		public Matrix2f(in bool bIdentity)
 		{
 			if (bIdentity)
 			{
@@ -36,14 +37,14 @@ namespace RNumerics
 				m00 = m01 = m10 = m11 = 0;
 			}
 		}
-		public Matrix2f(float m00, float m01, float m10, float m11)
+		public Matrix2f(in float m00, in float m01, in float m10, in float m11)
 		{
 			this.m00 = m00;
 			this.m01 = m01;
 			this.m10 = m10;
 			this.m11 = m11;
 		}
-		public Matrix2f(float m00, float m11)
+		public Matrix2f(in float m00, in float m11)
 		{
 			this.m00 = m00;
 			this.m11 = m11;
@@ -51,7 +52,7 @@ namespace RNumerics
 		}
 
 		// Create a rotation matrix (positive angle -> counterclockwise).
-		public Matrix2f(float radians)
+		public Matrix2f(in float radians)
 		{
 			SetToRotationRad(radians);
 		}
@@ -59,7 +60,7 @@ namespace RNumerics
 		// Create matrices based on vector input.  The bool is interpreted as
 		//   true: vectors are columns of the matrix
 		//   false: vectors are rows of the matrix
-		public Matrix2f(Vector2f u, Vector2f v, bool columns)
+		public Matrix2f(in Vector2f u, in Vector2f v, in bool columns)
 		{
 			if (columns)
 			{
@@ -78,7 +79,7 @@ namespace RNumerics
 		}
 
 		// Create a tensor product U*V^T.
-		public Matrix2f(Vector2f u, Vector2f v)
+		public Matrix2f(in Vector2f u, in Vector2f v)
 		{
 			m00 = u.x * v.x;
 			m01 = u.x * v.y;
@@ -87,27 +88,27 @@ namespace RNumerics
 		}
 
 
-		public void SetToDiagonal(float m00, float m11)
+		public void SetToDiagonal(in float m00, in float m11)
 		{
 			this.m00 = m00;
 			this.m11 = m11;
 			m01 = m10 = 0;
 		}
 
-		public void SetToRotationRad(float angleRad)
+		public void SetToRotationRad(in float angleRad)
 		{
 			m11 = m00 = (float)Math.Cos(angleRad);
 			m10 = (float)Math.Sin(angleRad);
 			m01 = -m10;
 		}
-		public void SetToRotationDeg(float angleDeg)
+		public void SetToRotationDeg(in float angleDeg)
 		{
 			SetToRotationRad(MathUtil.DEG_2_RADF * angleDeg);
 		}
 
 
 		// u^T*M*v
-		public float QForm(Vector2f u, Vector2f v)
+		public float QForm(in Vector2f u, in Vector2f v)
 		{
 			return u.Dot(this * v);
 		}
@@ -119,7 +120,7 @@ namespace RNumerics
 		}
 
 		// Other operations.
-		public Matrix2f Inverse(float epsilon = 0)
+		public Matrix2f Inverse(in float epsilon = 0)
 		{
 			var det = (m00 * m11) - (m10 * m01);
 			if (Math.Abs(det) > epsilon)
@@ -176,7 +177,7 @@ namespace RNumerics
 		}
 
 
-		public void EigenDecomposition(ref Matrix2f rot, ref Matrix2f diag)
+		public void EigenDecomposition(in Matrix2f rot, in Matrix2f diag)
 		{
 			var sum = Math.Abs(m00) + Math.Abs(m11);
 			if (Math.Abs(m01) + sum == sum)
@@ -224,28 +225,28 @@ namespace RNumerics
 
 
 
-		public static Matrix2f operator -(Matrix2f v) => new (-v.m00, -v.m01, -v.m10, -v.m11);
+		public static Matrix2f operator -(in Matrix2f v) => new (-v.m00, -v.m01, -v.m10, -v.m11);
 
-		public static Matrix2f operator +(Matrix2f a, Matrix2f o) => new (a.m00 + o.m00, a.m01 + o.m01, a.m10 + o.m10, a.m11 + o.m11);
-		public static Matrix2f operator +(Matrix2f a, float f) => new (a.m00 + f, a.m01 + f, a.m10 + f, a.m11 + f);
+		public static Matrix2f operator +(in Matrix2f a, in Matrix2f o) => new (a.m00 + o.m00, a.m01 + o.m01, a.m10 + o.m10, a.m11 + o.m11);
+		public static Matrix2f operator +(in Matrix2f a, in float f) => new (a.m00 + f, a.m01 + f, a.m10 + f, a.m11 + f);
 
-		public static Matrix2f operator -(Matrix2f a, Matrix2f o) => new (a.m00 - o.m00, a.m01 - o.m01, a.m10 - o.m10, a.m11 - o.m11);
-		public static Matrix2f operator -(Matrix2f a, float f) => new (a.m00 - f, a.m01 - f, a.m10 - f, a.m11 - f);
+		public static Matrix2f operator -(in Matrix2f a, in Matrix2f o) => new (a.m00 - o.m00, a.m01 - o.m01, a.m10 - o.m10, a.m11 - o.m11);
+		public static Matrix2f operator -(in Matrix2f a, in float f) => new (a.m00 - f, a.m01 - f, a.m10 - f, a.m11 - f);
 
-		public static Matrix2f operator *(Matrix2f a, float f) => new (a.m00 * f, a.m01 * f, a.m10 * f, a.m11 * f);
-		public static Matrix2f operator *(float f, Matrix2f a) => new (a.m00 * f, a.m01 * f, a.m10 * f, a.m11 * f);
-		public static Matrix2f operator /(Matrix2f a, float f) => new (a.m00 / f, a.m01 / f, a.m10 / f, a.m11 / f);
+		public static Matrix2f operator *(in Matrix2f a, in float f) => new (a.m00 * f, a.m01 * f, a.m10 * f, a.m11 * f);
+		public static Matrix2f operator *(in float f, in Matrix2f a) => new (a.m00 * f, a.m01 * f, a.m10 * f, a.m11 * f);
+		public static Matrix2f operator /(in Matrix2f a, in float f) => new (a.m00 / f, a.m01 / f, a.m10 / f, a.m11 / f);
 
 
 		// row*vector multiply
-		public static Vector2f operator *(Matrix2f m, Vector2f v)
+		public static Vector2f operator *(in Matrix2f m, in Vector2f v)
 		{
 			return new Vector2f((m.m00 * v.x) + (m.m01 * v.y),
 								 (m.m10 * v.x) + (m.m11 * v.y));
 		}
 
 		// vector*column multiply
-		public static Vector2f operator *(Vector2f v, Matrix2f m)
+		public static Vector2f operator *(in Vector2f v, in Matrix2f m)
 		{
 			return new Vector2f((v.x * m.m00) + (v.y * m.m10),
 								 (v.x * m.m01) + (v.y * m.m11));

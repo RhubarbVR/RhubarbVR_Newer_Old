@@ -13,7 +13,7 @@ using Mono.Cecil.Rocks;
 
 namespace RhuPostProcessor
 {
-	public class PostProcess
+	public sealed class PostProcess
 	{
 
 		public static Action<string>? logAction;

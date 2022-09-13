@@ -7,7 +7,7 @@ using MessagePack;
 namespace RNumerics
 {
 	[MessagePackObject]
-	public class ColorHSV 
+	public sealed class ColorHSV 
 	{
 		[Key(0)]
 		public float h;
@@ -18,12 +18,16 @@ namespace RNumerics
 		[Key(3)]
 		public float a;
 
-		public ColorHSV(float h, float s, float v, float a = 1) { this.h = h; this.s = s; this.v = v; this.a = a; }
-		public ColorHSV(Colorf rgb) {
+		public ColorHSV() {
+
+		}
+
+		public ColorHSV(in float h, in float s, in float v, in float a = 1) { this.h = h; this.s = s; this.v = v; this.a = a; }
+		public ColorHSV(in Colorf rgb) {
 			ConvertFromRGB(rgb);
 		}
 
-		public ColorHSV UpdateHue(float val) {
+		public ColorHSV UpdateHue(in float val) {
 			var newh = (h + val) % 360f;
 			return new ColorHSV(newh, s, v, a);
 		}
@@ -103,7 +107,7 @@ namespace RNumerics
 		}
 
 
-		public void ConvertFromRGB(Colorf rgb) {
+		public void ConvertFromRGB(in Colorf rgb) {
 			a = rgb.a;
 			float rp = rgb.r, gp = rgb.g, bp = rgb.b;
 

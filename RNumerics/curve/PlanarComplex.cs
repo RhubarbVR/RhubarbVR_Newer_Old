@@ -19,7 +19,7 @@ namespace RNumerics
 	}
 
 
-	public class PlanarComplex
+	public sealed class PlanarComplex
 	{
 		// these determine pointwise sampling rates
 		public double DistanceAccuracy = 0.1;
@@ -43,7 +43,7 @@ namespace RNumerics
 			}
 			public bool HasSetColor { get; private set; } = false;
 
-			protected void Copy_to(Element new_element) {
+			protected void Copy_to(in Element new_element) {
 				new_element.ID = ID;
 				new_element._color = _color;
 				new_element.HasSetColor = HasSetColor;
@@ -57,7 +57,7 @@ namespace RNumerics
 			public abstract Element Clone();
 		}
 
-		public class SmoothCurveElement : Element
+		public sealed class SmoothCurveElement : Element
 		{
 			public PolyLine2d polyLine;
 
@@ -76,7 +76,7 @@ namespace RNumerics
 			}
 		}
 
-		public class SmoothLoopElement : Element
+		public sealed class SmoothLoopElement : Element
 		{
 			public Polygon2d polygon;
 
@@ -108,7 +108,7 @@ namespace RNumerics
 
 		public int ElementCount => _vElements.Count;
 
-		public Element Add(IParametricCurve2d curve) {
+		public Element Add(in IParametricCurve2d curve) {
 			if (curve.IsClosed) {
 				var e = new SmoothLoopElement {
 					ID = _id_generator++,
@@ -130,7 +130,7 @@ namespace RNumerics
 		}
 
 
-		public Element Add(Polygon2d poly) {
+		public Element Add(in Polygon2d poly) {
 			var e = new SmoothLoopElement {
 				ID = _id_generator++,
 				source = new Polygon2DCurve() { Polygon = poly },
@@ -141,7 +141,7 @@ namespace RNumerics
 		}
 
 
-		public Element Add(PolyLine2d pline) {
+		public Element Add(in PolyLine2d pline) {
 			var e = new SmoothCurveElement {
 				ID = _id_generator++,
 				source = new PolyLine2DCurve() { Polyline = pline },
@@ -152,12 +152,12 @@ namespace RNumerics
 		}
 
 
-		public void Remove(Element e) {
+		public void Remove(in Element e) {
 			_vElements.Remove(e);
 		}
 
 
-		void UpdateSampling(SmoothCurveElement c) {
+		void UpdateSampling(in SmoothCurveElement c) {
 			if (MinimizeSampling && c.source is Segment2d d) {
 				c.polyLine = new PolyLine2d();
 				c.polyLine.AppendVertex(d.P0);
@@ -168,13 +168,13 @@ namespace RNumerics
 					CurveSampler2.AutoSample(c.source, DistanceAccuracy, SpacingT));
 			}
 		}
-		void UpdateSampling(SmoothLoopElement l) {
+		void UpdateSampling(in SmoothLoopElement l) {
 			l.polygon = new Polygon2d(
 				CurveSampler2.AutoSample(l.source, DistanceAccuracy, SpacingT));
 		}
 
 
-		public void Reverse(SmoothCurveElement c) {
+		public void Reverse(in SmoothCurveElement c) {
 			c.source.Reverse();
 			UpdateSampling(c);
 		}
@@ -302,7 +302,7 @@ namespace RNumerics
 				Add(c);
 			}
 		}
-		private void Find_sub_elements(IMultiCurve2d multicurve, List<IParametricCurve2d> vAdd) {
+		private void Find_sub_elements(in IMultiCurve2d multicurve, in List<IParametricCurve2d> vAdd) {
 			foreach (var curve in multicurve.Curves) {
 				if (curve is IMultiCurve2d) {
 					Find_sub_elements(curve as IMultiCurve2d, vAdd);
@@ -316,7 +316,7 @@ namespace RNumerics
 
 
 
-		public bool JoinElements(ComplexEndpoint2d a, ComplexEndpoint2d b, double loop_tolerance = MathUtil.ZERO_TOLERANCE) {
+		public bool JoinElements(in ComplexEndpoint2d a, in ComplexEndpoint2d b, in double loop_tolerance = MathUtil.ZERO_TOLERANCE) {
 			if (a.element == b.element) {
 				throw new Exception("PlanarComplex.ChainElements: same curve!!");
 			}
@@ -375,7 +375,7 @@ namespace RNumerics
 
 
 
-		public void ConvertToLoop(SmoothCurveElement curve, double tolerance = MathUtil.ZERO_TOLERANCE) {
+		public void ConvertToLoop(in SmoothCurveElement curve, in double tolerance = MathUtil.ZERO_TOLERANCE) {
 			var dDelta = (curve.polyLine.Start - curve.polyLine.End).Length;
 			if (dDelta < tolerance) {
 
@@ -402,7 +402,7 @@ namespace RNumerics
 
 
 
-		void Append(SmoothCurveElement cTo, SmoothCurveElement cAppend) {
+		void Append(in SmoothCurveElement cTo, in SmoothCurveElement cAppend) {
 			ParametricCurveSequence2 use;
 			if (cTo.source is ParametricCurveSequence2) {
 				use = cTo.source as ParametricCurveSequence2;
@@ -428,13 +428,13 @@ namespace RNumerics
 
 
 
-		public class GeneralSolid
+		public sealed class GeneralSolid
 		{
 			public Element Outer;
 			public List<Element> Holes = new();
 		}
 
-		public class SolidRegionInfo
+		public sealed class SolidRegionInfo
 		{
 			public List<GeneralPolygon2d> Polygons;
 			public List<PlanarSolid2d> Solids;
@@ -507,7 +507,7 @@ namespace RNumerics
 		}
 
 
-		public SolidRegionInfo FindSolidRegions(double fSimplifyDeviationTol = 0.1, bool bWantCurveSolids = true) {
+		public SolidRegionInfo FindSolidRegions(in double fSimplifyDeviationTol = 0.1, in bool bWantCurveSolids = true) {
 			var opt = FindSolidsOptions.Default;
 			opt.SimplifyDeviationTolerance = fSimplifyDeviationTol;
 			opt.WantCurveSolids = bWantCurveSolids;
@@ -516,7 +516,7 @@ namespace RNumerics
 
 		// Finds set of "solid" regions - eg boundary loops with interior holes.
 		// Result has outer loops being clockwise, and holes counter-clockwise
-		public SolidRegionInfo FindSolidRegions(FindSolidsOptions options) {
+		public SolidRegionInfo FindSolidRegions(in FindSolidsOptions options) {
 			var validLoops = new List<SmoothLoopElement>(LoopsItr());
 			var N = validLoops.Count;
 
@@ -822,7 +822,7 @@ namespace RNumerics
 
 
 
-		public class ClosedLoopsInfo
+		public sealed class ClosedLoopsInfo
 		{
 			public List<Polygon2d> Polygons;
 			public List<IParametricCurve2d> Loops;
@@ -841,7 +841,7 @@ namespace RNumerics
 			}
 		}
 		// returns set of closed loops (not necessarily solids)
-		public ClosedLoopsInfo FindClosedLoops(double fSimplifyDeviationTol = 0.1) {
+		public ClosedLoopsInfo FindClosedLoops(in double fSimplifyDeviationTol = 0.1) {
 			var loopElems = new List<SmoothLoopElement>(LoopsItr());
 			var maxid = 0;
 			foreach (var v in loopElems) {
@@ -884,7 +884,7 @@ namespace RNumerics
 
 
 
-		public class OpenCurvesInfo
+		public sealed class OpenCurvesInfo
 		{
 			public List<PolyLine2d> Polylines;
 			public List<IParametricCurve2d> Curves;
@@ -903,7 +903,7 @@ namespace RNumerics
 			}
 		}
 		// returns set of open curves (ie non-solids)
-		public OpenCurvesInfo FindOpenCurves(double fSimplifyDeviationTol = 0.1) {
+		public OpenCurvesInfo FindOpenCurves(in double fSimplifyDeviationTol = 0.1) {
 			var curveElems = new List<SmoothCurveElement>(CurvesItr());
 
 			var maxid = 0;
@@ -966,7 +966,7 @@ namespace RNumerics
 
 
 
-		public void Append(PlanarComplex append) {
+		public void Append(in PlanarComplex append) {
 			foreach (var element in append._vElements) {
 				element.ID = _id_generator++;
 				_vElements.Add(element);
@@ -978,7 +978,7 @@ namespace RNumerics
 
 
 
-		public void Transform(ITransform2 xform, bool bApplyToSources, bool bRecomputePolygons = false) {
+		public void Transform(in ITransform2 xform, in bool bApplyToSources, in bool bRecomputePolygons = false) {
 			foreach (var element in _vElements) {
 				if (element is SmoothLoopElement) {
 					var loop = element as SmoothLoopElement;
@@ -1017,7 +1017,7 @@ namespace RNumerics
 
 
 
-		public void PrintStats(string label = "") {
+		public void PrintStats(in string label = "") {
 			System.Console.WriteLine("PlanarComplex Stats {0}", label);
 			var Loops = new List<SmoothLoopElement>(LoopsItr());
 			var Curves = new List<SmoothCurveElement>(CurvesItr());
@@ -1040,7 +1040,7 @@ namespace RNumerics
 			System.Console.WriteLine("    segments {0,4}  arcs     {1,4}  circles      {2,4}", nSegments, nArcs, nCircles);
 			System.Console.WriteLine("    nurbs    {0,4}  ellipses {1,4}  ellipse-arcs {2,4}", nNURBS, nEllipses, nEllipseArcs);
 		}
-		public int CountType(Type t) {
+		public int CountType(in Type t) {
 			var count = 0;
 			foreach (var loop in _vElements) {
 				if (loop.source.GetType() == t) {
@@ -1053,7 +1053,7 @@ namespace RNumerics
 			}
 			return count;
 		}
-		public int CountType(IMultiCurve2d curve, Type t) {
+		public int CountType(in IMultiCurve2d curve, in Type t) {
 			var count = 0;
 			foreach (var c in curve.Curves) {
 				if (c.GetType() == t) {

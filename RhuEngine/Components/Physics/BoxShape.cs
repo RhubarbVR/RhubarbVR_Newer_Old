@@ -8,7 +8,7 @@ using RhuEngine.Physics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public class BoxShape : PhysicsObject
+	public sealed class BoxShape : PhysicsObject
 	{
 		[OnChanged(nameof(RebuildPysics))]
 		public readonly Sync<Vector3d> boxHalfExtent;

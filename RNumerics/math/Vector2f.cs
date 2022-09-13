@@ -14,17 +14,20 @@ namespace RNumerics
 		public float x;
 		[Key(1)]
 		public float y;
+		public Vector2f() {
+			x = 0f;
+			y = 0f;
+		}
+		public Vector2f(in float f) { x = y = f; }
+		public Vector2f(in float x, in float y) { this.x = x; this.y = y; }
+		public Vector2f(in float[] v2) { x = v2[0]; y = v2[1]; }
+		public Vector2f(in double f) { x = y = (float)f; }
+		public Vector2f(in double x, in double y) { this.x = (float)x; this.y = (float)y; }
+		public Vector2f(in double[] v2) { x = (float)v2[0]; y = (float)v2[1]; }
+		public Vector2f(in Vector2f copy) { x = copy[0]; y = copy[1]; }
+		public Vector2f(in Vector2d copy) { x = (float)copy[0]; y = (float)copy[1]; }
 
-		public Vector2f(float f) { x = y = f; }
-		public Vector2f(float x, float y) { this.x = x; this.y = y; }
-		public Vector2f(float[] v2) { x = v2[0]; y = v2[1]; }
-		public Vector2f(double f) { x = y = (float)f; }
-		public Vector2f(double x, double y) { this.x = (float)x; this.y = (float)y; }
-		public Vector2f(double[] v2) { x = (float)v2[0]; y = (float)v2[1]; }
-		public Vector2f(Vector2f copy) { x = copy[0]; y = copy[1]; }
-		public Vector2f(Vector2d copy) { x = (float)copy[0]; y = (float)copy[1]; }
-
-		public static explicit operator Vector2f(Vector2i v) => new(v.x, v.y);
+		public static explicit operator Vector2f(in Vector2i v) => new(v.x, v.y);
 
 		[IgnoreMember]
 		static public readonly Vector2f Zero = new(0.0f, 0.0f);
@@ -42,14 +45,14 @@ namespace RNumerics
 		static public readonly Vector2f MaxValue = new(float.MaxValue, float.MaxValue);
 		[IgnoreMember]
 		static public readonly Vector2f MinValue = new(float.MinValue, float.MinValue);
-		public bool IsInBox(Vector2f min,Vector2f check) {
+		public bool IsInBox(in Vector2f min, in Vector2f check) {
 			return check.y >= min.y && check.y <= y && check.x >= min.x && check.x <= x;
 		}
-		public bool IsInBox(Vector2f min, Vector2d check) {
+		public bool IsInBox(in Vector2f min, in Vector2d check) {
 			return check.y >= min.y && check.y <= y && check.x >= min.x && check.x <= x;
 		}
 		[IgnoreMember]
-		public float this[int key]
+		public float this[in int key]
 		{
 			get => (key == 0) ? x : y;
 			set {
@@ -80,7 +83,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public float Length => (float)Math.Sqrt(LengthSquared);
 
-		public float Normalize(float epsilon = MathUtil.EPSILONF) {
+		public float Normalize(in float epsilon = MathUtil.EPSILONF) {
 			var length = Length;
 			if (length > epsilon) {
 				var invLength = 1.0f / length;
@@ -119,87 +122,87 @@ namespace RNumerics
 			get { var f = x + y; return !float.IsNaN(f) && !float.IsInfinity(f); }
 		}
 
-		public void Round(int nDecimals) {
+		public void Round(in int nDecimals) {
 			x = (float)Math.Round(x, nDecimals);
 			y = (float)Math.Round(y, nDecimals);
 		}
-		public float Dot(Vector2f v2) {
+		public float Dot(in Vector2f v2) {
 			return (x * v2.x) + (y * v2.y);
 		}
 
 
-		public float Cross(Vector2f v2) {
+		public float Cross(in Vector2f v2) {
 			return (x * v2.y) - (y * v2.x);
 		}
 
 		[IgnoreMember]
 		public Vector2f Perp => new(y, -x);
 
-		public bool IsWithIn(Vector2f min, Vector2f max) {
+		public bool IsWithIn(in Vector2f min, in Vector2f max) {
 			return MathUtil.Clamp(this, min, max) == this;
 		}
 
 		[IgnoreMember]
 		public Vector2f UnitPerp => new Vector2f(y, -x).Normalized;
 
-		public float DotPerp(Vector2f v2) {
+		public float DotPerp(in Vector2f v2) {
 			return (x * v2.y) - (y * v2.x);
 		}
 
 
-		public float AngleD(Vector2f v2) {
+		public float AngleD(in Vector2f v2) {
 			var fDot = MathUtil.Clamp(Dot(v2), -1, 1);
 			return (float)(Math.Acos(fDot) * MathUtil.RAD_2_DEG);
 		}
-		public static float AngleD(Vector2f v1, Vector2f v2) {
+		public static float AngleD(in Vector2f v1, in Vector2f v2) {
 			return v1.AngleD(v2);
 		}
-		public float AngleR(Vector2f v2) {
+		public float AngleR(in Vector2f v2) {
 			var fDot = MathUtil.Clamp(Dot(v2), -1, 1);
 			return (float)Math.Acos(fDot);
 		}
-		public static float AngleR(Vector2f v1, Vector2f v2) {
+		public static float AngleR(in Vector2f v1, in Vector2f v2) {
 			return v1.AngleR(v2);
 		}
 
 
 
-		public float DistanceSquared(Vector2f v2) {
+		public float DistanceSquared(in Vector2f v2) {
 			float dx = v2.x - x, dy = v2.y - y;
 			return (dx * dx) + (dy * dy);
 		}
-		public float Distance(Vector2f v2) {
+		public float Distance(in Vector2f v2) {
 			float dx = v2.x - x, dy = v2.y - y;
 			return (float)Math.Sqrt((dx * dx) + (dy * dy));
 		}
-		public float Distance(Vector2d v2) {
+		public float Distance(in Vector2d v2) {
 			return Distance((Vector2f)v2);
 		}
 
-		public void Set(Vector2f o) {
+		public void Set(in Vector2f o) {
 			x = o.x;
 			y = o.y;
 		}
-		public void Set(float fX, float fY) {
+		public void Set(in float fX, in float fY) {
 			x = fX;
 			y = fY;
 		}
-		public void Add(Vector2f o) {
+		public void Add(in Vector2f o) {
 			x += o.x;
 			y += o.y;
 		}
-		public void Subtract(Vector2f o) {
+		public void Subtract(in Vector2f o) {
 			x -= o.x;
 			y -= o.y;
 		}
-		public static Vector2f MinMaxIntersect(Vector2d point, Vector2f min, Vector2f max) {
+		public static Vector2f MinMaxIntersect(in Vector2d point, in Vector2f min, in Vector2f max) {
 			return MinMaxIntersect((Vector2f)point, min, max);
 		}
-		public static Vector2f MinMaxIntersect(Vector2f point, Vector2f min, Vector2f max) {
+		public static Vector2f MinMaxIntersect(in Vector2f point, in Vector2f min, in Vector2f max) {
 			return new Vector2f(Math.Max(Math.Min(point.x,max.x),min.x), Math.Max(Math.Min(point.y, max.y), min.y));
 		}
 
-		public static Vector2f? Intersect(Vector2d line1V1, Vector2d line1V2, Vector2f line2V1, Vector2f line2V2) {
+		public static Vector2f? Intersect(in Vector2d line1V1, in Vector2d line1V2, in Vector2f line2V1, in Vector2f line2V2) {
 			var A1 = line1V2.y - line1V1.y;
 			var B1 = line1V1.x - line1V2.x;
 			var C1 = (A1 * line1V1.x) + (B1 * line1V1.y);
@@ -216,7 +219,7 @@ namespace RNumerics
 				return new Vector2f(x, y);
 			}
 		}
-		public static Vector2f? Intersect(Vector2f line1V1, Vector2f line1V2, Vector2f line2V1, Vector2f line2V2) {
+		public static Vector2f? Intersect(in Vector2f line1V1, in Vector2f line1V2, in Vector2f line2V1, in Vector2f line2V2) {
 			var A1 = line1V2.y - line1V1.y;
 			var B1 = line1V1.x - line1V2.x;
 			var C1 = (A1 * line1V1.x) + (B1 * line1V1.y);
@@ -233,28 +236,28 @@ namespace RNumerics
 				return new Vector2f(x, y);
 			}
 		}
-		public static Vector2f operator -(Vector2f v) => new(-v.x, -v.y);
+		public static Vector2f operator -(in Vector2f v) => new(-v.x, -v.y);
 
-		public static Vector2f operator +(Vector2f a, Vector2f o) => new(a.x + o.x, a.y + o.y);
-		public static Vector2f operator +(Vector2f a, float f) => new(a.x + f, a.y + f);
+		public static Vector2f operator +(in Vector2f a, in Vector2f o) => new(a.x + o.x, a.y + o.y);
+		public static Vector2f operator +(in Vector2f a, in float f) => new(a.x + f, a.y + f);
 
-		public static Vector2f operator -(Vector2f a, Vector2f o) => new(a.x - o.x, a.y - o.y);
-		public static Vector2f operator -(Vector2f a, float f) => new(a.x - f, a.y - f);
+		public static Vector2f operator -(in Vector2f a, in Vector2f o) => new(a.x - o.x, a.y - o.y);
+		public static Vector2f operator -(in Vector2f a, in float f) => new(a.x - f, a.y - f);
 
-		public static Vector2f operator *(Vector2f a, float f) => new(a.x * f, a.y * f);
-		public static Vector2f operator *(float f, Vector2f a) => new(a.x * f, a.y * f);
-		public static Vector2f operator /(Vector2f v, float f) => new(v.x / f, v.y / f);
-		public static Vector2f operator /(float f, Vector2f v) => new(f / v.x, f / v.y);
+		public static Vector2f operator *(in Vector2f a, in float f) => new(a.x * f, a.y * f);
+		public static Vector2f operator *(in float f, in Vector2f a) => new(a.x * f, a.y * f);
+		public static Vector2f operator /(in Vector2f v, in float f) => new(v.x / f, v.y / f);
+		public static Vector2f operator /(in float f, in Vector2f v) => new(f / v.x, f / v.y);
 
-		public static Vector2f operator *(Vector2f a, Vector2f b) => new(a.x * b.x, a.y * b.y);
-		public static Vector2f operator /(Vector2f a, Vector2f b) => new(a.x / b.x, a.y / b.y);
+		public static Vector2f operator *(in Vector2f a, in Vector2f b) => new(a.x * b.x, a.y * b.y);
+		public static Vector2f operator /(in Vector2f a, in Vector2f b) => new(a.x / b.x, a.y / b.y);
 
-		public static bool operator >(Vector2f a, Vector2f b) => a.x > b.x || a.y > b.y;
-		public static bool operator <(Vector2f a, Vector2f b) => a.x < b.x || a.y < b.y;
-		public static bool operator >=(Vector2f a, Vector2f b) => a.x >= b.x && a.y >= b.y;
-		public static bool operator <=(Vector2f a, Vector2f b) => a.x <= b.x && a.y <= b.y;
-		public static bool operator ==(Vector2f a, Vector2f b) => a.x == b.x && a.y == b.y;
-		public static bool operator !=(Vector2f a, Vector2f b) => a.x != b.x || a.y != b.y;
+		public static bool operator >(in Vector2f a, in Vector2f b) => a.x > b.x || a.y > b.y;
+		public static bool operator <(in Vector2f a, in Vector2f b) => a.x < b.x || a.y < b.y;
+		public static bool operator >=(in Vector2f a, in Vector2f b) => a.x >= b.x && a.y >= b.y;
+		public static bool operator <=(in Vector2f a, in Vector2f b) => a.x <= b.x && a.y <= b.y;
+		public static bool operator ==(in Vector2f a, in Vector2f b) => a.x == b.x && a.y == b.y;
+		public static bool operator !=(in Vector2f a, in Vector2f b) => a.x != b.x || a.y != b.y;
 		public override bool Equals(object obj) {
 			return this == (Vector2f)obj;
 		}
@@ -269,7 +272,7 @@ namespace RNumerics
 			}
 		}
 
-		public Vector2f ClosestPointOnLine(Vector2f first, Vector2f next) {
+		public Vector2f ClosestPointOnLine(in Vector2f first, in Vector2f next) {
 			var thisfirst = this - first;
 			var nextfitst = next - first;
 			var magnextfitst = nextfitst.LengthSquared;
@@ -293,17 +296,13 @@ namespace RNumerics
 		}
 
 
-		public bool EpsilonEqual(Vector2f v2, float epsilon) {
+		public bool EpsilonEqual(in Vector2f v2, in float epsilon) {
 			return (float)Math.Abs(x - v2.x) <= epsilon &&
 				   (float)Math.Abs(y - v2.y) <= epsilon;
 		}
 
 
-		public static Vector2f Lerp(Vector2f a, Vector2f b, float t) {
-			var s = 1 - t;
-			return new Vector2f((s * a.x) + (t * b.x), (s * a.y) + (t * b.y));
-		}
-		public static Vector2f Lerp(ref Vector2f a, ref Vector2f b, float t) {
+		public static Vector2f Lerp(in Vector2f a, in Vector2f b, in float t) {
 			var s = 1 - t;
 			return new Vector2f((s * a.x) + (t * b.x), (s * a.y) + (t * b.y));
 		}
@@ -325,7 +324,7 @@ namespace RNumerics
 			}
 		}
 
-		public static Vector2f GetUVPosOnTry(Vector3d p1, Vector2f p1uv, Vector3d p2, Vector2f p2uv, Vector3d p3, Vector2f p3uv, Vector3d point) {
+		public static Vector2f GetUVPosOnTry(in Vector3d p1, in Vector2f p1uv, in Vector3d p2, in Vector2f p2uv, in Vector3d p3, in Vector2f p3uv, in Vector3d point) {
 			// calculate vectors from point f to vertices p1, p2 and p3:
 			var f1 = p1 - point;
 			var f2 = p2 - point;
@@ -346,7 +345,7 @@ namespace RNumerics
 		}
 
 
-		public static explicit operator Vector2(Vector2f b) => b.ToSystemNumric();
+		public static explicit operator Vector2(in Vector2f b) => b.ToSystemNumric();
 
 		public static explicit operator Vector2f(Vector2 b) => ToRhuNumrics(ref b);
 

@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 {
 
 	[Category(new string[] { "Developer/Observer" })]
-	public class ObserverWindow : Component
+	public sealed class ObserverWindow : Component
 	{
 		[OnChanged(nameof(ChangeObserverd))]
 		public readonly SyncRef<IWorldObject> Observerd;

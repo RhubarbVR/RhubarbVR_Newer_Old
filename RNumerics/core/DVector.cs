@@ -11,7 +11,7 @@ namespace RNumerics
 	//   - this[] operator does not check bounds, so it can write to any valid Block
 	//   - some fns discard Blocks beyond iCurBlock
 	//   - wtf...
-	public class DVector<T> : IEnumerable<T>
+	public sealed class DVector<T> : IEnumerable<T>
 	{
 		List<T[]> _blocks;
 		int _iCurBlock;
@@ -27,7 +27,7 @@ namespace RNumerics
 			};
 		}
 
-		public DVector(DVector<T> copy) {
+		public DVector(in DVector<T> copy) {
 			BlockCount = copy.BlockCount;
 			_iCurBlock = copy._iCurBlock;
 			_iCurBlockUsed = copy._iCurBlockUsed;
@@ -38,11 +38,11 @@ namespace RNumerics
 			}
 		}
 
-		public DVector(T[] data) {
+		public DVector(in T[] data) {
 			Initialize(data);
 		}
 
-		public DVector(IEnumerable<T> init) {
+		public DVector(in IEnumerable<T> init) {
 			_iCurBlock = 0;
 			_iCurBlockUsed = 0;
 			_blocks = new List<T[]> {
@@ -69,7 +69,7 @@ namespace RNumerics
 
 		public int MemoryUsageBytes => (_blocks.Count == 0) ? 0 : _blocks.Count * BlockCount * System.Runtime.InteropServices.Marshal.SizeOf(_blocks[0][0]);
 
-		public void Add(T value) {
+		public void Add(in T value) {
 			if (_iCurBlockUsed == BlockCount) {
 				if (_iCurBlock == _blocks.Count - 1) {
 					_blocks.Add(new T[BlockCount]);
@@ -82,20 +82,20 @@ namespace RNumerics
 			_iCurBlockUsed++;
 		}
 
-		public void Add(T value, int nRepeat) {
+		public void Add(in T value, in int nRepeat) {
 			for (var i = 0; i < nRepeat; i++) {
 				Add(value);
 			}
 		}
 
-		public void Add(T[] values) {
+		public void Add(in T[] values) {
 			// TODO make this more efficient?
 			for (var i = 0; i < values.Length; ++i) {
 				Add(values[i]);
 			}
 		}
 
-		public void Add(T[] values, int nRepeat) {
+		public void Add(in T[] values, in int nRepeat) {
 			for (var i = 0; i < nRepeat; i++) {
 				for (var j = 0; j < values.Length; ++j) {
 					Add(values[j]);
@@ -104,7 +104,7 @@ namespace RNumerics
 		}
 
 
-		public void Push_back(T value) {
+		public void Push_back(in T value) {
 			Add(value);
 		}
 		public void Pop_back() {
@@ -120,10 +120,10 @@ namespace RNumerics
 			}
 		}
 
-		public void Insert(T value, int index) {
+		public void Insert(in T value, in int index) {
 			InsertAt(value, index);
 		}
-		public void InsertAt(T value, int index) {
+		public void InsertAt(in T value, in int index) {
 			var s = Size;
 			if (index == s) {
 				Push_back(value);
@@ -138,7 +138,7 @@ namespace RNumerics
 		}
 
 
-		public void Resize(int count) {
+		public void Resize(in int count) {
 			if (Length == count) {
 				return;
 			}
@@ -174,7 +174,7 @@ namespace RNumerics
 		}
 
 
-		public void Copy(DVector<T> copyIn) {
+		public void Copy(in DVector<T> copyIn) {
 			if (_blocks != null && copyIn._blocks.Count == _blocks.Count) {
 				var N = copyIn._blocks.Count;
 				for (var k = 0; k < N; ++k) {
@@ -281,7 +281,7 @@ namespace RNumerics
 
 
 
-		public void Initialize(T[] data) {
+		public void Initialize(in T[] data) {
 			var blocks = data.Length / BlockCount;
 			_blocks = new List<T[]>();
 			var ai = 0;
@@ -319,7 +319,7 @@ namespace RNumerics
 		/// <summary>
 		/// Apply action to each element of vector. Iterates by block so this is more efficient.
 		/// </summary>
-		public void Apply(Action<T, int> applyF) {
+		public void Apply(in Action<T, int> applyF) {
 			for (var bi = 0; bi < _iCurBlock; ++bi) {
 				var block = _blocks[bi];
 				for (var k = 0; k < BlockCount; ++k) {
@@ -336,7 +336,7 @@ namespace RNumerics
 		/// <summary>
 		/// set vec[i] = applyF(vec[i], i) for each element of vector
 		/// </summary>
-		public void ApplyReplace(Func<T, int, T> applyF) {
+		public void ApplyReplace(in Func<T, int, T> applyF) {
 			for (var bi = 0; bi < _iCurBlock; ++bi) {
 				var block = _blocks[bi];
 				for (var k = 0; k < BlockCount; ++k) {
@@ -358,7 +358,7 @@ namespace RNumerics
          *   common cases...
          */
 
-		public static unsafe void FastGetBuffer(DVector<double> v, double* pBuffer) {
+		public static unsafe void FastGetBuffer(in DVector<double> v, in double* pBuffer) {
 			var pCur = new IntPtr(pBuffer);
 			var N = v._blocks.Count;
 			for (var k = 0; k < N - 1; k++) {
@@ -368,7 +368,7 @@ namespace RNumerics
 			}
 			System.Runtime.InteropServices.Marshal.Copy(v._blocks[N - 1], 0, pCur, v._iCurBlockUsed);
 		}
-		public static unsafe void FastGetBuffer(DVector<float> v, float* pBuffer) {
+		public static unsafe void FastGetBuffer(in DVector<float> v, in float* pBuffer) {
 			var pCur = new IntPtr(pBuffer);
 			var N = v._blocks.Count;
 			for (var k = 0; k < N - 1; k++) {
@@ -378,7 +378,7 @@ namespace RNumerics
 			}
 			System.Runtime.InteropServices.Marshal.Copy(v._blocks[N - 1], 0, pCur, v._iCurBlockUsed);
 		}
-		public static unsafe void FastGetBuffer(DVector<int> v, int* pBuffer) {
+		public static unsafe void FastGetBuffer(in DVector<int> v, in int* pBuffer) {
 			var pCur = new IntPtr(pBuffer);
 			var N = v._blocks.Count;
 			for (var k = 0; k < N - 1; k++) {

@@ -9,7 +9,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Materials" })]
-	public class DynamicMaterial : AssetProvider<RMaterial>
+	public sealed class DynamicMaterial : AssetProvider<RMaterial>
 	{
 		[OnAssetLoaded(nameof(LoadMaterial))]
 		public readonly AssetRef<RShader> shader;

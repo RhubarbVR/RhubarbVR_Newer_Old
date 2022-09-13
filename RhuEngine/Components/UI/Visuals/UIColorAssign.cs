@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/Visuals" })]
-	public class UIColorAssign : Component
+	public sealed class UIColorAssign : Component
 	{
 		public enum ColorSelection
 		{

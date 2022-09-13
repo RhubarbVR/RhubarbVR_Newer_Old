@@ -8,7 +8,7 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
-	public class SyncObjectSerializerObject
+	public sealed class SyncObjectSerializerObject
 	{
 		public bool NetSync { get; private set; }
 

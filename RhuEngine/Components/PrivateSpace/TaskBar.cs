@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public class TaskBar : Component
+	public sealed class TaskBar : Component
 	{
 		public enum OpenPart
 		{

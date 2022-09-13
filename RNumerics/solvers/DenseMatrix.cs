@@ -6,15 +6,15 @@ namespace RNumerics
 	/// <summary>
 	/// Row-major dense matrix
 	/// </summary>
-	public class DenseMatrix : IMatrix
+	public sealed class DenseMatrix : IMatrix
 	{
-		public DenseMatrix(int Nrows, int Mcols) {
+		public DenseMatrix(in int Nrows, in int Mcols) {
 			Buffer = new double[Nrows * Mcols];
 			Array.Clear(Buffer, 0, Buffer.Length);
 			Rows = Nrows;
 			Columns = Mcols;
 		}
-		public DenseMatrix(DenseMatrix copy) {
+		public DenseMatrix(in DenseMatrix copy) {
 			Rows = copy.Rows;
 			Columns = copy.Columns;
 			Buffer = new double[Rows * Columns];
@@ -25,12 +25,12 @@ namespace RNumerics
 		public double[] Buffer { get; private set; }
 
 
-		public void Set(int r, int c, double value) {
+		public void Set(in int r, in int c, in double value) {
 			Buffer[(r * Columns) + c] = value;
 		}
 
 
-		public void Set(double[] values) {
+		public void Set(in double[] values) {
 			if (values.Length != Rows * Columns) {
 				throw new Exception("DenseMatrix.Set: incorrect length");
 			}
@@ -45,19 +45,19 @@ namespace RNumerics
 
 		public int Length => Columns * Rows;
 
-		public double this[int r, int c]
+		public double this[in int r, in int c]
 		{
 			get => Buffer[(r * Columns) + c];
 			set => Buffer[(r * Columns) + c] = value;
 		}
-		public double this[int i]
+		public double this[in int i]
 		{
 			get => Buffer[i];
 			set => Buffer[i] = value;
 		}
 
 
-		public DenseVector Row(int r) {
+		public DenseVector Row(in int r) {
 			var row = new DenseVector(Columns);
 			var ii = r * Columns;
 			for (var i = 0; i < Columns; ++i) {
@@ -66,7 +66,7 @@ namespace RNumerics
 
 			return row;
 		}
-		public DenseVector Column(int c) {
+		public DenseVector Column(in int c) {
 			var col = new DenseVector(Rows);
 			for (var i = 0; i < Rows; ++i) {
 				col[i] = Buffer[(i * Columns) + c];
@@ -126,7 +126,7 @@ namespace RNumerics
 
 
 
-		public bool IsSymmetric(double dTolerance = MathUtil.EPSILON) {
+		public bool IsSymmetric(in double dTolerance = MathUtil.EPSILON) {
 			if (Columns != Rows) {
 				throw new Exception("DenseMatrix.IsSymmetric: matrix is not square!");
 			}
@@ -168,7 +168,7 @@ namespace RNumerics
 
 
 
-		public bool EpsilonEquals(DenseMatrix m2, double epsilon = MathUtil.ZERO_TOLERANCE) {
+		public bool EpsilonEquals(in DenseMatrix m2, in double epsilon = MathUtil.ZERO_TOLERANCE) {
 			if (Rows != m2.Rows || Columns != m2.Columns) {
 				throw new Exception("DenseMatrix.Equals: matrices are not the same size!");
 			}
@@ -184,15 +184,15 @@ namespace RNumerics
 
 
 
-		public DenseVector Multiply(DenseVector X) {
+		public DenseVector Multiply(in DenseVector X) {
 			var R = new DenseVector(X.Length);
 			Multiply(X.Buffer, R.Buffer);
 			return R;
 		}
-		public void Multiply(DenseVector X, DenseVector R) {
+		public void Multiply(in DenseVector X, in DenseVector R) {
 			Multiply(X.Buffer, R.Buffer);
 		}
-		public void Multiply(double[] X, double[] Result) {
+		public void Multiply(in double[] X, in double[] Result) {
 			for (var i = 0; i < Rows; ++i) {
 				Result[i] = 0;
 				var ii = i * Columns;
@@ -204,7 +204,7 @@ namespace RNumerics
 
 
 
-		public void Add(DenseMatrix M2) {
+		public void Add(in DenseMatrix M2) {
 			if (Rows != M2.Rows || Columns != M2.Columns) {
 				throw new Exception("DenseMatrix.Add: matrices have incompatible dimensions");
 			}
@@ -213,7 +213,7 @@ namespace RNumerics
 				Buffer[i] += M2.Buffer[i];
 			}
 		}
-		public void Add(IMatrix M2) {
+		public void Add(in IMatrix M2) {
 			if (Rows != M2.Rows || Columns != M2.Columns) {
 				throw new Exception("DenseMatrix.Add: matrices have incompatible dimensions");
 			}
@@ -226,7 +226,7 @@ namespace RNumerics
 		}
 
 
-		public void MulAdd(DenseMatrix M2, double s) {
+		public void MulAdd(in DenseMatrix M2, in double s) {
 			if (Rows != M2.Rows || Columns != M2.Columns) {
 				throw new Exception("DenseMatrix.MulAdd: matrices have incompatible dimensions");
 			}
@@ -235,7 +235,7 @@ namespace RNumerics
 				Buffer[i] += s * M2.Buffer[i];
 			}
 		}
-		public void MulAdd(IMatrix M2, double s) {
+		public void MulAdd(in IMatrix M2, in double s) {
 			if (Rows != M2.Rows || Columns != M2.Columns) {
 				throw new Exception("DenseMatrix.MulAdd: matrices have incompatible dimensions");
 			}
@@ -249,12 +249,12 @@ namespace RNumerics
 
 
 
-		public DenseMatrix Multiply(DenseMatrix M2, bool bParallel = true) {
+		public DenseMatrix Multiply(in DenseMatrix M2, in bool bParallel = true) {
 			var R = new DenseMatrix(Rows, M2.Columns);
 			Multiply(M2, ref R, bParallel);
 			return R;
 		}
-		public void Multiply(DenseMatrix M2, ref DenseMatrix R, bool bParallel = true) {
+		public void Multiply(DenseMatrix M2, ref DenseMatrix R, in bool bParallel = true) {
 			int rows1 = Rows, cols1 = Columns;
 			int rows2 = M2.Rows, cols2 = M2.Columns;
 

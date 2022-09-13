@@ -14,14 +14,14 @@ namespace RNumerics
 	{
 		public DVector<T> vector;
 
-		public DVectorArray3(int nCount = 0) {
+		public DVectorArray3(in int nCount = 0) {
 			vector = new DVector<T>();
 			if (nCount > 0) {
 				vector.Resize(nCount * 3);
 			}
 		}
 
-		public DVectorArray3(T[] data) {
+		public DVectorArray3(in T[] data) {
 			vector = new DVector<T>(data);
 		}
 
@@ -31,17 +31,17 @@ namespace RNumerics
 			return vector.GetEnumerator();
 		}
 
-		public void Resize(int count) {
+		public void Resize(in int count) {
 			vector.Resize(3 * count);
 		}
 
-		public void Set(int i, T a, T b, T c) {
+		public void Set(in int i, in T a, in T b, in T c) {
 			vector.Insert(a, 3 * i);
 			vector.Insert(b, (3 * i) + 1);
 			vector.Insert(c, (3 * i) + 2);
 		}
 
-		public void Append(T a, T b, T c) {
+		public void Append(in T a, in T b, in T c) {
 			vector.Push_back(a);
 			vector.Push_back(b);
 			vector.Push_back(c);
@@ -57,12 +57,12 @@ namespace RNumerics
 	}
 
 
-	public class DVectorArray3d : DVectorArray3<double>
+	public sealed class DVectorArray3d : DVectorArray3<double>
 	{
-		public DVectorArray3d(int nCount = 0) : base(nCount) {
+		public DVectorArray3d(in int nCount = 0) : base(nCount) {
 		}
-		public DVectorArray3d(double[] data) : base(data) { }
-		public Vector3d this[int i]
+		public DVectorArray3d(in double[] data) : base(data) { }
+		public Vector3d this[in int i]
 		{
 			get => new(vector[3 * i], vector[(3 * i) + 1], vector[(3 * i) + 2]);
 			set => Set(i, value[0], value[1], value[2]);
@@ -76,11 +76,11 @@ namespace RNumerics
 	};
 
 
-	public class DVectorArray3f : DVectorArray3<float>
+	public sealed class DVectorArray3f : DVectorArray3<float>
 	{
-		public DVectorArray3f(int nCount = 0) : base(nCount) { }
-		public DVectorArray3f(float[] data) : base(data) { }
-		public Vector3f this[int i]
+		public DVectorArray3f(in int nCount = 0) : base(nCount) { }
+		public DVectorArray3f(in float[] data) : base(data) { }
+		public Vector3f this[in int i]
 		{
 			get => new(vector[3 * i], vector[(3 * i) + 1], vector[(3 * i) + 2]);
 			set => Set(i, value[0], value[1], value[2]);
@@ -94,17 +94,17 @@ namespace RNumerics
 	};
 
 
-	public class DVectorArray3i : DVectorArray3<int>
+	public sealed class DVectorArray3i : DVectorArray3<int>
 	{
-		public DVectorArray3i(int nCount = 0) : base(nCount) { }
-		public DVectorArray3i(int[] data) : base(data) { }
-		public Vector3i this[int i]
+		public DVectorArray3i(in int nCount = 0) : base(nCount) { }
+		public DVectorArray3i(in int[] data) : base(data) { }
+		public Vector3i this[in int i]
 		{
 			get => new(vector[3 * i], vector[(3 * i) + 1], vector[(3 * i) + 2]);
 			set => Set(i, value[0], value[1], value[2]);
 		}
 		// [RMS] for CW/CCW codes
-		public void Set(int i, int a, int b, int c, bool bCycle = false) {
+		public void Set(in int i, in int a, in int b, in int c, in bool bCycle = false) {
 			vector[3 * i] = a;
 			if (bCycle) {
 				vector[(3 * i) + 1] = c;
@@ -125,17 +125,17 @@ namespace RNumerics
 
 
 
-	public class DIndexArray3i : DVectorArray3<int>
+	public sealed class DIndexArray3i : DVectorArray3<int>
 	{
-		public DIndexArray3i(int nCount = 0) : base(nCount) { }
-		public DIndexArray3i(int[] data) : base(data) { }
-		public Index3i this[int i]
+		public DIndexArray3i(in int nCount = 0) : base(nCount) { }
+		public DIndexArray3i(in int[] data) : base(data) { }
+		public Index3i this[in int i]
 		{
 			get => new(vector[3 * i], vector[(3 * i) + 1], vector[(3 * i) + 2]);
 			set => Set(i, value[0], value[1], value[2]);
 		}
 		// [RMS] for CW/CCW codes
-		public void Set(int i, int a, int b, int c, bool bCycle = false) {
+		public void Set(in int i, in int a, in int b, in int c, in bool bCycle = false) {
 			vector[3 * i] = a;
 			if (bCycle) {
 				vector[(3 * i) + 1] = c;
@@ -165,12 +165,12 @@ namespace RNumerics
 	{
 		public DVector<T> vector;
 
-		public DVectorArray2(int nCount = 0) {
+		public DVectorArray2(in int nCount = 0) {
 			vector = new DVector<T>();
 			vector.Resize(nCount * 2);
 		}
 
-		public DVectorArray2(T[] data) {
+		public DVectorArray2(in T[] data) {
 			vector = new DVector<T>(data);
 		}
 
@@ -182,16 +182,16 @@ namespace RNumerics
 			}
 		}
 
-		public void Resize(int count) {
+		public void Resize(in int count) {
 			vector.Resize(2 * count);
 		}
 
-		public void Set(int i, T a, T b) {
+		public void Set(in int i, in T a, in T b) {
 			vector.Insert(a, 2 * i);
 			vector.Insert(b, (2 * i) + 1);
 		}
 
-		public void Append(T a, T b) {
+		public void Append(in T a, in T b) {
 			vector.Push_back(a);
 			vector.Push_back(b);
 		}
@@ -200,11 +200,11 @@ namespace RNumerics
 			return GetEnumerator();
 		}
 	}
-	public class DVectorArray2d : DVectorArray2<double>
+	public sealed class DVectorArray2d : DVectorArray2<double>
 	{
-		public DVectorArray2d(int nCount = 0) : base(nCount) { }
-		public DVectorArray2d(double[] data) : base(data) { }
-		public Vector2d this[int i]
+		public DVectorArray2d(in int nCount = 0) : base(nCount) { }
+		public DVectorArray2d(in double[] data) : base(data) { }
+		public Vector2d this[in int i]
 		{
 			get => new(vector[2 * i], vector[(2 * i) + 1]);
 			set => Set(i, value[0], value[1]);
@@ -216,11 +216,11 @@ namespace RNumerics
 			}
 		}
 	};
-	public class DVectorArray2f : DVectorArray2<float>
+	public sealed class DVectorArray2f : DVectorArray2<float>
 	{
-		public DVectorArray2f(int nCount = 0) : base(nCount) { }
-		public DVectorArray2f(float[] data) : base(data) { }
-		public Vector2f this[int i]
+		public DVectorArray2f(in int nCount = 0) : base(nCount) { }
+		public DVectorArray2f(in float[] data) : base(data) { }
+		public Vector2f this[in int i]
 		{
 			get => new(vector[2 * i], vector[(2 * i) + 1]);
 			set => Set(i, value[0], value[1]);
@@ -235,11 +235,11 @@ namespace RNumerics
 
 
 
-	public class DIndexArray2i : DVectorArray2<int>
+	public sealed class DIndexArray2i : DVectorArray2<int>
 	{
-		public DIndexArray2i(int nCount = 0) : base(nCount) { }
-		public DIndexArray2i(int[] data) : base(data) { }
-		public Index2i this[int i]
+		public DIndexArray2i(in int nCount = 0) : base(nCount) { }
+		public DIndexArray2i(in int[] data) : base(data) { }
+		public Index2i this[in int i]
 		{
 			get => new(vector[2 * i], vector[(2 * i) + 1]);
 			set => Set(i, value[0], value[1]);

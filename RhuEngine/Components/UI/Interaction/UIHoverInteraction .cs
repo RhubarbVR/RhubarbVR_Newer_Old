@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 	
 
 	[Category(new string[] { "UI/Interaction" })]
-	public class UIHoverInteraction : UIInteractionComponent
+	public sealed class UIHoverInteraction : UIInteractionComponent
 	{
 		[Default(true)]
 		public readonly Sync<bool> Laserable;

@@ -15,16 +15,23 @@ namespace RNumerics
 		public double y;
 		[Key(2)]
 		public double z;
+
+		public Vector3d() {
+			x = 0;
+			y = 0;
+			z = 0;
+		}
+
 		[IgnoreMember]
 		public double Magnitude => Math.Sqrt((x * x) + (y * y) + (z * z));
 
 		public static implicit operator Vector3(Vector3d v) => new((float)v.x, (float)v.y, (float)v.z);
 
-		public Vector3d(double f) { x = y = z = f; }
-		public Vector3d(double x, double y, double z) { this.x = x; this.y = y; this.z = z; }
-		public Vector3d(double[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; }
-		public Vector3d(Vector3d copy) { x = copy.x; y = copy.y; z = copy.z; }
-		public Vector3d(Vector3f copy) { x = copy.x; y = copy.y; z = copy.z; }
+		public Vector3d(in double f) { x = y = z = f; }
+		public Vector3d(in double x, in double y, in double z) { this.x = x; this.y = y; this.z = z; }
+		public Vector3d(in double[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; }
+		public Vector3d(in Vector3d copy) { x = copy.x; y = copy.y; z = copy.z; }
+		public Vector3d(in Vector3f copy) { x = copy.x; y = copy.y; z = copy.z; }
 		[IgnoreMember]
 		static public readonly Vector3d Zero = new(0.0f, 0.0f, 0.0f);
 		[IgnoreMember]
@@ -40,7 +47,7 @@ namespace RNumerics
 		[IgnoreMember]
 		static public readonly Vector3d MinValue = new(double.MinValue, double.MinValue, double.MinValue);
 		[IgnoreMember]
-		public double this[int key]
+		public double this[in int key]
 		{
 			get => (key == 0) ? x : (key == 1) ? y : z;
 			set {
@@ -81,7 +88,7 @@ namespace RNumerics
 		public double Max => Math.Max(x, Math.Max(y, z));
 		[IgnoreMember]
 		public double Min => Math.Min(x, Math.Min(y, z));
-		public static Vector3d Bezier(Vector3d a, Vector3d b, Vector3d c, Vector3d d, float t) {
+		public static Vector3d Bezier(in Vector3d a, in Vector3d b, in Vector3d c, in Vector3d d, in float t) {
 			var it = Lerp(b, c, t);
 			return Lerp(Lerp(Lerp(a, b, t), it, t), Lerp(it, Lerp(c, d, t), t), t);
 		}
@@ -94,7 +101,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public Vector3d Abs => new(Math.Abs(x), Math.Abs(y), Math.Abs(z));
 
-		public double Normalize(double epsilon = MathUtil.EPSILON) {
+		public double Normalize(in double epsilon = MathUtil.EPSILON) {
 			var length = Length;
 			if (length > epsilon) {
 				var invLength = 1.0 / length;
@@ -130,41 +137,33 @@ namespace RNumerics
 			get { var f = x + y + z; return double.IsNaN(f) == false && double.IsInfinity(f) == false; }
 		}
 
-		public void Round(int nDecimals) {
+		public void Round(in int nDecimals) {
 			x = Math.Round(x, nDecimals);
 			y = Math.Round(y, nDecimals);
 			z = Math.Round(z, nDecimals);
 		}
 
 
-		public double Dot(Vector3d v2) {
-			return (x * v2.x) + (y * v2.y) + (z * v2.z);
-		}
-		public double Dot(ref Vector3d v2) {
+		public double Dot(in Vector3d v2) {
 			return (x * v2.x) + (y * v2.y) + (z * v2.z);
 		}
 
-		public static double Dot(Vector3d v1, Vector3d v2) {
-			return v1.Dot(ref v2);
+		public static double Dot(in Vector3d v1, in Vector3d v2) {
+			return v1.Dot(v2);
 		}
 
-		public Vector3d Cross(Vector3d v2) {
+		public Vector3d Cross(in Vector3d v2) {
 			return new Vector3d(
 				(y * v2.z) - (z * v2.y),
 				(z * v2.x) - (x * v2.z),
 				(x * v2.y) - (y * v2.x));
 		}
-		public Vector3d Cross(ref Vector3d v2) {
-			return new Vector3d(
-				(y * v2.z) - (z * v2.y),
-				(z * v2.x) - (x * v2.z),
-				(x * v2.y) - (y * v2.x));
-		}
-		public static Vector3d Cross(Vector3d v1, Vector3d v2) {
-			return v1.Cross(ref v2);
+
+		public static Vector3d Cross(in Vector3d v1, in Vector3d v2) {
+			return v1.Cross(v2);
 		}
 
-		public Vector3d UnitCross(ref Vector3d v2) {
+		public Vector3d UnitCross(in Vector3d v2) {
 			var n = new Vector3d(
 				(y * v2.z) - (z * v2.y),
 				(z * v2.x) - (x * v2.z),
@@ -172,60 +171,51 @@ namespace RNumerics
 			n.Normalize();
 			return n;
 		}
-		public Vector3d UnitCross(Vector3d v2) {
-			return UnitCross(ref v2);
-		}
 
 
-		public double AngleD(Vector3d v2) {
+
+		public double AngleD(in Vector3d v2) {
 			var fDot = MathUtil.Clamp(Dot(v2), -1, 1);
 			return Math.Acos(fDot) * MathUtil.RAD_2_DEG;
 		}
-		public static double AngleD(Vector3d v1, Vector3d v2) {
+		public static double AngleD(in Vector3d v1, in Vector3d v2) {
 			return v1.AngleD(v2);
 		}
-		public double AngleR(Vector3d v2) {
+		public double AngleR(in Vector3d v2) {
 			var fDot = MathUtil.Clamp(Dot(v2), -1, 1);
 			return Math.Acos(fDot);
 		}
-		public static double AngleR(Vector3d v1, Vector3d v2) {
+		public static double AngleR(in Vector3d v1, in Vector3d v2) {
 			return v1.AngleR(v2);
 		}
 
-		public double DistanceSquared(Vector3d v2) {
-			double dx = v2.x - x, dy = v2.y - y, dz = v2.z - z;
-			return (dx * dx) + (dy * dy) + (dz * dz);
-		}
-		public double DistanceSquared(ref Vector3d v2) {
+		public double DistanceSquared(in Vector3d v2) {
 			double dx = v2.x - x, dy = v2.y - y, dz = v2.z - z;
 			return (dx * dx) + (dy * dy) + (dz * dz);
 		}
 
-		public double Distance(Vector3d v2) {
-			double dx = v2.x - x, dy = v2.y - y, dz = v2.z - z;
-			return Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
-		}
-		public double Distance(ref Vector3d v2) {
+
+		public double Distance(in Vector3d v2) {
 			double dx = v2.x - x, dy = v2.y - y, dz = v2.z - z;
 			return Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
 		}
 
-		public void Set(Vector3d o) {
+		public void Set(in Vector3d o) {
 			x = o.x;
 			y = o.y;
 			z = o.z;
 		}
-		public void Set(double fX, double fY, double fZ) {
+		public void Set(in double fX, in double fY, in double fZ) {
 			x = fX;
 			y = fY;
 			z = fZ;
 		}
-		public void Add(Vector3d o) {
+		public void Add(in Vector3d o) {
 			x += o.x;
 			y += o.y;
 			z += o.z;
 		}
-		public void Subtract(Vector3d o) {
+		public void Subtract(in Vector3d o) {
 			x -= o.x;
 			y -= o.y;
 			z -= o.z;
@@ -233,16 +223,16 @@ namespace RNumerics
 
 
 
-		public static Vector3d operator -(Vector3d v) => new(-v.x, -v.y, -v.z);
+		public static Vector3d operator -(in Vector3d v) => new(-v.x, -v.y, -v.z);
 
-		public static Vector3d operator *(double f, Vector3d v) => new(f * v.x, f * v.y, f * v.z);
-		public static Vector3d operator *(Vector3d v, double f) => new(f * v.x, f * v.y, f * v.z);
-		public static Vector3d operator /(Vector3d v, double f) => new(v.x / f, v.y / f, v.z / f);
-		public static Vector3d operator /(double f, Vector3d v) => new(f / v.x, f / v.y, f / v.z);
+		public static Vector3d operator *(in double f, in Vector3d v) => new(f * v.x, f * v.y, f * v.z);
+		public static Vector3d operator *(in Vector3d v, in double f) => new(f * v.x, f * v.y, f * v.z);
+		public static Vector3d operator /(in Vector3d v, in double f) => new(v.x / f, v.y / f, v.z / f);
+		public static Vector3d operator /(in double f, in Vector3d v) => new(f / v.x, f / v.y, f / v.z);
 
-		public static Vector3d operator *(Vector3d a, Vector3d b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
+		public static Vector3d operator *(in Vector3d a, in Vector3d b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
 
-		public void Bind(float angle, float radus,Vector3f scale,int splits) {
+		public void Bind(in float angle, in float radus, in Vector3f scale, in int splits) {
 			var selfAngle = angle * x;
 			var anglecalfirst = angle * (((float)Math.Floor(x * splits)) / splits);
 			var anglecalnext = angle * ((float)(Math.Floor(x * splits) + 1) / splits);
@@ -264,7 +254,7 @@ namespace RNumerics
 			z = newpoint.y;
 			this /= scale;
 		}
-		public void UnBind(float angle, float radus, Vector3f scale, int splits) {
+		public void UnBind(in float angle, in float radus, in Vector3f scale, in int splits) {
 			var selfAngle = angle * x;
 			var anglecalfirst = angle * (((float)Math.Floor(x * splits)) / splits);
 			var anglecalnext = angle * ((float)(Math.Floor(x * splits) + 1) / splits);
@@ -287,19 +277,19 @@ namespace RNumerics
 			this /= scale;
 		}
 
-		public static Vector3d operator /(Vector3d a, Vector3d b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
+		public static Vector3d operator /(in Vector3d a, in Vector3d b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
 
 
-		public static Vector3d operator +(Vector3d v0, Vector3d v1) => new(v0.x + v1.x, v0.y + v1.y, v0.z + v1.z);
-		public static Vector3d operator +(Vector3d v0, double f) => new(v0.x + f, v0.y + f, v0.z + f);
+		public static Vector3d operator +(in Vector3d v0, in Vector3d v1) => new(v0.x + v1.x, v0.y + v1.y, v0.z + v1.z);
+		public static Vector3d operator +(in Vector3d v0, in double f) => new(v0.x + f, v0.y + f, v0.z + f);
 
-		public static Vector3d operator -(Vector3d v0, Vector3d v1) => new(v0.x - v1.x, v0.y - v1.y, v0.z - v1.z);
-		public static Vector3d operator -(Vector3d v0, double f) => new(v0.x - f, v0.y - f, v0.z - f);
+		public static Vector3d operator -(in Vector3d v0, in Vector3d v1) => new(v0.x - v1.x, v0.y - v1.y, v0.z - v1.z);
+		public static Vector3d operator -(in Vector3d v0, in double f) => new(v0.x - f, v0.y - f, v0.z - f);
 
 
 
-		public static bool operator ==(Vector3d a, Vector3d b) => a.x == b.x && a.y == b.y && a.z == b.z;
-		public static bool operator !=(Vector3d a, Vector3d b) => a.x != b.x || a.y != b.y || a.z != b.z;
+		public static bool operator ==(in Vector3d a, in Vector3d b) => a.x == b.x && a.y == b.y && a.z == b.z;
+		public static bool operator !=(in Vector3d a, in Vector3d b) => a.x != b.x || a.y != b.y || a.z != b.z;
 		public override bool Equals(object obj) {
 			return this == (Vector3d)obj;
 		}
@@ -332,18 +322,14 @@ namespace RNumerics
 		}
 
 
-		public bool EpsilonEqual(Vector3d v2, double epsilon) {
+		public bool EpsilonEqual(in Vector3d v2, in double epsilon) {
 			return Math.Abs(x - v2.x) <= epsilon &&
 				   Math.Abs(y - v2.y) <= epsilon &&
 				   Math.Abs(z - v2.z) <= epsilon;
 		}
 
 
-		public static Vector3d Lerp(Vector3d a, Vector3d b, double t) {
-			var s = 1 - t;
-			return new Vector3d((s * a.x) + (t * b.x), (s * a.y) + (t * b.y), (s * a.z) + (t * b.z));
-		}
-		public static Vector3d Lerp(ref Vector3d a, ref Vector3d b, double t) {
+		public static Vector3d Lerp(in Vector3d a, in Vector3d b, in double t) {
 			var s = 1 - t;
 			return new Vector3d((s * a.x) + (t * b.x), (s * a.y) + (t * b.y), (s * a.z) + (t * b.z));
 		}
@@ -359,8 +345,8 @@ namespace RNumerics
 
 
 
-		public static implicit operator Vector3d(Vector3f v) => new(v.x, v.y, v.z);
-		public static explicit operator Vector3f(Vector3d v) => new((float)v.x, (float)v.y, (float)v.z);
+		public static implicit operator Vector3d(in Vector3f v) => new(v.x, v.y, v.z);
+		public static explicit operator Vector3f(in Vector3d v) => new((float)v.x, (float)v.y, (float)v.z);
 
 
 
@@ -414,7 +400,7 @@ namespace RNumerics
 		/// unit length and mutually perpendicular, and {U,V,W} is an orthonormal basis.
 		/// ported from WildMagic5
 		/// </summary>
-		public static void GenerateComplementBasis(ref Vector3d u, ref Vector3d v, Vector3d w) {
+		public static void GenerateComplementBasis(ref Vector3d u, ref Vector3d v, in Vector3d w) {
 			double invLength;
 
 			if (Math.Abs(w.x) >= Math.Abs(w.y)) {

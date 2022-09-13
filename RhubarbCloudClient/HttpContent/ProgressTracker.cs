@@ -2,7 +2,7 @@
 
 namespace RhubarbCloudClient.HttpContent
 {
-	public class ProgressTracker
+	public sealed class ProgressTracker
 	{
 		public ProgressState CurrentState { get; private set; }
 

@@ -9,13 +9,13 @@ namespace RNumerics
 	{
 
 		// basic ray-sphere intersection
-		public static bool Sphere(Vector3f vOrigin, Vector3f vDirection, Vector3f vCenter, float fRadius, out float fRayT) {
-			var bHit = SphereSigned(ref vOrigin, ref vDirection, ref vCenter, fRadius, out fRayT);
+		public static bool Sphere(in Vector3f vOrigin, in Vector3f vDirection, in Vector3f vCenter, in float fRadius, out float fRayT) {
+			var bHit = SphereSigned(vOrigin, vDirection, vCenter, fRadius, out fRayT);
 			fRayT = Math.Abs(fRayT);
 			return bHit;
 		}
 
-		public static bool SphereSigned(ref Vector3f vOrigin, ref Vector3f vDirection, ref Vector3f vCenter, float fRadius, out float fRayT) {
+		public static bool SphereSigned(in Vector3f vOrigin, in Vector3f vDirection, in Vector3f vCenter, in float fRadius, out float fRayT) {
 			fRayT = 0.0f;
 			var m = vOrigin - vCenter;
 			var b = m.Dot(vDirection);
@@ -41,10 +41,10 @@ namespace RNumerics
 
 
 
-		public static bool SphereSigned(ref Vector3d vOrigin, ref Vector3d vDirection, ref Vector3d vCenter, double fRadius, out double fRayT) {
+		public static bool SphereSigned(in Vector3d vOrigin, in Vector3d vDirection, in Vector3d vCenter, in double fRadius, out double fRayT) {
 			fRayT = 0.0;
 			var m = vOrigin - vCenter;
-			var b = m.Dot(ref vDirection);
+			var b = m.Dot(vDirection);
 			var c = m.Dot(m) - (fRadius * fRadius);
 
 			// Exit if r’s origin outside s (c > 0) and r pointing away from s (b > 0) 
@@ -63,12 +63,12 @@ namespace RNumerics
 		}
 
 
-		public static bool InfiniteCylinder(Vector3f vOrigin, Vector3f vDirection, Vector3f vCylOrigin, Vector3f vCylAxis, float fRadius, out float fRayT) {
+		public static bool InfiniteCylinder(in Vector3f vOrigin, in Vector3f vDirection, in Vector3f vCylOrigin, in Vector3f vCylAxis, in float fRadius, out float fRayT) {
 			var bHit = InfiniteCylinderSigned(vOrigin, vDirection, vCylOrigin, vCylAxis, fRadius, out fRayT);
 			fRayT = Math.Abs(fRayT);
 			return bHit;
 		}
-		public static bool InfiniteCylinderSigned(Vector3f vOrigin, Vector3f vDirection, Vector3f vCylOrigin, Vector3f vCylAxis, float fRadius, out float fRayT) {
+		public static bool InfiniteCylinderSigned(in Vector3f vOrigin, in Vector3f vDirection, in Vector3f vCylOrigin, in Vector3f vCylAxis, in float fRadius, out float fRayT) {
 			// [RMS] ugh this is shit...not even sure it works in general, but works for a ray inside cylinder
 
 			fRayT = 0.0f;

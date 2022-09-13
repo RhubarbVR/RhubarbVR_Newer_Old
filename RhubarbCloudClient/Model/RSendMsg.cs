@@ -6,7 +6,7 @@ using DataModel.Enums;
 
 namespace RhubarbCloudClient.Model
 {
-	public class RSendMsg
+	public sealed class RSendMsg
 	{
 		public MessageType MessageType { get; set; }
 		public string Data { get; set; }

@@ -26,21 +26,15 @@ namespace RhuEngine.WorldObjects
 			if (bodyNode == BodyNode.None) {
 				return Matrix.Identity;
 			}
-			if (userRoot.Target is null) {
-				return Matrix.Identity;
-			}
-			switch (bodyNode) {
-				case BodyNode.UserRoot:
-					return userRoot.Target.Entity.GlobalTrans;
-				case BodyNode.Head:
-					return userRoot.Target.head.Target?.GlobalTrans ?? Matrix.Identity;
-				case BodyNode.LeftController:
-					return userRoot.Target.leftController.Target?.GlobalTrans ?? Matrix.Identity;
-				case BodyNode.RightController:
-					return userRoot.Target.rightController.Target?.GlobalTrans ?? Matrix.Identity;
-				default:
-					return Matrix.Identity;
-			}
+			return userRoot.Target is null
+				? Matrix.Identity
+				: bodyNode switch {
+				BodyNode.UserRoot => userRoot.Target.Entity.GlobalTrans,
+				BodyNode.Head => userRoot.Target.head.Target?.GlobalTrans ?? Matrix.Identity,
+				BodyNode.LeftController => userRoot.Target.leftController.Target?.GlobalTrans ?? Matrix.Identity,
+				BodyNode.RightController => userRoot.Target.rightController.Target?.GlobalTrans ?? Matrix.Identity,
+				_ => Matrix.Identity,
+			};
 		}
 
 
@@ -80,8 +74,8 @@ namespace RhuEngine.WorldObjects
 				e?.BindDataUpdate((userdata) => {
 					UserName = userdata.UserName;
 					NormalizedUserName = userdata.NormalizedUserName;
-					var color = userdata.IconColor.GetColor();
-					UserColor = new Colorb(color.r, color.g, color.b, color.a);
+					var (r, g, b, a) = userdata.IconColor.GetColor();
+					UserColor = new Colorb(r, g, b, a);
 				});
 
 			});

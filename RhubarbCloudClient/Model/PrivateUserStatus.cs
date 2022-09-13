@@ -6,7 +6,7 @@ using DataModel.Enums;
 
 namespace RhubarbCloudClient.Model
 {
-	public class PrivateUserStatus : PublicUserStatus
+	public sealed class PrivateUserStatus : PublicUserStatus
 	{
 		public PrivateUserStatus() {
 

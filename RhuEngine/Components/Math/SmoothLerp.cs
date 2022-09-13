@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 	[GenericTypeConstraint()]
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Math" })]
-	public class SmoothLerp<T> : Component
+	public sealed class SmoothLerp<T> : Component
 	{
 		public readonly Linker<T> driver;
 		public readonly Sync<T> to;

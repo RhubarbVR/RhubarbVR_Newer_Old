@@ -14,7 +14,7 @@ namespace RNumerics
 	/// No overflow checking is done in release builds.
 	/// 
 	/// </summary>
-	public class RefCountVector : System.Collections.IEnumerable
+	public sealed class RefCountVector : System.Collections.IEnumerable
 	{
 		public static readonly short invalid = -1;
 		DVector<int> _free_indices;
@@ -26,14 +26,14 @@ namespace RNumerics
 			Count = 0;
 		}
 
-		public RefCountVector(RefCountVector copy)
+		public RefCountVector(in RefCountVector copy)
 		{
 			RawRefCounts = new DVector<short>(copy.RawRefCounts);
 			_free_indices = new DVector<int>(copy._free_indices);
 			Count = copy.Count;
 		}
 
-		public RefCountVector(short[] raw_ref_counts, bool build_free_list = false)
+		public RefCountVector(in short[] raw_ref_counts, in bool build_free_list = false)
 		{
 			RawRefCounts = new DVector<short>(raw_ref_counts);
 			_free_indices = new DVector<int>();
@@ -51,22 +51,22 @@ namespace RNumerics
 		public bool Is_dense => _free_indices.Length == 0;
 
 
-		public bool IsValid(int index)
+		public bool IsValid(in int index)
 		{
 			return index >= 0 && index < RawRefCounts.Size && RawRefCounts[index] > 0;
 		}
-		public bool IsValidUnsafe(int index)
+		public bool IsValidUnsafe(in int index)
 		{
 			return RawRefCounts[index] > 0;
 		}
 
 
-		public int RefCount(int index)
+		public int RefCount(in int index)
 		{
 			int n = RawRefCounts[index];
 			return (n == invalid) ? 0 : n;
 		}
-		public int RawRefCount(int index)
+		public int RawRefCount(in int index)
 		{
 			return RawRefCounts[index];
 		}
@@ -104,13 +104,13 @@ namespace RNumerics
 
 
 
-		public int Increment(int index, short increment = 1)
+		public int Increment(in int index, in short increment = 1)
 		{
 			RawRefCounts[index] += increment;
 			return RawRefCounts[index];
 		}
 
-		public void Decrement(int index, short decrement = 1)
+		public void Decrement(in int index, in short decrement = 1)
 		{
 			RawRefCounts[index] -= decrement;
 			if (RawRefCounts[index] == 0)
@@ -130,7 +130,7 @@ namespace RNumerics
 		/// If you are doing many of these, it is likely faster to use 
 		/// allocate_at_unsafe(), and then rebuild_free_list() after you are done.
 		/// </summary>
-		public bool Allocate_at(int index)
+		public bool Allocate_at(in int index)
 		{
 			if (index >= RawRefCounts.Size)
 			{
@@ -173,7 +173,7 @@ namespace RNumerics
 		/// However, we do not update free list. So, you probably need to do 
 		/// rebuild_free_list() after calling this.
 		/// </summary>
-		public bool Allocate_at_unsafe(int index)
+		public bool Allocate_at_unsafe(in int index)
 		{
 			if (index >= RawRefCounts.Size)
 			{
@@ -203,7 +203,7 @@ namespace RNumerics
 
 
 		// [RMS] really should not use this!!
-		public void Set_Unsafe(int index, short count)
+		public void Set_Unsafe(in int index, in short count)
 		{
 			RawRefCounts[index] = count;
 		}
@@ -231,7 +231,7 @@ namespace RNumerics
 		}
 
 
-		public void Trim(int maxIndex)
+		public void Trim(in int maxIndex)
 		{
 			_free_indices = new DVector<int>();
 			RawRefCounts.Resize(maxIndex);

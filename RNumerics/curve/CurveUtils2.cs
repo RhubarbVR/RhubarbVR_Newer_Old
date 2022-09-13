@@ -7,7 +7,7 @@ namespace RNumerics
 	{
 
 
-		public static IParametricCurve2d Convert(Polygon2d poly) {
+		public static IParametricCurve2d Convert(in Polygon2d poly) {
 			var seq = new ParametricCurveSequence2();
 			var N = poly.VertexCount;
 			for (var i = 0; i < N; ++i) {
@@ -20,7 +20,7 @@ namespace RNumerics
 
 
 		// 2D curve utils?
-		public static double SampledDistance(IParametricCurve2d c, Vector2d point, int N = 100) {
+		public static double SampledDistance(in IParametricCurve2d c, in Vector2d point, in int N = 100) {
 			var tMax = c.ParamLength;
 			var min_dist = double.MaxValue;
 			for (var i = 0; i <= N; ++i) {
@@ -54,7 +54,7 @@ namespace RNumerics
 		}
 
 
-		public static List<IParametricCurve2d> Flatten(List<IParametricCurve2d> curves) {
+		public static List<IParametricCurve2d> Flatten(in List<IParametricCurve2d> curves) {
 			var l = new List<IParametricCurve2d>();
 			foreach (var sourceC in curves) {
 				foreach (var c in LeafCurvesIteration(sourceC)) {
@@ -63,13 +63,13 @@ namespace RNumerics
 			}
 			return l;
 		}
-		public static List<IParametricCurve2d> Flatten(IParametricCurve2d curve) {
+		public static List<IParametricCurve2d> Flatten(in IParametricCurve2d curve) {
 			return new List<IParametricCurve2d>(LeafCurvesIteration(curve));
 		}
 
 
 		// returns largest scalar coordinate value, useful for converting to integer coords
-		public static Vector2d GetMaxOriginDistances(IEnumerable<Vector2d> vertices) {
+		public static Vector2d GetMaxOriginDistances(in IEnumerable<Vector2d> vertices) {
 			var max = Vector2d.Zero;
 			foreach (var v in vertices) {
 				var x = Math.Abs(v.x);
@@ -86,7 +86,7 @@ namespace RNumerics
 		}
 
 
-		public static int FindNearestVertex(Vector2d pt, IEnumerable<Vector2d> vertices) {
+		public static int FindNearestVertex(in Vector2d pt, in IEnumerable<Vector2d> vertices) {
 			var i = 0;
 			var iNearest = -1;
 			var nearestSqr = double.MaxValue;
@@ -102,7 +102,7 @@ namespace RNumerics
 		}
 
 
-		public static Vector2d CentroidVtx(IEnumerable<Vector2d> vertices) {
+		public static Vector2d CentroidVtx(in IEnumerable<Vector2d> vertices) {
 			var c = Vector2d.Zero;
 			var count = 0;
 			foreach (var v in vertices) {
@@ -119,7 +119,7 @@ namespace RNumerics
 
 
 
-		public static void LaplacianSmooth(IList<Vector2d> vertices, double alpha, int iterations, bool is_loop, bool in_place = false) {
+		public static void LaplacianSmooth(in IList<Vector2d> vertices, in double alpha, in int iterations, in bool is_loop, in bool in_place = false) {
 			var N = vertices.Count;
 			Vector2d[] temp = null;
 			if (in_place == false) {
@@ -170,8 +170,8 @@ namespace RNumerics
 		/// [TODO] this is pretty hacky...could be better in lots of ways...
 		/// 
 		/// </summary>
-		public static void LaplacianSmoothConstrained(Polygon2d poly, double alpha, int iterations,
-			double max_dist, bool bAllowShrink, bool bAllowGrow, bool bPerVertexDistances = true) {
+		public static void LaplacianSmoothConstrained(in Polygon2d poly, in double alpha, in int iterations,
+			in double max_dist, in bool bAllowShrink, in bool bAllowGrow, in bool bPerVertexDistances = true) {
 			var origPoly = new Polygon2d(poly);
 
 			var N = poly.VertexCount;
@@ -229,7 +229,7 @@ namespace RNumerics
 
 
 
-		public static void LaplacianSmoothConstrained(GeneralPolygon2d solid, double alpha, int iterations, double max_dist, bool bAllowShrink, bool bAllowGrow) {
+		public static void LaplacianSmoothConstrained(in GeneralPolygon2d solid, in double alpha, in int iterations, in double max_dist, in bool bAllowShrink, in bool bAllowGrow) {
 			LaplacianSmoothConstrained(solid.Outer, alpha, iterations, max_dist, bAllowShrink, bAllowGrow);
 			foreach (var hole in solid.Holes) {
 				CurveUtils2.LaplacianSmoothConstrained(hole, alpha, iterations, max_dist, bAllowShrink, bAllowGrow);
@@ -241,7 +241,7 @@ namespace RNumerics
 		/// <summary>
 		/// return list of objects for which keepF(obj) returns true
 		/// </summary>
-		public static List<T> Filter<T>(List<T> objects, Func<T, bool> keepF) {
+		public static List<T> Filter<T>(in List<T> objects, in Func<T, bool> keepF) {
 			var result = new List<T>(objects.Count);
 			foreach (var obj in objects) {
 				if (keepF(obj)) {
@@ -255,7 +255,7 @@ namespace RNumerics
 		/// <summary>
 		/// Split the input list into two new lists, based on predicate (set1 == true)
 		/// </summary>
-		public static void Split<T>(List<T> objects, out List<T> set1, out List<T> set2, Func<T, bool> splitF) {
+		public static void Split<T>(in List<T> objects, out List<T> set1, out List<T> set2, in Func<T, bool> splitF) {
 			set1 = new List<T>();
 			set2 = new List<T>();
 			foreach (var obj in objects) {
@@ -270,7 +270,7 @@ namespace RNumerics
 
 
 
-		public static Polygon2d SplitToTargetLength(Polygon2d poly, double length) {
+		public static Polygon2d SplitToTargetLength(in Polygon2d poly, in double length) {
 			var result = new Polygon2d();
 			result.AppendVertex(poly[0]);
 			for (var j = 0; j < poly.VertexCount; ++j) {
@@ -302,7 +302,7 @@ namespace RNumerics
 		/// <summary>
 		/// Remove polygons and polygon-holes smaller than minArea
 		/// </summary>
-		public static List<GeneralPolygon2d> FilterDegenerate(List<GeneralPolygon2d> polygons, double minArea) {
+		public static List<GeneralPolygon2d> FilterDegenerate(in List<GeneralPolygon2d> polygons, in double minArea) {
 			var result = new List<GeneralPolygon2d>(polygons.Count);
 			var filteredHoles = new List<Polygon2d>();
 			foreach (var poly in polygons) {

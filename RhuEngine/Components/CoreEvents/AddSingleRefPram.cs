@@ -8,7 +8,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreEvents" })]
-	public class AddSingleRefPram<T> : Component where T : class, IWorldObject
+	public sealed class AddSingleRefPram<T> : Component where T : class, IWorldObject
 	{
 		public readonly SyncRef<T> Ref;
 

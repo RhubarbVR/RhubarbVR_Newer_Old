@@ -10,7 +10,7 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects
 {
-	public class OpusStream : AudioStream
+	public sealed class OpusStream : AudioStream
 	{
 		[OnChanged(nameof(LoadOpus))]
 		[Default(Application.VoIP)]

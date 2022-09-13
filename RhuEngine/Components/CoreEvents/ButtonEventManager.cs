@@ -8,7 +8,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreEvents" })]
-	public class ButtonEventManager : Component
+	public sealed class ButtonEventManager : Component
 	{
 		public readonly SyncDelegate Click;
 		public readonly SyncDelegate Pressing;

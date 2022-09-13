@@ -14,7 +14,7 @@ namespace RNumerics
 	/// Use the Append() functions to add different transform types, and the TransformX()
 	/// to apply the sequence
 	/// </summary>
-	public class TransformSequence
+	public sealed class TransformSequence
 	{
 		enum XFormType
 		{
@@ -49,20 +49,20 @@ namespace RNumerics
 			_operations = new List<XForm>();
 		}
 
-		public TransformSequence(TransformSequence copy)
+		public TransformSequence(in TransformSequence copy)
 		{
 			_operations = new List<XForm>(copy._operations);
 		}
 
 
 
-		public void Append(TransformSequence sequence)
+		public void Append(in TransformSequence sequence)
 		{
 			_operations.AddRange(sequence._operations);
 		}
 
 
-		public void AppendTranslation(Vector3d dv)
+		public void AppendTranslation(in Vector3d dv)
 		{
 			_operations.Add(new XForm()
 			{
@@ -70,7 +70,7 @@ namespace RNumerics
 				data = new Vector3dTuple3(dv, Vector3d.Zero, Vector3d.Zero)
 			});
 		}
-		public void AppendTranslation(double dx, double dy, double dz)
+		public void AppendTranslation(in double dx, in double dy, in double dz)
 		{
 			_operations.Add(new XForm()
 			{
@@ -79,7 +79,7 @@ namespace RNumerics
 			});
 		}
 
-		public void AppendRotation(Quaternionf q)
+		public void AppendRotation(in Quaternionf q)
 		{
 			_operations.Add(new XForm()
 			{
@@ -88,7 +88,7 @@ namespace RNumerics
 			});
 		}
 
-		public void AppendRotation(Quaternionf q, Vector3d aroundPt)
+		public void AppendRotation(in Quaternionf q, in Vector3d aroundPt)
 		{
 			_operations.Add(new XForm()
 			{
@@ -97,7 +97,7 @@ namespace RNumerics
 			});
 		}
 
-		public void AppendScale(Vector3d s)
+		public void AppendScale(in Vector3d s)
 		{
 			_operations.Add(new XForm()
 			{
@@ -106,7 +106,7 @@ namespace RNumerics
 			});
 		}
 
-		public void AppendScale(Vector3d s, Vector3d aroundPt)
+		public void AppendScale(in Vector3d s, in Vector3d aroundPt)
 		{
 			_operations.Add(new XForm()
 			{
@@ -115,7 +115,7 @@ namespace RNumerics
 			});
 		}
 
-		public void AppendToFrame(Frame3f frame)
+		public void AppendToFrame(in Frame3f frame)
 		{
 			var q = frame.Rotation;
 			_operations.Add(new XForm()
@@ -125,7 +125,7 @@ namespace RNumerics
 			});
 		}
 
-		public void AppendFromFrame(Frame3f frame)
+		public void AppendFromFrame(in Frame3f frame)
 		{
 			var q = frame.Rotation;
 			_operations.Add(new XForm()
@@ -171,11 +171,11 @@ namespace RNumerics
 						break;
 
 					case XFormType.ToFrame:
-						p = _operations[i].Frame.ToFrameP(ref p);
+						p = _operations[i].Frame.ToFrameP(p);
 						break;
 
 					case XFormType.FromFrame:
-						p = _operations[i].Frame.FromFrameP(ref p);
+						p = _operations[i].Frame.FromFrameP(p);
 						break;
 
 					default:
@@ -234,7 +234,7 @@ namespace RNumerics
 		/// <summary>
 		/// Apply transforms to point
 		/// </summary>
-		public Vector3f TransformP(Vector3f p)
+		public Vector3f TransformP(in Vector3f p)
 		{
 			return (Vector3f)TransformP((Vector3d)p);
 		}

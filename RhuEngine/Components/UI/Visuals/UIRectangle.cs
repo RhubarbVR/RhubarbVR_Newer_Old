@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/Visuals" })]
-	public class UIRectangle : RenderUIComponent
+	public sealed class UIRectangle : RenderUIComponent
 	{
 		[Exposed]
 		public void AddRoundingSettings() {

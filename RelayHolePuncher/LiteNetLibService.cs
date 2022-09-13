@@ -9,7 +9,7 @@ namespace RelayHolePuncher
 	{
 		public void Initialize(int port);
 	}
-	public class LiteNetLibService
+	public sealed class LiteNetLibService
 	{
 		public HolePunchServer punchServer;
 

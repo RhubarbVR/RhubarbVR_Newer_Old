@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 
 using RhuEngine.WorldObjects;
+using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 
 namespace RhuEngine.Components
 {
-	public class IcosphereMesh : ProceduralMesh
+	[Category(new string[] { "Assets/Procedural Meshes" })]
+	public sealed class IcosphereMesh : ProceduralMesh
 	{
 		[Default(8)]
 		[OnChanged(nameof(LoadMesh))]

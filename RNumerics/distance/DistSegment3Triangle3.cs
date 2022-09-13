@@ -8,7 +8,7 @@ namespace RNumerics
 	// ported from WildMagic 5 
 	// https://www.geometrictools.com/Downloads/Downloads.html
 
-	public class DistSegment3Triangle3
+	public sealed class DistSegment3Triangle3
 	{
 		Segment3d _segment;
 		public Segment3d Segment
@@ -31,7 +31,7 @@ namespace RNumerics
 		public Vector3d TriangleClosest;
 		public Vector3d TriangleBaryCoords;
 
-		public DistSegment3Triangle3(Segment3d SegmentIn, Triangle3d TriangleIn) {
+		public DistSegment3Triangle3(in Segment3d SegmentIn, in Triangle3d TriangleIn) {
 			_triangle = TriangleIn;
 			_segment = SegmentIn;
 		}

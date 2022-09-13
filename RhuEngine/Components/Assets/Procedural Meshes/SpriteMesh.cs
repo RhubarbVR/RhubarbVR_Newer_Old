@@ -7,7 +7,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class SpriteMesh : ProceduralMesh
+	public sealed class SpriteMesh : ProceduralMesh
 	{
 		[OnChanged(nameof(LoadMesh))]
 		public readonly SyncRef<SpriteProvder> Sprite;

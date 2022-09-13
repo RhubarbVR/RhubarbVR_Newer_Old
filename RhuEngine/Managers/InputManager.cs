@@ -12,7 +12,7 @@ using RNumerics;
 
 namespace RhuEngine.Managers
 {
-	public class InputManager : IManager
+	public sealed class InputManager : IManager
 	{
 		private Engine _engine;
 
@@ -38,7 +38,8 @@ namespace RhuEngine.Managers
 			Primary,
 			Secondary,
 			Grab,
-			UnlockMouse
+			UnlockMouse,
+			ObserverOpen
 		}
 
 

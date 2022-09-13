@@ -5,13 +5,13 @@ using System.Text;
 
 namespace RNumerics
 {
-	public class CurveResampler
+	public sealed class CurveResampler
 	{
 
 		double[] _lengths;
 
 		// will return null if no edges need to be split!
-		public List<Vector3d> SplitResample(ISampledCurve3d curve, double fMaxEdgeLen) {
+		public List<Vector3d> SplitResample(in ISampledCurve3d curve, in double fMaxEdgeLen) {
 			var fMaxSqr = fMaxEdgeLen * fMaxEdgeLen;
 
 			var N = curve.VertexCount;
@@ -57,7 +57,7 @@ namespace RNumerics
 
 
 		// will return null if no edges need to be split!
-		public List<Vector3d> SplitCollapseResample(ISampledCurve3d curve, double fMaxEdgeLen, double fMinEdgeLen) {
+		public List<Vector3d> SplitCollapseResample(in ISampledCurve3d curve, in double fMaxEdgeLen, in double fMinEdgeLen) {
 			var fMaxSqr = fMaxEdgeLen * fMaxEdgeLen;
 			var fMinSqr = fMinEdgeLen * fMinEdgeLen;
 

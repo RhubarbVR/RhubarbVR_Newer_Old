@@ -9,7 +9,7 @@ namespace SharedModels.GameSpecific
 {
 
 	[Formatter]
-	public class ConnectToAnotherUserFormatter : IMessagePackFormatter<ConnectToAnotherUser>
+	public sealed class ConnectToAnotherUserFormatter : IMessagePackFormatter<ConnectToAnotherUser>
 	{
 		public void Serialize(ref MessagePackWriter writer, ConnectToAnotherUser value, MessagePackSerializerOptions options) {
 			options.Resolver.GetFormatterWithVerify<string>().Serialize(ref writer,value.Key, options);

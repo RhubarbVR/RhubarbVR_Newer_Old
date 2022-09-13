@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RhubarbCloudClient.Model
 {
-	public class JoinSession
+	public sealed class JoinSession
 	{
 		public Guid SessionID { get; set; }
 		public UserConnectionInfo UserConnectionInfo { get; set; }

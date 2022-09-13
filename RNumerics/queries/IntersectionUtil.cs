@@ -36,7 +36,7 @@ namespace RNumerics
 
 
 		// same code as IntrRay3Triangle3, but can be called w/o constructing additional data structures
-		public static bool Intersects(Vector3d rayOrigin, Vector3d rayDirection, Vector3d V0, Vector3d V1, Vector3d V2) {
+		public static bool Intersects(in Vector3d rayOrigin, in Vector3d rayDirection, in Vector3d V0, in Vector3d V1, in Vector3d V2) {
 			// Compute the offset origin, edges, and normal.
 			var diff = rayOrigin - V0;
 			var edge1 = V1 - V0;
@@ -90,7 +90,7 @@ namespace RNumerics
 		/// <summary>
 		/// Test if line intersects sphere
 		/// </summary>
-		public static bool LineSphereTest(ref Vector3d lineOrigin, ref Vector3d lineDirection, ref Vector3d sphereCenter, double sphereRadius) {
+		public static bool LineSphereTest(ref Vector3d lineOrigin, ref Vector3d lineDirection, ref Vector3d sphereCenter, in double sphereRadius) {
 			// [RMS] adapted from GeometricTools GTEngine
 			// https://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrLine3Sphere3.h
 
@@ -112,7 +112,7 @@ namespace RNumerics
 		/// <summary>
 		/// Intersect ray with sphere and return intersection info (# hits, ray parameters)
 		/// </summary>
-		public static bool LineSphere(ref Vector3d lineOrigin, ref Vector3d lineDirection, ref Vector3d sphereCenter, double sphereRadius, ref LinearIntersection result) {
+		public static bool LineSphere(ref Vector3d lineOrigin, ref Vector3d lineDirection, ref Vector3d sphereCenter, in double sphereRadius, ref LinearIntersection result) {
 			// [RMS] adapted from GeometricTools GTEngine
 			// https://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrLine3Sphere3.h
 
@@ -145,7 +145,7 @@ namespace RNumerics
 			}
 			return result.intersects;
 		}
-		public static LinearIntersection LineSphere(ref Vector3d lineOrigin, ref Vector3d lineDirection, ref Vector3d sphereCenter, double sphereRadius) {
+		public static LinearIntersection LineSphere(ref Vector3d lineOrigin, ref Vector3d lineDirection, ref Vector3d sphereCenter, in double sphereRadius) {
 			var result = new LinearIntersection();
 			LineSphere(ref lineOrigin, ref lineDirection, ref sphereCenter, sphereRadius, ref result);
 			return result;
@@ -156,7 +156,7 @@ namespace RNumerics
 		/// <summary>
 		/// Test if ray intersects sphere
 		/// </summary>
-		public static bool RaySphereTest(ref Vector3d rayOrigin, ref Vector3d rayDirection, ref Vector3d sphereCenter, double sphereRadius) {
+		public static bool RaySphereTest(ref Vector3d rayOrigin, ref Vector3d rayDirection, ref Vector3d sphereCenter, in double sphereRadius) {
 			// [RMS] adapted from GeometricTools GTEngine
 			// https://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Sphere3.h
 
@@ -185,7 +185,7 @@ namespace RNumerics
 		/// <summary>
 		/// Intersect ray with sphere and return intersection info (# hits, ray parameters)
 		/// </summary>
-		public static bool RaySphere(ref Vector3d rayOrigin, ref Vector3d rayDirection, ref Vector3d sphereCenter, double sphereRadius, ref LinearIntersection result) {
+		public static bool RaySphere(ref Vector3d rayOrigin, ref Vector3d rayDirection, ref Vector3d sphereCenter, in double sphereRadius, ref LinearIntersection result) {
 			// [RMS] adapted from GeometricTools GTEngine
 			// https://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Sphere3.h
 
@@ -205,7 +205,7 @@ namespace RNumerics
 			}
 			return result.intersects;
 		}
-		public static LinearIntersection RaySphere(ref Vector3d rayOrigin, ref Vector3d rayDirection, ref Vector3d sphereCenter, double sphereRadius) {
+		public static LinearIntersection RaySphere(ref Vector3d rayOrigin, ref Vector3d rayDirection, ref Vector3d sphereCenter, in double sphereRadius) {
 			var result = new LinearIntersection();
 			LineSphere(ref rayOrigin, ref rayDirection, ref sphereCenter, sphereRadius, ref result);
 			return result;

@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 {
 
 	[Category(new string[] { "UI/Rects" })]
-	public class Grid : RawScrollUIRect
+	public sealed class Grid : RawScrollUIRect
 	{
 		[Default(2)]
 		public readonly Sync<int> GridWidth;

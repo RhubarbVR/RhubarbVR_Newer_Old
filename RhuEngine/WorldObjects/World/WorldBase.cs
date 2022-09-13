@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World : IWorldObject
+	public sealed partial class World : IWorldObject
 	{
 		public PhysicsSim PhysicsSim { get; set; }
 

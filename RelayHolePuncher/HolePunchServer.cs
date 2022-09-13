@@ -8,7 +8,7 @@ using LiteNetLib;
 
 namespace RelayHolePuncher
 {
-	public class HolePunchServer : INetworkingServer, INatPunchListener
+	public sealed class HolePunchServer : INetworkingServer, INatPunchListener
 	{
 		private readonly ConcurrentDictionary<string, WaitPeer> _waitingPeers = new();
 		public void OnNatIntroductionRequest(IPEndPoint localEndPoint, IPEndPoint remoteEndPoint, string token) {

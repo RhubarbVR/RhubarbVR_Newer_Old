@@ -6,7 +6,7 @@ namespace RNumerics
 	{
 		// tan(theta/2) = +/- sqrt( (1-cos(theta)) / (1+cos(theta)) )
 		// (in context above we never want negative value!)
-		public static double VectorTanHalfAngle(Vector3d a, Vector3d b)
+		public static double VectorTanHalfAngle(in Vector3d a, in Vector3d b)
 		{
 			var cosAngle = a.Dot(b);
 			var sqr = (1 - cosAngle) / (1 + cosAngle);

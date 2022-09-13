@@ -7,7 +7,7 @@ namespace RNumerics
 	/// Source from https://github.com/behreajj/CreateCapsule/blob/master/Unity%20Capsule/Assets/Editor/CapsuleMaker.cs
 	/// GNU General Public License v3.0
 	/// </summary>
-	public class CapsuleGenerator : MeshGenerator
+	public sealed class CapsuleGenerator : MeshGenerator
 	{
 		public enum UvProfile : int
 		{

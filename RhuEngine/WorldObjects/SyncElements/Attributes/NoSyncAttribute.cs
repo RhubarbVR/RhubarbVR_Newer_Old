@@ -3,7 +3,7 @@
 
 namespace RhuEngine.WorldObjects
 {
-	public class NoSyncAttribute : Attribute
+	public sealed class NoSyncAttribute : Attribute
 	{
 		public NoSyncAttribute() {
 		}

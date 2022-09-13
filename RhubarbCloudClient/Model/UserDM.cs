@@ -6,9 +6,9 @@ using DataModel.Enums;
 
 namespace RhubarbCloudClient.Model
 {
-	public class UserDM
+	public sealed class UserDM
 	{
-		public class MSG
+		public sealed class MSG
 		{
 			public Guid Id { get; set; }
 			public Guid DMId { get; set; }

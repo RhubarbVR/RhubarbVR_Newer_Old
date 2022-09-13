@@ -2,7 +2,7 @@
 
 namespace RNumerics
 {
-	public class TorusGenerator : Curve3Axis3RevolveGenerator
+	public sealed class TorusGenerator : Curve3Axis3RevolveGenerator
 	{
 		public float MajorRadius;
 		public float MinorRadius;

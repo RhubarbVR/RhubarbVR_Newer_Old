@@ -7,13 +7,13 @@ using System.Linq;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Rendering" })]
-	public class Armature : LinkedWorldComponent
+	public sealed class Armature : LinkedWorldComponent
 	{
 		public readonly SyncObjList<SyncRef<Entity>> ArmatureEntitys;
 	}
 
 	[Category(new string[] { "Rendering" })]
-	public class SkinnedMeshRender : MeshRender
+	public sealed class SkinnedMeshRender : MeshRender
 	{
 		public class BlendShape : SyncObject
 		{

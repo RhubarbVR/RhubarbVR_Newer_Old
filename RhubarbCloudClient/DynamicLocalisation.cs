@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RhubarbCloudClient
 {
-	public class DynamicLocalisation:Localisation
+	public sealed class DynamicLocalisation:Localisation
 	{
 		public DynamicLocalisation(Func<IEnumerable<string>> files, Func<string,string> fileRead,Action reload, string three_Letter_other = null) {
 			Files = files;

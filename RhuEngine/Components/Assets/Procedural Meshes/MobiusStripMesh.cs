@@ -9,7 +9,7 @@ using RhuEngine.WorldObjects;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class MobiusStripMesh : ProceduralMesh
+	public sealed class MobiusStripMesh : ProceduralMesh
 	{
 		[Default(100)]
 		[OnChanged(nameof(LoadMesh))]

@@ -11,7 +11,7 @@ using RNumerics;
 
 namespace RBullet
 {
-	public class BulletColliderShape : ILinkedColliderShape
+	public sealed class BulletColliderShape : ILinkedColliderShape
 	{
 		public object GetBox2D(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ) {
 			return new Box2DShape((float)boxHalfExtentX, (float)boxHalfExtentY, (float)boxHalfExtentZ);

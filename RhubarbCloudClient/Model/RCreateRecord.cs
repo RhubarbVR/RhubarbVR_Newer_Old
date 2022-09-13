@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RhubarbCloudClient.Model
 {
-    public class RCreateRecord
+    public sealed class RCreateRecord
     {
         public long SizeInBytes { get; set; }
 

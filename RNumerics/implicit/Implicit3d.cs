@@ -8,7 +8,7 @@ namespace RNumerics
 	/// </summary>
 	public interface IMplicitFunction3d
 	{
-		double Value(ref Vector3d pt);
+		double Value(in Vector3d pt);
 	}
 
 
@@ -26,13 +26,13 @@ namespace RNumerics
 	/// <summary>
 	/// Implicit sphere, where zero isocontour is at Radius
 	/// </summary>
-	public class ImplicitSphere3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitSphere3d : IBoundedImplicitFunction3d
 	{
 		public Vector3d Origin;
 		public double Radius;
 
-		public double Value(ref Vector3d pt) {
-			return pt.Distance(ref Origin) - Radius;
+		public double Value(in Vector3d pt) {
+			return pt.Distance(Origin) - Radius;
 		}
 
 		public AxisAlignedBox3d Bounds() {
@@ -44,12 +44,12 @@ namespace RNumerics
 	/// <summary>
 	/// Implicit half-space. "Inside" is opposite of Normal direction.
 	/// </summary>
-	public class ImplicitHalfSpace3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitHalfSpace3d : IBoundedImplicitFunction3d
 	{
 		public Vector3d Origin;
 		public Vector3d Normal;
 
-		public double Value(ref Vector3d pt) {
+		public double Value(in Vector3d pt) {
 			return (pt - Origin).Dot(Normal);
 		}
 
@@ -63,11 +63,11 @@ namespace RNumerics
 	/// <summary>
 	/// Implicit axis-aligned box
 	/// </summary>
-	public class ImplicitAxisAlignedBox3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitAxisAlignedBox3d : IBoundedImplicitFunction3d
 	{
 		public AxisAlignedBox3d AABox;
 
-		public double Value(ref Vector3d pt) {
+		public double Value(in Vector3d pt) {
 			return AABox.SignedDistance(pt);
 		}
 
@@ -81,7 +81,7 @@ namespace RNumerics
 	/// <summary>
 	/// Implicit oriented box
 	/// </summary>
-	public class ImplicitBox3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitBox3d : IBoundedImplicitFunction3d
 	{
 		Box3d _box;
 		AxisAlignedBox3d _local_aabb;
@@ -99,7 +99,7 @@ namespace RNumerics
 		}
 
 
-		public double Value(ref Vector3d pt) {
+		public double Value(in Vector3d pt) {
 			var dx = (pt - Box.Center).Dot(Box.AxisX);
 			var dy = (pt - Box.Center).Dot(Box.AxisY);
 			var dz = (pt - Box.Center).Dot(Box.AxisZ);
@@ -116,12 +116,12 @@ namespace RNumerics
 	/// <summary>
 	/// Implicit tube around line segment
 	/// </summary>
-	public class ImplicitLine3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitLine3d : IBoundedImplicitFunction3d
 	{
 		public Segment3d Segment;
 		public double Radius;
 
-		public double Value(ref Vector3d pt) {
+		public double Value(in Vector3d pt) {
 			var d = Math.Sqrt(Segment.DistanceSquared(pt));
 			return d - Radius;
 		}
@@ -142,13 +142,13 @@ namespace RNumerics
 	/// Offset the zero-isocontour of an implicit function.
 	/// Assumes that negative is inside, if not, reverse offset.
 	/// </summary>
-	public class ImplicitOffset3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitOffset3d : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d A;
 		public double Offset;
 
-		public double Value(ref Vector3d pt) {
-			return A.Value(ref pt) - Offset;
+		public double Value(in Vector3d pt) {
+			return A.Value(pt) - Offset;
 		}
 
 		public AxisAlignedBox3d Bounds() {
@@ -166,13 +166,13 @@ namespace RNumerics
 	/// field, this converts single isocontour into two nested isocontours
 	/// with zeros at interval a and b, with 'inside' in interval
 	/// </summary>
-	public class ImplicitShell3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitShell3d : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d A;
 		public Interval1d Inside;
 
-		public double Value(ref Vector3d pt) {
-			var f = A.Value(ref pt);
+		public double Value(in Vector3d pt) {
+			var f = A.Value(pt);
 			f = f < Inside.a ? Inside.a - f : f > Inside.b ? f - Inside.b : -Math.Min(Math.Abs(f - Inside.a), Math.Abs(f - Inside.b));
 			return f;
 		}
@@ -192,13 +192,13 @@ namespace RNumerics
 	/// Assumption is that both have surface at zero isocontour and 
 	/// negative is inside.
 	/// </summary>
-	public class ImplicitUnion3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitUnion3d : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d A;
 		public IBoundedImplicitFunction3d B;
 
-		public double Value(ref Vector3d pt) {
-			return Math.Min(A.Value(ref pt), B.Value(ref pt));
+		public double Value(in Vector3d pt) {
+			return Math.Min(A.Value( pt), B.Value( pt));
 		}
 
 		public AxisAlignedBox3d Bounds() {
@@ -215,13 +215,13 @@ namespace RNumerics
 	/// Assumption is that both have surface at zero isocontour and 
 	/// negative is inside.
 	/// </summary>
-	public class ImplicitIntersection3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitIntersection3d : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d A;
 		public IBoundedImplicitFunction3d B;
 
-		public double Value(ref Vector3d pt) {
-			return Math.Max(A.Value(ref pt), B.Value(ref pt));
+		public double Value(in Vector3d pt) {
+			return Math.Max(A.Value(pt), B.Value(pt));
 		}
 
 		public AxisAlignedBox3d Bounds() {
@@ -239,13 +239,13 @@ namespace RNumerics
 	/// Assumption is that both have surface at zero isocontour and 
 	/// negative is inside.
 	/// </summary>
-	public class ImplicitDifference3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitDifference3d : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d A;
 		public IBoundedImplicitFunction3d B;
 
-		public double Value(ref Vector3d pt) {
-			return Math.Max(A.Value(ref pt), -B.Value(ref pt));
+		public double Value(in Vector3d pt) {
+			return Math.Max(A.Value( pt), -B.Value( pt));
 		}
 
 		public AxisAlignedBox3d Bounds() {
@@ -262,15 +262,15 @@ namespace RNumerics
 	/// Assumption is that both have surface at zero isocontour and 
 	/// negative is inside.
 	/// </summary>
-	public class ImplicitNaryUnion3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitNaryUnion3d : IBoundedImplicitFunction3d
 	{
 		public List<IBoundedImplicitFunction3d> Children;
 
-		public double Value(ref Vector3d pt) {
-			var f = Children[0].Value(ref pt);
+		public double Value(in Vector3d pt) {
+			var f = Children[0].Value( pt);
 			var N = Children.Count;
 			for (var k = 1; k < N; ++k) {
-				f = Math.Min(f, Children[k].Value(ref pt));
+				f = Math.Min(f, Children[k].Value( pt));
 			}
 
 			return f;
@@ -295,15 +295,15 @@ namespace RNumerics
 	/// Assumption is that both have surface at zero isocontour and 
 	/// negative is inside.
 	/// </summary>
-	public class ImplicitNaryIntersection3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitNaryIntersection3d : IBoundedImplicitFunction3d
 	{
 		public List<IBoundedImplicitFunction3d> Children;
 
-		public double Value(ref Vector3d pt) {
-			var f = Children[0].Value(ref pt);
+		public double Value(in Vector3d pt) {
+			var f = Children[0].Value(in pt);
 			var N = Children.Count;
 			for (var k = 1; k < N; ++k) {
-				f = Math.Max(f, Children[k].Value(ref pt));
+				f = Math.Max(f, Children[k].Value(in pt));
 			}
 
 			return f;
@@ -328,21 +328,21 @@ namespace RNumerics
 	/// Assumption is that both have surface at zero isocontour and 
 	/// negative is inside.
 	/// </summary>
-	public class ImplicitNaryDifference3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitNaryDifference3d : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d A;
 		public List<IBoundedImplicitFunction3d> BSet;
 
-		public double Value(ref Vector3d pt) {
-			var fA = A.Value(ref pt);
+		public double Value(in Vector3d pt) {
+			var fA = A.Value(in pt);
 			var N = BSet.Count;
 			if (N == 0) {
 				return fA;
 			}
 
-			var fB = BSet[0].Value(ref pt);
+			var fB = BSet[0].Value(in pt);
 			for (var k = 1; k < N; ++k) {
-				fB = Math.Min(fB, BSet[k].Value(ref pt));
+				fB = Math.Min(fB, BSet[k].Value(in pt));
 			}
 
 			return Math.Max(fA, -fB);
@@ -362,16 +362,16 @@ namespace RNumerics
 	/// Assumption is that both have surface at zero isocontour and 
 	/// negative is inside.
 	/// </summary>
-	public class ImplicitSmoothUnion3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitSmoothUnion3d : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d A;
 		public IBoundedImplicitFunction3d B;
 
 		const double MUL = 1.0 / 1.5;
 
-		public double Value(ref Vector3d pt) {
-			var fA = A.Value(ref pt);
-			var fB = B.Value(ref pt);
+		public double Value(in Vector3d pt) {
+			var fA = A.Value(in pt);
+			var fB = B.Value(in pt);
 			return MUL * (fA + fB - Math.Sqrt((fA * fA) + (fB * fB) - (fA * fB)));
 		}
 
@@ -389,16 +389,16 @@ namespace RNumerics
 	/// Assumption is that both have surface at zero isocontour and 
 	/// negative is inside.
 	/// </summary>
-	public class ImplicitSmoothIntersection3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitSmoothIntersection3d : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d A;
 		public IBoundedImplicitFunction3d B;
 
 		const double MUL = 1.0 / 1.5;
 
-		public double Value(ref Vector3d pt) {
-			var fA = A.Value(ref pt);
-			var fB = B.Value(ref pt);
+		public double Value(in Vector3d pt) {
+			var fA = A.Value(in pt);
+			var fB = B.Value(in pt);
 			return MUL * (fA + fB + Math.Sqrt((fA * fA) + (fB * fB) - (fA * fB)));
 		}
 
@@ -417,16 +417,16 @@ namespace RNumerics
 	/// Assumption is that both have surface at zero isocontour and 
 	/// negative is inside.
 	/// </summary>
-	public class ImplicitSmoothDifference3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitSmoothDifference3d : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d A;
 		public IBoundedImplicitFunction3d B;
 
 		const double MUL = 1.0 / 1.5;
 
-		public double Value(ref Vector3d pt) {
-			var fA = A.Value(ref pt);
-			var fB = -B.Value(ref pt);
+		public double Value(in Vector3d pt) {
+			var fA = A.Value( pt);
+			var fB = -B.Value( pt);
 			return MUL * (fA + fB + Math.Sqrt((fA * fA) + (fB * fB) - (fA * fB)));
 		}
 
@@ -444,7 +444,7 @@ namespace RNumerics
 	/// Blend of two implicit surfaces. Assumes surface is at zero iscontour.
 	/// Uses Pasko blend from http://www.hyperfun.org/F-rep.pdf
 	/// </summary>
-	public class ImplicitBlend3d : IBoundedImplicitFunction3d
+	public sealed class ImplicitBlend3d : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d A;
 		public IBoundedImplicitFunction3d B;
@@ -478,9 +478,9 @@ namespace RNumerics
 		public double ExpandBounds = 0.25;
 
 
-		public double Value(ref Vector3d pt) {
-			var fA = A.Value(ref pt);
-			var fB = B.Value(ref pt);
+		public double Value(in Vector3d pt) {
+			var fA = A.Value( pt);
+			var fB = B.Value( pt);
 			var sqr_sum = (fA * fA) + (fB * fB);
 			if (sqr_sum > 1e12) {
 				return Math.Min(fA, fB);
@@ -521,7 +521,7 @@ namespace RNumerics
 	/// the distance=0 isocontour lying just before midway in
 	/// the range (at the .ZeroIsocontour constant)
 	/// </summary>
-	public class DistanceFieldToSkeletalField : IBoundedImplicitFunction3d
+	public sealed class DistanceFieldToSkeletalField : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d DistanceField;
 		public double FalloffDistance;
@@ -533,8 +533,8 @@ namespace RNumerics
 			return bounds;
 		}
 
-		public double Value(ref Vector3d pt) {
-			var d = DistanceField.Value(ref pt);
+		public double Value(in Vector3d pt) {
+			var d = DistanceField.Value( pt);
 			if (d > FalloffDistance) {
 				return 0;
 			}
@@ -557,13 +557,13 @@ namespace RNumerics
 	/// <summary>
 	/// sum-blend
 	/// </summary>
-	public class SkeletalBlend3d : IBoundedImplicitFunction3d
+	public sealed class SkeletalBlend3d : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d A;
 		public IBoundedImplicitFunction3d B;
 
-		public double Value(ref Vector3d pt) {
-			return A.Value(ref pt) + B.Value(ref pt);
+		public double Value(in Vector3d pt) {
+			return A.Value( pt) + B.Value( pt);
 		}
 
 		public AxisAlignedBox3d Bounds() {
@@ -579,15 +579,15 @@ namespace RNumerics
 	/// <summary>
 	/// Ricci blend
 	/// </summary>
-	public class SkeletalRicciBlend3d : IBoundedImplicitFunction3d
+	public sealed class SkeletalRicciBlend3d : IBoundedImplicitFunction3d
 	{
 		public IBoundedImplicitFunction3d A;
 		public IBoundedImplicitFunction3d B;
 		public double BlendPower = 2.0;
 
-		public double Value(ref Vector3d pt) {
-			var a = A.Value(ref pt);
-			var b = B.Value(ref pt);
+		public double Value(in Vector3d pt) {
+			var a = A.Value( pt);
+			var b = B.Value( pt);
 			return BlendPower == 1.0
 				? a + b
 				: BlendPower == 2.0
@@ -611,30 +611,30 @@ namespace RNumerics
 	/// Assumption is that both have surface at zero isocontour and 
 	/// negative is inside.
 	/// </summary>
-	public class SkeletalRicciNaryBlend3d : IBoundedImplicitFunction3d
+	public sealed class SkeletalRicciNaryBlend3d : IBoundedImplicitFunction3d
 	{
 		public List<IBoundedImplicitFunction3d> Children;
 		public double BlendPower = 2.0;
 		public double FieldShift = 0;
 
-		public double Value(ref Vector3d pt) {
+		public double Value(in Vector3d pt) {
 			var N = Children.Count;
 			double f = 0;
 			if (BlendPower == 1.0) {
 				for (var k = 0; k < N; ++k) {
-					f += Children[k].Value(ref pt);
+					f += Children[k].Value( pt);
 				}
 			}
 			else if (BlendPower == 2.0) {
 				for (var k = 0; k < N; ++k) {
-					var v = Children[k].Value(ref pt);
+					var v = Children[k].Value( pt);
 					f += v * v;
 				}
 				f = Math.Sqrt(f);
 			}
 			else {
 				for (var k = 0; k < N; ++k) {
-					var v = Children[k].Value(ref pt);
+					var v = Children[k].Value( pt);
 					f += Math.Pow(v, BlendPower);
 				}
 				f = Math.Pow(f, 1.0 / BlendPower);

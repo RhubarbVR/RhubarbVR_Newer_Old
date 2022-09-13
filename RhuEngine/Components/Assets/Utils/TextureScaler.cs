@@ -10,7 +10,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Utils" })]
-	public class TextureScaler : Component
+	public sealed class TextureScaler : Component
 	{
 		[OnAssetLoaded(nameof(TextScale))]
 		public readonly AssetRef<RTexture2D> texture;

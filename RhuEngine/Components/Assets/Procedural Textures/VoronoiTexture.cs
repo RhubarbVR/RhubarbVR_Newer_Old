@@ -12,7 +12,7 @@ using SixLabors.ImageSharp.Processing;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Textures" })]
-	public class VoronoiTexture : ProceduralTexture
+	public sealed class VoronoiTexture : ProceduralTexture
 	{
 
 		[Default(12)]

@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 	}
 
 
-	public class RawECMAScript: ECMAScript
+	public sealed class RawECMAScript: ECMAScript
 	{
 
 		[Default(@"

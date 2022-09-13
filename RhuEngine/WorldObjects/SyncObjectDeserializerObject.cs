@@ -10,7 +10,7 @@ using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.WorldObjects
 {
-	public class SyncObjectDeserializerObject
+	public sealed class SyncObjectDeserializerObject
 	{
 		public List<Action> onLoaded = new();
 		public bool hasNewRefIDs = false;

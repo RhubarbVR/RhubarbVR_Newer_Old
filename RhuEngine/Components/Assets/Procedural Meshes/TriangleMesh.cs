@@ -5,7 +5,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class TriangleMesh : ProceduralMesh
+	public sealed class TriangleMesh : ProceduralMesh
 	{
 		public readonly SyncObjList<Triangle> listOfTris;
 		protected override void OnAttach() {

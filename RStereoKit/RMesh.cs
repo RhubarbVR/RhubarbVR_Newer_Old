@@ -49,7 +49,7 @@ namespace RStereoKit
 	}
 
 
-	public class SKRMesh : IRMesh
+	public sealed class SKRMesh : IRMesh
 	{
 		public SKRMesh() { }
 

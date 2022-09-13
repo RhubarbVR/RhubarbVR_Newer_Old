@@ -6,7 +6,7 @@ namespace RNumerics
 
 	public static class CurveSampler2
 	{
-		public static VectorArray2d AutoSample(IParametricCurve2d curve, double fSpacingLength, double fSpacingT) {
+		public static VectorArray2d AutoSample(in IParametricCurve2d curve, in double fSpacingLength, in double fSpacingT) {
 			return curve is ParametricCurveSequence2
 				? AutoSample(curve as ParametricCurveSequence2, fSpacingLength, fSpacingT)
 				: curve.HasArcLength
@@ -16,7 +16,7 @@ namespace RNumerics
 
 
 
-		public static VectorArray2d SampleT(IParametricCurve2d curve, int N) {
+		public static VectorArray2d SampleT(in IParametricCurve2d curve, in int N) {
 			var fLenT = curve.ParamLength;
 			var vec = new VectorArray2d(N);
 			var divide = curve.IsClosed ? (double)N : (double)(N - 1);
@@ -28,7 +28,7 @@ namespace RNumerics
 		}
 
 
-		public static VectorArray2d SampleTRange(IParametricCurve2d curve, int N, double t0, double t1) {
+		public static VectorArray2d SampleTRange(in IParametricCurve2d curve, in int N, in double t0, in double t1) {
 			var vec = new VectorArray2d(N);
 			for (var i = 0; i < N; ++i) {
 				var alpha = (double)i / (double)(N - 1);
@@ -39,7 +39,7 @@ namespace RNumerics
 		}
 
 
-		public static VectorArray2d SampleT(IParametricCurve2d curve, double fSpacing) {
+		public static VectorArray2d SampleT(in IParametricCurve2d curve, in double fSpacing) {
 			var fLenT = curve.ParamLength;
 
 			var nSteps = Math.Max((int)(fLenT / fSpacing) + 1, 2);
@@ -55,7 +55,7 @@ namespace RNumerics
 		}
 
 
-		public static VectorArray2d SampleArcLen(IParametricCurve2d curve, double fSpacing) {
+		public static VectorArray2d SampleArcLen(in IParametricCurve2d curve, in double fSpacing) {
 			if (curve.HasArcLength == false) {
 				throw new InvalidOperationException("CurveSampler2.SampleArcLen: curve does not support arc length sampling!");
 			}
@@ -91,7 +91,7 @@ namespace RNumerics
 		//      by subdividing the T-interval. This is not precise arc-length sampling but
 		//      is closer than uniform-T along the curve. And it means we don't have to
 		//      do an arc-length evaluation for each point, which is very expensive!!
-		public static VectorArray2d SampleNURBSHybrid(NURBSCurve2 curve, double fSpacing) {
+		public static VectorArray2d SampleNURBSHybrid(in NURBSCurve2 curve, in double fSpacing) {
 			var intervals = curve.GetParamIntervals();
 			var N = intervals.Count - 1;
 
@@ -132,7 +132,7 @@ namespace RNumerics
 
 
 
-		public static VectorArray2d AutoSample(ParametricCurveSequence2 curves, double fSpacingLength, double fSpacingT) {
+		public static VectorArray2d AutoSample(in ParametricCurveSequence2 curves, in double fSpacingLength, in double fSpacingT) {
 			var N = curves.Count;
 			var bClosed = curves.IsClosed;
 

@@ -23,18 +23,18 @@ namespace RNumerics
 			_vertices = new DVector<double>();
 		}
 
-		public DGraph(DGraph copy):base() {
+		public DGraph(in DGraph copy):base() {
 			_vertices = new DVector<double>();
 			AppendGraph(copy);
 		}
 
 
-		public Vector2d GetVertex(int vID) {
+		public Vector2d GetVertex(in int vID) {
 			return vertices_refcount.IsValid(vID) ?
 				new Vector2d(_vertices[2 * vID], _vertices[(2 * vID) + 1]) : InvalidVertex;
 		}
 
-		public void SetVertex(int vID, Vector2d vNewPos) {
+		public void SetVertex(in int vID, in Vector2d vNewPos) {
 			Debug.Assert(vNewPos.IsFinite);     // this will really catch a lot of bugs...
 			if (vertices_refcount.IsValid(vID)) {
 				var i = 2 * vID;
@@ -45,7 +45,7 @@ namespace RNumerics
 		}
 
 
-		public Vector3f GetVertexColor(int vID) {
+		public Vector3f GetVertexColor(in int vID) {
 			if (_colors == null) {
 				return Vector3f.One;
 			}
@@ -55,7 +55,7 @@ namespace RNumerics
 			}
 		}
 
-		public void SetVertexColor(int vID, Vector3f vNewColor) {
+		public void SetVertexColor(in int vID, in Vector3f vNewColor) {
 			if (HasVertexColors) {
 				var i = 3 * vID;
 				_colors[i] = vNewColor.x;
@@ -66,7 +66,7 @@ namespace RNumerics
 		}
 
 
-		public bool GetEdgeV(int eID, ref Vector2d a, ref Vector2d b) {
+		public bool GetEdgeV(in int eID, ref Vector2d a, ref Vector2d b) {
 			if (edges_refcount.IsValid(eID)) {
 				var iv0 = 2 * edges[3 * eID];
 				a.x = _vertices[iv0];
@@ -80,7 +80,7 @@ namespace RNumerics
 		}
 
 
-		public Segment2d GetEdgeSegment(int eID) {
+		public Segment2d GetEdgeSegment(in int eID) {
 			if (edges_refcount.IsValid(eID)) {
 				var iv0 = 2 * edges[3 * eID];
 				var iv1 = 2 * edges[(3 * eID) + 1];
@@ -90,7 +90,7 @@ namespace RNumerics
 			throw new Exception("DGraph2.GetEdgeSegment: invalid segment with id " + eID);
 		}
 
-		public Vector2d GetEdgeCenter(int eID) {
+		public Vector2d GetEdgeCenter(in int eID) {
 			if (edges_refcount.IsValid(eID)) {
 				var iv0 = 2 * edges[3 * eID];
 				var iv1 = 2 * edges[(3 * eID) + 1];
@@ -100,10 +100,10 @@ namespace RNumerics
 			throw new Exception("DGraph2.GetEdgeCenter: invalid segment with id " + eID);
 		}
 
-		public int AppendVertex(Vector2d v) {
+		public int AppendVertex(in Vector2d v) {
 			return AppendVertex(v, Vector3f.One);
 		}
-		public int AppendVertex(Vector2d v, Vector3f c) {
+		public int AppendVertex(in Vector2d v, in Vector3f c) {
 			var vid = Append_vertex_internal();
 			var i = 2 * vid;
 			_vertices.Insert(v[1], i + 1);
@@ -123,7 +123,7 @@ namespace RNumerics
 
 
 
-		public void AppendPolygon(Polygon2d poly, int gid = -1) {
+		public void AppendPolygon(in Polygon2d poly, in int gid = -1) {
 			var first = -1;
 			var prev = -1;
 			var N = poly.VertexCount;
@@ -140,7 +140,7 @@ namespace RNumerics
 			}
 			AppendEdge(prev, first, gid);
 		}
-		public void AppendPolygon(GeneralPolygon2d poly, int gid = -1) {
+		public void AppendPolygon(in GeneralPolygon2d poly, in int gid = -1) {
 			AppendPolygon(poly.Outer, gid);
 			foreach (var hole in poly.Holes) {
 				AppendPolygon(hole, gid);
@@ -148,7 +148,7 @@ namespace RNumerics
 		}
 
 
-		public void AppendPolyline(PolyLine2d poly, int gid = -1) {
+		public void AppendPolyline(in PolyLine2d poly, in int gid = -1) {
 			var prev = -1;
 			var N = poly.VertexCount;
 			for (var i = 0; i < N; ++i) {
@@ -162,7 +162,7 @@ namespace RNumerics
 		}
 
 
-		public void AppendGraph(DGraph graph, int gid = -1) {
+		public void AppendGraph(in DGraph graph, in int gid = -1) {
 			var mapV = new int[graph.MaxVertexID];
 			foreach (var vid in graph.VertexIndices()) {
 				mapV[vid] = AppendVertex(graph.GetVertex(vid));
@@ -178,7 +178,7 @@ namespace RNumerics
 
 		public bool HasVertexColors => _colors != null;
 
-		public void EnableVertexColors(Vector3f initial_color) {
+		public void EnableVertexColors(in Vector3f initial_color) {
 			if (HasVertexColors) {
 				return;
 			}
@@ -215,7 +215,7 @@ namespace RNumerics
 		/// <summary>
 		/// return edges around vID sorted by angle, in clockwise order
 		/// </summary>
-		public int[] SortedVtxEdges(int vID) {
+		public int[] SortedVtxEdges(in int vID) {
 
 			if (vertices_refcount.IsValid(vID) == false) {
 				return null;
@@ -299,7 +299,7 @@ namespace RNumerics
 		/// If not a vertex, or valence != 2, returns invalidValue argument.
 		/// If either edge is degenerate, returns invalidValue argument.
 		/// </summary>
-		public double OpeningAngle(int vID, double invalidValue = double.MaxValue) {
+		public double OpeningAngle(in int vID, in double invalidValue = double.MaxValue) {
 			if (vertices_refcount.IsValid(vID) == false) {
 				return invalidValue;
 			}
@@ -330,7 +330,7 @@ namespace RNumerics
 
 
 		// internal used in SplitEdge
-		protected virtual int Append_new_split_vertex(int a, int b) {
+		protected virtual int Append_new_split_vertex(in int a, in int b) {
 			var vNew = 0.5 * (GetVertex(a) + GetVertex(b));
 			var cNew = HasVertexColors ? (0.5f * (GetVertexColor(a) + GetVertexColor(b))) : Vector3f.One;
 			var f = AppendVertex(vNew, cNew);
@@ -338,7 +338,7 @@ namespace RNumerics
 		}
 
 
-		protected override void Subclass_validity_checks(Action<bool> CheckOrFailF) {
+		protected override void Subclass_validity_checks(in Action<bool> CheckOrFailF) {
 			foreach (var vID in VertexIndices()) {
 				var v = GetVertex(vID);
 				CheckOrFailF(double.IsNaN(v.LengthSquared) == false);

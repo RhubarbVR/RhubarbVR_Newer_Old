@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.Normal)]
 	[Category(new string[] { "UI/Visuals" })]
-	public class UITextCurrsor : Component
+	public sealed class UITextCurrsor : Component
 	{
 		public readonly AssetRef<RMaterial> Material;
 

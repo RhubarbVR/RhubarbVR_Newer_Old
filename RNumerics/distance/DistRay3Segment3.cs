@@ -9,7 +9,7 @@ namespace RNumerics
 	/// Distance between ray and segment
 	/// ported from WildMagic5
 	/// </summary>
-	public class DistRay3Segment3
+	public sealed class DistRay3Segment3
 	{
 		Ray3d _ray;
 		public Ray3d Ray
@@ -33,19 +33,19 @@ namespace RNumerics
 		public double SegmentParameter;
 
 
-		public DistRay3Segment3(Ray3d rayIn, Segment3d segmentIn) {
+		public DistRay3Segment3(in Ray3d rayIn, in Segment3d segmentIn) {
 			_ray = rayIn;
 			_segment = segmentIn;
 		}
 
 
-		static public double MinDistance(Ray3d r, Segment3d s) {
-			var dsqr = SquaredDistance(ref r, ref s, out var rayt, out var segt);
+		static public double MinDistance(in Ray3d r, in Segment3d s) {
+			var dsqr = SquaredDistance(r, s, out var rayt, out var segt);
 			return Math.Sqrt(dsqr);
 		}
-		static public double MinDistanceSegmentParam(Ray3d r, Segment3d s) {
+		static public double MinDistanceSegmentParam(in Ray3d r, in Segment3d s) {
 			/*double dsqr = */
-			SquaredDistance(ref r, ref s, out var rayt, out var segt);
+			SquaredDistance( r, s, out var rayt, out var segt);
 			return segt;
 		}
 
@@ -210,7 +210,7 @@ namespace RNumerics
 		/// <summary>
 		/// compute w/o allocating temporaries/etc
 		/// </summary>
-		public static double SquaredDistance(ref Ray3d ray, ref Segment3d segment,
+		public static double SquaredDistance(in Ray3d ray, in Segment3d segment,
 			out double rayT, out double segT) {
 			var diff = ray.Origin - segment.Center;
 			var a01 = -ray.Direction.Dot(segment.Direction);

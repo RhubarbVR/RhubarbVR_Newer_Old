@@ -10,7 +10,7 @@ using System.Xml.Linq;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Observer/Observers" })]
-	public class ObserverEnity : ObserverBase<Entity>
+	public sealed class ObserverEnity : ObserverBase<Entity>
 	{
 		protected override UIRect BuildMainUIRect() {
 			return Entity.AttachComponent<UIRect>();

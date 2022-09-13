@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 
 using RhuEngine.WorldObjects;
+using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 
 namespace RhuEngine.Components
 {
-	public class ConvexHullMesh : ProceduralMesh
+	[Category(new string[] { "Assets/Procedural Meshes" })]
+	public sealed class ConvexHullMesh : ProceduralMesh
 	{
 		[OnChanged(nameof(LoadMesh))]
 		public readonly SyncValueList<Vector3f> points = new();

@@ -2,7 +2,7 @@
 
 namespace RhuEngine.WorldObjects
 {
-	public class DefaultAttribute : Attribute
+	public sealed class DefaultAttribute : Attribute
 	{
 		public object Data { get; private set; }
 		public DefaultAttribute(object value) {

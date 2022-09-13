@@ -33,7 +33,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "UI/Interaction" })]
-	public class UIButtonInteraction : UIInteractionComponent
+	public sealed class UIButtonInteraction : UIInteractionComponent
 	{
 		[Default(true)]
 		public readonly Sync<bool> Laserable;

@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 		Y, X, Z
 	}
 	[Category(new string[] { "Physics" })]
-	public class ConeShape : PhysicsObject
+	public sealed class ConeShape : PhysicsObject
 	{
 		[OnChanged(nameof(RebuildPysics))]
 		[Default(0.5)]

@@ -17,7 +17,7 @@ namespace RhuEngine.WorldObjects
 	}
 
 	[GenericTypeConstraint()]
-	public class SyncValueList<T> : SyncObjList<Sync<T>>, ISyncMember
+	public sealed class SyncValueList<T> : SyncObjList<Sync<T>>, ISyncMember
 	{
 		[Exposed]
 		public new T this[int index]

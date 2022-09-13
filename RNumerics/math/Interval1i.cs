@@ -19,10 +19,10 @@ namespace RNumerics
 		[Key(1)]
 		public int b;
 
-		public Interval1i(int f) { a = b = f; }
-		public Interval1i(int x, int y) { a = x; b = y; }
-		public Interval1i(int[] v2) { a = v2[0]; b = v2[1]; }
-		public Interval1i(Interval1i copy) { a = copy.a; b = copy.b; }
+		public Interval1i(in int f) { a = b = f; }
+		public Interval1i(in int x, in int y) { a = x; b = y; }
+		public Interval1i(in int[] v2) { a = v2[0]; b = v2[1]; }
+		public Interval1i(in Interval1i copy) { a = copy.a; b = copy.b; }
 
 
 		[IgnoreMember]
@@ -33,22 +33,22 @@ namespace RNumerics
 		static public readonly Interval1i Infinite = new (-int.MaxValue, int.MaxValue);
 
 		/// <summary> construct interval [0, N-1] </summary>
-		static public Interval1i Range(int N) { return new (0, N - 1); }
+		static public Interval1i Range(in int N) { return new (0, N - 1); }
 
 		/// <summary> construct interval [0, N-1] </summary>
-		static public Interval1i RangeInclusive(int N) { return new (0, N); }
+		static public Interval1i RangeInclusive(in int N) { return new (0, N); }
 
 		/// <summary> construct interval [start, start+N-1] </summary>
-		static public Interval1i Range(int start, int N) { return new (start, start + N - 1); }
+		static public Interval1i Range(in int start, in int N) { return new (start, start + N - 1); }
 
 
 		/// <summary> construct interval [a, b] </summary>
-		static public Interval1i FromToInclusive(int a, int b) { return new (a, b); }
+		static public Interval1i FromToInclusive(in int a, in int b) { return new (a, b); }
 
 
 
 		[IgnoreMember]
-		public int this[int key]
+		public int this[in int key]
 		{
 			get => (key == 0) ? a : b;
 			set {
@@ -68,7 +68,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public int Center => (b + a) / 2;
 
-		public void Contain(int d) {
+		public void Contain(in int d) {
 			if (d < a) {
 				a = d;
 			}
@@ -78,41 +78,41 @@ namespace RNumerics
 			}
 		}
 
-		public bool Contains(int d) {
+		public bool Contains(in int d) {
 			return d >= a && d <= b;
 		}
 
 
-		public bool Overlaps(Interval1i o) {
+		public bool Overlaps(in Interval1i o) {
 			return !(o.a > b || o.b < a);
 		}
 
-		public int SquaredDist(Interval1i o) {
+		public int SquaredDist(in Interval1i o) {
 			return b < o.a ? (o.a - b) * (o.a - b) : a > o.b ? (a - o.b) * (a - o.b) : 0;
 		}
-		public int Dist(Interval1i o) {
+		public int Dist(in Interval1i o) {
 			return b < o.a ? o.a - b : a > o.b ? a - o.b : 0;
 		}
 
 
-		public void Set(Interval1i o) {
+		public void Set(in Interval1i o) {
 			a = o.a;
 			b = o.b;
 		}
-		public void Set(int fA, int fB) {
+		public void Set(in int fA, in int fB) {
 			a = fA;
 			b = fB;
 		}
 
 
 
-		public static Interval1i operator -(Interval1i v) => new(-v.a, -v.b);
+		public static Interval1i operator -(in Interval1i v) => new(-v.a, -v.b);
 
 
-		public static Interval1i operator +(Interval1i a, int f) => new(a.a + f, a.b + f);
-		public static Interval1i operator -(Interval1i a, int f) => new(a.a - f, a.b - f);
+		public static Interval1i operator +(in Interval1i a, in int f) => new(a.a + f, a.b + f);
+		public static Interval1i operator -(in Interval1i a, in int f) => new(a.a - f, a.b - f);
 
-		public static Interval1i operator *(Interval1i a, int f) => new(a.a * f, a.b * f);
+		public static Interval1i operator *(in Interval1i a, in int f) => new(a.a * f, a.b * f);
 
 
 		public IEnumerator<int> GetEnumerator() {

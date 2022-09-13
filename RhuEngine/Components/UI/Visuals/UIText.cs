@@ -25,7 +25,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "UI/Visuals" })]
-	public class UIText : MultiRenderUIComponent, ITextComp
+	public sealed class UIText : MultiRenderUIComponent, ITextComp
 	{
 		public DynamicTextRender TextRender => textRender;
 

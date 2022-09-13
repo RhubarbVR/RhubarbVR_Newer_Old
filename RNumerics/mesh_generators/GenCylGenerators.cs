@@ -20,7 +20,7 @@ namespace RNumerics
 	/// vertex normals
 	/// 
 	/// </summary>
-	public class TubeGenerator : MeshGenerator
+	public sealed class TubeGenerator : MeshGenerator
 	{
 		public List<Vector3d> Vertices;
 		public Polygon2d Polygon;
@@ -45,7 +45,7 @@ namespace RNumerics
 		public TubeGenerator() {
 		}
 
-		public TubeGenerator(Polygon2d tubePath, Frame3f pathPlane, Polygon2d tubeShape, int nPlaneNormal = 2) {
+		public TubeGenerator(in Polygon2d tubePath, in Frame3f pathPlane, in Polygon2d tubeShape, in int nPlaneNormal = 2) {
 			Vertices = new List<Vector3d>();
 			foreach (var v in tubePath.Vertices) {
 				Vertices.Add(pathPlane.FromPlaneUV((Vector2f)v, nPlaneNormal));
@@ -55,7 +55,7 @@ namespace RNumerics
 			ClosedLoop = true;
 			Capped = false;
 		}
-		public TubeGenerator(PolyLine2d tubePath, Frame3f pathPlane, Polygon2d tubeShape, int nPlaneNormal = 2) {
+		public TubeGenerator(in PolyLine2d tubePath, in Frame3f pathPlane, in Polygon2d tubeShape, in int nPlaneNormal = 2) {
 			Vertices = new List<Vector3d>();
 			foreach (var v in tubePath.Vertices) {
 				Vertices.Add(pathPlane.FromPlaneUV((Vector2f)v, nPlaneNormal));
@@ -65,7 +65,7 @@ namespace RNumerics
 			ClosedLoop = false;
 			Capped = true;
 		}
-		public TubeGenerator(DCurve3 tubePath, Polygon2d tubeShape) {
+		public TubeGenerator(in DCurve3 tubePath, in Polygon2d tubeShape) {
 			Vertices = new List<Vector3d>(tubePath.Vertices);
 			Polygon = new Polygon2d(tubeShape);
 			ClosedLoop = tubePath.Closed;

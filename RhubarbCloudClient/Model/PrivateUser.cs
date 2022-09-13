@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RhubarbCloudClient.Model
 {
-	public class PrivateUser : PublicUser
+	public sealed class PrivateUser : PublicUser
 	{
 		public bool TwoFactorEnabled { get; set; }
 		public long UsedBytes { get; set; }

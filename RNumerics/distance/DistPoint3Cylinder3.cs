@@ -15,7 +15,7 @@ namespace RNumerics
 	//
 	// DistanceSquared is always positive!!
 	//
-	public class DistPoint3Cylinder3
+	public sealed class DistPoint3Cylinder3
 	{
 		Vector3d _point;
 		public Vector3d Point
@@ -41,7 +41,7 @@ namespace RNumerics
 
 		public Vector3d CylinderClosest;
 
-		public DistPoint3Cylinder3(Vector3d PointIn, Cylinder3d CylinderIn) {
+		public DistPoint3Cylinder3(in Vector3d PointIn, in Cylinder3d CylinderIn) {
 			_point = PointIn;
 			_cylinder = CylinderIn;
 		}

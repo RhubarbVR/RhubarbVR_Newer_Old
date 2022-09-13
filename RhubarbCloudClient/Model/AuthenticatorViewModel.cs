@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RhubarbCloudClient.Model
 {
-	public class AuthenticatorViewModel
+	public sealed class AuthenticatorViewModel
 	{
 		public string SecretKey { get; set; }
 

@@ -14,10 +14,10 @@ namespace RNumerics
 	/// <summary>
 	/// Just wraps a func<bool> as an ICancelSource
 	/// </summary>
-	public class CancelFunction : ICancelSource
+	public sealed class CancelFunction : ICancelSource
 	{
 		public Func<bool> CancelF;
-		public CancelFunction(Func<bool> cancelF) {
+		public CancelFunction(in Func<bool> cancelF) {
 			CancelF = cancelF;
 		}
 		public bool Cancelled() { return CancelF(); }
@@ -29,16 +29,16 @@ namespace RNumerics
 	///  1) provide progress info back to caller (not implemented yet)
 	///  2) allow caller to cancel the computation
 	/// </summary>
-	public class ProgressCancel
+	public sealed class ProgressCancel
 	{
 		public ICancelSource Source;
 
 		bool _wasCancelled = false;  // will be set to true if CancelF() ever returns true
 
-		public ProgressCancel(ICancelSource source) {
+		public ProgressCancel(in ICancelSource source) {
 			Source = source;
 		}
-		public ProgressCancel(Func<bool> cancelF) {
+		public ProgressCancel(in Func<bool> cancelF) {
 			Source = new CancelFunction(cancelF);
 		}
 

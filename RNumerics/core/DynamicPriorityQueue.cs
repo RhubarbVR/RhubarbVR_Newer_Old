@@ -59,7 +59,7 @@ namespace RNumerics
 		/// if bFreeMemory is false, we don't discard internal data structures, so there will be less allocation next time
 		/// (this does not make a huge difference...)
 		/// </summary>
-		public void Clear(bool bFreeMemory = true) {
+		public void Clear(in bool bFreeMemory = true) {
 			if (bFreeMemory) {
 				_nodes = new DVector<T>();
 			}
@@ -81,7 +81,7 @@ namespace RNumerics
 		/// <summary>
 		/// constant-time check to see if node is already in queue
 		/// </summary>
-		public bool Contains(T node) {
+		public bool Contains(in T node) {
 			return _nodes[node.Index] == node;
 		}
 
@@ -90,7 +90,7 @@ namespace RNumerics
 		/// Add node to list w/ given priority
 		/// Behavior is undefined if you call w/ same node twice
 		/// </summary>
-		public void Enqueue(T node, float priority) {
+		public void Enqueue(in T node, in float priority) {
 			if (EnableDebugChecks && Contains(node) == true) {
 				throw new Exception("DynamicPriorityQueue.Enqueue: tried to add node that is already in queue!");
 			}
@@ -121,7 +121,7 @@ namespace RNumerics
 		/// remove this node from queue. Undefined behavior if called w/ same node twice!
 		/// Behavior is undefined if you call w/ node that is not in queue
 		/// </summary>
-		public void Remove(T node) {
+		public void Remove(in T node) {
 			if (EnableDebugChecks && Contains(node) == false) {
 				throw new Exception("DynamicPriorityQueue.Remove: tried to remove node that does not exist in queue!");
 			}
@@ -150,7 +150,7 @@ namespace RNumerics
 		/// update priority at node, and then move it to correct position in queue
 		/// Behavior is undefined if you call w/ node that is not in queue
 		/// </summary>
-		public void Update(T node, float priority) {
+		public void Update(in T node, in float priority) {
 			if (EnableDebugChecks && Contains(node) == false) {
 				throw new Exception("DynamicPriorityQueue.Update: tried to update node that does not exist in queue!");
 			}
@@ -179,7 +179,7 @@ namespace RNumerics
 
 
 		// swap node locations and indices
-		private void Swap_nodes(T node1, T node2) {
+		private void Swap_nodes(in T node1, in T node2) {
 			_nodes[node1.Index] = node2;
 			_nodes[node2.Index] = node1;
 			(node2.Index, node1.Index) = (node1.Index, node2.Index);
@@ -187,7 +187,7 @@ namespace RNumerics
 
 
 		// move node up tree to correct position by iteratively swapping w/ parent
-		private void Move_up(T node) {
+		private void Move_up(in T node) {
 			var parent = node.Index / 2;
 			while (parent >= 1) {
 				var parentNode = _nodes[parent];
@@ -202,7 +202,7 @@ namespace RNumerics
 
 
 		// move node down tree branches to correct position, by iteratively swapping w/ children
-		private void Move_down(T node) {
+		private void Move_down(in T node) {
 			// we will put input node at this position after we are done swaps (ie actually moves, not swaps)
 			var cur_node_index = node.Index;
 
@@ -252,7 +252,7 @@ namespace RNumerics
 
 
 		/// call after node is modified, to move it to correct position in queue
-		private void On_node_updated(T node) {
+		private void On_node_updated(in T node) {
 			var parentIndex = node.Index / 2;
 			var parentNode = _nodes[parentIndex];
 			if (parentIndex > 0 && Has_higher_priority(node, parentNode)) {
@@ -265,7 +265,7 @@ namespace RNumerics
 
 
 		/// returns true if priority at higher is less than at lower
-		private bool Has_higher_priority(T higher, T lower) {
+		private bool Has_higher_priority(in T higher, in T lower) {
 			return higher.Priority < lower.Priority;
 		}
 

@@ -8,7 +8,7 @@ using RhuEngine.Settings;
 using StereoKit;
 namespace RStereoKit
 {
-	public class SKRenderSettings:RenderSettingsBase
+	public sealed class SKRenderSettings:RenderSettingsBase
 	{
 		[SettingsField("Fov")]
 		public float Fov = 60f;

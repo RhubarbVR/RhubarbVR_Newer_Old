@@ -28,12 +28,12 @@ namespace RNumerics
 			rFaces = new List<RFace>();
 			rCount = 0;
 		}
-		public RSubMesh(RPrimitiveType type) {
+		public RSubMesh(in RPrimitiveType type) {
 			rPrimitiveType = type;
 			rFaces = new List<RFace>();
 			rCount = 0;
 		}
-		public RSubMesh(RPrimitiveType type, List<RFace> faces,int count) {
+		public RSubMesh(in RPrimitiveType type, in List<RFace> faces, in int count) {
 			rPrimitiveType = type;
 			rFaces = faces;
 			rCount = count;
@@ -65,7 +65,7 @@ namespace RNumerics
 		[Key(1)]
 		public float Weight;
 
-		public RVertexWeight(VertexWeight vertexWeight) {
+		public RVertexWeight(in VertexWeight vertexWeight) {
 			VertexID = vertexWeight.VertexID;
 			Weight = vertexWeight.Weight;
 		}
@@ -81,7 +81,7 @@ namespace RNumerics
 	}
 
 	[MessagePackObject]
-	public class RBone : IBone
+	public sealed class RBone : IBone
 	{
 
 		[Key(0)]
@@ -112,7 +112,7 @@ namespace RNumerics
 			}
 		}
 
-		public RBone(Bone asimp) {
+		public RBone(in Bone asimp) {
 			var baseM = asimp.OffsetMatrix;
 			OffsetMatrix = new System.Numerics.Matrix4x4 {
 				M11 = baseM.A1,
@@ -140,14 +140,14 @@ namespace RNumerics
 		}
 	}
 	[MessagePackObject]
-	public class RFace : IFace
+	public sealed class RFace : IFace
 	{
 		[Key(0)]
 		public List<int> Indices = new();
 		[IgnoreMember]
 		List<int> IFace.Indices => Indices;
 
-		public RFace(Face face) {
+		public RFace(in Face face) {
 			Indices = face.Indices;
 		}
 		public RFace() { }
@@ -193,7 +193,7 @@ namespace RNumerics
 	}
 
 	[MessagePackObject]
-	public class RAnimationAttachment : IAnimationAttachment
+	public sealed class RAnimationAttachment : IAnimationAttachment
 	{
 		[Key(0)]
 		public string Name = "Unknown";
@@ -228,7 +228,7 @@ namespace RNumerics
 		[IgnoreMember]
 		string IAnimationAttachment.Name => Name;
 
-		public RAnimationAttachment(MeshAnimationAttachment meshAnimationAttachment) {
+		public RAnimationAttachment(in MeshAnimationAttachment meshAnimationAttachment) {
 			Vertices = meshAnimationAttachment.Vertices.Select((x) => (Vector3f)x).ToList();
 			Normals = meshAnimationAttachment.Normals.Select((x) => (Vector3f)x).ToList();
 			Tangents = meshAnimationAttachment.Tangents.Select((x) => (Vector3f)x).ToList();
@@ -244,7 +244,7 @@ namespace RNumerics
 	}
 
 	[MessagePackObject]
-	public class ComplexMesh : IComplexMesh, IMesh
+	public sealed class ComplexMesh : IComplexMesh, IMesh
 	{
 		[Key(0)]
 		public string MeshName;
@@ -291,7 +291,7 @@ namespace RNumerics
 			}
 		}
 
-		public void LoadFromAsimp(Mesh mesh) {
+		public void LoadFromAsimp(in Mesh mesh) {
 			MeshName = mesh.Name;
 			PrimitiveType = (RPrimitiveType)(byte)(int)mesh.PrimitiveType;
 			Vertices = mesh.Vertices.Select((x) => (Vector3f)x).ToList();
@@ -308,7 +308,7 @@ namespace RNumerics
 		}
 
 
-		public int AddSubMesh(IComplexMesh complexMesh) {
+		public int AddSubMesh(in IComplexMesh complexMesh) {
 			if (complexMesh.HasSubMeshs) {
 				throw new Exception("Adding Mesh Already Has a submesh");
 			}
@@ -461,11 +461,11 @@ namespace RNumerics
 		[IgnoreMember]
 		public bool IsBasicMesh => !(HasBones || HasMeshAttachments);
 
-		public Vector2f GetVertexUV(int i, int channel = 1) {
+		public Vector2f GetVertexUV(in int i, in int channel = 1) {
 			return TexCoords[channel - 1][i].Xy;
 		}
 
-		public NewVertexInfo GetVertexAll(int i) {
+		public NewVertexInfo GetVertexAll(in int i) {
 			var vi = new NewVertexInfo {
 				v = GetVertex(i)
 			};
@@ -502,12 +502,12 @@ namespace RNumerics
 			return vi;
 		}
 
-		public Index3i GetTriangle(int i) {
+		public Index3i GetTriangle(in int i) {
 			var face = Faces[i];
 			return new Index3i(face.Indices[0], face.Indices[1], face.Indices[2]);
 		}
 
-		public int GetTriangleGroup(int i) {
+		public int GetTriangleGroup(in int i) {
 			throw new NotSupportedException();
 		}
 
@@ -567,22 +567,22 @@ namespace RNumerics
 			}
 		}
 
-		public Vector3d GetVertex(int i) {
+		public Vector3d GetVertex(in int i) {
 			return new Vector3d(Vertices[i]);
 		}
 
-		public Vector3f GetVertexNormal(int i) {
+		public Vector3f GetVertexNormal(in int i) {
 			return Normals[i];
 		}
 
-		public Vector3f GetVertexColor(int i) {
+		public Vector3f GetVertexColor(in int i) {
 			return Colors[0][i].ToRGB().IsAnyNan ? new Vector3f(1f) : Colors[0][i].ToRGB();
 		}
 
-		public bool IsVertex(int vID) {
+		public bool IsVertex(in int vID) {
 			return vID * 3 < Vertices.Count;
 		}
-		public bool IsTriangle(int tID) {
+		public bool IsTriangle(in int tID) {
 			return tID * 3 < Faces.Count;
 		}
 
@@ -599,7 +599,7 @@ namespace RNumerics
 			}
 		}
 
-		public ComplexMesh(Mesh asimpMesh) {
+		public ComplexMesh(in Mesh asimpMesh) {
 			LoadFromAsimp(asimpMesh);
 		}
 		public ComplexMesh() {

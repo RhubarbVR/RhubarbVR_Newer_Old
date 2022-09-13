@@ -11,7 +11,7 @@ using SixLabors.Fonts;
 
 namespace RhuEngine.Components
 {
-	public class DynamicTextRender
+	public sealed class DynamicTextRender
 	{
 		public Action UpdatedMeshses;
 		public DynamicTextRender(bool uiText = false, Action update = null) {

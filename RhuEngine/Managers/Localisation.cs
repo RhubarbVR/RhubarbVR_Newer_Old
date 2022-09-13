@@ -16,7 +16,7 @@ using RhubarbCloudClient;
 
 namespace RhuEngine.Managers
 {
-	public class LocalisationManager : Localisation, IManager
+	public sealed class LocalisationManager : Localisation, IManager
 	{
 		private Engine _engine;
 		public string localDir;

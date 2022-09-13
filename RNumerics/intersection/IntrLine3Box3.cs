@@ -6,7 +6,7 @@ using System.Text;
 namespace RNumerics
 {
 	// ported from WildMagic5 
-	public class IntrLine3Box3
+	public sealed class IntrLine3Box3
 	{
 		Line3d _line;
 		public Line3d Line
@@ -32,7 +32,7 @@ namespace RNumerics
 		public Vector3d Point0 = Vector3d.Zero;
 		public Vector3d Point1 = Vector3d.Zero;
 
-		public IntrLine3Box3(Line3d l, Box3d b)
+		public IntrLine3Box3(in Line3d l, in Box3d b)
 		{
 			_line = l;
 			_box = b;
@@ -108,8 +108,8 @@ namespace RNumerics
 
 
 		static public bool DoClipping(ref double t0, ref double t1,
-						 Vector3d origin, Vector3d direction,
-						 Box3d box, bool solid, ref int quantity,
+						 in Vector3d origin, in Vector3d direction,
+						 in Box3d box, in bool solid, ref int quantity,
 						 ref Vector3d point0, ref Vector3d point1,
 						 ref IntersectionType intrType)
 		{
@@ -163,7 +163,7 @@ namespace RNumerics
 
 
 
-		static public bool Clip(double denom, double numer, ref double t0, ref double t1)
+		static public bool Clip(in double denom, in double numer, ref double t0, ref double t1)
 		{
 			// Return value is 'true' if line segment intersects the current test
 			// plane.  Otherwise 'false' is returned in which case the line segment

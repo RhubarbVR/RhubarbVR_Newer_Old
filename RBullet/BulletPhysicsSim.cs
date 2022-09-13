@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace RBullet
 {
-	public class BPhysicsSim
+	public sealed class BPhysicsSim
 	{
 		public readonly DefaultCollisionConfiguration _collisionConfiguration;
 

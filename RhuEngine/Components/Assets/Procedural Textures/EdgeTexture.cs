@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 
 using RhuEngine.WorldObjects;
+using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 
 namespace RhuEngine.Components
 {
-	public class EdgeTexture : ProceduralTexture
+	[Category(new string[] { "Assets/Procedural Textures" })]
+	public sealed class EdgeTexture : ProceduralTexture
 	{
 		[Default(1)]
 		[OnChanged(nameof(ComputeTexture))]

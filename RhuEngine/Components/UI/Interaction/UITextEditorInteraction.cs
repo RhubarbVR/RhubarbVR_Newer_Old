@@ -29,7 +29,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "UI/Interaction" })]
-	public class UIGroupTextEditorInteraction : AbstractTextEditorInteraction
+	public sealed class UIGroupTextEditorInteraction : AbstractTextEditorInteraction
 	{
 		public override bool CurrentEditor { get; set; }
 

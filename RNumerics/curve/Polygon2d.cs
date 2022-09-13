@@ -17,32 +17,32 @@ namespace RNumerics
 			Timestamp = 0;
 		}
 
-		public Polygon2d(Polygon2d copy) {
+		public Polygon2d(in Polygon2d copy) {
 			vertices = new List<Vector2d>(copy.vertices);
 			Timestamp = 0;
 		}
 
-		public Polygon2d(IList<Vector2d> copy) {
+		public Polygon2d(in IList<Vector2d> copy) {
 			vertices = new List<Vector2d>(copy);
 			Timestamp = 0;
 		}
 
-		public Polygon2d(IEnumerable<Vector2d> copy) {
+		public Polygon2d(in IEnumerable<Vector2d> copy) {
 			vertices = new List<Vector2d>(copy);
 			Timestamp = 0;
 		}
 
-		public Polygon2d(Vector2d[] v) {
+		public Polygon2d(in Vector2d[] v) {
 			vertices = new List<Vector2d>(v);
 			Timestamp = 0;
 		}
-		public Polygon2d(VectorArray2d v) {
+		public Polygon2d(in VectorArray2d v) {
 			vertices = new List<Vector2d>(v.AsVector2d());
 			Timestamp = 0;
 		}
 
 
-		public Polygon2d(double[] values) {
+		public Polygon2d(in double[] values) {
 			var N = values.Length / 2;
 			vertices = new List<Vector2d>(N);
 			for (var k = 0; k < N; ++k) {
@@ -52,7 +52,7 @@ namespace RNumerics
 			Timestamp = 0;
 		}
 
-		public Polygon2d(Func<int, Vector2d> SourceF, int N) {
+		public Polygon2d(in Func<int, Vector2d> SourceF, in int N) {
 			vertices = new List<Vector2d>();
 			for (var k = 0; k < N; ++k) {
 				vertices.Add(SourceF(k));
@@ -61,7 +61,7 @@ namespace RNumerics
 			Timestamp = 0;
 		}
 
-		public virtual Polygon2d Duplicate() {
+		public  Polygon2d Duplicate() {
 			var p = new Polygon2d(this) {
 				Timestamp = Timestamp
 			};
@@ -69,7 +69,7 @@ namespace RNumerics
 		}
 
 
-		public Vector2d this[int key]
+		public Vector2d this[in int key]
 		{
 			get => vertices[key];
 			set { vertices[key] = value; Timestamp++; }
@@ -81,22 +81,22 @@ namespace RNumerics
 
 		public int VertexCount => vertices.Count;
 
-		public void AppendVertex(Vector2d v) {
+		public void AppendVertex(in Vector2d v) {
 			vertices.Add(v);
 			Timestamp++;
 		}
-		public void AppendVertices(IEnumerable<Vector2d> v) {
+		public void AppendVertices(in IEnumerable<Vector2d> v) {
 			vertices.AddRange(v);
 			Timestamp++;
 		}
 
-		public void RemoveVertex(int idx) {
+		public void RemoveVertex(in int idx) {
 			vertices.RemoveAt(idx);
 			Timestamp++;
 		}
 
 
-		public void SetVertices(List<Vector2d> newVertices, bool bTakeOwnership) {
+		public void SetVertices(in List<Vector2d> newVertices, in bool bTakeOwnership) {
 			if (bTakeOwnership) {
 				vertices = newVertices;
 			}
@@ -116,7 +116,7 @@ namespace RNumerics
 		}
 
 
-		public Vector2d GetTangent(int i) {
+		public Vector2d GetTangent(in int i) {
 			var next = vertices[(i + 1) % vertices.Count];
 			var prev = vertices[i == 0 ? vertices.Count - 1 : i - 1];
 			return (next - prev).Normalized;
@@ -127,7 +127,7 @@ namespace RNumerics
 		/// intuitive if edges have very different lengths. 
 		/// Points "inward" for clockwise polygon, outward for counter-clockwise
 		/// </summary>
-		public Vector2d GetNormal(int i) {
+		public Vector2d GetNormal(in int i) {
 			return GetTangent(i).Perp;
 		}
 
@@ -136,7 +136,7 @@ namespace RNumerics
 		/// equivalent (?) to angle-based normal, ie is local/independent of segment lengths.
 		/// Points "inward" for clockwise polygon, outward for counter-clockwise
 		/// </summary>
-		public Vector2d GetNormal_FaceAvg(int i) {
+		public Vector2d GetNormal_FaceAvg(in int i) {
 			var next = vertices[(i + 1) % vertices.Count];
 			var prev = vertices[i == 0 ? vertices.Count - 1 : i - 1];
 			next -= vertices[i];
@@ -233,12 +233,12 @@ namespace RNumerics
 
 
 
-		public void NeighboursP(int iVertex, ref Vector2d p0, ref Vector2d p1) {
+		public void NeighboursP(in int iVertex, ref Vector2d p0, ref Vector2d p1) {
 			var N = vertices.Count;
 			p0 = vertices[(iVertex == 0) ? N - 1 : iVertex - 1];
 			p1 = vertices[(iVertex + 1) % N];
 		}
-		public void NeighboursV(int iVertex, ref Vector2d v0, ref Vector2d v1, bool bNormalize = false) {
+		public void NeighboursV(in int iVertex, ref Vector2d v0, ref Vector2d v1, in bool bNormalize = false) {
 			var N = vertices.Count;
 			v0 = vertices[(iVertex == 0) ? N - 1 : iVertex - 1] - vertices[iVertex];
 			v1 = vertices[(iVertex + 1) % N] - vertices[iVertex];
@@ -248,7 +248,7 @@ namespace RNumerics
 			}
 		}
 
-		public double OpeningAngleDeg(int iVertex) {
+		public double OpeningAngleDeg(in int iVertex) {
 			Vector2d e0 = Vector2d.Zero, e1 = Vector2d.Zero;
 			NeighboursV(iVertex, ref e0, ref e1, true);
 			return Vector2d.AngleD(e0, e1);
@@ -258,7 +258,7 @@ namespace RNumerics
 		/// <summary>
 		/// Compute winding integral at point P
 		/// </summary>
-		public double WindingIntegral(Vector2d P) {
+		public double WindingIntegral(in Vector2d P) {
 			double sum = 0;
 			var N = vertices.Count;
 			var a = vertices[0] - P;
@@ -275,7 +275,7 @@ namespace RNumerics
 		/// <summary>
 		/// Returns true if point inside polygon, using fast winding-number computation
 		/// </summary>
-		public bool Contains(Vector2d P) {
+		public bool Contains(in Vector2d P) {
 			// based on http://geomalgorithms.com/a03-_inclusion.html	
 			var nWindingNumber = 0;
 
@@ -286,7 +286,7 @@ namespace RNumerics
 
 				if (a.y <= P.y) {   // y <= P.y (below)
 					if (b.y > P.y) {                         // an upward crossing
-						if (MathUtil.IsLeft(ref a, ref b, ref P) > 0)  // P left of edge
+						if (MathUtil.IsLeft(in a, in b, in P) > 0)  // P left of edge
 {
 							++nWindingNumber;                                      // have a valid up intersect
 						}
@@ -294,7 +294,7 @@ namespace RNumerics
 				}
 				else {    // y > P.y  (above)
 					if (b.y <= P.y) {                        // a downward crossing
-						if (MathUtil.IsLeft(ref a, ref b, ref P) < 0)  // P right of edge
+						if (MathUtil.IsLeft( a,  b,  P) < 0)  // P right of edge
 {
 							--nWindingNumber;                                      // have a valid down intersect
 						}
@@ -307,7 +307,7 @@ namespace RNumerics
 
 
 
-		public bool Contains(Polygon2d o) {
+		public bool Contains(in Polygon2d o) {
 
 			// [TODO] fast bbox check?
 
@@ -324,7 +324,7 @@ namespace RNumerics
 		/// <summary>
 		/// Checks that all points on a segment are within the area defined by the Polygon2d.
 		/// </summary>
-		public bool Contains(Segment2d o) {
+		public bool Contains(in Segment2d o) {
 			// [TODO] Add bbox check
 			if (Contains(o.P0) == false || Contains(o.P1) == false) {
 				return false;
@@ -338,7 +338,7 @@ namespace RNumerics
 			return true;
 		}
 
-		public bool Intersects(Polygon2d o) {
+		public bool Intersects(in Polygon2d o) {
 			if (!GetBounds().Intersects(o.GetBounds())) {
 				return false;
 			}
@@ -356,7 +356,7 @@ namespace RNumerics
 		/// <summary>
 		/// Checks if any point on a segment is within the area defined by the Polygon2d.
 		/// </summary>
-		public bool Intersects(Segment2d o) {
+		public bool Intersects(in Segment2d o) {
 			// [TODO] Add bbox check
 			if (Contains(o.P0) || Contains(o.P1) == true) {
 				return true;
@@ -373,7 +373,7 @@ namespace RNumerics
 
 
 
-		public List<Vector2d> FindIntersections(Polygon2d o) {
+		public List<Vector2d> FindIntersections(in Polygon2d o) {
 			var v = new List<Vector2d>();
 			if (!GetBounds().Intersects(o.GetBounds())) {
 				return v;
@@ -398,16 +398,16 @@ namespace RNumerics
 		}
 
 
-		public Segment2d Segment(int iSegment) {
+		public Segment2d Segment(in int iSegment) {
 			return new Segment2d(vertices[iSegment], vertices[(iSegment + 1) % vertices.Count]);
 		}
 
-		public Vector2d PointAt(int iSegment, double fSegT) {
+		public Vector2d PointAt(in int iSegment, in double fSegT) {
 			var seg = new Segment2d(vertices[iSegment], vertices[(iSegment + 1) % vertices.Count]);
 			return seg.PointAt(fSegT);
 		}
 
-		public Vector2d GetNormal(int iSeg, double segT) {
+		public Vector2d GetNormal(in int iSeg, in double segT) {
 			var seg = new Segment2d(vertices[iSeg], vertices[(iSeg + 1) % vertices.Count]);
 			var t = ((segT / seg.Extent) + 1.0) / 2.0;
 
@@ -418,7 +418,7 @@ namespace RNumerics
 
 
 
-		public double DistanceSquared(Vector2d p, out int iNearSeg, out double fNearSegT) {
+		public double DistanceSquared(in Vector2d p, out int iNearSeg, out double fNearSegT) {
 			iNearSeg = -1;
 			fNearSegT = double.MaxValue;
 			var dist = double.MaxValue;
@@ -437,7 +437,7 @@ namespace RNumerics
 			}
 			return dist;
 		}
-		public double DistanceSquared(Vector2d p) {
+		public double DistanceSquared(in Vector2d p) {
 			return DistanceSquared(p, out var seg, out var segt);
 		}
 
@@ -457,7 +457,7 @@ namespace RNumerics
 		}
 
 
-		public Polygon2d Translate(Vector2d translate) {
+		public Polygon2d Translate(in Vector2d translate) {
 			var N = vertices.Count;
 			for (var i = 0; i < N; ++i) {
 				vertices[i] += translate;
@@ -467,7 +467,7 @@ namespace RNumerics
 			return this;
 		}
 
-		public Polygon2d Rotate(Matrix2d rotation, Vector2d origin) {
+		public Polygon2d Rotate(in Matrix2d rotation, in Vector2d origin) {
 			var N = vertices.Count;
 			for (var i = 0; i < N; ++i) {
 				vertices[i] = (rotation * (vertices[i] - origin)) + origin;
@@ -477,7 +477,7 @@ namespace RNumerics
 			return this;
 		}
 
-		public Polygon2d Scale(Vector2d scale, Vector2d origin) {
+		public Polygon2d Scale(in Vector2d scale, in Vector2d origin) {
 			var N = vertices.Count;
 			for (var i = 0; i < N; ++i) {
 				vertices[i] = (scale * (vertices[i] - origin)) + origin;
@@ -487,7 +487,7 @@ namespace RNumerics
 			return this;
 		}
 
-		public Polygon2d Transform(Func<Vector2d, Vector2d> transformF) {
+		public Polygon2d Transform(in Func<Vector2d, Vector2d> transformF) {
 			var N = vertices.Count;
 			for (var i = 0; i < N; ++i) {
 				vertices[i] = transformF(vertices[i]);
@@ -497,7 +497,7 @@ namespace RNumerics
 			return this;
 		}
 
-		public Polygon2d Transform(ITransform2 xform) {
+		public Polygon2d Transform(in ITransform2 xform) {
 			var N = vertices.Count;
 			for (var k = 0; k < N; ++k) {
 				vertices[k] = xform.TransformP(vertices[k]);
@@ -512,7 +512,7 @@ namespace RNumerics
 		/// Offset each point by dist along vertex normal direction (ie tangent-perp)
 		/// CCW polygon offsets "outwards", CW "inwards".
 		/// </summary>
-		public void VtxNormalOffset(double dist, bool bUseFaceAvg = false) {
+		public void VtxNormalOffset(in double dist, in bool bUseFaceAvg = false) {
 			var newv = new Vector2d[vertices.Count];
 			if (bUseFaceAvg) {
 				for (var k = 0; k < vertices.Count; ++k) {
@@ -536,7 +536,7 @@ namespace RNumerics
 		/// offset polygon by fixed distance, by offsetting and intersecting edges.
 		/// CCW polygon offsets "outwards", CW "inwards".
 		/// </summary>
-		public void PolyOffset(double dist) {
+		public void PolyOffset(in double dist) {
 			// [TODO] possibly can do with half as many normalizes if we do w/ sequential edges,
 			//  rather than centering on each v?
 			var newv = new Vector2d[vertices.Count];
@@ -549,7 +549,7 @@ namespace RNumerics
 				var ln = new Line2d(v + (dist * dn.Perp), dn);
 				var lp = new Line2d(v - (dist * dp.Perp), dp);
 
-				newv[k] = ln.IntersectionPoint(ref lp);
+				newv[k] = ln.IntersectionPoint(lp);
 				if (newv[k] == Vector2d.MaxValue) {
 					newv[k] = vertices[k] + (dist * GetNormal_FaceAvg(k));
 				}
@@ -573,7 +573,7 @@ namespace RNumerics
 		//            v[] = polyline array of vertex points
 		//            j,k = indices for the subchain v[j] to v[k]
 		//    Output: mk[] = array of markers matching vertex array v[]
-		static void SimplifyDP(double tol, Vector2d[] v, int j, int k, bool[] mk) {
+		static void SimplifyDP(in double tol, in Vector2d[] v, in int j, in int k, in bool[] mk) {
 			if (k <= j + 1) // there is nothing to simplify
 {
 				return;
@@ -609,8 +609,8 @@ namespace RNumerics
 
 
 
-		public void Simplify(double clusterTol = 0.0001,
-							  double lineDeviationTol = 0.01) {
+		public void Simplify(in double clusterTol = 0.0001,
+							  in double lineDeviationTol = 0.01) {
 			var n = vertices.Count;
 			if (n < 3) {
 				return;
@@ -699,7 +699,7 @@ namespace RNumerics
 
 
 
-		public void Chamfer(double chamfer_dist, double minConvexAngleDeg = 30, double minConcaveAngleDeg = 30) {
+		public void Chamfer(in double chamfer_dist, in double minConvexAngleDeg = 30, in double minConcaveAngleDeg = 30) {
 			if (IsClockwise) {
 				throw new Exception("must be ccw?");
 			}
@@ -762,14 +762,14 @@ namespace RNumerics
 		/// <summary>
 		/// Return minimal bounding box of vertices, computed to epsilon tolerance
 		/// </summary>
-		public Box2d MinimalBoundingBox(double epsilon) {
+		public Box2d MinimalBoundingBox(in double epsilon) {
 			var box2 = new ContMinBox2(vertices, epsilon, QueryNumberType.QT_DOUBLE, false);
 			return box2.MinBox;
 		}
 
 
 
-		static public Polygon2d MakeRectangle(Vector2d center, double width, double height) {
+		static public Polygon2d MakeRectangle(in Vector2d center, in double width, in double height) {
 			var vertices = new VectorArray2d(4);
 			vertices.Set(0, center.x - (width / 2), center.y - (height / 2));
 			vertices.Set(1, center.x + (width / 2), center.y - (height / 2));
@@ -779,7 +779,7 @@ namespace RNumerics
 		}
 
 
-		static public Polygon2d MakeCircle(double fRadius, int nSteps, double angleShiftRad = 0) {
+		static public Polygon2d MakeCircle(in double fRadius, in int nSteps, in double angleShiftRad = 0) {
 			var vertices = new VectorArray2d(nSteps);
 
 			for (var i = 0; i < nSteps; ++i) {
@@ -800,7 +800,7 @@ namespace RNumerics
 	/// <summary>
 	/// Wrapper for a Polygon2d that provides minimal IParametricCurve2D interface
 	/// </summary>
-	public class Polygon2DCurve : IParametricCurve2d
+	public sealed class Polygon2DCurve : IParametricCurve2d
 	{
 		public Polygon2d Polygon;
 
@@ -808,7 +808,7 @@ namespace RNumerics
 
 		// can call SampleT in range [0,ParamLength]
 		public double ParamLength => Polygon.VertexCount;
-		public Vector2d SampleT(double t) {
+		public Vector2d SampleT(in double t) {
 			var i = (int)t;
 			if (i >= Polygon.VertexCount - 1) {
 				return Polygon[Polygon.VertexCount - 1];
@@ -819,13 +819,13 @@ namespace RNumerics
 			var alpha = t - (double)i;
 			return ((1.0 - alpha) * a) + (alpha * b);
 		}
-		public Vector2d TangentT(double t) {
+		public Vector2d TangentT(in double t) {
 			throw new NotImplementedException("Polygon2dCurve.TangentT");
 		}
 
 		public bool HasArcLength => true;
 		public double ArcLength => Polygon.ArcLength;
-		public Vector2d SampleArcLength(double a) {
+		public Vector2d SampleArcLength(in double a) {
 			throw new NotImplementedException("Polygon2dCurve.SampleArcLength");
 		}
 
@@ -838,7 +838,7 @@ namespace RNumerics
 		}
 
 		public bool IsTransformable => true;
-		public void Transform(ITransform2 xform) {
+		public void Transform(in ITransform2 xform) {
 			Polygon.Transform(xform);
 		}
 

@@ -3,7 +3,7 @@
 namespace RNumerics
 {
 	// ported from WildMagic5 Wm5LinearSystem.cpp
-	public class SparseSymmetricCG
+	public sealed class SparseSymmetricCG
 	{
 		// Compute B = A*X, where inputs are ordered <X,B>
 		public Action<double[], double[]> MultiplyF;
@@ -106,7 +106,7 @@ namespace RNumerics
 		}
 
 
-		void UpdateP(double[] P, double beta, double[] R)
+		void UpdateP(in double[] P,in double beta,in double[] R)
 		{
 			for (var i = 0; i < P.Length; ++i) {
 				P[i] = R[i] + (beta * P[i]);
@@ -114,7 +114,7 @@ namespace RNumerics
 		}
 
 
-		void InitializeR(double[] R)
+		void InitializeR(in double[] R)
 		{
 			// R = B - A*X
 			MultiplyF(X, R);
@@ -141,9 +141,7 @@ namespace RNumerics
 
 			if (X == null || UseXAsInitialGuess == false)
 			{
-				if (X == null) {
-					X = new double[n];
-				}
+				X ??= new double[n];
 
 				Array.Clear(X, 0, X.Length);
 				Array.Copy(B, _r, B.Length);
@@ -238,7 +236,7 @@ namespace RNumerics
 	/// converged, however we still have to do the multiplies!
 	/// 
 	/// </summary>
-	public class SparseSymmetricCGMultipleRHS
+	public sealed class SparseSymmetricCGMultipleRHS
 	{
 		// Compute B = A*X, where inputs are ordered <X,B>
 		public Action<double[][], double[][]> MultiplyF;
@@ -619,7 +617,7 @@ namespace RNumerics
 		}
 
 
-		void InitializeR(double[][] R)
+		void InitializeR(in double[][] R)
 		{
 			// R = B - A*X
 			MultiplyF(X, R);

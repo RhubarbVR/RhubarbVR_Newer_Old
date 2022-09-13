@@ -9,7 +9,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Textures" })]
-	public class NoiseTexture : ProceduralTexture
+	public sealed class NoiseTexture : ProceduralTexture
 	{
 		[Default(FastNoiseLite.NoiseType.OpenSimplex2)]
 		[OnChanged(nameof(ComputeTexture))]
@@ -30,7 +30,9 @@ namespace RhuEngine.Components
 			var index = 0;
 			for (var y = 0; y < _clampedSizeX; y++) {
 				for (var x = 0; x < _clampedSizeY; x++) {
-					var noisePixel = (_noise.GetNoise(x, y) + 1) / 2; // Remap -1/1 to 0/1
+					var xf = (float)x;
+					var yf = (float)y;
+					var noisePixel = (_noise.GetNoise(ref  xf,ref yf) + 1) / 2; // Remap -1/1 to 0/1
 					noiseData[index++] = new Colorb(
 						noisePixel,
 						noisePixel,
