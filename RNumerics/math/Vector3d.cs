@@ -259,16 +259,16 @@ namespace RNumerics
 			var anglecalfirst = angle * (((float)Math.Floor(x * splits)) / splits);
 			var anglecalnext = angle * ((float)(Math.Floor(x * splits) + 1) / splits);
 			this *= scale;
-			var firstx = ((-radus + z) * Math.Cos(anglecalfirst * Math.PI / 180)) + radus;
-			var firstz = (-radus + z) * Math.Sin(anglecalfirst * Math.PI / 180);
+			var firstx = ((-radus + z) * MathUtil.FastCos(anglecalfirst * Math.PI / 180)) + radus;
+			var firstz = (-radus + z) * MathUtil.FastSin(anglecalfirst * Math.PI / 180);
 			var first = new Vector2f(firstx, firstz);
 
-			var nextx = ((-radus + z) * Math.Cos(anglecalnext * Math.PI / 180)) + radus;
-			var nextz = (-radus + z) * Math.Sin(anglecalnext * Math.PI / 180);
+			var nextx = ((-radus + z) * MathUtil.FastCos(anglecalnext * Math.PI / 180)) + radus;
+			var nextz = (-radus + z) * MathUtil.FastSin(anglecalnext * Math.PI / 180);
 			var next = new Vector2f(nextx, nextz);
 
-			var selfx = ((-radus + z) * Math.Cos(selfAngle * Math.PI / 180)) + radus;
-			var selfz = (-radus + z) * Math.Sin(selfAngle * Math.PI / 180);
+			var selfx = ((-radus + z) * MathUtil.FastCos(selfAngle * Math.PI / 180)) + radus;
+			var selfz = (-radus + z) * MathUtil.FastSin(selfAngle * Math.PI / 180);
 			var self = new Vector2f(selfx, selfz);
 
 			var newpoint = self.ClosestPointOnLine(first, next);

@@ -231,9 +231,8 @@ namespace RNumerics
 
 			var settings = new PlaneSetting[segments];
 			for (var i = 0; i < segments; i++) {
-				var pos = i % 2 == 0 ? (double)(1f / segments * i) : (double)(1f / segments * (segments - i));
 				settings[i] = new PlaneSetting {
-					plane = new Plane3d(Vector3d.AxisX, pos)
+					plane = new Plane3d(Vector3d.AxisX, i % 2 == 0 ? (double)(1f / segments * i) : (double)(1f / segments * (segments - i)))
 				};
 			}
 			var lastmesh = CutOnPlane(settings);

@@ -59,11 +59,11 @@ namespace RNumerics
 			return (f < low) ? low : (f > high) ? high : f;
 		}
 		public static Vector2f Clamp(in Vector2f f, in Vector2f low, in Vector2f high) {
-			return new Vector2f(Clamp(f.x, low.x, high.x), Clamp(f.y,low.y, high.y));
+			return new Vector2f(Clamp(f.x, low.x, high.x), Clamp(f.y, low.y, high.y));
 		}
 
 		public static Vector2d Abs(in Vector2d vector2d) {
-			return new Vector2d(Math.Abs(vector2d.x),Math.Abs(vector2d.y));
+			return new Vector2d(Math.Abs(vector2d.x), Math.Abs(vector2d.y));
 		}
 		public static Vector2f Abs(in Vector2f vector2f) {
 			return new Vector2f(Math.Abs(vector2f.x), Math.Abs(vector2f.y));
@@ -468,7 +468,7 @@ namespace RNumerics
 
 
 		// lerps from [0,1] for x in range [deadzone,R]
-		public static float LinearRampT(in float R, in float deadzoneR,  float x) {
+		public static float LinearRampT(in float R, in float deadzoneR, float x) {
 			float sign = Math.Sign(x);
 			x = Math.Abs(x);
 			if (x < deadzoneR) {
@@ -682,7 +682,30 @@ namespace RNumerics
 				done = i == 0;
 			}
 		}
+		public static double FastSin(double x) {
+			double sinn;
+			if (x < -3.14159265) {
+				x += 6.28318531;
+			}
+			else if (x > 3.14159265) {
+				x -= 6.28318531;
+			}
 
+			if (x < 0) {
+				sinn = (1.27323954 * x) + (0.405284735 * x * x);
+				sinn = sinn < 0 ? (0.225 * ((sinn * -sinn) - sinn)) + sinn : (0.225 * ((sinn * sinn) - sinn)) + sinn;
+				return sinn;
+			}
+			else {
+				sinn = (1.27323954 * x) - (0.405284735 * x * x);
+				sinn = sinn < 0 ? (0.225 * ((sinn * -sinn) - sinn)) + sinn : (0.225 * ((sinn * sinn) - sinn)) + sinn;
+				return sinn;
 
+			}
+		}
+
+		public static double FastCos(in double v) {
+			return FastSin(v + 1.5707963);
+		}
 	}
 }
