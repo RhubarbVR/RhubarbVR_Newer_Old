@@ -219,11 +219,27 @@ namespace RNumerics
 		}
 		private void BindVerterts(in float angle, in float radus, in Vector3f scale, in int splits) {
 			for (var i = 0; i < VertexCount; ++i) {
-				var v = new Vector3d(Vertices[3 * i], Vertices[(3 * i) + 1], Vertices[(3 * i) + 2]);
-				v.Bind(angle, radus, scale, splits);
-				Vertices[3 * i] = v.x;
-				Vertices[(3 * i) + 1] = v.y;
-				Vertices[(3 * i) + 2] = v.z;
+				var x = Vertices[3 * i];
+				var selfAngle = angle * x;
+				var anglecalfirst = angle * (((float)Math.Floor(x * splits)) / splits);
+				var anglecalnext = angle * ((float)(Math.Floor(x * splits) + 1) / splits);
+				var value1 = (-radus + (Vertices[(3 * i) + 2] * scale.z));
+				var firstx = (value1 * MathUtil.FastCos(anglecalfirst * MathUtil.DEG_2_RADF)) + radus;
+				var firstz = value1 * MathUtil.FastSin(anglecalfirst * MathUtil.DEG_2_RADF);
+				var first = new Vector2f(firstx, firstz);
+
+				var nextx = (value1 * MathUtil.FastCos(anglecalnext * MathUtil.DEG_2_RADF)) + radus;
+				var nextz = value1 * MathUtil.FastSin(anglecalnext * MathUtil.DEG_2_RADF);
+				var next = new Vector2f(nextx, nextz);
+
+				var selfx = (value1 * MathUtil.FastCos(selfAngle * MathUtil.DEG_2_RADF)) + radus;
+				var selfz = value1 * MathUtil.FastSin(selfAngle * MathUtil.DEG_2_RADF);
+				var self = new Vector2f(selfx, selfz);
+
+				var newpoint = self.ClosestPointOnLine(first, next);
+				Vertices[3 * i] = newpoint.x / scale.x;;
+				Vertices[(3 * i) + 1] = Vertices[(3 * i) + 1];
+				Vertices[(3 * i) + 2] = newpoint.y / scale.z;
 			}
 			UpdateTimeStamp();
 		}

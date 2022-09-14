@@ -124,11 +124,13 @@ namespace RhuEngine.WorldObjects
 
 		public void RegisterUpdatingEntity(Entity data) {
 			lock (_updatingEntities) {
+				_sortEntitys = true;
 				_updatingEntities.Add(data);
 			}
 		}
 		public void UnregisterUpdatingEntity(Entity data) {
 			lock (_updatingEntities) {
+				_sortEntitys = true;
 				_updatingEntities.Remove(data);
 			}
 		}

@@ -12,6 +12,7 @@ using RhuEngine.Linker;
 using RhuEngine.Physics;
 using RNumerics;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace RhuEngine.WorldObjects
 {
@@ -273,6 +274,10 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
+		private readonly List<IGrouping<uint, Entity>> _sorrtedEntity = new();
+
+		private  bool _sortEntitys;
+
 		public void Step() {
 			_netManager?.PollEvents();
 			_netManager?.NatPunchModule.PollEvents();
@@ -287,12 +292,18 @@ namespace RhuEngine.WorldObjects
 				RLog.Err($"Failed To update PhysicsSim Error:{e}");
 			}
 			try {
-				var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
-											 group ent by ent.Depth;
-				var sorted = from groupe in sortedUpdatingEntities
-							 orderby groupe.Key ascending
-							 select groupe;
-				foreach (var item in sorted) {
+				if (_sortEntitys) {
+					lock (_updatingEntities) {
+						var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
+													 group ent by ent.Depth;
+						_sorrtedEntity.Clear();
+						_sorrtedEntity.AddRange(from groupe in sortedUpdatingEntities
+												orderby groupe.Key ascending
+												select groupe);
+						_sortEntitys = false;
+					}
+				}
+				foreach (var item in _sorrtedEntity) {
 					foreach (var ent in item) {
 						ent.Step();
 					}

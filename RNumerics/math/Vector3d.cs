@@ -232,51 +232,6 @@ namespace RNumerics
 
 		public static Vector3d operator *(in Vector3d a, in Vector3d b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
 
-		public void Bind(in float angle, in float radus, in Vector3f scale, in int splits) {
-			var selfAngle = angle * x;
-			var anglecalfirst = angle * (((float)Math.Floor(x * splits)) / splits);
-			var anglecalnext = angle * ((float)(Math.Floor(x * splits) + 1) / splits);
-			this *= scale;
-			var firstx = ((-radus + z) * Math.Cos(anglecalfirst * Math.PI / 180)) + radus;
-			var firstz = (-radus + z) * Math.Sin(anglecalfirst * Math.PI / 180);
-			var first = new Vector2f(firstx, firstz);
-			
-			var nextx = ((-radus + z) * Math.Cos(anglecalnext * Math.PI / 180)) + radus;
-			var nextz = (-radus + z) * Math.Sin(anglecalnext * Math.PI / 180);
-			var next = new Vector2f(nextx, nextz);
-
-			var selfx = ((-radus + z) * Math.Cos(selfAngle * Math.PI / 180)) + radus;
-			var selfz = (-radus + z) * Math.Sin(selfAngle * Math.PI / 180);
-			var self = new Vector2f(selfx, selfz);
-			
-			var newpoint = self.ClosestPointOnLine(first, next);
-			x = newpoint.x;
-			z = newpoint.y;
-			this /= scale;
-		}
-		public void UnBind(in float angle, in float radus, in Vector3f scale, in int splits) {
-			var selfAngle = angle * x;
-			var anglecalfirst = angle * (((float)Math.Floor(x * splits)) / splits);
-			var anglecalnext = angle * ((float)(Math.Floor(x * splits) + 1) / splits);
-			this *= scale;
-			var firstx = ((-radus + z) * MathUtil.FastCos(anglecalfirst * Math.PI / 180)) + radus;
-			var firstz = (-radus + z) * MathUtil.FastSin(anglecalfirst * Math.PI / 180);
-			var first = new Vector2f(firstx, firstz);
-
-			var nextx = ((-radus + z) * MathUtil.FastCos(anglecalnext * Math.PI / 180)) + radus;
-			var nextz = (-radus + z) * MathUtil.FastSin(anglecalnext * Math.PI / 180);
-			var next = new Vector2f(nextx, nextz);
-
-			var selfx = ((-radus + z) * MathUtil.FastCos(selfAngle * Math.PI / 180)) + radus;
-			var selfz = (-radus + z) * MathUtil.FastSin(selfAngle * Math.PI / 180);
-			var self = new Vector2f(selfx, selfz);
-
-			var newpoint = self.ClosestPointOnLine(first, next);
-			x = newpoint.x;
-			z = newpoint.y;
-			this /= scale;
-		}
-
 		public static Vector3d operator /(in Vector3d a, in Vector3d b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
 
 
