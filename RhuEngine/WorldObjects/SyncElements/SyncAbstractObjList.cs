@@ -12,7 +12,7 @@ namespace RhuEngine.WorldObjects
 	{
 		T Add(Type type, bool networkedObject = false, bool deserialize = false);
 	}
-	public class SyncAbstractObjList<T> : SyncListBase<T>, IAbstractObjList<T>, INetworkedObject, IEnumerable<ISyncObject>, ISyncMember where T : ISyncObject
+	public sealed class SyncAbstractObjList<T> : SyncListBase<T>, IAbstractObjList<T>, INetworkedObject, IEnumerable<ISyncObject>, ISyncMember where T : ISyncObject
 	{
 		public W Add<W>(bool networkedObject = false, bool deserialize = false) where W : T, new() {
 			return (W)Add(typeof(W), networkedObject, deserialize);
@@ -24,16 +24,16 @@ namespace RhuEngine.WorldObjects
 			}
 			var newElement = (T)Activator.CreateInstance(type);
 			newElement.Initialize(World, this, "List element", networkedObject, deserialize);
+			AddInternal(newElement);
 			if (!networkedObject) {
 				BroadcastAdd(newElement);
 				if (!deserialize) {
-					newElement.FirstCreation();
+					newElement.CallFirstCreation();
 				}
 			}
-			AddInternal(newElement);
 			return newElement;
 		}
-		public override void InitializeMembers(bool networkedObject, bool deserialize,Func<NetPointer> func) {
+		protected override void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate func) {
 		}
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
 			return syncObjectSerializerObject.CommonAbstractListSerialize(this, this);

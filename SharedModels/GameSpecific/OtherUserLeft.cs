@@ -9,7 +9,7 @@ namespace SharedModels.GameSpecific
 {
 
 	[Formatter]
-	public class OtherUserLeftFormatter : IMessagePackFormatter<OtherUserLeft>
+	public sealed class OtherUserLeftFormatter : IMessagePackFormatter<OtherUserLeft>
 	{
 		public void Serialize(ref MessagePackWriter writer, OtherUserLeft value, MessagePackSerializerOptions options) {
 			options.Resolver.GetFormatterWithVerify<ushort>().Serialize(ref writer,value.id, options);

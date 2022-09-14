@@ -10,14 +10,14 @@ using System.Numerics;
 
 namespace RStereoKit
 {
-	public class SKHead : IRHead
+	public sealed class SKHead : IRHead
 	{
 		public Vector3f Position => (Vector3)Input.Head.position;
 
 		public RNumerics.Matrix HeadMatrix => Input.Head.ToMatrix(1).m;
 	}
 
-	public class SKMouse : IRMouse
+	public sealed class SKMouse : IRMouse
 	{
 		public Vector2f ScrollChange => new Vector2f(0, Input.Mouse.scrollChange / 1000);
 
@@ -27,7 +27,7 @@ namespace RStereoKit
 		public bool CenterMouse { get; set; }
 	}
 
-	public class SKKeyPress : IKeyPress
+	public sealed class SKKeyPress : IKeyPress
 	{
 		public SKKeyPress(BtnState btnState) {
 			BtnState = btnState;
@@ -44,7 +44,7 @@ namespace RStereoKit
 		}
 	}
 
-	public class SKStick : IRStick
+	public sealed class SKStick : IRStick
 	{
 		public SKStick(Controller c) {
 			Controller = c;
@@ -54,7 +54,7 @@ namespace RStereoKit
 		public Vector2f YX => (Vector2f)(Vector2)Controller.stick;
 	}
 
-	public class SKConttroller : IRController
+	public sealed class SKConttroller : IRController
 	{
 		public SKConttroller(Controller c) {
 			Controller = c;
@@ -82,7 +82,7 @@ namespace RStereoKit
 		public KnownControllers ModelEnum => KnownControllers.Unknown;
 	}
 
-	public class SKHand : IRHand
+	public sealed class SKHand : IRHand
 	{
 		public StereoKit.Handed Handed { get; set; }
 
@@ -93,7 +93,7 @@ namespace RStereoKit
 		public RNumerics.Matrix Wrist => Input.Hand(Handed).wrist.ToMatrix().m;
 	}
 
-	public class SKInput : IRInput
+	public sealed class SKInput : IRInput
 	{
 		public IRHead Head { get; set; } = new SKHead();
 

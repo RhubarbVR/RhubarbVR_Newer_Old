@@ -1,5 +1,4 @@
-﻿#if (NETSTANDARD || NETFRAMEWORK || NET5_0_OR_GREATER)
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,4 +25,3 @@ public static partial class ClipboardService
 			: RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? LinuxClipboard.GetText : throw new NotSupportedException();
 	}
 }
-#endif

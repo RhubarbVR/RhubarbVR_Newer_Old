@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RhubarbPostProcessor": {
+      "commandName": "Project",
+      "commandLineArgs": "../../../../RhuEngine/bin/Debug/netstandard2.1/RhuEngineDebug.dll\r\n../../../../Platforms/Rhubarb_VR_DotNet/bin/Debug/net6.0/"
+    }
+  }
+}

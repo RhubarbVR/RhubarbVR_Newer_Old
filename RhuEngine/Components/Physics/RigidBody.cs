@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
 	[UpdateLevel(UpdateEnum.Movement)]
-	public class RigidBody : Component
+	public sealed class RigidBody : Component
 	{
 		public readonly Linker<Vector3f> Position;
 
@@ -21,7 +21,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(EntityChanged))]
 		public readonly SyncRef<Entity> TargetEntity;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			TargetEntity.Target = Entity;
 		}
@@ -61,7 +61,7 @@ namespace RhuEngine.Components
 		[NoSync]
 		private PhysicsObject _physicsObject;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			PhysicsObjectChanged();
 		}
@@ -92,7 +92,7 @@ namespace RhuEngine.Components
 			obj.Active = true;
 		}
 
-		public override void Step() {
+		protected override void Step() {
 			base.Step();
 			var colider = PhysicsObject.Target?.rigidBody;
 			if (colider is null) {

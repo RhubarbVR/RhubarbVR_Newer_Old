@@ -12,7 +12,7 @@ using RNumerics;
 
 namespace RhuEngine.Managers
 {
-	public class InputManager : IManager
+	public sealed class InputManager : IManager
 	{
 		private Engine _engine;
 
@@ -38,7 +38,8 @@ namespace RhuEngine.Managers
 			Primary,
 			Secondary,
 			Grab,
-			UnlockMouse
+			UnlockMouse,
+			ObserverOpen
 		}
 
 
@@ -184,7 +185,7 @@ namespace RhuEngine.Managers
 
 		public class ScreenInput
 		{
-			public Vector3f pos = new Vector3f(0, 1.84f, 0);
+			public Vector3f pos = new(0, 1.84f, 0);
 
 			public Vector2f yawpitch;
 			public const float PITCH = 85.5f;
@@ -255,7 +256,7 @@ namespace RhuEngine.Managers
 
 		}
 		public void RenderStep() {
-			if ((!RWorld.IsInVR) && _engine.EngineLink.CanInput) {
+			if ((!_engine.IsInVR) && _engine.EngineLink.CanInput) {
 				screenInput.Step();
 			}
 			_engine.MainSettings.InputSettings.MainControllerInputSettings.UpdateController(GetController(true));

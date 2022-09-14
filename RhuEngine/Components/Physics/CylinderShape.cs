@@ -8,13 +8,13 @@ using RhuEngine.Physics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public class CylinderShape : PhysicsObject
+	public sealed class CylinderShape : PhysicsObject
 	{
 		[OnChanged(nameof(RebuildPysics))]
 		public readonly Sync<Vector3d> boxHalfExtent;
 		[OnChanged(nameof(RebuildPysics))]
 		public readonly Sync<Dir> Direction;
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			boxHalfExtent.Value = new Vector3d(0.5f);
 		}

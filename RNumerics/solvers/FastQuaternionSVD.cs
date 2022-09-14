@@ -28,7 +28,7 @@ namespace RNumerics
 	///   - SymmetricMatrix3d currently a class, could make a struct (see comments)
 	/// 
 	/// </summary>
-	public class FastQuaternionSVD
+	public sealed class FastQuaternionSVD
 	{
 		int _numJacobiIterations = 4;   // increase this to get higher accuracy
 										// TODO: characterize...
@@ -42,7 +42,7 @@ namespace RNumerics
 		public FastQuaternionSVD() {
 		}
 
-		public FastQuaternionSVD(Matrix3d matrix, double epsilon = MathUtil.EPSILON, int jacobiIters = 4) {
+		public FastQuaternionSVD(in Matrix3d matrix, in double epsilon = MathUtil.EPSILON, in int jacobiIters = 4) {
 			Solve(matrix, epsilon, jacobiIters);
 		}
 
@@ -50,22 +50,18 @@ namespace RNumerics
 		SymmetricMatrix3d _aTA;
 		double[] _aV;
 
-		public void Solve(Matrix3d matrix, double epsilon = MathUtil.EPSILON, int jacobiIters = -1) {
+		public void Solve(Matrix3d matrix, in double epsilon = MathUtil.EPSILON, in int jacobiIters = -1) {
 			if (jacobiIters != -1) {
 				_numJacobiIterations = jacobiIters;
 			}
 
-			if (_aTA == null) {
-				_aTA = new SymmetricMatrix3d();
-			}
+			_aTA ??= new SymmetricMatrix3d();
 
 			_aTA.SetATA(ref matrix);
 
 			var v = JacobiDiagonalize(_aTA);
 
-			if (_aV == null) {
-				_aV = new double[9];
-			}
+			_aV ??= new double[9];
 
 			ComputeAV(ref matrix, ref v, _aV);
 
@@ -90,7 +86,7 @@ namespace RNumerics
 
 
 
-		Vector4d JacobiDiagonalize(SymmetricMatrix3d ATA) {
+		Vector4d JacobiDiagonalize(in SymmetricMatrix3d ATA) {
 			var V = new Vector4d(1, 0, 0, 0);
 
 			for (var i = 0; i < _numJacobiIterations; ++i) {
@@ -116,7 +112,7 @@ namespace RNumerics
 		/// compute givens angles of B for (p,q). Only 
 		/// ever called with p,q as [0,1], [0,2], or [1,2]
 		/// </summary>
-		Vector2d GivensAngles(SymmetricMatrix3d B, int p, int q) {
+		Vector2d GivensAngles(in SymmetricMatrix3d B, in int p, in int q) {
 			double ch = 0, sh = 0;
 			if (p == 0) {
 				if (q == 1) {
@@ -149,7 +145,7 @@ namespace RNumerics
 
 
 
-		void ComputeAV(ref Matrix3d matrix, ref Vector4d V, double[] buf) {
+		void ComputeAV(ref Matrix3d matrix, ref Vector4d V, in double[] buf) {
 			var qV = new Quaterniond(V[1], V[2], V[3], V[0]);
 			var MV = qV.ToRotationMatrix();
 			var AV = matrix * MV;
@@ -158,7 +154,7 @@ namespace RNumerics
 
 
 
-		void QRFactorize(double[] AV, ref Vector4d V, double eps, ref Vector3d S, ref Vector4d U) {
+		void QRFactorize(in double[] AV, ref Vector4d V, in double eps, ref Vector3d S, ref Vector4d U) {
 			PermuteColumns(AV, ref V);
 
 			U = new Vector4d(1, 0, 0, 0);
@@ -182,7 +178,7 @@ namespace RNumerics
 
 		//returns the 2 components of the quaternion
 		//such that Q^T * B has a 0 in element p, q
-		Vector2d ComputeGivensQR(double[] B, double eps, int r, int c) {
+		Vector2d ComputeGivensQR(in double[] B, in double eps, in int r, in int c) {
 			var app = B[4 * c];
 			var apq = B[(3 * r) + c];
 
@@ -204,7 +200,7 @@ namespace RNumerics
 
 
 		//Q is the rot matrix defined by quaternion (ch, . . . sh .. . ) where sh is coord i
-		void GivensQTB2(double[] B, double ch, double sh) {
+		void GivensQTB2(in double[] B, in double ch, in double sh) {
 			//quat is (ch, 0, 0, sh), rotation around Z axis
 			var c = (ch * ch) - (sh * sh);
 			var s = 2 * sh * ch;
@@ -229,7 +225,7 @@ namespace RNumerics
 
 		//This will be called after givensQTB<2>, so we know that
 		//B10 is 0... which actually doesn't matter since that row won't change
-		void GivensQTB1(double[] B, double ch, double sh) {
+		void GivensQTB1(in double[] B, in double ch, in double sh) {
 			var c = (ch * ch) - (sh * sh);
 			var s = 2 * sh * ch;
 			//Q = [c 0 s; 0 1 0; -s 0 c];
@@ -251,7 +247,7 @@ namespace RNumerics
 		}
 
 		//B10 and B20 are 0, so don't bother filling in/computing them :)
-		void GivensQTB0(double[] B, double ch, double sh) {
+		void GivensQTB0(in double[] B, in double ch, in double sh) {
 			var c = (ch * ch) - (sh * sh);
 			var s = 2 * ch * sh;
 
@@ -272,7 +268,7 @@ namespace RNumerics
 
 
 
-		void QuatTimesEqualCoordinateAxis(ref Vector4d lhs, double c, double s, int i) {
+		void QuatTimesEqualCoordinateAxis(ref Vector4d lhs, in double c, in double s, in int i) {
 			//the quat we're multiplying by is (c, ? s ?)  where s is in slot i of the vector part,
 			//and the other entries are 0
 			var newS = (lhs.x * c) - (lhs[i + 1] * s);
@@ -296,7 +292,7 @@ namespace RNumerics
 		const double SIN_BACKUP = 0.38268343236508973; //0.5 * Math.Sqrt(2.0 - MathUtil.SqrtTwo);
 		const double COS_BACKUP = 0.92387953251128674; //0.5 * Math.Sqrt(2.0 + MathUtil.SqrtTwo);
 
-		void PermuteColumns(double[] B, ref Vector4d V) {
+		void PermuteColumns(in double[] B, ref Vector4d V) {
 			var magx = (B[0] * B[0]) + (B[3] * B[3]) + (B[6] * B[6]);
 			var magy = (B[1] * B[1]) + (B[4] * B[4]) + (B[7] * B[7]);
 			var magz = (B[2] * B[2]) + (B[5] * B[5]) + (B[8] * B[8]);
@@ -324,7 +320,7 @@ namespace RNumerics
 
 
 
-		void SwapColsNeg(double[] B, int i, int j) {
+		void SwapColsNeg(in double[] B, in int i, in int j) {
 			var tmp = -B[i];
 			B[i] = B[j];
 			B[j] = tmp;
@@ -349,7 +345,7 @@ namespace RNumerics
 	/// 
 	/// This is a helper class for FastQuaternionSVD, currently not public
 	/// </summary>
-	class SymmetricMatrix3d
+	sealed class SymmetricMatrix3d
 	{
 		// [TODO] could replace entries w/ 2 Vector3d, 
 		// one for diag and one for off-diags. Then this can be a struct.
@@ -372,7 +368,7 @@ namespace RNumerics
          * These functions compute Q^T * S * Q
          * where Q is represented as the quaterion with c as the scalar and s in the slot that's not p or q
          */
-		public void QuatConjugate01(double c, double s) {
+		public void QuatConjugate01(in double c, in double s) {
 			//rotatoin around z axis
 			var realC = (c * c) - (s * s);
 			var realS = 2 * s * c;
@@ -395,7 +391,7 @@ namespace RNumerics
 		}
 
 
-		public void QuatConjugate02(double c, double s) {
+		public void QuatConjugate02(in double c, in double s) {
 			//rotation around y axis
 			//quat looks like (ch, 0, sh, 0)
 			var realC = (c * c) - (s * s);
@@ -420,7 +416,7 @@ namespace RNumerics
 
 
 
-		public void QuatConjugate12(double c, double s) {
+		public void QuatConjugate12(in double c, in double s) {
 			//rotation around x axis
 			//quat looks like (ch, sh, 0, 0)
 			var realC = (c * c) - (s * s);

@@ -10,12 +10,13 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Utils" })]
-	public class TextureScaler : Component
+	public sealed class TextureScaler : Component
 	{
 		[OnAssetLoaded(nameof(TextScale))]
 		public readonly AssetRef<RTexture2D> texture;
 
 		[OnChanged(nameof(TextScale))]
+		[Default(1f)]
 		public readonly Sync<float> scaleMultiplier;
 
 		public readonly Linker<Vector2f> scale;

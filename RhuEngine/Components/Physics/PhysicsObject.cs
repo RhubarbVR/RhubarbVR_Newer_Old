@@ -24,7 +24,7 @@ namespace RhuEngine.Components
 
 		public abstract ColliderShape PysicsBuild();
 		public void RebuildPysics() {
-			RWorld.ExecuteOnEndOfFrame(this, () => {
+			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
 				var shape = PysicsBuild();
 				if (shape is not null) {
 					BuildPhysics(shape);
@@ -46,7 +46,7 @@ namespace RhuEngine.Components
 			AddedData?.Invoke(rigidBody);
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			Entity.GlobalTransformChange += Entity_GlobalTransformChange;
 			Entity.enabled.Changed += Enabled_Changed;
@@ -72,8 +72,8 @@ namespace RhuEngine.Components
 			rigidBody.Matrix = obj.GlobalTrans;
 		}
 
-		public void Touch(uint handed, Vector3f hitnormal, Vector3f hitpointworld) {
-			Entity.CallOnTouch(handed, hitnormal, hitpointworld);
+		public void Touch(uint handed, Vector3f hitnormal, Vector3f hitpointworld,Handed handedSide) {
+			Entity.CallOnTouch(handed, hitnormal, hitpointworld, handedSide);
 		}
 
 		public void Lazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce,Handed hand) {

@@ -9,7 +9,7 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public class SyncDelegate: SyncDelegate<Action>
+	public sealed class SyncDelegate: SyncDelegate<Action>
 	{
 	}
 

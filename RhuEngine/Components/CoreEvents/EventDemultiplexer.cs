@@ -8,7 +8,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreEvents" })]
-	public class EventDemultiplexer : Component
+	public sealed class EventDemultiplexer : Component
 	{
 		public readonly Linker<int> Event;
 

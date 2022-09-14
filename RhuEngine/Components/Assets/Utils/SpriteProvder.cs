@@ -10,7 +10,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Utils" })]
-	public class SpriteProvder : Component
+	public sealed class SpriteProvder : Component
 	{
 		public readonly AssetRef<RTexture2D> Texture;
 

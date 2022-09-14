@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class Sphere3NormalizedCubeMesh : ProceduralMesh
+	public sealed class Sphere3NormalizedCubeMesh : ProceduralMesh
 	{
 		[Default(0.5f)]
 		[OnChanged(nameof(LoadMesh))]
@@ -31,10 +31,6 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<bool> WantNormals;
 
-		public override void FirstCreation() {
-			base.FirstCreation();
-
-		}
 
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {

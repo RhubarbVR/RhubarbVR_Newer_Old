@@ -5,9 +5,9 @@ using System.Text;
 using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Linker
 {
-	public interface IRenderLink
+	public interface IWorldLink
 	{
-		public RenderingComponent RenderingComponentGen { get; set; }
+		public LinkedWorldComponent LinkCompGen { get; set; }
 		public void Started();
 		
 		public void Stopped();
@@ -20,15 +20,15 @@ namespace RhuEngine.Linker
 
 	}
 
-	public interface IRenderLink<T>:IRenderLink where T : RenderingComponent,new()
+	public interface IRenderLink<T>:IWorldLink where T : LinkedWorldComponent,new()
 	{
-		T RenderingComponent { get; set; }
+		T LinkedComp { get; set; }
 	}
 
-	public abstract class RenderLinkBase<T> : IRenderLink<T> where T : RenderingComponent, new()
+	public abstract class EngineWorldLinkBase<T> : IRenderLink<T> where T : LinkedWorldComponent, new()
 	{
-		public T RenderingComponent { get; set; }
-		public RenderingComponent RenderingComponentGen { get => RenderingComponent; set => RenderingComponent = (T)value; }
+		public T LinkedComp { get; set; }
+		public LinkedWorldComponent LinkCompGen { get => LinkedComp; set => LinkedComp = (T)value; }
 
 		public abstract void Init();
 

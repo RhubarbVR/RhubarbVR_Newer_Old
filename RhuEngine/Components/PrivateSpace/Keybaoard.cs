@@ -20,7 +20,7 @@ using Newtonsoft.Json.Linq;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	public class KeyBoard : Component
+	public sealed class KeyBoard : Component
 	{
 		[NoSave]
 		[NoSync]
@@ -49,7 +49,7 @@ namespace RhuEngine.Components
 
 		[OnChanged(nameof(LoadKeyboard))]
 		public readonly Sync<KeyBoardLayOutSelection> CurrentLayout;
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			uICanvas = Entity.AddChild("Canvas").AttachComponent<UICanvas>();
 			uICanvas.scale.Value = new Vector3f(10f, 3.3f, 1);
 			mit = Entity.AttachComponent<UnlitMaterial>();
@@ -70,7 +70,8 @@ namespace RhuEngine.Components
 			if (_keyboardLoaded) {
 				return;
 			}
-			Task.Run(LoadKeyboard);
+			//Todo: Keyboard Update
+			//Task.Run(LoadKeyboard);
 		}
 
 		public void LoadKeyboard() {
@@ -94,7 +95,6 @@ namespace RhuEngine.Components
 			try {
 				var uiBuilder = new UIBuilder(uICanvas.Entity, mit);
 				var grabber = uiBuilder.CurretRectEntity.AttachComponent<UIGrabInteraction>();
-				grabber.AllowOtherZones.Value = true;
 				grabber.Grabeded.Target = grabable.RemoteGrab;
 				uiBuilder.PushRect();
 				uiBuilder.AddRectangle(0, 0.9f, true);
@@ -181,7 +181,7 @@ namespace RhuEngine.Components
 				PressingKeys.Add(code, DateTime.UtcNow);
 				void CheckIfStillPressing() {
 					if (PressingKeys.ContainsKey(code)) {
-						RWorld.ExecuteOnEndOfFrame(CheckIfStillPressing);
+						RUpdateManager.ExecuteOnEndOfFrame(CheckIfStillPressing);
 						if ((DateTime.UtcNow - PressingKeys[code]).TotalSeconds >= 1) {
 							RInput.InjectedTypeDelta += code;
 							PressingKeys.Remove(code);
@@ -189,7 +189,7 @@ namespace RhuEngine.Components
 						}
 					}
 				}
-				RWorld.ExecuteOnEndOfFrame(() => {
+				RUpdateManager.ExecuteOnEndOfFrame(() => {
 					RInput.InjectedTypeDelta = RInput.InjectedTypeDelta.Replace(code, string.Empty);
 					CheckIfStillPressing();
 				});

@@ -10,10 +10,15 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public interface ISync
+	public interface ISync : ISyncMember
 	{
 		public void SetStartingObject();
 		public void SetValue(object value);
+
+		public void SetValueForce(object value);
+		public object GetValue();
+
+		public Type GetValueType();
 	}
 	[GenericTypeConstraint()]
 	public class Sync<T> : SyncObject, ILinkerMember<T>, ISync, INetworkedObject, IChangeable, ISyncMember
@@ -54,15 +59,18 @@ namespace RhuEngine.WorldObjects
 			}
 			var newValue = typeof(T).IsEnum ? (T)(object)((DataNode<int>)data).Value : ((DataNode<T>)data).Value;
 			lock (_locker) {
+				var lastVal = _value;
 				_value = newValue;
-				Changed?.Invoke(this);
+				UpdatedValue();
+				if (!EqualityComparer<T>.Default.Equals(lastVal, _value)) {
+					Changed?.Invoke(this);
+				}
 			}
-			UpdatedValue();
 		}
 
 		public event Action<IChangeable> Changed;
 
-		public void SetValue(object value) {
+		public void SetValueForce(object value) {
 			lock (_locker) {
 				try {
 					_value = (T)value;
@@ -71,7 +79,7 @@ namespace RhuEngine.WorldObjects
 			}
 			UpdatedValue();
 		}
-		public override void InitializeMembers(bool networkedObject, bool deserializeFunc, Func<NetPointer> func) {
+		protected override void InitializeMembers(bool networkedObject, bool deserializeFunc, NetPointerUpdateDelegate func) {
 		}
 
 		public void Lerp(T targetpos,double time = 5f,bool removeOnDone = true) {
@@ -143,6 +151,18 @@ namespace RhuEngine.WorldObjects
 		public void SetStartingObject() {
 			_value = StartingValue;
 			UpdatedValue();
+		}
+
+		public void SetValue(object data) {
+			Value = (T)data;
+		}
+
+		public object GetValue() {
+			return Value;
+		}
+
+		public Type GetValueType() {
+			return typeof(T);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

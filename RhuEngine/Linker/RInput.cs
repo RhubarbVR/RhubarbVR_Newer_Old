@@ -9,6 +9,7 @@ namespace RhuEngine.Linker
 	{
 		public Vector2f YX { get; }
 	}
+
 	[Flags]
 	public enum KnownControllers: uint
 	{
@@ -24,6 +25,7 @@ namespace RhuEngine.Linker
 		MicrosoftHand = 256,
 		GenericXR = 512,
 	}
+
 	public interface IRController
 	{
 		public string Model { get; }
@@ -94,7 +96,7 @@ namespace RhuEngine.Linker
 		}
 		public static ScreenHead screenHead = new();
 
-		public static IRHead Head => RWorld.IsInVR?Instance?.Head:screenHead;
+		public static IRHead Head => Engine.MainEngine.IsInVR?Instance?.Head:screenHead;
 
 		public static IRMouse Mouse => Instance?.Mouse;
 

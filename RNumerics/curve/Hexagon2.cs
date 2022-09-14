@@ -2,7 +2,7 @@
 
 namespace RNumerics
 {
-	public class Hexagon2d
+	public sealed class Hexagon2d
 	{
 		public enum TopModes
 		{
@@ -14,7 +14,7 @@ namespace RNumerics
 		public double Radius;   // distance from center to corners
 		public TopModes TopMode;
 
-		public Hexagon2d(Vector2d center, double radius, TopModes mode = TopModes.Flat)
+		public Hexagon2d(in Vector2d center, in double radius, in TopModes mode = TopModes.Flat)
 		{
 			Center = center;
 			Radius = radius;
@@ -39,7 +39,7 @@ namespace RNumerics
 		}
 
 
-		public Vector2d Corner(int i)
+		public Vector2d Corner(in int i)
 		{
 			var angle_deg = 60.0 * (double)i;
 			if (TopMode == TopModes.Tip) {

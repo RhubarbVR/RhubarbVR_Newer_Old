@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace RNumerics
 {
-	public class IndexUtil
+	public static class IndexUtil
 	{
 		// test if [a0,a1] and [b0,b1] are the same pair, ignoring order
-		public static bool Same_pair_unordered(int a0, int a1, int b0, int b1) {
+		public static bool Same_pair_unordered(in int a0, in int a1, in int b0, in int b1) {
 			return (a0 == b0) ?
 				(a1 == b1) :
 				(a0 == b1 && a1 == b0);
@@ -19,34 +19,30 @@ namespace RNumerics
 
 
 		// find the vtx that is the same in both ev0 and ev1
-		public static int Find_edge_other_v(ref Index2i ev, int v) {
-			return ev.a == v ? ev.b : ev.b == v ? ev.a : int.MinValue;
-		}
-		public static int Find_edge_other_v(Index2i ev, int v) {
+		public static int Find_edge_other_v(in Index2i ev, in int v) {
 			return ev.a == v ? ev.b : ev.b == v ? ev.a : int.MinValue;
 		}
 
 
 		// return index of a in tri_verts, or InvalidID if not found
-		public static int Find_tri_index(int a, int[] tri_verts) {
+		public static int Find_tri_index(in int a, in int[] tri_verts) {
 			return tri_verts[0] == a ? 0 : tri_verts[1] == a ? 1 : tri_verts[2] == a ? 2 : int.MinValue;
 		}
-		public static int Find_tri_index(int a, Index3i tri_verts) {
-			return tri_verts.a == a ? 0 : tri_verts.b == a ? 1 : tri_verts.c == a ? 2 : int.MinValue;
-		}
-		public static int Find_tri_index(int a, ref Index3i tri_verts) {
+		public static int Find_tri_index(in int a, in Index3i tri_verts) {
 			return tri_verts.a == a ? 0 : tri_verts.b == a ? 1 : tri_verts.c == a ? 2 : int.MinValue;
 		}
 
+
 		// return index of a in tri_verts, or InvalidID if not found
-		public static int Find_edge_index_in_tri(int a, int b, int[] tri_verts) {
+		public static int Find_edge_index_in_tri(in int a, in int b, in int[] tri_verts) {
 			return Same_pair_unordered(a, b, tri_verts[0], tri_verts[1])
 				? 0
 				: Same_pair_unordered(a, b, tri_verts[1], tri_verts[2])
 				? 1
 				: Same_pair_unordered(a, b, tri_verts[2], tri_verts[0]) ? 2 : int.MinValue;
 		}
-		public static int Find_edge_index_in_tri(int a, int b, ref Index3i tri_verts) {
+
+		public static int Find_edge_index_in_tri(in int a, in int b, in Index3i tri_verts) {
 			return Same_pair_unordered(a, b, tri_verts.a, tri_verts.b)
 				? 0
 				: Same_pair_unordered(a, b, tri_verts.b, tri_verts.c)
@@ -55,7 +51,7 @@ namespace RNumerics
 		}
 
 		// find sequence [a,b] in tri_verts (mod3) and return index of a, or InvalidID if not found
-		public static int Find_tri_ordered_edge(int a, int b, int[] tri_verts) {
+		public static int Find_tri_ordered_edge(in int a, in int b, in int[] tri_verts) {
 			return tri_verts[0] == a && tri_verts[1] == b
 				? 0
 				: tri_verts[1] == a && tri_verts[2] == b ? 1 : tri_verts[2] == a && tri_verts[0] == b ? 2 : int.MinValue;
@@ -64,19 +60,16 @@ namespace RNumerics
 		/// <summary>
 		///  find sequence [a,b] in tri_verts (mod3) and return index of a, or InvalidID if not found
 		/// </summary>
-		public static int Find_tri_ordered_edge(int a, int b, ref Index3i tri_verts) {
+		public static int Find_tri_ordered_edge(in int a, in int b, in Index3i tri_verts) {
 			return tri_verts.a == a && tri_verts.b == b
 				? 0
 				: tri_verts.b == a && tri_verts.c == b ? 1 : tri_verts.c == a && tri_verts.a == b ? 2 : int.MinValue;
-		}
-		public static int Find_tri_ordered_edge(int a, int b, Index3i tri_verts) {
-			return Find_tri_ordered_edge(a, b, ref tri_verts);
 		}
 
 		/// <summary>
 		/// assuming a is in tri-verts, returns other two vertices, in correct order (or Index2i.Max if not found)
 		/// </summary>
-		public static Index2i Find_tri_other_verts(int a, ref Index3i tri_verts) {
+		public static Index2i Find_tri_other_verts(in int a, ref Index3i tri_verts) {
 			if (tri_verts.a == a) {
 				return new Index2i(tri_verts.b, tri_verts.c);
 			}
@@ -118,14 +111,14 @@ namespace RNumerics
 			return Orient_tri_edge(ref a, ref b, ref tri_verts);
 		}
 
-		public static bool Is_ordered(int a, int b, ref Index3i tri_verts) {
+		public static bool Is_ordered(in int a, in int b, ref Index3i tri_verts) {
 			return (tri_verts.a == a && tri_verts.b == b) ||
 				   (tri_verts.b == a && tri_verts.c == b) ||
 				   (tri_verts.c == a && tri_verts.a == b);
 		}
 
 
-		public static bool Is_same_triangle(int a, int b, int c, ref Index3i tri) {
+		public static bool Is_same_triangle(in int a, in int b, in int c, ref Index3i tri) {
 			return tri.a == a
 				? Same_pair_unordered(tri.b, tri.c, b, c)
 				: tri.b == a ? Same_pair_unordered(tri.a, tri.c, b, c) : tri.c == a && Same_pair_unordered(tri.a, tri.b, b, c);
@@ -181,20 +174,17 @@ namespace RNumerics
 
 
 
-		public static Vector3i ToGrid3Index(int idx, int nx, int ny) {
+		public static Vector3i ToGrid3Index(in int idx, in int nx, in int ny) {
 			var x = idx % nx;
 			var y = idx / nx % ny;
 			var z = idx / (nx * ny);
 			return new Vector3i(x, y, z);
 		}
 
-		public static int ToGrid3Linear(int i, int j, int k, int nx, int ny) {
+		public static int ToGrid3Linear(in int i, in int j, in int k, in int nx, in int ny) {
 			return i + (nx * (j + (ny * k)));
 		}
-		public static int ToGrid3Linear(Vector3i ijk, int nx, int ny) {
-			return ijk.x + (nx * (ijk.y + (ny * ijk.z)));
-		}
-		public static int ToGrid3Linear(ref Vector3i ijk, int nx, int ny) {
+		public static int ToGrid3Linear(in Vector3i ijk, in int nx, in int ny) {
 			return ijk.x + (nx * (ijk.y + (ny * ijk.z)));
 		}
 
@@ -204,7 +194,7 @@ namespace RNumerics
 		/// Filter out invalid entries in indices[] list. Will return indices itself if 
 		/// none invalid, and bForceCopy == false
 		/// </summary>
-		public static int[] FilterValid(int[] indices, Func<int, bool> FilterF, bool bForceCopy = false) {
+		public static int[] FilterValid(in int[] indices, in Func<int, bool> FilterF, in bool bForceCopy = false) {
 			var nValid = 0;
 			for (var i = 0; i < indices.Length; ++i) {
 				if (FilterF(indices[i])) {
@@ -230,7 +220,7 @@ namespace RNumerics
 		/// <summary>
 		/// return trune if CheckF returns true for all members of indices list
 		/// </summary>
-		public static bool IndicesCheck(int[] indices, Func<int, bool> CheckF) {
+		public static bool IndicesCheck(in int[] indices, in Func<int, bool> CheckF) {
 			for (var i = 0; i < indices.Length; ++i) {
 				if (CheckF(indices[i]) == false) {
 					return false;
@@ -244,21 +234,21 @@ namespace RNumerics
 		/// <summary>
 		/// Apply map to indices
 		/// </summary>
-		public static void Apply(List<int> indices, IIndexMap map) {
+		public static void Apply(in List<int> indices, in IIndexMap map) {
 			var N = indices.Count;
 			for (var i = 0; i < N; ++i) {
 				indices[i] = map[indices[i]];
 			}
 		}
 
-		public static void Apply(int[] indices, IIndexMap map) {
+		public static void Apply(in int[] indices, in IIndexMap map) {
 			var N = indices.Length;
 			for (var i = 0; i < N; ++i) {
 				indices[i] = map[indices[i]];
 			}
 		}
 
-		public static void Apply(int[] indices, IList<int> map) {
+		public static void Apply(in int[] indices, in IList<int> map) {
 			var N = indices.Length;
 			for (var i = 0; i < N; ++i) {
 				indices[i] = map[indices[i]];

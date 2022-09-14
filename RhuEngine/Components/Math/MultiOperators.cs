@@ -3,8 +3,9 @@ using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.Components
 {
+	//Todo no more dynamic use interfaces instead
 	[Category("Math")]
-	public class MultiOperators<In,Out> : AbMultiOperation<Out,In> where In : struct where Out : struct
+	public sealed class MultiOperators<In,Out> : AbMultiOperation<Out,In> where In : struct where Out : struct
 	{
 		public readonly Sync<bool> Unchecked;
 

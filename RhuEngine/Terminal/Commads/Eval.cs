@@ -23,7 +23,7 @@ namespace RhuEngine.Commads
 				return;
 			}
 			var enty = Manager.Engine.worldManager.FocusedWorld.GetLocalUser().userRoot.Target?.Entity ?? Manager.Engine.worldManager.FocusedWorld.RootEntity;
-			var comp = enty.AttachComponent<ECMAScript>();
+			var comp = enty.AttachComponent<RawECMAScript>();
 			var code = FullCommand.Substring(5);
 			if (code.Contains('\n') || code.Contains(';')) {
 				var firstLast = code.LastIndexOf('\n');
@@ -31,10 +31,10 @@ namespace RhuEngine.Commads
 				if (secondLast > firstLast) {
 					firstLast = secondLast;
 				}
-				comp.Script.Value = "function Eval(){"+ code.Substring(0, firstLast) + "; return " + code.Substring(firstLast + 1)+ "}";
+				comp.ScriptCode.Value = "function Eval(){"+ code.Substring(0, firstLast) + "; return " + code.Substring(firstLast + 1)+ "}";
 			}
 			else {
-				comp.Script.Value = "function Eval(){ return " + code + "}";
+				comp.ScriptCode.Value = "function Eval(){ return " + code + "}";
 			}
 			var returnData = comp.InvokeWithReturn("Eval");
 			Console.WriteLine(returnData.ToString());

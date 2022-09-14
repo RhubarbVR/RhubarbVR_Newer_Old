@@ -8,27 +8,22 @@ using SixLabors.Fonts;
 
 namespace RhuEngine
 {
-	public class StaticResources {
+	public sealed class StaticResources {
 		public static Stream GetStaticResourceStream(string name) {
 			return Assembly.GetCallingAssembly().GetManifestResourceStream("RhuEngine.Res." + name);
 		}
 		public static Stream GetStaticResource(string name) {
-			if(File.Exists(Engine.BaseDir + "/" + name)) {
-				return File.OpenRead(Engine.BaseDir + "/" + name);
-			}
-			if (File.Exists(Engine.BaseDir + "/res/" + name)) {
-				return File.OpenRead(Engine.BaseDir + "/" + name);
-			}
-			if (File.Exists(Engine.BaseDir + "/Res/" + name)) {
-				return File.OpenRead(Engine.BaseDir + "/Res/" + name);
-			}
-			if (File.Exists(Engine.BaseDir + "/OverRide/" + name)) {
-				return File.OpenRead(Engine.BaseDir + "/OverRide/" + name);
-			}
-			if (File.Exists(Engine.BaseDir + "/override/" + name)) {
-				return File.OpenRead(Engine.BaseDir + "/override/" + name);
-			}
-			return GetStaticResourceStream(name);
+			return File.Exists(Engine.BaseDir + "/" + name)
+				? File.OpenRead(Engine.BaseDir + "/" + name)
+				: File.Exists(Engine.BaseDir + "/res/" + name)
+				? File.OpenRead(Engine.BaseDir + "/" + name)
+				: File.Exists(Engine.BaseDir + "/Res/" + name)
+				? File.OpenRead(Engine.BaseDir + "/Res/" + name)
+				: File.Exists(Engine.BaseDir + "/OverRide/" + name)
+				? File.OpenRead(Engine.BaseDir + "/OverRide/" + name)
+				: File.Exists(Engine.BaseDir + "/override/" + name)
+				? File.OpenRead(Engine.BaseDir + "/override/" + name)
+				: GetStaticResourceStream(name);
 		}
 
 		public RTexture2D LoadTexture(string name) {

@@ -5,7 +5,7 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/ConstAssets" })]
-	public class GridTex : AssetProvider<RTexture2D>
+	public sealed class GridTex : AssetProvider<RTexture2D>
 	{
 		private void LoadTexture() {
 			if (!Engine.EngineLink.CanRender) {
@@ -13,7 +13,7 @@ namespace RhuEngine.Components
 			}
 			Load(Engine.staticResources.Grid);
 		}
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			LoadTexture();
 		}

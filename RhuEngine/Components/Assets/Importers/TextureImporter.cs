@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Importers" })]
-	public class TextureImporter : Importer
+	public sealed class TextureImporter : Importer
 	{
 		public static bool IsValidImport(string path) {
 			path = path.ToLower();

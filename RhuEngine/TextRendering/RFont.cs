@@ -16,7 +16,7 @@ using SixLabors.ImageSharp.Processing;
 
 namespace RhuEngine
 {
-	public class RText : IDisposable
+	public sealed class RText : IDisposable
 	{
 		public RText(RFont rFont) {
 			TargetFont = rFont;
@@ -50,7 +50,7 @@ namespace RhuEngine
 				throw new Exception("Need a font to Make text");
 			}
 			texture2D = TargetFont?.RenderText(_text);
-			FontRectangle = TargetFont?.GetSizeOfText(_text)??new FontRectangle();
+			FontRectangle = TargetFont?.GetSizeOfText(_text) ?? new FontRectangle();
 			AspectRatio = FontRectangle.Width / FontRectangle.Height;
 			UpdatedTexture?.Invoke();
 		}
@@ -64,7 +64,7 @@ namespace RhuEngine
 	}
 
 
-	public class RFont
+	public sealed class RFont
 	{
 		public const float FONTSIZE = 96f;
 		public FontCollection Collection { get; set; }
@@ -72,7 +72,7 @@ namespace RhuEngine
 
 		public event Action UpdateAtlas;
 
-		public RFont(Font mainFont,FontCollection fallBacks) {
+		public RFont(Font mainFont, FontCollection fallBacks) {
 			Collection = fallBacks;
 			TextOptions = new TextOptions(mainFont) {
 				Dpi = FONTSIZE,
@@ -84,67 +84,78 @@ namespace RhuEngine
 
 		public RFont(Font mainFont) {
 			TextOptions = new TextOptions(mainFont) {
-				Dpi = 96,
+				Dpi = FONTSIZE,
 			};
 		}
 
 		public readonly List<FontAtlisPart> fontAtlisParts = new();
 
-		public (RMaterial mit,RTexture2D texture,Vector2f bottomleft, Vector2f topright) GetGlygh(Rune rune) {
-			foreach (var item in fontAtlisParts) {
-				var glyih = item.GetGlygh(rune);
-				if (glyih != null) {
-					return glyih.GetValueOrDefault();
+
+		public (RMaterial mit, RTexture2D texture, Vector2f bottomleft, Vector2f topright) GetGlygh(in Rune rune) {
+			lock (this) {
+				foreach (var item in fontAtlisParts) {
+					var glyih = item.GetGlygh(rune);
+					if (glyih != null) {
+						return glyih.GetValueOrDefault();
+					}
 				}
+				RLog.Info("Ran out of room adding another text texture");
+				var fontAtlis = new FontAtlisPart(this);
+				fontAtlisParts.Add(fontAtlis);
+				UpdateAtlas?.Invoke();
+				return fontAtlis.GetGlygh(rune).GetValueOrDefault();
 			}
-			RLog.Info("Ran out of room adding another text texture");
-			var fontAtlis = new FontAtlisPart(this);
-			fontAtlisParts.Add(fontAtlis);
-			UpdateAtlas?.Invoke();
-			return fontAtlis.GetGlygh(rune).GetValueOrDefault();
 		}
 
-		public FontRectangle GetSizeOfText(string text) {
-			return TextMeasurer.Measure(text, TextOptions);
+		public FontRectangle GetSizeOfText(in string text) {
+			lock (this) {
+				return TextMeasurer.Measure(text, TextOptions);
+			}
 		}
 
 		public Dictionary<Rune, FontRectangle> CachedRuneSize = new();
 
-		public Dictionary<(Rune,Rune), float> CachedXAdvancesSize = new();
+		public Dictionary<(Rune, Rune), float> CachedXAdvancesSize = new();
 
-		public float GetXAdvances(Rune item, Rune nextitem) {
-			if (CachedXAdvancesSize.ContainsKey((item,nextitem))) {
-				return CachedXAdvancesSize[(item, nextitem)];
-			}
-			else {
-				var returnvalue = (TextMeasurer.Measure(item.ToString() + nextitem.ToString(), TextOptions).Width - TextMeasurer.MeasureBounds(nextitem.ToString(), TextOptions).Width) / (FONTSIZE * 2);
-				CachedXAdvancesSize.Add((item, nextitem), returnvalue);
-				return returnvalue;
+		public float GetXAdvances(in Rune item, in Rune nextitem) {
+			lock (this) {
+				if (CachedXAdvancesSize.ContainsKey((item, nextitem))) {
+					return CachedXAdvancesSize[(item, nextitem)];
+				}
+				else {
+					var returnvalue = (TextMeasurer.Measure(item.ToString() + nextitem.ToString(), TextOptions).Width - TextMeasurer.MeasureBounds(nextitem.ToString(), TextOptions).Width) / (FONTSIZE * 2);
+					CachedXAdvancesSize.Add((item, nextitem), returnvalue);
+					return returnvalue;
+				}
 			}
 		}
 
-		public FontRectangle GetSizeOfRune(Rune rune) {
-			if (CachedRuneSize.ContainsKey(rune)) {
-				return CachedRuneSize[rune];
-			}
-			else {
-				var returnvalue = TextMeasurer.Measure(rune.ToString(), TextOptions);
-				CachedRuneSize.Add(rune, returnvalue);
-				return returnvalue;
+		public FontRectangle GetSizeOfRune(in Rune rune) {
+			lock (this) {
+				if (CachedRuneSize.ContainsKey(rune)) {
+					return CachedRuneSize[rune];
+				}
+				else {
+					var returnvalue = TextMeasurer.Measure(rune.ToString(), TextOptions);
+					CachedRuneSize.Add(rune, returnvalue);
+					return returnvalue;
+				}
 			}
 		}
 
 
 		public RTexture2D RenderText(string text) {
-			var size = TextMeasurer.Measure(text, TextOptions);
-			if (size == FontRectangle.Empty) {
-				return RTexture2D.White;
+			lock (this) {
+				var size = TextMeasurer.Measure(text, TextOptions);
+				if (size == FontRectangle.Empty) {
+					return RTexture2D.White;
+				}
+				using var img = new Image<Rgba32>((int)size.Width, (int)size.Height);
+				img.Mutate(x => x.DrawText(TextOptions, text, Color.White));
+				return new ImageSharpTexture(img).CreateTextureAndDisposes();
 			}
-			using var img = new Image<Rgba32>((int)size.Width, (int)size.Height);
-			img.Mutate(x => x.DrawText(TextOptions, text, Color.White));
-			return new ImageSharpTexture(img).CreateTextureAndDisposes();
 		}
 
-		
+
 	}
 }

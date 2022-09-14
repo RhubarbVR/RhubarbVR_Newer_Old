@@ -8,7 +8,7 @@ namespace RNumerics
 	// ported from WildMagic 5's DistPoint2Box2
 	// https://www.geometrictools.com/Downloads/Downloads.html
 
-	public class DistPoint2Box2
+	public sealed class DistPoint2Box2
 	{
 		Vector2d _point;
 		public Vector2d Point
@@ -29,7 +29,7 @@ namespace RNumerics
 		public Vector2d BoxClosest;
 
 
-		public DistPoint2Box2(Vector2d PointIn, Box2d boxIn) {
+		public DistPoint2Box2(in Vector2d PointIn, in Box2d boxIn) {
 			_point = PointIn;
 			_box = boxIn;
 		}

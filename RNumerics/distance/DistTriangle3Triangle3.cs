@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RNumerics
 {
-	public class DistTriangle3Triangle3
+	public sealed class DistTriangle3Triangle3
 	{
 		Triangle3d _triangle0;
 		public Triangle3d Triangle0
@@ -29,7 +29,7 @@ namespace RNumerics
 		public Vector3d Triangle1BaryCoords;
 
 
-		public DistTriangle3Triangle3(Triangle3d Triangle0in, Triangle3d Triangle1in) {
+		public DistTriangle3Triangle3(in Triangle3d Triangle0in, in Triangle3d Triangle1in) {
 			_triangle0 = Triangle0in;
 			_triangle1 = Triangle1in;
 		}

@@ -9,8 +9,8 @@ namespace RhuEngine.Components
 {
 	[GenericTypeConstraint()]
 	[Category(new string[] { "CoreEvents" })]
-	public class AddTwoValuePram<T1,T2> : Component
-	{
+	public sealed class AddTwoValuePram<T1,T2> : Component
+	{ 
 		public readonly Sync<T1> FirstValue;
 		public readonly Sync<T2> SecondValue;
 

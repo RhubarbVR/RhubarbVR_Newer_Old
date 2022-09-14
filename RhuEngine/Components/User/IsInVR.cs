@@ -8,7 +8,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "User" })]
-	public class IsInVR : Component
+	public sealed class IsInVR : Component
 	{
 		public readonly SyncRef<User> user;
 
@@ -16,20 +16,20 @@ namespace RhuEngine.Components
 
 		public readonly Linker<bool> isNotVR;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			user.Target = LocalUser;
 		}
 
-		public override void Step() {
+		protected override void Step() {
 			if(user.Target != LocalUser) {
 				return;
 			}
 			if (isVR.Linked) {
-				isVR.LinkedValue = RWorld.IsInVR;
+				isVR.LinkedValue = Engine.IsInVR;
 			}
 			if (isNotVR.Linked) {
-				isNotVR.LinkedValue = !RWorld.IsInVR;
+				isNotVR.LinkedValue = !Engine.IsInVR;
 			}
 		}
 	}

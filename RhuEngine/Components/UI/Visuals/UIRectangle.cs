@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/Visuals" })]
-	public class UIRectangle : RenderUIComponent
+	public sealed class UIRectangle : RenderUIComponent
 	{
 		[Exposed]
 		public void AddRoundingSettings() {
@@ -19,42 +19,38 @@ namespace RhuEngine.Components
 		public readonly AssetRef<RMaterial> Material;
 
 		public readonly Sync<Colorf> Tint;
+		public override RMaterial RenderMaterial => Material.Asset;
+		public override Colorf RenderTint => Tint;
+
 		[Default(5)]
-		[OnChanged(nameof(RegProcessMesh))]
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<int> RoundingSteps;
 		[Default(0f)]
-		[OnChanged(nameof(RegProcessMesh))]
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<float> Rounding;
-		[OnChanged(nameof(RegProcessMesh))]
+		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<bool> FullBox;
-		public override RMaterial RenderMaterial => Material.Asset;
-		public override Colorf RenderTint => Tint.Value;
 
-		public override bool HasPhysics => true;
-
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			Tint.Value = Colorf.White;
 		}
 
-		public override void ProcessBaseMesh() {
-			if(Rect.Canvas is null) {
-				return;
-			}
+		protected override void UpdateMesh() {
 			var mesh = new SimpleMesh();
-			var startDepth = new Vector3f(0, 0, Entity.UIRect.StartPoint);
+			var startDepth = new Vector3f(0, 0, Entity.UIRect.CachedDepth);
 			var depth = new Vector3f(0, 0, Entity.UIRect.Depth.Value);
 			var depthStart = startDepth + depth;
 			Vector3f upleft, upright, downleft, downright = upleft = upright = downleft = depthStart;
-			var max = Rect.Max;
-			var min = Rect.Min;
+			var max = Max;
+			var min = Min;
 			upleft += new Vector3f(min.x, max.y);
 			upright += max.XY_;
 			downright += new Vector3f(max.x, min.y);
 			downleft += min.XY_;
 			var rotrationOffseter = new Vector3f(Rounding.Value / 100, Rounding.Value / 100, 0);
-			rotrationOffseter /= Rect.Canvas.scale.Value / 10;
-			if (Rounding.Value > 0 && Rect.ParentRect is not null && !FullBox.Value) {
+			rotrationOffseter /= UIRect.Canvas.scale.Value / 10;
+			if (Rounding.Value > 0 && UIRect.ParentRect is not null && !FullBox.Value) {
 				upright -= rotrationOffseter;
 				downleft += rotrationOffseter;
 				downright += new Vector3f(-1 * rotrationOffseter.x, rotrationOffseter.y);
@@ -66,8 +62,8 @@ namespace RhuEngine.Components
 			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.AxisX }, bHaveC = false, v = upright });
 			mesh.AppendTriangle(0, 1, 2);
 			mesh.AppendTriangle(1, 3, 2);
-			if (Rounding.Value <= 0 || Rect.ParentRect is null || FullBox.Value) {
-				if (Rect.ParentRect is null || FullBox.Value) {
+			if (Rounding.Value <= 0 || UIRect.ParentRect is null || FullBox.Value) {
+				if (UIRect.ParentRect is null || FullBox.Value) {
 					//Add back if first rec
 
 					//Depth
@@ -129,7 +125,7 @@ namespace RhuEngine.Components
 						}
 						var cos = Math.Cos(angle) * (Rounding.Value / 100);
 						var sin = Math.Sin(angle) * (Rounding.Value / 100);
-						var bindpos = new Vector3f(cos * multaple.x, sin * multaple.y, 0) / (Rect.Canvas.scale.Value / 10);
+						var bindpos = new Vector3f(cos * multaple.x, sin * multaple.y, 0) / (UIRect.Canvas.scale.Value / 10);
 						mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.AxisY }, bHaveC = false, v = pos + bindpos });
 						currentindex++;
 						mesh.AppendTriangle(lastIndex, b, currentindex);
@@ -151,7 +147,7 @@ namespace RhuEngine.Components
 				currentindex = AddCurv(currentindex, false, new Vector2f(1, -1), downright, 10, 1, 11);
 				AddCurv(currentindex, true, -Vector2f.One, downleft, 5, 0, 4);
 			}
-			MainMesh = mesh;
+			StandaredBaseMesh = mesh;
 		}
 	}
 }

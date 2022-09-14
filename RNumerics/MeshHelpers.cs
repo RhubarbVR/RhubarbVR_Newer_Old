@@ -9,27 +9,31 @@ using RNumerics;
 
 public static class MeshHelpers
 {
-	private static bool SameSide(Vector3 p1, Vector3 p2, Vector3 A, Vector3 B) {
+	private static bool SameSide(in Vector3 p1, in Vector3 p2, in Vector3 A, in Vector3 B) {
 		var cp1 = Vector3.Cross(Vector3.Subtract(B, A), Vector3.Subtract(p1, A));
 		var cp2 = Vector3.Cross(Vector3.Subtract(B, A), Vector3.Subtract(p2, A));
 		return Vector3.Dot(cp1, cp2) >= 0;
 
 	}
 
-	public static int InsideTry(this IMesh mesh, Vector3 point) {
+	public static int InsideTry(this IMesh mesh,in Vector3 point) {
 		return InsideTry(mesh, new Vector3f(point.X, point.Y, point.Z));
 	}
 
-	public static int InsideTry(this IMesh mesh, Vector3f point) {
+	public static int InsideTry(this IMesh mesh,in Vector3f point) {
 		return InsideTry(mesh, new Vector3d(point.x, point.y, point.z));
 	}
 
-	public static int InsideTry(this IMesh mesh, Vector3d point) {
+	public static int InsideTry(this IMesh mesh, in Vector3d point) {
 		var e = mesh.RenderIndices().ToArray();
 		for (var i = 0; i < e.Length; i += 3) {
 			var point1 = mesh.GetVertex(e[i]);
 			var point2 = mesh.GetVertex(e[i + 1]);
 			var point3 = mesh.GetVertex(e[i + 2]);
+
+			if(point1 == point2 || point1 == point3 || point2 == point3) {
+				continue;
+			}
 
 			var testPointStep1 = point - point1;
 			var point1Step1 = point1 - point1;

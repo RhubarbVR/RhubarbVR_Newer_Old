@@ -7,7 +7,7 @@ namespace RNumerics
 	/// <summary>
 	/// Generate a minimal box
 	/// </summary>
-	public class TrivialBox3Generator : MeshGenerator
+	public sealed class TrivialBox3Generator : MeshGenerator
 	{
 		public Box3d Box = Box3d.UnitZeroCentered;
 		public bool NoSharedVertices = false;
@@ -120,7 +120,7 @@ namespace RNumerics
 							var tx = (double)xi / (double)(N - 1);
 							normals[vi] = faceN;
 							uv[vi] = new Vector2f(tx, ty);
-							vertices[vi++] = Bilerp(ref v00, ref v01, ref v11, ref v10, tx, ty);
+							vertices[vi++] = Bilerp( v00,  v01,  v11,  v10, tx, ty);
 						}
 					}
 
@@ -179,9 +179,9 @@ namespace RNumerics
 					void do_edge(Vector3d a, Vector3d b, Vector3i ai, Vector3i bi) {
 						for (var i = 0; i < N; ++i) {
 							var t = (double)i / (double)(N - 1);
-							var vidx = Lerp(ref ai, ref bi, t);
+							var vidx = Lerp( ai,  bi, t);
 							if (edgeVerts.ContainsKey(vidx) == false) {
-								var v = Vector3d.Lerp(ref a, ref b, t);
+								var v = Vector3d.Lerp( a,  b, t);
 								normals[vi] = (Vector3f)v.Normalized;
 								uv[vi] = Vector2f.Zero;
 								edgeVerts[vidx] = vi;
@@ -219,9 +219,9 @@ namespace RNumerics
 						for (var xi = 0; xi < N; ++xi)
 						{
 							var tx = (double)xi / (double)(N - 1);
-							var vidx = Bilerp(ref vi00, ref vi01, ref vi11, ref vi10, tx, ty);
+							var vidx = Bilerp( vi00,  vi01,  vi11,  vi10, tx, ty);
 							if (edgeVerts.TryGetValue(vidx, out var use_vi) == false) {
-								var v = Bilerp(ref v00, ref v01, ref v11, ref v10, tx, ty);
+								var v = Bilerp( v00,  v01,  v11,  v10, tx, ty);
 								use_vi = vi++;
 								normals[use_vi] = faceN;
 								uv[use_vi] = new Vector2f(tx, ty);

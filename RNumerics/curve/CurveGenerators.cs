@@ -12,7 +12,7 @@ namespace RNumerics
 
 		abstract public void Generate();
 
-		public void Make(DCurve3 c)
+		public void Make(in DCurve3 c)
 		{
 			var nV = vertices.Count;
 			for (var i = 0; i < nV; ++i)
@@ -25,7 +25,7 @@ namespace RNumerics
 
 
 
-	public class LineGenerator : CurveGenerator
+	public sealed class LineGenerator : CurveGenerator
 	{
 		public Vector3d Start = Vector3d.Zero;
 		public Vector3d End = Vector3d.AxisX;

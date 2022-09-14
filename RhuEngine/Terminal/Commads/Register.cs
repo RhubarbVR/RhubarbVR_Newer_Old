@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using RhuEngine;
 using RhuEngine.Linker;
 namespace RhuEngine.Commads
@@ -25,12 +26,12 @@ namespace RhuEngine.Commads
 				return;
 			}
 			Task.Run(async () => {
-				var req = await Engine.MainEngine.netApiManager.SignUp(username, email,Password,DateTime.UtcNow);
-				if (!req?.Error??false) {
-					Console.WriteLine(req.Message);
+				var req = await Engine.MainEngine.netApiManager.Client.RegisterAccount(username, email, Password);
+				if (!req?.IsDataGood ?? false) {
+					Console.WriteLine(req.Data);
 				}
 				else {
-					Console.WriteLine("Failed to Create Account Error " + req?.Message ?? "Error is null");
+					Console.WriteLine("Failed to Create Account Error " + req?.Data ?? "Error is null");
 				}
 			});
 		}

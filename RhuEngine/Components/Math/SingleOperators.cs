@@ -4,12 +4,12 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category("Math")]
-	public class SingleOperators<In,Out> : AbSingleOperation<Out,In> where In : struct where Out : struct
+	public sealed class SingleOperators<In,Out> : AbSingleOperation<Out,In> where In : struct where Out : struct
 	{
 		[OnChanged(nameof(ComputeOutput))]
 		public readonly Sync<SingleOperators> Operators;
 
-		public override Out Compute(In a) {
+		protected override Out Compute(In a) {
 			switch (Operators.Value) {
 				case SingleOperators.Cast:
 					return (dynamic)a;

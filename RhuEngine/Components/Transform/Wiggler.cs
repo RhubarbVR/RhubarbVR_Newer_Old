@@ -7,7 +7,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Transform" })]
-	public class Wiggler: Component
+	public sealed class Wiggler: Component
 	{
 		public readonly Linker<Quaternionf> driver;
 
@@ -16,12 +16,12 @@ namespace RhuEngine.Components
 		public readonly Sync<Vector3f> seed;
 		public readonly Sync<Quaternionf> offset;
 
-		public override void OnInitialize() {
+		protected override void OnInitialize() {
 			base.OnInitialize();
 			offset.Value = Quaternionf.Identity;
 		}
 
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			if (driver.Linked) {
 				var time = (float)World.WorldTime;
 				var noiseValue = SimplexNoise.Generate3D(time, speed.Value, magnitude.Value, seed.Value);

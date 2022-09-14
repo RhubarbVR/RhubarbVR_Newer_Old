@@ -23,7 +23,7 @@ namespace RNumerics
 	//   on two concentric circles w/ radii of major/minor axes. Possibly that is what
 	//   the formula in SampleT is doing?
 	//
-	public class EllipseArc2d : IParametricCurve2d
+	public sealed class EllipseArc2d : IParametricCurve2d
 	{
 		public Vector2d Center;
 		public Vector2d Axis0, Axis1;
@@ -32,8 +32,8 @@ namespace RNumerics
 		public double AngleEndDeg;
 		public bool IsReversed;     // use ccw orientation instead of cw
 
-		public EllipseArc2d(Vector2d center, double rotationAngleDeg, double extent0, double extent1,
-						 double startDeg, double endDeg) {
+		public EllipseArc2d(in Vector2d center, in double rotationAngleDeg, in double extent0, in double extent1,
+						 in double startDeg, in double endDeg) {
 			Center = center;
 			var m = new Matrix2d(rotationAngleDeg * MathUtil.DEG_2_RAD);
 			Axis0 = m * Vector2d.AxisX;
@@ -47,8 +47,8 @@ namespace RNumerics
 			}
 		}
 
-		public EllipseArc2d(Vector2d center, Vector2d axis0, Vector2d axis1, Vector2d extent,
-						 double startDeg, double endDeg) {
+		public EllipseArc2d(in Vector2d center, in Vector2d axis0, in Vector2d axis1, in Vector2d extent,
+						 in double startDeg, in double endDeg) {
 			Center = center;
 			Axis0 = axis0;
 			Axis1 = axis1;
@@ -69,7 +69,7 @@ namespace RNumerics
 
 
 		// t in range[0,1] spans arc
-		public Vector2d SampleT(double t) {
+		public Vector2d SampleT(in double t) {
 			var theta = IsReversed ?
 				((1 - t) * AngleEndDeg) + (t * AngleStartDeg) :
 				((1 - t) * AngleStartDeg) + (t * AngleEndDeg);
@@ -92,7 +92,7 @@ namespace RNumerics
 
 
 		// t in range[0,1] spans ellipse
-		public Vector2d TangentT(double t) {
+		public Vector2d TangentT(in double t) {
 			var theta = IsReversed ?
 				((1 - t) * AngleEndDeg) + (t * AngleStartDeg) :
 				((1 - t) * AngleStartDeg) + (t * AngleEndDeg);
@@ -132,7 +132,7 @@ namespace RNumerics
 
 		public double ArcLength => throw new NotImplementedException("Ellipse2.ArcLength");
 
-		public Vector2d SampleArcLength(double a) {
+		public Vector2d SampleArcLength(in double a) {
 			throw new NotImplementedException("Ellipse2.SampleArcLength");
 		}
 
@@ -147,7 +147,7 @@ namespace RNumerics
 
 
 		public bool IsTransformable => true;
-		public void Transform(ITransform2 xform) {
+		public void Transform(in ITransform2 xform) {
 			Center = xform.TransformP(Center);
 			Axis0 = xform.TransformN(Axis0);
 			Axis1 = xform.TransformN(Axis1);

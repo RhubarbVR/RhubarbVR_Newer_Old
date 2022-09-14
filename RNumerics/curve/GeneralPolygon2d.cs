@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace RNumerics
 {
-	public class GeneralPolygon2d : IDuplicatable<GeneralPolygon2d>
+	public sealed class GeneralPolygon2d : IDuplicatable<GeneralPolygon2d>
 	{
 		Polygon2d _outer;
 		bool _bOuterIsCW;
@@ -13,10 +13,10 @@ namespace RNumerics
 
 		public GeneralPolygon2d() {
 		}
-		public GeneralPolygon2d(Polygon2d outer) {
+		public GeneralPolygon2d(in Polygon2d outer) {
 			Outer = outer;
 		}
-		public GeneralPolygon2d(GeneralPolygon2d copy) {
+		public GeneralPolygon2d(in GeneralPolygon2d copy) {
 			_outer = new Polygon2d(copy._outer);
 			_bOuterIsCW = copy._bOuterIsCW;
 			_holes = new List<Polygon2d>();
@@ -25,7 +25,7 @@ namespace RNumerics
 			}
 		}
 
-		public virtual GeneralPolygon2d Duplicate() {
+		public  GeneralPolygon2d Duplicate() {
 			return new GeneralPolygon2d(this);
 		}
 
@@ -40,7 +40,7 @@ namespace RNumerics
 		}
 
 
-		public void AddHole(Polygon2d hole, bool bCheckContainment = true, bool bCheckOrientation = true) {
+		public void AddHole(in Polygon2d hole, in bool bCheckContainment = true, in bool bCheckOrientation = true) {
 			if (_outer == null) {
 				throw new Exception("GeneralPolygon2d.AddHole: outer polygon not set!");
 			}
@@ -140,14 +140,14 @@ namespace RNumerics
 		}
 
 
-		public void Translate(Vector2d translate) {
+		public void Translate(in Vector2d translate) {
 			_outer.Translate(translate);
 			foreach (var h in _holes) {
 				h.Translate(translate);
 			}
 		}
 
-		public void Rotate(Matrix2d rotation, Vector2d origin) {
+		public void Rotate(in Matrix2d rotation, in Vector2d origin) {
 			_outer.Rotate(rotation, origin);
 			foreach (var h in _holes) {
 				h.Rotate(rotation, origin);
@@ -155,14 +155,14 @@ namespace RNumerics
 		}
 
 
-		public void Scale(Vector2d scale, Vector2d origin) {
+		public void Scale(in Vector2d scale, in Vector2d origin) {
 			_outer.Scale(scale, origin);
 			foreach (var h in _holes) {
 				h.Scale(scale, origin);
 			}
 		}
 
-		public void Transform(Func<Vector2d, Vector2d> transformF) {
+		public void Transform(in Func<Vector2d, Vector2d> transformF) {
 			_outer.Transform(transformF);
 			foreach (var h in _holes) {
 				h.Transform(transformF);
@@ -178,7 +178,7 @@ namespace RNumerics
 		}
 
 
-		public bool Contains(Vector2d vTest) {
+		public bool Contains(in Vector2d vTest) {
 			if (_outer.Contains(vTest) == false) {
 				return false;
 			}
@@ -192,7 +192,7 @@ namespace RNumerics
 		}
 
 
-		public bool Contains(Polygon2d poly) {
+		public bool Contains(in Polygon2d poly) {
 			if (_outer.Contains(poly) == false) {
 				return false;
 			}
@@ -209,7 +209,7 @@ namespace RNumerics
 		/// Checks that all points on a segment are within the area defined by the GeneralPolygon2d;
 		/// holes are included in the calculation.
 		/// </summary>
-		public bool Contains(Segment2d seg) {
+		public bool Contains(in Segment2d seg) {
 			if (_outer.Contains(seg) == false) {
 				return false;
 			}
@@ -223,7 +223,7 @@ namespace RNumerics
 		}
 
 
-		public bool Intersects(Polygon2d poly) {
+		public bool Intersects(in Polygon2d poly) {
 			if (_outer.Intersects(poly)) {
 				return true;
 			}
@@ -237,20 +237,20 @@ namespace RNumerics
 		}
 
 
-		public Vector2d PointAt(int iSegment, double fSegT, int iHoleIndex = -1) {
+		public Vector2d PointAt(in int iSegment, in double fSegT, in int iHoleIndex = -1) {
 			return iHoleIndex == -1 ? _outer.PointAt(iSegment, fSegT) : _holes[iHoleIndex].PointAt(iSegment, fSegT);
 		}
 
-		public Segment2d Segment(int iSegment, int iHoleIndex = -1) {
+		public Segment2d Segment(in int iSegment, in int iHoleIndex = -1) {
 			return iHoleIndex == -1 ? _outer.Segment(iSegment) : _holes[iHoleIndex].Segment(iSegment);
 		}
 
-		public Vector2d GetNormal(int iSegment, double segT, int iHoleIndex = -1) {
+		public Vector2d GetNormal(in int iSegment, in double segT, in int iHoleIndex = -1) {
 			return iHoleIndex == -1 ? _outer.GetNormal(iSegment, segT) : _holes[iHoleIndex].GetNormal(iSegment, segT);
 		}
 
 		// this should be more efficient when there are holes...
-		public double DistanceSquared(Vector2d p, out int iHoleIndex, out int iNearSeg, out double fNearSegT) {
+		public double DistanceSquared(in Vector2d p, out int iHoleIndex, out int iNearSeg, out double fNearSegT) {
 			iHoleIndex = -1;
 			var dist = _outer.DistanceSquared(p, out iNearSeg, out fNearSegT);
 			for (var i = 0; i < Holes.Count; ++i) {

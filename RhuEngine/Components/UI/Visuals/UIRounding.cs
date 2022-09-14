@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/Visuals" })]
-	public class UIRounding : Component
+	public sealed class UIRounding : Component
 	{
 		public readonly Linker<float> RectRounding;
 		public readonly Linker<int> RectRoundingSteps;
@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 			Engine_SettingsUpdate();
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			Engine.SettingsUpdate += Engine_SettingsUpdate;
 		}
 

@@ -8,18 +8,19 @@ using RhuEngine.Managers;
 using RhuEngine.WorldObjects.ECS;
 using RhuEngine.AssetSystem;
 using RhuEngine.Components;
-using SharedModels.Session;
-using SharedModels.UserSession;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
 using RNumerics;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World : IWorldObject {
+	public sealed partial class World : IWorldObject
+	{
 		public PhysicsSim PhysicsSim { get; set; }
 
-		public bool IsLoading => IsDeserializing || IsLoadingNet;
+		public bool IsLoading => (IsDeserializing || IsLoadingNet) & !HasError;
 
 		public bool IsPersonalSpace { get; private set; }
 
@@ -44,7 +45,7 @@ namespace RhuEngine.WorldObjects
 					if (typeof(ISync).IsAssignableFrom(item.FieldType)) {
 						var startValue = item.GetCustomAttribute<DefaultAttribute>();
 						if (startValue != null) {
-							((ISync)instance).SetValue(startValue.Data);
+							((ISync)instance).SetValueForce(startValue.Data);
 						}
 					}
 					if (typeof(IAssetRef).IsAssignableFrom(item.FieldType)) {
@@ -93,7 +94,8 @@ namespace RhuEngine.WorldObjects
 		}
 
 
-		public enum FocusLevel {
+		public enum FocusLevel
+		{
 			Background,
 			Focused,
 			Overlay,
@@ -117,10 +119,11 @@ namespace RhuEngine.WorldObjects
 						if (GetLocalUser() is not null) {
 							GetLocalUser().isPresent.Value = true;
 						}
-						if (Engine.netApiManager.UserStatus is not null) {
-							Engine.netApiManager.UserStatus.CurrentSession = Guid.Parse(SessionID.Value);
-							Engine.netApiManager.UserStatus = Engine.netApiManager.UserStatus;
-						}
+						//ToDO: set focus on net api
+						//if (Engine.netApiManager.UserStatus is not null) {
+						//	Engine.netApiManager.UserStatus.CurrentSession = Guid.Parse(SessionID.Value);
+						//	Engine.netApiManager.UserStatus = Engine.netApiManager.UserStatus;
+						//}
 					}
 					else {
 						if (GetLocalUser() is not null) {
@@ -133,13 +136,7 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 		}
-		[NoSync]
-		[NoSave]
-		[NoShow]
-		[UnExsposed]
-		[NoLoad]
-		public ScriptBuilder FocusedScriptBuilder = null;
-		
+
 		[Exposed]
 		[NoShow]
 		public readonly Entity RootEntity;
@@ -148,6 +145,11 @@ namespace RhuEngine.WorldObjects
 		[NoSave]
 		[NoSyncUpdate]
 		public readonly Sync<string> SessionID;
+
+		[NoSync]
+		[NoSave]
+		[NoSyncUpdate]
+		public readonly Sync<string> WorldID;
 
 		[NoSave]
 		[Default("New Session")]
@@ -170,9 +172,9 @@ namespace RhuEngine.WorldObjects
 		public readonly Sync<string> AssociatedGroup;
 
 		[NoSave]
-		[Default(SessionAccessLevel.Public)]
+		[Default(DataModel.Enums.AccessLevel.Public)]
 		[OnChanged(nameof(SessionInfoChanged))]
-		public readonly Sync<SessionAccessLevel> AccessLevel;
+		public readonly Sync<DataModel.Enums.AccessLevel> AccessLevel;
 
 		[NoSave]
 		[Default(30)]
@@ -245,7 +247,7 @@ namespace RhuEngine.WorldObjects
 			}
 			try {
 				var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
-											 group ent by ent.CachedDepth;
+											 group ent by ent.Depth;
 				var sorted = from groupe in sortedUpdatingEntities
 							 orderby groupe.Key ascending
 							 select groupe;
@@ -260,9 +262,9 @@ namespace RhuEngine.WorldObjects
 			}
 			try {
 				if (Engine.EngineLink.CanRender) {
-					lock (_renderingComponents) {
-						foreach (var item in _renderingComponents) {
-							item.Render();
+					lock (_worldLinkComponents) {
+						foreach (var item in _worldLinkComponents) {
+							item.RunRender();
 						}
 					}
 				}
@@ -271,6 +273,10 @@ namespace RhuEngine.WorldObjects
 				RLog.Err($"Failed to build render queue for session {WorldDebugName}. Error {e}");
 			}
 		}
+
+		private readonly List<IGrouping<uint, Entity>> _sorrtedEntity = new();
+
+		private  bool _sortEntitys;
 
 		public void Step() {
 			_netManager?.PollEvents();
@@ -286,12 +292,18 @@ namespace RhuEngine.WorldObjects
 				RLog.Err($"Failed To update PhysicsSim Error:{e}");
 			}
 			try {
-				var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
-											 group ent by ent.CachedDepth;
-				var sorted = from groupe in sortedUpdatingEntities
-							 orderby groupe.Key ascending
-							 select groupe;
-				foreach (var item in sorted) {
+				if (_sortEntitys) {
+					lock (_updatingEntities) {
+						var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
+													 group ent by ent.Depth;
+						_sorrtedEntity.Clear();
+						_sorrtedEntity.AddRange(from groupe in sortedUpdatingEntities
+												orderby groupe.Key ascending
+												select groupe);
+						_sortEntitys = false;
+					}
+				}
+				foreach (var item in _sorrtedEntity) {
 					foreach (var ent in item) {
 						ent.Step();
 					}
@@ -301,7 +313,7 @@ namespace RhuEngine.WorldObjects
 				RLog.Err($"Failed to update entities for session {WorldDebugName}. Error: {e}");
 			}
 		}
-
+		public event Action<World> IsDisposeing;
 		public bool IsDisposed { get; private set; }
 		public bool HasError { get; internal set; }
 
@@ -310,33 +322,39 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			IsDisposed = true;
-			assetSession.Dispose();
-			try {
-				worldManager.RemoveWorld(this);
-			}
-			catch { }
-			try {
-				if (!IsLoading) {
-					GetLocalUser()?.userRoot.Target?.Entity.Dispose();
-					if (_netManager is not null) {
-						for (var i = 0; i < 3; i++) {
-							_netManager.PollEvents();
-							Thread.Sleep(100);
+			IsDisposeing?.Invoke(this);
+			Task.Run(async () => {
+				assetSession.Dispose();
+				try {
+					worldManager.RemoveWorld(this);
+				}
+				catch { }
+				try {
+					if (!IsLoading) {
+						GetLocalUser()?.userRoot.Target?.Entity.Dispose();
+						if (_netManager is not null) {
+							for (var i = 0; i < 10; i++) {
+								_netManager.PollEvents();
+								await Task.Delay(100);
+							}
 						}
 					}
 				}
-			}
-			catch { }
-			if (IsNetworked) {
-				if (!HasError) {
-					Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = Guid.Parse(SessionID.Value), RequestData = SessionID.Value, RequestType = RequestType.LeaveSession });
+				catch { }
+				if (IsNetworked) {
+					if (!HasError) {
+						try {
+							await Engine.netApiManager.Client.LeaveSession(Guid.Parse(SessionID.Value));
+						}
+						catch { }
+					}
 				}
-			}
-			try {
-				_netManager?.DisconnectAll();
-			}
-			catch { }
-			GC.Collect();
+				try {
+					_netManager?.DisconnectAll();
+				}
+				catch { }
+				GC.Collect();
+			});
 		}
 	}
 }

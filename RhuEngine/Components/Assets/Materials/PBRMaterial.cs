@@ -9,7 +9,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Materials" })]
-	public class PBRMaterial : MaterialBase<IPBRMaterial>
+	public sealed class PBRMaterial : MaterialBase<IPBRMaterial>
 	{
 		[Default(BasicRenderMode.Opaque)]
 		[OnChanged(nameof(RenderModeChanged))]
@@ -261,7 +261,7 @@ namespace RhuEngine.Components
 			EmissionTextureUVUpdate();
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			AlbedoTint.Value = Colorf.White;
 			EmissionTint.Value = Colorf.Blue;
@@ -277,7 +277,7 @@ namespace RhuEngine.Components
 			OcclusionTilling.Value = Vector2f.One;
 		}
 
-		public override void UpdateAll() {
+		protected override void UpdateAll() {
 			RenderModeChanged();
 			BasicColorSettings();
 			MetalicAndSmoothness();

@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class CapsuleMesh : ProceduralMesh
+	public sealed class CapsuleMesh : ProceduralMesh
 	{
 		[Default(32)]
 		[OnChanged(nameof(LoadMesh))]
@@ -37,7 +37,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<bool> WantNormals;
 
-		public override void FirstCreation() {
+		protected override void FirstCreation() {
 			base.FirstCreation();
 
 		}

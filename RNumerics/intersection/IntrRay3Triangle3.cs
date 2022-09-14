@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RNumerics
 {
-	public class IntrRay3Triangle3
+	public sealed class IntrRay3Triangle3
 	{
 		Ray3d _ray;
 		public Ray3d Ray
@@ -32,7 +32,7 @@ namespace RNumerics
 		public Vector3d TriangleBaryCoords;
 
 
-		public IntrRay3Triangle3(Ray3d r, Triangle3d t) {
+		public IntrRay3Triangle3(in Ray3d r, in Triangle3d t) {
 			_ray = r;
 			_triangle = t;
 		}
@@ -117,7 +117,7 @@ namespace RNumerics
 			var diff = ray.Origin - V0;
 			var edge1 = V1 - V0;
 			var edge2 = V2 - V0;
-			var normal = edge1.Cross(ref edge2);
+			var normal = edge1.Cross(edge2);
 
 			rayT = double.MaxValue;
 
@@ -126,7 +126,7 @@ namespace RNumerics
 			//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
 			//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
 			//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-			var DdN = ray.Direction.Dot(ref normal);
+			var DdN = ray.Direction.Dot(normal);
 			double sign;
 			if (DdN > MathUtil.ZERO_TOLERANCE) {
 				sign = 1;
@@ -141,15 +141,15 @@ namespace RNumerics
 				return false;
 			}
 
-			var cross = diff.Cross(ref edge2);
-			var DdQxE2 = sign * ray.Direction.Dot(ref cross);
+			var cross = diff.Cross(edge2);
+			var DdQxE2 = sign * ray.Direction.Dot(cross);
 			if (DdQxE2 >= 0) {
-				cross = edge1.Cross(ref diff);
-				var DdE1xQ = sign * ray.Direction.Dot(ref cross);
+				cross = edge1.Cross(diff);
+				var DdE1xQ = sign * ray.Direction.Dot(cross);
 				if (DdE1xQ >= 0) {
 					if (DdQxE2 + DdE1xQ <= DdN) {
 						// Line intersects triangle, check if ray does.
-						var QdN = -sign * diff.Dot(ref normal);
+						var QdN = -sign * diff.Dot(normal);
 						if (QdN >= 0) {
 							// Ray intersects triangle.
 							var inv = 1 / DdN;

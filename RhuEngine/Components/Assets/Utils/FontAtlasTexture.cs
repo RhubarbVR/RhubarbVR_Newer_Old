@@ -10,7 +10,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Utils" })]
-	public class FontAtlasTexture : AssetProvider<RTexture2D>
+	public sealed class FontAtlasTexture : AssetProvider<RTexture2D>
 	{
 		[OnAssetLoaded(nameof(UpdateFont))]
 		public readonly AssetRef<RFont> font;
@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(UpdateTexture))]
 		public readonly Sync<int> AtlasIndex;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			font.Target = World.RootEntity.GetFirstComponentOrAttach<MainFont>();
 		}

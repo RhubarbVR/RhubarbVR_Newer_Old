@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(TextValueChanged))]
 		public readonly Sync<int> anisoptropy;
 
-		public void TextValueChanged() {
+		protected void TextValueChanged() {
 			if (Value is null) {
 				return;
 			}
@@ -29,7 +29,7 @@ namespace RhuEngine.Components
 			Value.SampleMode = sampleMode;
 		}
 
-		public void UpdateTexture(Colorf[][] colors) {
+		protected void UpdateTexture(Colorf[][] colors) {
 			var fullcolors = new Colorb[colors[0].Length * colors.Length];
 			for (var y = 0; y < colors.Length; y++) {
 				for (var x = 0; x < colors[0].Length; x++) {
@@ -44,7 +44,7 @@ namespace RhuEngine.Components
 			Value.SetColors(colors[0].Length, colors.Length, fullcolors);
 		}
 
-		public void UpdateTexture(Colorb[][] colors) {
+		protected void UpdateTexture(Colorb[][] colors) {
 			var fullcolors = new Colorb[colors[0].Length * colors.Length];
 			for (var y = 0; y < colors.Length; y++) {
 				for (var x = 0; x < colors[0].Length; x++) {
@@ -58,7 +58,7 @@ namespace RhuEngine.Components
 			}
 			Value.SetColors(colors[0].Length, colors.Length, fullcolors);
 		}
-		public void UpdateTexture(Colorf[] colors, int width, int height) {
+		protected void UpdateTexture(Colorf[] colors, int width, int height) {
 			var fullColors = new Colorb[colors.Length];
 			for (var i = 0; i < colors.Length; i++) {
 				fullColors[i] = colors[i].ToBytes();
@@ -71,7 +71,7 @@ namespace RhuEngine.Components
 			Value.SetColors(width, height, fullColors);
 		}
 
-		public void UpdateTexture(Colorb[] colors, int width,int height) {
+		protected void UpdateTexture(Colorb[] colors, int width,int height) {
 			if(Value is null) {
 				Load(RTexture2D.FromColors(colors, width, height,true));
 				TextValueChanged();
@@ -83,26 +83,26 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ComputeTexture))]
 		public readonly Sync<Vector2i> Size;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			Size.Value = new Vector2i(128);
 		}
 
-		public abstract void Generate();
+		protected abstract void Generate();
 
-		public override void OnLoaded() 
+		protected override void OnLoaded() 
 		{
 			ComputeTexture();
 		}
 
-		public void ComputeTexture() 
+		protected void ComputeTexture() 
 		{
 			if (!Engine.EngineLink.CanRender) 
 			{
 				return;
 			}
 
-			RWorld.ExecuteOnEndOfFrame(this, () => {
+			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
 				try {
 					Generate();
 				}

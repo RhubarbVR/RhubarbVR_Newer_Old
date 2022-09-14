@@ -7,7 +7,7 @@ using RhuEngine.Physics;
 
 namespace RStereoKit
 {
-	public class RhuStereoKit : IEngineLink
+	public sealed class RhuStereoKit : IEngineLink
 	{
 		public string BackendID => "StereoKit";
 
@@ -78,20 +78,16 @@ namespace RStereoKit
 		}
 
 		public void LoadStatics() {
+			World.RaycastEnabled = false;
 			RTexture2D.Instance = new SKTexture2d();
 			RMaterial.Instance = new SKRMaterial();
 			RMaterial.ConstInstance = new SKMitStactic();
 			RShader.Instance = new SKShader();
 			RMesh.Instance = typeof(SKRMesh);
-			RenderThread.ExecuteOnStartOfFrame(() => {
-				RMesh.Quad = new RMesh(new SKRMesh(Mesh.Quad), false);
-			});
+			RenderThread.ExecuteOnStartOfFrame(() => RMesh.Quad = new RMesh(new SKRMesh(Mesh.Quad), false));
 			RTime.Instance = new SKTime();
 			RRenderer.Instance = new SKRRenderer();
 			RInput.Instance = new SKInput();
-			RSound.Instance = new SKSound();
-			RSoundInst.Instance = new SKSoundInst();
-			RMicrophone.Instance = new SKMic();
 			StaticMaterialManager.Instanances = new StaticMitsManager();
 			PhysicsHelper.RegisterPhysics<RBullet.BulletPhsyicsLink>();
 		}

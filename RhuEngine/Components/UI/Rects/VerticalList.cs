@@ -4,108 +4,74 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RhuEngine.Components
 {
 
 	[Category(new string[] { "UI/Rects" })]
-	public class VerticalList : RawScrollUIRect
+	public sealed class VerticalList : UIRect
 	{
 		[Default(false)]
-		[OnChanged(nameof(RegUpdateUIMeshes))]
 		public readonly Sync<bool> Fit;
 
-		public override bool RemoveFakeRecs => false;
+		[Default(false)]
+		public readonly Sync<bool> FlipOrder;
 
-		public readonly SafeList<BasicRectOvride> fakeRects = new();
+		[Default(0f)]
+		public readonly Sync<float> Padding;
 
-		private Vector2f _maxScroll = Vector2f.Inf;
 
-		private Vector2f _minScroll = Vector2f.NInf;
+		public override void FowParrentRectUpdate() {
+			base.FowParrentRectUpdate();
+			ChildRectUpdate();
+		}
 
-		public override Vector2f MaxScroll => _maxScroll;
-
-		public override Vector2f MinScroll => _minScroll;
-
-		public override void UpdateUIMeshes() {
-			if (!Engine.EngineLink.CanRender) {
-				return;
-			}
-			UpdateMinMaxNoPross();
-			fakeRects.SafeOperation((list) => {
-				foreach (var item in list) {
-					try {
-						item.Child.AddedSizeCHange -= UpdateUIMeshes;
-					}
-					catch { }
-				}
-				list.Clear();
-				_childRects.SafeOperation((list) => {
-					foreach (var item in list) {
-						if (item is null) {
-							continue;
-						}
-						var fakeRec = new BasicRectOvride {
-							Child = item,
-							ParentRect = this,
-							Canvas = Canvas,
-							DepthValue = 0,
-							AnchorMax = Vector2f.One,
-							AnchorMin = Vector2f.Zero,
-						};
-						item.AddedSizeCHange += UpdateUIMeshes;
-						item.SetOverride(fakeRec);
-						fakeRects.SafeAdd(fakeRec);
-					}
-				});
-			});
+		public override void ChildRectUpdate() {
 			if (Fit) {
-				fakeRects.SafeOperation((list) => {
-					var inc = 1f / list.Count;
-					var currentpos = 0f;
-					foreach (var item in list) {
-						item.Canvas = Canvas;
-						item.AnchorMin = new Vector2f(0f, currentpos);
-						currentpos += inc;
-						item.AnchorMax = new Vector2f(1f, currentpos);
-						item.UpdateMinMaxNoPross();
+				var recList = new Stack<UIRect>();
+				//Todo: make forLoop
+				foreach (var item in Entity.children.Cast<Entity>()) {
+					var rect = item.UIRect;
+					if (rect is not null && item.IsEnabled && !item.IsDestroying) {
+						recList.Push(rect);
 					}
-					_maxScroll = Vector2f.Zero;
-					_minScroll = Vector2f.Zero;
-				});
+				}
+				var size = recList.Count;
+				var elmentySize = new Vector2f(CachedElementSize.x, CachedElementSize.y / size);
+				for (var i = 0; i < size; i++) {
+					var currenti = !FlipOrder ? size - i - 1 : i;
+					var MoveAmount = new Vector2f(0, elmentySize.y * currenti);
+					var fakeMax = elmentySize + TrueMin + MoveAmount;
+					var fakeMin = TrueMin + MoveAmount;
+					var fakeBadMin = BadMin - MoveAmount;
+					recList.Peek().StandardMinMaxCalculation(fakeMax, fakeMin, fakeBadMin);
+					recList.Peek().RegisterNestedParentUpdate(false);
+					recList.Pop();
+				}
+				CachedOverlapSize = CachedElementSize;
 			}
 			else {
-				var scale = Max - Min;
-				fakeRects.SafeOperation((list) => {
-					var ypos = 1f;
-					var min = Vector2f.Zero;
-					Vector2f? max = null;
-					foreach (var item in list) {
-						item.Canvas = Canvas;
-						item.ParentRect = this;
-						item.AnchorMin = new Vector2f(0);
-						item.AnchorMax = new Vector2f(1);
-						var targetSize = item.Child.AnchorMax.Value - item.Child.AnchorMin.Value;
-						targetSize += item.Child.AddedSize;
-						ypos -= targetSize.y;
-						item.AnchorMin = new Vector2f(0, ypos);
-						item.AnchorMax = new Vector2f(1, ypos + 1f);
-						item.UpdateMinMaxNoPross();
-						min = item.Child.Min;
-						max ??= item.Child.Max;
+				var recList = new Stack<UIRect>();
+				//Todo: make forLoop
+				foreach (var item in (FlipOrder ? Entity.children: Entity.children.Reverse()).Cast<Entity>()) {
+					var rect = item.UIRect;
+					if (rect is not null && item.IsEnabled && !item.IsDestroying) {
+						recList.Push(rect);
 					}
-					var scollmax = (max ?? Vector2f.Zero) - min;
-					if (scale.y <= ypos) {
-						_maxScroll = Vector2f.Zero;
-						_minScroll = Vector2f.Zero;
-					}
-					else {
-						_minScroll = Vector2f.Zero;
-						_maxScroll = new Vector2f(0, -ypos * scale.y);
-					}
-				});
+				}
+				var size = recList.Count;
+				var MoveVec = new Vector2f(0,1);
+				for (var i = 0; i < size; i++) {
+					MoveVec -= recList.Peek().CachedOverlapSize * new Vector2f(0, 1);
+					MoveVec -= new Vector2f(0, Padding.Value);
+					recList.Peek().StandardMinMaxCalculation(TrueMax + MoveVec, TrueMin + MoveVec, BadMin - MoveVec);
+					recList.Peek().RegisterNestedParentUpdate(false);
+					recList.Pop();
+				}
+				CachedOverlapSize = MoveVec;
 			}
-			base.UpdateUIMeshes();
 		}
 	}
 }

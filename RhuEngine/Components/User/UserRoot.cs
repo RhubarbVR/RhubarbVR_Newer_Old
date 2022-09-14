@@ -8,15 +8,15 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "User" })]
-	public class UserRoot : Component
+	public sealed class UserRoot : Component
 	{
 		public readonly SyncRef<User> user;
 
 		public readonly SyncRef<Entity> head;
 
-		public readonly SyncRef<Entity> leftHand;
+		public readonly SyncRef<Entity> leftController;
 
-		public readonly SyncRef<Entity> rightHand;
+		public readonly SyncRef<Entity> rightController;
 
 		public readonly Linker<Vector3f> pos;
 
@@ -24,13 +24,13 @@ namespace RhuEngine.Components
 
 		public readonly Linker<Vector3f> scale;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);
 			rot.SetLinkerTarget(Entity.rotation);
 			scale.SetLinkerTarget(Entity.scale);
 		}
 
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
@@ -41,14 +41,14 @@ namespace RhuEngine.Components
 				var userScale = user.Target.FindSyncStream<SyncValueStream<Vector3f>>("UserScale");
 				var userPos = user.Target.FindSyncStream<SyncValueStream<Vector3f>>("UserPos");
 				var userRot = user.Target.FindSyncStream<SyncValueStream<Quaternionf>>("UserRot");
-				Entity.position.Value = userPos?.Value ?? Vector3f.Zero;
 				Entity.scale.Value = userScale?.Value ?? Vector3f.Zero;
+				Entity.position.Value = userPos?.Value ?? Vector3f.Zero;
 				Entity.rotation.Value = userRot?.Value ?? Quaternionf.Identity;
 				return;
 			}
 			if (World.IsPersonalSpace) {
 				if (WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target is not null) {
-					RWorld.ExecuteOnStartOfFrame(() => {
+					RUpdateManager.ExecuteOnStartOfFrame(() => {
 						if (WorldManager.FocusedWorld is null) {
 							return;
 						}
@@ -59,11 +59,11 @@ namespace RhuEngine.Components
 					});
 				}
 				if (Engine.EngineLink.CanRender) {
-					if (RWorld.IsInVR) {
-						RWorld.ExecuteOnEndOfFrame(() => RRenderer.CameraRoot = Entity.GlobalTrans);
+					if (Engine.IsInVR) {
+						RUpdateManager.ExecuteOnEndOfFrame(() => RRenderer.CameraRoot = Entity.GlobalTrans);
 					}
 					else {
-						RWorld.ExecuteOnEndOfFrame(() => Engine.inputManager.screenInput.CamPos = Entity.GlobalTrans);
+						RUpdateManager.ExecuteOnEndOfFrame(() => Engine.inputManager.screenInput.CamPos = Entity.GlobalTrans);
 					}
 				}
 			}

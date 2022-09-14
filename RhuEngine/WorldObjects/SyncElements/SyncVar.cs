@@ -7,7 +7,7 @@ using RhuEngine.Datatypes;
 
 namespace RhuEngine.WorldObjects
 {
-	public class SyncVar : SyncObject, INetworkedObject, ISyncMember
+	public sealed class SyncVar : SyncObject, INetworkedObject, ISyncMember
 	{
 		private Type _type;
 		public Type Type

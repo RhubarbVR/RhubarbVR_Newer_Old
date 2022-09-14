@@ -5,10 +5,10 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class TriangleMesh : ProceduralMesh
+	public sealed class TriangleMesh : ProceduralMesh
 	{
 		public readonly SyncObjList<Triangle> listOfTris;
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			var tri = listOfTris.Add();
 			tri.a.ver.Value = new Vector3d(1, 0, 0);

@@ -47,7 +47,7 @@ namespace RNumerics
 		}
 
 
-		protected void UpdateTimeStamp(bool bShapeChange) {
+		protected void UpdateTimeStamp(in bool bShapeChange) {
 			timestamp++;
 			if (bShapeChange) {
 				shape_timestamp++;
@@ -68,19 +68,19 @@ namespace RNumerics
 		public int MaxGroupID => max_group_id;
 
 
-		public bool IsVertex(int vID) {
+		public bool IsVertex(in int vID) {
 			return vertices_refcount.IsValid(vID);
 		}
-		public bool IsEdge(int eID) {
+		public bool IsEdge(in int eID) {
 			return edges_refcount.IsValid(eID);
 		}
 
-		public ReadOnlyCollection<int> GetVtxEdges(int vID) {
+		public ReadOnlyCollection<int> GetVtxEdges(in int vID) {
 			return vertices_refcount.IsValid(vID) ?
 				vertex_edges[vID].AsReadOnly() : null;
 		}
 
-		public int GetVtxEdgeCount(int vID) {
+		public int GetVtxEdgeCount(in int vID) {
 			return vertices_refcount.IsValid(vID) ?
 				vertex_edges[vID].Count : -1;
 		}
@@ -99,11 +99,11 @@ namespace RNumerics
 
 
 
-		public int GetEdgeGroup(int eid) {
+		public int GetEdgeGroup(in int eid) {
 			return edges_refcount.IsValid(eid) ? edges[(3 * eid) + 2] : -1;
 		}
 
-		public void SetEdgeGroup(int eid, int group_id) {
+		public void SetEdgeGroup(in int eid, in int group_id) {
 			Debug.Assert(edges_refcount.IsValid(eid));
 			if (edges_refcount.IsValid(eid)) {
 				edges[(3 * eid) + 2] = group_id;
@@ -118,13 +118,13 @@ namespace RNumerics
 
 
 
-		public Index2i GetEdgeV(int eID) {
+		public Index2i GetEdgeV(in int eID) {
 			return edges_refcount.IsValid(eID) ?
 				new Index2i(edges[3 * eID], edges[(3 * eID) + 1]) : InvalidEdgeV;
 		}
 
 
-		public Index3i GetEdge(int eID) {
+		public Index3i GetEdge(in int eID) {
 			var j = 3 * eID;
 			return edges_refcount.IsValid(eID) ?
 				new Index3i(edges[j], edges[j + 1], edges[j + 2]) : InvalidEdge3;
@@ -142,10 +142,10 @@ namespace RNumerics
 
 
 
-		public int AppendEdge(int v0, int v1, int gid = -1) {
+		public int AppendEdge(in int v0, in int v1, in int gid = -1) {
 			return AppendEdge(new Index2i(v0, v1), gid);
 		}
-		public int AppendEdge(Index2i ev, int gid = -1) {
+		public int AppendEdge(in Index2i ev, in int gid = -1) {
 			if (IsVertex(ev[0]) == false || IsVertex(ev[1]) == false) {
 				return INVALID_ID;
 			}
@@ -169,7 +169,7 @@ namespace RNumerics
 			return eid;
 		}
 
-		protected int Add_edge(int a, int b, int gid) {
+		protected int Add_edge(int a, int b, in int gid) {
 			if (b < a) {
 				(a, b) = (b, a);
 			}
@@ -234,7 +234,7 @@ namespace RNumerics
 		}
 
 
-		public int FindEdge(int vA, int vB) {
+		public int FindEdge(in int vA, in int vB) {
 			var vO = Math.Max(vA, vB);
 			var e0 = vertex_edges[Math.Min(vA, vB)];
 			var N = e0.Count;
@@ -247,16 +247,16 @@ namespace RNumerics
 		}
 
 
-		protected bool Edge_has_v(int eid, int vid) {
+		protected bool Edge_has_v(in int eid, in int vid) {
 			var i = 3 * eid;
 			return (edges[i] == vid) || (edges[i + 1] == vid);
 		}
-		protected int Edge_other_v(int eID, int vID) {
+		protected int Edge_other_v(in int eID, in int vID) {
 			var i = 3 * eID;
 			int ev0 = edges[i], ev1 = edges[i + 1];
 			return (ev0 == vID) ? ev1 : ((ev1 == vID) ? ev0 : INVALID_ID);
 		}
-		protected int Replace_edge_vertex(int eID, int vOld, int vNew) {
+		protected int Replace_edge_vertex(in int eID, in int vOld, in int vNew) {
 			var i = 3 * eID;
 			int a = edges[i], b = edges[i + 1];
 			if (a == vOld) {
@@ -280,15 +280,15 @@ namespace RNumerics
 
 
 
-		public bool IsBoundaryVertex(int vID) {
+		public bool IsBoundaryVertex(in int vID) {
 			return vertices_refcount.IsValid(vID) && vertex_edges[vID].Count == 1;
 		}
 
-		public bool IsJunctionVertex(int vID) {
+		public bool IsJunctionVertex(in int vID) {
 			return vertices_refcount.IsValid(vID) && vertex_edges[vID].Count > 2;
 		}
 
-		public bool IsRegularVertex(int vID) {
+		public bool IsRegularVertex(in int vID) {
 			return vertices_refcount.IsValid(vID) && vertex_edges[vID].Count == 2;
 		}
 
@@ -302,7 +302,7 @@ namespace RNumerics
 		// This function checks that the graph is well-formed, ie all internal data
 		// structures are consistent
 		/// </summary>
-		public virtual bool CheckValidity(FailMode eFailMode = FailMode.Throw) {
+		public virtual bool CheckValidity(in FailMode eFailMode = FailMode.Throw) {
 			var is_ok = true;
 			Action<bool> CheckOrFailF = (b) => is_ok = is_ok && b;
 			if (eFailMode == FailMode.DebugAssert) {
@@ -370,7 +370,7 @@ namespace RNumerics
 
 			return is_ok;
 		}
-		protected virtual void Subclass_validity_checks(Action<bool> CheckOrFailF) {
+		protected virtual void Subclass_validity_checks(in Action<bool> CheckOrFailF) {
 		}
 	}
 
@@ -382,7 +382,7 @@ namespace RNumerics
 	/// Implementation of DGraph that has no dimensionality, ie no data
 	/// stored for vertieces besides indices. 
 	/// </summary>
-	public class DGraphN : DGraph
+	public sealed class DGraphN : DGraph
 	{
 		public int AppendVertex() {
 			return Append_vertex_internal();
@@ -390,7 +390,7 @@ namespace RNumerics
 
 
 		// internal used in SplitEdge
-		protected override int Append_new_split_vertex(int a, int b) {
+		protected override int Append_new_split_vertex(in int a, in int b) {
 			return AppendVertex();
 		}
 

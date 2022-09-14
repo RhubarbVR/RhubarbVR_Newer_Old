@@ -6,9 +6,8 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
-	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Transform" })]
-	public class LookAt : Component
+	public sealed class LookAtRef : Component
 	{
 		[OnChanged(nameof(BindAtPoint))]
 		public readonly SyncRef<IValueSource<Vector3f>> LookAtPoint;
@@ -45,7 +44,30 @@ namespace RhuEngine.Components
 
 
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
+			base.OnAttach();
+			offset.Value = Entity.rotation.Value;
+			Driver.SetLinkerTarget(Entity.rotation);
+		}
+	}
+
+	[Category(new string[] { "Transform" })]
+	public sealed class LookAtValue : Component
+	{
+		[OnChanged(nameof(Compute))]
+		public readonly Sync<Vector3f> LookAtPoint;
+
+		public readonly Linker<Quaternionf> Driver;
+
+		public readonly Sync<Quaternionf> offset;
+
+		private void Compute() {
+			if (Driver.Linked) {
+				Driver.LinkedValue = Quaternionf.LookAt(Entity.GlobalTrans.Translation, LookAtPoint.Value) * offset.Value;
+			}
+		}
+
+		protected override void OnAttach() {
 			base.OnAttach();
 			offset.Value = Entity.rotation.Value;
 			Driver.SetLinkerTarget(Entity.rotation);

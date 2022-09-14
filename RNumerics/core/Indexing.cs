@@ -8,12 +8,12 @@ namespace RNumerics
 
 	// An enumerator that enumerates over integers [start, start+count)
 	// (useful when you need to do things like iterate over indices of an array rather than values)
-	public class IndexRangeEnumerator : IEnumerable<int>
+	public sealed class IndexRangeEnumerator : IEnumerable<int>
 	{
 		readonly int _start = 0;
 		readonly int _count = 0;
-		public IndexRangeEnumerator(int count) { _count = count; }
-		public IndexRangeEnumerator(int start, int count) { _start = start; _count = count; }
+		public IndexRangeEnumerator(in int count) { _count = count; }
+		public IndexRangeEnumerator(in int start, in int count) { _start = start; _count = count; }
 		public IEnumerator<int> GetEnumerator() {
 			for (var i = 0; i < _count; ++i) {
 				yield return _start + i;
@@ -28,9 +28,9 @@ namespace RNumerics
 
 
 	// Add true/false operator[] to integer HashSet
-	public class IndexHashSet : HashSet<int>
+	public sealed class IndexHashSet : HashSet<int>
 	{
-		public bool this[int key]
+		public bool this[in int key]
 		{
 			get => Contains(key);
 			set {
@@ -52,14 +52,14 @@ namespace RNumerics
 	/// use a HashSet (or perhaps some other DS) if the fraction of the index space 
 	/// required is small
 	/// </summary>
-	public class IndexFlagSet : IEnumerable<int>
+	public sealed class IndexFlagSet : IEnumerable<int>
 	{
 		readonly BitArray _bits;
 		readonly HashSet<int> _hash;
 		int _count;      // only tracked for bitset
 
 
-		public IndexFlagSet(bool bForceSparse, int MaxIndex = -1) {
+		public IndexFlagSet(in bool bForceSparse, in int MaxIndex = -1) {
 			if (bForceSparse) {
 				_hash = new HashSet<int>();
 			}
@@ -69,7 +69,7 @@ namespace RNumerics
 			_count = 0;
 		}
 
-		public IndexFlagSet(int MaxIndex, int SubsetCountEst) {
+		public IndexFlagSet(in int MaxIndex, in int SubsetCountEst) {
 			var bSmall = MaxIndex < 128000;        // 16k in bits is a pretty small buffer?
 			var fPercent = (float)SubsetCountEst / (float)MaxIndex;
 			var fPercentThresh = 0.05f;
@@ -87,14 +87,14 @@ namespace RNumerics
 		/// <summary>
 		/// checks if value i is true
 		/// </summary>
-		public bool Contains(int i) {
+		public bool Contains(in int i) {
 			return this[i] == true;
 		}
 
 		/// <summary>
 		/// sets value i to true
 		/// </summary>
-		public void Add(int i) {
+		public void Add(in int i) {
 			this[i] = true;
 		}
 
@@ -103,7 +103,7 @@ namespace RNumerics
 		/// </summary>
 		public int Count => _bits != null ? _count : _hash.Count;
 
-		public bool this[int key]
+		public bool this[in int key]
 		{
 			get => (_bits != null) ? _bits[key] : _hash.Contains(key);
 			set {
@@ -159,46 +159,46 @@ namespace RNumerics
 	// basic interface that allows mapping an index to another index
 	public interface IIndexMap
 	{
-		int this[int index] { get; }
+		int this[in int index] { get; }
 	}
 
 
 	// i = i index map
-	public class IdentityIndexMap : IIndexMap
+	public sealed class IdentityIndexMap : IIndexMap
 	{
-		public int this[int index] => index;
+		public int this[in int index] => index;
 	}
 
 
 	// i = i + constant index map
-	public class ShiftIndexMap : IIndexMap
+	public sealed class ShiftIndexMap : IIndexMap
 	{
 		public int Shift;
 
-		public ShiftIndexMap(int n) {
+		public ShiftIndexMap(in int n) {
 			Shift = n;
 		}
 
-		public int this[int index] => index + Shift;
+		public int this[in int index] => index + Shift;
 	}
 
 
 	// i = constant index map
-	public class ConstantIndexMap : IIndexMap
+	public sealed class ConstantIndexMap : IIndexMap
 	{
 		public int Constant;
 
-		public ConstantIndexMap(int c) {
+		public ConstantIndexMap(in int c) {
 			Constant = c;
 		}
 
-		public int this[int index] => Constant;
+		public int this[in int index] => Constant;
 	}
 
 
 
 	// dense or sparse index map
-	public class IndexMap : IIndexMap
+	public sealed class IndexMap : IIndexMap
 	{
 		// this is returned if sparse map doesn't contain value
 		public readonly int InvalidIndex = int.MinValue;
@@ -206,7 +206,7 @@ namespace RNumerics
 		readonly Dictionary<int, int> _sparse_map;
 		readonly int _maxIndex;
 
-		public IndexMap(bool bForceSparse, int MaxIndex = -1) {
+		public IndexMap(in bool bForceSparse, in int MaxIndex = -1) {
 			if (bForceSparse) {
 				_sparse_map = new Dictionary<int, int>();
 			}
@@ -217,13 +217,13 @@ namespace RNumerics
 			SetToInvalid();
 		}
 
-		public IndexMap(int[] use_dense_map, int MaxIndex = -1) {
+		public IndexMap(in int[] use_dense_map, in int MaxIndex = -1) {
 			_dense_map = use_dense_map;
 			_maxIndex = MaxIndex;
 		}
 
 
-		public IndexMap(int MaxIndex, int SubsetCountEst) {
+		public IndexMap(in int MaxIndex, in int SubsetCountEst) {
 			var bSmall = MaxIndex < 32000;        // if buffer is less than 128k, just use dense map
 			var fPercent = (float)SubsetCountEst / (float)MaxIndex;
 			var fPercentThresh = 0.1f;
@@ -252,13 +252,13 @@ namespace RNumerics
 		// dense variant: returns true unless you have set index to InvalidIndex (eg via SetToInvalid)
 		// sparse variant: returns true if index is in map
 		// either: returns false if index is out-of-bounds
-		public bool Contains(int index) {
+		public bool Contains(in int index) {
 			return (_maxIndex <= 0 || index < _maxIndex) && (_dense_map != null ? _dense_map[index] != InvalidIndex : _sparse_map.ContainsKey(index));
 		}
 
 
 
-		public int this[int index]
+		public int this[in int index]
 		{
 			get => _dense_map != null ? _dense_map[index] : _sparse_map.TryGetValue(index, out var to) ? to : InvalidIndex;
 			set {

@@ -12,8 +12,8 @@ namespace RNumerics
 		/// Returns list of translations to element.
 		/// Always allows at least one row and column, even if element overflows bounds in that dimension.
 		/// </summary>
-		public static List<Vector2d> BoundedRegularTiling2(AxisAlignedBox2d element, AxisAlignedBox2d bounds,
-														   double spacing)
+		public static List<Vector2d> BoundedRegularTiling2(in AxisAlignedBox2d element, in AxisAlignedBox2d bounds,
+														   in double spacing)
 		{
             var oshift = -element.Min;
             var w = element.Width;
@@ -56,8 +56,8 @@ namespace RNumerics
 		/// Returns list of translations to element.
 		/// Always allows at least one row and column, even if element overflows bounds in that dimension.
 		/// </summary>
-		public static List<Vector2d> BoundedCircleTiling2(AxisAlignedBox2d element, AxisAlignedBox2d bounds,
-															 double spacing)
+		public static List<Vector2d> BoundedCircleTiling2(in AxisAlignedBox2d element, in AxisAlignedBox2d bounds,
+															 in double spacing)
 		{
 			var oshift = -element.Min;
 			var w = element.Width;

@@ -10,10 +10,11 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
+	[UpdatingComponent]
 	[Category(new string[] { "Assets/Utils" })]
-	public class ClipBoardImport :Component, IUpdatingComponent
+	public sealed class ClipBoardImport :Component
 	{
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			Engine.DragAndDrop += Engine_DragAndDrop;
 		}
@@ -27,7 +28,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public override void Step() {
+		protected override void Step() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}

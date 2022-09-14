@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Importers" })]
-	public class VideoImporter : Importer
+	public sealed class VideoImporter : Importer
 	{
 		public static bool IsValidImport(string path) {
 			path = path.ToLower();
@@ -98,20 +98,8 @@ namespace RhuEngine.Components
 				scaler.scale.SetLinkerTarget(pmesh.Dimensions);
 				scaler.scaleMultiplier.Value = 0.5f;
 				var textur = Entity.AttachComponent<VideoTexture>();
+				Entity.AttachComponent<SoundSource>().sound.Target = textur;
 				textur.url.Value = data;
-				var left = Entity.AddChild("left");
-				var rignt = Entity.AddChild("rignt");
-				left.position.Value = Vector3f.Right * -0.5f;
-				rignt.position.Value = Vector3f.Right * 0.5f;
-				left.position.Value += Vector3f.Forward * 0.2f;
-				rignt.position.Value += Vector3f.Forward * 0.2f;
-				left.scale.Value = new Vector3f(0.1f);
-				rignt.scale.Value = new Vector3f(0.1f);
-				textur.AudioChannels.Add();
-				left.AttachMesh<Sphere3NormalizedCubeMesh, UnlitMaterial>();
-				rignt.AttachMesh<Sphere3NormalizedCubeMesh, UnlitMaterial>();
-				left.AttachComponent<SoundSource>().sound.Target = textur.AudioChannels[0];
-				rignt.AttachComponent<SoundSource>().sound.Target = textur.AudioChannels[1];
 				scaler.texture.Target = textur;
 				mit.MainTexture.Target = textur;
 				var WinEntit = Entity.AddChild("Window");
@@ -127,7 +115,6 @@ namespace RhuEngine.Components
 				uiBuilder.AddRectangle(0,0.9f,true);
 
 				var grabAction = uiBuilder.AttachComponentToStack<UIGrabInteraction>();
-				grabAction.AllowOtherZones.Value = true;
 				grabAction.Grabeded.Target = gabable.RemoteGrab;
 
 				var list = uiBuilder.AttachChildRect<VerticalList>();
@@ -181,26 +168,6 @@ namespace RhuEngine.Components
 				uiBuilder.PopRect();
 				uiBuilder.PopRect();
 				uiBuilder.PopRect();
-
-				// TODO
-				//var window = WinEntit.AttachComponent<UIWindow>();
-				//WinEntit.rotation.Value *= Quaternionf.CreateFromYawPitchRoll(90, 0, 180);
-				//WinEntit.position.Value = Vector3f.Forward * 0.1f;
-				//window.Text.Value = "Media Controls";
-				//window.WindowType.Value = UIWin.Normal;
-				//var UIE = WinEntit.AddChild("UI");
-				//var Play = UIE.AttachComponent<UIButton>();
-				//Play.Text.Value = "Play";
-				//Play.onClick.Target = textur.Playback.Play;
-				//var Stop = UIE.AttachComponent<UIButton>();
-				//Stop.Text.Value = "Stop";
-				//Stop.onClick.Target = textur.Playback.Stop;
-				//var Pause = UIE.AttachComponent<UIButton>();
-				//Pause.Text.Value = "Pause";
-				//Pause.onClick.Target = textur.Playback.Pause;
-				//var Resume = UIE.AttachComponent<UIButton>();
-				//Resume.Text.Value = "Resume";
-				//Resume.onClick.Target = textur.Playback.Resume;
 				Destroy();
 			}
 			else {

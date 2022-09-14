@@ -14,6 +14,11 @@ namespace RNumerics
 		[Key(1)]
 		public double y;
 
+		public Vector2d() {
+			x = 0;
+			y = 0;
+		}
+
 		public override int GetHashCode() {
 			unchecked // Overflow is fine, just wrap
 			{
@@ -25,16 +30,16 @@ namespace RNumerics
 			}
 		}
 		[IgnoreMember]
-		public Vector2d Clean => new Vector2d(double.IsNaN(x)?0:x, double.IsNaN(y) ? 0 : y);
+		public Vector2d Clean => new(double.IsNaN(x)?0:x, double.IsNaN(y) ? 0 : y);
 
-		public Vector2d(double f) { x = y = f; }
-		public Vector2d(double x, double y) { this.x = x; this.y = y; }
-		public Vector2d(double[] v2) { x = v2[0]; y = v2[1]; }
-		public Vector2d(float f) { x = y = f; }
-		public Vector2d(float x, float y) { this.x = x; this.y = y; }
-		public Vector2d(float[] v2) { x = v2[0]; y = v2[1]; }
-		public Vector2d(Vector2d copy) { x = copy.x; y = copy.y; }
-		public Vector2d(Vector2f copy) { x = copy.x; y = copy.y; }
+		public Vector2d(in double f) { x = y = f; }
+		public Vector2d(in double x, in double y) { this.x = x; this.y = y; }
+		public Vector2d(in double[] v2) { x = v2[0]; y = v2[1]; }
+		public Vector2d(in float f) { x = y = f; }
+		public Vector2d(in float x, in float y) { this.x = x; this.y = y; }
+		public Vector2d(in float[] v2) { x = v2[0]; y = v2[1]; }
+		public Vector2d(in Vector2d copy) { x = copy.x; y = copy.y; }
+		public Vector2d(in Vector2f copy) { x = copy.x; y = copy.y; }
 		[IgnoreMember]
 		static public readonly Vector2d Zero = new(0.0f, 0.0f);
 		[IgnoreMember]
@@ -48,7 +53,7 @@ namespace RNumerics
 		[IgnoreMember]
 		static public readonly Vector2d MinValue = new(double.MinValue, double.MinValue);
 
-		public static Vector2d FromAngleRad(double angle) {
+		public static Vector2d FromAngleRad(in double angle) {
 			return new Vector2d(Math.Cos(angle), Math.Sin(angle));
 		}
 		public static Vector2d FromAngleDeg(double angle) {
@@ -58,7 +63,7 @@ namespace RNumerics
 
 
 		[IgnoreMember]
-		public double this[int key]
+		public double this[in int key]
 		{
 			get => (key == 0) ? x : y;
 			set {
@@ -75,7 +80,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public double Length => (double)Math.Sqrt(LengthSquared);
 
-		public double Normalize(double epsilon = MathUtil.EPSILON) {
+		public double Normalize(in double epsilon = MathUtil.EPSILON) {
 			var length = Length;
 			if (length > epsilon) {
 				var invLength = 1.0 / length;
@@ -112,13 +117,13 @@ namespace RNumerics
 			get { var f = x + y; return double.IsNaN(f) == false && double.IsInfinity(f) == false; }
 		}
 
-		public void Round(int nDecimals) {
+		public void Round(in int nDecimals) {
 			x = Math.Round(x, nDecimals);
 			y = Math.Round(y, nDecimals);
 		}
 
 
-		public double Dot(Vector2d v2) {
+		public double Dot(in Vector2d v2) {
 			return (x * v2.x) + (y * v2.y);
 		}
 
@@ -126,7 +131,7 @@ namespace RNumerics
 		/// <summary>
 		/// returns cross-product of this vector with v2 (same as DotPerp)
 		/// </summary>
-		public double Cross(Vector2d v2) {
+		public double Cross(in Vector2d v2) {
 			return (x * v2.y) - (y * v2.x);
 		}
 
@@ -146,77 +151,77 @@ namespace RNumerics
 		/// <summary>
 		/// returns dot-product of this vector with v2.Perp
 		/// </summary>
-		public double DotPerp(Vector2d v2) {
+		public double DotPerp(in Vector2d v2) {
 			return (x * v2.y) - (y * v2.x);
 		}
 
 
-		public double AngleD(Vector2d v2) {
+		public double AngleD(in Vector2d v2) {
 			var fDot = MathUtil.Clamp(Dot(v2), -1, 1);
 			return Math.Acos(fDot) * MathUtil.RAD_2_DEG;
 		}
-		public static double AngleD(Vector2d v1, Vector2d v2) {
+		public static double AngleD(in Vector2d v1, in Vector2d v2) {
 			return v1.AngleD(v2);
 		}
-		public double AngleR(Vector2d v2) {
+		public double AngleR(in Vector2d v2) {
 			var fDot = MathUtil.Clamp(Dot(v2), -1, 1);
 			return Math.Acos(fDot);
 		}
-		public static double AngleR(Vector2d v1, Vector2d v2) {
+		public static double AngleR(in Vector2d v1, in Vector2d v2) {
 			return v1.AngleR(v2);
 		}
 
 
 
-		public double DistanceSquared(Vector2d v2) {
+		public double DistanceSquared(in Vector2d v2) {
 			double dx = v2.x - x, dy = v2.y - y;
 			return (dx * dx) + (dy * dy);
 		}
-		public double Distance(Vector2d v2) {
+		public double Distance(in Vector2d v2) {
 			double dx = v2.x - x, dy = v2.y - y;
 			return Math.Sqrt((dx * dx) + (dy * dy));
 		}
 
 
-		public void Set(Vector2d o) {
+		public void Set(in Vector2d o) {
 			x = o.x;
 			y = o.y;
 		}
-		public void Set(double fX, double fY) {
+		public void Set(in double fX, in double fY) {
 			x = fX;
 			y = fY;
 		}
-		public void Add(Vector2d o) {
+		public void Add(in Vector2d o) {
 			x += o.x;
 			y += o.y;
 		}
-		public void Subtract(Vector2d o) {
+		public void Subtract(in Vector2d o) {
 			x -= o.x;
 			y -= o.y;
 		}
 
 
 
-		public static Vector2d operator -(Vector2d v) => new(-v.x, -v.y);
+		public static Vector2d operator -(in Vector2d v) => new(-v.x, -v.y);
 
-		public static Vector2d operator +(Vector2d a, Vector2d o) => new(a.x + o.x, a.y + o.y);
-		public static Vector2d operator +(Vector2d a, double f) => new(a.x + f, a.y + f);
+		public static Vector2d operator +(in Vector2d a, in Vector2d o) => new(a.x + o.x, a.y + o.y);
+		public static Vector2d operator +(in Vector2d a, in double f) => new(a.x + f, a.y + f);
 
-		public static Vector2d operator -(Vector2d a, Vector2d o) => new(a.x - o.x, a.y - o.y);
-		public static Vector2d operator -(Vector2d a, double f) => new(a.x - f, a.y - f);
+		public static Vector2d operator -(in Vector2d a, in Vector2d o) => new(a.x - o.x, a.y - o.y);
+		public static Vector2d operator -(in Vector2d a, in double f) => new(a.x - f, a.y - f);
 
-		public static Vector2d operator *(Vector2d a, double f) => new(a.x * f, a.y * f);
-		public static Vector2d operator *(double f, Vector2d a) => new(a.x * f, a.y * f);
-		public static Vector2d operator /(Vector2d v, double f) => new(v.x / f, v.y / f);
-		public static Vector2d operator /(double f, Vector2d v) => new(f / v.x, f / v.y);
-
-
-		public static Vector2d operator *(Vector2d a, Vector2d b) => new(a.x * b.x, a.y * b.y);
-		public static Vector2d operator /(Vector2d a, Vector2d b) => new(a.x / b.x, a.y / b.y);
+		public static Vector2d operator *(in Vector2d a, in double f) => new(a.x * f, a.y * f);
+		public static Vector2d operator *(in double f, in Vector2d a) => new(a.x * f, a.y * f);
+		public static Vector2d operator /(in Vector2d v, in double f) => new(v.x / f, v.y / f);
+		public static Vector2d operator /(in double f, in Vector2d v) => new(f / v.x, f / v.y);
 
 
-		public static bool operator ==(Vector2d a, Vector2d b) => a.x == b.x && a.y == b.y;
-		public static bool operator !=(Vector2d a, Vector2d b) => a.x != b.x || a.y != b.y;
+		public static Vector2d operator *(in Vector2d a, in Vector2d b) => new(a.x * b.x, a.y * b.y);
+		public static Vector2d operator /(in Vector2d a, in Vector2d b) => new(a.x / b.x, a.y / b.y);
+
+
+		public static bool operator ==(in Vector2d a, in Vector2d b) => a.x == b.x && a.y == b.y;
+		public static bool operator !=(in Vector2d a, in Vector2d b) => a.x != b.x || a.y != b.y;
 		public override bool Equals(object obj) {
 			return this == (Vector2d)obj;
 		}
@@ -236,20 +241,17 @@ namespace RNumerics
 		}
 
 
-		public bool EpsilonEqual(Vector2d v2, double epsilon) {
+		public bool EpsilonEqual(in Vector2d v2, in double epsilon) {
 			return Math.Abs(x - v2.x) <= epsilon &&
 				   Math.Abs(y - v2.y) <= epsilon;
 		}
 
 
-		public static Vector2d Lerp(Vector2d a, Vector2d b, double t) {
+		public static Vector2d Lerp(in Vector2d a, in Vector2d b, in double t) {
 			var s = 1 - t;
 			return new Vector2d((s * a.x) + (t * b.x), (s * a.y) + (t * b.y));
 		}
-		public static Vector2d Lerp(ref Vector2d a, ref Vector2d b, double t) {
-			var s = 1 - t;
-			return new Vector2d((s * a.x) + (t * b.x), (s * a.y) + (t * b.y));
-		}
+
 
 
 		public override string ToString() {
@@ -257,8 +259,8 @@ namespace RNumerics
 		}
 
 
-		public static implicit operator Vector2d(Vector2f v) => new(v.x, v.y);
-		public static explicit operator Vector2f(Vector2d v) => new((float)v.x, (float)v.y);
+		public static implicit operator Vector2d(in Vector2f v) => new(v.x, v.y);
+		public static explicit operator Vector2f(in Vector2d v) => new((float)v.x, (float)v.y);
 
 
 		// from WildMagic5 Vector2, used in ConvexHull2
@@ -303,7 +305,7 @@ namespace RNumerics
 
 		// The value of epsilon is used as a relative error when computing the
 		// dimension of the point set.
-		public static void GetInformation(IList<Vector2d> points, double epsilon, out Information info) {
+		public static void GetInformation(in IList<Vector2d> points, in double epsilon, out Information info) {
 			info = new Information();
 			var numPoints = points.Count;
 			if (numPoints == 0 || points == null || epsilon <= 0) {

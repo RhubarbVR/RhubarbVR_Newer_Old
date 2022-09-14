@@ -8,7 +8,7 @@ using RhuEngine.Linker;
 
 namespace RhuEngine
 {
-	public class OutputCapture : TextWriter, IDisposable
+	public sealed class OutputCapture : TextWriter, IDisposable
 	{
 		public string LogsPath = null;
 
@@ -45,6 +45,7 @@ namespace RhuEngine
 		}
 
 		public void WriteText(string data) {
+			data = data.AutoBrakeLine();
 			var amountOfnewLines = data.Count((car) => car == '\n');
 			AmountOfNewLines += amountOfnewLines;
 			var consoleColor = RhuConsole.ForegroundColor;

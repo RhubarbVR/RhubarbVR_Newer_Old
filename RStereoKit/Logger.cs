@@ -6,7 +6,7 @@ using RhuEngine.Linker;
 
 namespace RStereoKit
 {
-	public class Logger : IRLog
+	public sealed class Logger : IRLog
 	{
 		public void Err(string value) {
 			Log.Err(value);

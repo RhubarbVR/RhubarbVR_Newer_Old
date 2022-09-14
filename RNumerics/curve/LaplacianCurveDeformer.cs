@@ -12,7 +12,7 @@ namespace RNumerics
 	/// Currently only supports uniform weights (in Initialize)
 	/// 
 	/// </summary>
-	public class LaplacianCurveDeformer
+	public sealed class LaplacianCurveDeformer
 	{
 		public DCurve3 Curve;
 
@@ -62,18 +62,18 @@ namespace RNumerics
 		double[] _sx, _sy, _sz;
 
 
-		public LaplacianCurveDeformer(DCurve3 curve) {
+		public LaplacianCurveDeformer(in DCurve3 curve) {
 			Curve = curve;
 		}
 
 
-		public void SetConstraint(int vID, Vector3d targetPos, double weight, bool bForceToFixedPos = false) {
+		public void SetConstraint(in int vID, in Vector3d targetPos, in double weight, in bool bForceToFixedPos = false) {
 			_softConstraints[vID] = new SoftConstraintV() { Position = targetPos, Weight = weight, PostFix = bForceToFixedPos };
 			_havePostFixedConstraints = _havePostFixedConstraints || bForceToFixedPos;
 			_need_solve_update = true;
 		}
 
-		public bool IsConstrained(int vID) {
+		public bool IsConstrained(in int vID) {
 			return _softConstraints.ContainsKey(vID);
 		}
 
@@ -225,7 +225,7 @@ namespace RNumerics
 
 
 		// Result must be as large as Mesh.MaxVertexID
-		public bool SolveMultipleCG(Vector3d[] Result) {
+		public bool SolveMultipleCG(in Vector3d[] Result) {
 			if (_weightsM == null) {
 				Initialize();       // force initialize...
 			}
@@ -308,7 +308,7 @@ namespace RNumerics
 
 
 		// Result must be as large as Mesh.MaxVertexID
-		public bool SolveMultipleRHS(Vector3d[] Result) {
+		public bool SolveMultipleRHS(in Vector3d[] Result) {
 			if (_weightsM == null) {
 				Initialize();       // force initialize...
 			}
@@ -360,7 +360,7 @@ namespace RNumerics
 
 
 
-		public bool Solve(Vector3d[] Result) {
+		public bool Solve(in Vector3d[] Result) {
 			// for small problems, faster to use separate CGs?
 			return Curve.VertexCount < 10000 ? SolveMultipleCG(Result) : SolveMultipleRHS(Result);
 		}

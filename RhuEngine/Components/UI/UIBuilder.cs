@@ -9,9 +9,9 @@ using SixLabors.Fonts;
 
 namespace RhuEngine.Components
 {
-	public class UIBuilder
+	public sealed class UIBuilder
 	{
-		public AssetProvider<RMaterial> MainMit;
+		public IAssetProvider<RMaterial> MainMat;
 
 		public Stack<Entity> RectEntityStack = new();
 		public Stack<UIRect> RectStack = new();
@@ -28,23 +28,31 @@ namespace RhuEngine.Components
 
 		public bool AddLocal;
 
-		public UIBuilder(Entity entity, AssetProvider<RMaterial> mainMit, UIRect firstRect = null, bool addLocal = false) {
+		public UIBuilder(Entity entity, IAssetProvider<RMaterial> mainMit, UIRect firstRect = null, bool addLocal = false,bool noFirstUIRect = false) {
 			AddLocal = addLocal;
 			Root = entity;
 			CurretRectEntity = entity;
-			if (firstRect is null) {
-				firstRect = CurretRectEntity.AttachComponent<UIRect>();
+			if (!noFirstUIRect) {
+				firstRect ??= CurretRectEntity.AttachComponent<UIRect>();
 			}
 			CurrentRect = firstRect;
-			MainMit = mainMit;
+			MainMat = mainMit;
 		}
 
 		public T AttachComponentToStack<T>() where T : Component, new() {
 			return CurretRectEntity.AttachComponent<T>();
 		}
 
+		public UIRect PushRectNoDepth(Vector2f? min = null, Vector2f? max = null) {
+			return PushRect(min, max, 0);
+		}
+
 		public UIRect PushRect(Vector2f? min = null, Vector2f? max = null, float? Depth = null) {
 			return AttachChildRect<UIRect>(min, max, Depth);
+		}
+
+		public Entity AddChildEntity() {
+			return CurretRectEntity.AddChild("ChildRect");
 		}
 
 		public T AttachChildRect<T>(Vector2f? min = null, Vector2f? max = null, float? Depth = null) where T : UIRect, new() {
@@ -174,7 +182,7 @@ namespace RhuEngine.Components
 
 		public void AddRectangle(float coloroffset = 0, float alpha = 1, bool? fullbox = null) {
 			var rectangle = AttachComponentToStack<UIRectangle>();
-			rectangle.Material.Target = MainMit;
+			rectangle.Material.Target = MainMat;
 			rectangle.AddRoundingSettings();
 			var colorassing = AttachComponentToStack<UIColorAssign>();
 			colorassing.ColorShif.Value = coloroffset;
@@ -224,7 +232,7 @@ namespace RhuEngine.Components
 
 		public (UIText, UITextEditorInteraction, UITextCurrsor, Sync<string>) AddTextEditor(string emptytext = "This Is Input", float coloroffset = 0, float alpha = 1, string defaultString = "",float padding=0.1f, float? size = null, float textcoloroffset = 0, float textalpha = 1,bool autopop = true, FontStyle? fontStyle = null, Vector2f? min = null, Vector2f? max = null) {
 			var button = AddButtonEvent(null, null, null, false, coloroffset,alpha, null, min, max);
-			PushRect(new Vector2f(0), new Vector2f(1),0);
+			PushRect(new Vector2f(0), new Vector2f(1), 0.05f);
 			SetOffsetMinMax(new Vector2f(padding), new Vector2f(-padding));
 			var uitext = AddText(defaultString, size, textcoloroffset,textalpha, fontStyle, true);
 			uitext.EmptyString.Value = emptytext;
@@ -239,12 +247,23 @@ namespace RhuEngine.Components
 			var currsor = AttachComponentToStack<UITextCurrsor>();
 			currsor.TextCurrsor.Target = editor;
 			currsor.TextComp.Target = uitext;
-			currsor.Material.Target = MainMit;
+			currsor.Material.Target = MainMat;
 			if (autopop) {
 				PopRect();
 				PopRect();
 			}
 			return (uitext, editor, currsor, uitext.Text);
+		}
+
+		public (UIText,UIButtonInteraction, ButtonEventManager) AddButtonEventLabled(string text, float? size = null, float textcoloroffset = 2, float textalpha = 1,  Action onClick = null, Action onPressing = null, Action onReleases = null, bool autoPop = true, float coloroffset = 0, float alpha = 1, bool? fullbox = null, Vector2f? min = null, Vector2f? max = null) {
+			var buttonEvent = AddButtonEvent(onClick, onPressing, onReleases, false, coloroffset, alpha, fullbox, min, max);
+			PushRect(null, null, 0.1f);
+			var uitext = AddText(text, size, textcoloroffset, textalpha);
+			PopRect();
+			if (autoPop) {
+				PopRect();
+			}
+			return (uitext, buttonEvent.Item1, buttonEvent.Item2);
 		}
 	}
 }

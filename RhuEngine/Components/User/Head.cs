@@ -8,7 +8,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "User" })]
-	public class Head : Component
+	public sealed class Head : Component
 	{
 		public readonly SyncRef<User> user;
 
@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 
 		public readonly Linker<Vector3f> scale;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);
 			rot.SetLinkerTarget(Entity.rotation);
 			scale.SetLinkerTarget(Entity.scale);
@@ -48,23 +48,19 @@ namespace RhuEngine.Components
 			mesh.SetPos(new Vector2i(16,2));
 		}
 
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
 			if (World.IsPersonalSpace) {
-				var handVal = WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target?.head.Target;
-				if (handVal is not null) {
-					var focusUserHand = WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target?.head.Target;
-					Entity.LocalTrans = focusUserHand?.LocalTrans ?? Matrix.Identity;
-				}
+				Entity.LocalTrans = Engine.IsInVR ? RInput.Head.HeadMatrix * RRenderer.CameraRoot.Inverse : RInput.Head.HeadMatrix;
 			}
 			else {
 				if (user.Target is null) {
 					return;
 				}
-				if (user.Target == World.GetLocalUser()) {
-					Entity.LocalTrans = RWorld.IsInVR ? RInput.Head.HeadMatrix * RRenderer.CameraRoot.Inverse : RInput.Head.HeadMatrix;
+				if (user.Target == LocalUser) {
+					Entity.LocalTrans = Engine.IsInVR ? RInput.Head.HeadMatrix * RRenderer.CameraRoot.Inverse : RInput.Head.HeadMatrix;
 					user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("HeadPos").Value = Entity.position.Value;
 					user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>("HeadRot").Value = Entity.rotation.Value;
 				}

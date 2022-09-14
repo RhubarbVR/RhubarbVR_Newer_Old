@@ -25,7 +25,7 @@ namespace RNumerics
 	/// [TODO] 2d variant of variational shape segmentation?
 	/// 
 	/// </summary>
-	public class PolySimplification2
+	public sealed class PolySimplification2
 	{
 		readonly List<Vector2d> _vertices;
 		readonly bool _isLoop;
@@ -51,12 +51,12 @@ namespace RNumerics
 		public List<Vector2d> Result;
 
 
-		public PolySimplification2(Polygon2d polygon) {
+		public PolySimplification2(in Polygon2d polygon) {
 			_vertices = new List<Vector2d>(polygon.Vertices);
 			_isLoop = true;
 		}
 
-		public PolySimplification2(PolyLine2d polycurve) {
+		public PolySimplification2(in PolyLine2d polycurve) {
 			_vertices = new List<Vector2d>(polycurve.Vertices);
 			_isLoop = false;
 		}
@@ -66,7 +66,7 @@ namespace RNumerics
 		/// <summary>
 		/// simplify outer and holes of a polygon solid with same thresholds
 		/// </summary>
-		public static void Simplify(GeneralPolygon2d solid, double deviationThresh) {
+		public static void Simplify(in GeneralPolygon2d solid, in double deviationThresh) {
 			var simp = new PolySimplification2(solid.Outer) {
 				SimplifyDeviationThreshold = deviationThresh
 			};
@@ -98,7 +98,7 @@ namespace RNumerics
 
 
 
-		void Find_constrained_segments(List<Vector2d> vertices, bool[] markers) {
+		void Find_constrained_segments(in List<Vector2d> vertices, in bool[] markers) {
 			var N = vertices.Count;
 			var NStop = _isLoop ? vertices.Count : vertices.Count - 1;
 			for (var si = 0; si < NStop; si++) {
@@ -112,7 +112,7 @@ namespace RNumerics
 
 
 
-		List<Vector2d> Collapse_by_deviation_tol(List<Vector2d> input, bool[] keep_segments, double offset_threshold) {
+		List<Vector2d> Collapse_by_deviation_tol(in List<Vector2d> input, in bool[] keep_segments, in double offset_threshold) {
 			var N = input.Count;
 			var NStop = _isLoop ? input.Count : input.Count - 1;
 
@@ -211,7 +211,7 @@ namespace RNumerics
 
 
 
-		List<Vector2d> Handle_tiny_case(List<Vector2d> result, List<Vector2d> input) {
+		List<Vector2d> Handle_tiny_case(in List<Vector2d> result, in List<Vector2d> input) {
 			var N = input.Count;
 			if (N == 3) {
 				return input;       // not much we can really do here...

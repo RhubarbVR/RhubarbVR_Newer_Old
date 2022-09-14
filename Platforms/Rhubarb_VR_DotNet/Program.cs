@@ -3,7 +3,7 @@ using StereoKit;
 using RhuEngine;
 using RStereoKit;
 
-class SKLoader
+sealed class SKLoader
 {
 	static void Main(string[] args) {
 		// This will allow the App constructor to call a few SK methods

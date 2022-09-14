@@ -17,7 +17,7 @@ namespace RNumerics
 	///   - MeshVertices(mesh) - compute on vertices of mesh
 	/// 
 	/// </summary>
-	public class DijkstraGraphDistance
+	public sealed class DijkstraGraphDistance
 	{
 		public const float INVALID_VALUE = float.MaxValue;
 
@@ -50,7 +50,7 @@ namespace RNumerics
 			public bool frozen;
 			public float distance;
 
-			public GraphNodeStruct(int id, int parent, float distance) {
+			public GraphNodeStruct(in int id, in int parent, in float distance) {
 				this.id = id;
 				this.parent = parent;
 				this.distance = distance;
@@ -84,11 +84,11 @@ namespace RNumerics
 		/// neighboursF: return enumeration of neighbours of a
 		/// seeds: although Vector2d, are actually pairs (id, seedvalue)   (or use AddSeed later)
 		/// </summary>
-		public DijkstraGraphDistance(int nMaxID, bool bSparse,
-			Func<int, bool> nodeFilterF,
-			Func<int, int, float> nodeDistanceF,
-			Func<int, IEnumerable<int>> neighboursF,
-			IEnumerable<Vector2d> seeds = null                // these are pairs (index, seedval)
+		public DijkstraGraphDistance(in int nMaxID, in bool bSparse,
+			in Func<int, bool> nodeFilterF,
+			in Func<int, int, float> nodeDistanceF,
+			in Func<int, IEnumerable<int>> neighboursF,
+			in IEnumerable<Vector2d> seeds = null                // these are pairs (index, seedval)
 			) {
 			_nodeFilterF = nodeFilterF;
 			_nodeDistanceF = nodeDistanceF;
@@ -138,7 +138,7 @@ namespace RNumerics
 		/// <summary>
 		/// Add seed point as id/distance pair
 		/// </summary>
-		public void AddSeed(int id, float seed_dist) {
+		public void AddSeed(in int id, in float seed_dist) {
 			if (_sparseNodes != null) {
 				var g = Get_node(id);
 				Debug.Assert(_sparseQueue.Contains(g) == false);
@@ -150,7 +150,7 @@ namespace RNumerics
 			}
 			_seeds.Add(id);
 		}
-		public bool IsSeed(int id) {
+		public bool IsSeed(in int id) {
 			return _seeds.Contains(id);
 		}
 
@@ -170,7 +170,7 @@ namespace RNumerics
 				Compute_Dense();
 			}
 		}
-		protected void Compute_Sparse() {
+		private void Compute_Sparse() {
 			while (_sparseQueue.Count > 0) {
 				var g = _sparseQueue.Dequeue();
 				MaxDistance = Math.Max(g.Priority, MaxDistance);
@@ -182,7 +182,7 @@ namespace RNumerics
 				Update_neighbours_sparse(g);
 			}
 		}
-		protected void Compute_Dense() {
+		private void Compute_Dense() {
 			while (_denseQueue.Count > 0) {
 				var idx_priority = _denseQueue.FirstPriority;
 				var idx = _denseQueue.Dequeue();
@@ -204,7 +204,7 @@ namespace RNumerics
 		/// Compute distances that are less/equal to fMaxDistance from the seeds
 		/// Terminates early, so Queue may not be empty
 		/// </summary>
-		public void ComputeToMaxDistance(float fMaxDistance) {
+		public void ComputeToMaxDistance(in float fMaxDistance) {
 			if (TrackOrder == true) {
 				_order = new List<int>();
 			}
@@ -216,7 +216,7 @@ namespace RNumerics
 				ComputeToMaxDistance_Dense(fMaxDistance);
 			}
 		}
-		protected void ComputeToMaxDistance_Sparse(float fMaxDistance) {
+		private void ComputeToMaxDistance_Sparse(in float fMaxDistance) {
 			while (_sparseQueue.Count > 0) {
 				var g = _sparseQueue.Dequeue();
 				MaxDistance = Math.Max(g.Priority, MaxDistance);
@@ -232,7 +232,7 @@ namespace RNumerics
 				Update_neighbours_sparse(g);
 			}
 		}
-		protected void ComputeToMaxDistance_Dense(float fMaxDistance) {
+		private void ComputeToMaxDistance_Dense(in float fMaxDistance) {
 			while (_denseQueue.Count > 0) {
 				var idx_priority = _denseQueue.FirstPriority;
 				MaxDistance = Math.Max(idx_priority, MaxDistance);
@@ -261,7 +261,7 @@ namespace RNumerics
 		/// Terminates early, so Queue may not be empty
 		/// [TODO] can reimplement this w/ internal call to ComputeToNode(func) ?
 		/// </summary>
-		public void ComputeToNode(int node_id, float fMaxDistance = INVALID_VALUE) {
+		public void ComputeToNode(in int node_id, in float fMaxDistance = INVALID_VALUE) {
 			if (TrackOrder == true) {
 				_order = new List<int>();
 			}
@@ -273,7 +273,7 @@ namespace RNumerics
 				ComputeToNode_Dense(node_id, fMaxDistance);
 			}
 		}
-		protected void ComputeToNode_Sparse(int node_id, float fMaxDistance) {
+		private void ComputeToNode_Sparse(in int node_id, in float fMaxDistance) {
 			while (_sparseQueue.Count > 0) {
 				var g = _sparseQueue.Dequeue();
 				MaxDistance = Math.Max(g.Priority, MaxDistance);
@@ -293,7 +293,7 @@ namespace RNumerics
 				Update_neighbours_sparse(g);
 			}
 		}
-		protected void ComputeToNode_Dense(int node_id, float fMaxDistance) {
+		private void ComputeToNode_Dense(in int node_id, in float fMaxDistance) {
 			while (_denseQueue.Count > 0) {
 				var idx_priority = _denseQueue.FirstPriority;
 				MaxDistance = Math.Max(idx_priority, MaxDistance);
@@ -328,7 +328,7 @@ namespace RNumerics
 		/// Compute distances until node_id is frozen, or (optional) max distance is reached
 		/// Terminates early, so Queue may not be empty
 		/// </summary>
-		public int ComputeToNode(Func<int, bool> terminatingNodeF, float fMaxDistance = INVALID_VALUE) {
+		public int ComputeToNode(in Func<int, bool> terminatingNodeF, in float fMaxDistance = INVALID_VALUE) {
 			if (TrackOrder == true) {
 				_order = new List<int>();
 			}
@@ -337,7 +337,7 @@ namespace RNumerics
 				? ComputeToNode_Sparse(terminatingNodeF, fMaxDistance)
 				: ComputeToNode_Dense(terminatingNodeF, fMaxDistance);
 		}
-		protected int ComputeToNode_Sparse(Func<int, bool> terminatingNodeF, float fMaxDistance) {
+		private int ComputeToNode_Sparse(in Func<int, bool> terminatingNodeF, in float fMaxDistance) {
 			while (_sparseQueue.Count > 0) {
 				var g = _sparseQueue.Dequeue();
 				MaxDistance = Math.Max(g.Priority, MaxDistance);
@@ -358,7 +358,7 @@ namespace RNumerics
 			}
 			return -1;
 		}
-		protected int ComputeToNode_Dense(Func<int, bool> terminatingNodeF, float fMaxDistance) {
+		private int ComputeToNode_Dense(in Func<int, bool> terminatingNodeF, in float fMaxDistance) {
 			while (_denseQueue.Count > 0) {
 				var idx_priority = _denseQueue.FirstPriority;
 				MaxDistance = Math.Max(idx_priority, MaxDistance);
@@ -399,7 +399,7 @@ namespace RNumerics
 		/// <summary>
 		/// Get the computed distance at node id. returns InvalidValue if node was not computed.
 		/// </summary>
-		public float GetDistance(int id) {
+		public float GetDistance(in int id) {
 			if (_sparseNodes != null) {
 				var g = _sparseNodes[id];
 				return g == null ? INVALID_VALUE : g.Priority;
@@ -427,7 +427,7 @@ namespace RNumerics
 		/// <summary>
 		/// Walk from node fromv back to the (graph-)nearest seed point.
 		/// </summary>
-		public bool GetPathToSeed(int fromv, List<int> path) {
+		public bool GetPathToSeed(in int fromv, in List<int> path) {
 			if (_sparseNodes != null) {
 				var g = Get_node(fromv);
 				if (g.frozen == false) {
@@ -465,7 +465,7 @@ namespace RNumerics
 
 
 
-		GraphNode Get_node(int id) {
+		GraphNode Get_node(in int id) {
 			var g = _sparseNodes[id];
 			if (g == null) {
 				//g = new GraphNode() { id = id, parent = null, frozen = false };
@@ -480,7 +480,7 @@ namespace RNumerics
 
 
 
-		void Update_neighbours_sparse(GraphNode parent) {
+		void Update_neighbours_sparse(in GraphNode parent) {
 			var cur_dist = parent.Priority;
 			foreach (var nbr_id in _neighboursF(parent.id)) {
 				if (_nodeFilterF(nbr_id) == false) {
@@ -513,13 +513,13 @@ namespace RNumerics
 
 
 
-		void Enqueue_node_dense(int id, float dist, int parent_id) {
+		void Enqueue_node_dense(in int id, in float dist, in int parent_id) {
 			var g = new GraphNodeStruct(id, parent_id, dist);
 			_denseNodes[id] = g;
 			_denseQueue.Insert(id, dist);
 		}
 
-		void Update_neighbours_dense(int parent_id) {
+		void Update_neighbours_dense(in int parent_id) {
 			var g = _denseNodes[parent_id];
 			var cur_dist = g.distance;
 			foreach (var nbr_id in _neighboursF(parent_id)) {

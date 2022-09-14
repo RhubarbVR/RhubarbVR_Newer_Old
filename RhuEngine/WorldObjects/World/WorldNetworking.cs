@@ -12,6 +12,8 @@ using LiteNetLib;
 
 using Newtonsoft.Json;
 
+using RhubarbCloudClient.Model;
+
 using RhuEngine.AssetSystem.RequestStructs;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
@@ -20,13 +22,11 @@ using RhuEngine.Managers;
 
 using SharedModels;
 using SharedModels.GameSpecific;
-using SharedModels.Session;
-using SharedModels.UserSession;
 
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World : IWorldObject
+	public sealed partial class World : IWorldObject
 	{
 
 		public bool IsNetworked { get; internal set; } = false;
@@ -41,19 +41,19 @@ namespace RhuEngine.WorldObjects
 		private NetManager _netManager;
 		private readonly EventBasedNatPunchListener _natPunchListener = new();
 		private readonly EventBasedNetListener _clientListener = new();
-		public void StartNetworking(bool newWorld) {
+		public async Task StartNetworking(bool newWorld) {
 			IsNetworked = true;
 			if (newWorld) {
 				IsDeserializing = false;
 				AddLocalUser();
-				ConnectedToSession(false);
+				await ConnectedToSession(false);
 				WaitingForWorldStartState = false;
 			}
 			else {
 				LocalUserID = 0;
 				IsLoadingNet = true;
 				IsDeserializing = true;
-				ConnectedToSession(true);
+				await ConnectedToSession(true);
 			}
 		}
 
@@ -65,83 +65,81 @@ namespace RhuEngine.WorldObjects
 			if (!IsNetworked) {
 				return;
 			}
-			var sessionInfo = new SessionInfo {
-				ActiveUsers = Users.Select(user => (((User)user)?.isPresent?.Value??false) && (((User)user).IsConnected || ((User)user).IsLocalUser)).Where((val) => val).Count(),
-				Admins = Admins.Select((x) => Guid.Parse(((SyncRef<User>)x).Target?.userID.Value)).ToArray(),
-				AssociatedGroup = Guid.Parse(AssociatedGroup.Value),
-				IsHidden = IsHidden.Value,
-				MaxUsers = MaxUserCount.Value,
-				ThumNail = ThumNail.Value,
-				SessionTags = SessionTags,
-				SessionAccessLevel = AccessLevel.Value,
-				SessionName = SessionName.Value,
-				NormalizedSessionName = SessionName.Value.Normalize(),
-				SessionId = Guid.Parse(SessionID.Value)
-			};
-			var sessionConnection = new SessionCreation {
-				SessionInfo = sessionInfo,
-				UserConnectionInfo = null,
-				ForceJoin = Array.Empty<Guid>()
-			};
-			Engine.netApiManager.SendDataToSocked(new SessionRequest { RequestType = RequestType.UpdateSession, RequestData = JsonConvert.SerializeObject(sessionConnection), ID = sessionInfo.SessionId });
+			//ToDO: SessionRequest
+			//var sessionInfo = new SessionInfo {
+			//	ActiveUsers = Users.Select(user => (((User)user)?.isPresent?.Value??false) && (((User)user).IsConnected || ((User)user).IsLocalUser)).Where((val) => val).Count(),
+			//	Admins = Admins.Select((x) => Guid.Parse(((SyncRef<User>)x).Target?.userID.Value)).ToArray(),
+			//	AssociatedGroup = Guid.Parse(AssociatedGroup.Value),
+			//	IsHidden = IsHidden.Value,
+			//	MaxUsers = MaxUserCount.Value,
+			//	ThumNail = ThumNail.Value,
+			//	SessionTags = SessionTags,
+			//	SessionAccessLevel = AccessLevel.Value,
+			//	SessionName = SessionName.Value,
+			//	NormalizedSessionName = SessionName.Value.Normalize(),
+			//	SessionId = Guid.Parse(SessionID.Value)
+			//};
+			//var sessionConnection = new SessionCreation {
+			//	SessionInfo = sessionInfo,
+			//	UserConnectionInfo = null,
+			//	ForceJoin = Array.Empty<Guid>()
+			//};
+			//Engine.netApiManager.SendDataToSocked(new SessionRequest { RequestType = RequestType.UpdateSession, RequestData = JsonConvert.SerializeObject(sessionConnection), ID = sessionInfo.SessionId });
 		}
 
-		private void ConnectedToSession(bool joiningSession) {
-			Task.Run(async () => {
-				IsLoadingNet= true;
-				LoadNatManager();
-				try {
-					var Pings = new Dictionary<string, int>();
-					var servers = await Engine.netApiManager.GetRelayHoleServers();
-					foreach (var item in servers) {
-						var pingSender = new Ping();
-						var e = pingSender.Send(new Uri(item.IP).Host, 500);
-						if ((e?.Status ?? IPStatus.Unknown) == IPStatus.Success) {
-							Pings.Add(item.IP, (int)e.RoundtripTime);
-						}
-					}
-					//TODO: add support for changeing on connection info 
-					var userConnection = new UserConnectionInfo {
-						ConnectionType = ConnectionType.HolePunch,
-						ServerPingLevels = Pings,
-						Data = null
-					};
-					if (!joiningSession) {
-						SessionID.Value = Guid.NewGuid().ToString();
-						var sessionInfo = new SessionInfo {
-							ActiveUsers = 1,
-							Admins = Admins.Select((x)=>Guid.Parse(((SyncRef<User>)x).Target?.userID.Value)).ToArray(),
-							AssociatedGroup = Guid.Parse(AssociatedGroup.Value),
-							IsHidden = IsHidden.Value,
-							MaxUsers = MaxUserCount.Value,
-							ThumNail = ThumNail.Value,
-							SessionTags = SessionTags,
-							SessionAccessLevel = AccessLevel.Value,
-							SessionName = SessionName.Value,
-							NormalizedSessionName = SessionName.Value.Normalize(),
-							SessionId = Guid.Parse(SessionID.Value)
-						};
-						var sessionConnection = new SessionCreation {
-							SessionInfo = sessionInfo,
-							UserConnectionInfo = userConnection,
-							ForceJoin = Array.Empty<Guid>()
-						};
-						Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = Guid.Parse(SessionID.Value), RequestData = JsonConvert.SerializeObject(sessionConnection), RequestType = RequestType.CreateSession });
+		public bool IsJoiningSession { get; private set; }
 
+		private async Task ConnectedToSession(bool joiningSession) {
+			IsLoadingNet = true;
+			IsJoiningSession = joiningSession;
+			LoadNatManager();
+			try {
+				var Pings = new Dictionary<string, int>();
+				var servers = await Engine.netApiManager.Client.GetRelayHoleServers();
+				foreach (var item in servers) {
+					var pingSender = new Ping();
+					var e = pingSender.Send(item, 500);
+					if ((e?.Status ?? IPStatus.Unknown) == IPStatus.Success) {
+						Pings.Add(item, (int)e.RoundtripTime);
 					}
-					else {
-						var sessionConnection = new JoinSession {
-							SessionID = Guid.Parse(SessionID.Value),
-							UserConnectionInfo = userConnection,
-						};
-						Engine.netApiManager.SendDataToSocked(new SessionRequest { ID = Guid.Parse(SessionID.Value), RequestData = JsonConvert.SerializeObject(sessionConnection), RequestType = RequestType.JoinSession });
-					}
-					IsLoadingNet = false;
 				}
-				catch (Exception ex) {
-					LoadMsg = "Failed to Connected To Session" + ex.Message;
+				////TODO: add support for changeing on connection info 
+				var userConnection = new UserConnectionInfo {
+					ConnectionType = ConnectionType.HolePunch,
+					ServerPingLevels = Pings,
+					Data = null
+				};
+				if (!joiningSession) {
+					var newGUId = Guid.NewGuid();
+					SessionID.Value = newGUId.ToString();
+					var sessionConnection = new SessionCreation {
+						TempSessionID = newGUId,
+						UserConnectionInfo = userConnection,
+						SessionName = SessionName.Value,
+						SessionTags = SessionTags,
+						SessionAccessLevel = AccessLevel.Value,
+						MaxUsers = MaxUserCount.Value,
+						IsHidden = IsHidden.Value,
+						ThumNail = ThumNail.Value,
+						WorldID = WorldID.Value,
+						IsAssociatedToGroup = Guid.TryParse(AssociatedGroup.Value, out var gorupID),
+						AssociatedGroup = gorupID,
+					};
+					await Engine.netApiManager.Client.CreateSession(sessionConnection);
+
 				}
-			});
+				else {
+					var sessionConnection = new JoinSession {
+						SessionID = Guid.Parse(SessionID.Value),
+						UserConnectionInfo = userConnection,
+					};
+					await Engine.netApiManager.Client.JoinSession(sessionConnection);
+				}
+				IsLoadingNet = false;
+			}
+			catch (Exception ex) {
+				LoadMsg = "Failed to Connected To Session " + ex.Message;
+			}
 		}
 
 #if DEBUG
@@ -238,10 +236,9 @@ namespace RhuEngine.WorldObjects
 			_netManager.Start();
 			_netManager.EnableStatistics = true;
 			_netManager.MaxConnectAttempts = 15;
-			_netManager.DisconnectTimeout = 10000;
-			_netManager.UpdateTime = 10;
+			_netManager.DisconnectTimeout = 100000;
+			_netManager.UpdateTime = 45;
 			_netManager.ChannelsCount = 3;
-			_netManager.UpdateTime = 120;
 			//0 is main
 			//1 is syncStreams
 			//2 is assetPackeds
@@ -265,29 +262,31 @@ namespace RhuEngine.WorldObjects
 					if (worldData == null) {
 						throw new Exception();
 					}
-					Task.Run(() => {
+					Task.Run(async () => {
 						try {
 							LoadMsg = "World state Found";
+							// Wait for everyone
 							while (ActiveConnections.Count > 0) {
-								Thread.Sleep(1000);
+								LoadMsg = "Waiting for connections";
+								await Task.Delay(1000);
 							}
 							_worldObjects.Clear();
 							var deserializer = new SyncObjectDeserializerObject(false);
 							Deserialize((DataNodeGroup)worldData, deserializer);
 							LocalUserID = (ushort)(Users.Count + 1);
-							foreach (var item in deserializer.onLoaded) {
-								item?.Invoke();
-							}
 							RLog.Info(LoadMsg = "World state loaded");
 							foreach (var peer1 in _netManager.ConnectedPeerList) {
 								if (peer1.Tag is Peer contpeer) {
 									LoadUserIn(contpeer);
 								}
 							}
+							FindNewMaster();
+							AddLocalUser();
+							foreach (var item in deserializer.onLoaded) {
+								item?.Invoke();
+							}
 							IsDeserializing = false;
 							WaitingForWorldStartState = false;
-							AddLocalUser();
-							FindNewMaster();
 						}
 						catch (Exception ex) {
 							RLog.Err("Failed to load world state" + ex);
@@ -304,7 +303,16 @@ namespace RhuEngine.WorldObjects
 						throw new Exception();
 					}
 					try {
-						_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
+						lock (_networkedObjects) {
+							if (_networkedObjects.ContainsKey(target.Value)) {
+								_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
+							}
+							else {
+								if (deliveryMethod == DeliveryMethod.ReliableOrdered && peer.User is not null) {
+									RLog.Err($"Failed to Process NetData target:{target.Value.HexString()} Error: _networkedObjects Not loaded");
+								}
+							}
+						}
 					}
 					catch (Exception ex) {
 #if DEBUG
@@ -318,6 +326,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
+
 		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod) {
 			if (IsDisposed) {
 				return;
@@ -326,33 +335,66 @@ namespace RhuEngine.WorldObjects
 				var data = reader.GetRemainingBytes();
 				if (peer.Tag is Peer) {
 					var tag = peer.Tag as Peer;
-					if (Serializer.TryToRead<BlockStore>(data, out var keyValuePairs)) {
-						ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
-					}
-					else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
-						AssetResponses(assetRequest, tag, deliveryMethod);
-					}
-					else if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
-						ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
+					if(deliveryMethod == DeliveryMethod.Unreliable) {
+						if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
+							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
+						}
+						else if (Serializer.TryToRead<BlockStore>(data, out var keyValuePairs)) {
+							ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
+						}
+						else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
+							AssetResponses(assetRequest, tag, deliveryMethod);
+						}
+						else {
+							throw new Exception("Uknown Data from User");
+						}
 					}
 					else {
-						throw new Exception("Uknown Data from User");
+						if (Serializer.TryToRead<BlockStore>(data, out var keyValuePairs)) {
+							ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
+						}
+						else if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
+							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
+						}
+						else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
+							AssetResponses(assetRequest, tag, deliveryMethod);
+						}
+						else {
+							throw new Exception("Uknown Data from User");
+						}
 					}
+
 				}
 				else if (peer.Tag is RelayPeer) {
 					var tag = peer.Tag as RelayPeer;
 					if (Serializer.TryToRead<DataPacked>(data, out var packed)) {
-						if (Serializer.TryToRead<BlockStore>(packed.Data, out var keyValuePairs)) {
-							ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
-						}
-						else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
-							AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
-						}
-						else if (Serializer.TryToRead<StreamDataPacked>(packed.Data, out var streamDataPacked)) {
-							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
+						if (deliveryMethod == DeliveryMethod.Unreliable) {
+							if (Serializer.TryToRead<StreamDataPacked>(packed.Data, out var streamDataPacked)) {
+								ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
+							}
+							else if (Serializer.TryToRead<BlockStore>(packed.Data, out var keyValuePairs)) {
+								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
+							}
+							else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
+								AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+							}
+							else {
+								throw new Exception("Uknown Data from relay");
+							}
 						}
 						else {
-							throw new Exception("Uknown Data from relay");
+							if (Serializer.TryToRead<BlockStore>(packed.Data, out var keyValuePairs)) {
+								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
+							}
+							else if (Serializer.TryToRead<StreamDataPacked>(packed.Data, out var streamDataPacked)) {
+								ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
+							}
+							else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
+								AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+							}
+							else {
+								throw new Exception("Uknown Data from relay");
+							}
 						}
 					}
 					else if (Serializer.TryToRead<OtherUserLeft>(data, out var otherUserLeft)) {
@@ -420,73 +462,62 @@ namespace RhuEngine.WorldObjects
 
 		public List<ConnectToUser> ActiveConnections = new();
 
-		public void ConnectToUser(ConnectToUser user) {
-			Task.Run(() => {
-				lock (ActiveConnections) {
-					ActiveConnections.Add(user);
-				}
-				if (user is null) {
-					return;
-				}
-				RLog.Info("Connecting to user " + user.ConnectionType.ToString() + " Token:" + user.Data + " UserID:" + user.UserID);
-				LoadMsg = "Connecting to user";
-				switch (user.ConnectionType) {
-					case ConnectionType.Direct:
-						LoadMsg = "Direct Connected to User";
-						var idUri = new Uri(user.Data);
-						var dpeer = _netManager.Connect(idUri.Host, idUri.Port, KEY);
-						dpeer.Tag = user.UserID;
-						lock (ActiveConnections) {
-							ActiveConnections.Remove(user);
-						}
-						break;
-					case ConnectionType.HolePunch:
-						try {
-							LoadMsg = "Trying to HolePunch to User";
-							var peerCount = _netManager.ConnectedPeersCount;
-							RLog.Info("Server: " + worldManager.Engine.netApiManager.BaseAddress.Host);
-							NatUserIDS.TryAdd(user.Data, user.UserID);
-							var eidUri = new Uri(user.Server);
-							_netManager.NatPunchModule.SendNatIntroduceRequest(eidUri.Host,eidUri.Port, user.Data);
-							for (var i = 0; i < 60; i++) {
-								if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
-									if (NatConnection.TryGetValue(user.Data, out var peer)) {
-										if ((peer?.ConnectionState ?? ConnectionState.Disconnected) == ConnectionState.Connected) {
-											break;
-										}
+		public async Task ConnectToUser(ConnectToUser user) {
+			lock (ActiveConnections) {
+				ActiveConnections.Add(user);
+			}
+			if (user is null) {
+				return;
+			}
+			RLog.Info("Connecting to user " + user.ConnectionType.ToString() + " Token:" + user.Data + " UserID:" + user.UserID);
+			LoadMsg = "Connecting to user";
+			switch (user.ConnectionType) {
+				case ConnectionType.Direct:
+					LoadMsg = "Direct Connected to User";
+					var idUri = new Uri(user.Data);
+					var dpeer = _netManager.Connect(idUri.Host, idUri.Port, KEY);
+					dpeer.Tag = user.UserID;
+					lock (ActiveConnections) {
+						ActiveConnections.Remove(user);
+					}
+					break;
+				case ConnectionType.HolePunch:
+					try {
+						LoadMsg = "Trying to HolePunch to User";
+						var peerCount = _netManager.ConnectedPeersCount;
+						NatUserIDS.TryAdd(user.Data, user.UserID);
+						_netManager.NatPunchModule.SendNatIntroduceRequest(user.Server, 7856, user.Data);
+						for (var i = 0; i < 6; i++) {
+							if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
+								if (NatConnection.TryGetValue(user.Data, out var peer)) {
+									if ((peer?.ConnectionState ?? ConnectionState.Disconnected) == ConnectionState.Connected) {
+										break;
 									}
 								}
-								LoadMsg = $"HolePuch Try{(uint)(i / 10)}";
-								//Like this so i can add update Msgs
-								Thread.Sleep(100);
 							}
-							if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var value) && value) {
-								if (NatConnection.TryGetValue(user.Data, out var peer)) {
-									if ((peer?.ConnectionState ?? ConnectionState.Disconnected) != ConnectionState.Connected) {
-										try {
-											if (peer is not null) {
-												peer.Disconnect();
-											}
-										}
-										catch {
-											return;
-										}
-										RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
-										RelayConnect(user);
-										lock (ActiveConnections) {
-											ActiveConnections.Remove(user);
+							LoadMsg = $"HolePunch Try {i}";
+							//Like this so i can add update Msgs
+							await Task.Delay(1000);
+						}
+						if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var value) && value) {
+							if (NatConnection.TryGetValue(user.Data, out var peer)) {
+								if ((peer?.ConnectionState ?? ConnectionState.Disconnected) != ConnectionState.Connected) {
+									try {
+										if (peer is not null) {
+											peer.Disconnect();
 										}
 									}
-									else {
-										RLog.Info(LoadMsg = "HolePunch succeeded");
-										lock (ActiveConnections) {
-											ActiveConnections.Remove(user);
-										}
+									catch {
+										return;
+									}
+									RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
+									RelayConnect(user);
+									lock (ActiveConnections) {
+										ActiveConnections.Remove(user);
 									}
 								}
 								else {
-									RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
-									RelayConnect(user);
+									RLog.Info(LoadMsg = "HolePunch succeeded");
 									lock (ActiveConnections) {
 										ActiveConnections.Remove(user);
 									}
@@ -499,35 +530,42 @@ namespace RhuEngine.WorldObjects
 									ActiveConnections.Remove(user);
 								}
 							}
-							NatIntroductionSuccessIsGood.TryRemove(user.Data, out _);
-							NatConnection.TryRemove(user.Data, out _);
-							NatUserIDS.TryRemove(user.Data, out _);
 						}
-						catch (Exception e) {
-							RLog.Err($"Excerption when trying to hole punch {e}");
-							return;
+						else {
+							RLog.Info(LoadMsg = "Failed To Hole Punch now using relay");
+							RelayConnect(user);
+							lock (ActiveConnections) {
+								ActiveConnections.Remove(user);
+							}
 						}
-						break;
-					case ConnectionType.Relay:
-						LoadMsg = "Relay connecting to user";
-						NatUserIDS.TryAdd(user.Data, user.UserID);
-						RelayConnect(user);
-						lock (ActiveConnections) {
-							ActiveConnections.Remove(user);
-						}
-						break;
-					default:
-						break;
-				}
-				LoadMsg = "Waiting for world state";
-			});
+						NatIntroductionSuccessIsGood.TryRemove(user.Data, out _);
+						NatConnection.TryRemove(user.Data, out _);
+						NatUserIDS.TryRemove(user.Data, out _);
+					}
+					catch (Exception e) {
+						RLog.Err($"Excerption when trying to hole punch {e}");
+						return;
+					}
+					break;
+				case ConnectionType.Relay:
+					LoadMsg = "Relay connecting to user";
+					NatUserIDS.TryAdd(user.Data, user.UserID);
+					RelayConnect(user);
+					lock (ActiveConnections) {
+						ActiveConnections.Remove(user);
+					}
+					break;
+				default:
+					break;
+			}
+			LoadMsg = "Waiting for world state";
+
 		}
 
 		private void RelayConnect(ConnectToUser user) {
 			RLog.Info("Relay Connect Client");
 			try {
-				var eidUri = new Uri(user.Server);
-				var peer = _netManager.Connect(eidUri.Host, eidUri.Port + 1, user.Data);
+				var peer = _netManager.Connect(user.Server, 7857, user.Data);
 				if (peer.Tag is not null) {
 					RLog.Info(LoadMsg = "Adding another Relay Client");
 					var relay = peer.Tag as RelayPeer;
@@ -588,14 +626,14 @@ namespace RhuEngine.WorldObjects
 
 		public void AddLocalUser() {
 			LoadMsg = "Adding LocalUser";
-			var Olduser = GetUserFromID(Engine.netApiManager.User?.Id??new Guid());
+			var Olduser = GetUserFromID(Engine.netApiManager.Client.User?.Id ?? new Guid());
 			if (Olduser is null) {
 				LoadMsg = "Building new LocalUser";
 				ItemIndex = 176;
 				LocalUserID = (ushort)(Users.Count + 1);
 				RLog.Info($"Built local User with id{LocalUserID}");
 				var user = Users.Add();
-				user.userID.Value = (worldManager.Engine.netApiManager.User?.Id ?? new Guid()).ToString();
+				user.userID.Value = (worldManager.Engine.netApiManager.Client.User?.Id ?? new Guid()).ToString();
 				user.Platform.Value = Environment.OSVersion.Platform;
 				user.PlatformVersion.Value = Environment.OSVersion.Version.ToString();
 				user.BackendID.Value = Engine.EngineLink.BackendID;

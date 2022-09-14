@@ -7,11 +7,11 @@ using RhuEngine.Components;
 
 namespace RhuEngine.WorldObjects.ECS
 {
-	public class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox
+	public sealed class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox
 	{
-		public uint Depth => (_internalParent?.Depth + 1) ?? 0;
+		private uint CompDepth => (_internalParent?.Depth + 1) ?? 0;
 
-		public uint CachedDepth { get; private set; }
+		public uint Depth { get; private set; }
 
 		public readonly SyncObjList<Entity> children;
 		[OnChanged(nameof(ParentChanged))]
@@ -26,15 +26,20 @@ namespace RhuEngine.WorldObjects.ECS
 		public readonly Sync<Quaternionf> rotation;
 		[OnChanged(nameof(TransValueChange))]
 		public readonly Sync<Vector3f> scale;
-		[Default(true)]
-		[OnChanged(nameof(OnEnableChange))]
-		public readonly Sync<bool> enabled;
 		[OnChanged(nameof(OnOrderOffsetChange))]
 		public readonly Sync<int> orderOffset;
 		public int Offset => orderOffset.Value;
-		[OnChanged(nameof(OnComponentChange))]
-		public readonly SyncAbstractObjList<Component> components;
+		[Default(true)]
+		[OnChanged(nameof(OnEnableChange))]
+		public readonly Sync<bool> enabled;
 
+		[Default(true)]
+		public readonly Sync<bool> persistence;
+
+		public override bool Persistence => persistence.Value;
+
+		[OnChanged(nameof(OnComponentChange))]
+		public readonly SyncAbstractObjList<IComponent> components;
 		[Exposed]
 		public AxisAlignedBox3f Bounds
 		{
@@ -47,7 +52,7 @@ namespace RhuEngine.WorldObjects.ECS
 						box = BoundsUtil.Combined(box, scale);
 					}
 				}
-				foreach (Entity item in children) { 
+				foreach (Entity item in children.Cast<Entity>()) {
 					var element = item.Bounds;
 					element.Translate(item.GlobalTrans.Translation);
 					element.Rotate(item.GlobalTrans.Rotation);
@@ -63,31 +68,27 @@ namespace RhuEngine.WorldObjects.ECS
 			children.Clear();
 		}
 
-		[Default(true)]
-		public readonly Sync<bool> persistence;
 
-		public override bool Persistence => persistence.Value;
 
 		public event Action<GrabbableHolder, bool, float> OnGrip;
 		internal void CallOnGrip(GrabbableHolder obj, bool Laser, float gripForce) {
-			OnGrip?.Invoke(obj,Laser, gripForce);
+			OnGrip?.Invoke(obj, Laser, gripForce);
 		}
-		public event Action<uint, Vector3f, Vector3f, float, float,Handed> OnLazerPyhsics;
+		public event Action<uint, Vector3f, Vector3f, float, float, Handed> OnLazerPyhsics;
 
 		internal void CallOnLazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce, Handed handed) {
 			OnLazerPyhsics?.Invoke(v, hitnormal, hitpointworld, pressForce, gripForce, handed);
 		}
 
-		public event Action<uint, Vector3f, Vector3f> OnTouchPyhsics;
+		public event Action<uint, Vector3f, Vector3f, Handed> OnTouchPyhsics;
 
-		internal void CallOnTouch(uint v, Vector3f hitnormal, Vector3f hitpointworld) {
-			OnTouchPyhsics?.Invoke(v, hitnormal, hitpointworld);
+		internal void CallOnTouch(uint v, Vector3f hitnormal, Vector3f hitpointworld, Handed handedSide) {
+			OnTouchPyhsics?.Invoke(v, hitnormal, hitpointworld, handedSide);
 		}
-
 		public void ParentDepthUpdate() {
-			CachedDepth = Depth;
-			foreach (var child in children) {
-				((Entity)child).ParentDepthUpdate();
+			Depth = CompDepth;
+			foreach (Entity child in children.Cast<Entity>()) {
+				child.ParentDepthUpdate();
 			}
 		}
 
@@ -104,7 +105,7 @@ namespace RhuEngine.WorldObjects.ECS
 			_cachedGlobalMatrix = matrix;
 			_cachedLocalMatrix = newLocal;
 			GlobalTransformChange?.Invoke(this, false);
-			foreach (Entity item in children) {
+			foreach (var item in children.Cast<Entity>()) {
 				item.GlobalTransMark(false);
 			}
 		}
@@ -118,7 +119,7 @@ namespace RhuEngine.WorldObjects.ECS
 
 		[Exposed]
 		public Entity GetChildByName(string v) {
-			foreach (var child in children) {
+			foreach (var child in children.Cast<Entity>()) {
 				if (((Entity)child).name.Value == v) {
 					return (Entity)child;
 				}
@@ -131,40 +132,41 @@ namespace RhuEngine.WorldObjects.ECS
 				_hasUpdatingComponentSave = !_hasUpdatingComponentSave;
 				UpdateEnableList();
 			}
+			UIRect = GetFirstComponent<UIRect>();
 		}
 
 		private void OnOrderOffsetChange() {
 			OffsetChanged?.Invoke();
 		}
 		[Exposed]
-		public Component AttachComponent(Type type) {
+		public IComponent AttachComponent(Type type) {
 			if (!typeof(Component).IsAssignableFrom(type)) {
 				throw new ArgumentException($"Type {type.GetFormattedName()} is not assignable to {typeof(Component).GetFormattedName()}");
 			}
 			var comp = components.Add(type);
-			comp.OnAttach();
+			comp.RunAttach();
 			return comp;
 		}
 		[Exposed]
-		public T AttachComponent<T>(Type type) where T : Component {
+		public T AttachComponent<T>(Type type) where T : class, IComponent {
 			if (!typeof(T).IsAssignableFrom(type)) {
 				throw new ArgumentException($"Type {type.GetFormattedName()} is not assignable to {typeof(T).GetFormattedName()}");
 			}
 			var comp = components.Add(type);
-			comp.OnAttach();
+			comp.RunAttach();
 			return (T)comp;
 		}
 
 		[Exposed]
 		public T AttachComponent<T>() where T : Component, new() {
 			var comp = components.Add<T>();
-			comp.OnAttach();
+			comp.RunAttach();
 			return comp;
 		}
 		public T AttachComponent<T>(Action<T> beforeAttach) where T : Component, new() {
 			var comp = components.Add<T>();
 			beforeAttach.Invoke(comp);
-			comp.OnAttach();
+			comp.RunAttach();
 			return comp;
 		}
 
@@ -250,23 +252,6 @@ namespace RhuEngine.WorldObjects.ECS
 		[UnExsposed]
 		private Entity _internalParent;
 
-		[NoShow]
-		[NoSave]
-		[NoSync]
-		[NoLoad]
-		[UnExsposed]
-		public UIRect UIRect;
-
-		public void SetUIRect(UIRect newrect) {
-			var oldrec = UIRect;
-			UIRect = newrect;
-			UIRectUpdate?.Invoke(oldrec, UIRect);
-		}
-
-
-		public event Action<UIRect, UIRect> UIRectUpdate;
-
-
 		private Matrix _cachedGlobalMatrix = Matrix.S(1);
 
 		private Matrix _cachedLocalMatrix = Matrix.S(1);
@@ -274,6 +259,7 @@ namespace RhuEngine.WorldObjects.ECS
 		public bool CheckIfParented(Entity entity) {
 			return entity == this || (_internalParent?.CheckIfParented(entity) ?? false);
 		}
+
 		public bool parentEnabled = true;
 
 		public event Action EnabledChanged;
@@ -298,15 +284,11 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		private void UpdateEnableList() {
-			if (IsEnabled) {
-				foreach (var item in components) {
-					((Component)item).AddListObject();
-				}
+			if (IsRemoved || IsDestroying) {
+				return;
 			}
-			else {
-				foreach (var item in components) {
-					((Component)item).RemoveListObject();
-				}
+			foreach (var item in components) {
+				((Component)item).ListObjectUpdate(IsEnabled);
 			}
 			if (IsEnabled && _hasUpdatingComponentSave) {
 				try {
@@ -322,7 +304,7 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			UpdateEnableList();
 			TransValueChange();
@@ -335,7 +317,7 @@ namespace RhuEngine.WorldObjects.ECS
 
 			if (_parentEnabled != parentEnabled) {
 				parentEnabled = _parentEnabled;
-				foreach (var entity in children) {
+				foreach (var entity in children.Cast<Entity>()) {
 					((Entity)entity).ParentEnabledChange(_parentEnabled);
 				}
 			}
@@ -346,16 +328,28 @@ namespace RhuEngine.WorldObjects.ECS
 			if (!enabled.Value && (World.RootEntity == this)) {
 				enabled.Value = true;
 			};
-			foreach (var entity in children) {
+			foreach (var entity in children.Cast<Entity>()) {
 				((Entity)entity).ParentEnabledChange(enabled.Value);
 			}
 			EnabledChanged?.Invoke();
 			UpdateEnableList();
 		}
 		[Exposed]
-		public bool IsEnabled => parentEnabled && enabled.Value;
+		public bool IsEnabled => parentEnabled && enabled.Value && !IsDestroying && !IsRemoved;
+
+		private void GoBackToOld() {
+			if (parent.Target != _internalParent) {
+				parent.Target = _internalParent;
+			}
+		}
+
+		private bool IsParrent(Entity check) {
+			return (check == this) || (_internalParent?.IsParrent(check) ?? false);
+		}
+
 		private void ParentChanged() {
 			if (World.RootEntity == this) {
+				GoBackToOld();
 				return;
 			}
 
@@ -363,6 +357,15 @@ namespace RhuEngine.WorldObjects.ECS
 				return;
 			}
 
+			if (parent.Target.IsParrent(this)) {
+				GoBackToOld();
+				return;
+			}
+			if (World != parent.Target.World) {
+				RLog.Warn("tried to set parent from another world");
+				GoBackToOld();
+				return;
+			}
 			if (_internalParent == null) {
 				_internalParent = parent.Target;
 				ParentDepthUpdate();
@@ -374,21 +377,12 @@ namespace RhuEngine.WorldObjects.ECS
 				ParentDepthUpdate();
 				return;
 			}
-			if (World != parent.Target.World) {
-				RLog.Warn("tried to set parent from another world");
-				return;
-			}
-			if (!parent.Target.CheckIfParented(this)) {
-				parent.Target.children.AddInternal(this);
-				_internalParent.children.RemoveInternal(this);
-				_internalParent = parent.Target;
-				ParentDepthUpdate();
-				ParentEnabledChange(_internalParent.IsEnabled);
-				TransValueChange();
-			}
-			else {
-				parent.Target = _internalParent;
-			}
+			parent.Target.children.AddInternal(this);
+			_internalParent.children.RemoveInternal(this);
+			_internalParent = parent.Target;
+			ParentDepthUpdate();
+			ParentEnabledChange(_internalParent.IsEnabled);
+			TransValueChange();
 		}
 		[Exposed]
 		public void SetParent(Entity entity, bool preserverGlobal = true, bool resetPos = false) {
@@ -430,7 +424,7 @@ namespace RhuEngine.WorldObjects.ECS
 				_cachedGlobalMatrix = value;
 				_cachedLocalMatrix = newLocal;
 				GlobalTransformChange?.Invoke(this, true);
-				foreach (Entity item in children) {
+				foreach (Entity item in children.Cast<Entity>()) {
 					item.GlobalTransMark();
 				}
 			}
@@ -457,7 +451,7 @@ namespace RhuEngine.WorldObjects.ECS
 				_cachedGlobalMatrix = value * parentMatrix;
 				_cachedLocalMatrix = value;
 				GlobalTransformChange?.Invoke(this, true);
-				foreach (Entity item in children) {
+				foreach (var item in children.Cast<Entity>()) {
 					item.GlobalTransMark();
 				}
 			}
@@ -479,15 +473,15 @@ namespace RhuEngine.WorldObjects.ECS
 				return;
 			}
 			if (!_dirtyGlobal) {
-				foreach (Entity item in children) {
-					item.GlobalTransMark();
+				foreach (var child in children.Cast<Entity>()) {
+					child.GlobalTransMark(physics);
 				}
 				GlobalTransformChange?.Invoke(this, physics);
+				_dirtyGlobal = true;
 			}
-			_dirtyGlobal = true;
 		}
 
-		public override void FirstCreation() {
+		protected override void FirstCreation() {
 			base.FirstCreation();
 			rotation.Value = Quaternionf.Identity;
 			scale.Value = Vector3f.One;
@@ -496,38 +490,45 @@ namespace RhuEngine.WorldObjects.ECS
 		public void RenderStep() {
 			foreach (var item in components) {
 				var comp = (Component)item;
-				comp.AlwaysRenderStep();
-				if (comp.Enabled.Value) {
-					comp.RenderStep();
-				}
+				comp.RunRenderStep(comp.Enabled.Value && IsEnabled);
 			}
 		}
 
 		public void Step() {
 			foreach (var item in components) {
 				var comp = (Component)item;
-				comp.AlwaysStep();
-				if (comp.Enabled.Value) {
-					comp.Step();
-				}
+				comp.RunStep(comp.Enabled.Value && IsEnabled);
 			}
 		}
 		[Exposed]
 		public Entity AddChild(string name = "Entity") {
 			var entity = children.Add();
-			entity.parent.Target = this;
 			entity.name.Value = name;
 			return entity;
 		}
 
-		public override void OnInitialize() {
+		protected override void OnInitialize() {
 			World.RegisterEntity(this);
+			if (Parent?.Parent is Entity par) {
+				parent.NetValue = par.Pointer;
+				if (par.Depth >= 10000) {
+					throw new Exception("Max Entity Depth Reached");
+				}
+			}
 		}
 		public override void Dispose() {
 			base.Dispose();
 			World.UnregisterEntity(this);
-			World.UnregisterUpdatingEntity(this);
+			if (HasUpdatingComponent) {
+				World.UnregisterUpdatingEntity(this);
+			}
 		}
+		[NoShow]
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[UnExsposed]
+		public UIRect UIRect { get; private set; }
 
 		public Entity() {
 		}

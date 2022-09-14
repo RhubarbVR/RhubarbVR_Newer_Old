@@ -7,7 +7,7 @@ using RhuEngine.Physics;
 
 namespace NullContext
 {
-	public class NullLinker : IEngineLink, IRLog, IRTime
+	public sealed class NullLinker : IEngineLink, IRLog, IRTime
 	{
 		public void LoadArgs() {
 		}

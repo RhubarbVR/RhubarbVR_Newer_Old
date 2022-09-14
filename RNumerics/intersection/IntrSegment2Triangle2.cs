@@ -3,7 +3,7 @@
 namespace RNumerics
 {
 	// ported from WildMagic5 
-	public class IntrSegment2Triangle2
+	public sealed class IntrSegment2Triangle2
 	{
 		Segment2d _segment;
 		public Segment2d Segment
@@ -32,7 +32,7 @@ namespace RNumerics
 		public double Param1;
 
 
-		public IntrSegment2Triangle2(Segment2d s, Triangle2d t) {
+		public IntrSegment2Triangle2(in Segment2d s, in Triangle2d t) {
 			_segment = s;
 			_triangle = t;
 		}

@@ -8,16 +8,7 @@ namespace RhuEngine.Components
 {
 	public abstract class UIComponent : Component
 	{
-		[NoShow]
-		[NoSave]
-		[NoSync]
-		[NoLoad]
-		public UIRect Rect => Entity.UIRect;
+		public UIRect UIRect => Entity.UIRect;
 
-		public abstract void Render(Matrix matrix);
-
-		public abstract void RenderTargetChange();
-
-		public abstract void CutElement(bool cut, bool update = true);
 	}
 }

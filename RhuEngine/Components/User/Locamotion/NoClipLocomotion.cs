@@ -7,7 +7,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "User" })]
-	public class NoClipLocomotion : LocomotionModule
+	public sealed class NoClipLocomotion : LocomotionModule
 	{
 		[Default(1f)]
 		public readonly Sync<float> MovementSpeed;
@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public readonly Sync<bool> AllowMultiplier;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			locmotionName.Value = "No Clip";
 		}
@@ -41,10 +41,10 @@ namespace RhuEngine.Components
 			var AddToMatrix = Matrix.T(pos);
 			switch (Engine.inputManager.GetHand(isMain)) {
 				case Handed.Left:
-					ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot.Target?.leftHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
+					ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot.Target?.leftController.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
 					break;
 				case Handed.Right:
-					ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot.Target?.rightHand.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
+					ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot.Target?.rightController.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
 					break;
 				default:
 					break;
@@ -66,7 +66,7 @@ namespace RhuEngine.Components
 			if (UserRootEnity is null) {
 				return;
 			}
-			if (!RWorld.IsInVR) {
+			if (!Engine.IsInVR) {
 				ProcessHeadBased();
 			}
 			else {

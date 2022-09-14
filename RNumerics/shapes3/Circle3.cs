@@ -4,7 +4,7 @@ namespace RNumerics
 {
 	// somewhat ported from WildMagic5
 	[MessagePackObject]
-	public class Circle3d
+	public sealed class Circle3d
 	{
 		// The plane containing the circle is Dot(N,X-C) = 0, where X is any point
 		// in the plane.  Vectors U, V, and N form an orthonormal right-handed set
@@ -24,7 +24,7 @@ namespace RNumerics
 		[Key(5)]
 		public bool IsReversed;     // use ccw orientation instead of cw
 
-		public Circle3d(Vector3d center, double radius, Vector3d axis0, Vector3d axis1, Vector3d normal) {
+		public Circle3d(in Vector3d center, in double radius, in Vector3d axis0, in Vector3d axis1, in Vector3d normal) {
 			IsReversed = false;
 			Center = center;
 			Normal = normal;
@@ -32,7 +32,7 @@ namespace RNumerics
 			PlaneY = axis1;
 			Radius = radius;
 		}
-		public Circle3d(Frame3f frame, double radius, int nNormalAxis = 1) {
+		public Circle3d(in Frame3f frame, in double radius, in int nNormalAxis = 1) {
 			IsReversed = false;
 			Center = frame.Origin;
 			Normal = frame.GetAxis(nNormalAxis);
@@ -40,7 +40,7 @@ namespace RNumerics
 			PlaneY = frame.GetAxis((nNormalAxis + 2) % 3);
 			Radius = radius;
 		}
-		public Circle3d(Vector3d center, double radius) {
+		public Circle3d(in Vector3d center, in double radius) {
 			IsReversed = false;
 			Center = center;
 			Normal = Vector3d.AxisY;
@@ -57,14 +57,14 @@ namespace RNumerics
 
 
 		// angle in range [0,360] (but works for any value, obviously)
-		public Vector3d SampleDeg(double degrees) {
+		public Vector3d SampleDeg(in double degrees) {
 			var theta = degrees * MathUtil.DEG_2_RAD;
 			double c = Math.Cos(theta), s = Math.Sin(theta);
 			return Center + (c * Radius * PlaneX) + (s * Radius * PlaneY);
 		}
 
 		// angle in range [0,2pi] (but works for any value, obviously)
-		public Vector3d SampleRad(double radians) {
+		public Vector3d SampleRad(in double radians) {
 			double c = Math.Cos(radians), s = Math.Sin(radians);
 			return Center + (c * Radius * PlaneX) + (s * Radius * PlaneY);
 		}
@@ -75,7 +75,7 @@ namespace RNumerics
 		public double ParamLength => 1.0f;
 
 		// t in range[0,1] spans circle [0,2pi]
-		public Vector3d SampleT(double t) {
+		public Vector3d SampleT(in double t) {
 			var theta = IsReversed ? -t * MathUtil.TWO_PI : t * MathUtil.TWO_PI;
 			double c = Math.Cos(theta), s = Math.Sin(theta);
 			return Center + (c * Radius * PlaneX) + (s * Radius * PlaneY);
@@ -87,7 +87,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public double ArcLength => MathUtil.TWO_PI * Radius;
 
-		public Vector3d SampleArcLength(double a) {
+		public Vector3d SampleArcLength(in double a) {
 			var t = a / ArcLength;
 			var theta = IsReversed ? -t * MathUtil.TWO_PI : t * MathUtil.TWO_PI;
 			double c = Math.Cos(theta), s = Math.Sin(theta);

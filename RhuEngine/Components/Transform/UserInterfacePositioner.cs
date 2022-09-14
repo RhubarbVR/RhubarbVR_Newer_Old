@@ -8,7 +8,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Transform" })]
-	public class UserInterfacePositioner : Component,IUpdatingComponent
+	public sealed class UserInterfacePositioner : Component
 	{
 		public readonly SyncRef<User> targetUser;
 		[Default(true)]
@@ -37,18 +37,18 @@ namespace RhuEngine.Components
 
 		private Quaternionf _targetRotation = Quaternionf.Identity;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			targetUser.Target = LocalUser;
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			_activated = true;
 			_targetPosition = Entity.GlobalTrans.Translation;
 			_targetRotation = Entity.GlobalTrans.Rotation;
 		}
 
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			if (targetUser.Target == LocalUser && LocalUser.userRoot.Target != null) {
 				var HeadPos = LocalUser.userRoot.Target.head.Target.GlobalTrans.Translation;
 				var HeadRot = LocalUser.userRoot.Target.head.Target.GlobalTrans.Rotation;

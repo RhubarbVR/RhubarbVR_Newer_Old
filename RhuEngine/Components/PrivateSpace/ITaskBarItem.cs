@@ -9,7 +9,7 @@ using RNumerics;
 
 namespace RhuEngine.Components.PrivateSpace
 {
-	public class WorldTaskBarItem: ITaskBarItem {
+	public sealed class WorldTaskBarItem: ITaskBarItem {
 		public string ExtraText { get; set; }
 
 		public World target;
@@ -33,6 +33,9 @@ namespace RhuEngine.Components.PrivateSpace
 		public bool CanCloses => target != target.worldManager.LocalWorld;
 
 		public void Clicked() {
+			if (target.IsLoading) {
+				return;
+			}
 			if (target.Focus != World.FocusLevel.Focused) {
 				target.Focus = World.FocusLevel.Focused;
 			}
@@ -43,7 +46,7 @@ namespace RhuEngine.Components.PrivateSpace
 		}
 	}
 
-	public class ProgramTaskBarItem:ITaskBarItem
+	public sealed class ProgramTaskBarItem:ITaskBarItem
 	{
 		public string ExtraText { get; set; }
 
@@ -73,6 +76,9 @@ namespace RhuEngine.Components.PrivateSpace
 		public ProgramTaskBarItem(TaskBar taskBar, Type programLink) {
 			CanCloses = true;
 			if (programLink == typeof(LoginProgram)) {
+				CanCloses = false;
+			}
+			if (programLink == typeof(IsOnlineProgram)) {
 				CanCloses = false;
 			}
 			TaskBar = taskBar;

@@ -49,7 +49,7 @@ namespace RStereoKit
 	}
 
 
-	public class SKRMesh : IRMesh
+	public sealed class SKRMesh : IRMesh
 	{
 		public SKRMesh() { }
 
@@ -136,7 +136,7 @@ namespace RStereoKit
 				switch (primitiveType) {
 					case RPrimitiveType.Point:
 						if (item.Indices.Count > 0) {
-							yield return (uint)(item.Indices[0]);
+							yield return (uint)item.Indices[0];
 						}
 						break;
 					case RPrimitiveType.Line:
@@ -151,23 +151,23 @@ namespace RStereoKit
 						break;
 					case RPrimitiveType.Triangle:
 						if (item.Indices.Count == 3) {
-							yield return (uint)(item.Indices[0]);
-							yield return (uint)(item.Indices[1]);
-							yield return (uint)(item.Indices[2]);
+							yield return (uint)item.Indices[0];
+							yield return (uint)item.Indices[1];
+							yield return (uint)item.Indices[2];
 						}
 						else if (item.Indices.Count == 4) {
-							yield return (uint)(item.Indices[0]);
-							yield return (uint)(item.Indices[1]);
-							yield return (uint)(item.Indices[2]);
-							yield return (uint)(item.Indices[0]);
-							yield return (uint)(item.Indices[2]);
-							yield return (uint)(item.Indices[3]);
+							yield return (uint)item.Indices[0];
+							yield return (uint)item.Indices[1];
+							yield return (uint)item.Indices[2];
+							yield return (uint)item.Indices[0];
+							yield return (uint)item.Indices[2];
+							yield return (uint)item.Indices[3];
 						}
 						else {
 							for (var i = 1; i < (item.Indices.Count - 1); i++) {
-								yield return (uint)(item.Indices[i]);
-								yield return (uint)(item.Indices[i + 1]);
-								yield return (uint)(item.Indices[0]);
+								yield return (uint)item.Indices[i];
+								yield return (uint)item.Indices[i + 1];
+								yield return (uint)item.Indices[0];
 							}
 						}
 						break;
@@ -197,8 +197,18 @@ namespace RStereoKit
 				};
 			}
 			for (var i = 0; i < inds.Length; i++) {
-				newMeshes[i].SetVerts(vertices);
-				newMeshes[i].SetInds(inds[i]);
+				if(vertices.Length >= 1) {
+					newMeshes[i].SetVerts(vertices);
+				}
+				else {
+					newMeshes[i].SetVerts(new Vertex[] { new Vertex() });
+				}
+				if(inds[i].Length >= 3) {
+					newMeshes[i].SetInds(inds[i]);
+				}
+				else {
+					newMeshes[i].SetInds(new uint[]{ 0,0,0 });
+				}
 			}
 			Meshs = newMeshes;
 		}

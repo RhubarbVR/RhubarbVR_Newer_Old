@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace RNumerics
 {
@@ -12,15 +13,15 @@ namespace RNumerics
 	/// Uses Dictionary as sparsifying data structure, which is probably
 	/// not a good option. But it is easy.
 	/// </summary>
-	public class SymmetricSparseMatrix : IMatrix
+	public sealed class SymmetricSparseMatrix : IMatrix
 	{
 		readonly Dictionary<Index2i, double> _d = new();
 
-		public SymmetricSparseMatrix(int setN = 0) {
+		public SymmetricSparseMatrix(in int setN = 0) {
 			Rows = setN;
 		}
 
-		public SymmetricSparseMatrix(DenseMatrix m) {
+		public SymmetricSparseMatrix(in DenseMatrix m) {
 			if (m.Rows != m.Columns) {
 				throw new Exception("SymmetricSparseMatrix(DenseMatrix): Matrix is not square!");
 			}
@@ -38,13 +39,13 @@ namespace RNumerics
 		}
 
 
-		public SymmetricSparseMatrix(SymmetricSparseMatrix m) {
+		public SymmetricSparseMatrix(in SymmetricSparseMatrix m) {
 			Rows = m.Rows;
 			_d = new Dictionary<Index2i, double>(m._d);
 		}
 
 
-		public void Set(int r, int c, double value) {
+		public void Set(in int r,in int c,in double value) {
 			var v = new Index2i(Math.Min(r, c), Math.Max(r, c));
 			_d[v] = value;
 			if (r >= Rows) {
@@ -62,7 +63,7 @@ namespace RNumerics
 		public Index2i Size => new(Rows, Rows);
 
 
-		public double this[int r, int c]
+		public double this[in int r,in int c]
 		{
 			get {
 				var v = new Index2i(Math.Min(r, c), Math.Max(r, c));
@@ -72,7 +73,7 @@ namespace RNumerics
 		}
 
 
-		public void Multiply(double[] X, double[] Result) {
+		public void Multiply(in double[] X, in double[] Result) {
 			Array.Clear(Result, 0, Result.Length);
 
 			foreach (var v in _d) {
@@ -88,7 +89,7 @@ namespace RNumerics
 
 
 		// returns this*this (requires less memory)
-		public SymmetricSparseMatrix Square(bool bParallel = true) {
+		public SymmetricSparseMatrix Square(in bool bParallel = true) {
 			var R = new SymmetricSparseMatrix();
 			var M = new PackedSparseMatrix(this);
 			M.Sort();
@@ -148,12 +149,12 @@ namespace RNumerics
 
 
 
-		public SymmetricSparseMatrix Multiply(SymmetricSparseMatrix M2) {
+		public SymmetricSparseMatrix Multiply(in SymmetricSparseMatrix M2) {
 			var R = new SymmetricSparseMatrix();
 			Multiply(M2, ref R);
 			return R;
 		}
-		public void Multiply(SymmetricSparseMatrix M2, ref SymmetricSparseMatrix R, bool bParallel = true) {
+		public void Multiply(in SymmetricSparseMatrix M2, ref SymmetricSparseMatrix R, in bool bParallel = true) {
 			// testing code
 			//multiply_slow(M2, ref R);
 			//SymmetricSparseMatrix R2 = new SymmetricSparseMatrix();
@@ -168,15 +169,13 @@ namespace RNumerics
 		/// Construct packed versions of input matrices, and then use sparse row/column dot
 		/// to compute elements of output matrix. This is faster. But still relatively expensive.
 		/// </summary>
-		void Multiply_fast(SymmetricSparseMatrix M2in, ref SymmetricSparseMatrix Rin, bool bParallel) {
+		void Multiply_fast(in SymmetricSparseMatrix M2in, ref SymmetricSparseMatrix Rin,in bool bParallel) {
 			var N = Rows;
 			if (M2in.Rows != N) {
 				throw new Exception("SymmetricSparseMatrix.Multiply: matrices have incompatible dimensions");
 			}
 
-			if (Rin == null) {
-				Rin = new SymmetricSparseMatrix();
-			}
+			Rin ??= new SymmetricSparseMatrix();
 
 			var R = Rin;      // require alias for use in lambda below
 
@@ -229,7 +228,7 @@ namespace RNumerics
 		}
 
 
-		public bool EpsilonEqual(SymmetricSparseMatrix B, double eps = MathUtil.EPSILON) {
+		public bool EpsilonEqual(in SymmetricSparseMatrix B, in double eps = MathUtil.EPSILON) {
 			foreach (var val in _d) {
 				if (Math.Abs(B[val.Key.a, val.Key.b] - val.Value) > eps) {
 					return false;
@@ -249,11 +248,11 @@ namespace RNumerics
 
 
 
-	public class DiagonalMatrix
+	public sealed class DiagonalMatrix
 	{
 		public double[] D;
 
-		public DiagonalMatrix(int N) {
+		public DiagonalMatrix(in int N) {
 			D = new double[N];
 		}
 
@@ -261,7 +260,7 @@ namespace RNumerics
 			Array.Clear(D, 0, D.Length);
 		}
 
-		public void Set(int r, int c, double value) {
+		public void Set(in int r, in int c, in double value) {
 			D[r] = r == c ? value : throw new Exception("DiagonalMatrix.Set: tried to set off-diagonal entry!");
 		}
 
@@ -271,7 +270,7 @@ namespace RNumerics
 		public Index2i Size => new(D.Length, D.Length);
 
 
-		public double this[int r, int c]
+		public double this[in int r, in int c]
 		{
 			get {
 				Debug.Assert(r == c);
@@ -281,7 +280,7 @@ namespace RNumerics
 		}
 
 
-		public void Multiply(double[] X, double[] Result) {
+		public void Multiply( double[] X,  double[] Result) {
 			//Array.Clear(Result, 0, Result.Length);
 			for (var i = 0; i < X.Length; ++i) {
 				//Result[i] += d[i] * X[i];

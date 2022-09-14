@@ -7,13 +7,13 @@ using System.Diagnostics;
 namespace RNumerics
 {
 
-	public class BlockTimer
+	public sealed class BlockTimer
 	{
 		public Stopwatch Watch;
 		public string Label;
 		public TimeSpan Accumulated;
 
-		public BlockTimer(string label, bool bStart) {
+		public BlockTimer(in string label, in bool bStart) {
 			Label = label;
 			Watch = new Stopwatch();
 			if (bStart) {
@@ -30,7 +30,7 @@ namespace RNumerics
 		}
 		public bool Running => Watch.IsRunning;
 
-		public void Accumulate(bool bReset = false) {
+		public void Accumulate(in bool bReset = false) {
 			Watch.Stop();
 			Accumulated += Watch.Elapsed;
 			if (bReset) {
@@ -49,7 +49,7 @@ namespace RNumerics
 			return string.Format(TimeFormatString(Accumulated), Watch.Elapsed);
 		}
 
-		public static string TimeFormatString(TimeSpan span) {
+		public static string TimeFormatString(in TimeSpan span) {
 			return span.Minutes > 0 ? MINUTE_FORMAT : SECOND_FORMAT;
 		}
 		const string MINUTE_FORMAT = "{0:mm}:{0:ss}.{0:fffffff}";
@@ -58,12 +58,12 @@ namespace RNumerics
 
 
 
-	public class LocalProfiler : IDisposable
+	public sealed class LocalProfiler : IDisposable
 	{
 		readonly Dictionary<string, BlockTimer> _timers = new();
 		readonly List<string> _order = new();
 
-		public BlockTimer Start(string label) {
+		public BlockTimer Start(in string label) {
 			if (_timers.ContainsKey(label)) {
 				_timers[label].Reset();
 			}
@@ -75,17 +75,17 @@ namespace RNumerics
 		}
 
 
-		public BlockTimer StopAllAndStartNew(string label) {
+		public BlockTimer StopAllAndStartNew(in string label) {
 			StopAll();
 			return Start(label);
 		}
 
-		public BlockTimer Get(string label) {
+		public BlockTimer Get(in string label) {
 			return _timers[label];
 		}
 
 
-		public void Stop(string label) {
+		public void Stop(in string label) {
 			_timers[label].Stop();
 		}
 
@@ -98,15 +98,15 @@ namespace RNumerics
 		}
 
 
-		public void StopAndAccumulate(string label, bool bReset = false) {
+		public void StopAndAccumulate(in string label, in bool bReset = false) {
 			_timers[label].Accumulate(bReset);
 		}
 
-		public void Reset(string label) {
+		public void Reset(in string label) {
 			_timers[label].Reset();
 		}
 
-		public void ResetAccumulated(string label) {
+		public void ResetAccumulated(in string label) {
 			_timers[label].Accumulated = TimeSpan.Zero;
 		}
 
@@ -116,22 +116,22 @@ namespace RNumerics
 			}
 		}
 
-		public void DivideAllAccumulated(int div) {
+		public void DivideAllAccumulated(in int div) {
 			foreach (var t in _timers.Values) {
 				t.Accumulated = new TimeSpan(t.Accumulated.Ticks / div);
 			}
 		}
 
 
-		public string Elapsed(string label) {
+		public string Elapsed(in string label) {
 			return _timers[label].ToString();
 		}
-		public string Accumulated(string label) {
+		public string Accumulated(in string label) {
 			var accum = _timers[label].Accumulated;
 			return string.Format(BlockTimer.TimeFormatString(accum), accum);
 		}
 
-		public string AllTicks(string prefix = "Times:") {
+		public string AllTicks(in string prefix = "Times:") {
 			var b = new StringBuilder();
 			b.Append(prefix + " ");
 			foreach (var label in _order) {
@@ -140,7 +140,7 @@ namespace RNumerics
 			return b.ToString();
 		}
 
-		public string AllAccumulatedTicks(string prefix = "Times:") {
+		public string AllAccumulatedTicks(in string prefix = "Times:") {
 			var b = new StringBuilder();
 			b.Append(prefix + " ");
 			foreach (var label in _order) {
@@ -151,7 +151,7 @@ namespace RNumerics
 
 
 
-		public string AllTimes(string prefix = "Times:", string separator = " ") {
+		public string AllTimes(in string prefix = "Times:", in string separator = " ") {
 			var b = new StringBuilder();
 			b.Append(prefix + " ");
 			foreach (var label in _order) {
@@ -161,7 +161,7 @@ namespace RNumerics
 			return b.ToString();
 		}
 
-		public string AllAccumulatedTimes(string prefix = "Times:", string separator = " ") {
+		public string AllAccumulatedTimes(in string prefix = "Times:", in string separator = " ") {
 			var b = new StringBuilder();
 			b.Append(prefix + " ");
 			foreach (var label in _order) {

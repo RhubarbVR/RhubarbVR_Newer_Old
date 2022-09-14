@@ -32,7 +32,7 @@ namespace RNumerics
 			var len3 = len * len * len;
 			var fourPi_len3 = 1.0 / (MathUtil.FOUR_PI * len3);
 
-			var order1 = fourPi_len3 * order1Coeff.Dot(ref dpq);
+			var order1 = fourPi_len3 * order1Coeff.Dot(dpq);
 
 			// second-order hessian \grad^2(G)
 			var c = -3.0 / (MathUtil.FOUR_PI * len3 * len * len);
@@ -45,7 +45,7 @@ namespace RNumerics
 				c * dpq.y * dpq.x, fourPi_len3 + (c * dpq.y * dpq.y), c * dpq.y * dpq.z,
 				c * dpq.z * dpq.x, c * dpq.z * dpq.y, fourPi_len3 + (c * dpq.z * dpq.z));
 
-			var order2 = order2Coeff.InnerProduct(ref hessian);
+			var order2 = order2Coeff.InnerProduct( hessian);
 
 			return order1 + order2;
 		}
@@ -80,7 +80,7 @@ namespace RNumerics
 			var order1 = xA / MathUtil.FOUR_PI * xn.Dot(dpq / len3);
 
 			// second-order hessian \grad^2(G)
-			var xqxq = new Matrix3d(ref dpq, ref dpq);
+			var xqxq = new Matrix3d( dpq,  dpq);
 			xqxq *= 3.0 / (MathUtil.FOUR_PI * len3 * len * len);
 			var diag = 1 / (MathUtil.FOUR_PI * len3);
 			var hessian = new Matrix3d(diag, diag, diag) - xqxq;
@@ -89,8 +89,8 @@ namespace RNumerics
 			var centroid = new Vector3d(
 				(t.V0.x + t.V1.x + t.V2.x) / 3.0, (t.V0.y + t.V1.y + t.V2.y) / 3.0, (t.V0.z + t.V1.z + t.V2.z) / 3.0);
 			var dcp = centroid - p;
-			var o2_lhs = new Matrix3d(ref dcp, ref xn);
-			var order2 = xA * o2_lhs.InnerProduct(ref hessian);
+			var o2_lhs = new Matrix3d( dcp,  xn);
+			var order2 = xA * o2_lhs.InnerProduct( hessian);
 
 			return order1 + order2;
 		}
@@ -113,7 +113,7 @@ namespace RNumerics
 		/// order2: second-order matrix coeff
 		/// </summary>
 		public static void ComputeCoeffs(
-			IPointSet pointSet, IEnumerable<int> points, double[] pointAreas,
+			in IPointSet pointSet, in IEnumerable<int> points, in double[] pointAreas,
 			ref Vector3d p, ref double r,
 			ref Vector3d order1, ref Matrix3d order2) {
 			if (pointSet.HasVertexNormals == false) {
@@ -143,7 +143,7 @@ namespace RNumerics
 				order1 += a_i * n_i;
 
 				var dcp = p_i - p;
-				order2 += a_i * new Matrix3d(ref dcp, ref n_i);
+				order2 += a_i * new Matrix3d( dcp,  n_i);
 
 				// this is just for return value...
 				r = Math.Max(r, p_i.Distance(p));
@@ -172,7 +172,7 @@ namespace RNumerics
 			var len3 = len * len * len;
 			var fourPi_len3 = 1.0 / (MathUtil.FOUR_PI * len3);
 
-			var order1 = fourPi_len3 * order1Coeff.Dot(ref dpq);
+			var order1 = fourPi_len3 * order1Coeff.Dot(dpq);
 
 			// second-order hessian \grad^2(G)
 			var c = -3.0 / (MathUtil.FOUR_PI * len3 * len * len);
@@ -185,14 +185,14 @@ namespace RNumerics
 				c * dpq.y * dpq.x, fourPi_len3 + (c * dpq.y * dpq.y), c * dpq.y * dpq.z,
 				c * dpq.z * dpq.x, c * dpq.z * dpq.y, fourPi_len3 + (c * dpq.z * dpq.z));
 
-			var order2 = order2Coeff.InnerProduct(ref hessian);
+			var order2 = order2Coeff.InnerProduct( hessian);
 
 			return order1 + order2;
 		}
 
 
 
-		public static double ExactEval(ref Vector3d x, ref Vector3d xn, double xA, ref Vector3d q) {
+		public static double ExactEval(ref Vector3d x, ref Vector3d xn, in double xA, ref Vector3d q) {
 			var dv = x - q;
 			var len = dv.Length;
 			return xA / MathUtil.FOUR_PI * xn.Dot(dv / (len * len * len));
@@ -200,7 +200,7 @@ namespace RNumerics
 
 		// point-winding-number first-order approximation. 
 		// x is dipole point, p is 'center' of cluster of dipoles, q is evaluation point
-		public static double Order1Approx(ref Vector3d p, ref Vector3d xn, double xA, ref Vector3d q) {
+		public static double Order1Approx(ref Vector3d p, ref Vector3d xn, in double xA, ref Vector3d q) {
 			var dpq = p - q;
 			var len = dpq.Length;
 			var len3 = len * len * len;
@@ -211,7 +211,7 @@ namespace RNumerics
 
 		// point-winding-number second-order approximation
 		// x is dipole point, p is 'center' of cluster of dipoles, q is evaluation point
-		public static double Order2Approx(ref Vector3d x, ref Vector3d p, ref Vector3d xn, double xA, ref Vector3d q) {
+		public static double Order2Approx(ref Vector3d x, ref Vector3d p, ref Vector3d xn, in double xA, ref Vector3d q) {
 			var dpq = p - q;
 			var dxp = x - p;
 
@@ -222,14 +222,14 @@ namespace RNumerics
 			var order1 = xA / MathUtil.FOUR_PI * xn.Dot(dpq / len3);
 
 			// second-order hessian \grad^2(G)
-			var xqxq = new Matrix3d(ref dpq, ref dpq);
+			var xqxq = new Matrix3d( dpq,  dpq);
 			xqxq *= 3.0 / (MathUtil.FOUR_PI * len3 * len * len);
 			var diag = 1 / (MathUtil.FOUR_PI * len3);
 			var hessian = new Matrix3d(diag, diag, diag) - xqxq;
 
 			// second-order LHS area * \outer(x-p, normal)
-			var o2_lhs = new Matrix3d(ref dxp, ref xn);
-			var order2 = xA * o2_lhs.InnerProduct(ref hessian);
+			var o2_lhs = new Matrix3d( dxp,  xn);
+			var order2 = xA * o2_lhs.InnerProduct( hessian);
 
 			return order1 + order2;
 		}

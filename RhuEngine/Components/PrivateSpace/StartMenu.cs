@@ -19,8 +19,7 @@ using System.Reflection;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	[UpdateLevel(UpdateEnum.Normal)]
-	public class StartMenu : Component
+	public sealed class StartMenu : Component
 	{
 		[NoLoad]
 		[NoSave]
@@ -40,7 +39,7 @@ namespace RhuEngine.Components
 			if (!buttonEvent.IsClicked) {
 				return;
 			}
-			Engine.EngineLink.ChangeVR(!RWorld.IsInVR);
+			Engine.EngineLink.ChangeVR(!Engine.IsInVR);
 		}
 
 		[Exposed]
@@ -73,8 +72,9 @@ namespace RhuEngine.Components
 			var buttonColor = new Colorf(0.1f, 0.8f);
 			var scroller = uibuilder.AttachComponentToStack<UIScrollInteraction>();
 			uibuilder.AttachChildRect<CuttingUIRect>(new Vector2f(0), new Vector2f(0.5f, 1), 0);
+			var itemScroller = uibuilder.AttachChildRect<BasicScrollRect>(null, null, 0);
 			var itemslist = uibuilder.AttachChildRect<VerticalList>(null, null, 0);
-			scroller.OnScroll.Target = itemslist.Scroll;
+			scroller.OnScroll.Target = itemScroller.Scroll;
 			var programs =
 						 from assem in AppDomain.CurrentDomain.GetAssemblies().AsParallel()
 						 from t in assem.GetTypes().AsParallel()
@@ -114,6 +114,8 @@ namespace RhuEngine.Components
 			uibuilder.PopRect();
 
 			uibuilder.PopRect();
+			uibuilder.PopRect();
+
 			var list = uibuilder.AttachChildRect<VerticalList>(new Vector2f(0.5f, 0), new Vector2f(1), 0);
 			list.Fit.Value = true;
 
@@ -174,7 +176,7 @@ namespace RhuEngine.Components
 				var vrText = uibuilder.AddTextWithLocal("Actions.ChangeVR.Enable", 1.9f, 1);
 				Action<bool> action = (mode) => vrText.Key.Value = mode ? "Actions.ChangeVR.Disable" : "Actions.ChangeVR.Enable";
 				Engine.EngineLink.VRChange += action;
-				action.Invoke(RWorld.IsInVR);
+				action.Invoke(Engine.IsInVR);
 				uibuilder.PopRect();
 				uibuilder.PopRect();
 				uibuilder.PopRect();
@@ -201,7 +203,7 @@ namespace RhuEngine.Components
 			uibuilder.PopRect();
 			void OnLogin(bool login) {
 				if (login) {
-					text.Text.Value = Engine.netApiManager.User.UserName;
+					text.Text.Value = Engine.netApiManager.Client.User?.UserName;
 					imgasset.url.Value = "https://cataas.com/cat";
 				}
 				else {
@@ -209,18 +211,15 @@ namespace RhuEngine.Components
 					imgasset.url.Value = "https://cataas.com/cat";
 				}
 			};
-			Engine.netApiManager.OnLoginAndLoggout += OnLogin;
-			OnLogin(Engine.netApiManager.IsLoggedIn);
+			Engine.netApiManager.Client.OnLogin += (use) => OnLogin(true);
+			Engine.netApiManager.Client.OnLogout += () => OnLogin(false);
+			OnLogin(Engine.netApiManager.Client.IsLogin);
 			uibuilder.PopRect();
 			uibuilder.PopRect();
 			uibuilder.PopRect();
 			uibuilder.PopRect();
 
 			uibuilder.PopRect();
-		}
-
-
-		public override void Step() {
 		}
 
 	}

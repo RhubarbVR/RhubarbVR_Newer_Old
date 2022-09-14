@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 {
 	[Category("Transform/IK")]
 	[UpdateLevel(UpdateEnum.Movement)]
-	public class IKBone : Component
+	public sealed class IKBone : Component
 	{
 		[OnChanged(nameof(ReloadBone))]
 		public readonly Sync<Vector3f> StartingPosistion;
@@ -22,7 +22,7 @@ namespace RhuEngine.Components
 		public readonly Linker<Vector3f> EntityPosistion;
 		public readonly Linker<Quaternionf> EntityRotation;
 
-		public override void Step() {
+		protected override void Step() {
 			base.Step();
 			if(LoadedBone is null) {
 				return;
@@ -91,7 +91,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			ReloadBone();
 		}

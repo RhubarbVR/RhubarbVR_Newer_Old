@@ -110,7 +110,7 @@ namespace RhuEngine.DataStructure
 	}
 
 	[MessagePackObject]
-	public class DataNodeHolder
+	public sealed class DataNodeHolder
 	{
 		[Key(0)]
 		public int index;
@@ -119,14 +119,14 @@ namespace RhuEngine.DataStructure
 	}
 
 	[MessagePackObject]
-	public class BlockStore
+	public sealed class BlockStore
 	{
 		[Key(0)]
 		public List<DataNodeHolder> dataNodes = new();
 	}
 
 
-	public class DataReader
+	public sealed class DataReader
 	{
 		public BlockStore Store = new();
 		public DataReader(byte[] data) {

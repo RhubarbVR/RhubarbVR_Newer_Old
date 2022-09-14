@@ -14,13 +14,19 @@ namespace RNumerics
 		[Key(2)]
 		public int c;
 
-		public Index3i(int z) { a = b = c = z; }
-		public Index3i(int ii, int jj, int kk) { a = ii; b = jj; c = kk; }
-		public Index3i(int[] i2) { a = i2[0]; b = i2[1]; c = i2[2]; }
-		public Index3i(Index3i copy) { a = copy.a; b = copy.b; c = copy.b; }
+		public Index3i() {
+			a = 0;
+			b = 0;
+			c = 0;
+		}
+
+		public Index3i(in int z) { a = b = c = z; }
+		public Index3i(in int ii, in int jj, in int kk) { a = ii; b = jj; c = kk; }
+		public Index3i(in int[] i2) { a = i2[0]; b = i2[1]; c = i2[2]; }
+		public Index3i(in Index3i copy) { a = copy.a; b = copy.b; c = copy.b; }
 
 		// reverse last two indices if cycle is true (useful for cw/ccw codes)
-		public Index3i(int ii, int jj, int kk, bool cycle) {
+		public Index3i(in int ii, in int jj, in int kk, in bool cycle) {
 			a = ii;
 			if (cycle) { b = kk; c = jj; }
 			else { b = jj; c = kk; }
@@ -37,7 +43,7 @@ namespace RNumerics
 
 
 		[IgnoreMember]
-		public int this[int key]
+		public int this[in int key]
 		{
 			get => (key == 0) ? a : (key == 1) ? b : c;
 			set {
@@ -59,38 +65,38 @@ namespace RNumerics
 		public int Length => (int)Math.Sqrt(LengthSquared);
 
 
-		public void Set(Index3i o) {
+		public void Set(in Index3i o) {
 			a = o[0];
 			b = o[1];
 			c = o[2];
 		}
-		public void Set(int ii, int jj, int kk) {
+		public void Set(in int ii, in int jj, in int kk) {
 			a = ii;
 			b = jj;
 			c = kk;
 		}
 
 
-		public static Index3i operator -(Index3i v) => new(-v.a, -v.b, -v.c);
+		public static Index3i operator -(in Index3i v) => new(-v.a, -v.b, -v.c);
 
-		public static Index3i operator *(int f, Index3i v) => new(f * v.a, f * v.b, f * v.c);
-		public static Index3i operator *(Index3i v, int f) => new(f * v.a, f * v.b, f * v.c);
-		public static Index3i operator /(Index3i v, int f) => new(v.a / f, v.b / f, v.c / f);
-
-
-		public static Index3i operator *(Index3i a, Index3i b) => new(a.a * b.a, a.b * b.b, a.c * b.c);
-		public static Index3i operator /(Index3i a, Index3i b) => new(a.a / b.a, a.b / b.b, a.c / b.c);
+		public static Index3i operator *(in int f, in Index3i v) => new(f * v.a, f * v.b, f * v.c);
+		public static Index3i operator *(in Index3i v, in int f) => new(f * v.a, f * v.b, f * v.c);
+		public static Index3i operator /(in Index3i v, in int f) => new(v.a / f, v.b / f, v.c / f);
 
 
-		public static Index3i operator +(Index3i v0, Index3i v1) => new(v0.a + v1.a, v0.b + v1.b, v0.c + v1.c);
-		public static Index3i operator +(Index3i v0, int f) => new(v0.a + f, v0.b + f, v0.c + f);
-
-		public static Index3i operator -(Index3i v0, Index3i v1) => new(v0.a - v1.a, v0.b - v1.b, v0.c - v1.c);
-		public static Index3i operator -(Index3i v0, int f) => new(v0.a - f, v0.b - f, v0.c - f);
+		public static Index3i operator *(in Index3i a, in Index3i b) => new(a.a * b.a, a.b * b.b, a.c * b.c);
+		public static Index3i operator /(in Index3i a, in Index3i b) => new(a.a / b.a, a.b / b.b, a.c / b.c);
 
 
-		public static bool operator ==(Index3i a, Index3i b) => a.a == b.a && a.b == b.b && a.c == b.c;
-		public static bool operator !=(Index3i a, Index3i b) => a.a != b.a || a.b != b.b || a.c != b.c;
+		public static Index3i operator +(in Index3i v0, in Index3i v1) => new(v0.a + v1.a, v0.b + v1.b, v0.c + v1.c);
+		public static Index3i operator +(in Index3i v0, in int f) => new(v0.a + f, v0.b + f, v0.c + f);
+
+		public static Index3i operator -(in Index3i v0, in Index3i v1) => new(v0.a - v1.a, v0.b - v1.b, v0.c - v1.c);
+		public static Index3i operator -(in Index3i v0, in int f) => new(v0.a - f, v0.b - f, v0.c - f);
+
+
+		public static bool operator ==(in Index3i a, in Index3i b) => a.a == b.a && a.b == b.b && a.c == b.c;
+		public static bool operator !=(in Index3i a, in Index3i b) => a.a != b.a || a.b != b.b || a.c != b.c;
 		public override bool Equals(object obj) {
 			return this == (Index3i)obj;
 		}
@@ -146,11 +152,14 @@ namespace RNumerics
 		public int a;
 		[Key(1)]
 		public int b;
-
-		public Index2i(int z) { a = b = z; }
-		public Index2i(int ii, int jj) { a = ii; b = jj; }
-		public Index2i(int[] i2) { a = i2[0]; b = i2[1]; }
-		public Index2i(Index2i copy) { a = copy.a; b = copy.b; }
+		public Index2i() {
+			a = 0;
+			b = 0;
+		}
+		public Index2i(in int z) { a = b = z; }
+		public Index2i(in int ii, in int jj) { a = ii; b = jj; }
+		public Index2i(in int[] i2) { a = i2[0]; b = i2[1]; }
+		public Index2i(in Index2i copy) { a = copy.a; b = copy.b; }
 		[IgnoreMember]
 		static public readonly Index2i Zero = new(0, 0);
 		[IgnoreMember]
@@ -161,7 +170,7 @@ namespace RNumerics
 		static public readonly Index2i Min = new(int.MinValue, int.MinValue);
 
 		[IgnoreMember]
-		public int this[int key]
+		public int this[in int key]
 		{
 			get => (key == 0) ? a : b;
 			set {
@@ -180,37 +189,37 @@ namespace RNumerics
 		public int Length => (int)Math.Sqrt(LengthSquared);
 
 
-		public void Set(Index2i o) {
+		public void Set(in Index2i o) {
 			a = o[0];
 			b = o[1];
 		}
-		public void Set(int ii, int jj) {
+		public void Set(in int ii, in int jj) {
 			a = ii;
 			b = jj;
 		}
 
 
-		public static Index2i operator -(Index2i v) => new(-v.a, -v.b);
+		public static Index2i operator -(in Index2i v) => new(-v.a, -v.b);
 
-		public static Index2i operator *(int f, Index2i v) => new(f * v.a, f * v.b);
-		public static Index2i operator *(Index2i v, int f) => new(f * v.a, f * v.b);
-		public static Index2i operator /(Index2i v, int f) => new(v.a / f, v.b / f);
-
-
-		public static Index2i operator *(Index2i a, Index2i b) => new(a.a * b.a, a.b * b.b);
-		public static Index2i operator /(Index2i a, Index2i b) => new(a.a / b.a, a.b / b.b);
+		public static Index2i operator *(in int f, in Index2i v) => new(f * v.a, f * v.b);
+		public static Index2i operator *(in Index2i v, in int f) => new(f * v.a, f * v.b);
+		public static Index2i operator /(in Index2i v, in int f) => new(v.a / f, v.b / f);
 
 
-		public static Index2i operator +(Index2i v0, Index2i v1) => new(v0.a + v1.a, v0.b + v1.b);
-		public static Index2i operator +(Index2i v0, int f) => new(v0.a + f, v0.b + f);
-
-		public static Index2i operator -(Index2i v0, Index2i v1) => new(v0.a - v1.a, v0.b - v1.b);
-
-		public static Index2i operator -(Index2i v0, int f) => new(v0.a - f, v0.b - f);
+		public static Index2i operator *(in Index2i a, in Index2i b) => new(a.a * b.a, a.b * b.b);
+		public static Index2i operator /(in Index2i a, in Index2i b) => new(a.a / b.a, a.b / b.b);
 
 
-		public static bool operator ==(Index2i a, Index2i b) => a.a == b.a && a.b == b.b;
-		public static bool operator !=(Index2i a, Index2i b) => a.a != b.a || a.b != b.b;
+		public static Index2i operator +(in Index2i v0, in Index2i v1) => new(v0.a + v1.a, v0.b + v1.b);
+		public static Index2i operator +(in Index2i v0, in int f) => new(v0.a + f, v0.b + f);
+
+		public static Index2i operator -(in Index2i v0, in Index2i v1) => new(v0.a - v1.a, v0.b - v1.b);
+
+		public static Index2i operator -(in Index2i v0, in int f) => new(v0.a - f, v0.b - f);
+
+
+		public static bool operator ==(in Index2i a, in Index2i b) => a.a == b.a && a.b == b.b;
+		public static bool operator !=(in Index2i a, in Index2i b) => a.a != b.a || a.b != b.b;
 		public override bool Equals(object obj) {
 			return this == (Index2i)obj;
 		}
@@ -266,11 +275,16 @@ namespace RNumerics
 		public int c;
 		[Key(3)]
 		public int d;
-
-		public Index4i(int z) { a = b = c = d = z; }
-		public Index4i(int aa, int bb, int cc, int dd) { a = aa; b = bb; c = cc; d = dd; }
-		public Index4i(int[] i2) { a = i2[0]; b = i2[1]; c = i2[2]; d = i2[3]; }
-		public Index4i(Index4i copy) { a = copy.a; b = copy.b; c = copy.b; d = copy.d; }
+		public Index4i() {
+			a = 0;
+			b = 0;
+			c = 0;
+			d = 0;
+		}
+		public Index4i(in int z) { a = b = c = d = z; }
+		public Index4i(in int aa, in int bb, in int cc, in int dd) { a = aa; b = bb; c = cc; d = dd; }
+		public Index4i(in int[] i2) { a = i2[0]; b = i2[1]; c = i2[2]; d = i2[3]; }
+		public Index4i(in Index4i copy) { a = copy.a; b = copy.b; c = copy.b; d = copy.d; }
 
 		[IgnoreMember]
 		static public readonly Index4i Zero = new(0, 0, 0, 0);
@@ -281,7 +295,7 @@ namespace RNumerics
 
 
 		[IgnoreMember]
-		public int this[int key]
+		public int this[in int key]
 		{
 			get => (key == 0) ? a : (key == 1) ? b : (key == 2) ? c : d;
 			set {
@@ -304,13 +318,13 @@ namespace RNumerics
 		public int Length => (int)Math.Sqrt(LengthSquared);
 
 
-		public void Set(Index4i o) {
+		public void Set(in Index4i o) {
 			a = o[0];
 			b = o[1];
 			c = o[2];
 			d = o[3];
 		}
-		public void Set(int aa, int bb, int cc, int dd) {
+		public void Set(in int aa, in int bb, in int cc, in int dd) {
 			a = aa;
 			b = bb;
 			c = cc;
@@ -318,7 +332,7 @@ namespace RNumerics
 		}
 
 
-		public bool Contains(int val) {
+		public bool Contains(in int val) {
 			return a == val || b == val || c == val || d == val;
 		}
 
@@ -334,26 +348,26 @@ namespace RNumerics
 		}
 
 
-		public static Index4i operator -(Index4i v) => new(-v.a, -v.b, -v.c, -v.d);
+		public static Index4i operator -(in Index4i v) => new(-v.a, -v.b, -v.c, -v.d);
 
-		public static Index4i operator *(int f, Index4i v) => new(f * v.a, f * v.b, f * v.c, f * v.d);
-		public static Index4i operator *(Index4i v, int f) => new(f * v.a, f * v.b, f * v.c, f * v.d);
-		public static Index4i operator /(Index4i v, int f) => new(v.a / f, v.b / f, v.c / f, v.d / f);
-
-
-		public static Index4i operator *(Index4i a, Index4i b) => new(a.a * b.a, a.b * b.b, a.c * b.c, a.d * b.d);
-		public static Index4i operator /(Index4i a, Index4i b) => new(a.a / b.a, a.b / b.b, a.c / b.c, a.d / b.d);
+		public static Index4i operator *(in int f, in Index4i v) => new(f * v.a, f * v.b, f * v.c, f * v.d);
+		public static Index4i operator *(in Index4i v, in int f) => new(f * v.a, f * v.b, f * v.c, f * v.d);
+		public static Index4i operator /(in Index4i v, in int f) => new(v.a / f, v.b / f, v.c / f, v.d / f);
 
 
-		public static Index4i operator +(Index4i v0, Index4i v1) => new(v0.a + v1.a, v0.b + v1.b, v0.c + v1.c, v0.d + v1.d);
-		public static Index4i operator +(Index4i v0, int f) => new(v0.a + f, v0.b + f, v0.c + f, v0.d + f);
-
-		public static Index4i operator -(Index4i v0, Index4i v1) => new(v0.a - v1.a, v0.b - v1.b, v0.c - v1.c, v0.d - v1.d);
-		public static Index4i operator -(Index4i v0, int f) => new(v0.a - f, v0.b - f, v0.c - f, v0.d - f);
+		public static Index4i operator *(in Index4i a, in Index4i b) => new(a.a * b.a, a.b * b.b, a.c * b.c, a.d * b.d);
+		public static Index4i operator /(in Index4i a, in Index4i b) => new(a.a / b.a, a.b / b.b, a.c / b.c, a.d / b.d);
 
 
-		public static bool operator ==(Index4i a, Index4i b) => a.a == b.a && a.b == b.b && a.c == b.c && a.d == b.d;
-		public static bool operator !=(Index4i a, Index4i b) => a.a != b.a || a.b != b.b || a.c != b.c || a.d != b.d;
+		public static Index4i operator +(in Index4i v0, in Index4i v1) => new(v0.a + v1.a, v0.b + v1.b, v0.c + v1.c, v0.d + v1.d);
+		public static Index4i operator +(in Index4i v0, in int f) => new(v0.a + f, v0.b + f, v0.c + f, v0.d + f);
+
+		public static Index4i operator -(in Index4i v0, in Index4i v1) => new(v0.a - v1.a, v0.b - v1.b, v0.c - v1.c, v0.d - v1.d);
+		public static Index4i operator -(in Index4i v0, in int f) => new(v0.a - f, v0.b - f, v0.c - f, v0.d - f);
+
+
+		public static bool operator ==(in Index4i a, in Index4i b) => a.a == b.a && a.b == b.b && a.c == b.c && a.d == b.d;
+		public static bool operator !=(in Index4i a, in Index4i b) => a.a != b.a || a.b != b.b || a.c != b.c || a.d != b.d;
 		public override bool Equals(object obj) {
 			return this == (Index4i)obj;
 		}
@@ -369,7 +383,7 @@ namespace RNumerics
 				return hash;
 			}
 		}
-		public int CompareTo(Index4i other) {
+		public int CompareTo(in Index4i other) {
 			if (a != other.a) {
 				return a < other.a ? -1 : 1;
 			}
@@ -385,7 +399,7 @@ namespace RNumerics
 
 			return 0;
 		}
-		public bool Equals(Index4i other) {
+		public bool Equals(in Index4i other) {
 			return a == other.a && b == other.b && c == other.c && d == other.d;
 		}
 

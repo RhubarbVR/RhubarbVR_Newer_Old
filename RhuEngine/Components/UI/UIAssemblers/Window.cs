@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/UIAssemblers" })]
-	public class Window : Component
+	public sealed class Window : Component
 	{
 		[OnChanged(nameof(ChangeHeader))]
 		[Default(1f)]
@@ -89,7 +89,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			var icons = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
 			var sprite = IconSprite.Target = World.RootEntity.GetFirstComponentOrAttach<SpriteProvder>();

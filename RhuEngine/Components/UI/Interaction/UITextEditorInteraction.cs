@@ -29,7 +29,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "UI/Interaction" })]
-	public class UIGroupTextEditorInteraction : AbstractTextEditorInteraction
+	public sealed class UIGroupTextEditorInteraction : AbstractTextEditorInteraction
 	{
 		public override bool CurrentEditor { get; set; }
 
@@ -141,15 +141,21 @@ namespace RhuEngine.Components
 
 		public abstract int RenderCurrsorLength { get; set; }
 
-		public Matrix WorldPos =>  Rect.WorldPos;
+		public Matrix WorldPos => Matrix.Identity;//Todo: change to rect pos Rect.WorldPos;
 
 		public abstract void KeyboardBind();
 
 		public abstract void KeyboardUnBind();
+
+		protected override void OnLoaded() {
+			base.OnLoaded();
+			KeyboardUnBind();
+		}
+
 		[Exposed]
 		public abstract void EditingClick();
 
-		public override void Step() {
+		protected override void Step() {
 			if (!Value.Linked) {
 				return;
 			}

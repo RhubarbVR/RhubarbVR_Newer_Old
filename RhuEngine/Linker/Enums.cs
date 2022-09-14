@@ -237,49 +237,6 @@ namespace RhuEngine.Linker
 		None,
 	}
 
-	/// <summary>Depth test describes how this material looks at and responds
-	/// to depth information in the zbuffer! The default is Less, which means
-	/// if the material pixel's depth is Less than the existing depth data,
-	/// (basically, is this in front of some other object) it will draw that
-	/// pixel. Similarly, Greater would only draw the material if it's
-	/// 'behind' the depth buffer. Always would just draw all the time, and
-	/// not read from the depth buffer at all.</summary>
-	public enum DepthTest
-	{
-		/// <summary>Default behavior, pixels behind the depth buffer will be
-		/// discarded, and pixels in front of it will be drawn.</summary>
-		Less = 0,
-		/// <summary>Pixels behind the depth buffer will be discarded, and
-		/// pixels in front of, or at the depth buffer's value it will be
-		/// drawn. This could be great for things that might be sitting
-		/// exactly on a floor or wall.</summary>
-		LessOrEq,
-		/// <summary>Pixels in front of the zbuffer will be discarded! This
-		/// is opposite of how things normally work. Great for drawing
-		/// indicators that something is occluded by a wall or other
-		/// geometry.</summary>
-		Greater,
-		/// <summary>Pixels in front of (or exactly at) the zbuffer will be
-		/// discarded! This is opposite of how things normally work. Great
-		/// for drawing indicators that something is occluded by a wall or
-		/// other geometry.</summary>
-		GreaterOrEq,
-		/// <summary>Only draw pixels if they're at exactly the same depth as
-		/// the zbuffer!</summary>
-		Equal,
-		/// <summary>Draw any pixel that's not exactly at the value in the
-		/// zbuffer.</summary>
-		NotEqual,
-		/// <summary>Don't look at the zbuffer at all, just draw everything,
-		/// always, all the time! At this poit, the order at which the mesh
-		/// gets drawn will be  super important, so don't forget about
-		/// `Material.QueueOffset`!</summary>
-		Always,
-		/// <summary>Never draw a pixel, regardless of what's in the zbuffer.
-		/// I can think of better ways to do this, but uhh, this is here for
-		/// completeness! Maybe you can find a use for it.</summary>
-		Never,
-	}
 
 	/// <summary>TODO: v0.4 This may need significant revision?
 	/// What type of data does this material parameter need? This is
@@ -319,11 +276,10 @@ namespace RhuEngine.Linker
 		UInt3 = 14,
 		/// <summary>A 4 component vector composed of unsigned integers.</summary>
 		UInt4 = 15,
-		DepthTest = 16,
-		Cull = 17,
-		Transparency = 18,
-		TexAddress = 19,
-		TexSample = 20,
+		Cull = 16,
+		Transparency = 17,
+		TexAddress = 18,
+		TexSample = 19,
 	}
 
 

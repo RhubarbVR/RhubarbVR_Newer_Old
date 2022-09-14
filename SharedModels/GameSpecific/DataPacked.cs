@@ -8,7 +8,7 @@ using MessagePack.Formatters;
 namespace SharedModels.GameSpecific
 {
 	[Formatter]
-	public class DataPackedFormatter : IMessagePackFormatter<DataPacked>
+	public sealed class DataPackedFormatter : IMessagePackFormatter<DataPacked>
 	{
 		public void Serialize(ref MessagePackWriter writer, DataPacked value, MessagePackSerializerOptions options) {
 			options.Resolver.GetFormatterWithVerify<(byte[],ushort)>().Serialize(ref writer, (value.Data,value.Id), options);

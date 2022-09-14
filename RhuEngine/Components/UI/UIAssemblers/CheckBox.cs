@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/UIAssemblers" })]
-	public class CheckBox : Component
+	public sealed class CheckBox : Component
 	{
 		[OnChanged(nameof(OpenChange))]
 		public readonly Linker<Vector2i> Minicon;
@@ -23,7 +23,9 @@ namespace RhuEngine.Components
 
 		[OnChanged(nameof(OpenChange))]
 		public readonly Sync<bool> Open;
-		
+
+		public readonly SyncDelegate<Action<bool>> StateChange;
+
 		public void OpenChange() {
 			if (Minicon.Linked) {
 				Minicon.LinkedValue = Open.Value ? MinOpen.Value : MinClose.Value;
@@ -39,6 +41,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			Open.Value = !Open.Value;
+			StateChange.Target?.Invoke(Open.Value);
 		}
 	}
 }

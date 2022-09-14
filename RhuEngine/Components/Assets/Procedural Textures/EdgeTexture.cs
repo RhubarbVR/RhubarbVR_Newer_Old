@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 
 using RhuEngine.WorldObjects;
+using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 
 namespace RhuEngine.Components
 {
-	public class EdgeTexture : ProceduralTexture
+	[Category(new string[] { "Assets/Procedural Textures" })]
+	public sealed class EdgeTexture : ProceduralTexture
 	{
 		[Default(1)]
 		[OnChanged(nameof(ComputeTexture))]
@@ -20,7 +22,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ComputeTexture))]
 		public readonly Sync<Colorf> InnerColor;
 
-		public override void Generate() {
+		protected override void Generate() {
 
 			if (EdgeWidth.Value * 2 >= Size.Value.x || EdgeWidth.Value * 2 >= Size.Value.y) {
 				throw new Exception($"Edge width {EdgeWidth.Value} cannot be larger than texture size {Size.Value.x}x {Size.Value.y}y.");

@@ -12,7 +12,7 @@ using SixLabors.ImageSharp.Processing;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Textures" })]
-	public class VoronoiTexture : ProceduralTexture
+	public sealed class VoronoiTexture : ProceduralTexture
 	{
 
 		[Default(12)]
@@ -28,14 +28,14 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ComputeTexture))]
 		public readonly Sync<Colorf> StartingColor;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			StartingColor.Value = Colorf.Black;
 			Tint.Value = Colorf.White;
 			Seed.Value = new Random().Next();
 		}
 
-		public override void Generate() {
+		protected override void Generate() {
 			var _clampedSizeX = MathUtil.Clamp(Size.Value.x, 2, int.MaxValue);
 			var _clampedSizeY = MathUtil.Clamp(Size.Value.y, 2, int.MaxValue);
 			var _clapmedSizeCells = MathUtil.Clamp(Cells, 2, 16);

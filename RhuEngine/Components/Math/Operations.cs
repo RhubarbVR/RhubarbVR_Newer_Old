@@ -43,7 +43,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(Inputs_ChildChanged))]
 		public readonly SyncObjList<SyncRef<IValueSource<In>>> Inputs;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			Inputs.ChildChanged += Inputs_ChildChanged;
 		}
@@ -52,7 +52,7 @@ namespace RhuEngine.Components
 			ComputeOutput();
 		}
 
-		public void ComputeOutput() {
+		protected void ComputeOutput() {
 			if (Output.Linked) {
 				var ins = new In[Inputs.Count];
 				for (var i = 0; i < ins.Length; i++) {
@@ -100,7 +100,7 @@ namespace RhuEngine.Components
 			_lastInputTwo = InputTwo.Target;
 		}
 
-		public void ComputeOutput() {
+		protected void ComputeOutput() {
 			Compute(null);
 		}
 
@@ -111,7 +111,7 @@ namespace RhuEngine.Components
 				Output.LinkedValue = Compute(a,b);
 			}
 		}
-		public abstract Out Compute(In a, In b);
+		protected abstract Out Compute(In a, In b);
 	}
 
 	public abstract class AbTripleOperation<Out, In> : Component where Out : struct where In : struct
@@ -163,7 +163,7 @@ namespace RhuEngine.Components
 			}
 			_lastInputThree = InputThree.Target;
 		}
-		public void ComputeOutput() {
+		protected void ComputeOutput() {
 			Compute(null);
 		}
 
@@ -175,7 +175,7 @@ namespace RhuEngine.Components
 				Output.LinkedValue = Compute(a, b,c);
 			}
 		}
-		public abstract Out Compute(In a, In b,In c);
+		protected abstract Out Compute(In a, In b,In c);
 	}
 
 
@@ -199,7 +199,7 @@ namespace RhuEngine.Components
 			}
 			_lastInput = Input.Target;
 		}
-		public void ComputeOutput() {
+		protected void ComputeOutput() {
 			Compute(null);
 		}
 		internal void Compute(IChangeable changeable) {
@@ -209,6 +209,6 @@ namespace RhuEngine.Components
 				}
 			}
 		}
-		public abstract Out Compute(In ins);
+		protected abstract Out Compute(In ins);
 	}
 }

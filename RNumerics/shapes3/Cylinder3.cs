@@ -6,7 +6,7 @@ namespace RNumerics
 {
 	[MessagePackObject]
 	// ported from GTEngine (WildMagic5 doesn't have cylinder primitive)
-	public class Cylinder3d
+	public sealed class Cylinder3d
 	{
 		// The cylinder axis is a line.  The origin of the cylinder is chosen to be
 		// the line origin.  The cylinder wall is at a distance R units from the axis.
@@ -21,25 +21,25 @@ namespace RNumerics
 		[Key(2)]
 		public double Height;
 
-		public Cylinder3d(Line3d axis, double radius, double height)
+		public Cylinder3d(in Line3d axis, in double radius, in double height)
 		{
 			Axis = axis;
 			Radius = radius;
 			Height = height;
 		}
-		public Cylinder3d(Vector3d center, Vector3d axis, double radius, double height)
+		public Cylinder3d(in Vector3d center, in Vector3d axis, in double radius, in double height)
 		{
 			Axis = new Line3d(center, axis);
 			Radius = radius;
 			Height = height;
 		}
-		public Cylinder3d(Frame3f frame, double radius, double height, int nNormalAxis = 1)
+		public Cylinder3d(in Frame3f frame, in double radius, in double height, in int nNormalAxis = 1)
 		{
 			Axis = new Line3d(frame.Origin, frame.GetAxis(nNormalAxis));
 			Radius = radius;
 			Height = height;
 		}
-		public Cylinder3d(double radius, double height)
+		public Cylinder3d(in double radius, in double height)
 		{
 			Axis = new Line3d(Vector3d.Zero, Vector3d.AxisY);
 			Radius = radius;

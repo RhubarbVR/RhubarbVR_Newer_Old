@@ -10,7 +10,7 @@ using RNumerics;
 
 namespace RBullet
 {
-	public class BRigidBodyCollider
+	public sealed class BRigidBodyCollider
 	{
 		public float Mass = 0f;
 

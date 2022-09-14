@@ -5,7 +5,7 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/ConstAssets" })]
-	public class RhubarbLogo : AssetProvider<RTexture2D>
+	public sealed class RhubarbLogo : AssetProvider<RTexture2D>
 	{
 		[OnChanged(nameof(LoadTexture))]
 		public readonly Sync<bool> Filled;
@@ -21,7 +21,7 @@ namespace RhuEngine.Components
 				Load(Engine.staticResources.RhubarbLogoV2);
 			}
 		}
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			LoadTexture();
 		}

@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class TrivialBox3Mesh : ProceduralMesh
+	public sealed class TrivialBox3Mesh : ProceduralMesh
 	{
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<Vector3f> Extent;
@@ -37,7 +37,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<bool> WantNormals;
 
-		public override void FirstCreation() {
+		protected override void FirstCreation() {
 			base.FirstCreation();
 			Extent.Value = new Vector3f(0.5f);
 			AxisX.Value = Vector3f.AxisX;

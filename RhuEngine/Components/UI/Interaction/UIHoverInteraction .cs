@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 	
 
 	[Category(new string[] { "UI/Interaction" })]
-	public class UIHoverInteraction : UIInteractionComponent
+	public sealed class UIHoverInteraction : UIInteractionComponent
 	{
 		[Default(true)]
 		public readonly Sync<bool> Laserable;
@@ -22,33 +22,30 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public readonly Sync<bool> CustomTochable;
 
-		[Default(true)]
-		public readonly Sync<bool> AllowOtherZones;
-
 		public readonly SyncDelegate OnHover;
 		public readonly SyncDelegate OnUnHover;
 
 		private void Hover() {
 			if (!_isHovering) {
-				RWorld.ExecuteOnEndOfFrame(this, () => OnHover.Target?.Invoke());
+				RUpdateManager.ExecuteOnEndOfFrame(this, () => OnHover.Target?.Invoke());
 			}
 			_isHovering = true;
 		}
 		private void UnHover() {
 			_isHovering = false;
-			RWorld.ExecuteOnEndOfFrame(this, () => OnUnHover.Target?.Invoke());
+			RUpdateManager.ExecuteOnEndOfFrame(this, () => OnUnHover.Target?.Invoke());
 		}
 
 		private bool _isHovering;
 
-		public override void Step() {
+		protected override void Step() {
 			base.Step();
-			if (Rect is null) {
+			if (UIRect is null) {
 				return;
 			}
 			var hoverThisFrame = false;
-			foreach (var item in Rect.HitPoses(!AllowOtherZones.Value)) {
-				if (item.Laser) {
+			foreach (var item in UIRect.GetRectHitData()) {
+				if (item.Lazer) {
 					if (Laserable) {
 						hoverThisFrame = true;
 						Hover();

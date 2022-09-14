@@ -3,16 +3,17 @@ using System;
 using System.Collections.Generic;
 using LiteNetLib;
 
+using RhubarbCloudClient.Model;
+
 using RhuEngine.Linker;
 
 using SharedModels;
 using SharedModels.GameSpecific;
-using SharedModels.Session;
 
 
 namespace RhuEngine.WorldObjects
 {
-	public class RelayPeer
+	public sealed class RelayPeer
 	{
 		public int latency = 0;
 		public NetPeer NetPeer { get; private set; }
@@ -28,9 +29,8 @@ namespace RhuEngine.WorldObjects
 
 		public List<Peer> peers = new();
 		public Peer this[ushort id] => peers[id];
-		
 		public Peer LoadNewPeer(ConnectToUser user) {
-			var newpeer = new Peer(NetPeer,user.UserID, (ushort)(peers.Count + 1));
+			var newpeer = new Peer(NetPeer, user.UserID, (ushort)(peers.Count + 1));
 			peers.Add(newpeer);
 			NetPeer.Send(Serializer.Save(new ConnectToAnotherUser(user.UserID.ToString())), 2, DeliveryMethod.ReliableSequenced);
 			World.ProcessUserConnection(newpeer);
@@ -48,7 +48,7 @@ namespace RhuEngine.WorldObjects
 		}
 	}
 
-	public class Peer
+	public sealed class Peer
 	{
 		public User User { get; set; }
 		public Guid UserID { get;private set; }

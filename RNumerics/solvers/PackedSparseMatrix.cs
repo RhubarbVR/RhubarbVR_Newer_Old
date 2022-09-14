@@ -18,7 +18,7 @@ namespace RNumerics
 	/// This is a sparse matrix where each row is an array of (column,value) pairs
 	/// This is more efficient for Matrix*Vector multiply.
 	/// </summary>
-	public class PackedSparseMatrix
+	public sealed class PackedSparseMatrix
 	{
 		public struct Nonzero
 		{
@@ -41,7 +41,7 @@ namespace RNumerics
 		public bool IsSymmetric = false;
 
 
-		public PackedSparseMatrix(PackedSparseMatrix copy)
+		public PackedSparseMatrix(in PackedSparseMatrix copy)
 		{
 			var N = copy.Rows.Length;
 			Rows = new Nonzero[N][];
@@ -58,7 +58,7 @@ namespace RNumerics
 		}
 
 
-		public PackedSparseMatrix(SymmetricSparseMatrix m, bool bTranspose = false)
+		public PackedSparseMatrix(in SymmetricSparseMatrix m, in bool bTranspose = false)
 		{
 			var numRows = bTranspose ? m.Columns : m.Rows;
 			Columns = bTranspose ? m.Columns : m.Rows;
@@ -114,7 +114,7 @@ namespace RNumerics
 
 
 
-		public PackedSparseMatrix(DVector<Matrix_entry> entries, int numRows, int numCols, bool bSymmetric = true)
+		public PackedSparseMatrix(in DVector<Matrix_entry> entries, in int numRows, in int numCols, in bool bSymmetric = true)
 		{
 			Columns = numCols;
 			Rows = new Nonzero[numRows][];
@@ -162,7 +162,7 @@ namespace RNumerics
 
 
 
-		public static PackedSparseMatrix FromDense(DenseMatrix m, bool bSymmetric)
+		public static PackedSparseMatrix FromDense(in DenseMatrix m, in bool bSymmetric)
 		{
 			var nonzeros = new DVector<Matrix_entry>();
 			for (var r = 0; r < m.Rows; ++r)
@@ -182,7 +182,7 @@ namespace RNumerics
 
 
 
-		public double this[int r, int c]
+		public double this[in int r, in int c]
 		{
 			get
 			{
@@ -216,7 +216,7 @@ namespace RNumerics
 		/// <summary>
 		/// sort each row
 		/// </summary>
-		public void Sort(bool bParallel = true)
+		public void Sort(in bool bParallel = true)
 		{
 			if (bParallel)
 			{
@@ -242,7 +242,7 @@ namespace RNumerics
 		/// <summary>
 		/// For row r, find interval that nonzeros lie in
 		/// </summary>
-		public Interval1i NonZerosRange(int r)
+		public Interval1i NonZerosRange(in int r)
 		{
 			var Row = Rows[r];
 			if (Row.Length == 0) {
@@ -297,7 +297,7 @@ namespace RNumerics
 
 
 
-		public void Multiply(double[] X, double[] Result)
+		public void Multiply(in double[] X, in double[] Result)
 		{
 			Array.Clear(Result, 0, Result.Length);
 
@@ -361,7 +361,7 @@ namespace RNumerics
 		/// Compute dot product of this.row[r] and M.col[c], where the
 		/// column is stored as MTranspose.row[c]
 		/// </summary>
-		public double DotRowColumn(int r, int c, PackedSparseMatrix MTranspose)
+		public double DotRowColumn(in int r, in int c, in PackedSparseMatrix MTranspose)
 		{
 			if (Sorted == false || MTranspose.Sorted == false) {
 				throw new Exception("PackedSparseMatrix.DotRowColumn: matrices must be sorted!");
@@ -414,7 +414,7 @@ namespace RNumerics
 		/// <summary>
 		/// Dot product of this.row[r] with itself
 		/// </summary>
-		public double DotRowSelf(int r)
+		public double DotRowSelf(in int r)
 		{
 			var Row = Rows[r];
 			double sum = 0;
@@ -434,7 +434,7 @@ namespace RNumerics
 		/// however so far the difference is negligible...perhaps because
 		/// there are quite a few more branches in the inner loop
 		/// </summary>
-		public void DotRowAllColumns(int r, double[] sums, int[] col_indices, PackedSparseMatrix MTranspose)
+		public void DotRowAllColumns(in int r, in double[] sums, in int[] col_indices, in PackedSparseMatrix MTranspose)
 		{
 			Debug.Assert(Sorted && MTranspose.Sorted);
 			Debug.Assert(Rows.Length == MTranspose.Rows.Length);
@@ -481,7 +481,7 @@ namespace RNumerics
 		/// <summary>
 		/// Compute dot product of this.row[r1] and this.row[r2], up to N elements
 		/// </summary>
-		public double DotRows(int r1, int r2, int MaxCol = int.MaxValue)
+		public double DotRows(in int r1, in int r2, int MaxCol = int.MaxValue)
 		{
 			if (Sorted == false) {
 				throw new Exception("PackedSparseMatrix.DotRows: matrices must be sorted!");
@@ -536,7 +536,7 @@ namespace RNumerics
 		/// <summary>
 		/// Compute dot product of this.row[r] and vec, up to N elements
 		/// </summary>
-		public double DotRowVector(int r, double[] vec, int MaxCol = int.MaxValue)
+		public double DotRowVector(in int r, in double[] vec, int MaxCol = int.MaxValue)
 		{
 			if (Sorted == false && MaxCol < int.MaxValue) {
 				throw new Exception("PackedSparseMatrix.DotRows: matrices must be sorted if MaxCol is specified!");
@@ -565,7 +565,7 @@ namespace RNumerics
 		/// <summary>
 		/// Compute dot product of this.row[r1] and this.row[r2], up to N elements
 		/// </summary>
-		public double DotColumnVector(int c, double[] vec, int start_row = 0, int end_row = int.MaxValue)
+		public double DotColumnVector(in int c, in double[] vec, in int start_row = 0, in int end_row = int.MaxValue)
 		{
 			var Nr = Rows.Length;
 
@@ -732,7 +732,7 @@ namespace RNumerics
 
 
 
-		public string MatrixInfo(bool bExtended = false)
+		public string MatrixInfo(in bool bExtended = false)
 		{
 			var s = string.Format("Rows {0}  Cols {1}   NonZeros {2}  Sorted {3}", Rows.Length, Columns, NumNonZeros, Sorted);
 			if (bExtended)

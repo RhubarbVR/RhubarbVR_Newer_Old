@@ -7,7 +7,7 @@ using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.WorldObjects
 {
-	public class AssetRef<T> : SyncRef<IAssetProvider<T>>, IAssetRef, IWorldObject where T : class
+	public sealed class AssetRef<T> : SyncRef<IAssetProvider<T>>, IAssetRef, IWorldObject where T : class
 	{
 		public T Asset => base.Target?.Value;
 
@@ -33,7 +33,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			if (base.Target is null) {
 				return;

@@ -8,7 +8,7 @@ using RhuEngine.Physics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public class SphereShape : PhysicsObject
+	public sealed class SphereShape : PhysicsObject
 	{
 		[OnChanged(nameof(RebuildPysics))]
 		[Default(0.50)]

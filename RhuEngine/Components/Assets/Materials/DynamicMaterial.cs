@@ -9,14 +9,14 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Materials" })]
-	public class DynamicMaterial : AssetProvider<RMaterial>
+	public sealed class DynamicMaterial : AssetProvider<RMaterial>
 	{
 		[OnAssetLoaded(nameof(LoadMaterial))]
 		public readonly AssetRef<RShader> shader;
 
 		public readonly SyncAbstractObjList<PramInfo> Prams;
 
-		[OnAssetLoaded(nameof(UpdateRenderOrder))]
+		[OnChanged(nameof(UpdateRenderOrder))]
 		public readonly Sync<int> RenderOrderOffset;
 
 		public void UpdateRenderOrder() {
@@ -243,12 +243,6 @@ namespace RhuEngine.Components
 									pram = null;
 								}
 								break;
-							case MaterialParam.DepthTest:
-								if (pram.GetType() != typeof(ValuePramInfo<DepthTest>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
 							case MaterialParam.Cull:
 								if (pram.GetType() != typeof(ValuePramInfo<Cull>)) {
 									Prams.DisposeAtIndex(index);
@@ -326,9 +320,6 @@ namespace RhuEngine.Components
 							case MaterialParam.UInt4:
 								Prams.Add<ValuePramInfo<Vector4u>>().name.Value = item.name;
 								break;
-							case MaterialParam.DepthTest:
-								Prams.Add<ValuePramInfo<DepthTest>>().name.Value = item.name;
-								break;
 							case MaterialParam.Cull:
 								Prams.Add<ValuePramInfo<Cull>>().name.Value = item.name;
 								break;
@@ -384,7 +375,7 @@ namespace RhuEngine.Components
 			_material = null;
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			LoadMaterial();
 		}

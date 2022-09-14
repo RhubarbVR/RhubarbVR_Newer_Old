@@ -7,7 +7,7 @@ namespace RhuEngine.Components
 	[GenericTypeConstraint()]
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Math" })]
-	public class Wobbler<T> : Component where T : struct
+	public sealed class Wobbler<T> : Component where T : struct
 	{
 		public readonly Linker<T> driver;
 		public readonly Sync<T> speed;
@@ -15,7 +15,7 @@ namespace RhuEngine.Components
 		public readonly Sync<T> seed;
 		public readonly Sync<T> offset;
 
-		public override void Step() {
+		protected override void Step() {
 			if (driver.Linked) {
 				try {
 					var time = (float)World.WorldTime;

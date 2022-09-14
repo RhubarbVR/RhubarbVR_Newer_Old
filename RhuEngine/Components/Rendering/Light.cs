@@ -22,7 +22,7 @@ namespace RhuEngine.Components
 
 	[Supported(SupportedFancyFeatures.Lighting)]
 	[Category(new string[] { "Rendering" })]
-	public class Light : RenderingComponent
+	public sealed class Light : LinkedWorldComponent
 	{
 		[Default(RLightType.Point)]
 		public readonly Sync<RLightType> LightType;
@@ -51,7 +51,7 @@ namespace RhuEngine.Components
 
 		public readonly Sync<RenderLayer> Culling;
 
-		public override void FirstCreation() {
+		protected override void FirstCreation() {
 			base.FirstCreation();
 			Color.Value = Colorf.White;
 		}

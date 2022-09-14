@@ -12,7 +12,7 @@ using RNumerics;
 namespace RhuEngine.Components.PrivateSpace
 {
 	[RemoveFromProgramList]
-	public class LoginProgram : Program
+	public sealed class LoginProgram : Program
 	{
 		public override string ProgramID => "LoginScreen";
 
@@ -32,7 +32,7 @@ namespace RhuEngine.Components.PrivateSpace
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public UIText ErrorText;
+		public StandardLocale ErrorTextLoc;
 
 		[NoSave]
 		[NoSync]
@@ -51,10 +51,12 @@ namespace RhuEngine.Components.PrivateSpace
 		public Entity RegEntiyThree;
 
 		public void Error(string error) {
-			ErrorText.Text.Value = $"<colorred>{error}";
+			ErrorTextLoc.Key.Value = error;
+			ErrorTextLoc.AppendFront.Value = "<colorred>";
 		}
 		public void Normal(string n) {
-			ErrorText.Text.Value = $"{n}";
+			ErrorTextLoc.Key.Value = n;
+			ErrorTextLoc.AppendFront.Value = "";
 		}
 		[NoSave]
 		[NoSync]
@@ -84,30 +86,30 @@ namespace RhuEngine.Components.PrivateSpace
 				return;
 			}
 			if (RegScreen) {
-				if(Password.Text.Value != ConfPassword.Text.Value) {
+				if (Password.Text.Value != ConfPassword.Text.Value) {
 					Error("Passwords Don't Match");
 					return;
 				}
 
 				Task.Run(async () => {
-					var info = await Engine.netApiManager.SignUp(UserName.Text, Email.Text, Password.Text, new DateTime(1980, 9, 19));
-					if (info.Error || info.ErrorDetails == "Normal Error") {
-						Error(info.Message);
+					var info = await Engine.netApiManager.Client.RegisterAccount(UserName.Text, Password.Text, Email.Text);
+					if (!info.IsDataGood) {
+						Error(info.Data);
 					}
 					else {
-						Normal(info.Message);
+						Normal(info.Data);
 						SwitchReg();
 					}
 				});
 			}
 			else {
 				Task.Run(async () => {
-					var info = await Engine.netApiManager.Login(Email.Text, Password.Text);
-					if (!info.Login) {
-						Error(info.Message);
+					var info = await Engine.netApiManager.Client.Login(Email.Text, Password.Text);
+					if (info.Error) {
+						Error(info.MSG);
 					}
 					else {
-						Close();
+						Error(info.MSG);
 					}
 				});
 			}
@@ -145,6 +147,9 @@ namespace RhuEngine.Components.PrivateSpace
 		}
 		
 		public override void LoadUI(Entity uiRoot) {
+			Engine.netApiManager.Client.OnLogin += (user) => Close();
+			Engine.netApiManager.Client.HasGoneOfline += () => Close();
+
 			window.CloseButton.Value = false;
 			var ma = uiRoot.AttachComponent<UIRect>();
 			var mit = window.MainMit.Target;
@@ -167,7 +172,7 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(new Vector2f(0, 0), new Vector2f(0.5, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			uiBuilder.AddButton(false, 0.2f).ButtonEvent.Target = MainButton;
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0.05f);
 			ButtonOneText = uiBuilder.AddTextWithLocal("Programs.Login.LoginButton", 1.9f);
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
@@ -177,7 +182,7 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(new Vector2f(0.5, 0), new Vector2f(1, 1), 0);
 			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
 			uiBuilder.AddButton(false, 0.2f).ButtonEvent.Target = ToggleButton;
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0.05f);
 			ButtonTwoText = uiBuilder.AddTextWithLocal("Programs.Login.Register",1.9f);
 			uiBuilder.PopRect();
 			uiBuilder.PopRect();
@@ -191,19 +196,20 @@ namespace RhuEngine.Components.PrivateSpace
 
 
 			uiBuilder.PushRect();
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			var rectee = uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0f);
 			var Confirmpassword = uiBuilder.AddTextEditor("Programs.Login.ConfirmPassword", 0.2f, 1, "", 0.1f, null, 1.9f);
 			Confirmpassword.Item1.Password.Value = true;
 			ConfPassword = Confirmpassword.Item1;
+			Confirmpassword.Item1.HorizontalAlien.Value = EHorizontalAlien.Left;
+			Confirmpassword.Item1.MinClamp.Value = minclamp;
 			uiBuilder.PopRect();
-			RegEntiyOne = uiBuilder.CurretRectEntity;
+			uiBuilder.PopRect();
+			RegEntiyOne = rectee.Entity;
 			RegEntiyOne.enabled.Value = false;
-			ConfPassword.HorizontalAlien.Value = EHorizontalAlien.Left;
-			ConfPassword.MinClamp.Value = minclamp;
-			uiBuilder.PopRect();
+
 
 			uiBuilder.PushRect();
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0f);
 			var password = uiBuilder.AddTextEditor("Programs.Login.Password", 0.2f, 1, "", 0.1f, null, 1.9f);
 			password.Item1.Password.Value = true;
 			Password = password.Item1;
@@ -214,7 +220,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 
 			uiBuilder.PushRect();
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0f);
 			Email = uiBuilder.AddTextEditor("Programs.Login.Email", 0.2f,1,"",0.1f,null,1.9f).Item1;
 			Email.HorizontalAlien.Value = EHorizontalAlien.Left;
 			Email.MinClamp.Value = minclamp;
@@ -223,7 +229,7 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PushRect();
 
-			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0);
+			uiBuilder.PushRect(new Vector2f(0.1f, 0.1f), new Vector2f(0.9f, 0.9f), 0f);
 			UserName = uiBuilder.AddTextEditor("Programs.Login.Username", 0.2f, 1, "", 0.1f, null, 1.9f).Item1;
 			RegEntiyTwo = uiBuilder.CurretRectEntity;
 			RegEntiyTwo.enabled.Value = false;
@@ -233,13 +239,9 @@ namespace RhuEngine.Components.PrivateSpace
 
 			uiBuilder.PopRect();
 
-			//uiBuilder.PushRect();
-			////DateOfBirth
-			//uiBuilder.PopRect();
 
 			uiBuilder.PushRect();
-			//Error
-			ErrorText = uiBuilder.AddText("<colorred>",null,0,1,null,true);
+			ErrorTextLoc = uiBuilder.AddTextWithLocal("",0,1,null);
 			uiBuilder.PopRect();
 		}
 	}

@@ -4,14 +4,14 @@ namespace RNumerics
 {
 	// variant of Wm5::Query2, for special case of 3 points. This is used in
 	// IntrTriangle3Triangle3, to avoid allocating arrays
-	public class QueryTuple2d
+	public sealed class QueryTuple2d
 	{
 		Vector2dTuple3 _mVertices;
 
-		public QueryTuple2d(Vector2d v0, Vector2d v1, Vector2d v2) {
+		public QueryTuple2d(in Vector2d v0, in Vector2d v1, in Vector2d v2) {
 			_mVertices = new Vector2dTuple3(v0, v1, v2);
 		}
-		public QueryTuple2d(Vector2dTuple3 tuple) {
+		public QueryTuple2d(in Vector2dTuple3 tuple) {
 			_mVertices = tuple;
 		}
 
@@ -19,11 +19,11 @@ namespace RNumerics
 		//   +1, on right of line
 		//   -1, on left of line
 		//    0, on the line
-		public int ToLine(int i, int v0, int v1) {
+		public int ToLine(in int i, in int v0, in int v1) {
 			return ToLine(_mVertices[i], v0, v1);
 		}
 
-		public int ToLine(Vector2d test, int v0, int v1) {
+		public int ToLine(in Vector2d test, int v0, int v1) {
 			var positive = Sort(ref v0, ref v1);
 
 			var vec0 = _mVertices[v0];
@@ -46,11 +46,11 @@ namespace RNumerics
 		//   +1, outside triangle
 		//   -1, inside triangle
 		//    0, on triangle
-		public int ToTriangle(int i, int v0, int v1, int v2) {
+		public int ToTriangle(in int i, in int v0, in int v1, in int v2) {
 			return ToTriangle(_mVertices[i], v0, v1, v2);
 		}
 
-		public int ToTriangle(Vector2d test, int v0, int v1, int v2) {
+		public int ToTriangle(in Vector2d test, in int v0, in int v1, in int v2) {
 			var sign0 = ToLine(test, v1, v2);
 			if (sign0 > 0) {
 				return +1;
@@ -71,7 +71,7 @@ namespace RNumerics
 		//   +1, outside circumcircle of triangle
 		//   -1, inside circumcircle of triangle
 		//    0, on circumcircle of triangle
-		public int ToCircumcircle(int i, int v0, int v1, int v2) {
+		public int ToCircumcircle(in int i, in int v0, in int v1, in int v2) {
 			return ToCircumcircle(_mVertices[i], v0, v1, v2);
 		}
 		//----------------------------------------------------------------------------
@@ -109,14 +109,14 @@ namespace RNumerics
 
 
 		// Helper functions.
-		public static double Dot(double x0, double y0, double x1, double y1) {
+		public static double Dot(in double x0, in double y0, in double x1, in double y1) {
 			return (x0 * x1) + (y0 * y1);
 		}
-		public static double Det2(double x0, double y0, double x1, double y1) {
+		public static double Det2(in double x0, in double y0, in double x1, in double y1) {
 			return (x0 * y1) - (x1 * y0);
 		}
-		public static double Det3(double x0, double y0, double z0, double x1, double y1,
-			double z1, double x2, double y2, double z2) {
+		public static double Det3(in double x0, in double y0, in double z0, in double x1, in double y1,
+			in double z1, in double x2, in double y2, in double z2) {
 			var c00 = (y1 * z2) - (y2 * z1);
 			var c01 = (y2 * z0) - (y0 * z2);
 			var c02 = (y0 * z1) - (y1 * z0);

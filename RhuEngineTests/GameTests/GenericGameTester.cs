@@ -23,7 +23,7 @@ namespace RhuEngine.GameTests.Tests
 		public OutputCapture cap;
 		public NullLinker rhu;
 		public Engine app;
-		public Stopwatch EngineStopWatch = new Stopwatch();
+		public Stopwatch EngineStopWatch = new();
 		public void RunForSteps(int amountofSteps = 10) {
 			for (var i = 0; i < amountofSteps; i++) {
 				Step();
@@ -45,7 +45,7 @@ namespace RhuEngine.GameTests.Tests
 			Console.WriteLine("Starting Rhubarb Test!");
 			cap = new OutputCapture();
 			rhu = new NullLinker();
-			var dir = AppDomain.CurrentDomain.BaseDirectory + $"\\Tests\\Test{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss")}_{Guid.NewGuid()}\\";
+			var dir = AppDomain.CurrentDomain.BaseDirectory + $"\\Tests\\Test{DateTime.Now:yyyy-dd-M--HH-mm-ss}_{Guid.NewGuid()}\\";
 			Directory.CreateDirectory(dir);
 			app = new Engine(rhu, args, cap, dir, true);
 			app.Init();
@@ -55,6 +55,7 @@ namespace RhuEngine.GameTests.Tests
 			app.IsCloseing = true;
 			app.Dispose();
 			cap.Dispose();
+			GC.SuppressFinalize(this);
 		}
 	}
 }

@@ -5,7 +5,7 @@ namespace RhuEngine.Components
 {
 	[GenericTypeConstraint()]
 	[Category(new string[] { "CoreData" })]
-	public class ValueList<T> : Component
+	public sealed class ValueList<T> : Component
 	{
 		public readonly SyncValueList<T> Value;
 	}

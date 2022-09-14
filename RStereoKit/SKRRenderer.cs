@@ -10,7 +10,7 @@ using System.Numerics;
 
 namespace RStereoKit
 {
-	public class SKRRenderer : IRRenderer
+	public sealed class SKRRenderer : IRRenderer
 	{
 		public float _minClip = 0.08f;
 

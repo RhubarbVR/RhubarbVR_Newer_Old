@@ -5,7 +5,7 @@ namespace RhuEngine.Components
 {
 	[GenericTypeConstraint()]
 	[Category(new string[] { "CoreData" })]
-	public class ValueField<T> : Component
+	public sealed class ValueField<T> : Component
 	{
 		public readonly Sync<T> Value;
 	}

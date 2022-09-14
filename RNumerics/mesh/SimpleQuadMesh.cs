@@ -11,7 +11,7 @@ namespace RNumerics
 	/// use static WriteOBJ() to save. No loading, for now. 
 	/// 
 	/// </summary>
-	public class SimpleQuadMesh
+	public sealed class SimpleQuadMesh
 	{
 		public DVector<double> Vertices;
 		public DVector<float> Normals;
@@ -25,7 +25,7 @@ namespace RNumerics
 			Initialize();
 		}
 
-		public void Initialize(bool bWantNormals = true, bool bWantColors = true, bool bWantUVs = true, bool bWantFaceGroups = true) {
+		public void Initialize(in bool bWantNormals = true, in bool bWantColors = true, in bool bWantUVs = true, in bool bWantFaceGroups = true) {
 			Vertices = new DVector<double>();
 			Normals = bWantNormals ? new DVector<float>() : null;
 			Colors = bWantColors ? new DVector<float>() : null;
@@ -37,7 +37,7 @@ namespace RNumerics
 		/*
          * Construction
          */
-		public int AppendVertex(double x, double y, double z) {
+		public int AppendVertex(in double x, in double y, in double z) {
 			var i = Vertices.Length / 3;
 			if (HasVertexNormals) {
 				Normals.Add(0);
@@ -58,11 +58,11 @@ namespace RNumerics
 			Vertices.Add(z);
 			return i;
 		}
-		public int AppendVertex(Vector3d v) {
+		public int AppendVertex(in Vector3d v) {
 			return AppendVertex(v.x, v.y, v.z);
 		}
 
-		public int AppendVertex(NewVertexInfo info) {
+		public int AppendVertex(in NewVertexInfo info) {
 			var i = Vertices.Length / 3;
 
 			if (info.bHaveN && HasVertexNormals) {
@@ -101,7 +101,7 @@ namespace RNumerics
 		}
 
 
-		public int AppendQuad(int i, int j, int k, int l, int g = -1) {
+		public int AppendQuad(in int i, in int j, in int k, in int l, in int g = -1) {
 			var qi = Quads.Length / 4;
 			if (HasFaceGroups) {
 				FaceGroups.Add((g == -1) ? 0 : g);
@@ -121,10 +121,10 @@ namespace RNumerics
 		public int MaxQuadID => QuadCount;
 
 
-		public bool IsVertex(int vID) {
+		public bool IsVertex(in int vID) {
 			return vID * 3 < Vertices.Length;
 		}
-		public bool IsQuad(int qID) {
+		public bool IsQuad(in int qID) {
 			return qID * 4 < Quads.Length;
 		}
 
@@ -134,23 +134,23 @@ namespace RNumerics
 
 		public bool HasVertexUVs => UVs != null && UVs.Length / 2 == Vertices.Length / 3;
 
-		public Vector3d GetVertex(int i) {
+		public Vector3d GetVertex(in int i) {
 			return new Vector3d(Vertices[3 * i], Vertices[(3 * i) + 1], Vertices[(3 * i) + 2]);
 		}
 
-		public Vector3f GetVertexNormal(int i) {
+		public Vector3f GetVertexNormal(in int i) {
 			return new Vector3f(Normals[3 * i], Normals[(3 * i) + 1], Normals[(3 * i) + 2]);
 		}
 
-		public Vector3f GetVertexColor(int i) {
+		public Vector3f GetVertexColor(in int i) {
 			return new Vector3f(Colors[3 * i], Colors[(3 * i) + 1], Colors[(3 * i) + 2]);
 		}
 
-		public Vector2f GetVertexUV(int i) {
+		public Vector2f GetVertexUV(in int i) {
 			return new Vector2f(UVs[2 * i], UVs[(2 * i) + 1]);
 		}
 
-		public NewVertexInfo GetVertexAll(int i) {
+		public NewVertexInfo GetVertexAll(in int i) {
 			var vi = new NewVertexInfo {
 				v = GetVertex(i)
 			};
@@ -184,11 +184,11 @@ namespace RNumerics
 
 		public bool HasFaceGroups => FaceGroups != null && FaceGroups.Length == Quads.Length / 4;
 
-		public Index4i GetQuad(int i) {
+		public Index4i GetQuad(in int i) {
 			return new Index4i(Quads[4 * i], Quads[(4 * i) + 1], Quads[(4 * i) + 2], Quads[(4 * i) + 3]);
 		}
 
-		public int GetFaceGroup(int i) {
+		public int GetFaceGroup(in int i) {
 			return FaceGroups[i];
 		}
 
@@ -252,25 +252,25 @@ namespace RNumerics
 
 		// setters
 
-		public void SetVertex(int i, Vector3d v) {
+		public void SetVertex(in int i, in Vector3d v) {
 			Vertices[3 * i] = v.x;
 			Vertices[(3 * i) + 1] = v.y;
 			Vertices[(3 * i) + 2] = v.z;
 		}
 
-		public void SetVertexNormal(int i, Vector3f n) {
+		public void SetVertexNormal(in int i, in Vector3f n) {
 			Normals[3 * i] = n.x;
 			Normals[(3 * i) + 1] = n.y;
 			Normals[(3 * i) + 2] = n.z;
 		}
 
-		public void SetVertexColor(int i, Vector3f c) {
+		public void SetVertexColor(in int i, in Vector3f c) {
 			Colors[3 * i] = c.x;
 			Colors[(3 * i) + 1] = c.y;
 			Colors[(3 * i) + 2] = c.z;
 		}
 
-		public void SetVertexUV(int i, Vector2f uv) {
+		public void SetVertexUV(in int i, in Vector2f uv) {
 			UVs[2 * i] = uv.x;
 			UVs[(2 * i) + 1] = uv.y;
 		}

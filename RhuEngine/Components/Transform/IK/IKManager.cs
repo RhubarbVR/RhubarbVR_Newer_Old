@@ -11,11 +11,11 @@ namespace RhuEngine.Components
 {
 	//Todo: Finish adding ik constraints and add the ik controllers to do movement
 	[Category("Transform/IK")]
-	public class IKManager : Component
+	public sealed class IKManager : Component
 	{
 		public IKSolver iKSolver;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			iKSolver = new IKSolver();
 			iKSolver.ActiveSet.UseAutomass = true;

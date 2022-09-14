@@ -8,7 +8,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "User" })]
-	public class Hand : Component
+	public sealed class Hand : Component
 	{
 		public readonly SyncRef<User> user;
 
@@ -20,13 +20,13 @@ namespace RhuEngine.Components
 
 		public readonly Linker<Vector3f> scale;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);
 			rot.SetLinkerTarget(Entity.rotation);
 			scale.SetLinkerTarget(Entity.scale);
 		}
 
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}

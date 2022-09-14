@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 using RhuEngine.Managers;
 using RhuEngine.WorldObjects;
+
+using RNumerics;
+
 namespace RhuEngine.AssetSystem
 {
 	public class AssetSession: IDisposable
@@ -24,7 +27,7 @@ namespace RhuEngine.AssetSystem
 			return uri.Scheme.ToLower()=="local" ? GetLocalAsset(uri, useCache, ProgressUpdate) : Manager.GetAsset(uri, useCache, ProgressUpdate);
 		}
 
-		private byte[] GetLocalAsset(Uri uri, bool useCache,Action<float> ProgressUpdate = null) {
+		private byte[] GetLocalAsset(Uri uri, bool useCache, Action<float> ProgressUpdate = null) {
 			byte[] asset = null;
 			if (useCache) {
 				asset = Manager.GetCacheAsset(uri);

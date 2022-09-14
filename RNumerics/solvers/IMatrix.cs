@@ -9,8 +9,8 @@ namespace RNumerics
 		int Columns { get; }
 		Index2i Size { get; }
 
-		void Set(int r, int c, double value);
+		void Set(in int r,in int c, in double value);
 
-		double this[int r, int c] { get; set; }
+		double this[in int r,in int c] { get; set; }
 	}
 }

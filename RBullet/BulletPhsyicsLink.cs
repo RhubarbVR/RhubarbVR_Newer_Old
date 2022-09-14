@@ -9,7 +9,7 @@ using RhuEngine.Linker;
 
 namespace RBullet
 {
-	public class BulletPhsyicsLink : PhysicsHelper.Physics<BulletRigidBodyCollider, BulletPhysicsSim, BulletColliderShape>
+	public sealed class BulletPhsyicsLink : PhysicsHelper.Physics<BulletRigidBodyCollider, BulletPhysicsSim, BulletColliderShape>
 	{
 		public BulletPhsyicsLink() : this(false) {
 

@@ -4,14 +4,40 @@ using System.Threading.Tasks;
 
 using LiteNetLib;
 
+using RhubarbCloudClient.Model;
+
 using RhuEngine.Components;
 
 using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
+	public enum BodyNode
+	{
+		None,
+		UserRoot,
+		Head,
+		LeftController,
+		RightController,
+	}
 	public class User : SyncObject
 	{
+		public Matrix GetBodyNodeTrans(BodyNode bodyNode) {
+			if (bodyNode == BodyNode.None) {
+				return Matrix.Identity;
+			}
+			return userRoot.Target is null
+				? Matrix.Identity
+				: bodyNode switch {
+				BodyNode.UserRoot => userRoot.Target.Entity.GlobalTrans,
+				BodyNode.Head => userRoot.Target.head.Target?.GlobalTrans ?? Matrix.Identity,
+				BodyNode.LeftController => userRoot.Target.leftController.Target?.GlobalTrans ?? Matrix.Identity,
+				BodyNode.RightController => userRoot.Target.rightController.Target?.GlobalTrans ?? Matrix.Identity,
+				_ => Matrix.Identity,
+			};
+		}
+
+
 		public readonly SyncRef<UserRoot> userRoot;
 
 		public readonly SyncAbstractObjList<SyncStream> syncStreams;
@@ -20,11 +46,10 @@ namespace RhuEngine.WorldObjects
 		public string NormalizedUserName { get; private set; }
 		[Exposed]
 		[NoWriteExsposed]
-		public string UserName { get;private set; }
+		public string UserName { get; private set; }
 		[Exposed]
 		[NoWriteExsposed]
-		public string[] Roles { get; private set; }
-
+		public Colorb UserColor { get; private set; }
 		[NoSyncUpdate]
 		[OnChanged(nameof(UserIDLoad))]
 		public readonly Sync<string> userID;
@@ -36,14 +61,23 @@ namespace RhuEngine.WorldObjects
 
 		[NoSyncUpdate]
 		public readonly Sync<string> BackendID;
-
+		[BindProperty(nameof(UserName))]
+		public readonly SyncProperty<string> Username;
+		[BindProperty(nameof(NormalizedUserName))]
+		public readonly SyncProperty<string> NormalizedUsername;
+		[BindProperty(nameof(UserColor))]
+		public readonly SyncProperty<Colorb> UserColorProp;
 		public void UserIDLoad() {
 			Task.Run(async () => {
 				if (userID == null) { return; }
-				var e = await Engine.netApiManager.GetUserInfo(userID);
-				UserName = e?.UserName;
-				NormalizedUserName = e?.NormalizedUserName;
-				Roles = e?.Roles?.ToArray()??Array.Empty<string>();
+				var e = await Engine.netApiManager.Client.GetUser(Guid.Parse(userID));
+				e?.BindDataUpdate((userdata) => {
+					UserName = userdata.UserName;
+					NormalizedUserName = userdata.NormalizedUserName;
+					var (r, g, b, a) = userdata.IconColor.GetColor();
+					UserColor = new Colorb(r, g, b, a);
+				});
+
 			});
 		}
 
@@ -55,13 +89,13 @@ namespace RhuEngine.WorldObjects
 		}
 		public Peer CurrentPeer { get; set; }
 
-		public bool IsConnected  => (CurrentPeer?.NetPeer?.ConnectionState ?? LiteNetLib.ConnectionState.Disconnected) == LiteNetLib.ConnectionState.Connected;
+		public bool IsConnected => (CurrentPeer?.NetPeer?.ConnectionState ?? LiteNetLib.ConnectionState.Disconnected) == LiteNetLib.ConnectionState.Connected;
 
 		public bool IsLocalUser => World.GetLocalUser() == this;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
-			if(CurrentPeer is null) {
+			if (CurrentPeer is null) {
 				try {
 					var foundPeer = World.peers.Where((val) => val.UserID.ToString() == userID).First();
 					if (foundPeer is not null) {

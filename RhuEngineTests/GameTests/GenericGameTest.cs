@@ -22,6 +22,7 @@ using RNumerics;
 using SharedModels.GameSpecific;
 using System.Reflection;
 using RhuEngine.Datatypes;
+using RhuEngine.Components;
 
 namespace RhuEngine.GameTests.Tests
 {
@@ -36,7 +37,7 @@ namespace RhuEngine.GameTests.Tests
 			tester.Start(Array.Empty<string>());
 			tester.RunForSteps(20);
 			tester.app.startingthread.Join();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		private void SetUpForNormalTest() {
@@ -49,6 +50,10 @@ namespace RhuEngine.GameTests.Tests
 			SetUpForNormalTest();
 			var world = tester.app.worldManager.CreateNewWorld(World.FocusLevel.Focused, true);
 			Assert.IsNotNull(world);
+			world.RootEntity.AttachComponent<MainFont>();
+			world.RootEntity.AttachComponent<IconsTex>();
+			world.RootEntity.AttachComponent<SpriteProvder>();
+			world.RootEntity.AttachComponent<TrivialBox3Mesh>();
 			return world;
 		}
 
@@ -61,13 +66,13 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void StartNewTestWorldTest() {
 			StartNewTestWorld();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
 		public void AttachEntityTest() {
 			AttachEntity();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -76,7 +81,7 @@ namespace RhuEngine.GameTests.Tests
 			var TestEntity = newworld.RootEntity.AddChild("TestEntity");
 			var TestEntity2 = newworld.RootEntity.GetChildByName("TestEntity");
 			Assert.AreEqual(TestEntity, TestEntity2);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		public IEnumerable<Type> GetAllTypes(Func<Type, bool> func) {
@@ -105,6 +110,9 @@ namespace RhuEngine.GameTests.Tests
 					types.Add(typeof(Vector4d));
 					types.Add(typeof(RTexture2D));
 					types.Add(typeof(Type));
+					types.Add(typeof(Engine));
+					types.Add(typeof(WaitHandle));
+					types.Add(typeof(LogLevel));
 					types.Add(typeof(EditLevel));
 				}
 				else {
@@ -153,7 +161,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsNotNull(component);
 		}
 		public void RunSyncObjectTest(SyncObject syncObject) {
-			syncObject.OnSave();
+			syncObject.RunOnSave();
 			var serlize = syncObject.Serialize(new SyncObjectSerializerObject(true));
 			syncObject.Deserialize(serlize, new SyncObjectDeserializerObject(true));
 			Assert.IsNotNull(syncObject);
@@ -174,12 +182,16 @@ namespace RhuEngine.GameTests.Tests
 
 		[TestMethod()]
 		public void TestAllSyncObjects() {
-			var testEntity = AttachEntity();
+			var entity = AttachEntity();
+			var Beofre = entity.World.AllWorldObjects;
+			tester.RunForSteps(100);
+			var testEntity = entity.AddChild("Test");
 			var SyncObjecs = GetAllTypes((type) => !type.IsAbstract && !type.IsInterface && typeof(ISyncObject).IsAssignableFrom(type) && !typeof(Component).IsAssignableFrom(type));
 			foreach (var item in SyncObjecs) {
 				if (item.IsGenericType) {
+					Console.WriteLine("Testing Gen SyncObjects " + item.GetFormattedName());
 					foreach (var testType in MakeTestGenerics(item)) {
-						Console.WriteLine("Testing SyncObjects " + testType.GetFormattedName());
+						Console.WriteLine("Testing SyncObject " + testType.GetFormattedName());
 						ITestSyncObject e = null;
 						try {
 							try {
@@ -205,7 +217,7 @@ namespace RhuEngine.GameTests.Tests
 					}
 				}
 				else {
-					Console.WriteLine("Testing SyncObjects " + item.GetFormattedName());
+					Console.WriteLine("Testing SyncObject " + item.GetFormattedName());
 					ITestSyncObject e = null;
 					try {
 						e = (ITestSyncObject)testEntity.AttachComponent<Component>(typeof(TestSyncObject<>).MakeGenericType(item));
@@ -220,9 +232,23 @@ namespace RhuEngine.GameTests.Tests
 					}
 					RunSyncObjectTest(e.GetObject());
 				}
+				testEntity.Dispose();
+				try {
+					Assert.AreEqual(Beofre.Length, entity.World.WorldObjectsCount);
+				}
+				catch {
+					var newArray = entity.World.AllWorldObjects;
+					for (var i = 0; i < newArray.Length; i++) {
+						if (!Beofre.Contains(newArray[i])) {
+							Console.WriteLine($"Element {newArray[i].GetType().GetFormattedName()} should be removed");
+						}
+					}
+					Assert.AreEqual(Beofre.Length, entity.World.WorldObjectsCount);
+				}
+				testEntity = entity.AddChild("Test");
 			}
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -244,7 +270,7 @@ namespace RhuEngine.GameTests.Tests
 			synclist.SyncObject.DisposeAtIndex(0);
 			Assert.AreEqual(7, synclist.SyncObject.Count);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -257,7 +283,7 @@ namespace RhuEngine.GameTests.Tests
 			t.Deserialize(data, new SyncObjectDeserializerObject(true));
 			Assert.AreEqual(t.SyncObject[0][0].Value, e.SyncObject[0][0].Value);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 
@@ -291,7 +317,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsTrue(hashit);
 			Assert.AreEqual("Trains", hitcollider.CustomObject);
 			tester.RunForSteps(2);
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod]
@@ -310,7 +336,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsTrue(hashit);
 			Assert.AreEqual("Trains", hitcollider.CustomObject);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 		[TestMethod]
 		public void RayTestWithRawMesh() {
@@ -328,7 +354,44 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsTrue(hashit);
 			Assert.AreEqual("Trains", hitcollider.CustomObject);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
+		}
+
+		[TestMethod]
+		public void ParentChildToSelf() {
+			var testWorld = StartNewTestWorld();
+			tester.RunForSteps();
+			var thing = testWorld.RootEntity.AddChild("THings");
+			var test = thing.AddChild("Test");
+			thing.parent.Target = test;
+			Assert.AreEqual(testWorld.RootEntity, thing.parent.Target);
+		}
+
+		[TestMethod]
+		public void ParentToSelf() {
+			var testWorld = StartNewTestWorld();
+			tester.RunForSteps();
+			var test = testWorld.RootEntity.AddChild("Test");
+			test.parent.Target = test;
+			Assert.AreEqual(testWorld.RootEntity, test.parent.Target);
+		}
+
+		[TestMethod]
+		public void WorldObjectManagementTest() {
+			var testWorld = StartNewTestWorld();
+			tester.RunForSteps();
+			var amountatstart = testWorld.WorldObjectsCount;
+			var rootEntity = testWorld.RootEntity.AddChild("AddedChild");
+			for (var i = 0; i < 1000; i++) {
+				var entity = rootEntity.AddChild($"TEst{i}");
+				entity.AttachComponent<MeshRender>();
+				entity.AttachComponent<Grabbable>();
+				entity.AttachComponent<UIRect>();
+				entity.AttachComponent<Spinner>();
+				entity.AttachComponent<RawECMAScript>();
+			}
+			rootEntity.Dispose();
+			Assert.AreEqual(amountatstart, testWorld.WorldObjectsCount);
 		}
 
 
@@ -344,7 +407,7 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsTrue(hashit);
 			Assert.AreEqual("Trains", hitcollider.CustomObject);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
@@ -371,44 +434,44 @@ namespace RhuEngine.GameTests.Tests
 			Assert.AreNotEqual(output.Value, new NetPointer(valueone.id + valuetwo.id + valueThree.id));
 
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
-		[TestMethod()]
-		public void TestMultiOperatorsComponentVector() {
-			var testEntity = AttachEntity();
-			var inttest = testEntity.AttachComponent<Components.MultiOperators<Vector3f, Vector3f>>();
-			var output = testEntity.AttachComponent<Components.ValueField<Vector3f>>();
-			inttest.Output.Target = output.Value;
-			var random = new Random();
-			var inputs = testEntity.AttachComponent<Components.ValueList<Vector3f>>();
-			var one = inputs.Value.Add();
-			var valueone = one.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
-			inttest.Inputs.Add().Target = one;
+		//[TestMethod()]
+		//public void TestMultiOperatorsComponentVector() {
+		//	var testEntity = AttachEntity();
+		//	var inttest = testEntity.AttachComponent<Components.MultiOperators<Vector3f, Vector3f>>();
+		//	var output = testEntity.AttachComponent<Components.ValueField<Vector3f>>();
+		//	inttest.Output.Target = output.Value;
+		//	var random = new Random();
+		//	var inputs = testEntity.AttachComponent<Components.ValueList<Vector3f>>();
+		//	var one = inputs.Value.Add();
+		//	var valueone = one.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
+		//	inttest.Inputs.Add().Target = one;
 
-			var two = inputs.Value.Add();
-			var valuetwo = two.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
-			inttest.Inputs.Add().Target = two;
+		//	var two = inputs.Value.Add();
+		//	var valuetwo = two.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
+		//	inttest.Inputs.Add().Target = two;
 
-			var three = inputs.Value.Add();
-			var valueThree = three.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
-			inttest.Inputs.Add().Target = three;
+		//	var three = inputs.Value.Add();
+		//	var valueThree = three.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
+		//	inttest.Inputs.Add().Target = three;
 
-			inttest.Operators.Value = Components.MultiOperators.Addition;
-			Assert.AreEqual(output.Value, valueone + valuetwo + valueThree);
+		//	inttest.Operators.Value = Components.MultiOperators.Addition;
+		//	Assert.AreEqual(output.Value, valueone + valuetwo + valueThree);
 
-			inttest.Operators.Value = Components.MultiOperators.Subtraction;
-			Assert.AreEqual(output.Value, valueone - valuetwo - valueThree);
+		//	inttest.Operators.Value = Components.MultiOperators.Subtraction;
+		//	Assert.AreEqual(output.Value, valueone - valuetwo - valueThree);
 
-			inttest.Operators.Value = Components.MultiOperators.Multiplication;
-			Assert.AreEqual(output.Value, valueone * valuetwo * valueThree);
+		//	inttest.Operators.Value = Components.MultiOperators.Multiplication;
+		//	Assert.AreEqual(output.Value, valueone * valuetwo * valueThree);
 
-			inttest.Operators.Value = Components.MultiOperators.Division;
-			Assert.AreEqual(output.Value, valueone / valuetwo / valueThree);
+		//	inttest.Operators.Value = Components.MultiOperators.Division;
+		//	Assert.AreEqual(output.Value, valueone / valuetwo / valueThree);
 
-			tester.RunForSteps();
-			tester.Dispose();
-		}
+		//	tester.RunForSteps();
+		//	((IDisposable)tester).Dispose();
+		//}
 
 		[TestMethod()]
 		public void TestMultiOperatorsComponentInt() {
@@ -453,12 +516,16 @@ namespace RhuEngine.GameTests.Tests
 			inttest.Operators.Value = Components.MultiOperators.LogicalAND;
 			Assert.AreEqual(output.Value, valueone & valuetwo & valueThree);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		[TestMethod()]
 		public void TestAllComponents() {
-			var testEntity = AttachEntity();
+			var entity = AttachEntity();
+
+			var Beofre = entity.World.WorldObjectsCount;
+			tester.RunForSteps(100);
+			var testEntity = entity.AddChild("Test");
 			var components = GetAllTypes((type) => !type.IsAbstract && !type.IsInterface && typeof(Component).IsAssignableFrom(type));
 			foreach (var item in components) {
 				if (typeof(ITestSyncObject).IsAssignableFrom(item)) {
@@ -504,9 +571,12 @@ namespace RhuEngine.GameTests.Tests
 						throw new Exception("Loaded PrivateSpaceOnly object");
 					}
 				}
+				testEntity.Dispose();
+				Assert.AreEqual(Beofre, entity.World.WorldObjectsCount);
+				testEntity = entity.AddChild("Test");
 			}
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 
 		public static bool RunAcountLoginAndCreation = false;
@@ -516,25 +586,24 @@ namespace RhuEngine.GameTests.Tests
 			SetUpForNormalTest();
 			if (!RunAcountLoginAndCreation) {
 				tester.RunForSteps();
-				tester.Dispose();
+				((IDisposable)tester).Dispose();
 				return;
 			}
 			var userName = "AutoRemovedTestAcount" + Guid.NewGuid().ToString();
 			var email = $"{userName}@AutoRemovedTestAcount.rhubarbvr.net";
 			var password = "Password" + Guid.NewGuid().ToString();
-			var dateOfBirth = DateTime.Now.AddYears(-100);
-			var signup = await tester.app.netApiManager.SignUp(userName, email, password, dateOfBirth);
-			if (signup.Error) {
-				throw new Exception("Failed to createAcount" + signup.Message + $"\n{signup.ErrorDetails}");
+			var signup = await tester.app.netApiManager.Client.RegisterAccount(userName, email, password);
+			if (!signup.IsDataGood) {
+				throw new Exception("Failed to createAcount" + signup.Data);
 			}
-			var login = await tester.app.netApiManager.Login(email, password);
-			if (!login.Login) {
-				throw new Exception("Failed to login" + login.Message);
+			var login = await tester.app.netApiManager.Client.Login(email, password);
+			if (login.Error) {
+				throw new Exception("Failed to login" + login.MSG);
 			}
 			RLog.Info("Login as " + userName);
-			Assert.AreEqual(userName, tester.app.netApiManager.User.UserName);
+			Assert.AreEqual(userName, tester.app.netApiManager.Client?.User.UserName);
 			tester.RunForSteps();
-			tester.Dispose();
+			((IDisposable)tester).Dispose();
 		}
 	}
 }

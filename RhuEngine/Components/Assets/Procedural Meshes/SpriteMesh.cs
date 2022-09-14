@@ -7,7 +7,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class SpriteMesh : ProceduralMesh
+	public sealed class SpriteMesh : ProceduralMesh
 	{
 		[OnChanged(nameof(LoadMesh))]
 		public readonly SyncRef<SpriteProvder> Sprite;
@@ -43,7 +43,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<bool> WantNormals;
 
-		public override void FirstCreation() {
+		protected override void FirstCreation() {
 			base.FirstCreation();
 			IndicesMap.Value = new(1, 3);
 			Dimensions.Value = Vector2f.One;

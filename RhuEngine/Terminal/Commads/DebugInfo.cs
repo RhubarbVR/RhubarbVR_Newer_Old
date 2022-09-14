@@ -21,9 +21,11 @@ namespace RhuEngine.Commads
 			switch (args[1].ToLower()) {
 				case "enginestatistics":
 					Console.WriteLine(@$"=====---- EngineStatistics ----=====
-Is Login {Manager.Engine.netApiManager.IsLoggedIn}
-Username {Manager.Engine.netApiManager.User?.UserName ?? "Null"}
-UserID {Manager.Engine.netApiManager.User?.Id ?? new Guid()}
+Is Online {Manager.Engine.netApiManager.Client.IsOnline}
+Server Ping {Manager.Engine.netApiManager.Client.Ping}
+Is Login {Manager.Engine.netApiManager.Client.IsLogin}
+Username {Manager.Engine.netApiManager.Client.User?.UserName ?? "Null"}
+UserID {Manager.Engine.netApiManager.Client.User?.Id ?? new Guid()}
 
 worldManager stepTime {Manager.Engine.worldManager.TotalStepTime * 1000f:f3}ms
 FPS {1 / RTime.Elapsedf:f3}
@@ -75,7 +77,8 @@ stepTime { (Manager.Engine.worldManager.FocusedWorld?.stepTime * 1000f).Value:f3
 			var returnstring = "";
 			var currentUserID = 0;
 			if (Manager.Engine.worldManager.FocusedWorld != null) {
-				foreach (User item in Manager.Engine.worldManager.FocusedWorld.Users) {
+				//Todo: make forLoop
+				foreach (var item in Manager.Engine.worldManager.FocusedWorld.Users.Cast<User>()) {
 					returnstring += $"User: {currentUserID + 1} UserRef: {item.Pointer} UserName: {item.UserName} PeerLoaded: {item.CurrentPeer != null} UserID: {item.userID.Value} IsLocal: {Manager.Engine.worldManager.FocusedWorld?.GetLocalUser() == item} SyncStreamsCount: {item.syncStreams.Count} isPresent: {item.isPresent.Value} isConnected: {item.IsConnected} peerID: {item.CurrentPeer?.ID.ToString() ?? "null"}  latency{item.CurrentPeer?.latency ?? -1}\n";
 					currentUserID++;
 				}

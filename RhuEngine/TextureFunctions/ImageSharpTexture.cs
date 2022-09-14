@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 
 namespace RhuEngine
 {
-	public class ImageSharpTexture : IDisposable
+	public sealed class ImageSharpTexture : IDisposable
 	{
 		public Image<Rgba32> Image { get; }
 		public bool Srgb { get; }

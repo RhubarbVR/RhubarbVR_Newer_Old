@@ -9,7 +9,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Importers" })]
-	public class UnknownImporter : Importer {
+	public sealed class UnknownImporter : Importer {
 		public string path_url;
 
 		public bool isUrl;

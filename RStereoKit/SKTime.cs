@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace RStereoKit
 {
-	public class SKTime : IRTime
+	public sealed class SKTime : IRTime
 	{
 		public float Elapsedf => Time.Elapsedf;
 	}

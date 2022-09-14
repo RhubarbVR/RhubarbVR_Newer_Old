@@ -22,7 +22,6 @@ namespace RhuEngine.WorldObjects
 
 	public interface IWorldObject : IDisposable
 	{
-		public EditLevel EditLevel { get; }
 		public string Name { get; }
 		public bool IsRemoved { get; }
 		public bool Persistence { get; }

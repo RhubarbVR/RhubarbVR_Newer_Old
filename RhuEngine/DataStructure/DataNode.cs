@@ -8,7 +8,7 @@ using SharedModels.GameSpecific;
 namespace RhuEngine.DataStructure
 {
 	[MessagePackObject]
-	public class DataNode<T> : IDataNode
+	public sealed class DataNode<T> : IDataNode
 	{
 		public DataNode(T def = default) {
 			Value = def;

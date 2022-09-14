@@ -19,7 +19,7 @@ namespace RhuEngine.Components
 		}
 
 		public void LoadMesh() {
-			RWorld.ExecuteOnEndOfFrame(this, () => {
+			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
 				try {
 					ComputeMesh();
 				}
@@ -31,7 +31,7 @@ namespace RhuEngine.Components
 			});
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			LoadMesh();
 		}

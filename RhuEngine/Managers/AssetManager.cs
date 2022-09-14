@@ -7,10 +7,11 @@ using RhuEngine.AssetSystem.AssetProtocals;
 using System.IO;
 using System.Threading.Tasks;
 using RhuEngine.Linker;
+using RNumerics;
 
 namespace RhuEngine.Managers
 {
-	public class AssetManager : IManager
+	public sealed class AssetManager : IManager
 	{
 		public AssetManager(string cachePath) {
 			CacheDir = cachePath is null ? Engine.BaseDir + "/Cache" : cachePath;

@@ -8,9 +8,9 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.Normal)]
 	[Category(new string[] { "User" })]
-	public class SimpleSpawn : Component
+	public sealed class SimpleSpawn : Component
 	{
-		public override void Step() {
+		protected override void Step() {
 			if (!Engine.EngineLink.SpawnPlayer) {
 				return;
 			}
@@ -27,7 +27,7 @@ namespace RhuEngine.Components
 				var leftComp = leftHand.AttachComponent<Hand>();
 				leftComp.hand.Value = Handed.Left;
 				leftComp.user.Target = World.GetLocalUser();
-				userRoot.leftHand.Target = leftHand;
+				userRoot.leftController.Target = leftHand;
 				if (!World.IsPersonalSpace) {
 					var r = leftHand.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
 					r.Item1.Radius.Value = 0.03f / 2;
@@ -43,7 +43,7 @@ namespace RhuEngine.Components
 					l.Item1.Radius.Value = 0.03f / 2;
 					l.Item3.colorLinear.Value = Colorf.RhubarbGreen;
 				}
-				userRoot.rightHand.Target = rightHand;
+				userRoot.rightController.Target = rightHand;
 				var head = userEntity.AddChild("Head");
 				head.AttachComponent<GrabbableHolder>().InitializeGrabHolder(Handed.Max);
 				head.AttachComponent<Head>().user.Target = World.GetLocalUser();

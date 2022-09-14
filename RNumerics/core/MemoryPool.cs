@@ -6,7 +6,7 @@ namespace RNumerics
 	/// <summary>
 	/// Very basic object pool class. 
 	/// </summary>
-	public class MemoryPool<T> where T : class, new()
+	public sealed class MemoryPool<T> where T : class, new()
 	{
 		DVector<T> _allocated;
 		DVector<T> _free;
@@ -29,7 +29,7 @@ namespace RNumerics
 			}
 		}
 
-		public void Return(T obj) {
+		public void Return(in T obj) {
 			_free.Add(obj);
 		}
 

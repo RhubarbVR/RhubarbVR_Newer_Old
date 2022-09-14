@@ -5,7 +5,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class CircleMesh : ProceduralMesh
+	public sealed class CircleMesh : ProceduralMesh
 	{
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
@@ -22,7 +22,7 @@ namespace RhuEngine.Components
 		[Default(32)]
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<int> Slices;
-		public override void FirstCreation() {
+		protected override void FirstCreation() {
 			base.FirstCreation();
 		}
 

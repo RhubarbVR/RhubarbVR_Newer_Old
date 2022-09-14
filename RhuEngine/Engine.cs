@@ -19,7 +19,11 @@ using System.Runtime;
 
 namespace RhuEngine
 {
-	public class Engine : IDisposable
+	public class RhuException : Exception {
+		public RhuException(string data):base(data) { }
+	}
+
+	public sealed class Engine : IDisposable
 	{
 		public void DragAndDropAction(List<string> files) {
 			DragAndDrop?.Invoke(files);
@@ -60,9 +64,7 @@ namespace RhuEngine
 		public CommandManager commandManager;
 
 		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null, bool PassErrors = false) : base() {
-			if (baseDir is null) {
-				baseDir = AppDomain.CurrentDomain.BaseDirectory;
-			}
+			baseDir ??= AppDomain.CurrentDomain.BaseDirectory;
 			BaseDir = baseDir;
 			RhuConsole.ForegroundColor = ConsoleColor.White;
 			this.PassErrors = PassErrors;
@@ -218,6 +220,8 @@ namespace RhuEngine
 
 		public AssetManager assetManager;
 
+		public UIManager uiManager = new();
+
 		public InputManager inputManager = new();
 
 		public LocalisationManager localisationManager = new();
@@ -240,6 +244,7 @@ namespace RhuEngine
 
 		public RText StartingText;
 		public ITextMaterial StartingTextMit;
+		public bool IsInVR => EngineLink.InVR;
 
 		public void Init(bool RunStartThread = true) {
 			Thread.CurrentThread.Priority = ThreadPriority.Highest;
@@ -262,10 +267,10 @@ namespace RhuEngine
 			}
 			var startcode = () => {
 				IntMsg = "Building NetApiManager";
-				netApiManager = new NetApiManager(_userDataPathOverRide);
+				netApiManager = new NetApiManager((_userDataPathOverRide??BaseDir) + "/rhuCookie");
 				IntMsg = "Building AssetManager";
 				assetManager = new AssetManager(_cachePathOverRide);
-				_managers = new IManager[] { localisationManager, inputManager, netApiManager, assetManager, worldManager };
+				_managers = new IManager[] { localisationManager, inputManager, netApiManager, assetManager, worldManager, uiManager };
 				foreach (var item in _managers) {
 					IntMsg = $"Starting {item.GetType().Name}";
 					try {
@@ -309,7 +314,7 @@ namespace RhuEngine
 				if (EngineLink.CanRender) {
 					try {
 						var headMat = RInput.Head.HeadMatrix;
-						if (!RWorld.IsInVR) {
+						if (!IsInVR) {
 							RRenderer.CameraRoot = Matrix.Identity;
 							headMat = Matrix.T(Vector3f.Forward / 10);
 						}
@@ -344,7 +349,6 @@ namespace RhuEngine
 
 		public void RenderStep() {
 			try {
-				RWorld.RunOnStartOfFrame();
 				foreach (var item in _managers) {
 					try {
 						item.RenderStep();
@@ -354,7 +358,6 @@ namespace RhuEngine
 						throw ex;
 					}
 				}
-				RWorld.RunOnEndOfFrame();
 			}
 			catch (Exception wa) {
 				RLog.Err("GameStep Error" + wa.ToString());
@@ -363,7 +366,7 @@ namespace RhuEngine
 
 		public void GameStep() {
 			try {
-				RWorld.RunOnStartOfFrame();
+				RUpdateManager.RunOnStartOfFrame();
 				foreach (var item in _managers) {
 					try {
 						item.Step();
@@ -373,7 +376,7 @@ namespace RhuEngine
 						throw ex;
 					}
 				}
-				RWorld.RunOnEndOfFrame();
+				RUpdateManager.RunOnEndOfFrame();
 			}
 			catch (Exception wa) {
 				RLog.Err("GameStep Error" + wa.ToString());

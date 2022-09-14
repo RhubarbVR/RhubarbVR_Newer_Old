@@ -7,10 +7,8 @@ namespace RNumerics
 {
 	public static class FamcyTypeParser
 	{
-		public static Type PraseType(string type, Assembly[] asm = null) {
-			if (asm == null) {
-				asm = AppDomain.CurrentDomain.GetAssemblies();
-			}
+		public static Type PraseType(in string type, Assembly[] asm = null) {
+			asm ??= AppDomain.CurrentDomain.GetAssemblies();
 			return type.Contains("<") && type.Contains(">") ? PraseGeneric(type,asm) : SingleTypeParse(type,asm);
 		}
 		public static string[] ExtraNameSpaces = new string[] {
@@ -22,7 +20,7 @@ namespace RNumerics
 			"RhuEngine.WorldObjects.ECS.",
 		};
 
-		public static Type SingleTypeParse(string type,Assembly[] asm) {
+		public static Type SingleTypeParse(string type, in Assembly[] asm) {
 			if (type == "int") {
 				type = nameof(Int32);
 			}
@@ -93,7 +91,7 @@ namespace RNumerics
 			}
 			return returnType;
 		}
-		public static Type PraseGeneric(string type, Assembly[] asm) {
+		public static Type PraseGeneric(in string type, in Assembly[] asm) {
 			var firstGroup = type.IndexOf('<');
 			var depth = 0;
 			var lastIndex = firstGroup + 1;

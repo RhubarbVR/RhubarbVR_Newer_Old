@@ -9,7 +9,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Materials" })]
-	public class ToonMaterial : MaterialBase<IToonMaterial>
+	public sealed class ToonMaterial : MaterialBase<IToonMaterial>
 	{
 		[Default(BasicRenderMode.Opaque)]
 		[OnChanged(nameof(RenderModeChanged))]
@@ -632,10 +632,10 @@ namespace RhuEngine.Components
 			});
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 		}
-		public override void UpdateAll() {
+		protected override void UpdateAll() {
 
 			RenderModeChanged();
 			CullModeChanged();

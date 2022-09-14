@@ -9,166 +9,96 @@ using RhuEngine.Physics;
 
 namespace RhuEngine.Components
 {
-	public abstract class RenderUIComponent : UIComponent
+	public abstract class RenderUIComponent : BaseRenderUIComponent
 	{
-		public SimpleMesh MainMesh { get; set; }
-		public SimpleMesh ScrollMesh { get; set; }
-		public SimpleMesh CutMesh { get; set; }
-		public SimpleMesh RenderMesh { get; set; }
-
-		public abstract RMaterial RenderMaterial { get; }
 		public abstract Colorf RenderTint { get; }
+		public abstract RMaterial RenderMaterial { get; }
+		public RMesh mesh;
 
-		public abstract bool HasPhysics { get; }
+		public SimpleMesh StandaredBaseMesh;
+		public SimpleMesh MovedMesh;
+		public SimpleMesh FinalMesh;
 
-		public Matrix PhysicsPose;
-
-		public RigidBodyCollider PhysicsCollider;
-
-		public abstract void ProcessBaseMesh();
-
-		public void ProcessMesh() {
-			if (!Engine.EngineLink.CanRender) {
-				return;
-			}
-			RenderMesh = CutMesh = ScrollMesh = MainMesh = null;
-			RenderMainMesh();
-		}
-
-		public void RegProcessMesh() {
-			if (!Engine.EngineLink.CanRender) {
-				return;
-			}
-			RWorld.ExecuteOnEndOfFrame(this, ProcessMesh);
-		}
-
-		public override void RenderTargetChange() {
-			ProcessBaseMesh();
-		}
-		public override void Render(Matrix matrix) {
-			//Never Runs
-		}
-
-		public void RenderScrollMesh(bool updateMesh = true) {
-			if (MainMesh is null) {
-				ProcessBaseMesh();
-			}
-			if (Rect.ScrollOffset == Vector3f.Zero) {
-				ScrollMesh = MainMesh;
-			}
-			else {
-				var scrollMesh = new SimpleMesh(MainMesh);
-				scrollMesh.Translate(Rect.ScrollOffset);
-				ScrollMesh = scrollMesh;
-			}
-			if (updateMesh) {
-				Rect.UpdateMeshes();
-			}
-		}
-
-		private bool _isCut;
-
-		public override void CutElement(bool cut, bool update = true) {
-			_isCut = cut;
-			RenderCutMesh(update, update);
-		}
-
-
-
-		private void RunLoadPhysicsBox() {
-			PhysicsCollider?.Remove();
-			PhysicsCollider = null;
-			if (Rect.Culling) {
-				return;
-			}
-			var truemin = Rect.Min + Rect.ScrollOffset.Xy;
-			var truemax = Rect.Max + Rect.ScrollOffset.Xy;
-			var min = MathUtil.Max(Rect.CutZonesMin, truemin);
-			var max = MathUtil.Min(Rect.CutZonesMax, truemax);
-			var size = max - min;
-			var collidersize = new Vector3d(size.x, size.y, Rect.Depth.Value) / 2;
-			var pos = min + collidersize.Xy;
-			PhysicsPose = Matrix.T(new Vector3f((float)pos.x, (float)pos.y, Rect.StartPoint + (float)collidersize.z));
-			PhysicsCollider = new RBoxShape(collidersize).GetCollider(World.PhysicsSim);
-			Engine.worldManager.PrivateOverlay?.DrawDebugCube(PhysicsPose * Matrix.S(Rect.Canvas.scale.Value / 10) * Rect.LastRenderPos, Vector3f.Zero, collidersize, new Colorf(0, 1, 1, 0.2f), 5); //For testing collider
-			PhysicsCollider.CustomObject = this;
-			PhysicsCollider.Group = ECollisionFilterGroups.UI;
-			PhysicsCollider.Mask = ECollisionFilterGroups.UI;
-			PhysicsCollider.Active = Entity.IsEnabled;
-		}
-		private void RunLoadPhysicsMesh() {
-			PhysicsCollider?.Remove();
-			PhysicsCollider = null;
-			if (Rect.Culling) {
-				return;
-			}
-			PhysicsPose = Matrix.T(Vector3f.Zero);
-			PhysicsCollider = new RRawMeshShape(RenderMesh).GetCollider(World.PhysicsSim);
-			Engine.worldManager.PrivateOverlay?.DrawDebugMesh(RenderMesh, Matrix.S(1.01f) * Rect.LastRenderPos, new Colorf(0, 1, 1, 0.2f), 15); //For testing collider
-			PhysicsCollider.CustomObject = this;
-			PhysicsCollider.Group = ECollisionFilterGroups.UI;
-			PhysicsCollider.Mask = ECollisionFilterGroups.UI;
-			PhysicsCollider.Active = Entity.IsEnabled;
-		}
-		public void LoadPhysicsMesh() {
-			if (!Rect.PysicsLock) {
-				RWorld.ExecuteOnEndOfFrame(BoxBased ? RunLoadPhysicsBox : RunLoadPhysicsMesh);
-			}
-		}
-
-		public virtual bool BoxBased => !((Rect.Canvas?.FrontBind.Value ?? false) || (Rect.Canvas?.TopOffset.Value ?? false));
-
-		public void RenderMainMesh(bool updateMesh = true, bool PhysicsMesh = true) {
-			if (CutMesh is null) {
-				RenderCutMesh(false,false,false);
-			}
-			var returnMesh = CutMesh;
-			if (Rect.Canvas.TopOffset.Value) {
-				returnMesh = returnMesh.Copy();
-				returnMesh.OffsetTop(Rect.Canvas.TopOffsetValue.Value);
-			}
-			if (Rect.Canvas.FrontBind.Value) {
-				returnMesh = returnMesh.UIBind(Rect.Canvas.FrontBindAngle.Value, Rect.Canvas.FrontBindRadus.Value, Rect.Canvas.FrontBindSegments.Value, Rect.Canvas.scale);
-			}
-			if (!BoxBased) {
-				returnMesh.Scale(Rect.Canvas.scale.Value.x / 10, Rect.Canvas.scale.Value.y / 10, Rect.Canvas.scale.Value.z / 10);
-			}
-			RenderMesh = returnMesh;
-			if (PhysicsMesh) {
-				LoadPhysicsMesh();
-			}
-			if (updateMesh) {
-				Rect.UpdateMeshes();
-			}
-		}
-
-		public void RenderCutMesh(bool updateMesh = true, bool PhysicsMesh = true, bool UpdateManMesh = true) {
-			if (ScrollMesh is null) {
-				RenderScrollMesh(false);
-			}
-			var cutMesh = _isCut ? ScrollMesh.Cut(Rect.CutZonesMax, Rect.CutZonesMin) : ScrollMesh;
-			CutMesh = cutMesh;
-			if (UpdateManMesh) {
-				RenderMainMesh(updateMesh, PhysicsMesh);
-			}
-		}
-
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
-			Entity.EnabledChanged += Entity_EnabledChanged;
+			UIRect?.RenderComponents?.SafeAdd(this);
 		}
 
-		private void Entity_EnabledChanged() {
-			if(PhysicsCollider is null) {
+		protected virtual void UpdateMesh() {
+
+		}
+
+		protected virtual void MovedMeshUpdate() {
+			MovedMesh = StandaredBaseMesh?.Copy();
+			if (MovedMesh is null) {
 				return;
 			}
-			PhysicsCollider.Active = Entity.IsEnabled;
+			MovedMesh.Translate(MoveAmount);
+			if (HasBeenCut) {
+				MovedMesh = MovedMesh.Cut(CutMax, CutMin);
+			}
+		}
+		protected virtual void FinalMeshUpdate() {
+			FinalMesh = MovedMesh?.Copy();
+			if (FinalMesh is null) {
+				return;
+			}
+			if (UIRect.Canvas.TopOffset.Value) {
+				FinalMesh.OffsetTop(UIRect.Canvas.TopOffsetValue.Value);
+			}
+			if (UIRect.Canvas.FrontBind.Value) {
+				FinalMesh = FinalMesh.UIBind(UIRect.Canvas.FrontBindAngle.Value, UIRect.Canvas.FrontBindRadus.Value, UIRect.Canvas.FrontBindSegments.Value, UIRect.Canvas.scale);
+			}
+			FinalMesh.Scale(UIRect.Canvas.scale.Value.x / 10, UIRect.Canvas.scale.Value.y / 10, UIRect.Canvas.scale.Value.z / 10);
 		}
 
-		public override void Dispose() {
-			base.Dispose();
-			PhysicsCollider?.Remove();
-			PhysicsCollider = null;
+		public void UpdateRMeshForRender() {
+			mesh ??= new RMesh((IMesh)null, true);
+			mesh.LoadMesh(FinalMesh);
+		}
+
+		public override void Render(Matrix pos, int Depth) {
+			if (RenderMaterial is null) {
+				return;
+			}
+			mesh?.Draw(RenderMaterial, pos, RenderTint, Depth);
+		}
+
+		public override void ProcessMeshUpdate() {
+			if(UIRect?.CachedCanvas is null) {
+				return;
+			}
+			if(StandaredBaseMesh is null) {
+				UpdateMesh();
+				MovedMeshUpdate();
+				FinalMeshUpdate();
+				UpdateRMeshForRender();
+				return;
+			}
+			switch (UIRect.RenderMeshUpdate) {
+				case UIRect.RenderMeshUpdateType.FullResized:
+					UpdateMesh();
+					MovedMeshUpdate();
+					FinalMeshUpdate();
+					UpdateRMeshForRender();
+					break;
+				case UIRect.RenderMeshUpdateType.Movment:
+					MovedMeshUpdate();
+					FinalMeshUpdate();
+					UpdateRMeshForRender();
+					break;
+				case UIRect.RenderMeshUpdateType.CutMesh:
+					MovedMeshUpdate();
+					FinalMeshUpdate();
+					UpdateRMeshForRender();
+					break;
+				case UIRect.RenderMeshUpdateType.BindAndCanvasScale:
+					FinalMeshUpdate();
+					UpdateRMeshForRender();
+					break;
+				default:
+					break;
+			}
 		}
 	}
 }

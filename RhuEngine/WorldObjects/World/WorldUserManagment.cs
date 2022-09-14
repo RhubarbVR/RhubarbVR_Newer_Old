@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using RhuEngine.Components;
@@ -10,7 +11,7 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World
+	public sealed partial class World
 	{
 		public ushort LocalUserID { get; private set; } = 1;
 
@@ -19,7 +20,8 @@ namespace RhuEngine.WorldObjects
 		public readonly SyncObjList<User> Users;
 		
 		public User GetUserFromID(Guid id) {
-			foreach (User item in Users) {
+			//Todo: make forLoop
+			foreach (var item in Users.Cast<User>()) {
 				if (item.userID.Value == id.ToString()) {
 					return item;
 				}
@@ -66,7 +68,7 @@ namespace RhuEngine.WorldObjects
 		}
 		[Exposed]
 		public User GetMasterUser() {
-			return Users[MasterUser];
+			return IsNetworked ? Users[MasterUser] : Users[0];
 		}
 		[Exposed]
 		public User GetHostUser() {
@@ -86,7 +88,7 @@ namespace RhuEngine.WorldObjects
 
 		public void DrawDebugMesh(IMesh mesha,Matrix matrix,Colorf colorf, float drawTime = 1) {
 			if (DebugVisuals) {
-				RWorld.ExecuteOnStartOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					var mesh = RootEntity.GetFirstComponentOrAttach<RawMeshAsset>();
 					var comp = RootEntity.GetFirstComponent<UnlitMaterial>();
 					if (comp is null) {
@@ -114,7 +116,7 @@ namespace RhuEngine.WorldObjects
 		}
 		public void DrawDebugCube(Matrix matrix,Vector3f pos,Vector3f scale,Colorf colorf, float drawTime = 1) {
 			if (DebugVisuals) {
-				RWorld.ExecuteOnStartOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					var mesh = RootEntity.GetFirstComponentOrAttach<TrivialBox3Mesh>();
 					var comp = RootEntity.GetFirstComponent<UnlitMaterial>();
 					if (comp is null) {
@@ -135,13 +137,18 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public void DrawDebugText(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf,string text, float drawTime = 1) {
+		public void DrawDebugText(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf,object text, float drawTime = 1,bool lookAtLocal = true) {
 			if (DebugVisuals) {
-				RWorld.ExecuteOnStartOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					var debugcube = RootEntity.AddChild("DebugText");
+					if (lookAtLocal) {
+						var lookAt = debugcube.AttachComponent<LookAtValue>();
+						var userNodePos = debugcube.AttachComponent<UserBodyNodeTransform>();
+						userNodePos.Pos.SetLinkerTarget(lookAt.LookAtPoint);
+					}
 					var meshrender = debugcube.AttachComponent<WorldText>();
 					meshrender.StartingColor.Value = colorf;
-					meshrender.Text.Value = text;
+					meshrender.Text.Value = text.ToString();
 					meshrender.Entity.GlobalTrans = Matrix.TS(pos, scale) * matrix;
 					Task.Run(async () => {
 						await Task.Delay((int)(1000 * drawTime));
@@ -159,7 +166,7 @@ namespace RhuEngine.WorldObjects
 
 		public void DrawDebugSphere(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf, float drawTime = 1) {
 			if (DebugVisuals) {
-				RWorld.ExecuteOnStartOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					var mesh = worldManager.PrivateOverlay.RootEntity.GetFirstComponentOrAttach<Sphere3NormalizedCubeMesh>();
 					var comp = worldManager.PrivateOverlay.RootEntity.GetFirstComponent<UnlitMaterial>();
 					if (comp is null) {

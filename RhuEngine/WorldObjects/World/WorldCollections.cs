@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 using RhuEngine.Datatypes;
 using RhuEngine.Linker;
@@ -10,7 +11,7 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World
+	public sealed partial class World
 	{
 		private readonly ConcurrentDictionary<NetPointer, IWorldObject> _worldObjects = new();
 
@@ -20,7 +21,7 @@ namespace RhuEngine.WorldObjects
 
 		private readonly HashSet<Entity> _updatingEntities = new();
 
-		private readonly HashSet<RenderingComponent> _renderingComponents = new();
+		private readonly HashSet<LinkedWorldComponent> _worldLinkComponents = new();
 
 		private readonly HashSet<IGlobalStepable> _globalStepables = new();
 
@@ -32,9 +33,12 @@ namespace RhuEngine.WorldObjects
 		[Exposed]
 		public int UpdatingEntityCount => _updatingEntities.Count;
 		[Exposed]
-		public int RenderingComponentsCount => _renderingComponents.Count;
+		public int RenderingComponentsCount => _worldLinkComponents.Count;
 		[Exposed]
 		public int GlobalStepableCount => _globalStepables.Count;
+
+		public IWorldObject[] AllWorldObjects => _worldObjects.Values.ToArray();
+
 		[Exposed]
 		public int WorldObjectsCount => _worldObjects.Count;
 		[Exposed]
@@ -96,14 +100,14 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public void RegisterRenderObject(RenderingComponent data) {
-			lock (_renderingComponents) {
-				_renderingComponents.Add(data);
+		public void RegisterWorldLinkObject(LinkedWorldComponent data) {
+			lock (_worldLinkComponents) {
+				_worldLinkComponents.Add(data);
 			}
 		}
-		public void UnregisterRenderObject(RenderingComponent data) {
-			lock (_renderingComponents) {
-				_renderingComponents.Remove(data);
+		public void UnregisterWorldLinkObject(LinkedWorldComponent data) {
+			lock (_worldLinkComponents) {
+				_worldLinkComponents.Remove(data);
 			}
 		}
 
@@ -120,11 +124,13 @@ namespace RhuEngine.WorldObjects
 
 		public void RegisterUpdatingEntity(Entity data) {
 			lock (_updatingEntities) {
+				_sortEntitys = true;
 				_updatingEntities.Add(data);
 			}
 		}
 		public void UnregisterUpdatingEntity(Entity data) {
 			lock (_updatingEntities) {
+				_sortEntitys = true;
 				_updatingEntities.Remove(data);
 			}
 		}

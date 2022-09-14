@@ -4,12 +4,12 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category("Math")]
-	public class DualOperators<In,Out> : AbDualOperation<Out,In> where In : struct where Out : struct
+	public sealed class DualOperators<In,Out> : AbDualOperation<Out,In> where In : struct where Out : struct
 	{
 		[OnChanged(nameof(ComputeOutput))]
 		public readonly Sync<DualOperators> Operators;
 
-		public override Out Compute(In a, In b) {
+		protected override Out Compute(In a, In b) {
 			switch (Operators.Value) {
 				case DualOperators.Equal:
 					return ((dynamic)a) == ((dynamic)b);

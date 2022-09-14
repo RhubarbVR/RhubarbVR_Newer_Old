@@ -14,34 +14,30 @@ namespace RNumerics
 		public Vector2d Origin;
 		[Key(1)]
 		public Vector2d Direction;
-
-		public Line2d(Vector2d origin, Vector2d direction) {
+		public Line2d() {
+			Origin = Vector2d.Zero;
+			Direction = Vector2d.Zero;
+		}
+		public Line2d(in Vector2d origin, in Vector2d direction) {
 			Origin = origin;
 			Direction = direction;
 		}
 
-		public Line2d(ref Vector2d origin, ref Vector2d direction) {
-			Origin = origin;
-			Direction = direction;
-		}
 
-		public static Line2d FromPoints(Vector2d p0, Vector2d p1) {
-			return new Line2d(p0, (p1 - p0).Normalized);
-		}
-		public static Line2d FromPoints(ref Vector2d p0, ref Vector2d p1) {
+		public static Line2d FromPoints(in Vector2d p0, in Vector2d p1) {
 			return new Line2d(p0, (p1 - p0).Normalized);
 		}
 
 		// parameter is distance along Line
-		public Vector2d PointAt(double d) {
+		public Vector2d PointAt(in double d) {
 			return Origin + (d * Direction);
 		}
 
-		public double Project(Vector2d p) {
+		public double Project(in Vector2d p) {
 			return (p - Origin).Dot(Direction);
 		}
 
-		public double DistanceSquared(Vector2d p) {
+		public double DistanceSquared(in Vector2d p) {
 			var t = (p - Origin).Dot(Direction);
 			var proj = Origin + (t * Direction);
 			return (proj - p).LengthSquared;
@@ -55,15 +51,7 @@ namespace RNumerics
 		///   -1, on left of line
 		///    0, on the line
 		/// </summary>
-		public int WhichSide(Vector2d test, double tol = 0) {
-			var x0 = test.x - Origin.x;
-			var y0 = test.y - Origin.y;
-			var x1 = Direction.x;
-			var y1 = Direction.y;
-			var det = (x0 * y1) - (x1 * y0);
-			return det > tol ? +1 : (det < -tol ? -1 : 0);
-		}
-		public int WhichSide(ref Vector2d test, double tol = 0) {
+		public int WhichSide(in Vector2d test, in double tol = 0) {
 			var x0 = test.x - Origin.x;
 			var y0 = test.y - Origin.y;
 			var x1 = Direction.x;
@@ -79,7 +67,7 @@ namespace RNumerics
 		/// Returns Vector2d.MaxValue if lines are parallel.
 		/// </summary>
 		/// <returns></returns>
-		public Vector2d IntersectionPoint(ref Line2d other, double dotThresh = MathUtil.ZERO_TOLERANCE) {
+		public Vector2d IntersectionPoint(in Line2d other, in double dotThresh = MathUtil.ZERO_TOLERANCE) {
 			// see IntrLine2Line2 for explanation of algorithm
 			var diff = other.Origin - Origin;
 			var D0DotPerpD1 = Direction.DotPerp(other.Direction);
@@ -98,8 +86,8 @@ namespace RNumerics
 
 
 		// conversion operators
-		public static implicit operator Line2d(Line2f v) => new(v.Origin, v.Direction);
-		public static explicit operator Line2f(Line2d v) => new((Vector2f)v.Origin, (Vector2f)v.Direction);
+		public static implicit operator Line2d(in Line2f v) => new(v.Origin, v.Direction);
+		public static explicit operator Line2f(in Line2d v) => new((Vector2f)v.Origin, (Vector2f)v.Direction);
 
 
 	}
@@ -112,21 +100,21 @@ namespace RNumerics
 		[Key(1)]
 		public Vector2f Direction;
 
-		public Line2f(Vector2f origin, Vector2f direction) {
+		public Line2f(in Vector2f origin, in Vector2f direction) {
 			Origin = origin;
 			Direction = direction;
 		}
 
 		// parameter is distance along Line
-		public Vector2f PointAt(float d) {
+		public Vector2f PointAt(in float d) {
 			return Origin + (d * Direction);
 		}
 
-		public float Project(Vector2f p) {
+		public float Project(in Vector2f p) {
 			return (p - Origin).Dot(Direction);
 		}
 
-		public float DistanceSquared(Vector2f p) {
+		public float DistanceSquared(in Vector2f p) {
 			var t = (p - Origin).Dot(Direction);
 			var proj = Origin + (t * Direction);
 			return (proj - p).LengthSquared;

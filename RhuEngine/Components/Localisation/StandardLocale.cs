@@ -8,7 +8,7 @@ namespace RhuEngine.Components
 {
 
 	[Category(new string[] { "Localisation" })]
-	public class StandardLocale : Component
+	public sealed class StandardLocale : Component
 	{
 		[OnChanged(nameof(LoadLocale))]
 		public readonly Sync<string> Key;
@@ -16,13 +16,15 @@ namespace RhuEngine.Components
 		public readonly Linker<string> TargetValue;
 		[OnChanged(nameof(LoadLocale))]
 		public readonly Sync<string> Append;
-		public void LoadLocale() {
+		[OnChanged(nameof(LoadLocale))]
+		public readonly Sync<string> AppendFront;
+		private void LoadLocale() {
 			if (TargetValue.Linked) {
-				TargetValue.LinkedValue = Engine.localisationManager.GetLocalString(Key) + Append.Value;
+				TargetValue.LinkedValue = AppendFront.Value + Engine.localisationManager.GetLocalString(Key) + Append.Value;
 			}
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			Engine.localisationManager.LocalReload += LoadLocale;
 		}

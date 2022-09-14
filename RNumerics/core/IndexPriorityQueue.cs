@@ -17,7 +17,7 @@ namespace RNumerics
 	/// 
 	/// conceptually based on https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
 	/// </summary>
-	public class IndexPriorityQueue : IEnumerable<int>
+	public sealed class IndexPriorityQueue : IEnumerable<int>
 	{
 		// set this to true during development to catch issues
 		public bool EnableDebugChecks = false;
@@ -40,7 +40,7 @@ namespace RNumerics
 		/// from IDs to internal node indices. If this seems problematic because you won't be inserting the
 		/// full index space, consider a DynamicPriorityQueue instead.
 		/// </summary>
-		public IndexPriorityQueue(int maxID) {
+		public IndexPriorityQueue(in int maxID) {
 			_nodes = new DVector<QueueNode>();
 			_id_to_index = new int[maxID];
 			for (var i = 0; i < maxID; ++i) {
@@ -59,7 +59,7 @@ namespace RNumerics
 		/// if bFreeMemory is false, we don't discard internal data structures, so there will be less allocation next time
 		/// (this does not make a huge difference...)
 		/// </summary>
-		public void Clear(bool bFreeMemory = true) {
+		public void Clear(in bool bFreeMemory = true) {
 			if (bFreeMemory) {
 				_nodes = new DVector<QueueNode>();
 			}
@@ -82,7 +82,7 @@ namespace RNumerics
 		/// <summary>
 		/// constant-time check to see if id is already in queue
 		/// </summary>
-		public bool Contains(int id) {
+		public bool Contains(in int id) {
 			var iNode = _id_to_index[id];
 			return iNode > 0 && iNode <= Count && _nodes[iNode].index > 0;
 		}
@@ -92,7 +92,7 @@ namespace RNumerics
 		/// Add id to list w/ given priority
 		/// Behavior is undefined if you call w/ same id twice
 		/// </summary>
-		public void Insert(int id, float priority) {
+		public void Insert(in int id, in float priority) {
 			if (EnableDebugChecks && Contains(id) == true) {
 				throw new Exception("IndexPriorityQueue.Insert: tried to add node that is already in queue!");
 			}
@@ -107,7 +107,7 @@ namespace RNumerics
 			_nodes.Insert(node, Count);
 			Move_up(_nodes[Count].index);
 		}
-		public void Enqueue(int id, float priority) {
+		public void Enqueue(in int id, in float priority) {
 			Insert(id, priority);
 		}
 
@@ -128,7 +128,7 @@ namespace RNumerics
 		/// remove this node from queue. Undefined behavior if called w/ same id twice!
 		/// Behavior is undefined if you call w/ id that is not in queue
 		/// </summary>
-		public void Remove(int id) {
+		public void Remove(in int id) {
 			if (EnableDebugChecks && Contains(id) == false) {
 				throw new Exception("IndexPriorityQueue.Remove: tried to remove node that does not exist in queue!");
 			}
@@ -142,7 +142,7 @@ namespace RNumerics
 		/// update priority at node id, and then move it to correct position in queue
 		/// Behavior is undefined if you call w/ id that is not in queue
 		/// </summary>
-		public void Update(int id, float priority) {
+		public void Update(in int id, in float priority) {
 			if (EnableDebugChecks && Contains(id) == false) {
 				throw new Exception("IndexPriorityQueue.Update: tried to update node that does not exist in queue!");
 			}
@@ -160,7 +160,7 @@ namespace RNumerics
 		/// <summary>
 		/// Query the priority at node id, assuming it exists in queue
 		/// </summary>
-		public float GetPriority(int id) {
+		public float GetPriority(in int id) {
 			if (EnableDebugChecks && Contains(id) == false) {
 				throw new Exception("IndexPriorityQueue.Update: tried to get priorty of node that does not exist in queue!");
 			}
@@ -188,7 +188,7 @@ namespace RNumerics
          */
 
 
-		private void Remove_at_index(int iNode) {
+		private void Remove_at_index(in int iNode) {
 			// node-is-last-node case
 			if (iNode == Count) {
 				_nodes[iNode] = new QueueNode();
@@ -211,7 +211,7 @@ namespace RNumerics
 
 
 
-		private void Swap_nodes_at_indices(int i1, int i2) {
+		private void Swap_nodes_at_indices(in int i1, in int i2) {
 			var n1 = _nodes[i1];
 			n1.index = i2;
 			var n2 = _nodes[i2];
@@ -224,7 +224,7 @@ namespace RNumerics
 		}
 
 		/// move node at iFrom to iTo
-		private void Move(int iFrom, int iTo) {
+		private void Move(in int iFrom, in int iTo) {
 			var n = _nodes[iFrom];
 			n.index = iTo;
 			_nodes[iTo] = n;
@@ -232,7 +232,7 @@ namespace RNumerics
 		}
 
 		/// set node at iTo
-		private void Set(int iTo, ref QueueNode n) {
+		private void Set(in int iTo, ref QueueNode n) {
 			n.index = iTo;
 			_nodes[iTo] = n;
 			_id_to_index[n.id] = iTo;
@@ -315,7 +315,7 @@ namespace RNumerics
 
 
 		/// call after node is modified, to move it to correct position in queue
-		private void On_node_updated(int iNode) {
+		private void On_node_updated(in int iNode) {
 			var iParent = iNode / 2;
 			if (iParent > 0 && Has_higher_priority(iNode, iParent)) {
 				Move_up(iNode);
@@ -331,7 +331,7 @@ namespace RNumerics
 
 
 		/// returns true if priority at iHigher is less than at iLower
-		private bool Has_higher_priority(int iHigher, int iLower) {
+		private bool Has_higher_priority(in int iHigher, in int iLower) {
 			return _nodes[iHigher].priority < _nodes[iLower].priority;
 		}
 

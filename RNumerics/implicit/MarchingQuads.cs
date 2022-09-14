@@ -9,7 +9,7 @@ namespace RNumerics
 	/// [TODO] this is very, very old code. Should at minimum rewrite using current
 	/// vector classes/etc.
 	/// </summary>
-	public class MarchingQuads
+	public sealed class MarchingQuads
 	{
 		AxisAlignedBox2f _bounds;
 		float _fXShift;
@@ -36,7 +36,7 @@ namespace RNumerics
 			public int nTopVertex;   // vertex on top edge
 			public bool bTouched;   // true if node has been seen
 
-			public void Initialize(uint x, uint y) {
+			public void Initialize(in uint x, in uint y) {
 				X = x;
 				Y = y;
 				fValue = _fValueSentinel;
@@ -64,17 +64,17 @@ namespace RNumerics
 		{
 			public float x;
 			public float y;
-			public SeedPoint(float fX, float fY) { x = fX; y = fY; }
+			public SeedPoint(in float fX, in float fY) { x = fX; y = fY; }
 		}
 
 		readonly ArrayList _seedPoints;
 
-		ImplicitField2d _field;
+		IImplicitField2d _field;
 		readonly ArrayList _cellStack;
 		readonly bool[] _bEdgeSigns;
 
 
-		public MarchingQuads(int nSubdivisions, AxisAlignedBox2f bounds, float fIsoValue) {
+		public MarchingQuads(in int nSubdivisions, in AxisAlignedBox2f bounds, in float fIsoValue) {
 			Stroke = new DPolyLine2f();
 			_bounds = new AxisAlignedBox2f();
 
@@ -112,7 +112,7 @@ namespace RNumerics
 		}
 
 
-		public void AddSeedPoint(float x, float y) {
+		public void AddSeedPoint(in float x, in float y) {
 			_seedPoints.Add(new SeedPoint(x - _fXShift, y - _fYShift));
 		}
 
@@ -124,7 +124,7 @@ namespace RNumerics
 			Stroke.Clear();
 		}
 
-		public void Polygonize(ImplicitField2d field) {
+		public void Polygonize(in IImplicitField2d field) {
 
 			_field = field;
 
@@ -169,7 +169,7 @@ namespace RNumerics
 
 
 		void SubdivideStep(ref float fValue1, ref float fValue2, ref float fX1, ref float fY1, ref float fX2, ref float fY2,
-						bool bVerticalEdge) {
+						in bool bVerticalEdge) {
 
 			var fAlpha = 0.5f;
 
@@ -199,7 +199,7 @@ namespace RNumerics
 
 		}
 
-		int LerpAndAddStrokeVertex(float fValue1, float fValue2, int x1, int y1, int x2, int y2, bool bVerticalEdge) {
+		int LerpAndAddStrokeVertex(float fValue1, float fValue2, int x1, int y1, int x2, int y2, in bool bVerticalEdge) {
 
 			// swap if need be
 			if (fValue1 > fValue2) {
@@ -224,7 +224,7 @@ namespace RNumerics
 		}
 
 
-		int GetLeftEdgeVertex(int xi, int yi) {
+		int GetLeftEdgeVertex(in int xi, in int yi) {
 
 			var cell = _cells[yi][xi];
 			if (cell.nLeftVertex != -1) {
@@ -236,7 +236,7 @@ namespace RNumerics
 			return _cells[yi][xi].nLeftVertex;
 		}
 
-		int GetRightEdgeVertex(int xi, int yi) {
+		int GetRightEdgeVertex(in int xi, in int yi) {
 
 			var cell = _cells[yi][xi + 1];
 			if (cell.nLeftVertex != -1) {
@@ -248,7 +248,7 @@ namespace RNumerics
 			return _cells[yi][xi + 1].nLeftVertex;
 		}
 
-		int GetTopEdgeVertex(int xi, int yi) {
+		int GetTopEdgeVertex(in int xi, in int yi) {
 
 			var cell = _cells[yi][xi];
 			if (cell.nTopVertex != -1) {
@@ -260,7 +260,7 @@ namespace RNumerics
 			return _cells[yi][xi].nTopVertex;
 		}
 
-		int GetBottomEdgeVertex(int xi, int yi) {
+		int GetBottomEdgeVertex(in int xi, in int yi) {
 
 			var cell = _cells[yi + 1][xi];
 			if (cell.nTopVertex != -1) {
@@ -272,7 +272,7 @@ namespace RNumerics
 			return _cells[yi + 1][xi].nTopVertex;
 		}
 
-		bool ProcessCell(int xi, int yi) {
+		bool ProcessCell(in int xi, in int yi) {
 
 			_cells[yi][xi].bTouched = true;
 
@@ -428,7 +428,7 @@ namespace RNumerics
 			}
 		}
 
-		void SetBounds(AxisAlignedBox2f bounds) {
+		void SetBounds(in AxisAlignedBox2f bounds) {
 			_bounds = bounds;
 
 			_fXShift = (bounds.Min.x < 0) ? bounds.Min.x : -bounds.Min.x;

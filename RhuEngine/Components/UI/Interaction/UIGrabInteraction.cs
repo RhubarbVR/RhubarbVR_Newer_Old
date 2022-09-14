@@ -10,38 +10,34 @@ namespace RhuEngine.Components
 {
 
 	[Category(new string[] { "UI/Interaction" })]
-	public class UIGrabInteraction : UIInteractionComponent
+	public sealed class UIGrabInteraction : UIInteractionComponent
 	{
-		[Default(false)]
-		public readonly Sync<bool> AllowOtherZones;
-
 		[Default(0.5f)]
 		public readonly Sync<float> GrabForce;
 
 		public readonly SyncDelegate<Action<Handed>> Grabeded;
 
 		public void Grab(Handed handed) {
-			RWorld.ExecuteOnEndOfFrame(() => Grabeded.Target?.Invoke(handed));
+			RUpdateManager.ExecuteOnEndOfFrame(() => Grabeded.Target?.Invoke(handed));
 		}
 
 		public bool Grabed = true;
-		public override void Step() {
+		protected override void Step() {
 			base.Step();
-			if(Rect is null) {
+			if (UIRect is null) {
 				return;
 			}
 			var gabbedthisframe = false;
-			foreach (var item in Rect.HitPoses(!AllowOtherZones.Value))
-			{
-				if (item.GripForce > GrabForce.Value) {
+			foreach (var item in UIRect.GetRectHitData()) {
+				if (item.GripForces > GrabForce.Value) {
 					if (!Grabed) {
 						Grabed = true;
-						Grab(item.Handed);
+						Grab(item.Side);
 					}
 					gabbedthisframe = true;
 				}
 			}
-			if(!gabbedthisframe && Grabed) {
+			if (!gabbedthisframe && Grabed) {
 				Grabed = false;
 			}
 		}

@@ -8,7 +8,7 @@ namespace RNumerics
 	// ported from WildMagic 5
 	// https://www.geometrictools.com/Downloads/Downloads.html
 
-	public class DistPoint3Circle3
+	public sealed class DistPoint3Circle3
 	{
 		Vector3d _point;
 		public Vector3d Point
@@ -30,7 +30,7 @@ namespace RNumerics
 		public bool AllCirclePointsEquidistant;
 
 
-		public DistPoint3Circle3(Vector3d PointIn, Circle3d circleIn) {
+		public DistPoint3Circle3(in Vector3d PointIn, in Circle3d circleIn) {
 			_point = PointIn;
 			_circle = circleIn;
 		}

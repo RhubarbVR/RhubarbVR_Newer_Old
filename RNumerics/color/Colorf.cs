@@ -21,21 +21,26 @@ namespace RNumerics
 		public float b = 1;
 		[Key(3)]
 		public float a = 1;
-
-		public Colorf(float greylevel, float a = 1) { r = g = b = greylevel; this.a = a; }
-		public Colorf(float r, float g, float b, float a = 1) { this.r = r; this.g = g; this.b = b; this.a = a; }
-		public Colorf(int r, int g, int b, int a = 255) {
+		public Colorf() {
+			r = 0f;
+			g = 0f;
+			b = 0f;
+			a = 0f;
+		}
+		public Colorf(in float greylevel, in float a = 1) { r = g = b = greylevel; this.a = a; }
+		public Colorf(in float r, in float g, in float b, in float a = 1) { this.r = r; this.g = g; this.b = b; this.a = a; }
+		public Colorf(in int r, in int g, in int b, in int a = 255) {
 			this.r = MathUtil.Clamp((float)r, 0.0f, 255.0f) / 255.0f;
 			this.g = MathUtil.Clamp((float)g, 0.0f, 255.0f) / 255.0f;
 			this.b = MathUtil.Clamp((float)b, 0.0f, 255.0f) / 255.0f;
 			this.a = MathUtil.Clamp((float)a, 0.0f, 255.0f) / 255.0f;
 		}
-		public Colorf(float[] v2) { r = v2[0]; g = v2[1]; b = v2[2]; a = v2[3]; }
-		public Colorf(Colorf copy) { r = copy.r; g = copy.g; b = copy.b; a = copy.a; }
-		public Colorf(Colorf copy, float newAlpha) { r = copy.r; g = copy.g; b = copy.b; a = newAlpha; }
+		public Colorf(in float[] v2) { r = v2[0]; g = v2[1]; b = v2[2]; a = v2[3]; }
+		public Colorf(in Colorf copy) { r = copy.r; g = copy.g; b = copy.b; a = copy.a; }
+		public Colorf(in Colorf copy, in float newAlpha) { r = copy.r; g = copy.g; b = copy.b; a = newAlpha; }
 
 
-		public static Colorf Parse(string colorString) {
+		public static Colorf Parse(in string colorString) {
 			if (colorString.Length == 0) {
 				return White;
 			}
@@ -105,12 +110,12 @@ namespace RNumerics
 			return color.ConvertToRGB();
 		}
 
-		public Colorf Clone(float fAlphaMultiply = 1.0f) {
+		public Colorf Clone(in float fAlphaMultiply = 1.0f) {
 			return new Colorf(r, g, b, a * fAlphaMultiply);
 		}
 
 		[IgnoreMember]
-		public float this[int key]
+		public float this[in int key]
 		{
 			get => key == 0 ? r : key == 1 ? g : key == 2 ? b : a;
 			set {
@@ -123,7 +128,7 @@ namespace RNumerics
 			}
 		}
 
-		public float SqrDistance(Colorf v2) {
+		public float SqrDistance(in Colorf v2) {
 			float a = r - v2.r, b = g - v2.g, c = b - v2.b, d = a - v2.a;
 			return (a * a) + (b * b) + (c * c) + (d * d);
 		}
@@ -138,13 +143,13 @@ namespace RNumerics
 			return new Colorb(r, g, b, a);
 		}
 
-		public void Set(Colorf o) {
+		public void Set(in Colorf o) {
 			r = o.r;
 			g = o.g;
 			b = o.b;
 			a = o.a;
 		}
-		public void Set(float fR, float fG, float fB, float fA) {
+		public void Set(in float fR, in float fG, in float fB, in float fA) {
 			r = fR;
 			g = fG;
 			b = fB;
@@ -152,42 +157,42 @@ namespace RNumerics
 		}
 
 
-		public Colorf SetAlpha(float a) {
+		public Colorf SetAlpha(in float a) {
 			this.a = a;
 			return this;
 		}
-		public void Add(Colorf o) {
+		public void Add(in Colorf o) {
 			r += o.r;
 			g += o.g;
 			b += o.b;
 			a += o.a;
 		}
-		public void Subtract(Colorf o) {
+		public void Subtract(in Colorf o) {
 			r -= o.r;
 			g -= o.g;
 			b -= o.b;
 			a -= o.a;
 		}
-		public Colorf WithAlpha(float newAlpha) {
+		public Colorf WithAlpha(in float newAlpha) {
 			return new Colorf(r, g, b, newAlpha);
 		}
 
 
-		public static Colorf operator -(Colorf v) => new(-v.r, -v.g, -v.b, -v.a);
+		public static Colorf operator -(in Colorf v) => new(-v.r, -v.g, -v.b, -v.a);
 
-		public static Colorf operator *(float f, Colorf v) => new(f * v.r, f * v.g, f * v.b, f * v.a);
-		public static Colorf operator *(Colorf v, float f) => new(f * v.r, f * v.g, f * v.b, f * v.a);
-		public static Colorf operator *(Colorf v, Colorf f) => new(f.r * v.r, f.g  * v.g, f.b * v.b, f.a * v.a);
+		public static Colorf operator *(in float f, in Colorf v) => new(f * v.r, f * v.g, f * v.b, f * v.a);
+		public static Colorf operator *(in Colorf v, in float f) => new(f * v.r, f * v.g, f * v.b, f * v.a);
+		public static Colorf operator *(in Colorf v, in Colorf f) => new(f.r * v.r, f.g  * v.g, f.b * v.b, f.a * v.a);
 
-		public static Colorf operator +(Colorf v0, Colorf v1) => new(v0.r + v1.r, v0.g + v1.g, v0.b + v1.b, v0.a + v1.a);
-		public static Colorf operator +(Colorf v0, float f) => new(v0.r + f, v0.g + f, v0.b + f, v0.a + f);
+		public static Colorf operator +(in Colorf v0, in Colorf v1) => new(v0.r + v1.r, v0.g + v1.g, v0.b + v1.b, v0.a + v1.a);
+		public static Colorf operator +(in Colorf v0, in float f) => new(v0.r + f, v0.g + f, v0.b + f, v0.a + f);
 
-		public static Colorf operator -(Colorf v0, Colorf v1) => new(v0.r - v1.r, v0.g - v1.g, v0.b - v1.b, v0.a - v1.a);
-		public static Colorf operator -(Colorf v0, float f) => new(v0.r - f, v0.g - f, v0.b - f, v0.a = f);
+		public static Colorf operator -(in Colorf v0, in Colorf v1) => new(v0.r - v1.r, v0.g - v1.g, v0.b - v1.b, v0.a - v1.a);
+		public static Colorf operator -(Colorf v0, in float f) => new(v0.r - f, v0.g - f, v0.b - f, v0.a = f);
 
 
-		public static bool operator ==(Colorf a, Colorf b) => a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
-		public static bool operator !=(Colorf a, Colorf b) => a.r != b.r || a.g != b.g || a.b != b.b || a.a != b.a;
+		public static bool operator ==(in Colorf a, in Colorf b) => a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
+		public static bool operator !=(in Colorf a, in Colorf b) => a.r != b.r || a.g != b.g || a.b != b.b || a.a != b.a;
 
 		public unsafe Color4D ToAssimp() {
 			fixed (Colorf* vector3f = &this) {
@@ -199,7 +204,7 @@ namespace RNumerics
 				return *(Colorf*)vector3f;
 			}
 		}
-		public static implicit operator Color4D(Colorf b) => b.ToAssimp();
+		public static implicit operator Color4D(in Colorf b) => b.ToAssimp();
 
 		public static implicit operator Colorf(Color4D b) => ToRhuNumricsFromAssimp(ref b);
 
@@ -231,7 +236,7 @@ namespace RNumerics
 		}
 
 
-		public static Colorf Lerp(Colorf a, Colorf b, float t) {
+		public static Colorf Lerp(in Colorf a, in Colorf b, in float t) {
 			var s = 1 - t;
 			return new Colorf((s * a.r) + (t * b.r), (s * a.g) + (t * b.g), (s * a.b) + (t * b.b), (s * a.a) + (t * b.a));
 		}
@@ -241,19 +246,19 @@ namespace RNumerics
 		public override string ToString() {
 			return string.Format("{0:F8} {1:F8} {2:F8} {3:F8}", r, g, b, a);
 		}
-		public string ToString(string fmt) {
+		public string ToString(in string fmt) {
 			return string.Format("{0} {1} {2} {3}", r.ToString(fmt), g.ToString(fmt), b.ToString(fmt), a.ToString(fmt));
 		}
 
 		// allow conversion to/from Vector3f
-		public static implicit operator Vector3f(Colorf c) => new(c.r, c.g, c.b);
-		public static implicit operator Colorf(Vector3f c) => new(c.x, c.y, c.z, 1);
+		public static implicit operator Vector3f(in Colorf c) => new(c.r, c.g, c.b);
+		public static implicit operator Colorf(in Vector3f c) => new(c.x, c.y, c.z, 1);
 
 
 		public static implicit operator Colorf(ColorHSV c) => c.ConvertToRGB();
 
 
-		public static implicit operator ColorHSV(Colorf color) {
+		public static implicit operator ColorHSV(in Colorf color) {
 			var outval = new ColorHSV(0, 0, 0, color.a);
 			outval.ConvertFromRGB(color);
 			return outval;

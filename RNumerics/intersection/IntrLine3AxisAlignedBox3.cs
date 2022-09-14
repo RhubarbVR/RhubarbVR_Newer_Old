@@ -6,7 +6,7 @@ using System.Text;
 namespace RNumerics
 {
 	// adapted from IntrLine3Box3
-	public class IntrLine3AxisAlignedBox3
+	public sealed class IntrLine3AxisAlignedBox3
 	{
 		Line3d _line;
 		public Line3d Line
@@ -32,7 +32,7 @@ namespace RNumerics
 		public Vector3d Point0 = Vector3d.Zero;
 		public Vector3d Point1 = Vector3d.Zero;
 
-		public IntrLine3AxisAlignedBox3(Line3d l, AxisAlignedBox3d b) {
+		public IntrLine3AxisAlignedBox3(in Line3d l, in AxisAlignedBox3d b) {
 			_line = l;
 			_box = b;
 		}
@@ -104,7 +104,7 @@ namespace RNumerics
 
 		static public bool DoClipping(ref double t0, ref double t1,
 						 ref Vector3d origin, ref Vector3d direction,
-						 ref AxisAlignedBox3d box, bool solid, ref int quantity,
+						 ref AxisAlignedBox3d box, in bool solid, ref int quantity,
 						 ref Vector3d point0, ref Vector3d point1,
 						 ref IntersectionType intrType) {
 			var BOrigin = origin - box.Center;
@@ -143,7 +143,7 @@ namespace RNumerics
 
 
 
-		static public bool Clip(double denom, double numer, ref double t0, ref double t1) {
+		static public bool Clip(in double denom, in double numer, ref double t0, ref double t1) {
 			// Return value is 'true' if line segment intersects the current test
 			// plane.  Otherwise 'false' is returned in which case the line segment
 			// is entirely clipped.

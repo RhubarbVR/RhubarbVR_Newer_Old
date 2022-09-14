@@ -8,7 +8,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreEvents" })]
-	public class ButtonEventManager : Component
+	public sealed class ButtonEventManager : Component
 	{
 		public readonly SyncDelegate Click;
 		public readonly SyncDelegate Pressing;
@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 
 		public readonly Linker<Vector3f> WorldPos;
 
-		public readonly Linker<Vector3f> WindowPos;
+		public readonly Linker<Vector2f> WindowPos;
 
 		public readonly Linker<uint> FingerIndex;
 

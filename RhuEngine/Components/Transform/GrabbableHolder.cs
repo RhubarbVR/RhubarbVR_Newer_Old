@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "Interaction" })]
-	public class GrabbableHolder : Component
+	public sealed class GrabbableHolder : Component
 	{
 		public readonly SyncRef<Entity> holder;
 
@@ -33,7 +33,7 @@ namespace RhuEngine.Components
 		[NoSync]
 		private PhysicsObject _physicsObject;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			PhysicsObjectChanged();
 		}
@@ -67,7 +67,7 @@ namespace RhuEngine.Components
 			obj.Overlap += RigidBody_Overlap;
 		}
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			holder.Target = Entity.AddChild("Holder");
 		}
@@ -129,7 +129,7 @@ namespace RhuEngine.Components
 
 		bool _gripping = false;
 
-		public override void RenderStep() {
+		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
@@ -140,7 +140,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			if(source.Value == Handed.Max) {
-				if (RWorld.IsInVR) {
+				if (Engine.IsInVR) {
 					return;
 				}
 			}
@@ -158,7 +158,7 @@ namespace RhuEngine.Components
 					}
 				}
 				//StartGabbing
-				RWorld.ExecuteOnStartOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					switch (source.Value) {
 						case Handed.Left:
 							break;
@@ -175,7 +175,7 @@ namespace RhuEngine.Components
 			}
 			if (_gripping && !isGrab) {
 				//DoneGrabbing
-				RWorld.ExecuteOnStartOfFrame(() => {
+				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					switch (source.Value) {
 						case Handed.Left:
 							WorldManager.PrivateSpaceManager.DisableLeftLaser = false;

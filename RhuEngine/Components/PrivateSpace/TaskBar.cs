@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public class TaskBar : Component
+	public sealed class TaskBar : Component
 	{
 		public enum OpenPart
 		{
@@ -89,13 +89,13 @@ namespace RhuEngine.Components
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public ScrollUIRect scrollRect;
+		public CustomScrollUIRect scrollRect;
 
 		[NoSave]
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public ScrollUIRect scrollRectTwo;
+		public CustomScrollUIRect scrollRectTwo;
 		public List<ITaskBarItem> taskBarItems = new();
 
 		[NoSave]
@@ -192,7 +192,6 @@ namespace RhuEngine.Components
 			if (action != null) {
 				var buttoninter = child.AttachComponent<UIButtonInteraction>();
 				buttoninter.ButtonEvent.Target = action;
-				buttoninter.AllowOtherZones.Value = false;
 			}
 			return (child, iconrect);
 		}
@@ -227,7 +226,7 @@ namespace RhuEngine.Components
 		}
 
 		public void RegTaskBarItemsUpdate() {
-			RWorld.ExecuteOnEndOfFrame(this, TaskBarItemsUpdate);
+			RUpdateManager.ExecuteOnEndOfFrame(this, TaskBarItemsUpdate);
 		}
 
 		public void TaskBarItemsUpdate() {
@@ -382,14 +381,14 @@ namespace RhuEngine.Components
 			rectTwo.AnchorMax.Value = Vector2f.One;
 
 			var mainentity = startCanvas.Entity.AddChild("scroll");
-			scrollRectTwo = mainentity.AttachComponent<ScrollUIRect>();
+			scrollRectTwo = mainentity.AttachComponent<CustomScrollUIRect>();
 			LoadAudio(mainentity);
 			LoadStart(mainentity);
 			LoadNotification(mainentity);
 		}
 
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			ProgramsHolder = World.RootEntity.AddChild("Programms");
 			uICanvas = Entity.AddChild("Canvas").AttachComponent<UICanvas>();
 			Engine.SettingsUpdate += Engine_SettingsUpdate;
@@ -414,7 +413,7 @@ namespace RhuEngine.Components
 			rectTwo.AnchorMax.Value = Vector2f.One;
 
 			var mainentity = uICanvas.Entity.AddChild("scroll");
-			scrollRect = mainentity.AttachComponent<ScrollUIRect>();
+			scrollRect = mainentity.AttachComponent<CustomScrollUIRect>();
 			mainentity = mainentity.AddChild("scroll");
 			mainentity.AttachComponent<UIRect>();
 			var img = mainentity.AttachComponent<UIRectangle>();
@@ -439,13 +438,13 @@ namespace RhuEngine.Components
 			var listentitHolderrect = listentitHolder.AttachComponent<CuttingUIRect>();
 			listentitHolderrect.AnchorMin.Value = new Vector2f(0.20f, 0.1f);
 			listentitHolderrect.AnchorMax.Value = new Vector2f(0.8f, 0.9f);
-
-			var listentit = listentitHolder.AddChild("list");
+			var interaction = mainentity.AttachComponent<UIScrollInteraction>();
+			var img4 = listentitHolder.AttachComponent<UIRectangle>();
+			var scroller = listentitHolder.AddChild("Scroller");
+			var scrollerrect = scroller.AttachComponent<BasicScrollRect>();
+			var listentit = scroller.AddChild("list");
 			var list = listentit.AttachComponent<HorizontalList>();
-			var interaction = listentit.AttachComponent<UIScrollInteraction>();
-			interaction.AllowOtherZones.Value = true;
-			interaction.OnScroll.Target += list.Scroll;
-			var img4 = listentit.AttachComponent<UIRectangle>();
+			interaction.OnScroll.Target += scrollerrect.Scroll;
 			var colorassign2 = listentit.AttachComponent<UIColorAssign>();
 			colorassign2.Alpha.Value = 0.5f;
 			colorassign2.ColorShif.Value = 0.3f;
@@ -489,16 +488,31 @@ namespace RhuEngine.Components
 			var child3 = RightSide.AddChild("childEliment");
 			rectTwo2 = child3.AttachComponent<UIRect>();
 			rectTwo2.AnchorMin.Value = new Vector2f(0.5f, 0);
-			var rectTwom = child3.AttachComponent<UIRect>();
 			var text = child3.AttachComponent<UIText>();
 			TimeText.SetLinkerTarget(text.Text);
 			colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
 			colorassign.ColorShif.Value = 1.9f;
 			colorassign.TargetColor.Target = text.StartingColor;
-			if (!Engine.netApiManager.IsLoggedIn) {
+			WorldManager.OnWorldUpdateTaskBar += RegTaskBarItemsUpdate;
+
+			Engine.netApiManager.Client.HasGoneOfline += () => {
+				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(IsOnlineProgram)));
+			};
+
+			Engine.netApiManager.Client.HasGoneOfline += () => {
+				if (!Engine.netApiManager.Client.IsOnline) {
+					return;
+				}
+				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(LoginProgram)));
+			};
+
+			if (!Engine.netApiManager.Client.IsOnline) {
+				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(IsOnlineProgram)));
+				return;
+			}
+			if (!Engine.netApiManager.Client.IsLogin) {
 				AddTaskBarItemToList(new ProgramTaskBarItem(this, typeof(LoginProgram)));
 			}
-			WorldManager.OnWorldUpdateTaskBar += RegTaskBarItemsUpdate;
 		}
 		public Program HasProgramOpen(Type ProGramType) {
 			foreach (var item in programs) {
@@ -602,7 +616,7 @@ namespace RhuEngine.Components
 		private float _newvalue = 0;
 
 		public bool OpenedLastFrame = false;
-		public override void Step() {
+		protected override void Step() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
@@ -675,6 +689,7 @@ namespace RhuEngine.Components
 			var sysFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
 			var sysFormatTime = CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern;
 			var newTimeText = $"<size13>{date.ToString(sysFormatTime, CultureInfo.InvariantCulture)} \n<size10>{date.ToString(sysFormat, CultureInfo.InvariantCulture)}";
+			newTimeText += $"\nFPS:{1/RTime.Elapsedf:f0}";
 			if (TimeText.Linked) {
 				if (TimeText.LinkedValue != newTimeText) {
 					TimeText.LinkedValue = newTimeText;
