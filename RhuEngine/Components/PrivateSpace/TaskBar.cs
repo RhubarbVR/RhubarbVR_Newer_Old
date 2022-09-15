@@ -620,7 +620,7 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
-			var isHeld = Engine.inputManager.GetInputBool(Managers.InputManager.InputTypes.OpenDash);
+			var isHeld = Engine.inputManager.OpenDash.Activated();
 			if (isHeld & !OpenedLastFrame) {
 				OpenedLastFrame = true;
 				Open = !Open;

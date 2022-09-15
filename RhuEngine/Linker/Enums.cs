@@ -296,6 +296,20 @@ namespace RhuEngine.Linker
 		Max = 2,
 	}
 
+	public enum MouseKeys 
+	{
+		/// <summary>Left mouse button.</summary>
+		MouseLeft = 0x01,
+		/// <summary>Right mouse button.</summary>
+		MouseRight = 0x02,
+		/// <summary>Center mouse button.</summary>
+		MouseCenter = 0x04,
+		/// <summary>Mouse forward button.</summary>
+		MouseForward = 0x05,
+		/// <summary>Mouse back button.</summary>
+		MouseBack = 0x06,
+	}
+
 
 	/// <summary>A collection of system key codes, representing keyboard
 	/// characters and mouse buttons. Based on VK codes.</summary>

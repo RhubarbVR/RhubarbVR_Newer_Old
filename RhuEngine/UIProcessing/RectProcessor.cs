@@ -45,7 +45,7 @@ namespace RhuEngine.UIProcessing
 
 				//Register Parrent Update Enum
 				foreach (var item in rectsList) {
-					if (RInput.Key(Key.F10).IsActive()) {
+					if (UIManager.Engine.inputManager.KeyboardSystem.IsKeyJustDown(Key.F10)) {
 						//Reloads all ui
 						item.MarkForRenderMeshUpdate(UIRect.RenderMeshUpdateType.FullResized);
 					}

@@ -78,8 +78,9 @@ namespace RhuEngine.Components
 					UpdateLazer(left, Handed.Left);
 					UpdateLazer(right, Handed.Right);
 				}
-				UpdateTouch(RInput.Hand(Handed.Right).Wrist, 2, Handed.Right);
-				UpdateTouch(RInput.Hand(Handed.Left).Wrist, 1, Handed.Left);
+				//Todo: fingerPos
+				//UpdateTouch(RInput.Hand(Handed.Right).Wrist, 2, Handed.Right);
+				//UpdateTouch(RInput.Hand(Handed.Left).Wrist, 1, Handed.Left);
 			}
 		}
 
@@ -135,7 +136,7 @@ namespace RhuEngine.Components
 					physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
 				}
 				if (collider.CustomObject is IWorldObject syncObject) {
-					if (RInput.Key(Key.I).IsJustActive() && !Engine.HasKeyboard) {
+					if (InputManager.ObserverOpen.JustActivated() && !Engine.HasKeyboard) {
 						if (syncObject.World.IsPersonalSpace) {
 							return true;
 						}
@@ -165,8 +166,8 @@ namespace RhuEngine.Components
 					return;
 				}
 			}
-			var PressForce = Engine.inputManager.GetInputFloatFromController(Managers.InputManager.InputTypes.Primary, handed);
-			var GripForce = Engine.inputManager.GetInputFloatFromController(Managers.InputManager.InputTypes.Grab, handed);
+			var PressForce = Engine.inputManager.GetInputAction(InputTypes.Primary).HandedValue(handed);
+			var GripForce = Engine.inputManager.GetInputAction(InputTypes.Grab).HandedValue(handed);
 			var headPos = heand.GlobalTrans;
 			var headFrompos = headPos;
 			var headToPos = Matrix.T(Vector3f.AxisZ * -5) * headPos;
@@ -185,8 +186,8 @@ namespace RhuEngine.Components
 			if (DisableHeadLaser) {
 				return;
 			}
-			var PressForce = Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Primary);
-			var GripForce = Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Grab);
+			var PressForce = Engine.inputManager.GetInputAction(InputTypes.Primary).HandedValue(Handed.Max);
+			var GripForce = Engine.inputManager.GetInputAction(InputTypes.Grab).HandedValue(Handed.Max);
 			var headPos = head.GlobalTrans;
 			var headFrompos = headPos;
 			var headToPos = Matrix.T(Vector3f.AxisZ * -5) * headPos;

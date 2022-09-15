@@ -34,7 +34,7 @@ namespace RhuEngine.WorldObjects
 
 		public User LocalUser => World.GetLocalUser();
 		public User MasterUser => World.GetMasterUser();
-
+		public InputManager InputManager => Engine.inputManager;
 		public bool IsDestroying
 		{
 			get; set;

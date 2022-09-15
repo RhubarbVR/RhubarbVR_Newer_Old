@@ -2,7 +2,7 @@
 using RhuEngine.WorldObjects.ECS;
 
 using RhuEngine.Linker;
-using RNumerics; 
+using RNumerics;
 
 namespace RhuEngine.Components
 {
@@ -48,24 +48,23 @@ namespace RhuEngine.Components
 			}
 			if (World.IsPersonalSpace) {
 				if (WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target is not null) {
-					RUpdateManager.ExecuteOnStartOfFrame(() => {
-						if (WorldManager.FocusedWorld is null) {
-							return;
-						}
-						var focusUserRoot = WorldManager.FocusedWorld.GetLocalUser().userRoot.Target;
-						if (focusUserRoot is not null) {
-							Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
-						}
-					});
-				}
-				if (Engine.EngineLink.CanRender) {
-					if (Engine.IsInVR) {
-						RUpdateManager.ExecuteOnEndOfFrame(() => RRenderer.CameraRoot = Entity.GlobalTrans);
+					if (WorldManager.FocusedWorld is null) {
+						return;
 					}
-					else {
-						RUpdateManager.ExecuteOnEndOfFrame(() => Engine.inputManager.screenInput.CamPos = Entity.GlobalTrans);
+					var focusUserRoot = WorldManager.FocusedWorld.GetLocalUser().userRoot.Target;
+					if (focusUserRoot is not null) {
+						Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
+					}
+					if (Engine.EngineLink.CanRender) {
+						if (Engine.IsInVR) {
+							RRenderer.CameraRoot = Entity.GlobalTrans;
+						}
+						else {
+							Engine.inputManager.screenInput.CamPos = Entity.GlobalTrans;
+						}
 					}
 				}
+
 			}
 			else {
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("UserScale").Value = Entity.scale.Value;

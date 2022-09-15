@@ -3,6 +3,7 @@ using System.Threading;
 
 using RhuEngine;
 using RhuEngine.Linker;
+using RhuEngine.Managers;
 using RhuEngine.Physics;
 
 namespace NullContext
@@ -103,6 +104,9 @@ namespace NullContext
 
 		public void ChangeVR(bool value) {
 			throw new NotImplementedException();
+		}
+
+		public void LoadInput(InputManager manager) {
 		}
 	}
 

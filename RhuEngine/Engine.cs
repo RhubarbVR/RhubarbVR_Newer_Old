@@ -19,8 +19,9 @@ using System.Runtime;
 
 namespace RhuEngine
 {
-	public class RhuException : Exception {
-		public RhuException(string data):base(data) { }
+	public class RhuException : Exception
+	{
+		public RhuException(string data) : base(data) { }
 	}
 
 	public sealed class Engine : IDisposable
@@ -267,7 +268,7 @@ namespace RhuEngine
 			}
 			var startcode = () => {
 				IntMsg = "Building NetApiManager";
-				netApiManager = new NetApiManager((_userDataPathOverRide??BaseDir) + "/rhuCookie");
+				netApiManager = new NetApiManager((_userDataPathOverRide ?? BaseDir) + "/rhuCookie");
 				IntMsg = "Building AssetManager";
 				assetManager = new AssetManager(_cachePathOverRide);
 				_managers = new IManager[] { localisationManager, inputManager, netApiManager, assetManager, worldManager, uiManager };
@@ -313,7 +314,7 @@ namespace RhuEngine
 			if (EngineStarting) {
 				if (EngineLink.CanRender) {
 					try {
-						var headMat = RInput.Head.HeadMatrix;
+						var headMat = inputManager.HeadMatrix;
 						if (!IsInVR) {
 							RRenderer.CameraRoot = Matrix.Identity;
 							headMat = Matrix.T(Vector3f.Forward / 10);

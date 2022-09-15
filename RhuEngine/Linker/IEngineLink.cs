@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using RhuEngine.Managers;
+
 namespace RhuEngine.Linker
 {
 	[Flags]
@@ -43,6 +45,8 @@ namespace RhuEngine.Linker
 
 		Type RenderSettingsType { get; }
 		void BindEngine(Engine engine);
+		void LoadInput(InputManager manager);
+
 		void Start();
 		void LoadStatics();
 		void LoadArgs();

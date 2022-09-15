@@ -7,6 +7,7 @@ using RhuEngine.WorldObjects.ECS;
 
 using TextCopy;
 using RhuEngine.Linker;
+using RhuEngine.Managers;
 
 namespace RhuEngine.Components
 {
@@ -35,7 +36,7 @@ namespace RhuEngine.Components
 			if (Engine.HasKeyboard) {
 				return;
 			}
-			if(RInput.Key(Key.V).IsJustActive() && RInput.Key(Key.Ctrl).IsActive()) {
+			if(InputManager.KeyboardSystem.IsKeyJustDown(Key.V) && InputManager.KeyboardSystem.IsKeyDown(Key.Ctrl)) {
 				//ToDO inprove to have imgs and also have render bindings
 				var data = ClipboardService.GetText();
 				RLog.Info($"ClipBoard {data}");

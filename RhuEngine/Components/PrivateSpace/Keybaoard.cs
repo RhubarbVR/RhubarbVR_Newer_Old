@@ -176,29 +176,32 @@ namespace RhuEngine.Components
 					ToggleKeys.Add(ckey);
 				}
 			}
-			if (code is not null) {
-				RInput.InjectedTypeDelta += code;
-				PressingKeys.Add(code, DateTime.UtcNow);
-				void CheckIfStillPressing() {
-					if (PressingKeys.ContainsKey(code)) {
-						RUpdateManager.ExecuteOnEndOfFrame(CheckIfStillPressing);
-						if ((DateTime.UtcNow - PressingKeys[code]).TotalSeconds >= 1) {
-							RInput.InjectedTypeDelta += code;
-							PressingKeys.Remove(code);
-							PressingKeys.Add(code, DateTime.UtcNow);
-						}
-					}
-				}
-				RUpdateManager.ExecuteOnEndOfFrame(() => {
-					RInput.InjectedTypeDelta = RInput.InjectedTypeDelta.Replace(code, string.Empty);
-					CheckIfStillPressing();
-				});
-			}
+			//Todo injectKeys
+
+			//if (code is not null) {
+			//	RInput.InjectedTypeDelta += code;
+			//	PressingKeys.Add(code, DateTime.UtcNow);
+			//	void CheckIfStillPressing() {
+			//		if (PressingKeys.ContainsKey(code)) {
+			//			RUpdateManager.ExecuteOnEndOfFrame(CheckIfStillPressing);
+			//			if ((DateTime.UtcNow - PressingKeys[code]).TotalSeconds >= 1) {
+			//				RInput.InjectedTypeDelta += code;
+			//				PressingKeys.Remove(code);
+			//				PressingKeys.Add(code, DateTime.UtcNow);
+			//			}
+			//		}
+			//	}
+			//	RUpdateManager.ExecuteOnEndOfFrame(() => {
+			//		RInput.InjectedTypeDelta = RInput.InjectedTypeDelta.Replace(code, string.Empty);
+			//		CheckIfStillPressing();
+			//	});
+			//}
 		}
 		private void ProcesButtonReleases(int changeLayer, bool toggle, int ckey, string code) {
 			if (code is not null) {
 				PressingKeys.Remove(code);
-				RInput.InjectedTypeDelta = RInput.InjectedTypeDelta.Replace(code, string.Empty);
+				//Todo injectKeys
+				//RInput.InjectedTypeDelta = RInput.InjectedTypeDelta.Replace(code, string.Empty);
 			}
 		}
 	}

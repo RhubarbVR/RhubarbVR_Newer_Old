@@ -4,6 +4,7 @@ using StereoKit;
 using RhuEngine;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
+using RhuEngine.Managers;
 
 namespace RStereoKit
 {
@@ -87,7 +88,6 @@ namespace RStereoKit
 			RenderThread.ExecuteOnStartOfFrame(() => RMesh.Quad = new RMesh(new SKRMesh(Mesh.Quad), false));
 			RTime.Instance = new SKTime();
 			RRenderer.Instance = new SKRRenderer();
-			RInput.Instance = new SKInput();
 			StaticMaterialManager.Instanances = new StaticMitsManager();
 			PhysicsHelper.RegisterPhysics<RBullet.BulletPhsyicsLink>();
 		}
@@ -110,6 +110,11 @@ namespace RStereoKit
 		}
 
 		public void LoadArgs() {
+		}
+
+		public void LoadInput(InputManager manager) {
+			manager.LoadInputDriver<SKKeyboardDriver>();
+			manager.LoadInputDriver<SKMosueDriver>();
 		}
 	}
 }

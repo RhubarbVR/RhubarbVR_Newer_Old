@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace RhuSettings
@@ -44,12 +45,17 @@ namespace RhuSettings
 				}
 				else {
 					var value = ((DataNode)item.Value)?.Getval();
-					obj[item.Key] = new JValue(value);
+					if (value is string[][] data) {
+						obj[item.Key] = new JArray(data.Select(x=>new JArray(x)).ToArray());
+					}
+					else {
+						obj[item.Key] = new JValue(value);
+					}
 				}
 			}
 			return obj;
 		}
-		public static T LoadSettingsObject<T>(T start,params DataList[] args) where T : SettingsObject {
+		public static T LoadSettingsObject<T>(T start, params DataList[] args) where T : SettingsObject {
 			foreach (var item in args) {
 				start = (T)LoadSettingsObjectInternal(start, item);
 			}
@@ -100,7 +106,7 @@ namespace RhuSettings
 								try {
 									field.SetValue(obj, Enum.Parse(dataType, (string)val.Getval()));
 								}
-								catch {}
+								catch { }
 							}
 							else {
 								field.SetValue(obj, ChangeType(val.Getval(), dataType));
@@ -112,6 +118,11 @@ namespace RhuSettings
 			return obj;
 		}
 		public static object ChangeType(object source, Type dest) {
+			if(dest == typeof(string[][])) {
+				if(source is JArray jArray) {
+					return jArray.Select(x => ((JArray)x).Select(x=>(string)x).ToArray()).ToArray();
+				}
+			}
 			return Convert.ChangeType(source, dest);
 		}
 		public static DataList GetDataListFromSettingsObject(SettingsObject obj, DataList startlist) {

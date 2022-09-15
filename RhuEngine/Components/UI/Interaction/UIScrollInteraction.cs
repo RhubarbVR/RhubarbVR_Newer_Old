@@ -41,12 +41,12 @@ namespace RhuEngine.Components
 			var hitposes = UIRect.GetRectHitData();
 			foreach (var item in hitposes) {
 				if (firstLazer && item.Lazer) {
-					if (RInput.Mouse.ScrollChange != Vector2f.Zero) {
-						if (AllowAltSwitch && RInput.Key(Key.Alt).IsActive()) {
-							Scroll(new Vector2f(RInput.Mouse.ScrollChange.y, RInput.Mouse.ScrollChange.x) * MouseScrollSpeed);
+					if (InputManager.MouseSystem.MouseDelta != Vector2f.Zero) {
+						if (AllowAltSwitch && InputManager.KeyboardSystem.IsKeyDown(Key.Alt)) {
+							Scroll(new Vector2f(InputManager.MouseSystem.MouseDelta.y, InputManager.MouseSystem.MouseDelta.x) * MouseScrollSpeed);
 						}
 						else {
-							Scroll(RInput.Mouse.ScrollChange * MouseScrollSpeed);
+							Scroll(InputManager.MouseSystem.MouseDelta * MouseScrollSpeed);
 						}
 
 					}

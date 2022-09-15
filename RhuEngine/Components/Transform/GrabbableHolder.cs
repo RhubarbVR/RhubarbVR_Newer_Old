@@ -144,12 +144,7 @@ namespace RhuEngine.Components
 					return;
 				}
 			}
-			var grabForce = source.Value switch {
-				Handed.Left => Engine.inputManager.GetInputFloatFromController(Managers.InputManager.InputTypes.Grab, RInput.Controller(Handed.Left), Engine.MainSettings.InputSettings.SecondaryControllerInputSettings),
-				Handed.Right => Engine.inputManager.GetInputFloatFromController(Managers.InputManager.InputTypes.Grab, RInput.Controller(Handed.Right), Engine.MainSettings.InputSettings.MainControllerInputSettings),
-				Handed.Max => Engine.inputManager.GetInputFloatFromKeyboard(Managers.InputManager.InputTypes.Grab),
-				_ => 0f,
-			};
+			var grabForce = InputManager.Grab.HandedValue(source.Value);
 			var isGrab = grabForce > 0.5;
 			if (isGrab && !_gripping) {
 				foreach (var item in _overLappingObjects) {

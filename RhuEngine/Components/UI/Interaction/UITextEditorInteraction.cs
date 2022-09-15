@@ -162,15 +162,15 @@ namespace RhuEngine.Components
 			if (!CurrentEditor) {
 				return;
 			}
-			var deltaType = RInput.TypeDelta;
-			if (RInput.Key(Key.Alt).IsActive()) {
+			var deltaType = InputManager.KeyboardSystem.TypeDelta;
+			if (InputManager.KeyboardSystem.IsKeyDown(Key.Alt)) {
 				return;
 			}
-			if (RInput.Key(Key.Return).IsActive() && !RInput.Key(Key.Shift).IsActive()) {
+			if (InputManager.KeyboardSystem.IsKeyDown(Key.Return) && !InputManager.KeyboardSystem.IsKeyDown(Key.Shift)) {
 				EditingClick();
 				return;
 			}
-			if (RInput.Key(Key.Ctrl).IsActive() && RInput.Key(Key.Z).IsJustActive()) {
+			if (InputManager.KeyboardSystem.IsKeyDown(Key.Ctrl) && InputManager.KeyboardSystem.IsKeyJustDown(Key.Z)) {
 				var nstartpoint = Value.LinkedValue.Length - CurrsorPos;
 				var nEndpoint = nstartpoint + CurrsorLength;
 				if (nEndpoint < nstartpoint) {
@@ -183,7 +183,7 @@ namespace RhuEngine.Components
 				RenderCurrsorPos = endbit.Length;
 				return;
 			}
-			if (RInput.Key(Key.Ctrl).IsActive() && RInput.Key(Key.C).IsJustActive()) {
+			if (InputManager.KeyboardSystem.IsKeyDown(Key.Ctrl) && InputManager.KeyboardSystem.IsKeyJustDown(Key.C)) {
 				var nstartpoint = Value.LinkedValue.Length - CurrsorPos;
 				var nEndpoint = nstartpoint + CurrsorLength;
 				if (nEndpoint < nstartpoint) {
@@ -192,13 +192,13 @@ namespace RhuEngine.Components
 				ClipboardService.SetText(Value.LinkedValue.Substring(nstartpoint, nEndpoint - nstartpoint));
 				return;
 			}
-			if (RInput.Key(Key.Ctrl).IsActive() && RInput.Key(Key.A).IsJustActive()) {
+			if (InputManager.KeyboardSystem.IsKeyDown(Key.Ctrl) && InputManager.KeyboardSystem.IsKeyJustDown(Key.A)) {
 				RenderCurrsorPos = 0;
 				RenderCurrsorLength = -Value.LinkedValue.Length;
 				return;
 			}
-			if (RInput.Key(Key.Left).IsJustActive()) {
-				if (RInput.Key(Key.Shift).IsActive()) {
+			if (InputManager.KeyboardSystem.IsKeyJustDown(Key.Left)) {
+				if (InputManager.KeyboardSystem.IsKeyDown(Key.Shift)) {
 					RenderCurrsorLength--;
 					RenderCurrsorLength = Math.Min(Math.Max(RenderCurrsorLength, -(Value.LinkedValue.Length - RenderCurrsorPos)), RenderCurrsorPos);
 				}
@@ -217,8 +217,8 @@ namespace RhuEngine.Components
 				}
 				return;
 			}
-			if (RInput.Key(Key.Right).IsJustActive()) {
-				if (RInput.Key(Key.Shift).IsActive()) {
+			if (InputManager.KeyboardSystem.IsKeyJustDown(Key.Right)) {
+				if (InputManager.KeyboardSystem.IsKeyDown(Key.Shift)) {
 					RenderCurrsorLength++;
 					RenderCurrsorLength = Math.Min(Math.Max(RenderCurrsorLength, -(Value.LinkedValue.Length - RenderCurrsorPos)), RenderCurrsorPos);
 				}
@@ -237,10 +237,10 @@ namespace RhuEngine.Components
 				}
 				return;
 			}
-			if (RInput.Key(Key.Ctrl).IsActive() && RInput.Key(Key.V).IsJustActive()) {
+			if (InputManager.KeyboardSystem.IsKeyDown(Key.Ctrl) && InputManager.KeyboardSystem.IsKeyJustDown(Key.V)) {
 				deltaType = ClipboardService.GetText();
 			}
-			else if (RInput.Key(Key.Ctrl).IsActive()) {
+			else if (InputManager.KeyboardSystem.IsKeyDown(Key.Ctrl)) {
 				return;
 			}
 			try { 

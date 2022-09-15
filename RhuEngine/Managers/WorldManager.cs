@@ -261,23 +261,23 @@ namespace RhuEngine.Managers
 			try {
 				if (_isRunning.Count != 0) {
 					var world = _isRunning.Peek();
-					var textpos = Matrix.T(Vector3f.Forward * 0.35f) * Matrix.T(0,-0.1f,0) * RInput.Head.HeadMatrix;
+					var textpos = Matrix.T(Vector3f.Forward * 0.35f) * Matrix.T(0,-0.1f,0) * Engine.inputManager.HeadMatrix;
 					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 3.5f, 1);
 					var userPOS = PrivateOverlay.GetLocalUser().userRoot.Target?.Entity.GlobalTrans ?? Matrix.Identity;
 					if (world.IsLoading && !world.IsDisposed) {
 						_loadingText.Text.Value = $"{Engine.localisationManager.GetLocalString("Common.LoadingWorld")}\n {Engine.localisationManager.GetLocalString(world.LoadMsg)}";
-						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos)) * userPOS;
+						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.HeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}
 					if (!world.HasError) {
 						_loadingText.Text.Value = $"{Engine.localisationManager.GetLocalString("Common.LoadedWorld")}";
-						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos)) * userPOS;
+						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.HeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}
 					else {
 						var errorMsg = world.IsNetworked && world.IsJoiningSession
 							? Engine.localisationManager.GetLocalString("Common.FailedToJoinWorld")
 							: Engine.localisationManager.GetLocalString("Common.FailedToLoadWorld");
 						_loadingText.Text.Value = $"{errorMsg} {(Engine.netApiManager.Client.User?.UserName == null ? ", JIM" : "")}\n {Engine.localisationManager.GetLocalString(world.LoadMsg)}";
-						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180)* Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero, _loadingPos)) * userPOS;
+						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180)* Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.HeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}
 				}
 			}
