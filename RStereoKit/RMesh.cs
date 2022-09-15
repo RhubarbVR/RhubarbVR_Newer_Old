@@ -212,5 +212,8 @@ namespace RStereoKit
 			}
 			Meshs = newMeshes;
 		}
+
+		public void Init(RMesh rMesh) {
+		}
 	}
 }

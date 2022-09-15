@@ -11,7 +11,7 @@ namespace RhuEngine.Linker
 	{
 		public void LoadMeshData(IMesh mesh);
 		public void LoadMeshToRender();
-
+		public void Init(RMesh rMesh);
 		public void Draw(RMaterial loadingLogo, Matrix p, Colorf tint, int zDepth, RenderLayer layer, int submesh);
 	}
 
@@ -32,6 +32,7 @@ namespace RhuEngine.Linker
 		public RMesh(IRMesh rMesh, bool dynamic) {
 			Dynamic = dynamic;
 			Inst = rMesh ?? (IRMesh)Activator.CreateInstance(Instance);
+			Inst.Init(this);
 		}
 
 		public RMesh(IMesh mesh, bool dynamic) : this((IRMesh)null, dynamic) {
