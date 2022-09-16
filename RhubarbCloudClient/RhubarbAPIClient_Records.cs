@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -44,15 +45,36 @@ namespace RhubarbCloudClient
 		}
 
 		public async Task<ServerResponse<CreateRecordResponses>> CreateRecord(long sizeInBytes, bool publicData, string ContentType) {
-			return await SendPostServerResponses<CreateRecordResponses, RCreateRecord>(API_PATH + RECPATH + "CreateRecord", new RCreateRecord {
+			var create = await SendPostServerResponses<CreateRecordResponses, RCreateRecord>(API_PATH + RECPATH + "CreateRecord", new RCreateRecord {
 				ContentType = ContentType,
 				Public = publicData,
 				SizeInBytes = sizeInBytes,
 			});
+			await UpdateRecords();
+			return create;
 		}
+
+		public readonly List<RecordResponses> RecordResponses = new();
+
+		public event Action RecordResponsesUpdate;
+
+		public async Task LoadStartDataGroups() {
+			await UpdateRecords();
+		}
+
 
 		public async Task<ServerResponse<RecordResponses[]>> GetRecords() {
 			return await SendGetServerResponses<RecordResponses[]>(API_PATH + RECPATH + "GetRecords");
+		}
+
+		public async Task UpdateRecords() {
+			var data = await GetRecords();
+			if (data.Error) {
+				return;
+			}
+			RecordResponses.Clear();
+			RecordResponses.AddRange(data.Data);
+			RecordResponsesUpdate?.Invoke();
 		}
 
 		public async Task<ServerResponse<RecordAccessResponses>> GetRecordAccesses(Guid target) {

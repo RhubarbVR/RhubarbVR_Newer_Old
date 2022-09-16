@@ -34,6 +34,7 @@ namespace RhubarbCloudClient
 				OnLogin?.Invoke(User);
 				await InitSignlR();
 				await LoadStartDM();
+				await LoadStartDataGroups();
 				await LoadStartGroups();
 				await LoadStartUsers();
 			}
