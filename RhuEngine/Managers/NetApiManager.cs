@@ -32,12 +32,19 @@ namespace RhuEngine.Managers
 		public RhubarbAPIClient Client { get; private set; }
 
 		public NetApiManager(string path) {
+#if debug
 			Client = new RhubarbAPIClient(RhubarbAPIClient.BaseUri, path) {
 				UserConnectionBind = UserConnection,
 				SessionErrorBind = SessionError,
 				SessionIDBind = SessionIDupdate
 			};
-
+#else
+			Client = new RhubarbAPIClient(new Uri("https://api.rhubarbvr.net/"), path) {
+				UserConnectionBind = UserConnection,
+				SessionErrorBind = SessionError,
+				SessionIDBind = SessionIDupdate
+			};
+#endif
 		}
 		public void SessionError(string data, Guid session) {
 			var targetWorld = WorldManager.GetWorldBySessionID(session);
@@ -78,6 +85,7 @@ namespace RhuEngine.Managers
 		}
 		public void Init(Engine engine) {
 			WorldManager = engine.worldManager;
+			Task.Run(Client.Check);
 		}
 
 		public void Step() {
