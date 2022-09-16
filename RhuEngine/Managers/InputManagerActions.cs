@@ -182,8 +182,8 @@ namespace RhuEngine.Managers
 				ProsessUpdate(ref _lastFrameOther, ref _thisFrameOther, Handed.Max);
 				_lastFrame = _lastFrameLeft + _lastFrameOther + _lastFrameRight;
 				_thisFrame = _thisFrameLeft + _thisFrameOther + _thisFrameRight;
-				_lastFrame = Math.Min(1f,_lastFrame);
-				_thisFrame = Math.Min(1f,_thisFrame);
+				_lastFrame = Math.Min(1f, _lastFrame);
+				_thisFrame = Math.Min(1f, _thisFrame);
 			}
 
 			public float RightDeltaValue() {

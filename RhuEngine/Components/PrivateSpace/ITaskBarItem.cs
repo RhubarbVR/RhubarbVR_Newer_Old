@@ -61,6 +61,9 @@ namespace RhuEngine.Components.PrivateSpace
 			if (program.GetType() == typeof(LoginProgram)) {
 				CanCloses = false;
 			}
+			if (program.GetType() == typeof(IsOnlineProgram)) {
+				CanCloses = false;
+			}
 			TaskBar = taskBar;
 			Program = program;
 			if (program != null) {

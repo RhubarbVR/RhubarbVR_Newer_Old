@@ -37,8 +37,8 @@ namespace RhuEngine.UIProcessing
 		public void Step() {
 			Rects.SafeOperation((rectsList) => {
 				//Todo: find where ther not being removed
+				rectsList.RemoveAll(Remove);
 				if (UIManager.ReOrder) {
-					rectsList.RemoveAll(Remove);
 					rectsList.Sort(_cop);
 					UIManager.ReOrder = false;
 				}
