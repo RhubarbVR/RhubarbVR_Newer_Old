@@ -8,25 +8,25 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "User" })]
-	public class Hand : Component
+	public sealed class Hand : Component
 	{
-		public SyncRef<User> user;
+		public readonly SyncRef<User> user;
 
-		public Sync<Handed> hand;
+		public readonly Sync<Handed> hand;
 
-		public Linker<Vector3f> pos;
+		public readonly Linker<Vector3f> pos;
 
-		public Linker<Quaternionf> rot;
+		public readonly Linker<Quaternionf> rot;
 
-		public Linker<Vector3f> scale;
+		public readonly Linker<Vector3f> scale;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);
 			rot.SetLinkerTarget(Entity.rotation);
 			scale.SetLinkerTarget(Entity.scale);
 		}
 
-		public override void Step() {
+		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
@@ -34,7 +34,8 @@ namespace RhuEngine.Components
 				return;
 			}
 			if (user.Target == World.GetLocalUser()) {
-				Entity.LocalTrans = RInput.Hand(hand.Value).Wrist * RRenderer.CameraRoot.Inverse;
+				//Todo: Hand Poses
+				//Entity.LocalTrans = RInput.Hand(hand.Value).Wrist * RRenderer.CameraRoot.Inverse;
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>($"HandPos{hand.Value}").Value = Entity.position.Value;
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>($"HandRot{hand.Value}").Value = Entity.rotation.Value;
 			}

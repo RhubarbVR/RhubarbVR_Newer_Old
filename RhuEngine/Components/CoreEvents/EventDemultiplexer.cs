@@ -8,17 +8,17 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreEvents" })]
-	public class EventDemultiplexer : Component
+	public sealed class EventDemultiplexer : Component
 	{
-		public Linker<int> Event;
+		public readonly Linker<int> Event;
 
-		public SyncDelegate Called;
+		public readonly SyncDelegate Called;
 
-		public SyncObjList<InnerEvent> Events;
+		public readonly SyncObjList<InnerEvent> Events;
 
 		public class InnerEvent : SyncObject
 		{
-			[Exsposed]
+			[Exposed]
 			public void Call() {
 				try {
 					((EventDemultiplexer)Parent.Parent).CalledMethod(this);

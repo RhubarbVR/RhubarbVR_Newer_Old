@@ -9,7 +9,7 @@ namespace RNumerics
 	/// 2D Bezier curve of arbitrary degree
 	/// Ported from WildMagic5 Wm5BezierCurve2
 	/// </summary>
-	public class BezierCurve2 : BaseCurve2, IParametricCurve2d
+	public sealed class BezierCurve2 : BaseCurve2, IParametricCurve2d
 	{
 		int _mNumCtrlPoints;
 		Vector2d[] _mDer1CtrlPoint;
@@ -22,7 +22,7 @@ namespace RNumerics
 		public Vector2d[] ControlPoints { get; private set; }
 
 
-		public BezierCurve2(int degree, Vector2d[] ctrlPoint, bool bTakeOwnership = false) : base(0, 1) {
+		public BezierCurve2(in int degree, in Vector2d[] ctrlPoint, in bool bTakeOwnership = false) : base(0, 1) {
 			if (degree < 2) {
 				throw new Exception("BezierCurve2() The degree must be three or larger\n");
 			}
@@ -81,11 +81,11 @@ namespace RNumerics
 
 
 		// used in Clone()
-		protected BezierCurve2() : base(0, 1) {
+		private BezierCurve2() : base(0, 1) {
 		}
 
 
-		public override Vector2d GetPosition(double t) {
+		public override Vector2d GetPosition(in double t) {
 			var oneMinusT = 1 - t;
 			var powT = t;
 			var result = oneMinusT * ControlPoints[0];
@@ -102,7 +102,7 @@ namespace RNumerics
 		}
 
 
-		public override Vector2d GetFirstDerivative(double t) {
+		public override Vector2d GetFirstDerivative(in double t) {
 			var oneMinusT = 1 - t;
 			var powT = t;
 			var result = oneMinusT * _mDer1CtrlPoint[0];
@@ -121,7 +121,7 @@ namespace RNumerics
 		}
 
 
-		public override Vector2d GetSecondDerivative(double t) {
+		public override Vector2d GetSecondDerivative(in double t) {
 			var oneMinusT = 1 - t;
 			var powT = t;
 			var result = oneMinusT * _mDer2CtrlPoint[0];
@@ -140,7 +140,7 @@ namespace RNumerics
 		}
 
 
-		public override Vector2d GetThirdDerivative(double t) {
+		public override Vector2d GetThirdDerivative(in double t) {
 			if (Degree < 3) {
 				return Vector2d.Zero;
 			}
@@ -173,17 +173,17 @@ namespace RNumerics
 
 		// can call SampleT in range [0,ParamLength]
 		public double ParamLength => mTMax - mTMin;
-		public Vector2d SampleT(double t) {
+		public Vector2d SampleT(in double t) {
 			return GetPosition(t);
 		}
 
-		public Vector2d TangentT(double t) {
+		public Vector2d TangentT(in double t) {
 			return GetFirstDerivative(t).Normalized;
 		}
 
 		public bool HasArcLength => true;
 		public double ArcLength => GetTotalLength();
-		public Vector2d SampleArcLength(double a) {
+		public Vector2d SampleArcLength(in double a) {
 			var t = GetTime(a);
 			return GetPosition(t);
 		}
@@ -208,7 +208,7 @@ namespace RNumerics
 
 
 		public bool IsTransformable => true;
-		public void Transform(ITransform2 xform) {
+		public void Transform(in ITransform2 xform) {
 			for (var k = 0; k < ControlPoints.Length; ++k) {
 				ControlPoints[k] = xform.TransformP(ControlPoints[k]);
 			}

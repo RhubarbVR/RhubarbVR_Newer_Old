@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Configurations>Debug;Release;Unity</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="StereoKit" Version="0.3.6-preview.4" />
+    <PackageReference Include="StereoKit" Version="0.3.7-preview.3" />
   </ItemGroup>
 
   <ItemGroup>

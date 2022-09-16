@@ -7,7 +7,8 @@ using RhuEngine.Datatypes;
 
 namespace RhuEngine.WorldObjects
 {
-	public class SyncVar : SyncObject, INetworkedObject {
+	public sealed class SyncVar : SyncObject, INetworkedObject, ISyncMember
+	{
 		private Type _type;
 		public Type Type
 		{
@@ -28,12 +29,11 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 		}
-		[UnExsposed]
+		[NoSync]
 		[NoShow]
 		[NoSave]
-		[NoSync]
 		[NoLoad]
-		public INetworkedObject Target;
+		public INetworkedObject Target { get; private set; }
 		public bool NoSync { get; set; }
 
 		public T GetTarget<T>(out bool Failed) where T : class, INetworkedObject {

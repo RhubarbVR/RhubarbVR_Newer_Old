@@ -3,16 +3,18 @@
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
+using RNumerics;
+
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreEvents" })]
-	public class RemoveSinglePram<T> : Component
+	public sealed class RemoveSinglePram<T> : Component
 	{
-		public Linker<T> Linker;
+		public readonly Linker<T> Linker;
 
-		public SyncDelegate Target;
+		public readonly SyncDelegate Target;
 
-		[Exsposed]
+		[Exposed]
 		public void Call(T value) {
 			if (Linker.Linked) {
 				Linker.LinkedValue = value;

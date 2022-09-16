@@ -14,36 +14,36 @@ namespace RNumerics
 	///    - byte[] conversions
 	///    - zlib compress/decompress byte[] buffers
 	/// </summary>
-	public class BufferUtil
+	public static class BufferUtil
 	{
-		static public void SetVertex3(double[] v, int i, double x, double y, double z) {
+		static public void SetVertex3(in double[] v, in int i, in double x, in double y, in double z) {
 			v[3 * i] = x;
 			v[(3 * i) + 1] = y;
 			v[(3 * i) + 2] = z;
 		}
-		static public void SetVertex3(float[] v, int i, float x, float y, float z) {
+		static public void SetVertex3(in float[] v, in int i, in float x, in float y, in float z) {
 			v[3 * i] = x;
 			v[(3 * i) + 1] = y;
 			v[(3 * i) + 2] = z;
 		}
 
-		static public void SetVertex2(double[] v, int i, double x, double y) {
+		static public void SetVertex2(in double[] v, in int i, in double x, in double y) {
 			v[2 * i] = x;
 			v[(2 * i) + 1] = y;
 		}
-		static public void SetVertex2(float[] v, int i, float x, float y) {
+		static public void SetVertex2(in float[] v, in int i, in float x, in float y) {
 			v[2 * i] = x;
 			v[(2 * i) + 1] = y;
 		}
 
-		static public void SetTriangle(int[] v, int i, int a, int b, int c) {
+		static public void SetTriangle(in int[] v, in int i, in int a, in int b, in int c) {
 			v[3 * i] = a;
 			v[(3 * i) + 1] = b;
 			v[(3 * i) + 2] = c;
 		}
 
 
-		static public double Dot(double[] a, double[] b) {
+		static public double Dot(in double[] a, in double[] b) {
 			double dot = 0;
 			for (var i = 0; i < a.Length; ++i) {
 				dot += a[i] * b[i];
@@ -52,19 +52,19 @@ namespace RNumerics
 			return dot;
 		}
 
-		static public void MultiplyAdd(double[] dest, double multiply, double[] add) {
+		static public void MultiplyAdd(in double[] dest, in double multiply, in double[] add) {
 			for (var i = 0; i < dest.Length; ++i) {
 				dest[i] += multiply * add[i];
 			}
 		}
 
-		static public void MultiplyAdd(double[] dest, double[] multiply, double[] add) {
+		static public void MultiplyAdd(in double[] dest, in double[] multiply, in double[] add) {
 			for (var i = 0; i < dest.Length; ++i) {
 				dest[i] += multiply[i] * add[i];
 			}
 		}
 
-		static public double MultiplyAdd_GetSqrSum(double[] dest, double multiply, double[] add) {
+		static public double MultiplyAdd_GetSqrSum(in double[] dest, in double multiply, in double[] add) {
 			double sum = 0;
 			for (var i = 0; i < dest.Length; ++i) {
 				dest[i] += multiply * add[i];
@@ -73,7 +73,7 @@ namespace RNumerics
 			return sum;
 		}
 
-		static public double DistanceSquared(double[] a, double[] b) {
+		static public double DistanceSquared(in double[] a, in double[] b) {
 			double sum = 0;
 			for (var i = 0; i < a.Length; ++i) {
 				sum += (a[i] - b[i]) * (a[i] - b[i]);
@@ -96,7 +96,7 @@ namespace RNumerics
 		}
 
 
-		static public double[][] AllocNxM(int N, int M) {
+		static public double[][] AllocNxM(in int N, in int M) {
 			var d = new double[N][];
 			for (var k = 0; k < N; ++k) {
 				d[k] = new double[M];
@@ -105,7 +105,7 @@ namespace RNumerics
 			return d;
 		}
 
-		static public double[][] InitNxM(int N, int M, double[][] init) {
+		static public double[][] InitNxM(in int N, in int M, in double[][] init) {
 			var d = AllocNxM(N, M);
 			for (var k = 0; k < N; ++k) {
 				Array.Copy(init[k], d[k], M);
@@ -118,7 +118,7 @@ namespace RNumerics
 		/// <summary>
 		/// Count number of elements in array (or up to max_i) that pass FilterF test
 		/// </summary>
-		static public int CountValid<T>(T[] data, Func<T, bool> FilterF, int max_i = -1) {
+		static public int CountValid<T>(in T[] data, in Func<T, bool> FilterF, in int max_i = -1) {
 			var n = (max_i == -1) ? data.Length : max_i;
 			var valid = 0;
 			for (var i = 0; i < n; ++i) {
@@ -133,7 +133,7 @@ namespace RNumerics
 		/// shifts elements of array (or up to max_i) that pass FilterF to front of list,
 		/// and returns number that passed
 		/// </summary>
-		static public int FilterInPlace<T>(T[] data, Func<T, bool> FilterF, int max_i = -1) {
+		static public int FilterInPlace<T>(in T[] data, in Func<T, bool> FilterF, in int max_i = -1) {
 			var N = (max_i == -1) ? data.Length : max_i;
 			var k = 0;
 			for (var i = 0; i < N; ++i) {
@@ -147,7 +147,7 @@ namespace RNumerics
 		/// <summary>
 		/// return a new array containing only elements (or up to max_i) that pass FilterF test
 		/// </summary>
-		static public T[] Filter<T>(T[] data, Func<T, bool> FilterF, int max_i = -1) {
+		static public T[] Filter<T>(in T[] data, in Func<T, bool> FilterF, in int max_i = -1) {
 			var n = (max_i == -1) ? data.Length : max_i;
 			var valid = CountValid(data, FilterF);
 			if (valid == 0) {
@@ -171,7 +171,7 @@ namespace RNumerics
 		/// convert input set into Vector3d.
 		/// Supports packed list of float/double tuples, list of Vector3f/Vector3d
 		/// </summary>
-		static public Vector3d[] ToVector3d<T>(IEnumerable<T> values) {
+		static public Vector3d[] ToVector3d<T>(in IEnumerable<T> values) {
 			var N = values.Count();
 			var k = 0;
 			var j = 0;
@@ -229,7 +229,7 @@ namespace RNumerics
 		/// convert input set into Vector3f.
 		/// Supports packed list of float/double tuples, list of Vector3f/Vector3d
 		/// </summary>
-		static public Vector3f[] ToVector3f<T>(IEnumerable<T> values) {
+		static public Vector3f[] ToVector3f<T>(in IEnumerable<T> values) {
 			var N = values.Count();
 			var k = 0;
 			var j = 0;
@@ -288,7 +288,7 @@ namespace RNumerics
 		/// convert input set into Index3i.
 		/// Supports packed list of int tuples, list of Vector3i/Index3i
 		/// </summary>
-		static public Index3i[] ToIndex3i<T>(IEnumerable<T> values) {
+		static public Index3i[] ToIndex3i<T>(in IEnumerable<T> values) {
 			var N = values.Count();
 			var k = 0;
 			var j = 0;
@@ -333,7 +333,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert byte array to int array
 		/// </summary>
-		static public int[] ToInt(byte[] buffer) {
+		static public int[] ToInt(in byte[] buffer) {
 			var sz = sizeof(int);
 			var Nvals = buffer.Length / sz;
 			var v = new int[Nvals];
@@ -347,7 +347,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert byte array to short array
 		/// </summary>
-		static public short[] ToShort(byte[] buffer) {
+		static public short[] ToShort(in byte[] buffer) {
 			var sz = sizeof(short);
 			var Nvals = buffer.Length / sz;
 			var v = new short[Nvals];
@@ -361,7 +361,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert byte array to double array
 		/// </summary>
-		static public double[] ToDouble(byte[] buffer) {
+		static public double[] ToDouble(in byte[] buffer) {
 			var sz = sizeof(double);
 			var Nvals = buffer.Length / sz;
 			var v = new double[Nvals];
@@ -375,7 +375,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert byte array to float array
 		/// </summary>
-		static public float[] ToFloat(byte[] buffer) {
+		static public float[] ToFloat(in byte[] buffer) {
 			var sz = sizeof(float);
 			var Nvals = buffer.Length / sz;
 			var v = new float[Nvals];
@@ -389,7 +389,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert byte array to VectorArray3d
 		/// </summary>
-		static public VectorArray3d ToVectorArray3d(byte[] buffer) {
+		static public VectorArray3d ToVectorArray3d(in byte[] buffer) {
 			var sz = sizeof(double);
 			var Nvals = buffer.Length / sz;
 			var Nvecs = Nvals / 3;
@@ -408,7 +408,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert byte array to VectorArray2f
 		/// </summary>
-		static public VectorArray2f ToVectorArray2f(byte[] buffer) {
+		static public VectorArray2f ToVectorArray2f(in byte[] buffer) {
 			var sz = sizeof(float);
 			var Nvals = buffer.Length / sz;
 			var Nvecs = Nvals / 2;
@@ -424,7 +424,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert byte array to VectorArray3f
 		/// </summary>
-		static public VectorArray3f ToVectorArray3f(byte[] buffer) {
+		static public VectorArray3f ToVectorArray3f(in byte[] buffer) {
 			var sz = sizeof(float);
 			var Nvals = buffer.Length / sz;
 			var Nvecs = Nvals / 3;
@@ -444,7 +444,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert byte array to VectorArray3i
 		/// </summary>
-		static public VectorArray3i ToVectorArray3i(byte[] buffer) {
+		static public VectorArray3i ToVectorArray3i(in byte[] buffer) {
 			var sz = sizeof(int);
 			var Nvals = buffer.Length / sz;
 			var Nvecs = Nvals / 3;
@@ -462,7 +462,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert byte array to IndexArray4i
 		/// </summary>
-		static public IndexArray4i ToIndexArray4i(byte[] buffer) {
+		static public IndexArray4i ToIndexArray4i(in byte[] buffer) {
 			var sz = sizeof(int);
 			var Nvals = buffer.Length / sz;
 			var Nvecs = Nvals / 4;
@@ -481,7 +481,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert int array to bytes
 		/// </summary>
-		static public byte[] ToBytes(int[] array) {
+		static public byte[] ToBytes(in int[] array) {
 			var result = new byte[array.Length * sizeof(int)];
 			Buffer.BlockCopy(array, 0, result, 0, result.Length);
 			return result;
@@ -490,7 +490,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert short array to bytes
 		/// </summary>
-		static public byte[] ToBytes(short[] array) {
+		static public byte[] ToBytes(in short[] array) {
 			var result = new byte[array.Length * sizeof(short)];
 			Buffer.BlockCopy(array, 0, result, 0, result.Length);
 			return result;
@@ -499,7 +499,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert float array to bytes
 		/// </summary>
-		static public byte[] ToBytes(float[] array) {
+		static public byte[] ToBytes(in float[] array) {
 			var result = new byte[array.Length * sizeof(float)];
 			Buffer.BlockCopy(array, 0, result, 0, result.Length);
 			return result;
@@ -508,7 +508,7 @@ namespace RNumerics
 		/// <summary>
 		/// convert double array to bytes
 		/// </summary>
-		static public byte[] ToBytes(double[] array) {
+		static public byte[] ToBytes(in double[] array) {
 			var result = new byte[array.Length * sizeof(double)];
 			Buffer.BlockCopy(array, 0, result, 0, result.Length);
 			return result;
@@ -520,7 +520,7 @@ namespace RNumerics
 		/// <summary>
 		/// Compress a byte buffer using Deflate/ZLib compression. 
 		/// </summary>
-		static public byte[] CompressZLib(byte[] buffer, bool bFast) {
+		static public byte[] CompressZLib(in byte[] buffer, in bool bFast) {
 			var ms = new MemoryStream();
 			var zip = new DeflateStream(ms, (bFast) ? CompressionLevel.Fastest : CompressionLevel.Optimal, true);
 			zip.Write(buffer, 0, buffer.Length);
@@ -540,7 +540,7 @@ namespace RNumerics
 		/// <summary>
 		/// Decompress a byte buffer that has been compressed using Deflate/ZLib compression
 		/// </summary>
-		static public byte[] DecompressZLib(byte[] zBuffer) {
+		static public byte[] DecompressZLib(in byte[] zBuffer) {
 			var ms = new MemoryStream();
 			var msgLength = BitConverter.ToInt32(zBuffer, 0);
 			ms.Write(zBuffer, 4, zBuffer.Length - 4);
@@ -570,15 +570,15 @@ namespace RNumerics
 		public T[] Source;
 		public int Index;
 
-		public ArrayAlias(T[] source, int i) {
+		public ArrayAlias(in T[] source, in int i) {
 			Source = source;
-			this.Index = i;
+			Index = i;
 		}
 
-		public T this[int i]
+		public T this[in int i]
 		{
-			get { return Source[Index + i]; }
-			set { Source[Index + i] = value; }
+			get => Source[Index + i];
+			set => Source[Index + i] = value;
 		}
 	}
 

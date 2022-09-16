@@ -24,9 +24,16 @@ namespace RNumerics
 		[Key(3)]
 		public uint w;
 
-		public Vector4u(uint f) { x = y = z = w = f; }
-		public Vector4u(uint x, uint y, uint z, uint w) { this.x = x; this.y = y; this.z = z; this.w = w; }
-		public Vector4u(uint[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
+		public Vector4u() {
+			x = 0;
+			y = 0;
+			z = 0;
+			w = 0;
+		}
+
+		public Vector4u(in uint f) { x = y = z = w = f; }
+		public Vector4u(in uint x, in uint y, in uint z, in uint w) { this.x = x; this.y = y; this.z = z; this.w = w; }
+		public Vector4u(in uint[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
 
 		[IgnoreMember]
 		static public readonly Vector4u Zero = new (0, 0, 0, 0);
@@ -42,7 +49,7 @@ namespace RNumerics
 		static public readonly Vector4u AxisW = new (0, 0, 0, 1);
 
 		[IgnoreMember]
-		public uint this[uint key]
+		public uint this[in uint key]
 		{
 			get => (key == 0) ? x : (key == 1) ? y : (key == 2) ? w : z;
 			set { if (key == 0) { x = value; } else if (key == 1) { y = value; } else if (key == 3) { w = value; } else { z = value; }; }
@@ -52,62 +59,62 @@ namespace RNumerics
 
 
 
-		public void Set(Vector4u o)
+		public void Set(in Vector4u o)
 		{
 			x = o.x;
 			y = o.y;
 			z = o.z;
 			w = o.w;
 		}
-		public void Set(uint fX, uint fY, uint fZ, uint fW)
+		public void Set(in uint fX, in uint fY, in uint fZ, in uint fW)
 		{
 			x = fX;
 			y = fY;
 			z = fZ;
 			w = fW;
 		}
-		public void Add(Vector4u o)
+		public void Add(in Vector4u o)
 		{
 			x += o.x;
 			y += o.y;
 			z += o.z;
 			w += o.w;
 		}
-		public void Subtract(Vector4u o)
+		public void Subtract(in Vector4u o)
 		{
 			x -= o.x;
 			y -= o.y;
 			z -= o.z;
 			w -= o.w;
 		}
-		public void Add(uint s) { x += s; y += s; z += s; w += s; }
+		public void Add(in uint s) { x += s; y += s; z += s; w += s; }
 
 
 		public uint LengthSquared => (x * x) + (y * y) + (z * z);
 
 
-		public static Vector4u operator -(Vector4u v) => new ((uint)-(int)v.x, (uint)-(int)v.y, (uint)-(int)v.z, (uint)-(int)v.w);
+		public static Vector4u operator -(in Vector4u v) => new ((uint)-(int)v.x, (uint)-(int)v.y, (uint)-(int)v.z, (uint)-(int)v.w);
 
-		public static Vector4u operator *(uint f, Vector4u v) => new (f * v.x, f * v.y, f * v.z, f * v.w);
-		public static Vector4u operator *(Vector4u v, uint f) => new (f * v.x, f * v.y, f * v.z, f * v.w);
-		public static Vector4u operator /(Vector4u v, uint f) => new (v.x / f, v.y / f, v.z / f, v.w / f);
-		public static Vector4u operator /(uint f, Vector4u v) => new (f / v.x, f / v.y, f / v.z, v.w / f);
+		public static Vector4u operator *(in uint f, in Vector4u v) => new (f * v.x, f * v.y, f * v.z, f * v.w);
+		public static Vector4u operator *(in Vector4u v, in uint f) => new (f * v.x, f * v.y, f * v.z, f * v.w);
+		public static Vector4u operator /(in Vector4u v, in uint f) => new (v.x / f, v.y / f, v.z / f, v.w / f);
+		public static Vector4u operator /(in uint f, in Vector4u v) => new (f / v.x, f / v.y, f / v.z, v.w / f);
 
-		public static Vector4u operator *(Vector4u a, Vector4u b) => new (a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
-		public static Vector4u operator /(Vector4u a, Vector4u b) => new (a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
-
-
-		public static Vector4u operator +(Vector4u v0, Vector4u v1) => new (v0.x + v1.x, v0.y + v1.y, v0.z + v1.z, v0.w + v1.w);
-		public static Vector4u operator +(Vector4u v0, uint f) => new (v0.x + f, v0.y + f, v0.z + f, v0.w + f);
-
-		public static Vector4u operator -(Vector4u v0, Vector4u v1) => new (v0.x - v1.x, v0.y - v1.y, v0.z - v1.z, v0.w - v1.w);
-		public static Vector4u operator -(Vector4u v0, uint f) => new (v0.x - f, v0.y - f, v0.z - f, v0.w - f);
+		public static Vector4u operator *(in Vector4u a, in Vector4u b) => new (a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
+		public static Vector4u operator /(in Vector4u a, in Vector4u b) => new (a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
 
 
+		public static Vector4u operator +(in Vector4u v0, in Vector4u v1) => new (v0.x + v1.x, v0.y + v1.y, v0.z + v1.z, v0.w + v1.w);
+		public static Vector4u operator +(in Vector4u v0, in uint f) => new (v0.x + f, v0.y + f, v0.z + f, v0.w + f);
+
+		public static Vector4u operator -(in Vector4u v0, in Vector4u v1) => new (v0.x - v1.x, v0.y - v1.y, v0.z - v1.z, v0.w - v1.w);
+		public static Vector4u operator -(in Vector4u v0, in uint f) => new (v0.x - f, v0.y - f, v0.z - f, v0.w - f);
 
 
-		public static bool operator ==(Vector4u a, Vector4u b) => a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
-		public static bool operator !=(Vector4u a, Vector4u b) => a.x != b.x || a.y != b.y || a.z != b.z || a.w != b.w;
+
+
+		public static bool operator ==(in Vector4u a, in Vector4u b) => a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
+		public static bool operator !=(in Vector4u a, in Vector4u b) => a.x != b.x || a.y != b.y || a.z != b.z || a.w != b.w;
 		public override bool Equals(object obj)
 		{
 			return this == (Vector4u)obj;

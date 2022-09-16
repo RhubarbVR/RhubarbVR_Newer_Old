@@ -5,7 +5,7 @@ using MessagePack;
 namespace RNumerics
 {
 	[MessagePackObject]
-	public class ColorMap
+	public sealed class ColorMap
 	{
 		[MessagePackObject]
 		public struct ColorPoint
@@ -24,14 +24,14 @@ namespace RNumerics
 			_validRange = Interval1d.Empty;
 		}
 
-		public ColorMap(float[] t, Colorf[] c) {
+		public ColorMap(in float[] t, in Colorf[] c) {
 			_validRange = Interval1d.Empty;
 			for (var i = 0; i < t.Length; ++i) {
 				AddPoint(t[i], c[i]);
 			}
 		}
 
-		public void AddPoint(float t, Colorf c) {
+		public void AddPoint(in float t, in Colorf c) {
 			var cp = new ColorPoint() { t = t, c = c };
 			if (points.Count == 0) {
 				points.Add(cp);
@@ -60,7 +60,7 @@ namespace RNumerics
 
 
 
-		public Colorf Linear(float t) {
+		public Colorf Linear(in float t) {
 			if (t <= points[0].t) {
 				return points[0].c;
 			}

@@ -13,7 +13,8 @@ using RhuEngine.WorldObjects;
 
 namespace RStereoKit
 {
-	public class UIRender : RenderLinkBase<UICanvas>
+	//NotSupprted
+	public sealed class BasicLight : EngineWorldLinkBase<Light>
 	{
 		public override void Init() {
 		}
@@ -22,7 +23,6 @@ namespace RStereoKit
 		}
 
 		public override void Render() {
-			RenderingComponent?.RenderUI();
 		}
 
 		public override void Started() {
@@ -32,7 +32,25 @@ namespace RStereoKit
 		}
 	}
 
-	public class SKMeshRender : RenderLinkBase<MeshRender>
+	public sealed class SKArmiturer : EngineWorldLinkBase<Armature>
+	{
+		public override void Init() {
+		}
+
+		public override void Remove() {
+		}
+
+		public override void Render() {
+		}
+
+		public override void Started() {
+		}
+
+		public override void Stopped() {
+		}
+	}
+
+	public sealed class SKTempMeshRender : EngineWorldLinkBase<SkinnedMeshRender>
 	{
 		public override void Init() {
 			//Not needed for StereoKit
@@ -43,19 +61,49 @@ namespace RStereoKit
 		}
 
 		public override void Render() {
-			if (RenderingComponent.mesh.Asset != null) {
-				SKRender(RenderingComponent.mesh.Asset, RenderingComponent.materials,RenderingComponent.Entity.GlobalTrans, RenderingComponent.colorLinear.Value, RenderingComponent.renderLayer.Value);
+			if (LinkedComp.mesh.Asset != null) {
+				SKRender(LinkedComp.mesh.Asset, LinkedComp.materials.ToArray(), LinkedComp.Entity.GlobalTrans, LinkedComp.colorLinear.Value, LinkedComp.renderLayer.Value);
 			}
 		}
 
-		private void SKRender(RMesh rMesh,IEnumerable<ISyncObject> mits, RNumerics.Matrix globalTrans,Colorf color,RhuEngine.Linker.RenderLayer layer) {
-			foreach (AssetRef<RMaterial> item in mits) {
-				if (item.Asset != null) {
-					((Mesh)rMesh.mesh)?.Draw((Material)item.Asset.Target, new StereoKit.Matrix(globalTrans.m), new Color(color.r, color.g, color.b, color.a), (StereoKit.RenderLayer)layer);
-				}
+		private void SKRender(RMesh rMesh, ISyncObject[] mits, RNumerics.Matrix globalTrans, Colorf color, RhuEngine.Linker.RenderLayer layer) {
+			var mesh = (SKRMesh)rMesh.Inst;
+			for (var i = 0; i < mesh.Meshs.Length; i++) {
+				mesh.Draw(((AssetRef<RMaterial>)mits[i% mits.Length]).Asset, globalTrans, color, LinkedComp.OrderOffset.Value, layer, i);
 			}
 		}
 
+		public override void Started() {
+			//Not needed for StereoKit
+		}
+
+		public override void Stopped() {
+			//Not needed for StereoKit
+		}
+	}
+
+	public sealed class SKMeshRender : EngineWorldLinkBase<MeshRender>
+	{
+		public override void Init() {
+			//Not needed for StereoKit
+		}
+
+		public override void Remove() {
+			//Not needed for StereoKit
+		}
+
+		public override void Render() {
+			if (LinkedComp.mesh.Asset != null) {
+				SKRender(LinkedComp.mesh.Asset, LinkedComp.materials.ToArray(), LinkedComp.Entity.GlobalTrans, LinkedComp.colorLinear.Value, LinkedComp.renderLayer.Value);
+			}
+		}
+
+		private void SKRender(RMesh rMesh, ISyncObject[] mits, RNumerics.Matrix globalTrans, Colorf color, RhuEngine.Linker.RenderLayer layer) {
+			var mesh = (SKRMesh)rMesh.Inst;
+			for (var i = 0; i < mesh.Meshs.Length; i++) {
+				mesh.Draw(((AssetRef<RMaterial>)mits[i % mits.Length]).Asset, globalTrans, color, LinkedComp.OrderOffset.Value, layer, i);
+			}
+		}
 		public override void Started() {
 			//Not needed for StereoKit
 		}

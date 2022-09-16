@@ -12,12 +12,12 @@ namespace RNumerics
 	/// <summary>
 	/// Iterator that just returns a constant value N times
 	/// </summary>
-	public class ConstantItr<T> : IEnumerable<T>
+	public sealed class ConstantItr<T> : IEnumerable<T>
 	{
 		public T ConstantValue = default;
 		public int N;
 
-		public ConstantItr(int count, T constant) {
+		public ConstantItr(in int count, in T constant) {
 			N = count;
 			ConstantValue = constant;
 		}
@@ -33,12 +33,12 @@ namespace RNumerics
 	/// <summary>
 	/// Iterator that re-maps iterated values via a Func
 	/// </summary>
-	public class RemapItr<T, T2> : IEnumerable<T>
+	public sealed class RemapItr<T, T2> : IEnumerable<T>
 	{
 		public IEnumerable<T2> OtherItr;
 		public Func<T2, T> ValueF;
 
-		public RemapItr(IEnumerable<T2> otherIterator, Func<T2, T> valueFunction) {
+		public RemapItr(in IEnumerable<T2> otherIterator, in Func<T2, T> valueFunction) {
 			OtherItr = otherIterator;
 			ValueF = valueFunction;
 		}
@@ -55,12 +55,12 @@ namespace RNumerics
 	/// <summary>
 	/// IList wrapper that remaps values via a Func (eg for index maps)
 	/// </summary>
-	public class MappedList : IList<int>
+	public sealed class MappedList : IList<int>
 	{
 		public IList<int> BaseList;
 		public Func<int, int> MapF = (i) => i;
 
-		public MappedList(IList<int> list, int[] map) {
+		public MappedList(in IList<int> list, int[] map) {
 			BaseList = list;
 			MapF = (v) => map[v];
 		}
@@ -105,25 +105,25 @@ namespace RNumerics
 	{
 		Interval1i _range;
 
-		public IntSequence(Interval1i ival) {
+		public IntSequence(in Interval1i ival) {
 			_range = ival;
 		}
-		public IntSequence(int iStart, int iEnd) {
+		public IntSequence(in int iStart, in int iEnd) {
 			_range = new Interval1i(iStart, iEnd);
 		}
 
 		/// <summary> construct interval [0, N-1] </summary>
-		static public IntSequence Range(int N) { return new IntSequence(0, N - 1); }
+		static public IntSequence Range(in int N) { return new IntSequence(0, N - 1); }
 
 		/// <summary> construct interval [0, N-1] </summary>
-		static public IntSequence RangeInclusive(int N) { return new IntSequence(0, N); }
+		static public IntSequence RangeInclusive(in int N) { return new IntSequence(0, N); }
 
 		/// <summary> construct interval [start, start+N-1] </summary>
-		static public IntSequence Range(int start, int N) { return new IntSequence(start, start + N - 1); }
+		static public IntSequence Range(in int start, in int N) { return new IntSequence(start, start + N - 1); }
 
 
 		/// <summary> construct interval [a, b] </summary>
-		static public IntSequence FromToInclusive(int a, int b) { return new IntSequence(a, b); }
+		static public IntSequence FromToInclusive(in int a, in int b) { return new IntSequence(a, b); }
 
 		public int this[int index]
 		{

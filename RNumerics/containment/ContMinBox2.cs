@@ -10,7 +10,7 @@ namespace RNumerics
 	/// 
 	/// HullIndices provides ordered indices of vertices of input points that form hull.
 	/// </summary>
-	public class ConvexHull2
+	public sealed class ConvexHull2
 	{
 		//QueryNumberType mQueryType = QueryNumberType.QT_DOUBLE;
 		readonly IList<Vector2d> _mVertices;
@@ -49,7 +49,7 @@ namespace RNumerics
 		/// Compute convex hull of input points. 
 		/// epsilon is only used for check if points lie on a line (1d hull), not for rest of compute.
 		/// </summary>
-		public ConvexHull2(IList<Vector2d> vertices, double epsilon, QueryNumberType queryType) {
+		public ConvexHull2(in IList<Vector2d> vertices, in double epsilon, in QueryNumberType queryType) {
 			//mQueryType = queryType;
 			_mVertices = vertices;
 			_mNumVertices = vertices.Count;
@@ -226,7 +226,7 @@ namespace RNumerics
 		//        mQueryType);
 		//}
 
-		bool Update(ref Edge hull, int i) {
+		bool Update(ref Edge hull, in int i) {
 			// Locate an edge visible to the input point (if possible).
 			Edge visible = null;
 			var current = hull;
@@ -295,7 +295,7 @@ namespace RNumerics
 		/// <summary>
 		/// Internal class that represents edge of hull, and neighbours
 		/// </summary>
-		protected class Edge
+		private sealed class Edge
 		{
 			public Vector2i V;
 			public Edge E0;
@@ -303,7 +303,7 @@ namespace RNumerics
 			public int Sign;
 			public int Time;
 
-			public Edge(int v0, int v1) {
+			public Edge(in int v0, in int v1) {
 				Sign = 0;
 				Time = -1;
 				V[0] = v0;
@@ -312,7 +312,7 @@ namespace RNumerics
 				E1 = null;
 			}
 
-			public int GetSign(int i, IQuery2 query) {
+			public int GetSign(in int i, in IQuery2 query) {
 				if (i != Time) {
 					Time = i;
 					Sign = query.ToLine(i, V[0], V[1]);
@@ -320,7 +320,7 @@ namespace RNumerics
 				return Sign;
 			}
 
-			public void Insert(Edge adj0, Edge adj1) {
+			public void Insert(in Edge adj0, in Edge adj1) {
 				adj0.E1 = this;
 				adj1.E0 = this;
 				E0 = adj0;
@@ -372,12 +372,12 @@ namespace RNumerics
 	/// <summary>
 	/// Fit minimal bounding-box to a set of 2D points. Result is in MinBox.
 	/// </summary>
-	public class ContMinBox2
+	public sealed class ContMinBox2
 	{
 		public Box2d _mMinBox;
 
 		// Flags for the rotating calipers algorithm.
-		protected enum RCFlags
+		private enum RCFlags
 		{
 			F_NONE, F_LEFT, F_RIGHT, F_BOTTOM, F_TOP
 		};
@@ -385,7 +385,7 @@ namespace RNumerics
 
 		public Box2d MinBox => _mMinBox;
 
-		public ContMinBox2(IList<Vector2d> points, double epsilon, QueryNumberType queryType, bool isConvexPolygon) {
+		public ContMinBox2(in IList<Vector2d> points, in double epsilon, in QueryNumberType queryType, in bool isConvexPolygon) {
 			// Get the convex hull of the points.
 			IList<Vector2d> hullPoints;
 			int numPoints;
@@ -643,8 +643,8 @@ namespace RNumerics
 
 
 
-		protected void UpdateBox(Vector2d LPoint, Vector2d RPoint,
-								 Vector2d BPoint, Vector2d TPoint,
+		private void UpdateBox(in Vector2d LPoint, in Vector2d RPoint,
+								 in Vector2d BPoint, in Vector2d TPoint,
 								 ref Vector2d U, ref Vector2d V, ref double minAreaDiv4) {
 			var RLDiff = RPoint - LPoint;
 			var TBDiff = TPoint - BPoint;

@@ -7,7 +7,7 @@ using System.Diagnostics;
 namespace RNumerics
 {
 
-	public class Arc2d : IParametricCurve2d
+	public sealed class Arc2d : IParametricCurve2d
 	{
 		public Vector2d Center;
 		public double Radius;
@@ -16,7 +16,7 @@ namespace RNumerics
 		public bool IsReversed;     // use ccw orientation instead of cw
 
 
-		public Arc2d(Vector2d center, double radius, double startDeg, double endDeg) {
+		public Arc2d(in Vector2d center, in double radius, in double startDeg, in double endDeg) {
 			IsReversed = false;
 			Center = center;
 			Radius = radius;
@@ -34,7 +34,7 @@ namespace RNumerics
 		/// Create Arc around center, **clockwise** from start to end points.
 		/// Points must both be the same distance from center (ie on circle)
 		/// </summary>
-		public Arc2d(Vector2d vCenter, Vector2d vStart, Vector2d vEnd) {
+		public Arc2d(in Vector2d vCenter, in Vector2d vStart, in Vector2d vEnd) {
 			IsReversed = false;
 			SetFromCenterAndPoints(vCenter, vStart, vEnd);
 		}
@@ -44,7 +44,7 @@ namespace RNumerics
 		/// Initialize Arc around center, **clockwise** from start to end points.
 		/// Points must both be the same distance from center (ie on circle)
 		/// </summary>
-		public void SetFromCenterAndPoints(Vector2d vCenter, Vector2d vStart, Vector2d vEnd) {
+		public void SetFromCenterAndPoints(in Vector2d vCenter, in Vector2d vStart, in Vector2d vEnd) {
 			var ds = vStart - vCenter;
 			var de = vEnd - vCenter;
 			Debug.Assert(Math.Abs(ds.LengthSquared - de.LengthSquared) < MathUtil.ZERO_TOLERANCEF);
@@ -73,7 +73,7 @@ namespace RNumerics
 
 
 		// t in range[0,1] spans arc
-		public Vector2d SampleT(double t) {
+		public Vector2d SampleT(in double t) {
 			var theta = IsReversed ?
 				((1 - t) * AngleEndDeg) + (t * AngleStartDeg) :
 				((1 - t) * AngleStartDeg) + (t * AngleEndDeg);
@@ -83,7 +83,7 @@ namespace RNumerics
 		}
 
 
-		public Vector2d TangentT(double t) {
+		public Vector2d TangentT(in double t) {
 			var theta = IsReversed ?
 				((1 - t) * AngleEndDeg) + (t * AngleStartDeg) :
 				((1 - t) * AngleStartDeg) + (t * AngleEndDeg);
@@ -102,7 +102,7 @@ namespace RNumerics
 
 		public double ArcLength => (AngleEndDeg - AngleStartDeg) * MathUtil.DEG_2_RAD * Radius;
 
-		public Vector2d SampleArcLength(double a) {
+		public Vector2d SampleArcLength(in double a) {
 			if (ArcLength < MathUtil.EPSILON) {
 				return (a < 0.5) ? SampleT(0) : SampleT(1);
 			}
@@ -126,7 +126,7 @@ namespace RNumerics
 
 
 		public bool IsTransformable => true;
-		public void Transform(ITransform2 xform) {
+		public void Transform(in ITransform2 xform) {
 			var vCenter = xform.TransformP(Center);
 			var vStart = xform.TransformP(IsReversed ? P1 : P0);
 			var vEnd = xform.TransformP(IsReversed ? P0 : P1);
@@ -169,7 +169,7 @@ namespace RNumerics
 
 
 
-		public double Distance(Vector2d point) {
+		public double Distance(in Vector2d point) {
 			var PmC = point - Center;
 			var lengthPmC = PmC.Length;
 			if (lengthPmC > MathUtil.EPSILON) {
@@ -192,7 +192,7 @@ namespace RNumerics
 		}
 
 
-		public Vector2d NearestPoint(Vector2d point) {
+		public Vector2d NearestPoint(in Vector2d point) {
 			var PmC = point - Center;
 			var lengthPmC = PmC.Length;
 			if (lengthPmC > MathUtil.EPSILON) {

@@ -5,6 +5,8 @@
     <RootNamespace>RhuEngineTests</RootNamespace>
 
     <IsPackable>false</IsPackable>
+
+    <Configurations>Debug;Release;Unity</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NullContext\NullContext.csproj" />
     <ProjectReference Include="..\RhuEngine\RhuEngine.csproj" />
+    <ProjectReference Include="..\RNumerics\RNumerics.csproj" />
   </ItemGroup>
 
 </Project>

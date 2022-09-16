@@ -4,10 +4,11 @@ using StereoKit;
 using RhuEngine;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
+using RhuEngine.Managers;
 
 namespace RStereoKit
 {
-	public class RhuStereoKit : IEngineLink
+	public sealed class RhuStereoKit : IEngineLink
 	{
 		public string BackendID => "StereoKit";
 
@@ -39,8 +40,24 @@ namespace RStereoKit
 		public bool CanAudio => true;
 		public bool CanInput => true;
 
+		public bool ForceLibLoad => false;
+
+		public bool InVR => (SK.ActiveDisplayMode == DisplayMode.MixedReality) || !engine._noVRSim;
+		public event Action<bool> VRChange;
+
+		public bool LiveVRChange => false;
+
+		public Type RenderSettingsType => typeof(SKRenderSettings);
+
+		public SupportedFancyFeatures SupportedFeatures => SupportedFancyFeatures.Basic;
+
+		public void ChangeVR(bool value) {
+			throw new NotImplementedException();
+		}
 		public void BindEngine(Engine engine) {
 			this.engine = engine;
+			Renderer.OverrideCaptureFilter(true,(StereoKit.RenderLayer)(int)RhuEngine.Linker.RenderLayer.MainCam);
+			RLog.Instance = new Logger();
 		}
 
 		public void ColorizeFingers(StereoKit.Handed hand, int size, Gradient horizontal, Gradient vertical) {
@@ -62,19 +79,16 @@ namespace RStereoKit
 		}
 
 		public void LoadStatics() {
-			RLog.Instance = new Logger();
+			World.RaycastEnabled = false;
 			RTexture2D.Instance = new SKTexture2d();
 			RMaterial.Instance = new SKRMaterial();
+			RMaterial.ConstInstance = new SKMitStactic();
 			RShader.Instance = new SKShader();
-			RText.Instance = new SkRText();
-			RMesh.Instance = new SKRMesh();
+			RMesh.Instance = typeof(SKRMesh);
+			RenderThread.ExecuteOnStartOfFrame(() => RMesh.Quad = new RMesh(new SKRMesh(Mesh.Quad), false));
 			RTime.Instance = new SKTime();
 			RRenderer.Instance = new SKRRenderer();
-			RInput.Instance = new SKInput();
-			RSound.Instance = new SKSound();
-			RSoundInst.Instance = new SKSoundInst();
-			RMicrophone.Instance = new SKMic();
-			RFont.Instance = new SKFont();
+			StaticMaterialManager.Instanances = new StaticMitsManager();
 			PhysicsHelper.RegisterPhysics<RBullet.BulletPhsyicsLink>();
 		}
 
@@ -93,6 +107,14 @@ namespace RStereoKit
 					new GradientKey(new Color(1, 1, 1, 0), 0),
 					new GradientKey(new Color(1, 1, 1, 0), 0.4f),
 					new GradientKey(new Color(1, 1, 1, 1), 0.9f)));
+		}
+
+		public void LoadArgs() {
+		}
+
+		public void LoadInput(InputManager manager) {
+			manager.LoadInputDriver<SKKeyboardDriver>();
+			manager.LoadInputDriver<SKMosueDriver>();
 		}
 	}
 }

@@ -5,33 +5,33 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class ArrowMesh : ProceduralMesh
+	public sealed class ArrowMesh : ProceduralMesh
 	{
 		[Default(0.5f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> StickRadius;
+		public readonly Sync<float> StickRadius;
 
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> StickLength;
+		public readonly Sync<float> StickLength;
 
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> HeadBaseRadius;
+		public readonly Sync<float> HeadBaseRadius;
 
 		[Default(0.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> TipRadius;
+		public readonly Sync<float> TipRadius;
 
 		[Default(0.5f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> HeadLength;
+		public readonly Sync<float> HeadLength;
 
 		[Default(false)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> DoubleSided;
+		public readonly Sync<bool> DoubleSided;
 
-		public override void FirstCreation() {
+		protected override void FirstCreation() {
 			base.FirstCreation();
 		}
 

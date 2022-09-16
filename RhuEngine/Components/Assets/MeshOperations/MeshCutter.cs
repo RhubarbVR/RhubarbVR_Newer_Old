@@ -6,18 +6,18 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Mesh Operations" })]
-	public class MeshCutter : ProceduralMesh
+	public sealed class MeshCutter : ProceduralMesh
 	{
 		[OnAssetLoaded(nameof(ComputeMesh))]
-		public AssetRef<RMesh> TargetMesh;
+		public readonly AssetRef<RMesh> TargetMesh;
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Plane3d> CutPlane;
+		public readonly Sync<Plane3d> CutPlane;
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> SwitchSide;
+		public readonly Sync<bool> SwitchSide;
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> RemoveSide;
+		public readonly Sync<bool> RemoveSide;
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> Cap;
+		public readonly Sync<bool> Cap;
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {
 				return;

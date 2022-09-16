@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 		public RMesh loadedMesh = null;
 		public void GenMesh(IMesh mesh) {
 			if (loadedMesh == null) {
-				loadedMesh = new RMesh(mesh);
+				loadedMesh = new RMesh(mesh, false);
 				Load(loadedMesh);
 			}
 			else {
@@ -19,7 +19,7 @@ namespace RhuEngine.Components
 		}
 
 		public void LoadMesh() {
-			RWorld.ExecuteOnEndOfFrame(this, () => {
+			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
 				try {
 					ComputeMesh();
 				}
@@ -31,7 +31,7 @@ namespace RhuEngine.Components
 			});
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			LoadMesh();
 		}

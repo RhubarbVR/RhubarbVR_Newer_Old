@@ -20,7 +20,7 @@ namespace RNumerics
 	///          if ( det(V) == -1 ) { V *= -1; S *= -1 }     (right? seems to work)
 	///  
 	/// </summary>
-	public class SingularValueDecomposition
+	public sealed class SingularValueDecomposition
 	{
 		// port of WildMagic5 SingularValueDecomposition class (which is a back-port
 		// of GTEngine SVD class) see geometrictools.com
@@ -34,7 +34,7 @@ namespace RNumerics
 		// orthogonal V, and MxN matrix S for which U^T*A*V = S.  The only
 		// nonzero entries of S are on the diagonal; the diagonal entries are
 		// the singular values of the original matrix.
-		public SingularValueDecomposition(int numRows, int numCols, int maxIterations) {
+		public SingularValueDecomposition(in int numRows, in int numCols, in int maxIterations) {
 			_mNumRows = _mNumCols = _mMaxIterations = 0;
 			if (numCols > 1 && numRows >= numCols && maxIterations > 0) {
 				_mNumRows = numRows;
@@ -62,7 +62,7 @@ namespace RNumerics
 		// are ordered accordingly.  The return value is the number of iterations
 		// consumed when convergence occurred, 0xFFFFFFFF when convergence did not
 		// occur or 0 when N <= 1 or M < N was passed to theructor.
-		public uint Solve(double[] input, int sortType = -1) {
+		public uint Solve(in double[] input, in int sortType = -1) {
 			if (_mNumRows > 0) {
 				var numElements = _mNumRows * _mNumCols;
 				Array.Copy(input, _mMatrix, numElements);
@@ -148,7 +148,7 @@ namespace RNumerics
 
 		// Get the singular values of the matrix passed to Solve(...).  The input
 		// 'singularValues' must have N elements.
-		public void GetSingularValues(double[] singularValues) {
+		public void GetSingularValues(in double[] singularValues) {
 			if (singularValues != null && _mNumCols > 0) {
 				if (_mPermutation[0] >= 0) {
 					// Sorting was requested.
@@ -170,7 +170,7 @@ namespace RNumerics
 		// diagonal fix-up matrix to compute the orthogonal matrices U and V for
 		// which U^T*A*V = S.  The input uMatrix must be MxM and the input vMatrix
 		// must be NxN, both stored in row-major order.
-		public void GetU(double[] uMatrix) {
+		public void GetU(in double[] uMatrix) {
 			if (uMatrix == null || _mNumCols == 0) {
 				// Invalid input or the constructor failed.
 				return;
@@ -254,7 +254,7 @@ namespace RNumerics
 		}
 
 
-		public void GetV(double[] vMatrix) {
+		public void GetV(in double[] vMatrix) {
 			if (vMatrix == null || _mNumCols == 0) {
 				// Invalid input or the constructor failed.
 				return;
@@ -465,7 +465,7 @@ namespace RNumerics
 		}
 
 		// A helper for generating Givens rotation sine and cosine robustly.
-		void GetSinCos(double x, double y, out double cs, out double sn) {
+		void GetSinCos(in double x, in double y, out double cs, out double sn) {
 			// Solves sn*x + cs*y = 0 robustly.
 			double tau;
 			if (y != (double)0) {
@@ -490,7 +490,7 @@ namespace RNumerics
 		// the last).  For each such entry, the B matrix decouples.  Perform
 		// that decoupling.  If there are no zero-valued entries, then the
 		// Golub-Kahan step must be performed.
-		bool DiagonalEntriesNonzero(int imin, int imax, double threshold) {
+		bool DiagonalEntriesNonzero(in int imin, in int imax, in double threshold) {
 			for (var i = imin; i <= imax; ++i) {
 				if (Math.Abs(_mDiagonal[i]) <= threshold) {
 					// Use planar rotations to case the superdiagonal entry out of
@@ -517,7 +517,7 @@ namespace RNumerics
 
 		// This is Algorithm 8.3.1 in "Matrix Computations, 2nd edition" by
 		// G. H. Golub and C. F. Van Loan.
-		void DoGolubKahanStep(int imin, int imax) {
+		void DoGolubKahanStep(in int imin, in int imax) {
 			// The implicit shift.  Compute the eigenvalue u of the lower-right 2x2
 			// block of A = B^T*B that is closer to b11.
 			var f0 = imax >= (double)1 ? _mSuperdiagonal[imax - 1] : (double)0;
@@ -606,7 +606,7 @@ namespace RNumerics
 		// is used for reordering the singular values and the corresponding
 		// columns of the orthogonal matrix in the calls to GetSingularValues(...)
 		// and GetOrthogonalMatrices(...).
-		void ComputePermutation(int sortType) {
+		void ComputePermutation(in int sortType) {
 			if (sortType == 0) {
 				// Set a flag for GetSingularValues() and GetOrthogonalMatrices() to
 				// know that sorted output was not requested.
@@ -675,7 +675,7 @@ namespace RNumerics
 		// K*(N-1).
 		struct GivensRotation
 		{
-			public GivensRotation(int inIndex0, int inIndex1, double inCs, double inSn) {
+			public GivensRotation(in int inIndex0, in int inIndex1, in double inCs, in double inSn) {
 				index0 = inIndex0;
 				index1 = inIndex1;
 				cs = inCs;

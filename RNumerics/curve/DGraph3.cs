@@ -12,7 +12,7 @@ namespace RNumerics
 	/// Each vertex can be connected to an arbitrary number of edges.
 	/// Each vertex can have a 3-float color, and edge edge can have an integer GroupID
 	/// </summary>
-	public class DGraph3 : ADGraph
+	public sealed class DGraph3 : ADGraph
 	{
 
 		public static readonly Vector3d InvalidVertex = new(double.MaxValue, 0, 0);
@@ -30,12 +30,12 @@ namespace RNumerics
 
 
 
-		public Vector3d GetVertex(int vID) {
+		public Vector3d GetVertex(in int vID) {
 			var i = 3 * vID;
 			return new Vector3d(_vertices[i], _vertices[i + 1], _vertices[i + 2]);
 		}
 
-		public void SetVertex(int vID, Vector3d vNewPos) {
+		public void SetVertex(in int vID, in Vector3d vNewPos) {
 			Debug.Assert(vNewPos.IsFinite);     // this will really catch a lot of bugs...
 			if (vertices_refcount.IsValid(vID)) {
 				var i = 3 * vID;
@@ -47,7 +47,7 @@ namespace RNumerics
 		}
 
 
-		public Vector3f GetVertexColor(int vID) {
+		public Vector3f GetVertexColor(in int vID) {
 			if (_colors == null) {
 				return Vector3f.One;
 			}
@@ -58,7 +58,7 @@ namespace RNumerics
 		}
 
 
-		public void SetVertexColor(int vID, Vector3f vNewColor) {
+		public void SetVertexColor(in int vID, in Vector3f vNewColor) {
 			if (HasVertexColors) {
 				var i = 3 * vID;
 				_colors[i] = vNewColor.x;
@@ -69,7 +69,7 @@ namespace RNumerics
 		}
 
 
-		public bool GetEdgeV(int eID, ref Vector3d a, ref Vector3d b) {
+		public bool GetEdgeV(in int eID, ref Vector3d a, ref Vector3d b) {
 			if (edges_refcount.IsValid(eID)) {
 				var iv0 = 3 * edges[3 * eID];
 				a.x = _vertices[iv0];
@@ -84,7 +84,7 @@ namespace RNumerics
 			return false;
 		}
 
-		public Segment3d GetEdgeSegment(int eID) {
+		public Segment3d GetEdgeSegment(in int eID) {
 			if (edges_refcount.IsValid(eID)) {
 				var iv0 = 3 * edges[3 * eID];
 				var iv1 = 3 * edges[(3 * eID) + 1];
@@ -94,7 +94,7 @@ namespace RNumerics
 			throw new Exception("DGraph3.GetEdgeSegment: invalid segment with id " + eID);
 		}
 
-		public Vector3d GetEdgeCenter(int eID) {
+		public Vector3d GetEdgeCenter(in int eID) {
 			if (edges_refcount.IsValid(eID)) {
 				var iv0 = 3 * edges[3 * eID];
 				var iv1 = 3 * edges[(3 * eID) + 1];
@@ -115,10 +115,10 @@ namespace RNumerics
 
 
 
-		public int AppendVertex(Vector3d v) {
+		public int AppendVertex(in Vector3d v) {
 			return AppendVertex(v, Vector3f.One);
 		}
-		public int AppendVertex(Vector3d v, Vector3f c) {
+		public int AppendVertex(in Vector3d v, in Vector3f c) {
 			var vid = Append_vertex_internal();
 			var i = 3 * vid;
 			_vertices.Insert(v[2], i + 2);
@@ -136,7 +136,7 @@ namespace RNumerics
 
 
 
-		public void AppendGraph(DGraph3 graph, int gid = -1) {
+		public void AppendGraph(in DGraph3 graph, in int gid = -1) {
 			var mapV = new int[graph.MaxVertexID];
 			foreach (var vid in graph.VertexIndices()) {
 				mapV[vid] = AppendVertex(graph.GetVertex(vid));
@@ -152,7 +152,7 @@ namespace RNumerics
 
 		public bool HasVertexColors => _colors != null;
 
-		public void EnableVertexColors(Vector3f initial_color) {
+		public void EnableVertexColors(in Vector3f initial_color) {
 			if (HasVertexColors) {
 				return;
 			}
@@ -251,7 +251,7 @@ namespace RNumerics
 
 
 		// internal used in SplitEdge
-		protected virtual int Append_new_split_vertex(int a, int b) {
+		private int Append_new_split_vertex(in int a, in int b) {
 			var vNew = 0.5 * (GetVertex(a) + GetVertex(b));
 			var cNew = HasVertexColors ? (0.5f * (GetVertexColor(a) + GetVertexColor(b))) : Vector3f.One;
 			var f = AppendVertex(vNew, cNew);
@@ -260,7 +260,7 @@ namespace RNumerics
 
 
 
-		protected override void Subclass_validity_checks(Action<bool> CheckOrFailF) {
+		protected override void Subclass_validity_checks(in Action<bool> CheckOrFailF) {
 			foreach (var vID in VertexIndices()) {
 				var v = GetVertex(vID);
 				CheckOrFailF(double.IsNaN(v.LengthSquared) == false);

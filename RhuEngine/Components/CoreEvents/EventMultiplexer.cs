@@ -8,13 +8,13 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreEvents" })]
-	public class EventMultiplexer : Component
+	public sealed class EventMultiplexer : Component
 	{
-		public Sync<int> Index;
+		public readonly Sync<int> Index;
 
-		public SyncObjList<SyncDelegate> Events;
+		public readonly SyncObjList<SyncDelegate> Events;
 
-		[Exsposed]
+		[Exposed]
 		public void Call() {
 			if(Index.Value < 0) {
 				return;

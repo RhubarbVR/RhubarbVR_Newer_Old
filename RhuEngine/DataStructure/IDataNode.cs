@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using MessagePack;
 
 using RhuEngine.Datatypes;
 
 using RNumerics;
+
+using SharedModels.GameSpecific;
 
 namespace RhuEngine.DataStructure
 {
@@ -95,12 +98,85 @@ namespace RhuEngine.DataStructure
 	[Union(93, typeof(DataNode<Vector2dTuple4>))]
 	[Union(94, typeof(DataNode<Circle3d>))]
 	[Union(95, typeof(DataNode<Cylinder3d>))]
+	[Union(96, typeof(DataNode<ushort>))]
+	[Union(97, typeof(DataNode<Matrix>))]
 	[Union(100, typeof(DataNode<object>))]
 
 	public interface IDataNode
 	{
-		public abstract byte[] GetByteArray();
-		public abstract void SetByteArray(byte[] array);
+		public abstract void InitData();
+		public abstract void ReadChildEnd(IDataNode child);
+		public abstract void SaveAction(DataSaver DataSaver);
+	}
 
+	[MessagePackObject]
+	public sealed class DataNodeHolder
+	{
+		[Key(0)]
+		public int index;
+		[Key(1)]
+		public IDataNode dataNode;
+	}
+
+	[MessagePackObject]
+	public sealed class BlockStore
+	{
+		[Key(0)]
+		public List<DataNodeHolder> dataNodes = new();
+	}
+
+
+	public sealed class DataReader
+	{
+		public BlockStore Store = new();
+		public DataReader(byte[] data) {
+			Store = Serializer.Read<BlockStore>(data);
+			ReadData();
+		}
+		public DataReader(BlockStore storeData) {
+			Store = storeData;
+			ReadData();
+		}
+
+		public IDataNode Data { get; private set; }
+
+		private void ReadData() {
+			for (var i = Store.dataNodes.Count - 1; i >= 0; i--) {
+				if(i == 0) {
+					Data = Store.dataNodes[0].dataNode;
+					Store.dataNodes[0].dataNode.InitData();
+					Store = null;
+					break;
+				}
+				Store.dataNodes[Store.dataNodes[i].index].dataNode.ReadChildEnd(Store.dataNodes[i].dataNode);
+				Store.dataNodes[i].dataNode.InitData();
+			}
+		}
+	}
+	public class DataSaver
+	{
+		public DataSaver(IDataNode dataNode) {
+			Store.dataNodes.Add(new DataNodeHolder { index = -1, dataNode = dataNode });
+			LoadDataInToStore();
+		}
+
+		public void LoadDataInToStore() {
+			for (var i = 0; i < Store.dataNodes.Count; i++) {
+				CurrentIndex = i;
+				var currentObject = Store.dataNodes[i];
+				currentObject.dataNode.SaveAction(this);
+			}
+		}
+
+		public BlockStore Store = new();
+		public int CurrentIndex;
+
+		public void RunChildAction(IDataNode item) {
+			Store.dataNodes.Add(new DataNodeHolder { index = CurrentIndex, dataNode = item });
+		}
+
+		public byte[] SaveStore() {
+			return Serializer.Save(Store);
+		}
 	}
 }

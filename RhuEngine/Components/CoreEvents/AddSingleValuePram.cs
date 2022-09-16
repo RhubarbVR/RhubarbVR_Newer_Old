@@ -3,16 +3,19 @@
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
+using RNumerics;
+
 namespace RhuEngine.Components
 {
+	[GenericTypeConstraint()]
 	[Category(new string[] { "CoreEvents" })]
-	public class AddSingleValuePram<T> : Component
+	public sealed class AddSingleValuePram<T> : Component
 	{
-		public Sync<T> Value;
-		
-		public SyncDelegate<Action<T>> Target;
+		public readonly Sync<T> Value;
 
-		[Exsposed]
+		public readonly SyncDelegate<Action<T>> Target;
+
+		[Exposed]
 		public void Call() {
 			Target.Target?.Invoke(Value);
 		}

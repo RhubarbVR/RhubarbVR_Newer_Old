@@ -14,11 +14,11 @@ namespace RNumerics
 	{
 		public T[] array;
 
-		public VectorArray3(int nCount = 0) {
+		public VectorArray3(in int nCount = 0) {
 			array = new T[nCount * 3];
 		}
 
-		public VectorArray3(T[] data) {
+		public VectorArray3(in T[] data) {
 			array = data;
 		}
 
@@ -30,17 +30,17 @@ namespace RNumerics
 			}
 		}
 
-		public void Resize(int Count) {
+		public void Resize(in int Count) {
 			array = new T[3 * Count];
 		}
 
-		public void Set(int i, T a, T b, T c) {
+		public void Set(in int i, in T a, in T b, in T c) {
 			array[3 * i] = a;
 			array[(3 * i) + 1] = b;
 			array[(3 * i) + 2] = c;
 		}
 
-		public void Set(int iStart, int iCount, VectorArray3<T> source) {
+		public void Set(in int iStart, in int iCount, in VectorArray3<T> source) {
 			Array.Copy(source.array, 0, array, 3 * iStart, 3 * iCount);
 		}
 
@@ -50,12 +50,12 @@ namespace RNumerics
 	}
 
 
-	public class VectorArray3d : VectorArray3<double>
+	public sealed class VectorArray3d : VectorArray3<double>
 	{
-		public VectorArray3d(int nCount) : base(nCount) {
+		public VectorArray3d(in int nCount) : base(nCount) {
 		}
-		public VectorArray3d(double[] data) : base(data) { }
-		public Vector3d this[int i]
+		public VectorArray3d(in double[] data) : base(data) { }
+		public Vector3d this[in int i]
 		{
 			get => new(array[3 * i], array[(3 * i) + 1], array[(3 * i) + 2]);
 			set => Set(i, value[0], value[1], value[2]);
@@ -69,11 +69,11 @@ namespace RNumerics
 	};
 
 
-	public class VectorArray3f : VectorArray3<float>
+	public sealed class VectorArray3f : VectorArray3<float>
 	{
-		public VectorArray3f(int nCount) : base(nCount) { }
-		public VectorArray3f(float[] data) : base(data) { }
-		public Vector3f this[int i]
+		public VectorArray3f(in int nCount) : base(nCount) { }
+		public VectorArray3f(in float[] data) : base(data) { }
+		public Vector3f this[in int i]
 		{
 			get => new(array[3 * i], array[(3 * i) + 1], array[(3 * i) + 2]);
 			set => Set(i, value[0], value[1], value[2]);
@@ -87,17 +87,17 @@ namespace RNumerics
 	};
 
 
-	public class VectorArray3i : VectorArray3<int>
+	public sealed class VectorArray3i : VectorArray3<int>
 	{
-		public VectorArray3i(int nCount) : base(nCount) { }
-		public VectorArray3i(int[] data) : base(data) { }
-		public Vector3i this[int i]
+		public VectorArray3i(in int nCount) : base(nCount) { }
+		public VectorArray3i(in int[] data) : base(data) { }
+		public Vector3i this[in int i]
 		{
 			get => new(array[3 * i], array[(3 * i) + 1], array[(3 * i) + 2]);
 			set => Set(i, value[0], value[1], value[2]);
 		}
 		// [RMS] for CW/CCW codes
-		public void Set(int i, int a, int b, int c, bool bCycle = false) {
+		public void Set(in int i, in int a, in int b, in int c, in bool bCycle = false) {
 			array[3 * i] = a;
 			if (bCycle) {
 				array[(3 * i) + 1] = c;
@@ -118,17 +118,17 @@ namespace RNumerics
 
 
 
-	public class IndexArray3i : VectorArray3<int>
+	public sealed class IndexArray3i : VectorArray3<int>
 	{
-		public IndexArray3i(int nCount) : base(nCount) { }
-		public IndexArray3i(int[] data) : base(data) { }
-		public Index3i this[int i]
+		public IndexArray3i(in int nCount) : base(nCount) { }
+		public IndexArray3i(in int[] data) : base(data) { }
+		public Index3i this[in int i]
 		{
 			get => new(array[3 * i], array[(3 * i) + 1], array[(3 * i) + 2]);
 			set => Set(i, value[0], value[1], value[2]);
 		}
 		// [RMS] for CW/CCW codes
-		public void Set(int i, int a, int b, int c, bool bCycle = false) {
+		public void Set(in int i, in int a, in int b, in int c, in bool bCycle = false) {
 			array[3 * i] = a;
 			if (bCycle) {
 				array[(3 * i) + 1] = c;
@@ -158,11 +158,11 @@ namespace RNumerics
 	{
 		public T[] array;
 
-		public VectorArray2(int nCount = 0) {
+		public VectorArray2(in int nCount = 0) {
 			array = new T[nCount * 2];
 		}
 
-		public VectorArray2(T[] data) {
+		public VectorArray2(in T[] data) {
 			array = data;
 		}
 
@@ -174,16 +174,16 @@ namespace RNumerics
 			}
 		}
 
-		public void Resize(int Count) {
+		public void Resize(in int Count) {
 			array = new T[2 * Count];
 		}
 
-		public void Set(int i, T a, T b) {
+		public void Set(in int i, in T a, in T b) {
 			array[2 * i] = a;
 			array[(2 * i) + 1] = b;
 		}
 
-		public void Set(int iStart, int iCount, VectorArray2<T> source) {
+		public void Set(in int iStart, in int iCount, in VectorArray2<T> source) {
 			Array.Copy(source.array, 0, array, 2 * iStart, 2 * iCount);
 		}
 
@@ -191,11 +191,11 @@ namespace RNumerics
 			return array.GetEnumerator();
 		}
 	}
-	public class VectorArray2d : VectorArray2<double>
+	public sealed class VectorArray2d : VectorArray2<double>
 	{
-		public VectorArray2d(int nCount) : base(nCount) { }
-		public VectorArray2d(double[] data) : base(data) { }
-		public Vector2d this[int i]
+		public VectorArray2d(in int nCount) : base(nCount) { }
+		public VectorArray2d(in double[] data) : base(data) { }
+		public Vector2d this[in int i]
 		{
 			get => new(array[2 * i], array[(2 * i) + 1]);
 			set => Set(i, value[0], value[1]);
@@ -207,11 +207,11 @@ namespace RNumerics
 			}
 		}
 	};
-	public class VectorArray2f : VectorArray2<float>
+	public sealed class VectorArray2f : VectorArray2<float>
 	{
-		public VectorArray2f(int nCount) : base(nCount) { }
-		public VectorArray2f(float[] data) : base(data) { }
-		public Vector2f this[int i]
+		public VectorArray2f(in int nCount) : base(nCount) { }
+		public VectorArray2f(in float[] data) : base(data) { }
+		public Vector2f this[in int i]
 		{
 			get => new(array[2 * i], array[(2 * i) + 1]);
 			set => Set(i, value[0], value[1]);
@@ -226,11 +226,11 @@ namespace RNumerics
 
 
 
-	public class IndexArray2i : VectorArray2<int>
+	public sealed class IndexArray2i : VectorArray2<int>
 	{
-		public IndexArray2i(int nCount) : base(nCount) { }
-		public IndexArray2i(int[] data) : base(data) { }
-		public Index2i this[int i]
+		public IndexArray2i(in int nCount) : base(nCount) { }
+		public IndexArray2i(in int[] data) : base(data) { }
+		public Index2i this[in int i]
 		{
 			get => new(array[2 * i], array[(2 * i) + 1]);
 			set => Set(i, value[0], value[1]);
@@ -253,15 +253,15 @@ namespace RNumerics
 
 
 
-	public class VectorArray4<T> : IEnumerable<T>
+	public  class VectorArray4<T> : IEnumerable<T>
 	{
 		public T[] array;
 
-		public VectorArray4(int nCount = 0) {
+		public VectorArray4(in int nCount = 0) {
 			array = new T[nCount * 4];
 		}
 
-		public VectorArray4(T[] data) {
+		public VectorArray4(in T[] data) {
 			array = data;
 		}
 
@@ -273,11 +273,11 @@ namespace RNumerics
 			}
 		}
 
-		public void Resize(int Count) {
+		public void Resize(in int Count) {
 			array = new T[4 * Count];
 		}
 
-		public void Set(int i, T a, T b, T c, T d) {
+		public void Set(in int i, in T a, in T b, in T c, in T d) {
 			var j = 4 * i;
 			array[j] = a;
 			array[j + 1] = b;
@@ -285,7 +285,7 @@ namespace RNumerics
 			array[j + 3] = d;
 		}
 
-		public void Set(int iStart, int iCount, VectorArray4<T> source) {
+		public void Set(in int iStart, in int iCount, in VectorArray4<T> source) {
 			Array.Copy(source.array, 0, array, 4 * iStart, 4 * iCount);
 		}
 
@@ -296,11 +296,11 @@ namespace RNumerics
 
 
 
-	public class IndexArray4i : VectorArray4<int>
+	public sealed class IndexArray4i : VectorArray4<int>
 	{
-		public IndexArray4i(int nCount) : base(nCount) { }
-		public IndexArray4i(int[] data) : base(data) { }
-		public Index4i this[int i]
+		public IndexArray4i(in int nCount) : base(nCount) { }
+		public IndexArray4i(in int[] data) : base(data) { }
+		public Index4i this[in int i]
 		{
 			get { var j = 4 * i; return new Index4i(array[j], array[j + 1], array[j + 2], array[j + 3]); }
 			set => Set(i, value[0], value[1], value[2], value[4]);

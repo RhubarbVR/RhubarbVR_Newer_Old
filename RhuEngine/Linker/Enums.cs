@@ -23,15 +23,6 @@ namespace RhuEngine.Linker
 		Error,
 	}
 
-	public enum FontStyle
-	{
-		Regular,
-		Bold,
-		Italic,
-		oblique,
-		Strikeout,
-		Underline,
-	}
 
 	/// <summary>When rendering content, you can filter what you're rendering by the
 	/// RenderLayer that they're on. This allows you to draw items that are
@@ -42,13 +33,11 @@ namespace RhuEngine.Linker
 	[Flags]
 	public enum RenderLayer
 	{
-		/// <summary>The default render layer. All Draw use this layer unless
-		/// otherwise specified.</summary>
-		Layer0 = 1 << 0,
+		MainLayer = 1 << 0,
 		/// <summary>Render layer 1.</summary>
-		Layer1 = 1 << 1,
+		Text = 1 << 1,
 		/// <summary>Render layer 2.</summary>
-		Layer2 = 1 << 2,
+		UI = 1 << 2,
 		/// <summary>Render layer 3.</summary>
 		Layer3 = 1 << 3,
 		/// <summary>Render layer 4.</summary>
@@ -63,15 +52,10 @@ namespace RhuEngine.Linker
 		Layer8 = 1 << 8,
 		/// <summary>Render layer 9.</summary>
 		Layer9 = 1 << 9,
-		/// <summary>The default VFX layer, StereoKit draws some non-standard
-		/// mesh content using this flag, such as lines.</summary>
-		Vfx = 1 << 10,
 		/// <summary>This is a flag that specifies all possible layers. If you
 		/// want to render all layers, then this is the layer filter
 		/// you would use. This is the default for render filtering.</summary>
-		All = 0xFFFF,
-		/// <summary>This is a combination of all layers that are not the VFX layer.</summary>
-		AllRegular = Layer0 | Layer1 | Layer2 | Layer3 | Layer4 | Layer5 | Layer6 | Layer7 | Layer8 | Layer9,
+		MainCam = MainLayer | Text | UI | Layer3,
 	}
 
 	/// <summary>Textures come in various types and flavors! These are bit-flags
@@ -147,13 +131,6 @@ namespace RhuEngine.Linker
 		Rgb10a2,
 		/// <summary>TODO: remove during major version update</summary>
 		Rgba64,
-		Rgba64s,
-		Rgba64f,
-		/// <summary>Red/Green/Blue/Transparency data channels at 32 bits
-		/// per-channel! Basically 4 floats per color, which is bonkers
-		/// expensive. Don't use this unless you know -exactly- what you're
-		/// doing.</summary>
-		Rgba128,
 		/// <summary>A single channel of data, with 8 bits per-pixel! This
 		/// can be great when you're only using one channel, and want to
 		/// reduce memory usage. Values in the shader are always 0.0-1.0.</summary>
@@ -162,18 +139,10 @@ namespace RhuEngine.Linker
 		/// is a good format for height maps, since it stores a fair bit of
 		/// information in it. Values in the shader are always 0.0-1.0.</summary>
 		R16,
-		/// <summary>A single channel of data, with 32 bits per-pixel! This
-		/// basically treats each pixel as a generic float, so you can do all
-		/// sorts of strange and interesting things with this.</summary>
-		R32,
 		/// <summary>A depth data format, 24 bits for depth data, and 8 bits
 		/// to store stencil information! Stencil data can be used for things
 		/// like clipping effects, deferred rendering, or shadow effects.</summary>
 		DepthStencil,
-		/// <summary>32 bits of data per depth value! This is pretty detailed,
-		/// and is excellent for experiences that have a very far view
-		/// distance.</summary>
-		Depth32,
 		/// <summary>16 bits of depth is not a lot, but it can be enough if
 		/// your far clipping plane is pretty close. If you're seeing lots of
 		/// flickering where two objects overlap, you either need to bring
@@ -268,49 +237,6 @@ namespace RhuEngine.Linker
 		None,
 	}
 
-	/// <summary>Depth test describes how this material looks at and responds
-	/// to depth information in the zbuffer! The default is Less, which means
-	/// if the material pixel's depth is Less than the existing depth data,
-	/// (basically, is this in front of some other object) it will draw that
-	/// pixel. Similarly, Greater would only draw the material if it's
-	/// 'behind' the depth buffer. Always would just draw all the time, and
-	/// not read from the depth buffer at all.</summary>
-	public enum DepthTest
-	{
-		/// <summary>Default behavior, pixels behind the depth buffer will be
-		/// discarded, and pixels in front of it will be drawn.</summary>
-		Less = 0,
-		/// <summary>Pixels behind the depth buffer will be discarded, and
-		/// pixels in front of, or at the depth buffer's value it will be
-		/// drawn. This could be great for things that might be sitting
-		/// exactly on a floor or wall.</summary>
-		LessOrEq,
-		/// <summary>Pixels in front of the zbuffer will be discarded! This
-		/// is opposite of how things normally work. Great for drawing
-		/// indicators that something is occluded by a wall or other
-		/// geometry.</summary>
-		Greater,
-		/// <summary>Pixels in front of (or exactly at) the zbuffer will be
-		/// discarded! This is opposite of how things normally work. Great
-		/// for drawing indicators that something is occluded by a wall or
-		/// other geometry.</summary>
-		GreaterOrEq,
-		/// <summary>Only draw pixels if they're at exactly the same depth as
-		/// the zbuffer!</summary>
-		Equal,
-		/// <summary>Draw any pixel that's not exactly at the value in the
-		/// zbuffer.</summary>
-		NotEqual,
-		/// <summary>Don't look at the zbuffer at all, just draw everything,
-		/// always, all the time! At this poit, the order at which the mesh
-		/// gets drawn will be  super important, so don't forget about
-		/// `Material.QueueOffset`!</summary>
-		Always,
-		/// <summary>Never draw a pixel, regardless of what's in the zbuffer.
-		/// I can think of better ways to do this, but uhh, this is here for
-		/// completeness! Maybe you can find a use for it.</summary>
-		Never,
-	}
 
 	/// <summary>TODO: v0.4 This may need significant revision?
 	/// What type of data does this material parameter need? This is
@@ -318,17 +244,11 @@ namespace RhuEngine.Linker
 	/// to on the shader.</summary>
 	public enum MaterialParam
 	{
-		/// <summary>This data type is not currently recognized. Please
-		/// report your case on Github Issues!</summary>
+		/// <summary>This is for use of hardtype</summary>
 		Unknown = 0,
 		/// <summary>A single 32 bit float value.</summary>
 		Float = 1,
-		/// <summary>A color value described by 4 floating point values. Memory-wise this is
-		/// the same as a Vector4, but in the shader this variable has a ':color'
-		/// tag applied to it using StereoKits's shader info syntax, indicating it's
-		/// a color value. Color values for shaders should be in linear space, not
-		/// gamma.</summary>
-		Color128 = 2,
+		Bool = 2,
 		/// <summary>A 2 component vector composed of floating point values.</summary>
 		Vector2 = 3,
 		/// <summary>A 3 component vector composed of floating point values.</summary>
@@ -356,6 +276,10 @@ namespace RhuEngine.Linker
 		UInt3 = 14,
 		/// <summary>A 4 component vector composed of unsigned integers.</summary>
 		UInt4 = 15,
+		Cull = 16,
+		Transparency = 17,
+		TexAddress = 18,
+		TexSample = 19,
 	}
 
 
@@ -370,6 +294,20 @@ namespace RhuEngine.Linker
 		/// than doing a for loop with '2' as the condition! It's much clearer
 		/// when you can loop Hand.Max times instead.</summary>
 		Max = 2,
+	}
+
+	public enum MouseKeys 
+	{
+		/// <summary>Left mouse button.</summary>
+		MouseLeft = 0x01,
+		/// <summary>Right mouse button.</summary>
+		MouseRight = 0x02,
+		/// <summary>Center mouse button.</summary>
+		MouseCenter = 0x04,
+		/// <summary>Mouse forward button.</summary>
+		MouseForward = 0x05,
+		/// <summary>Mouse back button.</summary>
+		MouseBack = 0x06,
 	}
 
 

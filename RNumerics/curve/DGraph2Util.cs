@@ -24,7 +24,7 @@ namespace RNumerics
 		/// <summary>
 		/// Decompose graph into simple polylines and polygons. 
 		/// </summary>
-		public static Curves ExtractCurves(DGraph graph) {
+		public static Curves ExtractCurves(in DGraph graph) {
 			var c = new Curves {
 				Loops = new List<Polygon2d>(),
 				Paths = new List<PolyLine2d>()
@@ -152,7 +152,7 @@ namespace RNumerics
 		/// unless the 'other' end of those junctions is dangling.
 		/// Also, horribly innefficient!
 		/// </summary>
-		public static void ChainOpenPaths(Curves c, double epsilon = MathUtil.EPSILON) {
+		public static void ChainOpenPaths(in Curves c, in double epsilon = MathUtil.EPSILON) {
 			var to_process = new List<PolyLine2d>(c.Paths);
 			c.Paths = new List<PolyLine2d>();
 
@@ -236,7 +236,7 @@ namespace RNumerics
 
 
 
-		static List<PolyLine2d> Find_connected_start(PolyLine2d pTest, List<PolyLine2d> potential, double eps = MathUtil.EPSILON) {
+		static List<PolyLine2d> Find_connected_start(in PolyLine2d pTest, in List<PolyLine2d> potential, in double eps = MathUtil.EPSILON) {
 			var result = new List<PolyLine2d>();
 			foreach (var p in potential) {
 				if (pTest == p) {
@@ -250,7 +250,7 @@ namespace RNumerics
 			}
 			return result;
 		}
-		static List<PolyLine2d> Find_connected_end(PolyLine2d pTest, List<PolyLine2d> potential, double eps = MathUtil.EPSILON) {
+		static List<PolyLine2d> Find_connected_end(in PolyLine2d pTest, in List<PolyLine2d> potential, in double eps = MathUtil.EPSILON) {
 			var result = new List<PolyLine2d>();
 			foreach (var p in potential) {
 				if (pTest == p) {
@@ -264,7 +264,7 @@ namespace RNumerics
 			}
 			return result;
 		}
-		static Polygon2d To_loop(PolyLine2d p1, PolyLine2d p2, double eps = MathUtil.EPSILON) {
+		static Polygon2d To_loop(in PolyLine2d p1, in PolyLine2d p2, in double eps = MathUtil.EPSILON) {
 			var p = new Polygon2d(p1.Vertices);
 			if (p1.End.Distance(p2.Start) > eps) {
 				p2.Reverse();
@@ -273,7 +273,7 @@ namespace RNumerics
 			p.AppendVertices(p2);
 			return p;
 		}
-		static PolyLine2d Merge_paths(PolyLine2d p1, PolyLine2d p2, double eps = MathUtil.EPSILON) {
+		static PolyLine2d Merge_paths(in PolyLine2d p1, in PolyLine2d p2, in double eps = MathUtil.EPSILON) {
 			PolyLine2d pNew;
 			if (p1.End.Distance(p2.Start) < eps) {
 				pNew = new PolyLine2d(p1);
@@ -304,7 +304,7 @@ namespace RNumerics
 		/// <summary>
 		/// If vid has two or more neighbours, returns uniform laplacian, otherwise returns vid position
 		/// </summary>
-		public static Vector2d VertexLaplacian(DGraph graph, int vid, out bool isValid) {
+		public static Vector2d VertexLaplacian(in DGraph graph, in int vid, out bool isValid) {
 			var v = graph.GetVertex(vid);
 			var centroid = Vector2d.Zero;
 			var n = 0;
@@ -325,7 +325,7 @@ namespace RNumerics
 
 
 
-		public static bool FindRayIntersection(Vector2d o, Vector2d d, out int hit_eid, out double hit_ray_t, DGraph graph) {
+		public static bool FindRayIntersection(in Vector2d o, in Vector2d d, out int hit_eid, out double hit_ray_t, DGraph graph) {
 			var line = new Line2d(o, d);
 			Vector2d a = Vector2d.Zero, b = Vector2d.Zero;
 
@@ -357,7 +357,7 @@ namespace RNumerics
 		/// and return pair [next_edge, shared_vtx]
 		/// Returns [int.MaxValue, shared_vtx] if shared_vtx is not valence=2   (ie stops at boundaries and complex junctions)
 		/// </summary>
-		public static Index2i NextEdgeAndVtx(int eid, int prev_vid, DGraph graph) {
+		public static Index2i NextEdgeAndVtx(in int eid, in int prev_vid, in DGraph graph) {
 			var ev = graph.GetEdgeV(eid);
 			if (ev.a == DGraph.INVALID_ID) {
 				return Index2i.Max;
@@ -383,7 +383,7 @@ namespace RNumerics
 		/// <summary>
 		/// walk through graph from fromVtx, in direction of eid, until we hit the next junction vertex
 		/// </summary>
-		public static List<int> WalkToNextNonRegularVtx(DGraph graph, int fromVtx, int eid) {
+		public static List<int> WalkToNextNonRegularVtx(in DGraph graph, in int fromVtx, in int eid) {
 			var path = new List<int> {
 				fromVtx
 			};
@@ -419,7 +419,7 @@ namespace RNumerics
 		/// <summary>
 		/// compute length of path through graph
 		/// </summary>
-		public static double PathLength(DGraph graph, IList<int> pathVertices) {
+		public static double PathLength(in DGraph graph, in IList<int> pathVertices) {
 			double len = 0;
 			var N = pathVertices.Count;
 			var prev = graph.GetVertex(pathVertices[0]);

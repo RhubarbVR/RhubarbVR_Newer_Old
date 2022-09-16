@@ -7,7 +7,7 @@ namespace RNumerics
 	public static class BoundsUtil
 	{
 
-		public static AxisAlignedBox3d Bounds(IPointSet source) {
+		public static AxisAlignedBox3d Bounds(in IPointSet source) {
 			var bounds = AxisAlignedBox3d.Empty;
 			foreach (var vid in source.VertexIndices()) {
 				bounds.Contain(source.GetVertex(vid));
@@ -17,11 +17,11 @@ namespace RNumerics
 		}
 
 
-		public static AxisAlignedBox3d Bounds(ref Triangle3d tri) {
-			return Bounds(ref tri.V0, ref tri.V1, ref tri.V2);
+		public static AxisAlignedBox3d Bounds(in Triangle3d tri) {
+			return Bounds(tri.V0, tri.V1, tri.V2);
 		}
 
-		public static AxisAlignedBox3d Bounds(ref Vector3d v0, ref Vector3d v1, ref Vector3d v2) {
+		public static AxisAlignedBox3d Bounds(in Vector3d v0, in Vector3d v1, in Vector3d v2) {
 			AxisAlignedBox3d box;
 			MathUtil.MinMax(v0.x, v1.x, v2.x, out box.Min.x, out box.Max.x);
 			MathUtil.MinMax(v0.y, v1.y, v2.y, out box.Min.y, out box.Max.y);
@@ -29,7 +29,7 @@ namespace RNumerics
 			return box;
 		}
 
-		public static AxisAlignedBox2d Bounds(ref Vector2d v0, ref Vector2d v1, ref Vector2d v2) {
+		public static AxisAlignedBox2d Bounds(in Vector2d v0, in Vector2d v1, in Vector2d v2) {
 			AxisAlignedBox2d box;
 			MathUtil.MinMax(v0.x, v1.x, v2.x, out box.Min.x, out box.Max.x);
 			MathUtil.MinMax(v0.y, v1.y, v2.y, out box.Min.y, out box.Max.y);
@@ -37,7 +37,7 @@ namespace RNumerics
 		}
 
 		// AABB of transformed AABB (corners)
-		public static AxisAlignedBox3d Bounds(ref AxisAlignedBox3d boxIn, Func<Vector3d, Vector3d> TransformF) {
+		public static AxisAlignedBox3d Bounds(in AxisAlignedBox3d boxIn, in Func<Vector3d, Vector3d> TransformF) {
 			if (TransformF == null) {
 				return boxIn;
 			}
@@ -51,7 +51,7 @@ namespace RNumerics
 		}
 
 
-		public static AxisAlignedBox3d Bounds(IEnumerable<Vector3d> positions) {
+		public static AxisAlignedBox3d Bounds(in IEnumerable<Vector3d> positions) {
 			var box = AxisAlignedBox3d.Empty;
 			foreach (var v in positions) {
 				box.Contain(v);
@@ -59,7 +59,7 @@ namespace RNumerics
 
 			return box;
 		}
-		public static AxisAlignedBox3f Bounds(IEnumerable<Vector3f> positions) {
+		public static AxisAlignedBox3f Bounds(in IEnumerable<Vector3f> positions) {
 			var box = AxisAlignedBox3f.Empty;
 			foreach (var v in positions) {
 				box.Contain(v);
@@ -69,7 +69,7 @@ namespace RNumerics
 		}
 
 
-		public static AxisAlignedBox2d Bounds(IEnumerable<Vector2d> positions) {
+		public static AxisAlignedBox2d Bounds(in IEnumerable<Vector2d> positions) {
 			var box = AxisAlignedBox2d.Empty;
 			foreach (var v in positions) {
 				box.Contain(v);
@@ -77,7 +77,7 @@ namespace RNumerics
 
 			return box;
 		}
-		public static AxisAlignedBox2f Bounds(IEnumerable<Vector2f> positions) {
+		public static AxisAlignedBox2f Bounds(in IEnumerable<Vector2f> positions) {
 			var box = AxisAlignedBox2f.Empty;
 			foreach (var v in positions) {
 				box.Contain(v);
@@ -87,7 +87,7 @@ namespace RNumerics
 		}
 
 
-		public static AxisAlignedBox3d Bounds<T>(IEnumerable<T> values, Func<T, Vector3d> PositionF) {
+		public static AxisAlignedBox3d Bounds<T>(in IEnumerable<T> values, in Func<T, Vector3d> PositionF) {
 			var box = AxisAlignedBox3d.Empty;
 			foreach (var t in values) {
 				box.Contain(PositionF(t));
@@ -95,7 +95,7 @@ namespace RNumerics
 
 			return box;
 		}
-		public static AxisAlignedBox3f Bounds<T>(IEnumerable<T> values, Func<T, Vector3f> PositionF) {
+		public static AxisAlignedBox3f Bounds<T>(in IEnumerable<T> values, in Func<T, Vector3f> PositionF) {
 			var box = AxisAlignedBox3f.Empty;
 			foreach (var t in values) {
 				box.Contain(PositionF(t));
@@ -108,7 +108,7 @@ namespace RNumerics
 		/// <summary>
 		/// compute axis-aligned bounds of set of points after transforming 
 		/// </summary>
-		public static AxisAlignedBox3d Bounds(IEnumerable<Vector3d> values, TransformSequence xform) {
+		public static AxisAlignedBox3d Bounds(in IEnumerable<Vector3d> values, in TransformSequence xform) {
 			var box = AxisAlignedBox3d.Empty;
 			foreach (var v in values) {
 				box.Contain(xform.TransformP(v));
@@ -117,11 +117,18 @@ namespace RNumerics
 			return box;
 		}
 
+		public static AxisAlignedBox3f Combined(in AxisAlignedBox3f a, in AxisAlignedBox3f b) {
+			return new AxisAlignedBox3f {
+				Max = new Vector3f(Math.Max(a.Max.x, b.Max.x), Math.Max(a.Max.y, b.Max.y), Math.Max(a.Max.z, b.Max.z)),
+				Min = new Vector3f(Math.Min(a.Min.x, b.Min.x), Math.Min(a.Min.y, b.Min.y), Math.Min(a.Min.z, b.Min.z)),
+			};
+		}
+
 
 		/// <summary>
 		/// compute axis-aligned bounds of set of points after transforming into frame f
 		/// </summary>
-		public static AxisAlignedBox3d BoundsInFrame(IEnumerable<Vector3d> values, Frame3f f) {
+		public static AxisAlignedBox3d BoundsInFrame(in IEnumerable<Vector3d> values, in Frame3f f) {
 			var box = AxisAlignedBox3d.Empty;
 			foreach (var v in values) {
 				box.Contain(f.ToFrameP(v));

@@ -7,15 +7,15 @@ using RhuEngine.Linker;
 namespace RhuEngine.WorldObjects.ECS
 {
 	[Category(new string[] { "Internal" })]
-	public class MissingComponent : Component
+	public sealed class MissingComponent : Component
 	{
-		public Sync<string> type;
+		public readonly Sync<string> type;
 
 		public string tempType;
 
 		public DataNodeGroup tempData;
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			type.Value = tempType;
 		}
 

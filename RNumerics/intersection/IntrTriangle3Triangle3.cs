@@ -8,7 +8,7 @@ namespace RNumerics
 	// use Find() to compute full information
 	// By default fully-contained co-planar triangles are not reported as intersecting.
 	// set ReportCoplanarIntersection=true to handle this case (more expensive)
-	public class IntrTriangle3Triangle3
+	public sealed class IntrTriangle3Triangle3
 	{
 		Triangle3d _triangle0;
 		public Triangle3d Triangle0
@@ -42,7 +42,7 @@ namespace RNumerics
 		public Vector3d[] PolygonPoints;
 
 
-		public IntrTriangle3Triangle3(Triangle3d t0, Triangle3d t1) {
+		public IntrTriangle3Triangle3(in Triangle3d t0, in Triangle3d t1) {
 			_triangle0 = t0;
 			_triangle1 = t1;
 		}
@@ -242,10 +242,10 @@ namespace RNumerics
 			E0.V2 = triangle0.V0 - triangle0.V2;
 
 			// Get normal vector of triangle0.
-			var N0 = E0.V0.UnitCross(ref E0.V1);
+			var N0 = E0.V0.UnitCross(E0.V1);
 
 			// Project triangle1 onto normal line of triangle0, test for separation.
-			var N0dT0V0 = N0.Dot(ref triangle0.V0);
+			var N0dT0V0 = N0.Dot(triangle0.V0);
 			ProjectOntoAxis(ref triangle1, ref N0, out var min1, out var max1);
 			if (N0dT0V0 < min1 || N0dT0V0 > max1) {
 				return false;
@@ -258,19 +258,19 @@ namespace RNumerics
 			E1.V2 = triangle1.V0 - triangle1.V2;
 
 			// Get normal vector of triangle1.
-			var N1 = E1.V0.UnitCross(ref E1.V1);
+			var N1 = E1.V0.UnitCross(E1.V1);
 
 			Vector3d dir;
 			double min0, max0;
 			int i0, i1;
 
-			var N0xN1 = N0.UnitCross(ref N1);
-			if (N0xN1.Dot(ref N0xN1) >= MathUtil.ZERO_TOLERANCE) {
+			var N0xN1 = N0.UnitCross(N1);
+			if (N0xN1.Dot(N0xN1) >= MathUtil.ZERO_TOLERANCE) {
 				// Triangles are not parallel.
 
 				// Project triangle0 onto normal line of triangle1, test for
 				// separation.
-				var N1dT1V0 = N1.Dot(ref triangle1.V0);
+				var N1dT1V0 = N1.Dot(triangle1.V0);
 				ProjectOntoAxis(ref triangle0, ref N1, out min0, out max0);
 				if (N1dT1V0 < min0 || N1dT1V0 > max0) {
 					return false;
@@ -381,7 +381,7 @@ namespace RNumerics
 
 
 
-		bool ContainsPoint(ref Triangle3d triangle, ref Plane3d plane, Vector3d point) {
+		bool ContainsPoint(ref Triangle3d triangle, ref Plane3d plane, in Vector3d point) {
 			// Generate a coordinate system for the plane.  The incoming triangle has
 			// vertices <V0,V1,V2>.  The incoming plane has unit-length normal N.
 			// The incoming point is P.  V0 is chosen as the origin for the plane. The
@@ -425,7 +425,7 @@ namespace RNumerics
 
 
 
-		bool IntersectsSegment(ref Plane3d plane, ref Triangle3d triangle, Vector3d end0, Vector3d end1) {
+		bool IntersectsSegment(ref Plane3d plane, ref Triangle3d triangle, in Vector3d end0, in Vector3d end1) {
 			// Compute the 2D representations of the triangle vertices and the
 			// segment endpoints relative to the plane of the triangle.  Then
 			// compute the intersection in the 2D space.

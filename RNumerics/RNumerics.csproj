@@ -4,10 +4,13 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<Configurations>Debug;Release;Unity</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="MessagePack" Version="2.3.85" />
+	  <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
+	  <PackageReference Include="MessagePack" Version="2.4.35" />
+	  <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 	</ItemGroup>
 
 </Project>

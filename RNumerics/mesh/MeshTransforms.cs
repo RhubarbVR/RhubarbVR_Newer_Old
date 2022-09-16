@@ -8,10 +8,10 @@ namespace RNumerics
 	public static class MeshTransforms
 	{
 
-		public static void Translate(IDeformableMesh mesh, Vector3d v) {
+		public static void Translate(in IDeformableMesh mesh, in Vector3d v) {
 			Translate(mesh, v.x, v.y, v.z);
 		}
-		public static void Translate(IDeformableMesh mesh, double tx, double ty, double tz) {
+		public static void Translate(in IDeformableMesh mesh, in double tx, in double ty, in double tz) {
 			var NV = mesh.MaxVertexID;
 			for (var vid = 0; vid < NV; ++vid) {
 				if (mesh.IsVertex(vid)) {
@@ -25,23 +25,23 @@ namespace RNumerics
 		}
 
 
-		public static Vector3d Rotate(Vector3d pos, Vector3d origin, Quaternionf rotation) {
+		public static Vector3d Rotate(in Vector3d pos, in Vector3d origin, in Quaternionf rotation) {
 			var v = pos - origin;
 			v = (Vector3d)(rotation * (Vector3f)v);
 			v += origin;
 			return v;
 		}
-		public static Frame3f Rotate(Frame3f f, Vector3d origin, Quaternionf rotation) {
+		public static Frame3f Rotate(Frame3f f, in Vector3d origin, in Quaternionf rotation) {
 			f.Rotate(rotation);
 			f.Origin = (Vector3f)Rotate(f.Origin, origin, rotation);
 			return f;
 		}
-		public static Frame3f Rotate(Frame3f f, Vector3d origin, Quaterniond rotation) {
+		public static Frame3f Rotate(Frame3f f, in Vector3d origin, in Quaterniond rotation) {
 			f.Rotate((Quaternionf)rotation);
 			f.Origin = (Vector3f)Rotate(f.Origin, origin, rotation);
 			return f;
 		}
-		public static void Rotate(IDeformableMesh mesh, Vector3d origin, Quaternionf rotation) {
+		public static void Rotate(in IDeformableMesh mesh, in Vector3d origin, in Quaternionf rotation) {
 			var NV = mesh.MaxVertexID;
 			for (var vid = 0; vid < NV; ++vid) {
 				if (mesh.IsVertex(vid)) {
@@ -55,10 +55,10 @@ namespace RNumerics
 		}
 
 
-		public static Vector3d Rotate(Vector3d pos, Vector3d origin, Quaterniond rotation) {
+		public static Vector3d Rotate(in Vector3d pos, in Vector3d origin, in Quaterniond rotation) {
 			return (rotation * (pos - origin)) + origin;
 		}
-		public static void Rotate(IDeformableMesh mesh, Vector3d origin, Quaterniond rotation) {
+		public static void Rotate(in IDeformableMesh mesh, in Vector3d origin, in Quaterniond rotation) {
 			var bHasNormals = mesh.HasVertexNormals;
 			var NV = mesh.MaxVertexID;
 			for (var vid = 0; vid < NV; ++vid) {
@@ -73,7 +73,7 @@ namespace RNumerics
 		}
 
 
-		public static void Scale(IDeformableMesh mesh, Vector3d scale, Vector3d origin) {
+		public static void Scale(in IDeformableMesh mesh, in Vector3d scale, in Vector3d origin) {
 			var NV = mesh.MaxVertexID;
 			for (var vid = 0; vid < NV; ++vid) {
 				if (mesh.IsVertex(vid)) {
@@ -91,21 +91,21 @@ namespace RNumerics
 				}
 			}
 		}
-		public static void Scale(IDeformableMesh mesh, double sx, double sy, double sz) {
+		public static void Scale(in IDeformableMesh mesh, in double sx, in double sy, in double sz) {
 			Scale(mesh, new Vector3d(sx, sy, sz), Vector3d.Zero);
 		}
-		public static void Scale(IDeformableMesh mesh, double s) {
+		public static void Scale(in IDeformableMesh mesh, in double s) {
 			Scale(mesh, s, s, s);
 		}
 
 		///<summary>Map mesh *into* local coordinates of Frame </summary>
-		public static void ToFrame(IDeformableMesh mesh, Frame3f f) {
+		public static void ToFrame(in IDeformableMesh mesh, in Frame3f f) {
 			var NV = mesh.MaxVertexID;
 			var bHasNormals = mesh.HasVertexNormals;
 			for (var vid = 0; vid < NV; ++vid) {
 				if (mesh.IsVertex(vid)) {
 					var v = mesh.GetVertex(vid);
-					var vf = f.ToFrameP(ref v);
+					var vf = f.ToFrameP( v);
 					mesh.SetVertex(vid, vf);
 					if (bHasNormals) {
 						var n = mesh.GetVertexNormal(vid);
@@ -117,13 +117,13 @@ namespace RNumerics
 		}
 
 		/// <summary> Map mesh *from* local frame coordinates into "world" coordinates </summary>
-		public static void FromFrame(IDeformableMesh mesh, Frame3f f) {
+		public static void FromFrame(in IDeformableMesh mesh, in Frame3f f) {
 			var NV = mesh.MaxVertexID;
 			var bHasNormals = mesh.HasVertexNormals;
 			for (var vid = 0; vid < NV; ++vid) {
 				if (mesh.IsVertex(vid)) {
 					var vf = mesh.GetVertex(vid);
-					var v = f.FromFrameP(ref vf);
+					var v = f.FromFrameP( vf);
 					mesh.SetVertex(vid, v);
 					if (bHasNormals) {
 						var n = mesh.GetVertexNormal(vid);
@@ -135,20 +135,20 @@ namespace RNumerics
 		}
 
 
-		public static Vector3d ConvertZUpToYUp(Vector3d v) {
+		public static Vector3d ConvertZUpToYUp(in Vector3d v) {
 			return new Vector3d(v.x, v.z, -v.y);
 		}
-		public static Vector3f ConvertZUpToYUp(Vector3f v) {
+		public static Vector3f ConvertZUpToYUp(in Vector3f v) {
 			return new Vector3f(v.x, v.z, -v.y);
 		}
-		public static Frame3f ConvertZUpToYUp(Frame3f f) {
+		public static Frame3f ConvertZUpToYUp(in Frame3f f) {
 			return new Frame3f(
 				ConvertZUpToYUp(f.Origin),
 				ConvertZUpToYUp(f.X),
 				ConvertZUpToYUp(f.Y),
 				ConvertZUpToYUp(f.Z));
 		}
-		public static void ConvertZUpToYUp(IDeformableMesh mesh) {
+		public static void ConvertZUpToYUp(in IDeformableMesh mesh) {
 			var NV = mesh.MaxVertexID;
 			var bHasNormals = mesh.HasVertexNormals;
 			for (var vid = 0; vid < NV; ++vid) {
@@ -163,20 +163,20 @@ namespace RNumerics
 			}
 		}
 
-		public static Vector3d ConvertYUpToZUp(Vector3d v) {
+		public static Vector3d ConvertYUpToZUp(in Vector3d v) {
 			return new Vector3d(v.x, -v.z, v.y);
 		}
-		public static Vector3f ConvertYUpToZUp(Vector3f v) {
+		public static Vector3f ConvertYUpToZUp(in Vector3f v) {
 			return new Vector3f(v.x, -v.z, v.y);
 		}
-		public static Frame3f ConvertYUpToZUp(Frame3f f) {
+		public static Frame3f ConvertYUpToZUp(in Frame3f f) {
 			return new Frame3f(
 				ConvertYUpToZUp(f.Origin),
 				ConvertYUpToZUp(f.X),
 				ConvertYUpToZUp(f.Y),
 				ConvertYUpToZUp(f.Z));
 		}
-		public static void ConvertYUpToZUp(IDeformableMesh mesh) {
+		public static void ConvertYUpToZUp(in IDeformableMesh mesh) {
 			var NV = mesh.MaxVertexID;
 			var bHasNormals = mesh.HasVertexNormals;
 			for (var vid = 0; vid < NV; ++vid) {
@@ -192,13 +192,13 @@ namespace RNumerics
 		}
 
 
-		public static Vector3d FlipLeftRightCoordSystems(Vector3d v) {
+		public static Vector3d FlipLeftRightCoordSystems(in Vector3d v) {
 			return new Vector3d(v.x, v.y, -v.z);
 		}
-		public static Vector3f FlipLeftRightCoordSystems(Vector3f v) {
+		public static Vector3f FlipLeftRightCoordSystems(in Vector3f v) {
 			return new Vector3f(v.x, v.y, -v.z);
 		}
-		public static Frame3f FlipLeftRightCoordSystems(Frame3f f) {
+		public static Frame3f FlipLeftRightCoordSystems(in Frame3f f) {
 			throw new NotImplementedException("this doesn't work...frame becomes broken somehow?");
 			//return new Frame3f(
 			//    FlipLeftRightCoordSystems(f.Origin),
@@ -207,7 +207,7 @@ namespace RNumerics
 			//    //FlipLeftRightCoordSystems(f.Y),
 			//    //FlipLeftRightCoordSystems(f.Z));
 		}
-		public static void FlipLeftRightCoordSystems(IDeformableMesh mesh) {
+		public static void FlipLeftRightCoordSystems(in IDeformableMesh mesh) {
 			var NV = mesh.MaxVertexID;
 			for (var vid = 0; vid < NV; ++vid) {
 				if (mesh.IsVertex(vid)) {
@@ -228,7 +228,7 @@ namespace RNumerics
 
 
 
-		public static void VertexNormalOffset(IDeformableMesh mesh, double offsetDistance) {
+		public static void VertexNormalOffset(in IDeformableMesh mesh, in double offsetDistance) {
 			var NV = mesh.MaxVertexID;
 			for (var vid = 0; vid < NV; ++vid) {
 				if (mesh.IsVertex(vid)) {
@@ -242,7 +242,7 @@ namespace RNumerics
 		/// <summary>
 		/// Apply TransformF to vertices of mesh
 		/// </summary>
-		public static void PerVertexTransform(IDeformableMesh mesh, Func<Vector3d, Vector3d> TransformF) {
+		public static void PerVertexTransform(in IDeformableMesh mesh, in Func<Vector3d, Vector3d> TransformF) {
 			var NV = mesh.MaxVertexID;
 			for (var vid = 0; vid < NV; ++vid) {
 				if (mesh.IsVertex(vid)) {
@@ -251,7 +251,7 @@ namespace RNumerics
 				}
 			}
 		}
-		public static void PerVertexTransform(IDeformableMesh mesh, Func<Vector3d, Vector3f, Vector3d> TransformF) {
+		public static void PerVertexTransform(in IDeformableMesh mesh, in Func<Vector3d, Vector3f, Vector3d> TransformF) {
 			var NV = mesh.MaxVertexID;
 			for (var vid = 0; vid < NV; ++vid) {
 				if (mesh.IsVertex(vid)) {
@@ -265,7 +265,7 @@ namespace RNumerics
 		/// <summary>
 		/// Apply TransformF to vertices and normals of mesh
 		/// </summary>
-		public static void PerVertexTransform(IDeformableMesh mesh, Func<Vector3d, Vector3f, Vector3dTuple2> TransformF) {
+		public static void PerVertexTransform(in IDeformableMesh mesh, in Func<Vector3d, Vector3f, Vector3dTuple2> TransformF) {
 			var NV = mesh.MaxVertexID;
 			for (var vid = 0; vid < NV; ++vid) {
 				if (mesh.IsVertex(vid)) {
@@ -280,7 +280,7 @@ namespace RNumerics
 		/// <summary>
 		/// Apply Transform to vertices and normals of mesh
 		/// </summary>
-		public static void PerVertexTransform(IDeformableMesh mesh, TransformSequence xform) {
+		public static void PerVertexTransform(in IDeformableMesh mesh, in TransformSequence xform) {
 			var NV = mesh.MaxVertexID;
 			if (mesh.HasVertexNormals) {
 				for (var vid = 0; vid < NV; ++vid) {
@@ -304,7 +304,7 @@ namespace RNumerics
 		/// <summary>
 		/// Apply TransformF to subset of vertices of mesh
 		/// </summary>
-		public static void PerVertexTransform(IDeformableMesh mesh, IEnumerable<int> vertices, Func<Vector3d, int, Vector3d> TransformF) {
+		public static void PerVertexTransform(in IDeformableMesh mesh, in IEnumerable<int> vertices, in Func<Vector3d, int, Vector3d> TransformF) {
 			foreach (var vid in vertices) {
 				if (mesh.IsVertex(vid)) {
 					var newPos = TransformF(mesh.GetVertex(vid), vid);
@@ -316,7 +316,7 @@ namespace RNumerics
 		/// <summary>
 		/// Apply TransformF to subset of mesh vertices defined by MapV[vertices] 
 		/// </summary>
-		public static void PerVertexTransform(IDeformableMesh mesh, IEnumerable<int> vertices, Func<int, int> MapV, Func<Vector3d, int, int, Vector3d> TransformF) {
+		public static void PerVertexTransform(in IDeformableMesh mesh, in IEnumerable<int> vertices, in Func<int, int> MapV, in Func<Vector3d, int, int, Vector3d> TransformF) {
 			foreach (var vid in vertices) {
 				var map_vid = MapV(vid);
 				if (mesh.IsVertex(map_vid)) {
@@ -330,7 +330,7 @@ namespace RNumerics
 		/// <summary>
 		/// Apply TransformF to subset of mesh vertices defined by MapV[vertices] 
 		/// </summary>
-		public static void PerVertexTransform(IDeformableMesh targetMesh, IDeformableMesh sourceMesh, int[] mapV, Func<Vector3d, int, int, Vector3d> TransformF) {
+		public static void PerVertexTransform(in IDeformableMesh targetMesh, in IDeformableMesh sourceMesh, in int[] mapV, in Func<Vector3d, int, int, Vector3d> TransformF) {
 			foreach (var vid in sourceMesh.VertexIndices()) {
 				var map_vid = mapV[vid];
 				if (targetMesh.IsVertex(map_vid)) {

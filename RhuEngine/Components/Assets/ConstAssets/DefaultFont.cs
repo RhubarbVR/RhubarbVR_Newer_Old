@@ -4,17 +4,17 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/ConstAssets" })]
-	public class DefaultFont : AssetProvider<RFont>
+	public sealed class MainFont : AssetProvider<RFont>
 	{
 		RFont _font;
 		private void LoadFont() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			_font = RFont.Default;
+			_font = Engine.staticResources.MainFont;
 			Load(_font);
 		}
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			LoadFont();
 		}

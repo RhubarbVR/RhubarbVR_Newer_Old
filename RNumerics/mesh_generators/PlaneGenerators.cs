@@ -29,7 +29,7 @@ namespace RNumerics
 		public UVModes UVMode = UVModes.FullUVSquare;
 
 
-		virtual protected Vector3d Make_vertex(float x, float y) {
+		virtual protected Vector3d Make_vertex(in float x, in float y) {
 			var v = Vector3d.Zero;
 			v[Math.Abs(IndicesMap.a) - 1] = (IndicesMap.a < 0) ? -x : x;
 			v[Math.Abs(IndicesMap.b) - 1] = (IndicesMap.b < 0) ? -y : y;
@@ -99,6 +99,65 @@ namespace RNumerics
 
 
 
+	public class SpriteRectGenerator : MeshGenerator
+	{
+		public float Width = 1.0f;
+		public float Height = 1.0f;
+
+		public Vector3f Normal = Vector3f.AxisY;
+
+		/// <summary>
+		/// How to map 2D indices to 3D. Default is (x,0,z). Set this value to (1,2) if you want (x,y,0).
+		/// Set values to negative to mirror on that axis.
+		/// </summary>
+		public Index2i IndicesMap = new(1, 3);
+
+		public float uvleft = 1.0f;
+		public float uvright = 1.0f;
+		public float uvtop = 1.0f;
+		public float uvbottom = 1.0f;
+
+		virtual protected Vector3d Make_vertex(in float x, in float y) {
+			var v = Vector3d.Zero;
+			v[Math.Abs(IndicesMap.a) - 1] = (IndicesMap.a < 0) ? -x : x;
+			v[Math.Abs(IndicesMap.b) - 1] = (IndicesMap.b < 0) ? -y : y;
+			return v;
+		}
+
+		override public MeshGenerator Generate() {
+			if (MathUtil.InRange(IndicesMap.a, 1, 3) == false || MathUtil.InRange(IndicesMap.b, 1, 3) == false) {
+				throw new Exception("TrivialRectGenerator: Invalid IndicesMap!");
+			}
+
+			vertices = new VectorArray3d(4);
+			uv = new VectorArray2f(4);
+			normals = new VectorArray3f(4);
+			triangles = new IndexArray3i(2);
+
+			vertices[0] = Make_vertex(-Width / 2.0f, -Height / 2.0f);
+			vertices[1] = Make_vertex(Width / 2.0f, -Height / 2.0f);
+			vertices[2] = Make_vertex(Width / 2.0f, Height / 2.0f);
+			vertices[3] = Make_vertex(-Width / 2.0f, Height / 2.0f);
+
+			normals[0] = normals[1] = normals[2] = normals[3] = Normal;
+
+			uv[0] = new Vector2f(uvleft, uvbottom);
+			uv[1] = new Vector2f(uvright, uvbottom);
+			uv[2] = new Vector2f(uvright, uvtop);
+			uv[3] = new Vector2f(uvleft, uvtop);
+
+			if (Clockwise == true) {
+				triangles.Set(0, 0, 1, 2);
+				triangles.Set(1, 0, 2, 3);
+			}
+			else {
+				triangles.Set(0, 0, 2, 1);
+				triangles.Set(1, 0, 3, 2);
+			}
+
+			return this;
+		}
+	}
 
 
 
@@ -107,7 +166,7 @@ namespace RNumerics
 	/// with EdgeVertices verts along each edge.
 	/// [TODO] allow varying EdgeVertices in each dimension (tricky...)
 	/// </summary>
-	public class GriddedRectGenerator : TrivialRectGenerator
+	public sealed class GriddedRectGenerator : TrivialRectGenerator
 	{
 		public int EdgeVertices = 8;
 
@@ -171,8 +230,8 @@ namespace RNumerics
 				for (var xi = 0; xi < N; ++xi) {
 					var tx = (double)xi / (double)(N - 1);
 					normals[vi] = Normal;
-					uv[vi] = Bilerp(ref uv00, ref uv01, ref uv11, ref uv10, (float)tx, (float)ty);
-					vertices[vi++] = Bilerp(ref v00, ref v01, ref v11, ref v10, tx, ty);
+					uv[vi] = Bilerp( uv00,  uv01,  uv11,  uv10, (float)tx, (float)ty);
+					vertices[vi++] = Bilerp( v00,  v01,  v11,  v10, tx, ty);
 				}
 			}
 
@@ -207,7 +266,7 @@ namespace RNumerics
 
 	// Generate a rounded rect centered at origin.
 	// Force individual corners to be sharp using the SharpCorners flags field.
-	public class RoundRectGenerator : MeshGenerator
+	public sealed class RoundRectGenerator : MeshGenerator
 	{
 		public float Width = 1.0f;
 		public float Height = 1.0f;

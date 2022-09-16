@@ -18,10 +18,16 @@ namespace RNumerics
 		[Key(3)]
 		public bool w;
 
+		public Vector4b() {
+			x = false;
+			y = false;
+			z = false;
+			w = false;
+		}
 
-		public Vector4b(bool f) { x = y = z = w = f; }
-		public Vector4b(bool x, bool y, bool z, bool w) { this.x = x; this.y = y; this.z = z; this.w = w; }
-		public Vector4b(bool[] v4) { x = v4[0]; y = v4[1]; z = v4[2]; w = v4[3]; }
+		public Vector4b(in bool f) { x = y = z = w = f; }
+		public Vector4b(in bool x, in bool y, in bool z, in bool w) { this.x = x; this.y = y; this.z = z; this.w = w; }
+		public Vector4b(in bool[] v4) { x = v4[0]; y = v4[1]; z = v4[2]; w = v4[3]; }
 
 		[IgnoreMember]
 		static public readonly Vector4b True = new(true, true, true, true);
@@ -29,7 +35,7 @@ namespace RNumerics
 		static public readonly Vector4b False = new(false, false, false, false);
 
 		[IgnoreMember]
-		public bool this[int key]
+		public bool this[in int key]
 		{
 			get => (key == 0) ? x : y;
 			set {
@@ -46,19 +52,19 @@ namespace RNumerics
 
 
 
-		public void Set(Vector2b o) {
+		public void Set(in Vector2b o) {
 			x = o.x;
 			y = o.y;
 		}
-		public void Set(bool fX, bool fY) {
+		public void Set(in bool fX, in bool fY) {
 			x = fX;
 			y = fY;
 		}
 
 
 
-		public static bool operator ==(Vector4b a, Vector4b b) => a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
-		public static bool operator !=(Vector4b a, Vector4b b) => a.x != b.x || (a.y != b.y && a.z != b.z && a.w != b.w);
+		public static bool operator ==(in Vector4b a, in Vector4b b) => a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
+		public static bool operator !=(in Vector4b a, in Vector4b b) => a.x != b.x || (a.y != b.y && a.z != b.z && a.w != b.w);
 		public override bool Equals(object obj) {
 			return this == (Vector4b)obj;
 		}

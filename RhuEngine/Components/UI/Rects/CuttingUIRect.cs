@@ -7,10 +7,29 @@ using System.Collections.Generic;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "UI\\Rects" })]
-	public class CuttingUIRect : UIRect
+	[Category(new string[] { "UI/Rects" })]
+	public sealed class CuttingUIRect : UIRect
 	{
-		public override Vector2f CutZonesMax => Max + ScrollOffset.Xy;
-		public override Vector2f CutZonesMin => Min + ScrollOffset.Xy;
+		[Default(true)]
+		[OnChanged(nameof(CuttingUpdate))]
+		public readonly Sync<bool> Inherent;
+
+		protected override void CutZoneNotify() {
+			CuttingUpdate();
+		}
+
+		public void CuttingUpdate() {
+			var newMax = CachedMax;
+			var newMin = CachedMin;
+			if (Inherent) {
+				if (CachedCutMax.IsFinite) {
+					newMax = MathUtil.Min(CachedCutMax, newMax);
+				}
+				if(CachedCutMin.IsFinite) {
+					newMin = MathUtil.Max(CachedCutMin, newMin);
+				 }
+			}
+			UpdateCuttingZones(newMin, newMax,true);
+		}
 	}
 }

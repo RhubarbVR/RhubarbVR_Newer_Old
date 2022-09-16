@@ -14,11 +14,11 @@ namespace RhuEngine.Components
 	public abstract class StaticAsset<T> : AssetProvider<T> where T : class
 	{
 		[OnChanged(nameof(StartLoadAsset))]
-		public Sync<string> url;
+		public readonly Sync<string> url;
 
 		[Default(true)]
 		[OnChanged(nameof(StartLoadAsset))]
-		public Sync<bool> useCache;
+		public readonly Sync<bool> useCache;
 
 		public AssetTask CurrentTask = null;
 
@@ -38,7 +38,7 @@ namespace RhuEngine.Components
 		}
 
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			base.OnLoaded();
 			StartLoadAsset();
 		}

@@ -12,13 +12,13 @@ namespace RNumerics
 	/// 
 	/// Currently uses Dictionary<> as sparse data structure
 	/// </summary>
-	public class SparseList<T> where T : IEquatable<T>
+	public sealed class SparseList<T> where T : IEquatable<T>
 	{
 		readonly T[] _dense;
 		readonly Dictionary<int, T> _sparse;
 		readonly T _zeroValue;
 
-		public SparseList(int MaxIndex, int SubsetCountEst, T ZeroValue) {
+		public SparseList(in int MaxIndex, in int SubsetCountEst, in T ZeroValue) {
 			_zeroValue = ZeroValue;
 
 			var bSmall = MaxIndex is > 0 and < 1024;
@@ -37,7 +37,7 @@ namespace RNumerics
 		}
 
 
-		public T this[int idx]
+		public T this[in int idx]
 		{
 			get => _dense != null ? _dense[idx] : _sparse.TryGetValue(idx, out var val) ? val : _zeroValue;
 			set {
@@ -51,7 +51,7 @@ namespace RNumerics
 		}
 
 
-		public int Count(Func<T, bool> CountF) {
+		public int Count(in Func<T, bool> CountF) {
 			var count = 0;
 			if (_dense != null) {
 				for (var i = 0; i < _dense.Length; ++i) {
@@ -118,12 +118,12 @@ namespace RNumerics
 	/// 
 	/// TODO: can we combine these classes somehow?
 	/// </summary>
-	public class SparseObjectList<T> where T : class
+	public sealed class SparseObjectList<T> where T : class
 	{
 		readonly T[] _dense;
 		readonly Dictionary<int, T> _sparse;
 
-		public SparseObjectList(int MaxIndex, int SubsetCountEst) {
+		public SparseObjectList(in int MaxIndex, in int SubsetCountEst) {
 			var bSmall = MaxIndex < 1024;
 			var fPercent = SubsetCountEst / (float)MaxIndex;
 			var fPercentThresh = 0.1f;
@@ -140,7 +140,7 @@ namespace RNumerics
 		}
 
 
-		public T this[int idx]
+		public T this[in int idx]
 		{
 			get => _dense != null ? _dense[idx] : _sparse.TryGetValue(idx, out var val) ? val : null;
 			set {
@@ -154,7 +154,7 @@ namespace RNumerics
 		}
 
 
-		public int Count(Func<T, bool> CountF) {
+		public int Count(in Func<T, bool> CountF) {
 			var count = 0;
 			if (_dense != null) {
 				for (var i = 0; i < _dense.Length; ++i) {

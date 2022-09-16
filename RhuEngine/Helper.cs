@@ -6,13 +6,67 @@ using RhuEngine.WorldObjects;
 using RNumerics;
 using RhuEngine.Linker;
 using System.Reflection;
+using RhuEngine.WorldObjects.ECS;
+using System.Text;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace RhuEngine
 {
 	public static class Helper
 	{
-		public static Matrix CastToNormal(this Assimp.Matrix4x4 matrix) {
-			return new Matrix(matrix.A1, matrix.A2, matrix.A3, matrix.A4, matrix.B1, matrix.B2, matrix.B3, matrix.B4, matrix.C1, matrix.C2, matrix.C3, matrix.C4, matrix.D1, matrix.D2, matrix.D3, matrix.D4);
+		public static int RuneLength(this string value) {
+			return value.EnumerateRunes().Count();
+		}
+		public static string ToNormalString(this IEnumerable<Rune> value) {
+			return string.Join(string.Empty, value.Select((x) => x.ToString()).ToArray());
+		}
+
+		public static string RuneSubstring(this string value, int startIndex, int endlength = int.MaxValue) {
+			var newstring = new List<Rune>();
+			var runeIndex = 0;
+			var endIndex = startIndex + endlength;
+			foreach (var item in value.EnumerateRunes()) {
+				if (runeIndex >= startIndex && runeIndex <= endIndex) {
+					newstring.Add(item);
+				}
+				runeIndex++;
+			}
+			return newstring.ToNormalString();
+		}
+		public static string AutoBrakeLine(this string value,int amount = 155) {
+			var newSTreing = "";
+			var currentAmount = 0;
+			foreach (var item in value) {
+				newSTreing += item;
+				currentAmount++;
+				if (item == '\n') {
+					currentAmount = 0;
+				}
+				if (currentAmount >= amount) {
+					newSTreing += '\n';
+					currentAmount = 0;
+				}
+			}
+			return newSTreing;
+		}
+
+		public static string ApplyStringFunctions(this string value) {
+			var newstring = new List<Rune>();
+			foreach (var currentchar in value.EnumerateRunes()) {
+				if (currentchar == new Rune('\r')) {
+					newstring.Add(new Rune('\n'));
+				}
+				else if (currentchar == new Rune('\b')) {
+					if (newstring.Count != 0) {
+						newstring.RemoveAt(newstring.Count - 1);
+					}
+				}
+				else {
+					newstring.Add(currentchar);
+				}
+			}
+			return newstring.ToNormalString();
 		}
 
 		public static string CleanPath(this string path) {
@@ -20,7 +74,7 @@ namespace RhuEngine
 			var r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
 			return r.Replace(path, "");
 		}
-		
+
 		public static string TouchUpPath(this string path) {
 			return path.Replace("\\", "/");
 		}
@@ -35,7 +89,7 @@ namespace RhuEngine
 		}
 
 		public static string GetFormattedName(this Type type) {
-			if(type == null) {
+			if (type == null) {
 				return "Null";
 			}
 			if (type.IsGenericType) {
@@ -70,11 +124,17 @@ namespace RhuEngine
 
 		public static Colorf GetHashHue(this string str) {
 			var hashCode = str.GetHashCodeSafe();
-			var h = (float)(int)(ushort)hashCode%360f;
+			var h = (float)(int)(ushort)hashCode % 360f;
 			var s = (float)(int)(byte)(hashCode >> 16) / 255f / 2f;
 			var v = 0.5f + ((float)(int)(byte)(hashCode >> 24) / 255f * 0.5f);
 			return new ColorHSV(h, s, v).RGBA;
 		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsAssignableTo(this Type type,Type type1) {
+			return type1.IsAssignableFrom(type);
+		}
+
 		public static Type MemberInnerType(this MemberInfo data) {
 			switch (data.MemberType) {
 				case MemberTypes.Field:
@@ -86,24 +146,24 @@ namespace RhuEngine
 			}
 			return null;
 		}
-			public static Colorf GetTypeColor(this Type type) {
-			if(type is null) {
+		public static Colorf GetTypeColor(this Type type) {
+			if (type is null) {
 				return Colorf.Black;
 			}
 			if (type == typeof(bool)) {
 				return new Colorf(0.25f, 0.25f, 0.25f);
 			}
 			if (type == typeof(string)) {
-				return new Colorf(0.5f,0f,0f);
+				return new Colorf(0.5f, 0f, 0f);
 			}
 			if (type == typeof(Colorf)) {
 				return new Colorf(0.75f, 0.4f, 0f);
 			}
 			if (type == typeof(Colorb)) {
-				return new Colorf(0.75f,0.5f,0f);
+				return new Colorf(0.75f, 0.5f, 0f);
 			}
 			if (type == typeof(Action)) {
-				return new Colorf(1,1,1);
+				return new Colorf(1, 1, 1);
 			}
 			if (type == typeof(object)) {
 				return new Colorf(0.68f, 0.82f, 0.3137254901960784f);
@@ -121,7 +181,7 @@ namespace RhuEngine
 				return new Colorf(0, 0.1f, 1) + new Colorf(0, 1f, 0.4f);
 			}
 			if (type == typeof(sbyte)) {
-				return new Colorf(1f, 0.7f, 0) + new Colorf(0.7f, 1f,0f);
+				return new Colorf(1f, 0.7f, 0) + new Colorf(0.7f, 1f, 0f);
 			}
 			if (type == typeof(short)) {
 				return new Colorf(1f, 0.7f, 0) + new Colorf(0.6f, 1f, 0f);
@@ -147,7 +207,7 @@ namespace RhuEngine
 				}
 			}
 			var hashCode = type.GetFormattedName().GetHashCodeSafe();
-			var h = (float)(int)(ushort)hashCode%360f;
+			var h = (float)(int)(ushort)hashCode % 360f;
 			var s = (float)(int)(byte)(hashCode >> 16) / 255f / 2f;
 			var v = 0.5f + ((float)(int)(byte)(hashCode >> 24) / 255f * 0.5f);
 			return new ColorHSV(h, s, v).RGBA;
@@ -163,6 +223,73 @@ namespace RhuEngine
 		}
 		public static float DistSquared(this Vector3f start, Vector3f end) {
 			return System.Numerics.Vector3.DistanceSquared(start, end);
+		}
+		
+		public static IWorldObject GetClosedSyncObject(this IWorldObject worldObject, bool allowSyncVals = false) {
+			allowSyncVals = allowSyncVals || typeof(SyncStream).IsAssignableFrom(worldObject.GetType());
+			try {
+				return allowSyncVals
+					? (IWorldObject)worldObject
+					: typeof(ISyncProperty).IsAssignableFrom(worldObject.GetType())
+						? (worldObject.Parent?.GetClosedSyncObject(allowSyncVals))
+						: (IWorldObject)worldObject;
+			}
+			catch {
+				return worldObject?.Parent?.GetClosedSyncObject(allowSyncVals);
+			}
+		}
+
+		public static Entity GetClosedEntityOrRoot(this IWorldObject worldObject) {
+			return worldObject.GetClosedEntity() ?? worldObject.World.RootEntity;
+		}
+
+
+		public static Entity GetClosedEntity(this IWorldObject worldObject) {
+			try {
+				return (Entity)worldObject;
+			}
+			catch {
+				return worldObject?.Parent?.GetClosedEntity();
+			}
+		}
+
+		public static User GetClosedUser(this IWorldObject worldObject) {
+			try {
+				return (User)worldObject;
+			}
+			catch {
+				return worldObject?.Parent?.GetClosedUser();
+			}
+		}
+
+		public static Component GetClosedComponent(this IWorldObject worldObject) {
+			try {
+				return (Component)worldObject;
+			}
+			catch {
+				return worldObject?.Parent?.GetClosedComponent();
+			}
+		}
+
+		public static T GetClosedGeneric<T>(this IWorldObject worldObject) where T : class, IWorldObject {
+			try {
+				return (T)worldObject;
+			}
+			catch {
+				return worldObject?.Parent?.GetClosedGeneric<T>();
+			}
+		}
+
+		public static string GetNameString(this IWorldObject worldObject) {
+			return worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null";
+		}
+
+
+		public static string GetExtendedNameString(this IWorldObject worldObject) {
+			var comp = worldObject.GetClosedComponent();
+			return comp is null || comp == worldObject
+				? worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null"
+				: $"{comp.GetType().GetFormattedName()} attached to " + (worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null");
 		}
 	}
 }

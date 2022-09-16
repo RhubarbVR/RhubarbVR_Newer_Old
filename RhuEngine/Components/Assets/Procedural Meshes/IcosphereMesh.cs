@@ -3,20 +3,22 @@ using System.Collections.Generic;
 using System.Text;
 
 using RhuEngine.WorldObjects;
+using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 
 namespace RhuEngine.Components
 {
-	public class IcosphereMesh : ProceduralMesh
+	[Category(new string[] { "Assets/Procedural Meshes" })]
+	public sealed class IcosphereMesh : ProceduralMesh
 	{
 		[Default(8)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<int> iterations;
+		public readonly Sync<int> iterations;
 
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> radius;
+		public readonly Sync<float> Radius;
 
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {
@@ -24,7 +26,7 @@ namespace RhuEngine.Components
 			}
 			var mesh = new IcosphereGenerator {
 				iterations = iterations,
-				radius = radius,
+				radius = Radius,
 			};
 			mesh.Generate();
 			GenMesh(mesh.MakeSimpleMesh());

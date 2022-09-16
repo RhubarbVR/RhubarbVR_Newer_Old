@@ -8,7 +8,7 @@ using SharedModels.GameSpecific;
 namespace RhuEngine.DataStructure
 {
 	[MessagePackObject]
-	public class DataNode<T> : IDataNode
+	public sealed class DataNode<T> : IDataNode
 	{
 		public DataNode(T def = default) {
 			Value = def;
@@ -20,15 +20,23 @@ namespace RhuEngine.DataStructure
 		[Key(0)]
 		public T Value { get; set; }
 
-		public byte[] GetByteArray() {
-			return Serializer.Save(this);
-		}
-
-		public void SetByteArray(byte[] arrBytes) {
-			Value = Serializer.Read<DataNode<T>>(arrBytes).Value;
-		}
-
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static implicit operator T(DataNode<T> data) => data.Value;
+
+		public void SaveAction(DataSaver DataSaver) {
+			//Not needed no children
+		}
+
+		public void InitData() {
+			//Not needed no children
+		}
+
+		public void ReadChildEnd(IDataNode child) {
+			//Not needed no children
+		}
+
+		public void ReadAction(DataReader dataReader) {
+			//Not needed no children
+		}
 	}
 }

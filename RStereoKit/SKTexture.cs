@@ -6,12 +6,16 @@ using RhuEngine.Linker;
 using RNumerics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace RStereoKit
 {
-	public class SKTexture2d : IRTexture2D
+	public sealed class SKTexture2d : IRTexture2D
 	{
 		public RTexture2D White { get; set; } = new RTexture2D(Tex.White);
+
+		public void Dispose(object tex) {
+		}
 
 		public RhuEngine.Linker.TexAddress GetAddressMode(object target) {
 			return (RhuEngine.Linker.TexAddress)((Tex)target).AddressMode;
@@ -39,21 +43,11 @@ namespace RStereoKit
 
 		public unsafe object MakeFromColors(Colorb[] colors, int width, int height, bool srgb) {
 			var color32s = new Color32[colors.Length];
-			fixed (Color32* ptr = color32s) {
-				for (var i = 0; i < colors.Length; i++) {
-					((Colorb*)ptr)[i] = colors[i];
-				}
-				return Tex.FromColors(color32s, width, height, srgb);
-			}
-		}
-
-		public object MakeFromMemory(byte[] data) {
-			var tex = Tex.FromMemory(data);
-			//Is only used on startup logo
-			while (tex.AssetState != AssetState.Loaded) {
-				Thread.Sleep(1);
-			}
-			return tex;
+			var hanndel = GCHandle.Alloc(color32s,GCHandleType.Pinned);
+			var pin = hanndel.AddrOfPinnedObject();
+			Parallel.For(0, colors.Length, (i) => ((Colorb*)pin)[i] = colors[i]);
+			hanndel.Free();
+			return Tex.FromColors(color32s, width, height, srgb);
 		}
 
 		public void SetAddressMode(object target, RhuEngine.Linker.TexAddress value) {
@@ -66,6 +60,15 @@ namespace RStereoKit
 
 		public void SetColors(object tex, int width, int height, byte[] rgbaData) {
 			((Tex)tex).SetColors(width, height, rgbaData);
+		}
+
+		public unsafe void SetColors(object tex, int width, int height, Colorb[] colors) {
+			var color32s = new Color32[colors.Length];
+			var hanndel = GCHandle.Alloc(color32s, GCHandleType.Pinned);
+			var pin = hanndel.AddrOfPinnedObject();
+			Parallel.For(0, colors.Length, (i) => ((Colorb*)pin)[i] = colors[i]);
+			hanndel.Free();
+			((Tex)tex).SetColors(width, height, color32s);
 		}
 
 		public void SetSampleMode(object target, RhuEngine.Linker.TexSample value) {

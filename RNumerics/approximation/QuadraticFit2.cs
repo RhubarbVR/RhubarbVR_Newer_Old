@@ -38,7 +38,7 @@ namespace RNumerics
 		//   d0 v0^2 + d1 v1^2 + d2 v^2 + e0 v0 + e1 v1 + e2 v2 + f = 0
 		//
 		// The characterization depends on the signs of the d_i.
-		public static double Fit(Vector2d[] points, double[] coefficients) {
+		public static double Fit(in Vector2d[] points, in double[] coefficients) {
 			var A = new DenseMatrix(6, 6);
 			var numPoints = points.Length;
 			for (var i = 0; i < numPoints; ++i) {
@@ -111,7 +111,7 @@ namespace RNumerics
 		// function returns C = (C'[0]/C'[3],C'[1]/C'[3],C'[2]/C'[3]), so the fitted
 		// circle is C[0]+C[1]*X+C[2]*Y+X^2+Y^2.  The center is (xc,yc) =
 		// -0.5*(C[1],C[2]) and the radius is r = sqrt(xc*xc+yc*yc-C[0]).
-		public static double FitCircle2(Vector2d[] points, out Circle2d circle) {
+		public static double FitCircle2(in Vector2d[] points, out Circle2d circle) {
 			var A = new DenseMatrix(4, 4);
 			var numPoints = points.Length;
 			for (var i = 0; i < numPoints; ++i) {

@@ -21,6 +21,12 @@ namespace RNumerics
 		public float z;
 		[Key(0)]
 		public float w;
+		public Quaternionf() {
+			x = 0f;
+			y = 0f;
+			z = 0f;
+			w = 1f;
+		}
 
 		public unsafe Quaternion ToSystemNumric() {
 			fixed (Quaternionf* vector3f = &this) {
@@ -32,30 +38,30 @@ namespace RNumerics
 				return *(Quaternionf*)vector3f;
 			}
 		}
-		public static explicit operator Quaternion(Quaternionf b) => b.ToSystemNumric();
+		public static explicit operator Quaternion(in Quaternionf b) => b.ToSystemNumric();
 
 		public static explicit operator Quaternionf(Quaternion b) => ToRhuNumrics(ref b);
 
-		public Quaternionf(float x, float y, float z, float w) { this.x = x; this.y = y; this.z = z; this.w = w; }
-		public Quaternionf(float[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
-		public Quaternionf(Quaternionf q2) { x = q2.x; y = q2.y; z = q2.z; w = q2.w; }
+		public Quaternionf(in float x, in float y, in float z, in float w) { this.x = x; this.y = y; this.z = z; this.w = w; }
+		public Quaternionf(in float[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
+		public Quaternionf(in Quaternionf q2) { x = q2.x; y = q2.y; z = q2.z; w = q2.w; }
 
-		public Quaternionf(Vector3f axis, float AngleDeg) {
+		public Quaternionf(in Vector3f axis, in float AngleDeg) {
 			x = y = z = 0;
 			w = 1;
 			SetAxisAngleD(axis, AngleDeg);
 		}
-		public Quaternionf(Vector3f vFrom, Vector3f vTo) {
+		public Quaternionf(in Vector3f vFrom, in Vector3f vTo) {
 			x = y = z = 0;
 			w = 1;
 			SetFromTo(vFrom, vTo);
 		}
-		public Quaternionf(Quaternionf p, Quaternionf q, float t) {
+		public Quaternionf(in Quaternionf p, in Quaternionf q, in float t) {
 			x = y = z = 0;
 			w = 1;
 			SetToSlerp(p, q, t);
 		}
-		public Quaternionf(Matrix3f mat) {
+		public Quaternionf(in Matrix3f mat) {
 			x = y = z = 0;
 			w = 1;
 			SetFromRotationMatrix(mat);
@@ -77,7 +83,7 @@ namespace RNumerics
 		[IgnoreMember]
 		static public readonly Quaternionf Rolled180 = CreateFromEuler(0, 0, 180);
 		[IgnoreMember]
-		public float this[int key]
+		public float this[in int key]
 		{
 			get => key != 0 ? key == 1 ? y : key == 2 ? z : w : x;
 			set {
@@ -96,7 +102,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public float Length => (float)Math.Sqrt((x * x) + (y * y) + (z * z) + (w * w));
 
-		public float Normalize(float epsilon = 0) {
+		public float Normalize(in float epsilon = 0) {
 			var length = Length;
 			if (length > epsilon) {
 				var invLength = 1.0f / length;
@@ -116,14 +122,14 @@ namespace RNumerics
 		{
 			get { var q = new Quaternionf(this); q.Normalize(); return q; }
 		}
-		public float Dot(Quaternionf q2) {
+		public float Dot(in Quaternionf q2) {
 			return (x * q2.x) + (y * q2.y) + (z * q2.z) + (w * q2.w);
 		}
 
 
 
 
-		public static Quaternionf operator *(Quaternionf a, Quaternionf b) {
+		public static Quaternionf operator *(in Quaternionf a, in Quaternionf b) {
 			var w = (a.w * b.w) - (a.x * b.x) - (a.y * b.y) - (a.z * b.z);
 			var x = (a.w * b.x) + (a.x * b.w) + (a.y * b.z) - (a.z * b.y);
 			var y = (a.w * b.y) + (a.y * b.w) + (a.z * b.x) - (a.x * b.z);
@@ -132,9 +138,9 @@ namespace RNumerics
 		}
 
 
-		public static Quaternionf operator -(Quaternionf q1, Quaternionf q2) => new(q1.x - q2.x, q1.y - q2.y, q1.z - q2.z, q1.w - q2.w);
+		public static Quaternionf operator -(in Quaternionf q1, in Quaternionf q2) => new(q1.x - q2.x, q1.y - q2.y, q1.z - q2.z, q1.w - q2.w);
 
-		public static Vector3f operator *(Quaternionf q, Vector3f v) {
+		public static Vector3f operator *(in Quaternionf q, in Vector3f v) {
 			//return q.ToRotationMatrix() * v;
 			// inline-expansion of above:
 			var twoX = 2 * q.x;
@@ -157,7 +163,7 @@ namespace RNumerics
 		}
 
 		// so convenient
-		public static Vector3d operator *(Quaternionf q, Vector3d v) {
+		public static Vector3d operator *(in Quaternionf q, in Vector3d v) {
 			//return q.ToRotationMatrix() * v;
 			// inline-expansion of above:
 			double twoX = 2 * q.x;
@@ -307,7 +313,7 @@ namespace RNumerics
 		}
 
 
-		public float Angle(Quaternionf e) {
+		public float Angle(in Quaternionf e) {
 			return (float)Math.Acos(Math.Min(Math.Abs(Dot(e)), 1f)) * 2f * 57.29578f;
 		}
 
@@ -339,7 +345,7 @@ namespace RNumerics
 
 
 
-		public void SetAxisAngleD(Vector3f axis, float AngleDeg) {
+		public void SetAxisAngleD(in Vector3f axis, in float AngleDeg) {
 			var angle_rad = MathUtil.DEG_2_RAD * AngleDeg;
 			var halfAngle = 0.5 * angle_rad;
 			var sn = Math.Sin(halfAngle);
@@ -348,15 +354,15 @@ namespace RNumerics
 			y = (float)(sn * axis.y);
 			z = (float)(sn * axis.z);
 		}
-		public static Quaternionf AxisAngleD(Vector3f axis, float angleDeg) {
+		public static Quaternionf AxisAngleD(in Vector3f axis, in float angleDeg) {
 			return new Quaternionf(axis, angleDeg);
 		}
-		public static Quaternionf AxisAngleR(Vector3f axis, float angleRad) {
+		public static Quaternionf AxisAngleR(in Vector3f axis, in float angleRad) {
 			return new Quaternionf(axis, angleRad * MathUtil.RAD_2_DEGF);
 		}
 
 		// this function can take non-normalized vectors vFrom and vTo (normalizes internally)
-		public void SetFromTo(Vector3f vFrom, Vector3f vTo) {
+		public void SetFromTo(in Vector3f vFrom, in Vector3f vTo) {
 			// [TODO] this page seems to have optimized version:
 			//    http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
 
@@ -391,18 +397,18 @@ namespace RNumerics
 			}
 			Normalize();   // aaahhh just to be safe...
 		}
-		public static Quaternionf FromTo(Vector3f vFrom, Vector3f vTo) {
+		public static Quaternionf FromTo(in Vector3f vFrom, in Vector3f vTo) {
 			return new Quaternionf(vFrom, vTo);
 		}
-		public static Quaternionf FromTo(Vector3f vFrom, Vector3f vTo,Vector3f vOffset) {
+		public static Quaternionf FromTo(in Vector3f vFrom, in Vector3f vTo, in Vector3f vOffset) {
 			return new Quaternionf(vFrom- vOffset, vTo- vOffset);
 		}
-		public static Quaternionf FromToConstrained(Vector3f vFrom, Vector3f vTo, Vector3f vAround) {
+		public static Quaternionf FromToConstrained(in Vector3f vFrom, in Vector3f vTo, in Vector3f vAround) {
 			var fAngle = MathUtil.PlaneAngleSignedD(vFrom, vTo, vAround);
 			return Quaternionf.AxisAngleD(vAround, fAngle);
 		}
 
-		public static Quaternionf Slerp(Quaternionf a, Quaternionf b, float lerp) {
+		public static Quaternionf Slerp(in Quaternionf a, Quaternionf b, in float lerp) {
 			if (lerp <= 0f) {
 				return a;
 			}
@@ -424,7 +430,7 @@ namespace RNumerics
 			return new Quaternionf((a.x * num4) + (b.x * num5), (a.y * num4) + (b.y * num5), (a.z * num4) + (b.z * num5), (a.w * num4) + (b.w * num5));
 		}
 
-		public void SetToSlerp(Quaternionf a, Quaternionf b, float lerp) {
+		public void SetToSlerp(in Quaternionf a, in Quaternionf b, in float lerp) {
 			var e = Slerp(a, b, lerp);
 			x = e.x;
 			y = e.y;
@@ -434,7 +440,7 @@ namespace RNumerics
 		}
 
 
-		public void SetFromRotationMatrix(Matrix3f rot) {
+		public void SetFromRotationMatrix(in Matrix3f rot) {
 			// Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
 			// article "Quaternion Calculus and Fast Animation".
 			var next = new Index3i(1, 2, 0);
@@ -482,8 +488,8 @@ namespace RNumerics
 
 
 
-		public static bool operator ==(Quaternionf a, Quaternionf b) => a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
-		public static bool operator !=(Quaternionf a, Quaternionf b) => a.x != b.x || a.y != b.y || a.z != b.z || a.w != b.w;
+		public static bool operator ==(in Quaternionf a, in Quaternionf b) => a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
+		public static bool operator !=(in Quaternionf a, in Quaternionf b) => a.x != b.x || a.y != b.y || a.z != b.z || a.w != b.w;
 		public override bool Equals(object obj) {
 			return this == (Quaternionf)obj;
 		}
@@ -523,14 +529,14 @@ namespace RNumerics
 
 
 
-		public bool EpsilonEqual(Quaternionf q2, float epsilon) {
+		public bool EpsilonEqual(in Quaternionf q2, in float epsilon) {
 			return (float)Math.Abs(x - q2.x) <= epsilon &&
 				   (float)Math.Abs(y - q2.y) <= epsilon &&
 				   (float)Math.Abs(z - q2.z) <= epsilon &&
 				   (float)Math.Abs(w - q2.w) <= epsilon;
 		}
 
-		public static Quaternionf CreateFromYawPitchRoll(Vector3f val) {
+		public static Quaternionf CreateFromYawPitchRoll(in Vector3f val) {
 			return CreateFromYawPitchRoll(val.x, val.y, val.z);
 		}
 
@@ -541,7 +547,7 @@ namespace RNumerics
 		/// <param name="pitch">The pitch angle, in radians, around the X-axis.</param>
 		/// <param name="roll">The roll angle, in radians, around the Z-axis.</param>
 		/// <returns></returns>
-		public static Quaternionf CreateFromYawPitchRoll(float yaw, float pitch, float roll) {
+		public static Quaternionf CreateFromYawPitchRoll(in float yaw, in float pitch, in float roll) {
 			//  Roll first, about axis the object is facing, then
 			//  pitch upward, then yaw to face into the new heading
 			float sr, cr, sp, cp, sy, cy;
@@ -567,15 +573,15 @@ namespace RNumerics
 
 			return result;
 		}
-		public static Quaternionf LookAt(Vector3f sourcePoint, Vector3f destPoint) {
+		public static Quaternionf LookAt(in Vector3f sourcePoint, in Vector3f destPoint) {
 			return LookAt(sourcePoint, destPoint, Vector3f.Up);
 		}
-		public static Quaternionf LookAt(Vector3f sourcePoint, Vector3f destPoint, Vector3f up) {
+		public static Quaternionf LookAt(in Vector3f sourcePoint, in Vector3f destPoint, in Vector3f up) {
 			var toVector = (destPoint - sourcePoint).Normalized;
 			return LookRotation(toVector,up);
 		}
 
-		public static Quaternionf FromToRotation(Vector3f from, Vector3f to) {
+		public static Quaternionf FromToRotation(in Vector3f from, in Vector3f to) {
 			var num = from.Dot(to);
 			if (!(from == to)) {
 				var b = Vector3f.Zero;
@@ -601,7 +607,7 @@ namespace RNumerics
 
 
 
-		public static Quaternionf LookRotation(Vector3f forward, Vector3f up) {
+		public static Quaternionf LookRotation(in Vector3f forward, in Vector3f up) {
 			var b = Vector3f.Zero;
 			if (forward == b) {
 				return Identity;
@@ -657,13 +663,13 @@ namespace RNumerics
 			return new Quaternionf(newx, newy, newz, neww);
 		}
 
-		public static explicit operator Quaternionf(Vector3f v) => CreateFromEuler(v.x, v.y, v.z);
+		public static explicit operator Quaternionf(in Vector3f v) => CreateFromEuler(v.x, v.y, v.z);
 
-		public static Quaternionf CreateFromEuler(Vector3f v) {
+		public static Quaternionf CreateFromEuler(in Vector3f v) {
 			return CreateFromEuler(v.x, v.y, v.z);
 		}
 
-		public static Quaternionf CreateFromEuler(float yaw, float pitch, float roll) {
+		public static Quaternionf CreateFromEuler(in float yaw, in float pitch, in float roll) {
 
 			return CreateFromYawPitchRoll((float)(Math.PI / 180) * yaw, (float)(Math.PI / 180) * pitch, (float)(Math.PI / 180) * roll);
 		}
@@ -714,7 +720,7 @@ namespace RNumerics
 		public override string ToString() {
 			return string.Format("{0:F8} {1:F8} {2:F8} {3:F8}", x, y, z, w);
 		}
-		public string ToString(string fmt) {
+		public string ToString(in string fmt) {
 			return string.Format("{0} {1} {2} {3}", x.ToString(fmt), y.ToString(fmt), z.ToString(fmt), w.ToString(fmt));
 		}
 

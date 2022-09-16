@@ -5,7 +5,7 @@ namespace OpusDotNet
 	/// <summary>
 	/// The exception that is thrown when an Opus error occurs.
 	/// </summary>
-	public class OpusException : Exception
+	public sealed class OpusException : Exception
 	{
 		/// <summary>
 		/// Initializes a new <see cref="OpusException"/> instance, with the specified Opus error code.

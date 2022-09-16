@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
 using MessagePack;
+using Assimp;
 
 namespace RNumerics
 {
@@ -17,22 +18,29 @@ namespace RNumerics
 		public float z;
 		[IgnoreMember]
 		public float Magnitude => (float)Math.Sqrt((x * x) + (y * y) + (z * z));
-		public Vector3f(float f) { x = y = z = f; }
-		public Vector3f(float x, float y, float z) { this.x = x; this.y = y; this.z = z; }
-		public Vector3f(float x, float y) { this.x = x; this.y = y; z = 0f; }
-		public Vector3f(float[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; }
-		public Vector3f(Vector3f copy) { x = copy.x; y = copy.y; z = copy.z; }
 
-		public Vector3f(double f) { x = y = z = (float)f; }
-		public Vector3f(double x, double y, double z) { this.x = (float)x; this.y = (float)y; this.z = (float)z; }
-		public Vector3f(double[] v2) { x = (float)v2[0]; y = (float)v2[1]; z = (float)v2[2]; }
+		public Vector3f() {
+			x = 0f;
+			y = 0f;
+			z = 0f;
+		}
 
-		public float Distance(Vector3 v2) {
+		public Vector3f(in float f) { x = y = z = f; }
+		public Vector3f(in float x, in float y, in float z) { this.x = x; this.y = y; this.z = z; }
+		public Vector3f(in float x, in float y) { this.x = x; this.y = y; z = 0f; }
+		public Vector3f(in float[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; }
+		public Vector3f(in Vector3f copy) { x = copy.x; y = copy.y; z = copy.z; }
+
+		public Vector3f(in double f) { x = y = z = (float)f; }
+		public Vector3f(in double x, in double y, in double z) { this.x = (float)x; this.y = (float)y; this.z = (float)z; }
+		public Vector3f(in double[] v2) { x = (float)v2[0]; y = (float)v2[1]; z = (float)v2[2]; }
+
+		public float Distance(in Vector3 v2) {
 			float dx = v2.X - x, dy = v2.Y - y, dz = v2.Z - z;
 			return (float)Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
 		}
 
-		public Vector3f(Vector3d copy) { x = (float)copy.x; y = (float)copy.y; z = (float)copy.z; }
+		public Vector3f(in Vector3d copy) { x = (float)copy.x; y = (float)copy.y; z = (float)copy.z; }
 		[IgnoreMember]
 		public static readonly Vector3f Zero = new(0.0f, 0.0f, 0.0f);
 		[IgnoreMember]
@@ -76,7 +84,7 @@ namespace RNumerics
 		/// </summary>
 		public static readonly Vector3f Right = new (1, 0, 0);
 		[IgnoreMember]
-		public float this[int key]
+		public float this[in int key]
 		{
 			get => (key == 0) ? x : (key == 1) ? y : z;
 			set {
@@ -120,9 +128,10 @@ namespace RNumerics
 		public float MaxAbs => Math.Max(Math.Abs(x), Math.Max(Math.Abs(y), Math.Abs(z)));
 		[IgnoreMember]
 		public float MinAbs => Math.Min(Math.Abs(x), Math.Min(Math.Abs(y), Math.Abs(z)));
+		[IgnoreMember]
+		public bool IsAnyNan => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z);
 
-
-		public float Normalize(float epsilon = MathUtil.EPSILONF) {
+		public float Normalize(in float epsilon = MathUtil.EPSILONF) {
 			var length = Length;
 			if (length > epsilon) {
 				var invLength = 1.0f / length;
@@ -164,7 +173,7 @@ namespace RNumerics
 			var smallist = Math.Min(x, Math.Min(y, z));
 			return y == smallist ? new Vector3f(x, 0, z) : x == smallist ? new Vector3f(0, y, z) : new Vector3f(x, y, 0);
 		}
-		public Vector3f SetComponent(float value, int index) {
+		public Vector3f SetComponent(in float value, in int index) {
 			return index switch {
 				0 => new Vector3f(value, y, z),
 				1 => new Vector3f(x, value, z),
@@ -173,32 +182,32 @@ namespace RNumerics
 			};
 		}
 
-		public void Round(int nDecimals) {
+		public void Round(in int nDecimals) {
 			x = (float)Math.Round(x, nDecimals);
 			y = (float)Math.Round(y, nDecimals);
 			z = (float)Math.Round(z, nDecimals);
 		}
 
 
-		public float Dot(Vector3f v2) {
+		public float Dot(in Vector3f v2) {
 			return (x * v2[0]) + (y * v2[1]) + (z * v2[2]);
 		}
-		public static float Dot(Vector3f v1, Vector3f v2) {
+		public static float Dot(in Vector3f v1, in Vector3f v2) {
 			return v1.Dot(v2);
 		}
 
 
-		public Vector3f Cross(Vector3f v2) {
+		public Vector3f Cross(in Vector3f v2) {
 			return new Vector3f(
 				(y * v2.z) - (z * v2.y),
 				(z * v2.x) - (x * v2.z),
 				(x * v2.y) - (y * v2.x));
 		}
-		public static Vector3f Cross(Vector3f v1, Vector3f v2) {
+		public static Vector3f Cross(in Vector3f v1, in Vector3f v2) {
 			return v1.Cross(v2);
 		}
 
-		public Vector3f UnitCross(Vector3f v2) {
+		public Vector3f UnitCross(in Vector3f v2) {
 			var n = new Vector3f(
 				(y * v2.z) - (z * v2.y),
 				(z * v2.x) - (x * v2.z),
@@ -207,49 +216,49 @@ namespace RNumerics
 			return n;
 		}
 
-		public float AngleD(Vector3f v2) {
+		public float AngleD(in Vector3f v2) {
 			var fDot = MathUtil.Clamp(Dot(v2), -1, 1);
 			return (float)(Math.Acos(fDot) * MathUtil.RAD_2_DEG);
 		}
-		public static float AngleD(Vector3f v1, Vector3f v2) {
+		public static float AngleD(in Vector3f v1, in Vector3f v2) {
 			return v1.AngleD(v2);
 		}
-		public float AngleR(Vector3f v2) {
+		public float AngleR(in Vector3f v2) {
 			var fDot = MathUtil.Clamp(Dot(v2), -1, 1);
 			return (float)Math.Acos(fDot);
 		}
-		public static float AngleR(Vector3f v1, Vector3f v2) {
+		public static float AngleR(in Vector3f v1, in Vector3f v2) {
 			return v1.AngleR(v2);
 		}
 
 
-		public float DistanceSquared(Vector3f v2) {
+		public float DistanceSquared(in Vector3f v2) {
 			float dx = v2.x - x, dy = v2.y - y, dz = v2.z - z;
 			return (dx * dx) + (dy * dy) + (dz * dz);
 		}
-		public float Distance(Vector3f v2) {
+		public float Distance(in Vector3f v2) {
 			float dx = v2.x - x, dy = v2.y - y, dz = v2.z - z;
 			return (float)Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
 		}
 
 
 
-		public void Set(Vector3f o) {
+		public void Set(in Vector3f o) {
 			x = o[0];
 			y = o[1];
 			z = o[2];
 		}
-		public void Set(float fX, float fY, float fZ) {
+		public void Set(in float fX, in float fY, in float fZ) {
 			x = fX;
 			y = fY;
 			z = fZ;
 		}
-		public void Add(Vector3f o) {
+		public void Add(in Vector3f o) {
 			x += o[0];
 			y += o[1];
 			z += o[2];
 		}
-		public void Subtract(Vector3f o) {
+		public void Subtract(in Vector3f o) {
 			x -= o[0];
 			y -= o[1];
 			z -= o[2];
@@ -257,29 +266,29 @@ namespace RNumerics
 
 
 
-		public static Vector3f operator -(Vector3f v) => new(-v.x, -v.y, -v.z);
+		public static Vector3f operator -(in Vector3f v) => new(-v.x, -v.y, -v.z);
 
-		public static Vector3f operator *(float f, Vector3f v) => new(f * v.x, f * v.y, f * v.z);
-		public static Vector3f operator *(Vector3f v, float f) => new(f * v.x, f * v.y, f * v.z);
-		public static Vector3f operator /(Vector3f v, float f) => new(v.x / f, v.y / f, v.z / f);
-		public static Vector3f operator /(float f, Vector3f v) => new(f / v.x, f / v.y, f / v.z);
+		public static Vector3f operator *(in float f, in Vector3f v) => new(f * v.x, f * v.y, f * v.z);
+		public static Vector3f operator *(in Vector3f v, in float f) => new(f * v.x, f * v.y, f * v.z);
+		public static Vector3f operator /(in Vector3f v, in float f) => new(v.x / f, v.y / f, v.z / f);
+		public static Vector3f operator /(in float f, in Vector3f v) => new(f / v.x, f / v.y, f / v.z);
 
-		public static Vector3f operator *(Vector3f a, Vector3f b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
-		public static Vector3f operator /(Vector3f a, Vector3f b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
-
-
-		public static Vector3f operator +(Vector3f v0, Vector3f v1) => new(v0.x + v1.x, v0.y + v1.y, v0.z + v1.z);
-		public static Vector3f operator +(Vector3f v0, float f) => new(v0.x + f, v0.y + f, v0.z + f);
-
-		public static Vector3f operator -(Vector3f v0, Vector3f v1) => new(v0.x - v1.x, v0.y - v1.y, v0.z - v1.z);
-		public static Vector3f operator -(Vector3f v0, float f) => new(v0.x - f, v0.y - f, v0.z - f);
+		public static Vector3f operator *(in Vector3f a, in Vector3f b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
+		public static Vector3f operator /(in Vector3f a, in Vector3f b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
 
 
-		public static bool operator ==(Vector3f a, Vector3f b) => a.x == b.x && a.y == b.y && a.z == b.z;
-		public static bool operator !=(Vector3f a, Vector3f b) => a.x != b.x || a.y != b.y || a.z != b.z;
+		public static Vector3f operator +(in Vector3f v0, in Vector3f v1) => new(v0.x + v1.x, v0.y + v1.y, v0.z + v1.z);
+		public static Vector3f operator +(in Vector3f v0, in float f) => new(v0.x + f, v0.y + f, v0.z + f);
 
-		public static bool operator >(Vector3f a, Vector3f b) => a.x > b.x || a.y > b.y || a.z > b.z;
-		public static bool operator <(Vector3f a, Vector3f b) => a.x < b.x || a.y < b.y || a.z < b.z;
+		public static Vector3f operator -(in Vector3f v0, in Vector3f v1) => new(v0.x - v1.x, v0.y - v1.y, v0.z - v1.z);
+		public static Vector3f operator -(in Vector3f v0, in float f) => new(v0.x - f, v0.y - f, v0.z - f);
+
+
+		public static bool operator ==(in Vector3f a, in Vector3f b) => a.x == b.x && a.y == b.y && a.z == b.z;
+		public static bool operator !=(in Vector3f a, in Vector3f b) => a.x != b.x || a.y != b.y || a.z != b.z;
+
+		public static bool operator >(in Vector3f a, in Vector3f b) => a.x > b.x || a.y > b.y || a.z > b.z;
+		public static bool operator <(in Vector3f a, in Vector3f b) => a.x < b.x || a.y < b.y || a.z < b.z;
 
 		public override bool Equals(object obj) {
 			return this == (Vector3f)obj;
@@ -313,14 +322,14 @@ namespace RNumerics
 		}
 
 
-		public bool EpsilonEqual(Vector3f v2, float epsilon) {
+		public bool EpsilonEqual(in Vector3f v2, in float epsilon) {
 			return (float)Math.Abs(x - v2.x) <= epsilon &&
 				   (float)Math.Abs(y - v2.y) <= epsilon &&
 				   (float)Math.Abs(z - v2.z) <= epsilon;
 		}
 
 
-		public static Vector3f Lerp(Vector3f a, Vector3f b, float t) {
+		public static Vector3f Lerp(in Vector3f a, in Vector3f b, in float t) {
 			var s = 1 - t;
 			return new Vector3f((s * a.x) + (t * b.x), (s * a.y) + (t * b.y), (s * a.z) + (t * b.z));
 		}
@@ -330,7 +339,7 @@ namespace RNumerics
 		public override string ToString() {
 			return string.Format("{0:F8} {1:F8} {2:F8}", x, y, z);
 		}
-		public string ToString(string fmt) {
+		public string ToString(in string fmt) {
 			return string.Format("{0} {1} {2}", x.ToString(fmt), y.ToString(fmt), z.ToString(fmt));
 		}
 
@@ -346,7 +355,22 @@ namespace RNumerics
 			}
 		}
 
-		public static implicit operator Vector3(Vector3f b) => b.ToSystemNumrics();
+		public unsafe Vector3D ToAssimp() {
+			fixed (Vector3f* vector3f = &this) {
+				return *(Vector3D*)vector3f;
+			}
+		}
+		public static unsafe Vector3f ToRhuNumricsFromAssimp(ref Vector3D value) {
+			fixed (Vector3D* vector3f = &value) {
+				return *(Vector3f*)vector3f;
+			}
+		}
+
+		public static implicit operator Vector3D(in Vector3f b) => b.ToAssimp();
+
+		public static implicit operator Vector3f(Vector3D b) => ToRhuNumricsFromAssimp(ref b);
+
+		public static implicit operator Vector3(in Vector3f b) => b.ToSystemNumrics();
 
 		public static implicit operator Vector3f(Vector3 b) => ToRhuNumrics(ref b);
 

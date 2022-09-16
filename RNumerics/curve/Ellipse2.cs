@@ -31,7 +31,7 @@ namespace RNumerics
 		public bool IsReversed;     // use ccw orientation instead of cw
 
 
-		public Ellipse2d(Vector2d center, Vector2d axis0, Vector2d axis1, Vector2d extent) {
+		public Ellipse2d(in Vector2d center, in Vector2d axis0, in Vector2d axis1, in Vector2d extent) {
 			Center = center;
 			Axis0 = axis0;
 			Axis1 = axis1;
@@ -40,7 +40,7 @@ namespace RNumerics
 			IsReversed = false;
 		}
 
-		public Ellipse2d(Vector2d center, Vector2d axis0, Vector2d axis1, double extent0, double extent1) {
+		public Ellipse2d(in Vector2d center, in Vector2d axis0, in Vector2d axis1, in double extent0, in double extent1) {
 			Center = center;
 			Axis0 = axis0;
 			Axis1 = axis1;
@@ -49,7 +49,7 @@ namespace RNumerics
 			IsReversed = false;
 		}
 
-		public Ellipse2d(Vector2d center, double rotationAngleDeg, double extent0, double extent1) {
+		public Ellipse2d(in Vector2d center, in double rotationAngleDeg, in double extent0, in double extent1) {
 			Center = center;
 			var m = new Matrix2d(rotationAngleDeg * MathUtil.DEG_2_RAD);
 			Axis0 = m * Vector2d.AxisX;
@@ -113,7 +113,7 @@ namespace RNumerics
 		}
 
 		// Evaluate the quadratic function Q(X) = (X-K)^T * M * (X-K) - 1.
-		public double Evaluate(Vector2d point) {
+		public double Evaluate(in Vector2d point) {
 			var diff = point - Center;
 			var ratio0 = Axis0.Dot(diff) / Extent[0];
 			var ratio1 = Axis1.Dot(diff) / Extent[1];
@@ -125,11 +125,11 @@ namespace RNumerics
 		// Test whether the input point is inside or on the ellipse.  The point
 		// is contained when Q(X) <= 0, where Q(X) is the function in the comment
 		// before the function Evaluate().
-		public bool Contains(Vector2d point) {
+		public bool Contains(in Vector2d point) {
 			return Evaluate(point) <= (double)0;
 		}
 
-		static double[] Convert(Matrix2d A, Vector2d B, double C) {
+		static double[] Convert(in Matrix2d A, in Vector2d B, in double C) {
 			var coeff = new double[6];
 			coeff[0] = C;
 			coeff[1] = B.x;
@@ -156,7 +156,7 @@ namespace RNumerics
 
 
 		public bool IsTransformable => true;
-		public void Transform(ITransform2 xform) {
+		public void Transform(in ITransform2 xform) {
 			Center = xform.TransformP(Center);
 			Axis0 = xform.TransformN(Axis0);
 			Axis1 = xform.TransformN(Axis1);
@@ -167,14 +167,14 @@ namespace RNumerics
 
 
 		// angle in range [-2pi,2pi]
-		public Vector2d SampleDeg(double degrees) {
+		public Vector2d SampleDeg(in double degrees) {
 			var theta = degrees * MathUtil.DEG_2_RAD;
 			double c = Math.Cos(theta), s = Math.Sin(theta);
 			return Center + (Extent.x * c * Axis0) + (Extent.y * s * Axis1);
 		}
 
 		// angle in range [-2pi,2pi]
-		public Vector2d SampleRad(double radians) {
+		public Vector2d SampleRad(in double radians) {
 			double c = Math.Cos(radians), s = Math.Sin(radians);
 			return Center + (Extent.x * c * Axis0) + (Extent.y * s * Axis1);
 		}
@@ -183,14 +183,14 @@ namespace RNumerics
 		public double ParamLength => 1.0f;
 
 		// t in range[0,1] spans ellipse
-		public Vector2d SampleT(double t) {
+		public Vector2d SampleT(in double t) {
 			var theta = IsReversed ? -t * MathUtil.TWO_PI : t * MathUtil.TWO_PI;
 			double c = Math.Cos(theta), s = Math.Sin(theta);
 			return Center + (Extent.x * c * Axis0) + (Extent.y * s * Axis1);
 		}
 
 		// t in range[0,1] spans ellipse
-		public Vector2d TangentT(double t) {
+		public Vector2d TangentT(in double t) {
 			var theta = IsReversed ? -t * MathUtil.TWO_PI : t * MathUtil.TWO_PI;
 			double c = Math.Cos(theta), s = Math.Sin(theta);
 			var tangent = (-Extent.x * s * Axis0) + (Extent.y * c * Axis1);
@@ -212,7 +212,7 @@ namespace RNumerics
 
 		public double ArcLength => throw new NotImplementedException("Ellipse2.ArcLength");
 
-		public Vector2d SampleArcLength(double a) {
+		public Vector2d SampleArcLength(in double a) {
 			throw new NotImplementedException("Ellipse2.SampleArcLength");
 		}
 

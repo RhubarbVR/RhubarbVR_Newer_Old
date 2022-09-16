@@ -11,10 +11,11 @@ using RhuEngine.Components;
 using System.IO;
 using RNumerics;
 using RhuEngine.Linker;
+using System.Threading.Tasks;
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class World : IWorldObject {
+	public sealed partial class World : IWorldObject {
 	
 		public enum AssetType {
 			Unknown,
@@ -54,31 +55,33 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void ImportString(string data) {
-			if (string.IsNullOrEmpty(data)) {
-				RLog.Err("Import string was empty");
-				return;
-			}
-			var spawnroot = GetLocalUser()?.userRoot.Target?.Entity?.parent.Target??RootEntity;
-			var assetEntity = spawnroot.AddChild("Asset Importer");
-			if(GetLocalUser() is not null) {
-				assetEntity.GlobalTrans = Matrix.TR(Vector3f.Forward * 0.35f, Quaternionf.Pitched) * GetLocalUser().userRoot.Target?.head.Target?.GlobalTrans ?? Matrix.Identity;
-			}
-			switch (GetAssetTypeOfString(ref data, out var wasUri)) {
-				case AssetType.Unknown:
-					assetEntity.AttachComponent<UnknownImporter>().Import(data, wasUri, null);
-					break;
-				case AssetType.Texture:
-					assetEntity.AttachComponent<TextureImporter>().Import(data, wasUri,null);
-					break;
-				case AssetType.Video:
-					assetEntity.AttachComponent<VideoImporter>().Import(data, wasUri, null);
-					break;
-				case AssetType.Model:
-					assetEntity.AttachComponent<AssimpImporter>().Import(data, wasUri, null);
-					break;
-				default:
-					break;
-			}
+			//Task.Run(() => {
+				if (string.IsNullOrEmpty(data)) {
+					RLog.Err("Import string was empty");
+					return;
+				}
+				var spawnroot = GetLocalUser()?.userRoot.Target?.Entity?.parent.Target ?? RootEntity;
+				var assetEntity = spawnroot.AddChild("Asset Importer");
+				if (GetLocalUser() is not null) {
+					assetEntity.GlobalTrans = Matrix.TR(Vector3f.Forward * 0.35f, Quaternionf.Pitched) * GetLocalUser().userRoot.Target?.head.Target?.GlobalTrans ?? Matrix.Identity;
+				}
+				switch (GetAssetTypeOfString(ref data, out var wasUri)) {
+					case AssetType.Unknown:
+						assetEntity.AttachComponent<UnknownImporter>().Import(data, wasUri, null);
+						break;
+					case AssetType.Texture:
+						assetEntity.AttachComponent<TextureImporter>().Import(data, wasUri, null);
+						break;
+					case AssetType.Video:
+						assetEntity.AttachComponent<VideoImporter>().Import(data, wasUri, null);
+						break;
+					case AssetType.Model:
+						assetEntity.AttachComponent<AssimpImporter>().Import(data, wasUri, null);
+						break;
+					default:
+						break;
+				}
+			//});
 		} 
 	}
 }

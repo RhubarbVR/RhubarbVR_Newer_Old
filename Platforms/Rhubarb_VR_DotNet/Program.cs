@@ -3,7 +3,7 @@ using StereoKit;
 using RhuEngine;
 using RStereoKit;
 
-class SKLoader
+sealed class SKLoader
 {
 	static void Main(string[] args) {
 		// This will allow the App constructor to call a few SK methods
@@ -20,13 +20,13 @@ class SKLoader
 		if (!SK.Initialize(rhu.Settings)) {
 			Environment.Exit(1);
 		}
-
+		app.OnCloseEngine += () => SK.Quit();
 		app.Init();
 
 		// Now loop until finished, and then shut down
-		while (SK.Step(app.Step)) { }
+		while (SK.Step(app.Step)) {
+		}
 		app.IsCloseing = true;
-		cap.DisableSingleString = true;
 		app.Dispose();
 		SK.Shutdown();
 	}

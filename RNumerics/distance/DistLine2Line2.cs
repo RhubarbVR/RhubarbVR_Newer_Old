@@ -8,7 +8,7 @@ namespace RNumerics
 	// ported from WildMagic 5 
 	// https://www.geometrictools.com/Downloads/Downloads.html
 
-	public class DistLine2Line2
+	public sealed class DistLine2Line2
 	{
 		Line2d _line1;
 		public Line2d Line
@@ -32,12 +32,12 @@ namespace RNumerics
 		public double Line2Parameter;
 
 
-		public DistLine2Line2(Line2d Line1, Line2d Line2) {
+		public DistLine2Line2(in Line2d Line1, in Line2d Line2) {
 			_line2 = Line2;
 			_line1 = Line1;
 		}
 
-		static public double MinDistance(Line2d line1, Line2d line2) {
+		static public double MinDistance(in Line2d line1, in Line2d line2) {
 			return new DistLine2Line2(line1, line2).Get();
 		}
 

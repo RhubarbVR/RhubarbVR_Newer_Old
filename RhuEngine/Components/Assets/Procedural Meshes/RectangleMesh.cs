@@ -7,33 +7,33 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class RectangleMesh : ProceduralMesh
+	public sealed class RectangleMesh : ProceduralMesh
 	{
 
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vector2f> Dimensions;
+		public readonly Sync<Vector2f> Dimensions;
 
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vector3f> Normal;
+		public readonly Sync<Vector3f> Normal;
 
 
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Index2i> IndicesMap;
+		public readonly Sync<Index2i> IndicesMap;
 
 		[Default(TrivialRectGenerator.UVModes.FullUVSquare)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<TrivialRectGenerator.UVModes> UVMode;
+		public readonly Sync<TrivialRectGenerator.UVModes> UVMode;
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantUVs;
+		public readonly Sync<bool> WantUVs;
 
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantNormals;
+		public readonly Sync<bool> WantNormals;
 
-		public override void FirstCreation() {
+		protected override void FirstCreation() {
 			base.FirstCreation();
 			IndicesMap.Value = new(1, 3);
 			Dimensions.Value = Vector2f.One;

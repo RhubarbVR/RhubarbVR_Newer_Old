@@ -5,6 +5,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using System.Collections.Generic;
 using System;
+using static RhuEngine.Components.UICanvas;
 
 namespace RhuEngine.Components
 {
@@ -18,7 +19,7 @@ namespace RhuEngine.Components
 
 		public Vector3f WorldPos;
 
-		public Vector3f WindowPos;
+		public Vector2f WindowPos;
 
 		public uint FingerIndex;
 
@@ -31,50 +32,47 @@ namespace RhuEngine.Components
 		public bool CustomTouch;
 	}
 
-	[Category(new string[] { "UI\\Rects" })]
-	public class UIButtonInteraction : UIInteractionComponent
+	[Category(new string[] { "UI/Interaction" })]
+	public sealed class UIButtonInteraction : UIInteractionComponent
 	{
 		[Default(true)]
-		public Sync<bool> Laserable;
+		public readonly Sync<bool> Laserable;
 
 		[Default(true)]
-		public Sync<bool> Touchable;
+		public readonly Sync<bool> Touchable;
 		
 		[Default(true)]
-		public Sync<bool> CustomTouchable;
-
-		[Default(true)]
-		public Sync<bool> AllowOtherZones;
+		public readonly Sync<bool> CustomTouchable;
 
 		[Default(0.5f)]
-		public Sync<float> PressForce;
+		public readonly Sync<float> PressForce;
 
-		public SyncDelegate<Action<ButtonEvent>> ButtonEvent;
+		public readonly SyncDelegate<Action<ButtonEvent>> ButtonEvent;
 
-		[Exsposed]
+		[Exposed]
 		[NoWriteExsposed]
 		public bool IsClicking { get; private set; }
 
 		private HitData _lastHitData;
 
 		private void SendEvent(ButtonEvent buttonEvent) {
-			ButtonEvent.Target?.Invoke(buttonEvent);
+			RUpdateManager.ExecuteOnEndOfFrame(this, () => ButtonEvent.Target?.Invoke(buttonEvent));
 		}
 
 		private void RunButtonClickEvent(HitData hitData) {
 			_lastHitData = hitData;
-			RLog.Info("Click");
+			UIRect?.Canvas?.LockPysics();
 			SendEvent(new ButtonEvent {
-					IsPressing = false,
-					IsClicked = true,
-					IsReleased = false,
-					WorldPos = hitData.HitPosWorld,
-					WindowPos = hitData.HitPos,
-					FingerIndex = hitData.Touchindex,
-					Force = hitData.PressForce,
-					Lazer = hitData.Laser,
-					Touch = !hitData.Laser,
-					CustomTouch = hitData.CustomTouch,
+				IsPressing = false,
+				IsClicked = true,
+				IsReleased = false,
+				WorldPos = hitData.Hitpointworld,
+				WindowPos = hitData.HitPointOnCanvas,
+				FingerIndex = hitData.TouchUndex,
+				Force = hitData.PressForce,
+				Lazer = hitData.Lazer,
+				Touch = !hitData.Lazer,
+				CustomTouch = hitData.CustomTouch,
 			});
 		}
 
@@ -84,12 +82,12 @@ namespace RhuEngine.Components
 				IsPressing = true,
 				IsClicked = false,
 				IsReleased = false,
-				WorldPos = hitData.HitPosWorld,
-				WindowPos = hitData.HitPos,
-				FingerIndex = hitData.Touchindex,
+				WorldPos = hitData.Hitpointworld,
+				WindowPos = hitData.HitPointOnCanvas,
+				FingerIndex = hitData.TouchUndex,
 				Force = hitData.PressForce,
-				Lazer = hitData.Laser,
-				Touch = !hitData.Laser,
+				Lazer = hitData.Lazer,
+				Touch = !hitData.Lazer,
 				CustomTouch = hitData.CustomTouch,
 			});
 
@@ -97,30 +95,30 @@ namespace RhuEngine.Components
 		private void RunButtonReleaseEvent(HitData hitData) {
 			_lastHitData = hitData;
 			IsClicking = false;
-			RLog.Info("Release");
-			Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, Rect.ParentRect.ScrollOffset.z));
+			UIRect.AddAddedDepth(0f);
+			UIRect?.Canvas?.UnLockPysics();
 			SendEvent(new ButtonEvent {
 				IsPressing = false,
 				IsClicked = false,
 				IsReleased = true,
-				WorldPos = hitData.HitPosWorld,
-				WindowPos = hitData.HitPos,
-				FingerIndex = hitData.Touchindex,
+				WorldPos = hitData.Hitpointworld,
+				WindowPos = hitData.HitPointOnCanvas,
+				FingerIndex = hitData.TouchUndex,
 				Force = hitData.PressForce,
-				Lazer = hitData.Laser,
-				Touch = !hitData.Laser,
+				Lazer = hitData.Lazer,
+				Touch = !hitData.Lazer,
 				CustomTouch = hitData.CustomTouch,
 			});
 		}
 
-		public override void Step() {
+		protected override void Step() {
 			base.Step();
-			if(Rect is null) {
+			if (UIRect is null) {
 				return;
 			}
 			var StillClicking = false;
 			var minPress = 1f;
-			foreach (var item in Rect.HitPoses(!AllowOtherZones.Value)) {
+			foreach (var item in UIRect.GetRectHitData()) {
 				void Touch() {
 					if (item.PressForce >= PressForce) {
 						minPress = Math.Min(minPress, item.PressForce);
@@ -134,12 +132,12 @@ namespace RhuEngine.Components
 						StillClicking = true;
 					}
 				}
-				if (item.Laser) {
+				if (item.Lazer) {
 					if (Laserable) {
 						Touch();
 					}
 				}
-				else if(item.CustomTouch) {
+				else if (item.CustomTouch) {
 					if (CustomTouchable) {
 						Touch();
 					}
@@ -151,7 +149,7 @@ namespace RhuEngine.Components
 				}
 			}
 			if (IsClicking) {
-				Rect.Scroll(new Vector3f(Rect.ScrollOffset.x, Rect.ScrollOffset.y, 0.005f + (-(Rect.Depth.Value*0.999f * minPress))));
+				UIRect.AddAddedDepth(0.005f + (-(UIRect.Depth.Value * 0.999f * minPress)));
 			}
 			if (IsClicking && !StillClicking) {
 				RunButtonReleaseEvent(_lastHitData);

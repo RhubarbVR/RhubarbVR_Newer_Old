@@ -8,45 +8,43 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "UI/Visuals" })]
-	public class UIImage : RenderUIComponent
-	{
-		[OnAssetLoaded(nameof(ProcessMesh))]
-		public AssetRef<RTexture2D> Texture;
+	public sealed class UIImage : RenderUIComponent {
+		[OnAssetLoaded(nameof(ForceUpdate))]
+		public readonly AssetRef<RTexture2D> Texture;
 
-		public AssetRef<RMaterial> Material;
-
-		public Sync<Colorf> Tint;
-
-		public override bool HasPhysics => true;
-
-		[Default(EVerticalAlien.Center)]
-		[OnChanged(nameof(ProcessMesh))]
-		public Sync<EVerticalAlien> VerticalAlien;
-
-		[Default(EHorizontalAlien.Middle)]
-		[OnChanged(nameof(ProcessMesh))]
-		public Sync<EHorizontalAlien> HorizontalAlien;
-
-		[Default(true)]
-		[OnChanged(nameof(ProcessMesh))]
-		public Sync<bool> KeepAspectRatio;
+		public readonly AssetRef<RMaterial> Material;
 
 		public override RMaterial RenderMaterial => Material.Asset;
-		public override Colorf RenderTint => Tint.Value;
+		public override Colorf RenderTint => Tint;
 
-		public override void OnAttach() {
+		public readonly Sync<Colorf> Tint;
+
+
+		[Default(EVerticalAlien.Center)]
+		[OnChanged(nameof(ForceUpdate))]
+		public readonly Sync<EVerticalAlien> VerticalAlien;
+
+		[Default(EHorizontalAlien.Middle)]
+		[OnChanged(nameof(ForceUpdate))]
+		public readonly Sync<EHorizontalAlien> HorizontalAlien;
+
+		[Default(true)]
+		[OnChanged(nameof(ForceUpdate))]
+		public readonly Sync<bool> KeepAspectRatio;
+
+		protected override void OnAttach() {
 			base.OnAttach();
 			Tint.Value = Colorf.White;
 		}
 
-		public override void ProcessBaseMesh() {
+		protected override void UpdateMesh() {
 			var mesh = new SimpleMesh();
-			var startDepth = new Vector3f(0, 0, Entity.UIRect.StartPoint);
-			var depth = new Vector3f(0, 0, Entity.UIRect.Depth.Value);
+			var startDepth = new Vector3f(0, 0, Entity.UIRect.CachedDepth);
+			var depth = new Vector3f(0, 0, Entity.UIRect.Depth.Value + 0.01);
 			var depthStart = startDepth + depth;
-			Vector3f upleft , upright , downleft , downright = upleft = upright = downleft = depthStart;
-			var max = Rect.Max;
-			var min = Rect.Min;
+			Vector3f upleft, upright, downleft, downright = upleft = upright = downleft = depthStart;
+			var max = Max;
+			var min = Min;
 			var boxsize = max - min;
 			boxsize /= Math.Max(boxsize.x, boxsize.y);
 			var canvassize = Entity.UIRect.Canvas?.scale.Value.Xy ?? Vector2f.One;
@@ -84,41 +82,40 @@ namespace RhuEngine.Components
 			downright += new Vector3f(maxoffset.x, minoffset.y);
 			downleft += minoffset.XY_;
 
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true,n = Vector3f.AxisY, bHaveUV = true,uv = new Vector2f[] { Vector2f.AxisY },bHaveC = false,v = downleft });
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.One },  bHaveC = false, v = downright });
+			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.AxisY }, bHaveC = false, v = downleft });
+			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.One }, bHaveC = false, v = downright });
 			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = upleft });
 			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.AxisX }, bHaveC = false, v = upright });
 			mesh.AppendTriangle(0, 1, 2);
 			mesh.AppendTriangle(1, 3, 2);
 
-
-			//Depth
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero },  bHaveC = false, v = downleft });
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero },  bHaveC = false, v = downright });
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero },  bHaveC = false, v = upleft });
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero },  bHaveC = false, v = upright });
-			upleft -= depth;
-			upright -= depth;
-			downleft -= depth;
-			downright -= depth;
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = downleft });
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = downright });
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = upleft });
-			mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = upright });
-			mesh.AppendTriangle(4, 8, 9);
-			mesh.AppendTriangle(9, 5, 4);
-			mesh.AppendTriangle(5, 9, 11);
-			mesh.AppendTriangle(11, 7, 5);
-			mesh.AppendTriangle(6, 10, 8);
-			mesh.AppendTriangle(8, 4, 6);
-			mesh.AppendTriangle(7, 11, 6);
-			mesh.AppendTriangle(10, 6, 11);
-			if (Rect.ParentRect is null) {
+			if (UIRect.ParentRect is null) {
 				//Add back if first rec
+				//Depth
+				mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = downleft });
+				mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = downright });
+				mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = upleft });
+				mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = upright });
+				upleft -= depth;
+				upright -= depth;
+				downleft -= depth;
+				downright -= depth;
+				mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = downleft });
+				mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = downright });
+				mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = upleft });
+				mesh.AppendVertex(new NewVertexInfo { bHaveN = true, n = Vector3f.AxisY, bHaveUV = true, uv = new Vector2f[] { Vector2f.Zero }, bHaveC = false, v = upright });
+				mesh.AppendTriangle(4, 8, 9);
+				mesh.AppendTriangle(9, 5, 4);
+				mesh.AppendTriangle(5, 9, 11);
+				mesh.AppendTriangle(11, 7, 5);
+				mesh.AppendTriangle(6, 10, 8);
+				mesh.AppendTriangle(8, 4, 6);
+				mesh.AppendTriangle(7, 11, 6);
+				mesh.AppendTriangle(10, 6, 11);
 				mesh.AppendTriangle(10, 9, 8);
 				mesh.AppendTriangle(10, 11, 9);
 			}
-			MainMesh = mesh;
+			StandaredBaseMesh = mesh;
 		}
 	}
 }

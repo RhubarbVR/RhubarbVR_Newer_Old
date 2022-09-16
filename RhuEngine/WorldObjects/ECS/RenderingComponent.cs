@@ -2,11 +2,17 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Reflection;
+
 namespace RhuEngine.WorldObjects.ECS
 {
-	public abstract class RenderingComponent : Component
+	public class NotLinkedRenderingComponentAttribute : Attribute {
+
+	}
+
+	public abstract class LinkedWorldComponent : Component
 	{
-		public IRenderLink RenderLink { get; set; }
+		public IWorldLink WorldLink { get; set; }
 
 		public static Dictionary<Type, Type> loadedCasts = new();
 
@@ -14,45 +20,70 @@ namespace RhuEngine.WorldObjects.ECS
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			if (!loadedCasts.TryGetValue(GetType(), out var linker)) {
-				var generic = typeof(IRenderLink<>).MakeGenericType(GetType());
-				var types = from a in AppDomain.CurrentDomain.GetAssemblies()
-							from t in a.GetTypes()
-							where !t.IsAbstract && t.IsClass
-							where generic.IsAssignableFrom(t)
-							select t;
-				if (types.Count() != 1) {
-					RLog.Err("No linker found or to many found");
-					throw new Exception("No linker found or to many found");
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (GetType().GetCustomAttribute<NotLinkedRenderingComponentAttribute>() is not null) {
+					return;
 				}
-				linker = types.First();
-				loadedCasts.Add(GetType(), linker);
-			}
-			RenderLink = (IRenderLink)Activator.CreateInstance(linker);
-			RenderLink.RenderingComponentGen = this;
-			RenderLink.Init();
+				if (!loadedCasts.TryGetValue(GetType(), out var linker)) {
+					var generic = typeof(IRenderLink<>).MakeGenericType(GetType());
+					var types = from a in AppDomain.CurrentDomain.GetAssemblies()
+								from t in a.GetTypes()
+								where !t.IsAbstract && t.IsClass
+								where generic.IsAssignableFrom(t)
+								select t;
+					if (types.Count() != 1) {
+						RLog.Err("No linker found or to many found");
+						throw new Exception("No linker found or to many found");
+					}
+					linker = types.First();
+					loadedCasts.Add(GetType(), linker);
+				}
+				WorldLink = (IWorldLink)Activator.CreateInstance(linker);
+				WorldLink.LinkCompGen = this;
+				WorldLink.Init();
+			});
 		}
-		public override void OnInitialize() {
+		protected override void OnLoaded() {
+			base.OnLoaded();
 			BuildRenderLink();
-			base.OnInitialize();
+			World.FoucusChanged += World_FoucusChanged;
 		}
 
-		public override void AddListObject() {
-			World.RegisterRenderObject(this);
-			RenderLink?.Started();
+		private void World_FoucusChanged() {
+			if(World.Focus == World.FocusLevel.Background) {
+				WorldLink?.Stopped();
+			}
+			else {
+				WorldLink?.Started();
+			}
 		}
-		public override void RemoveListObject() {
-			World.UnregisterRenderObject(this);
-			RenderLink?.Stopped();
+
+		protected override void AddListObject() {
+			World.RegisterWorldLinkObject(this);
+			if (World.Focus == World.FocusLevel.Background) {
+				WorldLink?.Stopped();
+			}
+			else {
+				WorldLink?.Started();
+			}
+		}
+		protected override void RemoveListObject() {
+			World.UnregisterWorldLinkObject(this);
+			WorldLink?.Stopped();
 		}
 
 		public override void Dispose() {
-			World.UnregisterRenderObject(this);
+			World.FoucusChanged -= World_FoucusChanged;
+			World.UnregisterWorldLinkObject(this);
 			base.Dispose();
 		}
 
-		public void Render() {
-			RenderLink?.Render();
+		internal void RunRender() {
+			Render();
+		}
+
+		protected virtual void Render() {
+			WorldLink?.Render();
 		}
 	}
 }

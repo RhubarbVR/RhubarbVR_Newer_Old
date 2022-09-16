@@ -12,10 +12,10 @@ namespace RNumerics
 	/// Note that input Vector2d values are directly cast to int64 - you must
 	/// scale them to suitable coordinates yourself!
 	/// </summary>
-	public class Query2Int64 : Query2d
+	public sealed class Query2Int64 : Query2d
 	{
 
-		public Query2Int64(IList<Vector2d> Vertices) : base(Vertices) {
+		public Query2Int64(in IList<Vector2d> Vertices) : base(Vertices) {
 		}
 
 
@@ -63,12 +63,12 @@ namespace RNumerics
 		}
 
 
-		long Det2(long x0, long y0, long x1, long y1) {
+		long Det2(in long x0, in long y0, in long x1, in long y1) {
 			return (x0 * y1) - (x1 * y0);
 		}
 
 
-		long Det3(long x0, long y0, long z0, long x1, long y1, long z1, long x2, long y2, long z2) {
+		long Det3(in long x0, in long y0, in long z0, in long x1, in long y1, in long z1, in long x2, in long y2, in long z2) {
 			var c00 = (y1 * z2) - (y2 * z1);
 			var c01 = (y2 * z0) - (y0 * z2);
 			var c02 = (y0 * z1) - (y1 * z0);

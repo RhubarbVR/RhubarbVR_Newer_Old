@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
+using RNumerics;
+
 namespace RhuEngine.AssetSystem
 {
 	public interface IAssetProtocol

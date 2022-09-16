@@ -3,7 +3,7 @@
 namespace RNumerics
 {
 	// ported from WildMagic5 
-	public class IntrLine2Line2
+	public sealed class IntrLine2Line2
 	{
 		Line2d _line1;
 		public Line2d Line1
@@ -38,7 +38,7 @@ namespace RNumerics
 		public double Segment2Parameter;
 
 
-		public IntrLine2Line2(Line2d l1, Line2d l2) {
+		public IntrLine2Line2(in Line2d l1, in Line2d l2) {
 			_line1 = l1;
 			_line2 = l2;
 		}
@@ -84,7 +84,7 @@ namespace RNumerics
 
 
 
-		public static IntersectionType Classify(Vector2d P0, Vector2d D0, Vector2d P1, Vector2d D1,
+		public static IntersectionType Classify(in Vector2d P0, in Vector2d D0, in Vector2d P1, in Vector2d D1,
 					 double dotThreshold, ref Vector2d s) {
 			// Ensure dotThreshold is nonnegative.
 			dotThreshold = Math.Max(dotThreshold, (double)0);

@@ -3,6 +3,8 @@
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public interface ISyncObject : IWorldObject
@@ -12,12 +14,14 @@ namespace RhuEngine.WorldObjects
 		public event Action<object> OnDispose;
 
 		public void ChangeName(string name);
-		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize, Func<NetPointer> netPointer = null);
-		public void OnSave();
+		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer = null);
 		public void Destroy();
-		public void OnLoaded();
 		public IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject);
 		public void Deserialize(IDataNode data, SyncObjectDeserializerObject syncObjectSerializerObject);
-		void FirstCreation();
+		internal void CallFirstCreation();
+
+		internal void RunOnLoad();
+		internal void RunOnSave();
+		
 	}
 }

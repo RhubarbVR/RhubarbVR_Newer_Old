@@ -15,11 +15,14 @@ using SharedModels.GameSpecific;
 
 using RNumerics;
 using RhuEngine.Linker;
+using DataModel.Enums;
+using Esprima;
 
 namespace RhuEngine.Managers
 {
-	public class WorldManager : IManager
+	public sealed class WorldManager : IManager
 	{
+		public Action OnWorldUpdateTaskBar;
 		public Engine Engine { get; private set; }
 
 		public SynchronizedCollection<World> worlds = new();
@@ -36,6 +39,8 @@ namespace RhuEngine.Managers
 
 		public float TotalStepTime { get; private set; }
 
+		public PrivateSpaceManager PrivateSpaceManager { get; internal set; }
+
 		private readonly Stopwatch _stepStopwatch = new();
 
 		private void FocusedWorldChange() {
@@ -43,9 +48,13 @@ namespace RhuEngine.Managers
 
 		public void Dispose() {
 			if (SaveLocalWorld) {
-				var data = LocalWorld.Serialize(new SyncObjectSerializerObject(false));
-				var json = MessagePack.MessagePackSerializer.ConvertToJson(data.GetByteArray(), Serializer.Options);
-				File.WriteAllText(Engine.BaseDir + "LocalWorldTest.json", json);
+				try {
+					var data = LocalWorld.Serialize(new SyncObjectSerializerObject(false));
+					File.WriteAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld", new DataSaver(data).SaveStore());
+				}
+				catch (Exception ex) {
+					RLog.Err($"Failed to save world {ex}");
+				}
 			}
 			for (var i = worlds.Count - 1; i >= 0; i--) {
 				try {
@@ -55,20 +64,22 @@ namespace RhuEngine.Managers
 					RLog.Err($"Failed to dispose world {worlds[i].WorldDebugName}. Error: {ex}");
 				}
 			}
+			OnWorldUpdateTaskBar?.Invoke();
 		}
 
 		private readonly Stack<World> _isRunning = new();
 
 		private Task ShowLoadingFeedback(World world, World.FocusLevel focusLevel) {
-			return Task.Run(() => {
+			return Task.Run(async () => {
 				_isRunning.Push(world);
 				while (world.IsLoading && !world.IsDisposed) {
-					Thread.Sleep(100);
+					await Task.Delay(100);
 				}
-				if (world.IsDisposed) {
+				if (world.IsDisposed || world.HasError) {
 					RLog.Err($"Failed to start world {world.WorldDebugName} Error {world.LoadMsg}");
-					Thread.Sleep(3000);
+					await Task.Delay(3000);
 					_isRunning.Pop();
+					world.Dispose();
 				}
 				else {
 					RLog.Info($"Done loading world {world.WorldDebugName}");
@@ -78,10 +89,10 @@ namespace RhuEngine.Managers
 			});
 		}
 
-		public World GetWorldBySessionID(string sessionID) {
+		public World GetWorldBySessionID(Guid sessionID) {
 			for (var i = worlds.Count - 1; i >= 0; i--) {
 				try {
-					if (worlds[i].SessionID.Value == sessionID) {
+					if (worlds[i].SessionID.Value == sessionID.ToString()) {
 						return worlds[i];
 					}
 				}
@@ -103,36 +114,53 @@ namespace RhuEngine.Managers
 			}
 			world.SessionName.Value = sessionName;
 			if ((focusLevel != World.FocusLevel.PrivateOverlay) && !localWorld) {
-				Task.Run(() => world.StartNetworking(true));
+				Task.Run(async () => await world.StartNetworking(true));
 			}
 			else {
 				world.WaitingForWorldStartState = false;
 			}
 			worlds.Add(world);
+			OnWorldUpdateTaskBar?.Invoke();
 			ShowLoadingFeedback(world, focusLevel);
 			return world;
 		}
 
-		public World JoinNewWorld(string sessionID, World.FocusLevel focusLevel, string sessionName = null) {
+		public World CreateNewWorld(World.FocusLevel focusLevel,string sessionName,AccessLevel accessLevel,int maxUsers,bool isHiden,Guid? assosiatedGroup = null) {
+			var world = new World(this) {
+				Focus = World.FocusLevel.Background
+			};
+			world.Initialize(true, false, false, false);
+			world.RootEntity.name.Value = "Root";
+			world.RootEntity.AttachComponent<SimpleSpawn>();
+			world.RootEntity.AttachComponent<ClipBoardImport>();
+			world.SessionName.Value = sessionName;
+			world.AssociatedGroup.Value = assosiatedGroup?.ToString();
+			world.AccessLevel.Value = accessLevel;
+			world.MaxUserCount.Value = maxUsers;
+			world.IsHidden.Value = isHiden;
+			Task.Run(async () => await world.StartNetworking(true));
+			worlds.Add(world);
+			OnWorldUpdateTaskBar?.Invoke();
+			ShowLoadingFeedback(world, focusLevel);
+			return world;
+		}
+
+		public World JoinNewWorld(Guid sessionID, World.FocusLevel focusLevel, string sessionName = null) {
 			var world = new World(this) {
 				Focus = World.FocusLevel.Background
 			};
 			world.Initialize(true, true, true, false);
-			world.SessionID.SetValueNoOnChangeAndNetworking(sessionID);
+			world.SessionID.SetValueNoOnChangeAndNetworking(sessionID.ToString());
 			world.SessionName.SetValueNoOnChangeAndNetworking(sessionName);
 			Task.Run(() => world.StartNetworking(false));
 			worlds.Add(world);
+			OnWorldUpdateTaskBar?.Invoke();
 			ShowLoadingFeedback(world, focusLevel);
 			return world;
 		}
-
-
-		public World LoadWorldFromJson(World.FocusLevel focusLevel, string json, bool localWorld = false) {
-			return LoadWorldFromDataNodeGroup(focusLevel, new DataNodeGroup(json), localWorld);
-		}
-
+		
 		public World LoadWorldFromBytes(World.FocusLevel focusLevel, byte[] data, bool localWorld = false) {
-			return LoadWorldFromDataNodeGroup(focusLevel, new DataNodeGroup(data), localWorld);
+			return LoadWorldFromDataNodeGroup(focusLevel,(DataNodeGroup)new DataReader(data).Data, localWorld);
 		}
 		public World LoadWorldFromDataNodeGroup(World.FocusLevel focusLevel, DataNodeGroup data, bool localWorld = false) {
 			var world = new World(this) {
@@ -149,15 +177,20 @@ namespace RhuEngine.Managers
 			}
 			worlds.Add(world);
 			ShowLoadingFeedback(world, focusLevel);
+			OnWorldUpdateTaskBar?.Invoke();
 			return world;
 		}
-
+		private WorldText _loadingText;
 		public void Init(Engine engine) {
 			Engine = engine;
 			Engine.IntMsg = "Creating Personal Space";
 			PrivateOverlay = CreateNewWorld(World.FocusLevel.PrivateOverlay);
 			Engine.IntMsg = "Done Creating Personal Space";
 			PrivateOverlay.RootEntity.AddChild("PrivateSpace").AttachComponent<PrivateSpaceManager>();
+			_loadingText = PrivateOverlay.RootEntity.AddChild("LoadingText").AttachComponent<WorldText>();
+			_loadingText.FitText.Value = true;
+			_loadingText.Width.Value = _loadingText.Height.Value = 0.35f;
+			_loadingText.StartingColor.Value = Colorf.White;
 			Engine.IntMsg = "Creating Local World";
 			LocalWorld = CreateNewWorld(World.FocusLevel.Focused, true);
 			Engine.IntMsg = "Loading Local World Data";
@@ -170,7 +203,7 @@ namespace RhuEngine.Managers
 				Engine.IntMsg = LocalWorld.LoadMsg;
 				Thread.Sleep(10);
 			}
-			engine.netApiManager.HasGoneOfline += NetApiManager_HasGoneOfline;
+			engine.netApiManager.Client.HasGoneOfline += NetApiManager_HasGoneOfline;
 		}
 
 		private void NetApiManager_HasGoneOfline() {
@@ -182,6 +215,7 @@ namespace RhuEngine.Managers
 					Task.Run(() => item.Dispose());
 				}
 			}
+			OnWorldUpdateTaskBar?.Invoke();
 		}
 		public void Step() {
 			float totalStep = 0;
@@ -191,7 +225,7 @@ namespace RhuEngine.Managers
 					worlds[i].Step();
 				}
 				catch (Exception ex) {
-					RLog.Err($"Failed to step world {worlds[i].WorldDebugName}. Error: {ex}");
+					RLog.Err($"Failed to game step world {worlds[i].WorldDebugName}. Error: {ex}");
 				}
 				finally {
 					_stepStopwatch.Stop();
@@ -199,28 +233,51 @@ namespace RhuEngine.Managers
 					totalStep += (float)_stepStopwatch.Elapsed.TotalSeconds;
 				}
 			}
-
-			UpdateJoinMessage();
-
 			TotalStepTime = totalStep;
+		}
+
+		public void RenderStep() {
+			for (var i = worlds.Count - 1; i >= 0; i--) {
+				try {
+					worlds[i].RenderStep();
+				}
+				catch (Exception ex) {
+					RLog.Err($"Failed to render step world {worlds[i].WorldDebugName}. Error: {ex}");
+				}
+			}
+			UpdateJoinMessage();
 		}
 
 		private Vector3f _oldPlayerPos = Vector3f.Zero;
 		private Vector3f _loadingPos = Vector3f.Zero;
 		private void UpdateJoinMessage() {
+			if(_loadingText is null) {
+				return;
+			}
+			if(PrivateOverlay.GetLocalUser() is null) {
+				return;
+			}
+			_loadingText.Entity.enabled.Value = _isRunning.Count != 0;
 			try {
 				if (_isRunning.Count != 0) {
 					var world = _isRunning.Peek();
-					var textpos = Matrix.T(Vector3f.Forward * 0.25f) * RInput.Head.HeadMatrix;
-					var playerPos = RRenderer.CameraRoot.Translation;
-					_loadingPos += playerPos - _oldPlayerPos;
-					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
-					_oldPlayerPos = playerPos;
+					var textpos = Matrix.T(Vector3f.Forward * 0.35f) * Matrix.T(0,-0.1f,0) * Engine.inputManager.HeadMatrix;
+					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 3.5f, 1);
+					var userPOS = PrivateOverlay.GetLocalUser().userRoot.Target?.Entity.GlobalTrans ?? Matrix.Identity;
 					if (world.IsLoading && !world.IsDisposed) {
-						RText.Add($"Loading World: \n{world.LoadMsg}", Matrix.TR(_loadingPos, Quaternionf.LookAt((Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero), _loadingPos)));
+						_loadingText.Text.Value = $"{Engine.localisationManager.GetLocalString("Common.LoadingWorld")}\n {Engine.localisationManager.GetLocalString(world.LoadMsg)}";
+						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.HeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
+					}
+					if (!world.HasError) {
+						_loadingText.Text.Value = $"{Engine.localisationManager.GetLocalString("Common.LoadedWorld")}";
+						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.HeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}
 					else {
-						RText.Add($"Failed to load world{(Engine.netApiManager.User?.UserName == null ? ", JIM": "")}\nError {world.LoadMsg}", Matrix.TR(_loadingPos, Quaternionf.LookAt((Engine.EngineLink.CanInput ? RInput.Head.Position : Vector3f.Zero), _loadingPos)));
+						var errorMsg = world.IsNetworked && world.IsJoiningSession
+							? Engine.localisationManager.GetLocalString("Common.FailedToJoinWorld")
+							: Engine.localisationManager.GetLocalString("Common.FailedToLoadWorld");
+						_loadingText.Text.Value = $"{errorMsg} {(Engine.netApiManager.Client.User?.UserName == null ? ", JIM" : "")}\n {Engine.localisationManager.GetLocalString(world.LoadMsg)}";
+						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180)* Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.HeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}
 				}
 			}
@@ -235,6 +292,7 @@ namespace RhuEngine.Managers
 			}
 			worlds.Remove(world);
 			world.Dispose();
+			OnWorldUpdateTaskBar?.Invoke();
 		}
 	}
 }

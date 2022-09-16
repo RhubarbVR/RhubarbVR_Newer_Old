@@ -5,23 +5,23 @@ using System.Text;
 
 namespace RNumerics
 {
-	abstract public class ImplicitNAryOp2d : ImplicitOperator2d
+	abstract public class ImplicitNAryOp2d : IImplicitOperator2d
 	{
-		protected List<ImplicitField2d> m_vChildren;
+		protected List<IImplicitField2d> m_vChildren;
 
 		public ImplicitNAryOp2d() {
-			m_vChildren = new List<ImplicitField2d>();
+			m_vChildren = new List<IImplicitField2d>();
 		}
 
-		public void AddChild(ImplicitField2d pField) {
+		public void AddChild(IImplicitField2d pField) {
 			m_vChildren.Add(pField);
 		}
 
-		virtual public float Value(float fX, float fY) {
+		virtual public float Value(in float fX, in float fY) {
 			return 0;
 		}
 
-		virtual public void Gradient(float fX, float fY, ref float fGX, ref float fGY) {
+		virtual public void Gradient(in float fX, in float fY, ref float fGX, ref float fGY) {
 			const float F_DELTA = 0.001f;
 			var fValue = Value(fX, fY);
 			fGX = (Value(fX + F_DELTA, fY) - fValue) / F_DELTA;
@@ -41,12 +41,12 @@ namespace RNumerics
 		}
 	}
 
-	public class ImplicitBlend2d : ImplicitNAryOp2d
+	public sealed class ImplicitBlend2d : ImplicitNAryOp2d
 	{
 		public ImplicitBlend2d() : base() {
 		}
 
-		override public float Value(float fX, float fY) {
+		override public float Value(in float fX, in float fY) {
 			var fSumValue = 0.0f;
 			foreach (var child in m_vChildren) {
 				fSumValue += child.Value(fX, fY);
@@ -55,7 +55,7 @@ namespace RNumerics
 			return fSumValue;
 		}
 
-		override public void Gradient(float fX, float fY, ref float fGX, ref float fGY) {
+		override public void Gradient(in float fX, in float fY, ref float fGX, ref float fGY) {
 			fGX = fGY = 0;
 			float fTempX = 0, fTempY = 0;
 			foreach (var child in m_vChildren) {
@@ -66,12 +66,12 @@ namespace RNumerics
 		}
 	}
 
-	public class ImplicitUnion2d : ImplicitNAryOp2d
+	public sealed class ImplicitUnion2d : ImplicitNAryOp2d
 	{
 		public ImplicitUnion2d() : base() {
 		}
 
-		override public float Value(float fX, float fY) {
+		override public float Value(in float fX, in float fY) {
 			var fMaxValue = 0.0f;
 			foreach (var child in m_vChildren) {
 				fMaxValue = Math.Max(fMaxValue, child.Value(fX, fY));
@@ -80,7 +80,7 @@ namespace RNumerics
 			return fMaxValue;
 		}
 
-		override public void Gradient(float fX, float fY, ref float fGX, ref float fGY) {
+		override public void Gradient(in float fX, in float fY, ref float fGX, ref float fGY) {
 			var fMaxValue = 0.0f;
 			var nMax = -1;
 			for (var i = 0; i < m_vChildren.Count; ++i) {
@@ -100,12 +100,12 @@ namespace RNumerics
 	}
 
 
-	public class ImplicitIntersection2d : ImplicitNAryOp2d
+	public sealed class ImplicitIntersection2d : ImplicitNAryOp2d
 	{
 		public ImplicitIntersection2d() {
 		}
 
-		override public float Value(float fX, float fY) {
+		override public float Value(in float fX, in float fY) {
 			var fMinValue = 9999999999.0f;
 			foreach (var child in m_vChildren) {
 				fMinValue = Math.Min(fMinValue, child.Value(fX, fY));
@@ -114,7 +114,7 @@ namespace RNumerics
 			return fMinValue;
 		}
 
-		override public void Gradient(float fX, float fY, ref float fGX, ref float fGY) {
+		override public void Gradient(in float fX, in float fY, ref float fGX, ref float fGY) {
 			var fMinValue = 9999999999.0f;
 			var nMin = -1;
 			for (var i = 0; i < m_vChildren.Count; ++i) {
@@ -135,12 +135,12 @@ namespace RNumerics
 	}
 
 
-	public class ImplicitDifference2d : ImplicitNAryOp2d
+	public sealed class ImplicitDifference2d : ImplicitNAryOp2d
 	{
 		public ImplicitDifference2d() {
 		}
 
-		override public float Value(float fX, float fY) {
+		override public float Value(in float fX, in float fY) {
 			if (m_vChildren.Count <= 0) {
 				return 0;
 			}
@@ -156,7 +156,7 @@ namespace RNumerics
 			return fCurValue;
 		}
 
-		override public void Gradient(float fX, float fY, ref float fGX, ref float fGY) {
+		override public void Gradient(in float fX, in float fY, ref float fGX, ref float fGY) {
 			if (m_vChildren.Count <= 0) {
 				fGX = fGY = 0;
 				return;

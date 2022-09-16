@@ -45,7 +45,7 @@ namespace RNumerics
 		protected Frame3f vPreviousPos;
 
 
-		public virtual void BeginDeformation(Frame3f vStartPos) {
+		public virtual void BeginDeformation(in Frame3f vStartPos) {
 			vPreviousPos = vStartPos;
 		}
 
@@ -56,14 +56,14 @@ namespace RNumerics
 			public double maxEdgeLenSqr;
 			public double minEdgeLenSqr;
 		}
-		public virtual DeformInfo UpdateDeformation(Frame3f vNextPos) {
+		public virtual DeformInfo UpdateDeformation(in Frame3f vNextPos) {
 			var result = Apply(vNextPos);
 			vPreviousPos = vNextPos;
 			return result;
 		}
 
 
-		public abstract DeformInfo Apply(Frame3f vNextPos);
+		public abstract DeformInfo Apply(in Frame3f vNextPos);
 
 
 
@@ -97,7 +97,7 @@ namespace RNumerics
 		}
 
 
-		public override DeformInfo Apply(Frame3f vNextPos) {
+		public override DeformInfo Apply(in Frame3f vNextPos) {
 			var edgeRangeSqr = Interval1d.Empty;
 
 			var N = Curve.VertexCount;
@@ -192,7 +192,7 @@ namespace RNumerics
 
 
 	// just apply smoothing pass from standard op
-	public class SculptCurveSmooth : StandardSculptCurveDeformation
+	public sealed class SculptCurveSmooth : StandardSculptCurveDeformation
 	{
 		public SculptCurveSmooth() {
 			DeformF = null;
@@ -204,7 +204,7 @@ namespace RNumerics
 
 
 
-	public class SculptCurveMove : StandardSculptCurveDeformation
+	public sealed class SculptCurveMove : StandardSculptCurveDeformation
 	{
 
 		public SculptCurveMove() {
@@ -214,7 +214,8 @@ namespace RNumerics
 
 
 		// returns max edge length of moved vertices, after deformation
-		public override DeformInfo Apply(Frame3f vNextPos) {
+		public override DeformInfo Apply(in Frame3f vNextPos) {
+			var data = vNextPos;
 			// if we did not move brush far enough, don't do anything
 			Vector3d vDelta = vNextPos.Origin - vPreviousPos.Origin;
 			if (vDelta.Length < 0.0001f) {
@@ -224,7 +225,7 @@ namespace RNumerics
 			// otherwise apply base deformation
 			DeformF = (idx, t) => {
 				var v = vPreviousPos.ToFrameP(Curve[idx]);
-				var vNew = vNextPos.FromFrameP(v);
+				var vNew = data.FromFrameP(v);
 				return Vector3d.Lerp(Curve[idx], vNew, t);
 			};
 			return base.Apply(vNextPos);

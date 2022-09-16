@@ -2,51 +2,34 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Configurations>Debug;Release;Unity</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BulletSharp.x64" Version="0.12.0" />
+	  <PackageReference Include="RhuBulletSharp" Version="1.2.5" GeneratePathProperty="true">
+	  </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RhuEngine\RhuEngine.csproj" />
   </ItemGroup>
-
   <ItemGroup>
-    <None Update="runtimes\linux-arm64\native\libopus.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="runtimes\linux-arm64\native\NeedToAddArmBuild.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Update="runtimes\linux-arm64\native\liblibbulletc.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="runtimes\linux-x64\native\libbulletc.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="runtimes\linux-x64\native\libopus.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Update="runtimes\MacOS\native\liblibbulletc.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="runtimes\win-x64\native\libbulletc.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="runtimes\win-x64\native\opus.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="runtimes\win10-x64\native\libbulletc.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="runtimes\win10-x64\native\opus.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
-	<Target Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'" Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="rm $(OutDir)libbulletc.dll&#xD;&#xA;rm $(OutDir)libbulletc-linux-x64.so&#xD;&#xA;rm $(OutDir)libbulletc-linux-x86.so&#xD;&#xA;rm $(OutDir)libbulletc-windows-x64.dll&#xD;&#xA;rm $(OutDir)libbulletc-windows-x86.dll" />
-	</Target>
-	<Target Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'" Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="rm $(OutDir)libbulletc.dll&#xD;&#xA;rm $(OutDir)libbulletc-linux-x64.so&#xD;&#xA;rm $(OutDir)libbulletc-linux-x86.so&#xD;&#xA;rm $(OutDir)libbulletc-windows-x64.dll&#xD;&#xA;rm $(OutDir)libbulletc-windows-x86.dll" />
-	</Target>
-	<Target Condition="'$(OS)' == 'Windows_NT'" Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="del $(OutDir)libbulletc.dll&#xD;&#xA;del $(OutDir)libbulletc-linux-x64.so&#xD;&#xA;del $(OutDir)libbulletc-linux-x86.so&#xD;&#xA;del $(OutDir)libbulletc-windows-x64.dll&#xD;&#xA;del $(OutDir)libbulletc-windows-x86.dll" />
-	</Target>
-
+	
 </Project>

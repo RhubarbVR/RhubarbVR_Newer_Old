@@ -8,42 +8,61 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "User" })]
-	public class Head : Component
+	public sealed class Head : Component
 	{
-		public SyncRef<User> user;
+		public readonly SyncRef<User> user;
 
-		public Linker<Vector3f> pos;
+		public readonly Linker<Vector3f> pos;
 
-		public Linker<Quaternionf> rot;
+		public readonly Linker<Quaternionf> rot;
 
-		public Linker<Vector3f> scale;
+		public readonly Linker<Vector3f> scale;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			pos.SetLinkerTarget(Entity.position);
 			rot.SetLinkerTarget(Entity.rotation);
 			scale.SetLinkerTarget(Entity.scale);
+			if (!World.IsPersonalSpace) {
+				return;
+			}
+			var invr = Entity.AttachComponent<IsInVR>();
+			var entity = Entity.AddChild("Currsor");
+			entity.position.Value = new Vector3f(0, 0, -0.1f);
+			entity.scale.Value = new Vector3f(0.005f);
+			entity.rotation.Value = Quaternionf.CreateFromEuler(0, 90, 0);
+			invr.isNotVR.Target = entity.enabled;
+			var (mesh,mrit,render) = entity.AttachMeshWithMeshRender<SpriteMesh, UnlitMaterial>();
+			var colorer = entity.AttachComponent<UIColorAssign>();
+			colorer.TargetColor.Target = render.colorLinear;
+			colorer.ColorShif.Value = 1.9f;
+			colorer.Alpha.Value = 0.9f;
+			var ea = entity.AttachComponent<IconsTex>();
+			var sprite = entity.AttachComponent<SpriteProvder>();
+			sprite.Texture.Target = ea;
+			mrit.MainTexture.Target = ea;
+			mrit.Transparency.Value = Transparency.Blend;
+			render.OrderOffset.Value = 1000000000;
+			sprite.GridSize.Value = new Vector2i(26, 7);
+			mesh.Dimensions.Value = new Vector2f(1.25f);
+			mesh.Sprite.Target = sprite;
+			mesh.SetPos(new Vector2i(16,2));
 		}
 
-
-		public override void Step() {
+		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
 			if (World.IsPersonalSpace) {
-				var handVal = WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target?.head.Target;
-				if (handVal is not null) {
-					var focusUserHand = WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target?.head.Target;
-					Entity.LocalTrans = focusUserHand?.LocalTrans ?? Matrix.Identity;
-				}
+				Entity.LocalTrans = Engine.IsInVR ? InputManager.HeadMatrix * RRenderer.CameraRoot.Inverse : InputManager.HeadMatrix;
 			}
 			else {
 				if (user.Target is null) {
 					return;
 				}
-				if (user.Target == World.GetLocalUser()) {
-						Entity.LocalTrans = RInput.Head.HeadMatrix * RRenderer.CameraRoot.Inverse;
-						user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("HeadPos").Value = Entity.position.Value;
-						user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>("HeadRot").Value = Entity.rotation.Value;
+				if (user.Target == LocalUser) {
+					Entity.LocalTrans = Engine.IsInVR ? InputManager.HeadMatrix  * RRenderer.CameraRoot.Inverse : InputManager.HeadMatrix;
+					user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("HeadPos").Value = Entity.position.Value;
+					user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>("HeadRot").Value = Entity.rotation.Value;
 				}
 				else {
 					var position = user.Target.FindSyncStream<SyncValueStream<Vector3f>>("HeadPos")?.Value ?? Vector3f.Zero;

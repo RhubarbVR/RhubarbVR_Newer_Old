@@ -23,6 +23,7 @@ namespace RhuEngine.Physics
 		public object GetCylinderShapeX(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ);
 
 		public object GetConvexMeshShape(IMesh mesh);
+		public object GetRawMeshShape(IMesh mesh);
 
 		public object GetCylinderShapeZ(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ);
 		public object GetSphereShape(double radus);
@@ -34,8 +35,17 @@ namespace RhuEngine.Physics
 
 		public object obj;
 
-		public RigidBodyCollider GetCollider(PhysicsSim physicsSim) {
+		public RigidBodyCollider GetCollider(PhysicsSim physicsSim,object selfobject = null,bool startActive = true) {
 			var col =  Manager?.GetCollider(this, physicsSim);
+			col.CustomObject = selfobject;
+			col.Active = startActive;
+			return col;
+		}
+		public RigidBodyCollider GetCollider(PhysicsSim physicsSim,Matrix startingpos, object selfobject = null, bool startActive = true) {
+			var col = Manager?.GetCollider(this, physicsSim);
+			col.CustomObject = selfobject;
+			col.Matrix = startingpos;
+			col.Active = startActive;
 			return col;
 		}
 	}
@@ -46,7 +56,12 @@ namespace RhuEngine.Physics
 			obj = Manager?.GetConvexMeshShape(mesh);
 		}
 	}
-
+	public class RRawMeshShape : ColliderShape
+	{
+		public RRawMeshShape(IMesh mesh) {
+			obj = Manager?.GetRawMeshShape(mesh);
+		}
+	}
 	public class RConeShape : ColliderShape
 	{
 		public RConeShape(double radius, double height) {

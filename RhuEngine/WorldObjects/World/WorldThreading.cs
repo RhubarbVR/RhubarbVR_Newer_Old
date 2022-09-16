@@ -9,6 +9,7 @@ using RhuEngine.WorldObjects.ECS;
 using RhuEngine.AssetSystem;
 using System.Collections.Generic;
 using RhuEngine.Linker;
+using System.Threading.Tasks;
 
 namespace RhuEngine.WorldObjects
 {
@@ -17,29 +18,11 @@ namespace RhuEngine.WorldObjects
 		[ThreadStatic]
 		public static uint MethodCalls = 0;
 
-		public static uint MaxCalls = 100;
+		public static uint MaxCalls = 25;
 	}
 
 	public partial class World
 	{
-		private readonly List<Action> _actions = new();
-
-		public void AddCoroutine(Action action) {
-			_actions.Add(action);
-		}
-
-		private void UpdateCoroutine() {
-			var e = _actions.GetEnumerator();
-			while (e.MoveNext()) {
-				try {
-					e.Current();
-				}
-				catch (Exception ex) 
-				{
-					RLog.Err("Failed to update Coroutine in " + WorldDebugName + " Error:" + ex.ToString());
-				}
-			}
-			_actions.Clear();
-		}
+		
 	}
 }

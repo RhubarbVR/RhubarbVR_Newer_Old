@@ -9,11 +9,11 @@ using RhuEngine.WorldObjects;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class MobiusStripMesh : ProceduralMesh
+	public sealed class MobiusStripMesh : ProceduralMesh
 	{
 		[Default(100)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<int> planeResolution;
+		public readonly Sync<int> planeResolution;
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {
 				return;

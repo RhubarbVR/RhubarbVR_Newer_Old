@@ -13,53 +13,45 @@ namespace RNumerics
 	{
 		public int Hash;
 
-		public HashBuilder(int init = unchecked((int)2166136261)) {
+		public HashBuilder(in int init = unchecked((int)2166136261)) {
 			Hash = init;
 		}
 
 
-		public void Add(int i) {
+		public void Add(in int i) {
 			unchecked {
 				Hash = (Hash * 16777619) ^ i.GetHashCode();
 			}
 		}
 
-		public void Add(double d) {
+		public void Add(in double d) {
 			unchecked {
 				Hash = (Hash * 16777619) ^ d.GetHashCode();
 			}
 		}
 
-		public void Add(float f) {
+		public void Add(in float f) {
 			unchecked {
 				Hash = (Hash * 16777619) ^ f.GetHashCode();
 			}
 		}
 
 
-		public void Add(Vector2f v) {
+		public void Add(in Vector2f v) {
 			unchecked {
 				Hash = (Hash * 16777619) ^ v.x.GetHashCode();
 				Hash = (Hash * 16777619) ^ v.y.GetHashCode();
 			}
 		}
 
-		public void Add(Vector2d v) {
+		public void Add(in Vector2d v) {
 			unchecked {
 				Hash = (Hash * 16777619) ^ v.x.GetHashCode();
 				Hash = (Hash * 16777619) ^ v.y.GetHashCode();
 			}
 		}
 
-		public void Add(Vector3f v) {
-			unchecked {
-				Hash = (Hash * 16777619) ^ v.x.GetHashCode();
-				Hash = (Hash * 16777619) ^ v.y.GetHashCode();
-				Hash = (Hash * 16777619) ^ v.z.GetHashCode();
-			}
-		}
-
-		public void Add(Vector3d v) {
+		public void Add(in Vector3f v) {
 			unchecked {
 				Hash = (Hash * 16777619) ^ v.x.GetHashCode();
 				Hash = (Hash * 16777619) ^ v.y.GetHashCode();
@@ -67,7 +59,15 @@ namespace RNumerics
 			}
 		}
 
-		public void Add(Frame3f f) {
+		public void Add(in Vector3d v) {
+			unchecked {
+				Hash = (Hash * 16777619) ^ v.x.GetHashCode();
+				Hash = (Hash * 16777619) ^ v.y.GetHashCode();
+				Hash = (Hash * 16777619) ^ v.z.GetHashCode();
+			}
+		}
+
+		public void Add(in Frame3f f) {
 			unchecked {
 				Hash = (Hash * 16777619) ^ f.Origin.x.GetHashCode();
 				Hash = (Hash * 16777619) ^ f.Origin.y.GetHashCode();
@@ -79,7 +79,7 @@ namespace RNumerics
 			}
 		}
 
-		public void Add(Index3i v) {
+		public void Add(in Index3i v) {
 			unchecked {
 				Hash = (Hash * 16777619) ^ v.a.GetHashCode();
 				Hash = (Hash * 16777619) ^ v.b.GetHashCode();
@@ -87,7 +87,7 @@ namespace RNumerics
 			}
 		}
 
-		public void Add(Index2i v) {
+		public void Add(in Index2i v) {
 			unchecked {
 				Hash = (Hash * 16777619) ^ v.a.GetHashCode();
 				Hash = (Hash * 16777619) ^ v.b.GetHashCode();

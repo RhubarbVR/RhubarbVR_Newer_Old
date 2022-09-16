@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using RhuEngine.Linker;
+using NAudio.Wave;
 
 namespace RhuEngine.WorldObjects
 {
-	public abstract class AudioStream : SyncStream, INetworkedObject, IAssetProvider<RSound>, IGlobalStepable
+	public abstract class AudioStream : SyncStream, INetworkedObject, IAssetProvider<IWaveProvider>, IGlobalStepable
 	{
 		public enum AudioFrameTime
 		{
@@ -23,13 +24,12 @@ namespace RhuEngine.WorldObjects
 
 		[OnChanged(nameof(UpdateFrameSize))]
 		[Default(AudioFrameTime.ms40)]
-		public Sync<AudioFrameTime> frameSize;
+		public readonly Sync<AudioFrameTime> frameSize;
 
 		public virtual void UpdateFrameSize() {
 			if (!Engine.EngineLink.CanAudio) {
 				return;
 			}
-			_output = RSound.CreateStream(TimeInMs * 0.003f);
 		}
 
 		public float TimeInMs
@@ -60,14 +60,13 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public virtual bool IsRunning => true;
 		public int SampleCount => (int)(48000 / 1000 * TimeInMs);
 
-		public event Action<RSound> OnAssetLoaded;
+		public event Action<IWaveProvider> OnAssetLoaded;
 
-		public RSound Value { get; private set; }
+		public IWaveProvider Value { get; private set; }
 
-		public void Load(RSound data) {
+		public void Load(IWaveProvider data) {
 			Value = data;
 			Loaded = data != null;
 			OnAssetLoaded?.Invoke(data);
@@ -79,128 +78,34 @@ namespace RhuEngine.WorldObjects
 			Load(null);
 			base.Dispose();
 		}
-		private RSound _input;
 
-		private RSound _output;
-
-		private bool _loadedDevice = false;
-		
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			UpdateFrameSize();
-			Load(_output);
 		}
 
 		public void LoadInput(string deviceName = null) {
 			if (!Engine.EngineLink.CanAudio) {
 				return;
 			}
-			if (RuntimeInformation.FrameworkDescription.StartsWith("Mono ")) {
-				RLog.Err("Android And mic is buggy");
-				return;
-			}
 			if (deviceName is null) {
 				deviceName = Engine.MainMic;
 				Engine.MicChanged += LoadInput;
 			}
-			if (!RMicrophone.Start(deviceName)) {
-				RLog.Err($"Failed to load Mic {deviceName ?? "System Default"}");
-				return;
-			}
-			_input = RMicrophone.Sound;
-			Load(_input);
-			_output = null;
-			_loadedDevice = true;
-		}
-
-		public virtual byte[] SendAudioSamples(float[] audio) {
-			throw new NotImplementedException();
-		}
-
-		public virtual float[] ProssesAudioSamples(byte[] data) {
-			throw new NotImplementedException();
-		}
-
-		private float[] _samples = new float[0];
-
-		private const int MAX_QUEUE_SIZE = 2;
-
-		private readonly Queue<byte[]> _samplesQueue = new(MAX_QUEUE_SIZE);
-
-		private float[] _currentData = new float[1];
-
-		private long _currsorPos = 0;
-		private long _startPos = 0;
-
-		//Todo: make read a whole array
-		private float ReadSample() {
-			_currsorPos++;
-			if ((_startPos + _currentData.LongLength) > _currsorPos) {
-				return _currentData[_currsorPos - _startPos];
-			}
-			else {
-				_startPos = _currsorPos + 1;
-				if(_samplesQueue.Count > MAX_QUEUE_SIZE) {
-					for (var i = 0; i < MAX_QUEUE_SIZE - _samplesQueue.Count; i++) {
-						_samplesQueue.Dequeue(); // Drop Packed
-					}
-				}
-				_currentData = _samplesQueue.Count > 0 ? ProssesAudioSamples(_samplesQueue.Dequeue()) : ProssesAudioSamples(null);
-				return _currentData[0];
-			}
+			//if (!RMicrophone.Start(deviceName,out var rMicReader)) {
+			//	RLog.Err($"Failed to load Mic {deviceName ?? "System Default"}");
+			//	return;
+			//}
+			//_input = rMicReader;
+			//Load(_input.SoundClip);
+			//_output = null;
+			//_loadedDevice = true;
 		}
 
 		public override void Received(Peer sender, IDataNode data) {
-			if (data is DataNode<byte[]> dataNode) {
-				_samplesQueue.Enqueue(dataNode);
-			}
-		}
-
-		private bool ShouldSendAudioPacked(float[] samples) {
-			var sum = 0f;
-			for (var i = 0; i < samples.Length; i++) {
-				sum += samples[i];
-			}
-			var average = sum / samples.Length;
-
-
-			return true;
+		
 		}
 
 		public void Step() {
-			if (!Engine.EngineLink.CanAudio) {
-				return;
-			}
-			if (NoSync) {
-				return;
-			}
-			if (!IsRunning) {
-				return;
-			}
-			if (!_loadedDevice) {
-				if(_output is null) {
-					return;
-				}
-				var count = Math.Max(0, (int)(0.1f * 48000) - (_output.TotalSamples - _output.CursorSamples));
-				if (_samples.Length < count) {
-					_samples = new float[count];
-				}
-				for (var i = 0; i < count; i++) {
-					_samples[i] = ReadSample();
-				}
-				_output.WriteSamples(_samples, count);
-			}
-			else {
-				if (_input is null) {
-					return;
-				}
-				if (_input.UnreadSamples >= SampleCount) { 
-					var audioPacked = new float[SampleCount];
-					_input.ReadSamples(ref audioPacked);
-					if (ShouldSendAudioPacked(audioPacked)) {
-						World.BroadcastDataToAllStream(this, new DataNode<byte[]>(SendAudioSamples(audioPacked)), LiteNetLib.DeliveryMethod.Unreliable);
-					}
-				}
-			}
 		}
 	}
 }

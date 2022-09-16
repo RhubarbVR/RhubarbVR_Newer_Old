@@ -7,14 +7,22 @@ using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 using RhuEngine.Linker;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
-	public abstract class SyncListBase<T> : SyncObject, INetworkedObject, IEnumerable<ISyncObject> , IChangeable where T : ISyncObject
+	public abstract class SyncListBase<T> : SyncObject, INetworkedObject, IEnumerable<ISyncObject> , IChangeable, ISyncMember where T : ISyncObject
 	{
 		private readonly SynchronizedCollection<T> _syncObjects = new(5);
 
+		public event Action<IChangeable> ChildChanged;
+
+		private void UpdateChildChanged(IChangeable changeable) {
+			ChildChanged?.Invoke(changeable);
+		}
+
 		public event Action<IChangeable> Changed;
-		[Exsposed]
+		[Exposed]
 		public int IndexOf(T value) {
 			return _syncObjects.IndexOf(value);
 		}
@@ -22,21 +30,21 @@ namespace RhuEngine.WorldObjects
 		public void ChildElementOnChanged(IChangeable changeable) {
 			Changed?.Invoke(changeable);
 		}
-		[Exsposed]
+		[Exposed]
 		public T GetValue(int index) {
 			return _syncObjects[index];
 		}
-		[Exsposed]
+		[Exposed]
 		public void Clear() {
 			var sendData = new DataNodeGroup();
 			sendData.SetValue("type", new DataNode<int>(3));
 			World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
-			foreach (var item in _syncObjects) {
+			foreach (var item in _syncObjects.ToArray()) {
 				item.Dispose();
 			}
 			_syncObjects.Clear();
 		}
-		[Exsposed]
+		[Exposed]
 		public T this[int i] => _syncObjects[i];
 
 		public T this[NetPointer pointer] => _syncObjects.Where((val)=> val.Pointer == pointer).First();
@@ -46,10 +54,12 @@ namespace RhuEngine.WorldObjects
 		public bool NoSync { get; set; }
 
 		private readonly object _locker = new();
-		public void RemoveAtIndex(int index) {
+		public void DisposeAtIndex(int index) {
+			_syncObjects[index].Dispose();
+		}
+		public void DestroyAtIndex(int index) {
 			_syncObjects[index].Destroy();
 		}
-
 		public virtual void OnAddedElement(T element) {
 
 		}
@@ -65,6 +75,10 @@ namespace RhuEngine.WorldObjects
 				var offset = (IOffsetableElement)newElement;
 				offset.OffsetChanged += ReorderList;
 				offsetindex = offset.Offset;
+			}
+			if (typeof(IChangeable).IsAssignableFrom(newElement.GetType())) {
+				var offset = (IChangeable)newElement;
+				offset.Changed += UpdateChildChanged;
 			}
 			lock (_locker) {
 				var hasAdded = false;
@@ -111,6 +125,10 @@ namespace RhuEngine.WorldObjects
 			}
 			OnElementRemmoved(value);
 			value.OnDispose -= NewElement_OnDispose;
+			if (typeof(IChangeable).IsAssignableFrom(value.GetType())) {
+				var offset = (IChangeable)value;
+				offset.Changed -= UpdateChildChanged;
+			}
 			lock (_locker) {
 				_syncObjects.Remove(value);
 				FixAllNames();
@@ -190,7 +208,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public override void InitializeMembers(bool networkedObject, bool deserialize, Func<NetPointer> func) {
+		protected override void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate func) {
 		}
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
 			throw new NotImplementedException();

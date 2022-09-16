@@ -24,30 +24,37 @@ namespace RNumerics
 		public Vector3d AxisZ;
 		[Key(4)]
 		public Vector3d Extent;
+		public Box3d() {
+			Center = Vector3d.Zero;
+			AxisX = Vector3d.Zero;
+			AxisY = Vector3d.Zero;
+			AxisZ = Vector3d.Zero;
+			Extent = Vector3d.Zero;
+		}
 
-		public Box3d(Vector3d center) {
+		public Box3d(in Vector3d center) {
 			Center = center;
 			AxisX = Vector3d.AxisX;
 			AxisY = Vector3d.AxisY;
 			AxisZ = Vector3d.AxisZ;
 			Extent = Vector3d.Zero;
 		}
-		public Box3d(Vector3d center, Vector3d x, Vector3d y, Vector3d z,
-						 Vector3d extent) {
+		public Box3d(in Vector3d center, in Vector3d x, in Vector3d y, in Vector3d z,
+						in Vector3d extent) {
 			Center = center;
 			AxisX = x;
 			AxisY = y;
 			AxisZ = z;
 			Extent = extent;
 		}
-		public Box3d(Vector3d center, Vector3d extent) {
+		public Box3d(in Vector3d center, in Vector3d extent) {
 			Center = center;
 			Extent = extent;
 			AxisX = Vector3d.AxisX;
 			AxisY = Vector3d.AxisY;
 			AxisZ = Vector3d.AxisZ;
 		}
-		public Box3d(AxisAlignedBox3d aaBox) {
+		public Box3d(in AxisAlignedBox3d aaBox) {
 			// [RMS] this should produce Empty for aaBox.Empty...
 			Extent = new Vector3f(aaBox.Width * 0.5, aaBox.Height * 0.5, aaBox.Depth * 0.5);
 			Center = aaBox.Center;
@@ -55,14 +62,14 @@ namespace RNumerics
 			AxisY = Vector3d.AxisY;
 			AxisZ = Vector3d.AxisZ;
 		}
-		public Box3d(Frame3f frame, Vector3d extent) {
+		public Box3d(in Frame3f frame, in Vector3d extent) {
 			Center = frame.Origin;
 			AxisX = frame.X;
 			AxisY = frame.Y;
 			AxisZ = frame.Z;
 			Extent = extent;
 		}
-		public Box3d(Segment3d seg) {
+		public Box3d(in Segment3d seg) {
 			Center = seg.Center;
 			AxisZ = seg.Direction;
 			Vector3d.MakePerpVectors(ref AxisZ, out AxisX, out AxisY);
@@ -77,7 +84,7 @@ namespace RNumerics
 		public static readonly Box3d UnitPositive = new(0.5 * Vector3d.One, 0.5 * Vector3d.One);
 
 
-		public Vector3d Axis(int i) {
+		public Vector3d Axis(in int i) {
 			return (i == 0) ? AxisX : (i == 1) ? AxisY : AxisZ;
 		}
 
@@ -87,7 +94,7 @@ namespace RNumerics
 			ComputeVertices(v);
 			return v;
 		}
-		public void ComputeVertices(Vector3d[] vertex) {
+		public void ComputeVertices(in Vector3d[] vertex) {
 			var extAxis0 = Extent.x * AxisX;
 			var extAxis1 = Extent.y * AxisY;
 			var extAxis2 = Extent.z * AxisZ;
@@ -148,7 +155,7 @@ namespace RNumerics
 		// Note that in RHS system (which is our default), +z is "forward" so -z in this diagram 
 		// is actually the back of the box (!) This is odd but want to keep consistency w/ ComputeVertices(),
 		// and the implementation there needs to stay consistent w/ C++ Wildmagic5
-		public Vector3d Corner(int i) {
+		public Vector3d Corner(in int i) {
 			var c = Center;
 			c += (((i & 1) != 0) ^ ((i & 2) != 0)) ? (Extent.x * AxisX) : (-Extent.x * AxisX);
 			c += (i / 2 % 2 == 0) ? (-Extent.y * AxisY) : (Extent.y * AxisY);
@@ -173,7 +180,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public double Volume => 2 * Extent.x * 2 * Extent.y * 2 * Extent.z;
 
-		public void Contain(Vector3d v) {
+		public void Contain(in Vector3d v) {
 			var lv = v - Center;
 			for (var k = 0; k < 3; ++k) {
 				var t = lv.Dot(Axis(k));
@@ -197,7 +204,7 @@ namespace RNumerics
 		/// update the box to contain set of input points. More efficient tha ncalling Contain() many times
 		/// code ported from GTEngine GteContOrientedBox3.h 
 		/// </summary>
-		public void Contain(IEnumerable<Vector3d> points) {
+		public void Contain(in IEnumerable<Vector3d> points) {
 			// Let C be the box center and let U0, U1, and U2 be the box axes.
 			// Each input point is of the form X = C + y0*U0 + y1*U1 + y2*U2.
 			// The following code computes min(y0), max(y0), min(y1), max(y1),
@@ -246,29 +253,29 @@ namespace RNumerics
 
 		// I think this can be more efficient...no? At least could combine
 		// all the axis-interval updates before updating Center...
-		public void Contain(Box3d o) {
+		public void Contain(in Box3d o) {
 			var v = o.ComputeVertices();
 			for (var k = 0; k < 8; ++k) {
 				Contain(v[k]);
 			}
 		}
 
-		public bool Contains(Vector3d v) {
+		public bool Contains(in Vector3d v) {
 			var lv = v - Center;
 			return (Math.Abs(lv.Dot(AxisX)) <= Extent.x) &&
 				(Math.Abs(lv.Dot(AxisY)) <= Extent.y) &&
 				(Math.Abs(lv.Dot(AxisZ)) <= Extent.z);
 		}
 
-		public void Expand(double f) {
+		public void Expand(in double f) {
 			Extent += f;
 		}
 
-		public void Translate(Vector3d v) {
+		public void Translate(in Vector3d v) {
 			Center += v;
 		}
 
-		public void Scale(Vector3d s) {
+		public void Scale(in Vector3d s) {
 			Center *= s;
 			Extent *= s;
 			AxisX *= s;
@@ -279,7 +286,7 @@ namespace RNumerics
 			AxisZ.Normalize();
 		}
 
-		public void ScaleExtents(Vector3d s) {
+		public void ScaleExtents(in Vector3d s) {
 			Extent *= s;
 		}
 
@@ -300,7 +307,7 @@ namespace RNumerics
 			var closest = new Vector3d();
 			int i;
 			for (i = 0; i < 3; ++i) {
-				closest[i] = Axis(i).Dot(ref v);
+				closest[i] = Axis(i).Dot(v);
 				if (closest[i] < -Extent[i]) {
 					delta = closest[i] + Extent[i];
 					sqrDistance += delta * delta;
@@ -331,7 +338,7 @@ namespace RNumerics
 			double delta;
 			var closest = new Vector3d();
 			for (var i = 0; i < 3; ++i) {
-				closest[i] = Axis(i).Dot(ref v);
+				closest[i] = Axis(i).Dot(v);
 				var extent = Extent[i];
 				if (closest[i] < -extent) {
 					delta = closest[i] + extent;
@@ -353,7 +360,7 @@ namespace RNumerics
 
 
 		// ported from WildMagic5 Wm5ContBox3.cpp::MergeBoxes
-		public static Box3d Merge(ref Box3d box0, ref Box3d box1) {
+		public static Box3d Merge(in Box3d box0, in Box3d box1) {
 			// Construct a box that contains the input boxes.
 			var box = new Box3d {
 
@@ -370,10 +377,10 @@ namespace RNumerics
 			// is converted back to a rotation matrix and its columns are selected as
 			// the merged box axes.
 			Quaterniond q0 = new(), q1 = new();
-			var rot0 = new Matrix3d(ref box0.AxisX, ref box0.AxisY, ref box0.AxisZ, false);
-			q0.SetFromRotationMatrix(ref rot0);
-			var rot1 = new Matrix3d(ref box1.AxisX, ref box1.AxisY, ref box1.AxisZ, false);
-			q1.SetFromRotationMatrix(ref rot1);
+			var rot0 = new Matrix3d(box0.AxisX, box0.AxisY, box0.AxisZ, false);
+			q0.SetFromRotationMatrix( rot0);
+			var rot1 = new Matrix3d(box1.AxisX, box1.AxisY, box1.AxisZ, false);
+			q1.SetFromRotationMatrix( rot1);
 			if (q0.Dot(q1) < 0) {
 				q1 = -q1;
 			}
@@ -407,7 +414,7 @@ namespace RNumerics
 			for (i = 0; i < 8; ++i) {
 				var diff = vertex[i] - box.Center;
 				for (j = 0; j < 3; ++j) {
-					dot = box.Axis(j).Dot(ref diff);
+					dot = box.Axis(j).Dot(diff);
 					if (dot > pmax[j]) {
 						pmax[j] = dot;
 					}
@@ -421,7 +428,7 @@ namespace RNumerics
 			for (i = 0; i < 8; ++i) {
 				var diff = vertex[i] - box.Center;
 				for (j = 0; j < 3; ++j) {
-					dot = box.Axis(j).Dot(ref diff);
+					dot = box.Axis(j).Dot(diff);
 					if (dot > pmax[j]) {
 						pmax[j] = dot;
 					}
@@ -449,8 +456,8 @@ namespace RNumerics
 
 
 
-		public static implicit operator Box3d(Box3f v) => new(v.Center, v.AxisX, v.AxisY, v.AxisZ, v.Extent);
-		public static explicit operator Box3f(Box3d v) => new((Vector3f)v.Center, (Vector3f)v.AxisX, (Vector3f)v.AxisY, (Vector3f)v.AxisZ, (Vector3f)v.Extent);
+		public static implicit operator Box3d(in Box3f v) => new(v.Center, v.AxisX, v.AxisY, v.AxisZ, v.Extent);
+		public static explicit operator Box3f(in Box3d v) => new((Vector3f)v.Center, (Vector3f)v.AxisX, (Vector3f)v.AxisY, (Vector3f)v.AxisZ, (Vector3f)v.Extent);
 
 	}
 
@@ -483,29 +490,29 @@ namespace RNumerics
 		[Key(4)]
 		public Vector3f Extent;
 
-		public Box3f(Vector3f center) {
+		public Box3f(in Vector3f center) {
 			Center = center;
 			AxisX = Vector3f.AxisX;
 			AxisY = Vector3f.AxisY;
 			AxisZ = Vector3f.AxisZ;
 			Extent = Vector3f.Zero;
 		}
-		public Box3f(Vector3f center, Vector3f x, Vector3f y, Vector3f z,
-					 Vector3f extent) {
+		public Box3f(in Vector3f center, in Vector3f x, in Vector3f y, in Vector3f z,
+					 in Vector3f extent) {
 			Center = center;
 			AxisX = x;
 			AxisY = y;
 			AxisZ = z;
 			Extent = extent;
 		}
-		public Box3f(Vector3f center, Vector3f extent) {
+		public Box3f(in Vector3f center, in Vector3f extent) {
 			Center = center;
 			Extent = extent;
 			AxisX = Vector3f.AxisX;
 			AxisY = Vector3f.AxisY;
 			AxisZ = Vector3f.AxisZ;
 		}
-		public Box3f(AxisAlignedBox3f aaBox) {
+		public Box3f(in AxisAlignedBox3f aaBox) {
 			// [RMS] this should produce Empty for aaBox.Empty...
 			Extent = new Vector3f(aaBox.Width * 0.5f, aaBox.Height * 0.5f, aaBox.Depth * 0.5f);
 			Center = aaBox.Center;
@@ -518,7 +525,7 @@ namespace RNumerics
 		public static readonly Box3f Empty = new(Vector3f.Zero);
 
 
-		public Vector3f Axis(int i) {
+		public Vector3f Axis(in int i) {
 			return (i == 0) ? AxisX : (i == 1) ? AxisY : AxisZ;
 		}
 
@@ -528,7 +535,7 @@ namespace RNumerics
 			ComputeVertices(v);
 			return v;
 		}
-		public void ComputeVertices(Vector3f[] vertex) {
+		public void ComputeVertices(in Vector3f[] vertex) {
 			var extAxis0 = Extent.x * AxisX;
 			var extAxis1 = Extent.y * AxisY;
 			var extAxis2 = Extent.z * AxisZ;
@@ -593,7 +600,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public double Volume => 2 * Extent.x * 2 * Extent.y * 2 * Extent.z;
 
-		public void Contain(Vector3f v) {
+		public void Contain(in Vector3f v) {
 			var lv = v - Center;
 			for (var k = 0; k < 3; ++k) {
 				double t = lv.Dot(Axis(k));
@@ -614,29 +621,29 @@ namespace RNumerics
 
 		// I think this can be more efficient...no? At least could combine
 		// all the axis-interval updates before updating Center...
-		public void Contain(Box3f o) {
+		public void Contain(in Box3f o) {
 			var v = o.ComputeVertices();
 			for (var k = 0; k < 8; ++k) {
 				Contain(v[k]);
 			}
 		}
 
-		public bool Contains(Vector3f v) {
+		public bool Contains(in Vector3f v) {
 			var lv = v - Center;
 			return (Math.Abs(lv.Dot(AxisX)) <= Extent.x) &&
 				(Math.Abs(lv.Dot(AxisY)) <= Extent.y) &&
 				(Math.Abs(lv.Dot(AxisZ)) <= Extent.z);
 		}
 
-		public void Expand(float f) {
+		public void Expand(in float f) {
 			Extent += f;
 		}
 
-		public void Translate(Vector3f v) {
+		public void Translate(in Vector3f v) {
 			Center += v;
 		}
 
-		public void Scale(Vector3f s) {
+		public void Scale(in Vector3f s) {
 			Center *= s;
 			Extent *= s;
 			AxisX *= s;
@@ -647,7 +654,7 @@ namespace RNumerics
 			AxisZ.Normalize();
 		}
 
-		public void ScaleExtents(Vector3f s) {
+		public void ScaleExtents(in Vector3f s) {
 			Extent *= s;
 		}
 

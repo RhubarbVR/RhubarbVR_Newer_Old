@@ -8,13 +8,16 @@ using SharedModels.GameSpecific;
 namespace RhuEngine.DataStructure
 {
 	[MessagePackObject]
-	public class DataNodeList : IDataNode
+	public sealed class DataNodeList : IDataNode
 	{
-		[Key(0)]
-		public List<IDataNode> _nodeGroup = new();
-		public byte[] GetByteArray() {
-			return Serializer.Save(_nodeGroup);
+		public void SaveAction(DataSaver DataSaver) {
+			foreach (var item in _nodeGroup) {
+				DataSaver.RunChildAction(item);
+			}
 		}
+
+		[IgnoreMember]
+		public List<IDataNode> _nodeGroup = new();
 
 		public IEnumerator<IDataNode> GetEnumerator() {
 			for (var i = 0; i < _nodeGroup.Count; i++) {
@@ -22,7 +25,7 @@ namespace RhuEngine.DataStructure
 			}
 		}
 		[IgnoreMember]
-		IDataNode this[int i]
+		public IDataNode this[int i]
 		{
 			get => _nodeGroup[i];
 			set => _nodeGroup[i] = value;
@@ -31,16 +34,15 @@ namespace RhuEngine.DataStructure
 		public void Add(IDataNode val) {
 			_nodeGroup.Add(val);
 		}
-		public void SetByteArray(byte[] arrBytes) {
-			_nodeGroup = Serializer.Read<List<IDataNode>>(arrBytes);
+
+		public void InitData() {
+		}
+
+		public void ReadChildEnd(IDataNode child) {
+			_nodeGroup.Insert(0, child);
 		}
 
 		public DataNodeList() {
-		}
-
-
-		public DataNodeList(byte[] data) {
-			SetByteArray(data);
 		}
 	}
 }

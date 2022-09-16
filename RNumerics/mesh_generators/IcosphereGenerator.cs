@@ -6,7 +6,7 @@ using System.Text;
 namespace RNumerics
 {
 	// TODO Make the vertx, norm, tris, uv's be in-place
-	public class IcosphereGenerator : MeshGenerator
+	public sealed class IcosphereGenerator : MeshGenerator
 	{
 		public int iterations = 1;
 		public float radius = 1f;
@@ -149,7 +149,7 @@ namespace RNumerics
 
 			return this;
 		}
-		private static void CreateUV(int iterations, Vector3d[] vertices, Vector2d[] uv) {
+		private static void CreateUV(in int iterations, in Vector3d[] vertices, in Vector2d[] uv) {
 			var tri = iterations * iterations;        // devided triangle count (1,4,9...)
 			var uvLimit = tri * 6;  // range of wrap UV.x 
 
@@ -157,12 +157,7 @@ namespace RNumerics
 				var v = vertices[i];
 
 				Vector2d textureCoordinates;
-				if ((v.x == 0f) && (i < uvLimit)) {
-					textureCoordinates.x = 1f;
-				}
-				else {
-					textureCoordinates.x = (float) (Math.Atan2(v.x, v.z) / -2f * Math.PI);
-				}
+				textureCoordinates.x = (v.x == 0f) && (i < uvLimit) ? (double)1f : (double)(float) (Math.Atan2(v.x, v.z) / -2f * Math.PI);
 
 				if (textureCoordinates.x < 0f) {
 					textureCoordinates.x += 1f;

@@ -8,10 +8,14 @@ using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 using RhuEngine.Linker;
 using RhuEngine.Managers;
+using RhuEngine.WorldObjects.ECS;
 
+using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
+	public delegate NetPointer NetPointerUpdateDelegate();
+
 	public abstract class SyncObject : ISyncObject
 	{
 		private readonly HashSet<IDisposable> _disposables = new();
@@ -29,7 +33,8 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public User LocalUser => World.GetLocalUser();
-
+		public User MasterUser => World.GetMasterUser();
+		public InputManager InputManager => Engine.inputManager;
 		public bool IsDestroying
 		{
 			get; set;
@@ -65,21 +70,17 @@ namespace RhuEngine.WorldObjects
 			get; private set;
 		}
 
-		public EditLevel LocalEditLevel
-		{
-			get; set;
-		}
-
-		public EditLevel EditLevel => (LocalEditLevel == EditLevel.None) ? Parent?.EditLevel ?? EditLevel.None : LocalEditLevel;
-
 		public virtual bool Persistence => true;
 
 		public event Action<object> OnDispose;
-
+		[Exposed]
 		public virtual void Destroy() {
+			if (IsDestroying) {
+				return;
+			}
+			IsDestroying = true;
 			Task.Run(() => {
 				try {
-					IsDestroying = true;
 					Dispose();
 				}
 				catch (Exception e) {
@@ -98,7 +99,7 @@ namespace RhuEngine.WorldObjects
 				World.UnregisterGlobalStepable((IGlobalStepable)this);
 			}
 			foreach (var item in _disposables.ToArray()) {
-				if(item is SyncObject @object) {
+				if (item is SyncObject @object) {
 					@object.IsDestroying = true;
 				}
 				item?.Dispose();
@@ -106,40 +107,101 @@ namespace RhuEngine.WorldObjects
 			World.UnRegisterWorldObject(this);
 		}
 
-		public virtual void FirstCreation() {
+		protected virtual void FirstCreation() {
 
 		}
 
-		public virtual void OnInitialize() {
+		protected virtual void OnInitialize() {
 
 		}
 
-		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize,Func<NetPointer> netPointer = null) {
-			Name = name;
-			World = world;
-			Parent = parent;
-			if (!networkedObject) {
-				Pointer = netPointer is null ? World.NextRefID() : netPointer.Invoke();
-				World.RegisterWorldObject(this);
+		public class NotVailedGenaric : Exception
+		{
+			public override string Message => "Generic given is invalid";
+		}
+
+		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer = null) {
+			try {
+				if (GetType().GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && !world.IsPersonalSpace) {
+					throw new InvalidOperationException("This SyncObject is PrivateSpaceOnly");
+				}
+				var arguments = GetType().GetGenericArguments();
+				foreach (var arguiminet in arguments) {
+					var isVailed = false;
+					var types = GetType().GetCustomAttributes<GenericTypeConstraintAttribute>(true);
+					if (types.Count() == 0) {
+						isVailed = true;
+					}
+					foreach (var item in types) {
+						foreach (var typ in item.Data) {
+							if (typ == typeof(Enum)) {
+								if (arguiminet.IsEnum) {
+									isVailed = true;
+								}
+							}
+							if (arguiminet.IsAssignableFrom(typ)) {
+								isVailed = true;
+							}
+						}
+						var LoopGroups = item.Groups switch {
+							TypeConstGroups.Serializable => TypeCollections.StandaredTypes,
+							_ => Array.Empty<Type>(),
+						};
+						foreach (var typ in LoopGroups) {
+							if (typ == typeof(Enum)) {
+								if (arguiminet.IsEnum) {
+									isVailed = true;
+								}
+							}
+							if (arguiminet.IsAssignableFrom(typ)) {
+								isVailed = true;
+							}
+						}
+					}
+					if (!isVailed) {
+						throw new NotVailedGenaric();
+					}
+				}
+				Name = name;
+				World = world;
+				Parent = parent;
+				if (!networkedObject) {
+					Pointer = netPointer is null ? World.NextRefID() : netPointer.Invoke();
+					World.RegisterWorldObject(this);
+				}
+				InitializeMembers(networkedObject, deserialize, netPointer);
+				OnInitialize();
+				if (!deserialize) {
+					OnLoaded();
+				}
+				if (typeof(IGlobalStepable).IsAssignableFrom(GetType())) {
+					world.RegisterGlobalStepable((IGlobalStepable)this);
+				}
 			}
-			InitializeMembers(networkedObject, deserialize,netPointer);
-			OnInitialize();
-			if (!deserialize) {
-				OnLoaded();
-			}
-			if (typeof(IGlobalStepable).IsAssignableFrom(GetType())) {
-				world.RegisterGlobalStepable((IGlobalStepable)this);
+			catch (Exception e) {
+				try {
+					Dispose();
+				}
+				catch { }
+				throw e;
 			}
 		}
 
-		public virtual void OnSave() {
+		public void RunOnSave() {
+			OnSave();
+		}
+
+		protected virtual void OnSave() {
 		}
 
 
-		public virtual void InitializeMembers(bool networkedObject, bool deserialize, Func<NetPointer> netPointer) {
+		protected virtual void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer) {
 			try {
 				var data = GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
 				foreach (var item in data) {
+					if ((item.Attributes & FieldAttributes.InitOnly) == 0) {
+						continue;
+					}
 					if ((item.GetCustomAttribute<NoLoadAttribute>() == null) && typeof(SyncObject).IsAssignableFrom(item.FieldType) && !((item.GetCustomAttribute<NoSaveAttribute>() != null) && (item.GetCustomAttribute<NoSyncAttribute>() != null))) {
 						var instance = (SyncObject)Activator.CreateInstance(item.FieldType);
 						instance.Initialize(World, this, item.Name, networkedObject, deserialize, netPointer);
@@ -153,7 +215,7 @@ namespace RhuEngine.WorldObjects
 						if (typeof(ISync).IsAssignableFrom(item.FieldType)) {
 							var startValue = item.GetCustomAttribute<DefaultAttribute>();
 							if (startValue != null) {
-								((ISync)instance).SetValue(startValue.Data);
+								((ISync)instance).SetValueForce(startValue.Data);
 							}
 							else {
 								((ISync)instance).SetStartingObject();
@@ -166,11 +228,12 @@ namespace RhuEngine.WorldObjects
 							}
 						}
 						if (typeof(IChangeable).IsAssignableFrom(item.FieldType)) {
+							//RLog.Info($"Loaded Change Field {GetType().GetFormattedName()} , {item.Name} type {item.FieldType.GetFormattedName()}");
 							var startValue = item.GetCustomAttribute<OnChangedAttribute>();
 							if (startValue != null) {
 								var method = GetType().GetMethod(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 								if (method is null) {
-									RLog.Err($"Method {startValue.Data} not found");
+									throw new Exception($"Method {startValue.Data} not found");
 								}
 								else {
 									var prams = method.GetParameters();
@@ -181,7 +244,7 @@ namespace RhuEngine.WorldObjects
 										((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[1] { obj });
 									}
 									else {
-										RLog.Err($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
+										throw new Exception($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
 									}
 								}
 							}
@@ -209,11 +272,19 @@ namespace RhuEngine.WorldObjects
 			syncObjectSerializerObject.Deserialize((DataNodeGroup)data, this);
 		}
 
-		public virtual void OnLoaded() {
+		protected virtual void OnLoaded() {
 		}
 
 		public void ChangeName(string name) {
 			Name = name;
+		}
+
+		void ISyncObject.CallFirstCreation() {
+			FirstCreation();
+		}
+
+		void ISyncObject.RunOnLoad() {
+			OnLoaded();
 		}
 	}
 }

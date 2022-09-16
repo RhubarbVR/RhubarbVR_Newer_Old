@@ -7,6 +7,8 @@ using System.Runtime.CompilerServices;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public interface ISyncObjectList<T> : ISyncObject
@@ -14,9 +16,10 @@ namespace RhuEngine.WorldObjects
 		public T Add(bool networkedObject = false, bool deserialize = false);
 	}
 
-	public class SyncValueList<T> : SyncObjList<Sync<T>>
+	[GenericTypeConstraint()]
+	public sealed class SyncValueList<T> : SyncObjList<Sync<T>>, ISyncMember
 	{
-		[Exsposed]
+		[Exposed]
 		public new T this[int index]
 		{
 			get => base[index].Value;
@@ -31,7 +34,7 @@ namespace RhuEngine.WorldObjects
 		public override void OnElementRemmoved(Sync<T> element) {
 			element.Changed -= ChildElementOnChanged;
 		}
-		[Exsposed]
+		[Exposed]
 		public void Add(T value) {
 			Add().Value = value;
 		}
@@ -41,7 +44,7 @@ namespace RhuEngine.WorldObjects
 				Add(item);
 			}
 		}
-		[Exsposed]
+		[Exposed]
 		public T[] GetValues() {
 			return this;
 		}
@@ -52,30 +55,30 @@ namespace RhuEngine.WorldObjects
 
 	public class SyncObjList<T> : SyncListBase<T>, ISyncObjectList<T>, INetworkedObject, IEnumerable<ISyncObject> where T : ISyncObject, new()
 	{
-		public T AddWithCustomRefIds(bool networkedObject = false, bool deserialize = false,Func<NetPointer> func = null) {
+		public T AddWithCustomRefIds(bool networkedObject = false, bool deserialize = false, NetPointerUpdateDelegate func = null) {
 			var newElement = new T();
 			newElement.Initialize(World, this, "List Elemenet", networkedObject, deserialize, func);
 			AddInternal(newElement);
 			return newElement;
 		}
-		[Exsposed]
+		[Exposed]
 		public T AddElement() {
 			return Add();
 		}
 		public T Add(bool networkedObject = false, bool deserialize = false) {
 			var newElement = new T();
 			newElement.Initialize(World, this, "List Elemenet", networkedObject, deserialize);
+			AddInternal(newElement);
 			if (!networkedObject) {
 				BroadcastAdd(newElement);
 				if (!deserialize) {
-					newElement.FirstCreation();
+					newElement.CallFirstCreation();
 				}
 			}
-			AddInternal(newElement);
 			return newElement;
 		}
 
-		public override void InitializeMembers(bool networkedObject, bool deserialize, Func<NetPointer> func) {
+		protected override void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate func) {
 		}
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
 			return syncObjectSerializerObject.CommonListSerialize(this, this);

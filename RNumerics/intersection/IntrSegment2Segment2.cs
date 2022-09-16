@@ -34,7 +34,7 @@ namespace RNumerics
 	//			Type is Segment. Points are Point0 and Point1
 
 
-	public class IntrSegment2Segment2
+	public sealed class IntrSegment2Segment2
 	{
 		Segment2d _segment1;
 		public Segment2d Segment1
@@ -78,7 +78,7 @@ namespace RNumerics
 		public double Parameter0;
 		public double Parameter1;     // only set if Quantity == 2, ie segment overlap
 
-		public IntrSegment2Segment2(Segment2d seg1, Segment2d seg2) {
+		public IntrSegment2Segment2(in Segment2d seg1, in Segment2d seg2) {
 			_segment1 = seg1;
 			_segment2 = seg2;
 		}

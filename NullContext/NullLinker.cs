@@ -3,12 +3,15 @@ using System.Threading;
 
 using RhuEngine;
 using RhuEngine.Linker;
+using RhuEngine.Managers;
 using RhuEngine.Physics;
 
 namespace NullContext
 {
-	public class NullLinker : IEngineLink, IRLog, IRTime
+	public sealed class NullLinker : IEngineLink, IRLog, IRTime
 	{
+		public void LoadArgs() {
+		}
 		public string BackendID => "HeadLess";
 
 		public bool SpawnPlayer => false;
@@ -25,7 +28,18 @@ namespace NullContext
 
 		public float Elapsedf { get; set; }
 
+		public bool ForceLibLoad => false;
+
+		public bool InVR => false;
+
+		public bool LiveVRChange => false;
+
+		public Type RenderSettingsType => null;
+
+		public SupportedFancyFeatures SupportedFeatures => SupportedFancyFeatures.Basic;
+
 		public void BindEngine(Engine engine) {
+			RLog.Instance = this;
 		}
 
 		public void Err(string value) {
@@ -40,22 +54,22 @@ namespace NullContext
 			var logPreamble = $"[{TimeStamp}]: ";
 			switch (logLevel) {
 				case LogLevel.Diagnostic:
-					Console.ForegroundColor = ConsoleColor.Magenta;
+					RhuConsole.ForegroundColor = ConsoleColor.Magenta;
 					break;
 				case LogLevel.Info:
-					Console.ForegroundColor = ConsoleColor.Green;
+					RhuConsole.ForegroundColor = ConsoleColor.Green;
 					break;
 				case LogLevel.Warning:
-					Console.ForegroundColor = ConsoleColor.Yellow;
+					RhuConsole.ForegroundColor = ConsoleColor.Yellow;
 					break;
 				case LogLevel.Error:
-					Console.ForegroundColor = ConsoleColor.Red;
+					RhuConsole.ForegroundColor = ConsoleColor.Red;
 					break;
 				default:
 					break;
 			}
 			Console.Write(logPreamble);
-			Console.ForegroundColor = ConsoleColor.Gray;
+			RhuConsole.ForegroundColor = ConsoleColor.Gray;
 			Console.WriteLine(log);
 			_semaphore.Release();
 			Log?.Invoke(logLevel, logPreamble + log);
@@ -66,7 +80,6 @@ namespace NullContext
 		}
 
 		public void LoadStatics() {
-			RLog.Instance = this;
 			RTime.Instance = this;
 			PhysicsHelper.RegisterPhysics<RBullet.BulletPhsyicsLink>();
 		}
@@ -75,6 +88,7 @@ namespace NullContext
 		}
 
 		public event Action<LogLevel, string> Log;
+		public event Action<bool> VRChange;
 
 		public void Subscribe(Action<LogLevel, string> logCall) {
 			Log += logCall;
@@ -86,6 +100,13 @@ namespace NullContext
 
 		public void Warn(string v) {
 			LogOutput(LogLevel.Warning, v);
+		}
+
+		public void ChangeVR(bool value) {
+			throw new NotImplementedException();
+		}
+
+		public void LoadInput(InputManager manager) {
 		}
 	}
 

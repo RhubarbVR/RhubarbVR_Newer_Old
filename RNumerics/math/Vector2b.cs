@@ -14,16 +14,21 @@ namespace RNumerics
 		[Key(1)]
 		public bool y;
 
-		public Vector2b(bool f) { x = y = f; }
-		public Vector2b(bool x, bool y) { this.x = x; this.y = y; }
-		public Vector2b(bool[] v2) { x = v2[0]; y = v2[1]; }
+		public Vector2b() {
+			x = false;
+			y = false;
+		}
+
+		public Vector2b(in bool f) { x = y = f; }
+		public Vector2b(in bool x, in bool y) { this.x = x; this.y = y; }
+		public Vector2b(in bool[] v2) { x = v2[0]; y = v2[1]; }
 
 		[IgnoreMember]
 		static public readonly Vector2b True = new (true, true);
 		[IgnoreMember]
 		static public readonly Vector2b False = new (false, false);
 
-		public bool this[int key]
+		public bool this[in int key]
 		{
 			get => (key == 0) ? x : y;
 			set { if (key == 0) { x = value; } else {
@@ -36,12 +41,12 @@ namespace RNumerics
 
 
 
-		public void Set(Vector2b o)
+		public void Set(in Vector2b o)
 		{
 			x = o.x;
 			y = o.y;
 		}
-		public void Set(bool fX, bool fY)
+		public void Set(in bool fX, in bool fY)
 		{
 			x = fX;
 			y = fY;
@@ -49,8 +54,8 @@ namespace RNumerics
 
 
 
-		public static bool operator ==(Vector2b a, Vector2b b) => a.x == b.x && a.y == b.y;
-		public static bool operator !=(Vector2b a, Vector2b b) => a.x != b.x || a.y != b.y;
+		public static bool operator ==(in Vector2b a, in Vector2b b) => a.x == b.x && a.y == b.y;
+		public static bool operator !=(in Vector2b a, in Vector2b b) => a.x != b.x || a.y != b.y;
 		public override bool Equals(object obj)
 		{
 			return this == (Vector2b)obj;

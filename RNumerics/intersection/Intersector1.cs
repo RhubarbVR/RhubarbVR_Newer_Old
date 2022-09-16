@@ -11,7 +11,7 @@ namespace RNumerics
 	//
 	// [TODO] could this be struct? is not used in contexts where we necessarily need a new object...
 	//
-	public class Intersector1
+	public sealed class Intersector1
 	{
 		// intervals to intersect
 		public Interval1d U;
@@ -26,12 +26,12 @@ namespace RNumerics
 		// intersection point/interval, access via GetIntersection
 		private Interval1d _intersections = Interval1d.Zero;
 
-		public Intersector1(double u0, double u1, double v0, double v1) {
+		public Intersector1(in double u0, in double u1, in double v0, in double v1) {
 			// [TODO] validate 0 < 1
 			U = new Interval1d(u0, u1);
 			V = new Interval1d(v0, v1);
 		}
-		public Intersector1(Interval1d u, Interval1d v) {
+		public Intersector1(in Interval1d u, in Interval1d v) {
 			U = u;
 			V = v;
 		}
@@ -39,7 +39,7 @@ namespace RNumerics
 		public bool Test => U.a <= V.b && U.b >= V.a;
 
 
-		public double GetIntersection(int i) {
+		public double GetIntersection(in int i) {
 			return _intersections[i];
 		}
 

@@ -8,22 +8,22 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Transform" })]
-	public class Spinner : Component
+	public sealed class Spinner : Component
 	{
-		public Linker<Quaternionf> driver;
+		public readonly Linker<Quaternionf> driver;
 
-		public Sync<Vector3f> speed;
+		public readonly Sync<Vector3f> speed;
 
-		public Sync<Quaternionf> offset;
+		public readonly Sync<Quaternionf> offset;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			offset.Value = Entity.rotation.Value;
 			driver.SetLinkerTarget(Entity.rotation);
 			speed.Value = new Vector3f(35, 35, 0);
 		}
 
-		public override void Step() {
+		protected override void RenderStep() {
 			var deltaSeconds = RTime.Elapsedf;
 			if (driver.Linked) {
 				var newval = Entity.LocalTrans * Matrix.R(offset.Value) * Matrix.R(Quaternionf.CreateFromEuler(speed.Value.x * deltaSeconds, speed.Value.y * deltaSeconds, speed.Value.z * deltaSeconds));

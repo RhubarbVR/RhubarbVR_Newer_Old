@@ -21,26 +21,33 @@ namespace RNumerics
 		[Key(3)]
 		public double w;
 
-		public Quaterniond(double x, double y, double z, double w) { this.x = x; this.y = y; this.z = z; this.w = w; }
-		public Quaterniond(double[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
-		public Quaterniond(Quaterniond q2) { x = q2.x; y = q2.y; z = q2.z; w = q2.w; }
+		public Quaterniond() {
+			x = 0;
+			y = 0;
+			z = 0;
+			w = 1;
+		}
 
-		public Quaterniond(Vector3d axis, double AngleDeg) {
+		public Quaterniond(in double x, in double y, in double z, in double w) { this.x = x; this.y = y; this.z = z; this.w = w; }
+		public Quaterniond(in double[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
+		public Quaterniond(in Quaterniond q2) { x = q2.x; y = q2.y; z = q2.z; w = q2.w; }
+
+		public Quaterniond(in Vector3d axis, in double AngleDeg) {
 			x = y = z = 0;
 			w = 1;
 			SetAxisAngleD(axis, AngleDeg);
 		}
-		public Quaterniond(Vector3d vFrom, Vector3d vTo) {
+		public Quaterniond(in Vector3d vFrom, in Vector3d vTo) {
 			x = y = z = 0;
 			w = 1;
 			SetFromTo(vFrom, vTo);
 		}
-		public Quaterniond(Quaterniond p, Quaterniond q, double t) {
+		public Quaterniond(in Quaterniond p, in Quaterniond q, in double t) {
 			x = y = z = 0;
 			w = 1;
 			SetToSlerp(p, q, t);
 		}
-		public Quaterniond(Matrix3d mat) {
+		public Quaterniond(in Matrix3d mat) {
 			x = y = z = 0;
 			w = 1;
 			SetFromRotationMatrix(mat);
@@ -50,7 +57,7 @@ namespace RNumerics
 		[IgnoreMember]
 		static public readonly Quaterniond Identity = new(0.0, 0.0, 0.0, 1.0);
 
-		public double this[int key]
+		public double this[in int key]
 		{
 			get => key == 0 ? x : key == 1 ? y : key == 2 ? z : w;
 			set {
@@ -69,7 +76,7 @@ namespace RNumerics
 		[IgnoreMember]
 		public double Length => (double)Math.Sqrt((x * x) + (y * y) + (z * z) + (w * w));
 
-		public double Normalize(double epsilon = 0) {
+		public double Normalize(in double epsilon = 0) {
 			var length = Length;
 			if (length > epsilon) {
 				var invLength = 1.0 / length;
@@ -90,28 +97,28 @@ namespace RNumerics
 			get { var q = new Quaterniond(this); q.Normalize(); return q; }
 		}
 
-		public double Dot(Quaterniond q2) {
+		public double Dot(in Quaterniond q2) {
 			var v = x * q2.x;
 			return v + (y * q2.y) + (z * q2.z) + (w * q2.w);
 		}
 
 
-		public static Quaterniond operator -(Quaterniond q2) => new(-q2.x, -q2.y, -q2.z, -q2.w);
+		public static Quaterniond operator -(in Quaterniond q2) => new(-q2.x, -q2.y, -q2.z, -q2.w);
 
-		public static Quaterniond operator *(Quaterniond a, Quaterniond b) {
+		public static Quaterniond operator *(in Quaterniond a, in Quaterniond b) {
 			var w = (a.w * b.w) - (a.x * b.x) - (a.y * b.y) - (a.z * b.z);
 			var x = (a.w * b.x) + (a.x * b.w) + (a.y * b.z) - (a.z * b.y);
 			var y = (a.w * b.y) + (a.y * b.w) + (a.z * b.x) - (a.x * b.z);
 			var z = (a.w * b.z) + (a.z * b.w) + (a.x * b.y) - (a.y * b.x);
 			return new Quaterniond(x, y, z, w);
 		}
-		public static Quaterniond operator *(Quaterniond q1, double d) => new(d * q1.x, d * q1.y, d * q1.z, d * q1.w);
-		public static Quaterniond operator *(double d, Quaterniond q1) => new(d * q1.x, d * q1.y, d * q1.z, d * q1.w);
+		public static Quaterniond operator *(in Quaterniond q1, in double d) => new(d * q1.x, d * q1.y, d * q1.z, d * q1.w);
+		public static Quaterniond operator *(in double d, in Quaterniond q1) => new(d * q1.x, d * q1.y, d * q1.z, d * q1.w);
 
-		public static Quaterniond operator -(Quaterniond q1, Quaterniond q2) => new(q1.x - q2.x, q1.y - q2.y, q1.z - q2.z, q1.w - q2.w);
-		public static Quaterniond operator +(Quaterniond q1, Quaterniond q2) => new(q1.x + q2.x, q1.y + q2.y, q1.z + q2.z, q1.w + q2.w);
+		public static Quaterniond operator -(in Quaterniond q1, in Quaterniond q2) => new(q1.x - q2.x, q1.y - q2.y, q1.z - q2.z, q1.w - q2.w);
+		public static Quaterniond operator +(in Quaterniond q1, in Quaterniond q2) => new(q1.x + q2.x, q1.y + q2.y, q1.z + q2.z, q1.w + q2.w);
 
-		public static Vector3d operator *(Quaterniond q, Vector3d v) {
+		public static Vector3d operator *(in Quaterniond q, in Vector3d v) {
 			//return q.ToRotationMatrix() * v;
 			// inline-expansion of above:
 			var twoX = 2 * q.x;
@@ -231,7 +238,7 @@ namespace RNumerics
 
 
 
-		public void SetAxisAngleD(Vector3d axis, double AngleDeg) {
+		public void SetAxisAngleD(in Vector3d axis, in double AngleDeg) {
 			var angle_rad = MathUtil.DEG_2_RAD * AngleDeg;
 			var halfAngle = 0.5 * angle_rad;
 			var sn = Math.Sin(halfAngle);
@@ -240,15 +247,15 @@ namespace RNumerics
 			y = (double)(sn * axis.y);
 			z = (double)(sn * axis.z);
 		}
-		public static Quaterniond AxisAngleD(Vector3d axis, double angleDeg) {
+		public static Quaterniond AxisAngleD(in Vector3d axis, in double angleDeg) {
 			return new Quaterniond(axis, angleDeg);
 		}
-		public static Quaterniond AxisAngleR(Vector3d axis, double angleRad) {
+		public static Quaterniond AxisAngleR(in Vector3d axis, in double angleRad) {
 			return new Quaterniond(axis, angleRad * MathUtil.RAD_2_DEGF);
 		}
 
 		// this function can take non-normalized vectors vFrom and vTo (normalizes internally)
-		public void SetFromTo(Vector3d vFrom, Vector3d vTo) {
+		public void SetFromTo(in Vector3d vFrom, in Vector3d vTo) {
 			// [TODO] this page seems to have optimized version:
 			//    http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
 
@@ -283,16 +290,16 @@ namespace RNumerics
 			}
 			Normalize();   // aaahhh just to be safe...
 		}
-		public static Quaterniond FromTo(Vector3d vFrom, Vector3d vTo) {
+		public static Quaterniond FromTo(in Vector3d vFrom, in Vector3d vTo) {
 			return new Quaterniond(vFrom, vTo);
 		}
-		public static Quaterniond FromToConstrained(Vector3d vFrom, Vector3d vTo, Vector3d vAround) {
+		public static Quaterniond FromToConstrained(in Vector3d vFrom, in Vector3d vTo, in Vector3d vAround) {
 			var fAngle = MathUtil.PlaneAngleSignedD(vFrom, vTo, vAround);
 			return Quaterniond.AxisAngleD(vAround, fAngle);
 		}
 
 
-		public void SetToSlerp(Quaterniond p, Quaterniond q, double t) {
+		public void SetToSlerp(in Quaterniond p, in Quaterniond q, in double t) {
 			var cs = p.Dot(q);
 			var angle = (double)Math.Acos(cs);
 			if (Math.Abs(angle) >= MathUtil.ZERO_TOLERANCE) {
@@ -313,15 +320,12 @@ namespace RNumerics
 				w = p.w;
 			}
 		}
-		public static Quaterniond Slerp(Quaterniond p, Quaterniond q, double t) {
+		public static Quaterniond Slerp(in Quaterniond p, in Quaterniond q, in double t) {
 			return new Quaterniond(p, q, t);
 		}
 
 
-		public void SetFromRotationMatrix(Matrix3d rot) {
-			SetFromRotationMatrix(ref rot);
-		}
-		public void SetFromRotationMatrix(ref Matrix3d rot) {
+		public void SetFromRotationMatrix(in Matrix3d rot) {
 			// Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
 			// article "Quaternion Calculus and Fast Animation".
 			var next = new Index3i(1, 2, 0);
@@ -370,7 +374,7 @@ namespace RNumerics
 
 
 
-		public bool EpsilonEqual(Quaterniond q2, double epsilon) {
+		public bool EpsilonEqual(in Quaterniond q2, in double epsilon) {
 			return Math.Abs(x - q2.x) <= epsilon &&
 				   Math.Abs(y - q2.y) <= epsilon &&
 				   Math.Abs(z - q2.z) <= epsilon &&
@@ -379,14 +383,14 @@ namespace RNumerics
 
 
 		// [TODO] should we be normalizing in these casts??
-		public static implicit operator Quaterniond(Quaternionf q) => new(q.x, q.y, q.z, q.w);
-		public static explicit operator Quaternionf(Quaterniond q) => new((float)q.x, (float)q.y, (float)q.z, (float)q.w);
+		public static implicit operator Quaterniond(in Quaternionf q) => new(q.x, q.y, q.z, q.w);
+		public static explicit operator Quaternionf(in Quaterniond q) => new((float)q.x, (float)q.y, (float)q.z, (float)q.w);
 
 
 		public override string ToString() {
 			return string.Format("{0:F8} {1:F8} {2:F8} {3:F8}", x, y, z, w);
 		}
-		public string ToString(string fmt) {
+		public string ToString(in string fmt) {
 			return string.Format("{0} {1} {2} {3}", x.ToString(fmt), y.ToString(fmt), z.ToString(fmt), w.ToString(fmt));
 		}
 	}

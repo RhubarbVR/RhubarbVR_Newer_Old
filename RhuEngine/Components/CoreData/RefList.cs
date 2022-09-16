@@ -4,8 +4,8 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreData" })]
-	public class RefList<T> : Component where T :class , IWorldObject
+	public sealed class RefList<T> : Component where T :class , IWorldObject
 	{
-		public SyncObjList<SyncRef<T>> Refs;
+		public readonly SyncObjList<SyncRef<T>> Refs;
 	}
 }

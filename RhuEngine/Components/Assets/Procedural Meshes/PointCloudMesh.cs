@@ -6,13 +6,13 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class PointCloudMesh : ProceduralMesh {
+	public sealed class PointCloudMesh : ProceduralMesh {
 
-		public SyncValueList<int> iList;
+		public readonly SyncValueList<int> iList;
 
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<double> Radius;
+		public readonly Sync<double> Radius;
 
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {
@@ -28,8 +28,8 @@ namespace RhuEngine.Components
 			GenMesh(mesh.MakeSimpleMesh());
 		}
 
-		public SyncDelegate<Func<int, Vector3d>> PointF;
-		public SyncDelegate<Func<int, Vector3d>> NormalF;
+		public readonly SyncDelegate<Func<int, Vector3d>> PointF;
+		public readonly SyncDelegate<Func<int, Vector3d>> NormalF;
 
 
 

@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace RNumerics
 {
-	public class ParametricCurveSequence2 : IParametricCurve2d, IMultiCurve2d
+	public sealed class ParametricCurveSequence2 : IParametricCurve2d, IMultiCurve2d
 	{
 
 		List<IParametricCurve2d> _curves;
@@ -13,7 +13,7 @@ namespace RNumerics
 			_curves = new List<IParametricCurve2d>();
 		}
 
-		public ParametricCurveSequence2(IEnumerable<IParametricCurve2d> curvesIn, bool isClosed = true) {
+		public ParametricCurveSequence2(in IEnumerable<IParametricCurve2d> curvesIn, in bool isClosed = true) {
 			_curves = new List<IParametricCurve2d>(curvesIn);
 			IsClosed = isClosed;
 		}
@@ -25,12 +25,12 @@ namespace RNumerics
 		public bool IsClosed { get; set; }
 
 
-		public void Append(IParametricCurve2d c) {
+		public void Append(in IParametricCurve2d c) {
 			// sanity checking??
 			_curves.Add(c);
 		}
 
-		public void Prepend(IParametricCurve2d c) {
+		public void Prepend(in IParametricCurve2d c) {
 			_curves.Insert(0, c);
 		}
 
@@ -47,7 +47,7 @@ namespace RNumerics
 			}
 		}
 
-		public Vector2d SampleT(double t) {
+		public Vector2d SampleT(in double t) {
 			double sum = 0;
 			for (var i = 0; i < Curves.Count; ++i) {
 				var l = _curves[i].ParamLength;
@@ -60,7 +60,7 @@ namespace RNumerics
 			throw new ArgumentException("ParametricCurveSequence2.SampleT: argument out of range");
 		}
 
-		public Vector2d TangentT(double t) {
+		public Vector2d TangentT(in double t) {
 			double sum = 0;
 			for (var i = 0; i < Curves.Count; ++i) {
 				var l = _curves[i].ParamLength;
@@ -100,7 +100,7 @@ namespace RNumerics
 			}
 		}
 
-		public Vector2d SampleArcLength(double a) {
+		public Vector2d SampleArcLength(in double a) {
 			double sum = 0;
 			for (var i = 0; i < Curves.Count; ++i) {
 				var l = _curves[i].ArcLength;
@@ -135,7 +135,7 @@ namespace RNumerics
 
 
 		public bool IsTransformable => true;
-		public void Transform(ITransform2 xform) {
+		public void Transform(in ITransform2 xform) {
 			foreach (var c in _curves) {
 				c.Transform(xform);
 			}

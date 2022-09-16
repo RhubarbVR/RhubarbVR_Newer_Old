@@ -7,7 +7,7 @@ using MessagePack;
 namespace RNumerics
 {
 	[MessagePackObject]
-	public class ColorHSV : IConvertible
+	public sealed class ColorHSV 
 	{
 		[Key(0)]
 		public float h;
@@ -18,12 +18,16 @@ namespace RNumerics
 		[Key(3)]
 		public float a;
 
-		public ColorHSV(float h, float s, float v, float a = 1) { this.h = h; this.s = s; this.v = v; this.a = a; }
-		public ColorHSV(Colorf rgb) {
+		public ColorHSV() {
+
+		}
+
+		public ColorHSV(in float h, in float s, in float v, in float a = 1) { this.h = h; this.s = s; this.v = v; this.a = a; }
+		public ColorHSV(in Colorf rgb) {
 			ConvertFromRGB(rgb);
 		}
 
-		public ColorHSV UpdateHue(float val) {
+		public ColorHSV UpdateHue(in float val) {
 			var newh = (h + val) % 360f;
 			return new ColorHSV(newh, s, v, a);
 		}
@@ -103,7 +107,7 @@ namespace RNumerics
 		}
 
 
-		public void ConvertFromRGB(Colorf rgb) {
+		public void ConvertFromRGB(in Colorf rgb) {
 			a = rgb.a;
 			float rp = rgb.r, gp = rgb.g, bp = rgb.b;
 
@@ -152,74 +156,6 @@ namespace RNumerics
               *r_s = delta / (1 - fabs (1 - (2 * (l - 1))));
             }*/
 			s = cmax == 0 ? 0 : delta / cmax;
-		}
-
-		public TypeCode GetTypeCode() {
-			return TypeCode.Object;
-		}
-
-		public bool ToBoolean(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public byte ToByte(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public char ToChar(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public DateTime ToDateTime(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public decimal ToDecimal(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public double ToDouble(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public short ToInt16(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public int ToInt32(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public long ToInt64(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public sbyte ToSByte(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public float ToSingle(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public string ToString(IFormatProvider provider) {
-			return ToString();
-		}
-
-		public object ToType(Type conversionType, IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public ushort ToUInt16(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public uint ToUInt32(IFormatProvider provider) {
-			throw new NotImplementedException();
-		}
-
-		public ulong ToUInt64(IFormatProvider provider) {
-			throw new NotImplementedException();
 		}
 	}
 }

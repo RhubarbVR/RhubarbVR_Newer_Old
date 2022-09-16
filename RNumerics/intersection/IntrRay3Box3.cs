@@ -6,7 +6,7 @@ using System.Text;
 namespace RNumerics
 {
 	// ported from WildMagic5 
-	public class IntrRay3Box3
+	public sealed class IntrRay3Box3
 	{
 		Ray3d _ray;
 		public Ray3d Ray
@@ -32,7 +32,7 @@ namespace RNumerics
 		public Vector3d Point0 = Vector3d.Zero;
 		public Vector3d Point1 = Vector3d.Zero;
 
-		public IntrRay3Box3(Ray3d r, Box3d b) {
+		public IntrRay3Box3(in Ray3d r, in Box3d b) {
 			_ray = r;
 			_box = b;
 		}
@@ -79,7 +79,7 @@ namespace RNumerics
 		/// test if ray intersects box.
 		/// expandExtents allows you to scale box for hit-testing purposes.
 		/// </summary>
-		public static bool Intersects(ref Ray3d ray, ref Box3d box, double expandExtents = 0) {
+		public static bool Intersects(ref Ray3d ray, ref Box3d box, in double expandExtents = 0) {
 			var WdU = Vector3d.Zero;
 			var AWdU = Vector3d.Zero;
 			var DdU = Vector3d.Zero;
@@ -90,25 +90,25 @@ namespace RNumerics
 			var diff = ray.Origin - box.Center;
 			var extent = box.Extent + expandExtents;
 
-			WdU[0] = ray.Direction.Dot(ref box.AxisX);
+			WdU[0] = ray.Direction.Dot(box.AxisX);
 			AWdU[0] = Math.Abs(WdU[0]);
-			DdU[0] = diff.Dot(ref box.AxisX);
+			DdU[0] = diff.Dot(box.AxisX);
 			ADdU[0] = Math.Abs(DdU[0]);
 			if (ADdU[0] > extent.x && DdU[0] * WdU[0] >= (double)0) {
 				return false;
 			}
 
-			WdU[1] = ray.Direction.Dot(ref box.AxisY);
+			WdU[1] = ray.Direction.Dot(box.AxisY);
 			AWdU[1] = Math.Abs(WdU[1]);
-			DdU[1] = diff.Dot(ref box.AxisY);
+			DdU[1] = diff.Dot(box.AxisY);
 			ADdU[1] = Math.Abs(DdU[1]);
 			if (ADdU[1] > extent.y && DdU[1] * WdU[1] >= (double)0) {
 				return false;
 			}
 
-			WdU[2] = ray.Direction.Dot(ref box.AxisZ);
+			WdU[2] = ray.Direction.Dot(box.AxisZ);
 			AWdU[2] = Math.Abs(WdU[2]);
-			DdU[2] = diff.Dot(ref box.AxisZ);
+			DdU[2] = diff.Dot(box.AxisZ);
 			ADdU[2] = Math.Abs(DdU[2]);
 			if (ADdU[2] > extent.z && DdU[2] * WdU[2] >= (double)0) {
 				return false;
@@ -116,19 +116,19 @@ namespace RNumerics
 
 			var WxD = ray.Direction.Cross(diff);
 
-			AWxDdU[0] = Math.Abs(WxD.Dot(ref box.AxisX));
+			AWxDdU[0] = Math.Abs(WxD.Dot(box.AxisX));
 			RHS = (extent.y * AWdU[2]) + (extent.z * AWdU[1]);
 			if (AWxDdU[0] > RHS) {
 				return false;
 			}
 
-			AWxDdU[1] = Math.Abs(WxD.Dot(ref box.AxisY));
+			AWxDdU[1] = Math.Abs(WxD.Dot(box.AxisY));
 			RHS = (extent.x * AWdU[2]) + (extent.z * AWdU[0]);
 			if (AWxDdU[1] > RHS) {
 				return false;
 			}
 
-			AWxDdU[2] = Math.Abs(WxD.Dot(ref box.AxisZ));
+			AWxDdU[2] = Math.Abs(WxD.Dot(box.AxisZ));
 			RHS = (extent.x * AWdU[1]) + (extent.y * AWdU[0]);
 			return AWxDdU[2] <= RHS;
 		}

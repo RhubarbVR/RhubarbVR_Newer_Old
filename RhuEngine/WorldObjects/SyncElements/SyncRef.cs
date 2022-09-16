@@ -3,15 +3,16 @@
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
-	public interface ISyncRef : IWorldObject
+	public interface ISyncRef : ISyncObject
 	{
-		void OnLoaded();
 		NetPointer NetValue { get; set; }
 	}
 
-	public class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, INetworkedObject, IChangeable where T : class, IWorldObject
+	public class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, INetworkedObject, IChangeable, ISyncMember where T : class, IWorldObject
 	{
 		public object Object { get => _targetPointer; set => _targetPointer = (NetPointer)value; }
 
@@ -38,10 +39,10 @@ namespace RhuEngine.WorldObjects
 				OnChanged();
 			}
 		}
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			NetValue = _targetPointer;
 		}
-		[Exsposed]
+		[Exposed]
 		public virtual NetPointer Value
 		{
 			get => _targetPointer;
@@ -66,8 +67,9 @@ namespace RhuEngine.WorldObjects
 
 		private T _target;
 
-		public IWorldObject TargetIWorldObject { get => Target; set { if (value != null) { Value = value.Pointer; } } }
-		[Exsposed]
+		public IWorldObject TargetIWorldObject { get => Target; set { if (value is T data) { Target = data; } else { Target = null; } } }
+
+		[Exposed]
 		public virtual T Target
 		{
 			get => _target == null || (_target?.IsRemoved ?? false) || _target?.World != World ? null : _target;
@@ -78,11 +80,12 @@ namespace RhuEngine.WorldObjects
 					_target = value;
 					BroadcastValue();
 					Bind();
-					Changed?.Invoke(this);
-					OnChanged();
 				}
+				OnChanged();
+				Changed?.Invoke(this);
 			}
 		}
+
 		public event Action<IChangeable> Changed;
 
 		public virtual void Bind() {
@@ -110,7 +113,7 @@ namespace RhuEngine.WorldObjects
 			NetValue = new NetPointer(newID);
 		}
 
-		public override void InitializeMembers(bool networkedObject, bool deserialize, Func<NetPointer> func) {
+		protected override void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate func) {
 		}
 
 		public virtual void OnChanged() {

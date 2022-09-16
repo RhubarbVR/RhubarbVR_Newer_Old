@@ -6,7 +6,7 @@ using System.Text;
 namespace RNumerics
 {
 	// ported from WildMagic5 
-	public class IntrSegment3Box3
+	public sealed class IntrSegment3Box3
 	{
 		Segment3d _segment;
 		public Segment3d Segment
@@ -40,7 +40,7 @@ namespace RNumerics
 		public Vector3d Point1 = Vector3d.Zero;
 
 		// solidBox == false means fully contained segment does not intersect
-		public IntrSegment3Box3(Segment3d s, Box3d b, bool solidBox) {
+		public IntrSegment3Box3(in Segment3d s, in Box3d b, in bool solidBox) {
 			_segment = s;
 			_box = b;
 			_solid = solidBox;
@@ -130,8 +130,8 @@ namespace RNumerics
 
 
 		static public bool DoClipping(ref double t0, ref double t1,
-						 Vector3d origin, Vector3d direction,
-						 Box3d box, bool solid, ref int quantity,
+						 in Vector3d origin, in Vector3d direction,
+						 in Box3d box, in bool solid, ref int quantity,
 						 ref Vector3d point0, ref Vector3d point1,
 						 ref IntersectionType intrType) {
 			// Convert linear component to box coordinates.
@@ -180,7 +180,7 @@ namespace RNumerics
 
 
 
-		static public bool Clip(double denom, double numer, ref double t0, ref double t1) {
+		static public bool Clip(in double denom, in double numer, ref double t0, ref double t1) {
 			// Return value is 'true' if line segment intersects the current test
 			// plane.  Otherwise 'false' is returned in which case the line segment
 			// is entirely clipped.

@@ -8,7 +8,7 @@
 		Movement = 1000,
 		PlayerInput = 10000,
 	}
-	public class UpdateLevelAttribute : UpdatingComponentAttribute
+	public sealed class UpdateLevelAttribute : UpdatingComponentAttribute
 	{
 		public int offset;
 		public UpdateLevelAttribute(int value) {

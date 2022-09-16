@@ -21,13 +21,13 @@ namespace RNumerics
 
 	public interface IQuery2
 	{
-		int ToLine(int i, int v0, int v1);
-		int ToLine(ref Vector2d test, int v0, int v1);
+		int ToLine(in int i, in int v0, in int v1);
+		int ToLine(ref Vector2d test,  int v0,  int v1);
 
-		int ToTriangle(int i, int v0, int v1, int v2);
-		int ToTriangle(ref Vector2d test, int v0, int v1, int v2);
+		int ToTriangle(in int i, in int v0, in int v1, in int v2);
+		int ToTriangle(ref Vector2d test, in int v0, in int v1, in int v2);
 
-		int ToCircumcircle(int i, int v0, int v1, int v2);
+		int ToCircumcircle(in int i, in int v0, in int v1, in int v2);
 		int ToCircumcircle(ref Vector2d test, int v0, int v1, int v2);
 	}
 
@@ -38,7 +38,7 @@ namespace RNumerics
 	{
 		protected IList<Vector2d> mVertices;
 
-		public Query2d(IList<Vector2d> Vertices) {
+		public Query2d(in IList<Vector2d> Vertices) {
 			mVertices = Vertices;
 		}
 
@@ -57,7 +57,7 @@ namespace RNumerics
 		///   -1, on left of line
 		///    0, on the line
 		/// </summary>
-		public virtual int ToLine(int i, int v0, int v1) {
+		public virtual int ToLine(in int i, in int v0, in int v1) {
 			var v = mVertices[i];
 			return ToLine(ref v, v0, v1);
 		}
@@ -94,7 +94,7 @@ namespace RNumerics
 		///   -1, inside triangle
 		///    0, on triangle
 		/// </summary>
-		public virtual int ToTriangle(int i, int v0, int v1, int v2) {
+		public virtual int ToTriangle(in int i, in int v0, in int v1, in int v2) {
 			var v = mVertices[i];
 			return ToTriangle(ref v, v0, v1, v2);
 		}
@@ -104,7 +104,7 @@ namespace RNumerics
 		///   -1, inside triangle
 		///    0, on triangle
 		/// </summary>
-		public virtual int ToTriangle(ref Vector2d test, int v0, int v1, int v2) {
+		public virtual int ToTriangle(ref Vector2d test, in int v0, in int v1, in int v2) {
 			var sign0 = ToLine(ref test, v1, v2);
 			if (sign0 > 0) {
 				return +1;
@@ -126,7 +126,7 @@ namespace RNumerics
 		///   -1, inside circumcircle of triangle
 		///    0, on circumcircle of triangle
 		/// </summary>
-		public virtual int ToCircumcircle(int i, int v0, int v1, int v2) {
+		public virtual int ToCircumcircle(in int i, in int v0, in int v1, in int v2) {
 			var v = mVertices[i];
 			return ToCircumcircle(ref v, v0, v1, v2);
 		}
@@ -137,7 +137,7 @@ namespace RNumerics
 		///   -1, inside circumcircle of triangle
 		///    0, on circumcircle of triangle
 		/// </summary>
-		public virtual int ToCircumcircle(ref Vector2d test, int v0, int v1, int v2) {
+		public virtual int ToCircumcircle(ref Vector2d test,  int v0,  int v1,  int v2) {
 			var positive = Sort(ref v0, ref v1, ref v2);
 
 			var vec0 = mVertices[v0];
@@ -169,17 +169,17 @@ namespace RNumerics
 		}
 
 
-		public double Dot(double x0, double y0, double x1, double y1) {
+		public double Dot(in double x0, in double y0, in double x1, in double y1) {
 			return (x0 * x1) + (y0 * y1);
 		}
 
 
-		double Det2(double x0, double y0, double x1, double y1) {
+		double Det2(in double x0, in double y0, in double x1, in double y1) {
 			return (x0 * y1) - (x1 * y0);
 		}
 
 
-		public double Det3(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2) {
+		public double Det3(in double x0, in double y0, in double z0, in double x1, in double y1, in double z1, in double x2, in double y2, in double z2) {
 			var c00 = (y1 * z2) - (y2 * z1);
 			var c01 = (y2 * z0) - (y0 * z2);
 			var c02 = (y0 * z1) - (y1 * z0);
@@ -195,7 +195,7 @@ namespace RNumerics
 	/// <summary>
 	/// Port of WildMagic5 Query class
 	/// </summary>
-	public class QueryBase
+	public  class QueryBase
 	{
 
 		// Support for ordering a set of unique indices into the vertex pool.  On

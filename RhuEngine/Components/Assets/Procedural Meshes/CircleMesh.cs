@@ -5,24 +5,24 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class CircleMesh : ProceduralMesh
+	public sealed class CircleMesh : ProceduralMesh
 	{
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> Radius;
+		public readonly Sync<float> Radius;
 
 		[Default(0.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> StartAngleDeg;
+		public readonly Sync<float> StartAngleDeg;
 
 		[Default(360.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> EndAngleDeg;
+		public readonly Sync<float> EndAngleDeg;
 
 		[Default(32)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<int> Slices;
-		public override void FirstCreation() {
+		public readonly Sync<int> Slices;
+		protected override void FirstCreation() {
 			base.FirstCreation();
 		}
 

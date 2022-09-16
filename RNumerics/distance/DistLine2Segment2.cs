@@ -8,7 +8,7 @@ namespace RNumerics
 	// ported from WildMagic 5 
 	// https://www.geometrictools.com/Downloads/Downloads.html
 
-	public class DistLine2Segment2
+	public sealed class DistLine2Segment2
 	{
 		Line2d _line;
 		public Line2d Line
@@ -32,12 +32,12 @@ namespace RNumerics
 		public double SegmentParameter;
 
 
-		public DistLine2Segment2(Line2d LineIn, Segment2d SegmentIn) {
+		public DistLine2Segment2(in Line2d LineIn, in Segment2d SegmentIn) {
 			_segment = SegmentIn;
 			_line = LineIn;
 		}
 
-		static public double MinDistance(Line2d line, Segment2d segment) {
+		static public double MinDistance(in Line2d line, in Segment2d segment) {
 			return new DistLine2Segment2(line, segment).Get();
 		}
 

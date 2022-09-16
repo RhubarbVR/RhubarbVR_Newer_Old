@@ -6,7 +6,7 @@ namespace RNumerics
 
 	public static class MeshUtil
 	{
-		public static DCurve3 ExtractLoopV(IMesh mesh, IEnumerable<int> vertices)
+		public static DCurve3 ExtractLoopV(in IMesh mesh, in IEnumerable<int> vertices)
 		{
 			var curve = new DCurve3();
 			foreach (var vid in vertices) {
@@ -16,7 +16,7 @@ namespace RNumerics
 			curve.Closed = true;
 			return curve;
 		}
-		public static DCurve3 ExtractLoopV(IMesh mesh, int[] vertices)
+		public static DCurve3 ExtractLoopV(in IMesh mesh, in int[] vertices)
 		{
 			var curve = new DCurve3();
 			for (var i = 0; i < vertices.Length; ++i) {

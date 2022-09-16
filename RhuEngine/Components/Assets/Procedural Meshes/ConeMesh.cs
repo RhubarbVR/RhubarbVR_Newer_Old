@@ -6,48 +6,43 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class ConeMesh : ProceduralMesh
+	public sealed class ConeMesh : ProceduralMesh
 	{
 
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> BaseRadius;
+		public readonly Sync<float> BaseRadius;
 
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> Height;
+		public readonly Sync<float> Height;
 
 		[Default(0.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> StartAngleDeg;
+		public readonly Sync<float> StartAngleDeg;
 
 		[Default(360.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<float> EndAngleDeg;
+		public readonly Sync<float> EndAngleDeg;
 
 		[Default(16)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<int> Slices;
+		public readonly Sync<int> Slices;
 
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> NoSharedVertices;
+		public readonly Sync<bool> NoSharedVertices;
 
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantUVs;
+		public readonly Sync<bool> WantUVs;
 
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantNormals;
-
-		public override void FirstCreation() {
-			base.FirstCreation();
-
-		}
+		public readonly Sync<bool> WantNormals;
 
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {

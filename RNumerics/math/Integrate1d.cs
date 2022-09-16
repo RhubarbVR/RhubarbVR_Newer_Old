@@ -5,7 +5,7 @@ namespace RNumerics
 	// ported from WildMagic5 Integrate1
 	public static class Integrate1d
 	{
-		public static double RombergIntegral(int order, double a, double b, Func<double, object, double> function, object userData) {
+		public static double RombergIntegral(in int order, in double a, in double b, in Func<double, object, double> function, in object userData) {
 			if (order <= 0) {
 				throw new Exception("Integrate1d.RombergIntegral: Integration order must be positive\n");
 			}
@@ -44,7 +44,7 @@ namespace RNumerics
 		private static readonly double[] _coeff = {
 			(double)0.2369268850, (double)0.4786286705, (double)0.5688888889, (double)0.4786286705, (double)0.2369268850 };
 
-		public static double GaussianQuadrature(double a, double b, Func<double, object, double> function, object userData) {
+		public static double GaussianQuadrature(in double a, in double b, in Func<double, object, double> function, in object userData) {
 			// Legendre polynomials:
 			// P_0(x) = 1
 			// P_1(x) = x
@@ -81,7 +81,7 @@ namespace RNumerics
 
 
 
-		static public double TrapezoidRule(int numSamples, double a, double b, Func<double, object, double> function, object userData) {
+		static public double TrapezoidRule(in int numSamples, in double a, in double b, in Func<double, object, double> function, in object userData) {
 			if (numSamples < 2) {
 				throw new Exception("Integrate1d.TrapezoidRule: Must have more than two samples\n");
 			}

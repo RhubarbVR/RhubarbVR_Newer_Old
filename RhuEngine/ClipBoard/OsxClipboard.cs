@@ -1,4 +1,3 @@
-#if (NETSTANDARD || NETFRAMEWORK || NET5_0_OR_GREATER)
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -81,4 +80,3 @@ static class OsxClipboard
     [DllImport("/System/Library/Frameworks/AppKit.framework/AppKit")]
     static extern IntPtr sel_registerName(string selectorName);
 }
-#endif

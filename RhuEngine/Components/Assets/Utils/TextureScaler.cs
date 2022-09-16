@@ -9,16 +9,17 @@ using TextCopy;
 using RNumerics;
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Assets\\Utils" })]
-	public class TextureScaler : Component
+	[Category(new string[] { "Assets/Utils" })]
+	public sealed class TextureScaler : Component
 	{
 		[OnAssetLoaded(nameof(TextScale))]
-		public AssetRef<RTexture2D> texture;
+		public readonly AssetRef<RTexture2D> texture;
 
 		[OnChanged(nameof(TextScale))]
-		public Sync<float> scaleMultiplier;
+		[Default(1f)]
+		public readonly Sync<float> scaleMultiplier;
 
-		public Linker<Vector2f> scale;
+		public readonly Linker<Vector2f> scale;
 
 		private void TextScale() {
 			if(texture.Asset is null) {

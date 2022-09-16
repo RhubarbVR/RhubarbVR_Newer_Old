@@ -4,7 +4,7 @@ namespace RNumerics
 {
 	// ported from WildMagic5 
 	// [TODO] Vector2d 6-tuple, to avoid internal arrays
-	public class IntrTriangle2Triangle2
+	public sealed class IntrTriangle2Triangle2
 	{
 		Triangle2d _triangle0;
 		public Triangle2d Triangle0
@@ -31,7 +31,7 @@ namespace RNumerics
 		// however only the first Quantity vertices will be valid
 		public Vector2d[] Points;
 
-		public IntrTriangle2Triangle2(Triangle2d t0, Triangle2d t1) {
+		public IntrTriangle2Triangle2(in Triangle2d t0, in Triangle2d t1) {
 			_triangle0 = t0;
 			_triangle1 = t1;
 			Points = null;
@@ -114,7 +114,7 @@ namespace RNumerics
 
 
 
-		public static int WhichSide(Triangle2d V, Vector2d P, Vector2d D) {
+		public static int WhichSide(in Triangle2d V, in Vector2d P, in Vector2d D) {
 			// Vertices are projected to the form P+t*D.  Return value is +1 if all
 			// t > 0, -1 if all t < 0, 0 otherwise, in which case the line splits the
 			// triangle.
@@ -145,7 +145,7 @@ namespace RNumerics
 		//   clipped polygon is returned in quantity
 		// **NOTE** returned array may have more elements than quantity!!
 		public static void ClipConvexPolygonAgainstLine(
-			Vector2d N, double c, ref int quantity, ref Vector2d[] V) {
+			in Vector2d N, in double c, ref int quantity, ref Vector2d[] V) {
 			// The input vertices are assumed to be in counterclockwise order.  The
 			// ordering is an invariant of this function.
 

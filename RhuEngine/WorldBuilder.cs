@@ -3,201 +3,343 @@
 using RhuEngine.Components;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
-using RhuEngine.Components.ScriptNodes;
 using System.Collections.Generic;
 using RNumerics;
 using RhuEngine.Linker;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace RhuEngine
 {
 	public static class WorldBuilder
 	{
-		private static Entity AttachImage(this Entity parrent, IAssetProvider<RShader> shader, Vector2f min, Vector2f max, Colorf color,IAssetProvider<RTexture2D> assetProvider) {
-			var child = parrent.AddChild("childEliment");
-			var rectTwo = child.AttachComponent<UIRect>();
-			rectTwo.AnchorMin.Value = min;
-			rectTwo.AnchorMax.Value = max;
-			var img = child.AttachComponent<UIImage>();
-			img.Tint.Value = color;
-			var mit = child.AttachComponent<DynamicMaterial>();
-			mit.shader.Target = shader;
-			mit.SetPram("diffuse", assetProvider);
-			img.Material.Target = mit;
-			img.Texture.Target = assetProvider;
-			return child;
-		}
-
-		private static Entity AttachText(this Entity parrent, Vector2f min, Vector2f max, Colorf color,string text) {
-			var child = parrent.AddChild("childEliment");
-			var rectTwo = child.AttachComponent<UIRect>();
-			rectTwo.AnchorMin.Value = min;
-			rectTwo.AnchorMax.Value = max;
-			var img = child.AttachComponent<UIText>();
-			img.Text.Value = text;
-			img.StartingColor.Value = color;
-			return child;
-		}
-		private static Entity AttachList(this Entity parrent, DynamicMaterial mit, Vector2f min, Vector2f max, Colorf color) {
-			var child = parrent.AddChild("Cut");
-			var rectTwo = child.AttachComponent<CuttingUIRect>();
-			rectTwo.AnchorMin.Value = min;
-			rectTwo.AnchorMax.Value = max;
-			var img = child.AttachComponent<UIRectangle>();
-			img.Tint.Value = color;
-			img.Material.Target = mit;
-			var list = child.AddChild("List");
-			var scroll = list.AttachComponent<UIScrollInteraction>();
-			var rectthrere = list.AttachComponent<HorizontalList>();
-			rectthrere.Depth.Value = 0f;
-			scroll.OnScroll.Target = rectthrere.Scroll;
-			return list;
-		}
-		private static Entity AttachRectangle(this Entity parrent, DynamicMaterial mit,Vector2f min, Vector2f max, Colorf color) {
-			var child = parrent.AddChild("childEliment");
-			var rectTwo = child.AttachComponent<UIRect>();
-			rectTwo.AnchorMin.Value = min;
-			rectTwo.AnchorMax.Value = max;
-			var img = child.AttachComponent<UIRectangle>();
-			img.Tint.Value = color;
-			img.Material.Target = mit;
-			return child;
-		}
-		public static void BuildUITest(Entity entity) {
-			entity.position.Value = new Vector3f(0, 1, 0);
-			var pannel = entity.AddChild("PannelRoot");
-			var shader = entity.World.RootEntity.GetFirstComponentOrAttach<UnlitClipShader>();
-			var mit = pannel.AttachComponent<DynamicMaterial>();
-			mit.shader.Target = shader;
-			var rectone = pannel.AttachComponent<UIRect>();
-			var canvas = pannel.AttachComponent<UICanvas>();
-			var rectTwo = pannel.AttachComponent<UIRect>();
-			var img = pannel.AttachComponent<UIRectangle>();
-			img.Tint.Value = Colorf.Black;
-			img.Material.Target = mit;
-			var texture = pannel.AttachComponent<StaticTexture>();
-			texture.url.Value = "https://cdn.discordapp.com/attachments/222386596236886026/963193866645831680/Screenshot_20220411-234823_Reddit.jpg";
-			////pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Blue)
-			////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red)
-			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Yellow)
-			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Gold)
-			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Green)
-			//////.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Grey)
-			////.AttachImage(shader, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.White, texture);
-			///
-			var rect = pannel.AttachRectangle(mit, new Vector2f(0.25f, 0f), new Vector2f(1f), Colorf.RhubarbGreen);
-			var button = rect.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.RhubarbRed);
-			button.AttachText(Vector2f.Zero, Vector2f.One, Colorf.White, "<colorred>Button<color=blue><size=20> Can go clicky<color=yellow> clicky<size5> So Click");
-			var buttonint = button.AttachComponent<UIButtonInteraction>();
-			var buttonpramremove = button.AttachComponent<ButtonEventManager>();
-			var floatValue = button.AttachComponent<ValueField<float>>();
-			buttonpramremove.Force.Target = floatValue.Value;
-			buttonint.ButtonEvent.Target = buttonpramremove.Call;
-			var a = button.AttachComponent<ECMAScript>();
-			a.Targets.Add().Target = floatValue;
-			a.Script.Value = @"
-			let trains = 10
-			function Tains(pie,piw) {
-				return pie + piw;
-			}
-			function RunCode()	{
-				
-			}
-			";
-			buttonpramremove.Click.Target = a.RunCode;
-
-			var listRoot = pannel.AttachList(mit, new Vector2f(0f), new Vector2f(0.25f, 1f), Colorf.Blue);
-			void AttachListElement(Entity root,string text) {
-				var e = root.AttachRectangle(mit, new Vector2f(0f, 0f), new Vector2f(0.2f,1f), Colorf.RhubarbRed);
-				e.AttachImage(shader, new Vector2f(0.5, 0), new Vector2f(1f), Colorf.White, texture);
-				e.AttachText(new Vector2f(0), new Vector2f(0.5f, 1), Colorf.White,text);
-			}
-			for (var i = 0; i < 15; i++) {
-				AttachListElement(listRoot,$"Element {i}");
-			}
-			listRoot.GetFirstComponent<UIRect>().RegUpdateUIMeshes();
-			//pannel.AttachRectangle(mit, new Vector2f(0.25f), new Vector2f(0.75f), Colorf.Red);
-			//// TODO add back with ui
-			////pannel.AttachComponent<UIWindow>();
-			////var button = pannel.AddChild("Button").AttachComponent<UIButton>();
-			//var script = pannel.AttachComponent<RhuScript>();
-			////button.onClick.Target = script.CallMainMethod;
-			////Hello World with number
-			////var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			////var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
-			////method.Prams[0] = tostring;
-			////tostring.Prams[0] = new ScriptNodeConst(10);
-			////normal hello world
-			//var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			//method.Prams[0] = new ScriptNodeConst("Hi there is has been changed");
-			////Hello Word
-			////var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			////Test for stack overflow
-			////var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("CallMainMethod")[0];
-			////Test for fields
-			////var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			////var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
-			////method.Prams[0] = tostring;
-			////tostring.Prams[0] = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeFieldsRead()[0];
-			////var method = ScriptNodeBuidlers.GetScriptNodes(typeof(RhuScript))[0].GetNodeMethods("InfoLog")[0];
-			////var tostring = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "ToString")[0];
-			////method.Prams[0] = tostring;
-			////var inc = 2;
-			////var add = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "Add")[0];
-			////inc++;
-			////var e = AddNodeSpawn(new ScriptNodeMethod[1] {add},ref inc);
-			////var length = 8;
-			////for (var i = 0; i < length; i++) {
-			////	e = AddNodeSpawn(e, ref inc);
-			////}
-			////Console.WriteLine("Nodes" + e.Length);
-			////foreach (var item in e) {
-			////	item.Prams[0] = new ScriptNodeConst(1);
-			////	inc++;
-			////	item.Prams[1] = new ScriptNodeConst(1);
-			////	inc++;
-			////}
-			////Console.WriteLine($"Nodes are {inc}");
-			////tostring.Prams[0] = add;
-			//script.MainMethod = method;
-			//var ScripEditor = entity.AddChild("ScripEditor");
-			//ScripEditor.position.Value = new Vector3f(0, -0.1f, 0);
-			//// TODO add back with ui
-			////var VisualScriptBuilder = ScripEditor.AttachComponent<VisualScriptBuilder>();
-			////VisualScriptBuilder.script.Target = script;
-		}
-
-		public static ScriptNodeMethod[] AddNodeSpawn(ScriptNodeMethod[] scriptNodeMethod,ref int inc) {
-			var e = new List<ScriptNodeMethod>();
-			foreach (var item in scriptNodeMethod) {
-				item.Prams[0] = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "Add")[0];
-				inc++;
-				item.Prams[1] = ScriptNodeBuidlers.GetNodeMethods(typeof(RhuScriptStatics), "Add")[0];
-				inc++;
-				e.Add((ScriptNodeMethod)item.Prams[0]);
-				e.Add((ScriptNodeMethod)item.Prams[1]);
-			}
-			return e.ToArray();
-		}
 
 		public static void BuildLocalWorld(this World world) {
 			RLog.Info("Building Local World");
-			BuildUITest(world.RootEntity.AddChild("UITest"));
 			var floor = world.RootEntity.AddChild("Floor");
 			floor.position.Value = new Vector3f(0, 0, 0);
-			var (mesh, _, render) = floor.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitShader>();
-			render.colorLinear.Value = new Colorf(0.9f, 0.9f, 0.9f);
-			mesh.Extent.Value = new Vector3f(10, 0.01f, 10);
+			var coloider = floor.AttachComponent<CylinderShape>();
+			var (mesh, mit, render) = floor.AttachMeshWithMeshRender<CylinderMesh, UnlitMaterial>();
+			mit.Transparency.Value = Transparency.Blend;
+			var colorFollower = floor.AttachComponent<UIColorAssign>();
+			colorFollower.Alpha.Value = 0.75f;
+			colorFollower.Color.Value = UIColorAssign.ColorSelection.Primary;
+			colorFollower.ColorShif.Value = 0.1f;
+			colorFollower.TargetColor.Target = render.colorLinear;
+			mesh.TopRadius.Value = 4;
+			mesh.BaseRadius.Value = 3.5f;
+			mesh.Height.Value = 0.25f;
+			coloider.boxHalfExtent.Value = new Vector3d(8, 0.25f, 8) / 2;
 			var spinningCubes = world.RootEntity.AddChild("SpinningCubes");
 			spinningCubes.position.Value = new Vector3f(0, 0.5f, 0);
 			AttachSpiningCubes(spinningCubes);
+#if DEBUG || UNITY
+
+			var DebugStuff = floor.AddChild("DebugStuff");
+			DebugStuff.position.Value = new Vector3f(-1.5f, 0f, -1f);
+
+			var TempComps = DebugStuff.AddChild("RenderComps");
+			TempComps.position.Value = new Vector3f(0f, 3f, 4f);
+			TempComps.AttachComponent<Light>();
+			TempComps.AttachComponent<MeshRender>();
+			TempComps.AttachComponent<Armature>();
+			TempComps.AttachComponent<SkinnedMeshRender>();
+
+			var Mits = DebugStuff.AddChild("DebugStuff");
+			Mits.position.Value = new Vector3f(2f, 3f, -2f);
+			Mits.scale.Value = new Vector3f(0.25f);
+			var unlitmit = Mits.AddChild("Unlit");
+			var (_, _, unliotRender) = unlitmit.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
+			unliotRender.CastShadows.Value = ShadowCast.On;
+			unliotRender.RecevieShadows.Value = true;
+			unlitmit.AttachComponent<Grabbable>();
+			unlitmit.AttachComponent<SphereShape>();
+			var pbrmit = Mits.AddChild("PBR");
+			var (_, _, pbrRender) = pbrmit.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, PBRMaterial>();
+			pbrRender.CastShadows.Value = ShadowCast.On;
+			pbrRender.RecevieShadows.Value = true;
+			pbrmit.AttachComponent<Grabbable>();
+			pbrmit.AttachComponent<SphereShape>();
+			pbrmit.position.Value = new Vector3f(4f, 0f, 0f);
+
+			var lights = DebugStuff.AddChild("Lights");
+			lights.position.Value = new Vector3f(2f, 4f, -2f);
+
+			var pointLight = lights.AddChild("PointLight");
+			var pointLightmesh = pointLight.AttachMeshWithMeshRender<IcosphereMesh, UnlitMaterial>();
+			pointLightmesh.Item1.Radius.Value = 0.05f;
+			pointLightmesh.Item3.colorLinear.Value = Colorf.Plum;
+			pointLight.AttachComponent<Grabbable>();
+			pointLight.AttachComponent<SphereShape>().Radus.Value = 0.05f;
+			var plight = pointLight.AddChild("Light");
+			plight.position.Value = new Vector3f(0f, 0f, 0.1f);
+			plight.AttachComponent<Light>().LightType.Value = RLightType.Point;
+
+			var dirLight = lights.AddChild("DirLight");
+			dirLight.position.Value = new Vector3f(1f, 0f, 0f);
+			var dirLightmesh = dirLight.AttachMeshWithMeshRender<IcosphereMesh, UnlitMaterial>();
+			dirLightmesh.Item1.Radius.Value = 0.05f;
+			dirLightmesh.Item3.colorLinear.Value = Colorf.Violet;
+			dirLight.AttachComponent<Grabbable>();
+			dirLight.AttachComponent<SphereShape>().Radus.Value = 0.05f;
+			var dlight = dirLight.AddChild("Light");
+			dlight.position.Value = new Vector3f(0f, 0f, 0.1f);
+			dlight.AttachComponent<Light>().LightType.Value = RLightType.Directional;
+
+			var spotLight = lights.AddChild("SpotLight");
+			spotLight.position.Value = new Vector3f(2f, 0f, 0f);
+			var spotLightmesh = spotLight.AttachMeshWithMeshRender<IcosphereMesh, UnlitMaterial>();
+			spotLightmesh.Item1.Radius.Value = 0.05f;
+			spotLightmesh.Item3.colorLinear.Value = Colorf.Beige;
+			spotLight.AttachComponent<Grabbable>();
+			spotLight.AttachComponent<SphereShape>().Radus.Value = 0.05f;
+			var slight = spotLight.AddChild("Light");
+			slight.position.Value = new Vector3f(0f, 0f, 0.1f);
+			slight.AttachComponent<Light>().LightType.Value = RLightType.Spot;
+
+			var box = floor.AttachComponent<TrivialBox3Mesh>();
+			var size = 10;
+			Entity LastpowerCube = null;
+			for (var y = 0; y < size; y++) {
+				for (var a = 0; a < size; a++) {
+					for (var i = 0; i < size; i++) {
+						var PowerCube = DebugStuff.AddChild($"PowerCube{i}{a}{y}");
+						PowerCube.position.Value = new Vector3f((i * 0.3f) - (size * 0.15), 0.7f + (y * 0.3f), -0.4f - (a * 0.3f));
+						PowerCube.scale.Value = new Vector3f(0.15);
+						if (LastpowerCube is not null) {
+							PowerCube.SetParent(LastpowerCube);
+						}
+						AttachRender(box, mit, PowerCube, Colorf.RandomHue());
+						PowerCube.AttachComponent<BoxShape>();
+						PowerCube.AttachComponent<Grabbable>();
+						LastpowerCube = PowerCube;
+					}
+				}
+			}
+			var testCubes = DebugStuff.AddChild("Test cubes");
+			testCubes.position.Value = new Vector3f(2, 0.5f, -2);
+			testCubes.scale.Value = new Vector3f(0.5f);
+
+			var fontAtlis = testCubes.AddChild("Font Stuff");
+			fontAtlis.AttachComponent<BoxShape>();
+			fontAtlis.AttachComponent<Grabbable>();
+			var data = fontAtlis.AttachMesh<TrivialBox3Mesh, UnlitMaterial>();
+			data.Item2.MainTexture.Target = fontAtlis.AttachComponent<FontAtlasTexture>();
+
+			var text = fontAtlis.AddChild("Text");
+			text.position.Value = new Vector3f(0, 1.5f, 0);
+			text.AttachComponent<WorldText>();
+
+			var text2 = fontAtlis.AddChild("Text2");
+			text2.position.Value = new Vector3f(0, 2.5f, 0);
+			text2.AttachComponent<WorldText>().Text.Value = "This is another\nBit of Text";
+
+			var text3 = fontAtlis.AddChild("Text3");
+			text3.position.Value = new Vector3f(0, 3.5f, 0);
+			text3.AttachComponent<WorldText>().VerticalAlien.Value = EVerticalAlien.Center;
+			var text4 = fontAtlis.AddChild("Text4");
+			text4.position.Value = new Vector3f(0, 4.5f, 0);
+			text4.AttachComponent<WorldText>().VerticalAlien.Value = EVerticalAlien.Top;
+			var text5 = fontAtlis.AddChild("Text5");
+			text5.position.Value = new Vector3f(0, 5.5f, 0);
+			text5.AttachComponent<WorldText>().VerticalAlien.Value = EVerticalAlien.Bottom;
+			var text6 = fontAtlis.AddChild("Text6");
+			text6.position.Value = new Vector3f(0, 6.5f, 0);
+			text6.AttachComponent<WorldText>().HorizontalAlien.Value = EHorizontalAlien.Left;
+			var text7 = fontAtlis.AddChild("Text7");
+			text7.position.Value = new Vector3f(0, 7.5f, 0);
+			text7.AttachComponent<WorldText>().HorizontalAlien.Value = EHorizontalAlien.Right;
+			var text8 = fontAtlis.AddChild("Text8");
+			text8.position.Value = new Vector3f(1, 0, 0);
+			text8.AttachComponent<WorldText>().Text.Value = "<color=red>Wa<colorblue>Trains<size=50>Trains";
+			var textureStuff = testCubes.AddChild("Texture Stuff");
+			var dfg = textureStuff.AddChild("DFG-Noise");
+			dfg.position.Value = new Vector3f(2, 0, 0);
+			var (dfgMesh, dfgMat, dfgRender) = dfg.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var noiseComp = dfg.AttachComponent<NoiseTexture>();
+			dfgMat.MainTexture.Target = noiseComp;
+			dfg.AttachComponent<Grabbable>();
+			dfg.AttachComponent<BoxShape>();
+
+			var dfg2 = textureStuff.AddChild("DFG-Checker");
+			dfg2.position.Value = new Vector3f(4, 0, 0);
+			var (dfgMesh2, dfgMat2, dfgRender2) = dfg2.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var CheckerComp = dfg2.AttachComponent<CheckerboardTexture>();
+			dfgMat2.MainTexture.Target = CheckerComp;
+			dfg2.AttachComponent<Grabbable>();
+			dfg2.AttachComponent<BoxShape>();
+
+			var dfg3 = textureStuff.AddChild("DFG-Voronoi");
+			dfg3.position.Value = new Vector3f(6, 0, 0);
+			var (dfgMesh3, dfgMat3, dfgRender3) = dfg3.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var voronoiTexture = dfg3.AttachComponent<VoronoiTexture>();
+			voronoiTexture.Tint.Value = Colorf.Magenta;
+			voronoiTexture.StartingColor.Value = Colorf.Orange;
+			dfgMat3.MainTexture.Target = voronoiTexture;
+			dfg3.AttachComponent<Grabbable>();
+			dfg3.AttachComponent<BoxShape>();
+
+			var dfg4 = textureStuff.AddChild("DFG-Edge");
+			dfg4.position.Value = new Vector3f(8, 0, 0);
+			var (dfgMesh4, dfgMat4, dfgRender4) = dfg4.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var edgeTexture = dfg4.AttachComponent<EdgeTexture>();
+			edgeTexture.BackgroundColor.Value = Colorf.Magenta;
+			edgeTexture.InnerColor.Value = Colorf.Orange;
+			dfgMat4.MainTexture.Target = edgeTexture;
+			dfg4.AttachComponent<Grabbable>();
+			dfg4.AttachComponent<BoxShape>();
+
+
+			//Build Debug Man
+			var debugMan = DebugStuff.AddChild("DebugMan");
+			var debugManMit = debugMan.AttachComponent<UnlitMaterial>();
+			debugMan.position.Value = new Vector3f(-3f, 1.5f, -1f);
+			debugMan.scale.Value = new Vector3f(0.2f);
+
+			var debugManBody = debugMan.AddChild("body");
+			var bodyRender = debugManBody.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			bodyRender.Extent.Value = new Vector3f(1.5f, 2f, 1f) / 2f;
+			debugManBody.AttachComponent<BoxShape>().boxHalfExtent.Value = bodyRender.Extent.Value;
+
+			var debugManHead = debugManBody.AddChild("Head");
+			debugManHead.position.Value = new Vector3f(0, 2, 0);
+			var sphere = debugManHead.AttachMesh<Sphere3NormalizedCubeMesh>(debugManMit);
+			debugManHead.AttachComponent<SphereShape>();
+
+			var debugManUpperLeftArm = debugManBody.AddChild("UpperLeftArm");
+			debugManUpperLeftArm.position.Value = new Vector3f(-1.6f, .8f, 0);
+			var upperLeftArmRender = debugManUpperLeftArm.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			upperLeftArmRender.Extent.Value = new Vector3f(1f, .5f, .5f) / 2f;
+			debugManUpperLeftArm.AttachComponent<BoxShape>().boxHalfExtent.Value = upperLeftArmRender.Extent.Value;
+
+			var debugManLowerLeftArm = debugManUpperLeftArm.AddChild("LowerLeftArm");
+			debugManLowerLeftArm.position.Value = new Vector3f(-1.4f, 0, 0);
+			var LowerLeftArmRender = debugManLowerLeftArm.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			LowerLeftArmRender.Extent.Value = new Vector3f(1f, .5f, .5f) / 2f;
+			debugManLowerLeftArm.AttachComponent<BoxShape>().boxHalfExtent.Value = LowerLeftArmRender.Extent.Value;
+
+			var debugManLeftHand = debugManLowerLeftArm.AddChild("leftHand");
+			debugManLeftHand.position.Value = new Vector3f(-.8f, 0, 0);
+			var debugManLeftHandRender = debugManLeftHand.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			debugManLeftHandRender.Extent.Value = new Vector3f(0.5f, 0.3f, 0.5f) / 2f;
+			debugManLeftHand.AttachComponent<BoxShape>().boxHalfExtent.Value = debugManLeftHandRender.Extent.Value;
+
+
+
+
+			var debugManUpperRightArm = debugManBody.AddChild("UpperRightArm");
+			debugManUpperRightArm.position.Value = new Vector3f(1.6f, .8f, 0);
+			var upperRightArmRender = debugManUpperRightArm.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			upperRightArmRender.Extent.Value = new Vector3f(1f, .5f, .5f) / 2f;
+			debugManUpperRightArm.AttachComponent<BoxShape>().boxHalfExtent.Value = upperRightArmRender.Extent.Value;
+
+			var debugManLowerRightArm = debugManUpperRightArm.AddChild("LowerRightArm");
+			debugManLowerRightArm.position.Value = new Vector3f(1.4f, 0, 0);
+			var LowerRightArmRender = debugManLowerRightArm.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			LowerRightArmRender.Extent.Value = new Vector3f(1f, .5f, .5f) / 2f;
+			debugManLowerRightArm.AttachComponent<BoxShape>().boxHalfExtent.Value = LowerRightArmRender.Extent.Value;
+
+			var debugManRightHand = debugManLowerRightArm.AddChild("RightHand");
+			debugManRightHand.position.Value = new Vector3f(.8f, 0, 0);
+			var debugManRightHandRender = debugManRightHand.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			debugManRightHandRender.Extent.Value = new Vector3f(0.5f, 0.3f, 0.5f) / 2f;
+			debugManRightHand.AttachComponent<BoxShape>().boxHalfExtent.Value = debugManRightHandRender.Extent.Value;
+
+			var debugManUpperLeftLeg = debugManBody.AddChild("UpperLeftLeg");
+			debugManUpperLeftLeg.position.Value = new Vector3f(-.6f, -2.1f, 0);
+			var upperLeftLegRender = debugManUpperLeftLeg.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			upperLeftLegRender.Extent.Value = new Vector3f(.5f, 1.3f, .5f) / 2f;
+			debugManUpperLeftLeg.AttachComponent<BoxShape>().boxHalfExtent.Value = upperLeftLegRender.Extent.Value;
+
+			var debugManLowerLeftLeg = debugManUpperLeftLeg.AddChild("LowerLeftLeg");
+			debugManLowerLeftLeg.position.Value = new Vector3f(0, -1.7f, 0);
+			var lowerLeftLegRender = debugManLowerLeftLeg.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			lowerLeftLegRender.Extent.Value = new Vector3f(.5f, 1.3f, .5f) / 2f;
+			debugManLowerLeftLeg.AttachComponent<BoxShape>().boxHalfExtent.Value = lowerLeftLegRender.Extent.Value;
+
+			var debugManLeftFoot = debugManLowerLeftLeg.AddChild("LeftFoot");
+			debugManLeftFoot.position.Value = new Vector3f(0, -0.9f, 0.25f);
+			var leftFootRender = debugManLeftFoot.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			leftFootRender.Extent.Value = new Vector3f(.5f, .4f, 1) / 2f;
+			debugManLeftFoot.AttachComponent<BoxShape>().boxHalfExtent.Value = leftFootRender.Extent.Value;
+
+			var debugManUpperRightLeg = debugManBody.AddChild("UpperRightLeg");
+			debugManUpperRightLeg.position.Value = new Vector3f(.6f, -2.1f, 0);
+			var upperRightLegRender = debugManUpperRightLeg.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			upperRightLegRender.Extent.Value = new Vector3f(.5f, 1.3f, .5f) / 2f;
+			debugManUpperRightLeg.AttachComponent<BoxShape>().boxHalfExtent.Value = upperRightLegRender.Extent.Value;
+
+			var debugManLowerRightLeg = debugManUpperRightLeg.AddChild("LowerRightLeg");
+			debugManLowerRightLeg.position.Value = new Vector3f(0, -1.7f, 0);
+			var lowerRightLegRender = debugManLowerRightLeg.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			lowerRightLegRender.Extent.Value = new Vector3f(.5f, 1.3f, .5f) / 2f;
+			debugManLowerRightLeg.AttachComponent<BoxShape>().boxHalfExtent.Value = lowerRightLegRender.Extent.Value;
+
+			var debugManRightFoot = debugManLowerRightLeg.AddChild("RightFoot");
+			debugManRightFoot.position.Value = new Vector3f(0, -0.9f, 0.25f);
+			var RightFootRender = debugManRightFoot.AttachMesh<TrivialBox3Mesh>(debugManMit);
+			RightFootRender.Extent.Value = new Vector3f(.5f, .4f, 1) / 2f;
+			debugManRightFoot.AttachComponent<BoxShape>().boxHalfExtent.Value = RightFootRender.Extent.Value;
+
+			//IKloadeding
+			var IkManager = debugMan.AttachComponent<IKManager>();
+
+			var bodyBone = debugManBody.AttachComponent<IKBone>();
+			bodyBone.Radius.Value = .75f;
+			bodyBone.Height.Value = 2f;
+			var headBone = debugManHead.AttachComponent<IKBone>();
+			headBone.Radius.Value = 0.4f;
+			headBone.Height.Value = 0.8f;
+
+			var upperLeftArmBone = debugManUpperLeftArm.AttachComponent<IKBone>();
+			debugManUpperLeftArm.rotation.Value = Quaternionf.AxisAngleR(new Vector3f(0, 0, 0.5f), MathUtil.HALF_P_IF);
+			var lowerLeftArmBone = debugManLowerLeftArm.AttachComponent<IKBone>();
+			var upperRightArmBone = debugManUpperRightArm.AttachComponent<IKBone>();
+			debugManUpperRightArm.rotation.Value = Quaternionf.AxisAngleR(new Vector3f(0, 0, -0.5f), MathUtil.HALF_P_IF);
+			var lowerRightArmBone = debugManLowerRightArm.AttachComponent<IKBone>();
+
+			var leftHandBone = debugManLeftHand.AttachComponent<IKBone>();
+			leftHandBone.Height.Value = .5f;
+			leftHandBone.Radius.Value = .2f;
+			var rightHandBone = debugManRightHand.AttachComponent<IKBone>();
+			rightHandBone.Height.Value = .5f;
+			rightHandBone.Radius.Value = .2f;
+
+
+			var upperLeftLegBone = debugManUpperLeftLeg.AttachComponent<IKBone>();
+			upperLeftLegBone.Height.Value = 1.3f;
+			var lowerLeftLegBone = debugManLowerLeftLeg.AttachComponent<IKBone>();
+			lowerLeftLegBone.Height.Value = 1.3f;
+
+			var leftFootBone = debugManLeftFoot.AttachComponent<IKBone>();
+			leftFootBone.Height.Value = 1f;
+			debugManLeftFoot.rotation.Value = Quaternionf.AxisAngleR(new Vector3f(-0.5f, 0, 0), MathUtil.HALF_P_IF);
+
+			var upperRightLegBone = debugManUpperRightLeg.AttachComponent<IKBone>();
+			upperRightLegBone.Height.Value = 1.3f;
+			var lowerRightLegBone = debugManLowerRightLeg.AttachComponent<IKBone>();
+			lowerRightLegBone.Height.Value = 1.3f;
+
+			var rightFootBone = debugManRightFoot.AttachComponent<IKBone>();
+			rightFootBone.Height.Value = 1f;
+			debugManRightFoot.rotation.Value = Quaternionf.AxisAngleR(new Vector3f(-0.5f, 0, 0), MathUtil.HALF_P_IF);
+
+			rightFootBone.MoveMentSpace.Target = leftFootBone.MoveMentSpace.Target = debugMan;
+			lowerRightLegBone.MoveMentSpace.Target = lowerLeftLegBone.MoveMentSpace.Target = debugMan;
+			upperRightLegBone.MoveMentSpace.Target = upperLeftLegBone.MoveMentSpace.Target = debugMan;
+
+
+			leftHandBone.MoveMentSpace.Target = rightHandBone.MoveMentSpace.Target = debugMan;
+			lowerLeftArmBone.MoveMentSpace.Target = lowerRightArmBone.MoveMentSpace.Target = debugMan;
+			upperLeftArmBone.MoveMentSpace.Target = upperRightArmBone.MoveMentSpace.Target = debugMan;
+			headBone.MoveMentSpace.Target = debugMan;
+			bodyBone.MoveMentSpace.Target = debugMan;
+
+			RLog.Info("Built Debug Local World");
+
+#else
 			RLog.Info("Built Local World");
-
-
-
-
-
-
+#endif
 		}
 
 
@@ -236,11 +378,9 @@ namespace RhuEngine
 			group61.AttachComponent<Spinner>().speed.Value = new Vector3f(-speed, 0, -speed);
 
 
-			var shader = root.GetFirstComponentOrAttach<UnlitClipShader>();
 			var boxMesh = root.AttachComponent<TrivialBox3Mesh>();
 			boxMesh.Extent.Value = new Vector3f(0.4f, 0.4f, 0.4f);
-			var mit = root.AttachComponent<DynamicMaterial>();
-			mit.shader.Target = shader;
+			var mit = root.AttachComponent<UnlitMaterial>();
 			BuildGroup(boxMesh, mit, group1, Colorf.RhubarbGreen);
 			BuildGroup(boxMesh, mit, group2, Colorf.RhubarbRed);
 			BuildGroup(boxMesh, mit, group3, Colorf.RhubarbGreen);
@@ -256,18 +396,18 @@ namespace RhuEngine
 
 		}
 
-		public static void BuildGroup(TrivialBox3Mesh boxMesh, DynamicMaterial mit, Entity entity, Colorf color) {
+		public static void BuildGroup(TrivialBox3Mesh boxMesh, UnlitMaterial mit, Entity entity, Colorf color) {
 			for (var i = 0; i < 6; i++) {
 				var cubeHolder = entity.AddChild("CubeHolder");
 				cubeHolder.rotation.Value = Quaternionf.CreateFromEuler(NextFloat() * 180, NextFloat() * 180, NextFloat() * 180);
 				var cube = cubeHolder.AddChild("Cube");
-				cube.position.Value = new Vector3f(0, 2, 0);
+				cube.position.Value = new Vector3f(0, 6, 0);
 				cube.scale.Value = new Vector3f(0.5f, 0.5f, 0.5f);
 				AttachRender(boxMesh, mit, cube, color);
 			}
 		}
 
-		public static void AttachRender(TrivialBox3Mesh boxMesh, DynamicMaterial mit, Entity entity, Colorf color) {
+		public static void AttachRender(TrivialBox3Mesh boxMesh, UnlitMaterial mit, Entity entity, Colorf color) {
 			var meshRender = entity.AttachComponent<MeshRender>();
 			meshRender.colorLinear.Value = color;
 			meshRender.materials.Add().Target = mit;

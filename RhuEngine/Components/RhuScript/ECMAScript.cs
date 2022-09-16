@@ -9,15 +9,19 @@ using Jint;
 using Jint.Runtime.Interop;
 using Jint.Native;
 using System.Reflection;
+using Jint.Native.Object;
+using System.Threading;
 
 namespace RhuEngine.Components
 {
-	public class ECMAScript : Component
-	{
-		[Exsposed]
-		public bool ScriptLoaded => _ecma is not null;
 
-		public SyncObjList<SyncRef<IWorldObject>> Targets;
+	public abstract class ProceduralECMAScript : ECMAScript
+	{
+	}
+
+
+	public sealed class RawECMAScript: ECMAScript
+	{
 
 		[Default(@"
 		function RunCode()	{
@@ -25,77 +29,119 @@ namespace RhuEngine.Components
 		}
 		")]
 		[OnChanged(nameof(InitECMA))]
-		public Sync<string> Script; 
+		public readonly Sync<string> ScriptCode;
+
+		protected override string Script => ScriptCode;
+	}
+
+	public abstract class ECMAScript : Component
+	{
+		public class ECMAScriptFunction : SyncObject
+		{
+			[Default("RunCode")]
+			public readonly Sync<string> FunctionName;
+
+			[Exposed]
+			public void Invoke() {
+				((ECMAScript)Parent.Parent).RunCode(FunctionName.Value);
+			}
+
+			[Exposed]
+			public void Invoke(params object[] prams) {
+				((ECMAScript)Parent.Parent).RunCode(FunctionName.Value, prams);
+			}
+
+			[Exposed]
+			public object InvokeWithReturn() {
+				return ((ECMAScript)Parent.Parent).RunCode(FunctionName.Value);
+			}
+
+			[Exposed]
+			public object InvokeWithReturn(params object[] prams) {
+				return ((ECMAScript)Parent.Parent).RunCode(FunctionName.Value, prams);
+			}
+		}
+
+		public readonly SyncObjList<ECMAScriptFunction> Functions;
+
+		protected override void OnAttach() {
+			base.OnAttach();
+			Functions.Add();
+		}
+
+		[Exposed]
+		public bool ScriptLoaded => _ecma is not null;
+
+		public readonly SyncObjList<SyncRef<IWorldObject>> Targets;
 
 		private Jint.Engine _ecma;
 
-		[Exsposed]
-		public void RunCode() {
-			try {
-				WorldThreadSafty.MethodCalls++;
-				if (WorldThreadSafty.MethodCalls > 3) {
-					throw new StackOverflowException();
-				}
-				_ecma?.Invoke("RunCode");
-				WorldThreadSafty.MethodCalls--;
-			}
-			catch (StackOverflowException) {
-				WorldThreadSafty.MethodCalls = 0;
-				_ecma = null;
-				RLog.Err("Script Err " + "StackOverflowException");
-			}
-			catch (Exception ex) {
-#if DEBUG
-				WorldThreadSafty.MethodCalls = 0;
-				RLog.Err("Script Err " + ex.ToString());
-#endif
-			}
+		[Exposed]
+		public void Invoke(string function, params object[] values) {
+			RunCode(function, values);
 		}
-		[Exsposed]
-		public void RunCode(params object[] values) {
+		[Exposed]
+		public object InvokeWithReturn(string function, params object[] values) {
+			return RunCode(function, values);
+		}
+
+		private object RunCode(string function, params object[] values) {
+			object reterndata = null;
 			try {
 				WorldThreadSafty.MethodCalls++;
-				if (WorldThreadSafty.MethodCalls > 3) {
+				if (WorldThreadSafty.MethodCalls > WorldThreadSafty.MaxCalls) {
 					throw new StackOverflowException();
 				}
-				_ecma?.Invoke("RunCode", values);
+				if (_ecma.GetValue(function) == JsValue.Undefined) {
+					throw new Exception("function " + function + " Not found");
+				}
+				reterndata = _ecma.Invoke(function, values);
 				WorldThreadSafty.MethodCalls--;
 			}
 			catch (StackOverflowException) {
 				_ecma = null;
-				WorldThreadSafty.MethodCalls = 0;
+				RLog.Err("Script Err StackOverflowException");
+				WorldThreadSafty.MethodCalls--;
 			}
 			catch (Exception ex) {
 #if DEBUG
-				WorldThreadSafty.MethodCalls = 0;
+				WorldThreadSafty.MethodCalls--;
 				RLog.Err("Script Err " + ex.ToString());
 #endif
 			}
+			return reterndata;
 		}
-		[Exsposed]
+
+		[Exposed]
 		public IWorldObject GetTarget(int index) {
 			return Targets.GetValue(index).Target;
 		}
 
-		private void InitECMA() {
+
+		protected abstract string Script { get; }
+
+		protected void InitECMA() {
 			_ecma = new Jint.Engine(options => {
 				options.LimitMemory(1_000_000); // alocate 1 MB
 				options.TimeoutInterval(TimeSpan.FromSeconds(1));
-				options.MaxStatements(1000);
+				options.MaxStatements(1580);
 				options.SetTypeResolver(new TypeResolver {
-					MemberFilter = member => Attribute.IsDefined(member, typeof(ExsposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()),
+					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()))&& !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
 				});
+				options.Strict = true;
 			});
-			_ecma.SetValue("self", this);
+			_ecma.ResetCallStack();
+			_ecma.SetValue("script", this);
 			_ecma.SetValue("entity", Entity);
 			_ecma.SetValue("world", World);
 			_ecma.SetValue("localUser", LocalUser);
 			_ecma.SetValue("log", new Action<string>(RLog.Info));
-			_ecma.SetValue("getType", (string a) => Type.GetType(a,false,true));
+			_ecma.SetValue("getType", (string a) => FamcyTypeParser.PraseType(a));
 			_ecma.SetValue("typeOf", (object a) => a?.GetType());
-			_ecma.SetValue("toString", new Func<object,string>((object a) => (a.GetType() == typeof(Type))? ((Type)a).GetFormattedName():a?.ToString()));
+			_ecma.SetValue("toString", new Func<object, string>((object a) => (a.GetType() == typeof(Type)) ? ((Type)a).GetFormattedName() : a?.ToString()));
 			try {
-				_ecma.Execute(Script.Value);
+				_ecma.Execute(Script);
+
 			}
 			catch (Exception ex) {
 				_ecma = null;
@@ -104,7 +150,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public override void OnLoaded() {
+		protected override void OnLoaded() {
 			InitECMA();
 		}
 	}

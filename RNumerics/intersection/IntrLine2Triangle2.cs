@@ -3,7 +3,7 @@
 namespace RNumerics
 {
 	// ported from WildMagic5 
-	public class IntrLine2Triangle2
+	public sealed class IntrLine2Triangle2
 	{
 		Line2d _line;
 		public Line2d Line
@@ -32,7 +32,7 @@ namespace RNumerics
 		public double Param1;
 
 
-		public IntrLine2Triangle2(Line2d l, Triangle2d t)
+		public IntrLine2Triangle2(in Line2d l, in Triangle2d t)
 		{
 			_line = l;
 			_triangle = t;
@@ -113,8 +113,8 @@ namespace RNumerics
 
 
 		public static void TriangleLineRelations(
-			Vector2d origin, Vector2d direction,
-			Triangle2d tri, ref Vector3d dist, ref Vector3i sign,
+			in Vector2d origin, in Vector2d direction,
+			in Triangle2d tri, ref Vector3d dist, ref Vector3i sign,
 			ref int positive, ref int negative, ref int zero)
 		{
 			positive = 0;
@@ -145,8 +145,8 @@ namespace RNumerics
 
 
 
-		public static void GetInterval(Vector2d origin, Vector2d direction, Triangle2d tri,
-						  Vector3d dist, Vector3i sign, ref Vector2d param)
+		public static void GetInterval(in Vector2d origin, in Vector2d direction, in Triangle2d tri,
+						  in Vector3d dist, in Vector3i sign, ref Vector2d param)
 		{
 			// Project triangle onto line.
 			var proj = Vector3d.Zero;
@@ -178,7 +178,7 @@ namespace RNumerics
 			// Check for grazing contact.
 			if (quantity < 2)
 			{
-				for (i0 = 1, i1 = 2, i2 = 0; i2 < 3; i0 = i1, i1 = i2++)
+				for (i2 = 0; i2 < 3; i2++)
 				{
 					if (sign[i2] == 0)
 					{

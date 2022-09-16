@@ -9,10 +9,10 @@ using System.Runtime.InteropServices;
 using System.ComponentModel;
 using RhuEngine.Linker;
 using LibVLCSharp.Shared;
-
+using NAudio.Wave;
 namespace RhuEngine.VLC
 {
-	public class VlcVideoSourceProvider : INotifyPropertyChanged, IDisposable
+	public sealed class VlcVideoSourceProvider : INotifyPropertyChanged, IDisposable
 	{
 		public VlcVideoSourceProvider() {
 			VideoSource = new RTexture2D(TexType.Dynamic, TexFormat.Rgba32Linear);
@@ -34,21 +34,11 @@ namespace RhuEngine.VLC
 
 		public event Action RelaodTex;
 
-		public event Action<float[], int> LoadAudio;
-
 		public RTexture2D VideoSource { get; private set; }
 
 		public int Pitches { get; private set; }
 
-		private uint _channelCount;
-
-		private uint _loadedChannelCount;
-
-		public uint ChannelCount
-		{
-			get => _loadedChannelCount;
-			set => _channelCount = value;
-		}
+		public uint ChannelCount { get; set; }
 
 		/// <summary>
 		/// Creates the player. This method must be called before using <see cref="MediaPlayer"/>
@@ -58,18 +48,26 @@ namespace RhuEngine.VLC
 			MediaPlayer.EnableHardwareDecoding = true;
 			MediaPlayer.SetVideoFormatCallbacks(VideoFormat, null);
 			MediaPlayer.SetVideoCallbacks(LockVideo, null, DisplayVideo);
-			MediaPlayer.SetAudioFormat("S16N", 48000, _channelCount);
-			_loadedChannelCount = _channelCount;
+			MediaPlayer.SetAudioFormat("S16L",48000,ChannelCount);
+			_bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(48000, 16, (int)ChannelCount)) {
+				DiscardOnBufferOverflow = true
+			};
 			mediaPlayer.SetAudioCallbacks(PlayAudio, null, null, null, null);
 		}
+
+		BufferedWaveProvider _bufferedWaveProvider;
+
+		public IWaveProvider Audio => _bufferedWaveProvider;
+
+
 		public unsafe void PlayAudio(IntPtr data, IntPtr samples, uint count, long pts) {
-			for (var c = 0; c < _loadedChannelCount; c++) {
-				var newbuff = new float[count];
-				for (var i = 0; i < count; i++) {
-					newbuff[i] = Marshal.ReadInt16(samples + (sizeof(short) * ((i * (int)_loadedChannelCount) + c))) * (1 / 32768.0f);
-				}
-				LoadAudio?.Invoke(newbuff, c);
+			if (_bufferedWaveProvider is null) {
+				return;
 			}
+			var amount = count * 2;
+			var buffer = new byte[amount];
+			Marshal.Copy(samples, buffer, 0, (int)amount);
+			_bufferedWaveProvider.AddSamples(buffer, 0, (int)amount);
 		}
 
 		/// <summary>
@@ -169,7 +167,7 @@ namespace RhuEngine.VLC
 				if (rgbaData.Length < VideoSource.Width * VideoSource.Height) {
 					return;
 				}
-				RWorld.ExecuteOnStartOfFrame(this, () => VideoSource.SetColors(VideoSource.Width, VideoSource.Height, rgbaData));
+				RUpdateManager.ExecuteOnStartOfFrame(this, () => VideoSource.SetColors(VideoSource.Width, VideoSource.Height, rgbaData));
 			}
 		}
 		#endregion
@@ -191,7 +189,7 @@ namespace RhuEngine.VLC
 		/// Disposes the control.
 		/// </summary>
 		/// <param name="disposing">The parameter is not used.</param>
-		protected virtual void Dispose(bool disposing) {
+		private void Dispose(bool disposing) {
 			if (!_disposedValue) {
 				_disposedValue = true;
 				MediaPlayer?.Dispose();
@@ -216,7 +214,7 @@ namespace RhuEngine.VLC
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		protected virtual void OnPropertyChanged(string propertyName) {
+		private void OnPropertyChanged(string propertyName) {
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 	}

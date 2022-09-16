@@ -1,4 +1,3 @@
-#if (NETSTANDARD2_0 || NETFRAMEWORK)
 
 using System;
 using System.Diagnostics;
@@ -120,4 +119,3 @@ static class LinuxClipboard
         }
     }
 }
-#endif

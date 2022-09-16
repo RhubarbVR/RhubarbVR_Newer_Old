@@ -3,16 +3,18 @@
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
+using RNumerics;
+
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreEvents" })]
-	public class AddSingleRefPram<T> : Component where T : class, IWorldObject
+	public sealed class AddSingleRefPram<T> : Component where T : class, IWorldObject
 	{
-		public SyncRef<T> Ref;
-		
-		public SyncDelegate<Action<T>> Target;
+		public readonly SyncRef<T> Ref;
 
-		[Exsposed]
+		public readonly SyncDelegate<Action<T>> Target;
+
+		[Exposed]
 		public void Call() {
 			Target.Target?.Invoke(Ref.Target);
 		}

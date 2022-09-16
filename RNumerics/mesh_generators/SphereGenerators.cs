@@ -10,7 +10,7 @@ namespace RNumerics
 	/// Generate a mesh of a sphere by first generating a mesh of a cube, 
 	/// and then normalizing the vertices and moving them to sphere of desired radius.
 	/// </summary>
-	public class Sphere3Generator_NormalizedCube : GridBox3Generator
+	public sealed class Sphere3Generator_NormalizedCube : GridBox3Generator
 	{
 		public double Radius = 1.0;
 
@@ -39,7 +39,7 @@ namespace RNumerics
 					v = (sx * Box.AxisX) + (sy * Box.AxisY) + (sz * Box.AxisZ);
 				}
 				v.Normalize();
-				vertices[i] = Box.Center + (Radius * v);
+				vertices[i] = Box.Center + (Radius * 2 * v);
 				normals[i] = (Vector3f)v;
 			}
 

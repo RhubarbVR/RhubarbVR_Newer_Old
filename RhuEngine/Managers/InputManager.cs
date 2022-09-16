@@ -8,126 +8,68 @@ using System.IO;
 using System.Threading.Tasks;
 using RhuEngine.Settings;
 using RhuEngine.Linker;
+using RNumerics;
+using RhuEngine.Input;
 
 namespace RhuEngine.Managers
 {
-	public class InputManager : IManager
+	public sealed partial class InputManager : IManager
 	{
 		private Engine _engine;
 
-		public enum InputTypes
-		{
-			None,
-			StickLocker,
-			MoveSpeed,
-			Back,
-			Forward,
-			Left,
-			Right,
-			Jump,
-			FlyUp,
-			FlyDown,
-			RotateLeft,
-			RotateRight,
-			ObjectPull,
-			ObjectPush,
-			OpenDash,
-			ChangeWorld,
-			ContextMenu,
-			Primary,
-			Secondary,
-			Grab,
+		private readonly List<IInputDevice> _inputDevices = new();
+		private IInputSystem[] _inputSystems = Array.Empty<IInputSystem>();
+
+		public void LoadInputDriver<T>() where T : IInputDevice, new() {
+			LoadInputDriver(new T());
 		}
 
+		public void LoadInputDriver(IInputDevice inputDriver) {
+			_inputDevices.Add(inputDriver);
+			foreach (var item in _inputSystems) {
+				item.LoadDevice(inputDriver);
+			}
+		}
+		public void RemoveInputDriver(IInputDevice inputDriver) {
+			_inputDevices.Remove(inputDriver);
+			foreach (var item in _inputSystems) {
+				item.RemoveDevice(inputDriver);
+			}
+			if (inputDriver is IDisposable disposable) {
+				disposable.Dispose();
+			}
+		}
+
+		public KeyboardSystem KeyboardSystem { get; private set; }
+		public MouseSystem MouseSystem { get; private set; }
+
+		public Matrix HeadMatrix { get; set; }
 
 		public void Dispose() {
 		}
 
 		public void Init(Engine engine) {
 			_engine = engine;
-		}
-
-		public float GetInputFloatFromKeyboard(InputTypes inputType) {
-			var keyboard = _engine.MainSettings.InputSettings.KeyboardInputSettings;
-			var keyboardInput = inputType switch {
-				InputTypes.MoveSpeed => keyboard.Sprint.GetInput() ? 1.0f : keyboard.SlowCraw.GetInput() ? 0f : 0.3f,
-				InputTypes.Back => keyboard.Back.GetInput() ? 1.0f : 0.0f,
-				InputTypes.Forward => keyboard.Forward.GetInput() ? 1.0f : 0.0f,
-				InputTypes.Left => keyboard.Left.GetInput() ? 1.0f : 0.0f,
-				InputTypes.Right => keyboard.Right.GetInput() ? 1.0f : 0.0f,
-				InputTypes.Jump => keyboard.Jump.GetInput() ? 1.0f : 0.0f,
-				InputTypes.FlyUp => keyboard.FlyUP.GetInput() ? 1.0f : 0.0f,
-				InputTypes.FlyDown => keyboard.FlyDown.GetInput() ? 1.0f : 0.0f,
-				InputTypes.RotateLeft => keyboard.RotateLeft.GetInput() ? 1.0f : 0.0f,
-				InputTypes.RotateRight => keyboard.RotateRight.GetInput() ? 1.0f : 0.0f,
-				InputTypes.OpenDash => keyboard.Dash.GetInput() ? 1.0f : 0.0f,
-				InputTypes.ChangeWorld => keyboard.SwitchWorld.GetInput() ? 1.0f : 0.0f,
-				InputTypes.ContextMenu => keyboard.ContextMenu.GetInput() ? 1.0f : 0.0f,
-				InputTypes.Primary => keyboard.PrimaryPress.GetInput() ? 1.0f : 0.0f,
-				InputTypes.Secondary => keyboard.SecondaryPress.GetInput() ? 1.0f : 0.0f,
-				InputTypes.Grab => keyboard.Grab.GetInput() ? 1.0f : 0.0f,
-				InputTypes.ObjectPull => keyboard.ObjectPull.GetInput() ? 1.0f : 0.0f,
-				InputTypes.ObjectPush => keyboard.ObjectPush.GetInput() ? 1.0f : 0.0f,
-				_ => 0,
+			KeyboardSystem = new KeyboardSystem(this);
+			MouseSystem = new MouseSystem(this);
+			screenInput = new ScreenInput(this);
+			_inputSystems = new IInputSystem[] {
+				KeyboardSystem,
+				MouseSystem,
 			};
-			if (keyboard.MousePositive == inputType) {
-				keyboardInput =  RInput.Mouse.ScrollChange.y;
-			}
-			if (keyboard.MouseNegevitve == inputType) {
-				keyboardInput = -RInput.Mouse.ScrollChange.y;
-			}
-			return keyboardInput;
+			LoadInputActions();
+			_engine.EngineLink.LoadInput(this);
+			SettingsUpdateInputActions();
+			_engine.SettingsUpdate += SettingsUpdateInputActions;
 		}
-		public float GetInputFloatFromGamePad(InputTypes inputType) {
-			switch (inputType) {
-				case InputTypes.None:
-					break;
-				case InputTypes.StickLocker:
-					break;
-				case InputTypes.MoveSpeed:
-					break;
-				case InputTypes.Back:
-					break;
-				case InputTypes.Forward:
-					break;
-				case InputTypes.Left:
-					break;
-				case InputTypes.Right:
-					break;
-				case InputTypes.Jump:
-					break;
-				case InputTypes.FlyUp:
-					break;
-				case InputTypes.FlyDown:
-					break;
-				case InputTypes.RotateLeft:
-					break;
-				case InputTypes.RotateRight:
-					break;
-				case InputTypes.ObjectPull:
-					break;
-				case InputTypes.ObjectPush:
-					break;
-				case InputTypes.OpenDash:
-					break;
-				case InputTypes.ChangeWorld:
-					break;
-				case InputTypes.ContextMenu:
-					break;
-				case InputTypes.Primary:
-					break;
-				case InputTypes.Secondary:
-					break;
-				case InputTypes.Grab:
-					break;
-				default:
-					break;
+		public void RenderStep() {
+			foreach (var item in _inputSystems) {
+				item.Update();
 			}
-			return 0f;
-		}
-
-		public float GetInputFloatFromController(InputTypes inputType,IRController controller, ControllerInputSettingsObject controllerInput) {
-			return controllerInput.GetInputFloatFromController(inputType,controller);
+			UpdateInputActions();
+			if ((!_engine.IsInVR) && _engine.EngineLink.CanInput) {
+				screenInput.Step();
+			}
 		}
 
 		public Handed GetHand(bool main) {
@@ -135,40 +77,106 @@ namespace RhuEngine.Managers
 				? _engine.MainSettings.InputSettings.RightHanded ? Handed.Right : Handed.Left
 				: _engine.MainSettings.InputSettings.RightHanded ? Handed.Left : Handed.Right;
 		}
-
-		public float GetInputFloatFromMainController(InputTypes inputType) {
-			return GetInputFloatFromController(inputType, GetController(true), _engine.MainSettings.InputSettings.MainControllerInputSettings);
+		private float GetActionStringValue(string v) {
+			return Math.Min(GetActionStringValue(v, Handed.Left) + GetActionStringValue(v, Handed.Right) + GetActionStringValue(v, Handed.Max), 1f);
 		}
 
-		private IRController GetController(bool v) {
-			return RInput.Controller(GetHand(v));
+		private readonly Dictionary<(string, Handed), Func<float>> _actions = new();
+
+		private static float ReturnZero() {
+			return 0f;
 		}
 
-		public float GetInputFloatFromSeccondController(InputTypes inputType) {
-			return GetInputFloatFromController(inputType, GetController(false), _engine.MainSettings.InputSettings.SecondaryControllerInputSettings);
-		}
-		public float GetInputFloat(InputTypes inputType,bool? mainController = null) {
-			var main = GetInputFloatFromKeyboard(inputType) + GetInputFloatFromGamePad(inputType);
-			if(mainController is null) {
-				main += GetInputFloatFromMainController(inputType);
-				main += GetInputFloatFromSeccondController(inputType);
+		private float GetActionStringValue(string v, Handed handed) {
+			var lookValue = (v, handed);
+			if (_actions.TryGetValue(lookValue, out var action)) {
+				return action();
 			}
-			else {
-				if (mainController.Value) {
-					main += GetInputFloatFromMainController(inputType);
-				}
-				else {
-					main += GetInputFloatFromSeccondController(inputType);
+			if (v is null) {
+				_actions.Add(lookValue, ReturnZero);
+				return 0f;
+			}
+			var data = v.ToLower().Split('.');
+			if (data.Length == 0) {
+				_actions.Add(lookValue, ReturnZero);
+				return 0f;
+			}
+			var device = data[0];
+			if (data.Length == 1) {
+				_actions.Add(lookValue, ReturnZero);
+				return 0f;
+			}
+			var second = data[1];
+			if (handed == Handed.Max) {
+				if (device == "key") {
+					if (!Enum.TryParse<Key>(second, true, out var keydata)) {
+						_actions.Add(lookValue, ReturnZero);
+						return 0f;
+					}
+					var keyAction = () => (KeyboardSystem.IsKeyDown(keydata) || MouseSystem.IsMouseKeyDown((MouseKeys)keydata)) ? 1f : 0f;
+					_actions.Add(lookValue, keyAction);
+					return keyAction();
 				}
 			}
-			return Math.Max(Math.Min(main, 1), 0);
-		}
+			if (data.Length == 2) {
+				_actions.Add(lookValue, ReturnZero);
+				return 0f;
+			}
+			var thread = data[2];
 
-		public bool GetInputBool(InputTypes inputType, bool? mainController = null) {
-			return GetInputFloat(inputType, mainController) >= 0.9f;
+			if (handed == Handed.Max) {
+				if (device == "mouse") {
+					if (second == "scroll") {
+						if (thread is "x") {
+							var scrollAction = () => MouseSystem.ScrollDelta.x;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+						else if (thread is "x-" or "-x") {
+							var scrollAction = () => -MouseSystem.ScrollDelta.x;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+						if (thread is "y") {
+							var scrollAction = () => MouseSystem.ScrollDelta.y;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+						else if (thread is "y-" or "-y") {
+							var scrollAction = () => -MouseSystem.ScrollDelta.y;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+					}
+					if (second == "pos") {
+						if (thread is "x") {
+							var scrollAction = () => MouseSystem.MouseDelta.x;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+						else if (thread is "x-" or "-x") {
+							var scrollAction = () => -MouseSystem.MouseDelta.x;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+						if (thread is "y") {
+							var scrollAction = () => MouseSystem.MouseDelta.y;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+						else if (thread is "y-" or "-y") {
+							var scrollAction = () => -MouseSystem.MouseDelta.y;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+					}
+				}
+			}
+			_actions.Add(lookValue, ReturnZero);
+			return 0f;
 		}
-
 		public void Step() {
+
 		}
 	}
 }

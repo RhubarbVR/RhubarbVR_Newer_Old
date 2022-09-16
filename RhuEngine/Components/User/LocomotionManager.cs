@@ -9,34 +9,35 @@ namespace RhuEngine.Components
 
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "User" })]
-	public class LocomotionManager : Component
+	public sealed class LocomotionManager : Component
 	{
-		public SyncRef<User> user;
+		public readonly SyncRef<User> user;
 
-		public Sync<int> selectedModule;
+		public readonly Sync<int> selectedModule;
 
-		public SyncObjList<SyncRef<LocomotionModule>> modules;
+		public readonly SyncObjList<SyncRef<LocomotionModule>> modules;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			modules.Add().Target = Entity.AttachComponent<NoClipLocomotion>();
 		}
 
 		public LocomotionModule CurrentLocomotionModule => selectedModule.Value > (modules.Count - 1) ? null : modules[selectedModule.Value].Target;
 
-		public override void Step() {
+		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
-			if (user.Target is null) {
+			if (World.IsPersonalSpace) {
 				return;
 			}
-			if (user.Target == World.GetLocalUser()) {
-				var locModule = CurrentLocomotionModule;
-				if (locModule is null) {
-					return;
-				}
-				locModule.ProcessMovement();
+			if (user.Target is null || user.Target != World.GetLocalUser()) {
+				return;
 			}
+			var locModule = CurrentLocomotionModule;
+			if (locModule is null) {
+				return;
+			}
+			locModule.ProcessMovement();
 		}
 
 	}

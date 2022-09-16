@@ -2,16 +2,16 @@
 
 namespace RNumerics
 {
-	public class DenseVector
+	public sealed class DenseVector
 	{
-		public DenseVector(int N) {
+		public DenseVector(in int N) {
 			Buffer = new double[N];
 			Array.Clear(Buffer, 0, Buffer.Length);
 			Size = N;
 		}
 
 
-		public void Set(int i, double value) {
+		public void Set(in int i, in double value) {
 			Buffer[i] = value;
 		}
 
@@ -19,7 +19,7 @@ namespace RNumerics
 		public int Size { get; }
 		public int Length => Size;
 
-		public double this[int i]
+		public double this[in int i]
 		{
 			get => Buffer[i];
 			set => Buffer[i] = value;
@@ -28,10 +28,10 @@ namespace RNumerics
 		public double[] Buffer { get; }
 
 
-		public double Dot(DenseVector v2) {
+		public double Dot(in DenseVector v2) {
 			return Dot(v2.Buffer);
 		}
-		public double Dot(double[] v2) {
+		public double Dot(in double[] v2) {
 			if (v2.Length != Size) {
 				throw new Exception("DenseVector.Dot: incompatible lengths");
 			}

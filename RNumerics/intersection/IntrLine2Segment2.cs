@@ -33,7 +33,7 @@ namespace RNumerics
 	//   q = int.MaxValue:  The line/segment are collinear.  Type is Segment.
 
 
-	public class IntrLine2Segment2
+	public sealed class IntrLine2Segment2
 	{
 		Line2d _line;
 		public Line2d Line
@@ -75,7 +75,7 @@ namespace RNumerics
 		/// <summary>Parameter along line, only set if Quanityt = 1    </summary>
 		public double Parameter;
 
-		public IntrLine2Segment2(Line2d line, Segment2d seg) {
+		public IntrLine2Segment2(in Line2d line, in Segment2d seg) {
 			_line = line;
 			_segment = seg;
 		}

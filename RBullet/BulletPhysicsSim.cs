@@ -3,11 +3,11 @@
 using RhuEngine.Physics;
 using BulletSharp;
 using RNumerics;
-using BulletSharp.Math;
+using System.Numerics;
 
 namespace RBullet
 {
-	public class BPhysicsSim
+	public sealed class BPhysicsSim
 	{
 		public readonly DefaultCollisionConfiguration _collisionConfiguration;
 
@@ -16,15 +16,19 @@ namespace RBullet
 		public readonly DbvtBroadphase _broadphase;
 
 		public readonly DiscreteDynamicsWorld _physicsWorld;
-
-		public readonly ConstraintSolverPoolMultiThreaded _constraintSolver;
+		
+		public readonly ConstraintSolverPoolMultiThreaded _solverPool;
+		public readonly SequentialImpulseConstraintSolverMultiThreaded _parallelSolver;
 
 		public BPhysicsSim() {
 			_collisionConfiguration = new DefaultCollisionConfiguration();
 			_dispatcher = new CollisionDispatcher(_collisionConfiguration);
 			_broadphase = new DbvtBroadphase();
-			_constraintSolver = new ConstraintSolverPoolMultiThreaded(Environment.ProcessorCount);
-			_physicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _constraintSolver, _collisionConfiguration);
+			_solverPool = new ConstraintSolverPoolMultiThreaded(Math.Max(Environment.ProcessorCount - 1,1));
+			_parallelSolver = new SequentialImpulseConstraintSolverMultiThreaded();
+			_physicsWorld = new DiscreteDynamicsWorldMultiThreaded(_dispatcher, _broadphase, _solverPool, _parallelSolver, _collisionConfiguration);
+			var grav = new Vector3(0, -10, 0);
+			_physicsWorld.SetGravity(ref grav);
 		}
 
 		public SafeList<BRigidBodyCollider> Updates = new SafeList<BRigidBodyCollider>();
@@ -53,7 +57,7 @@ namespace RBullet
 				callback1 = bOverlapCallback;
 			}
 
-			public override double AddSingleResult(ManifoldPoint cp, CollisionObjectWrapper colObj0Wrap, int partId0, int index0, CollisionObjectWrapper colObj1Wrap, int partId1, int index1) {
+			public override float AddSingleResult(ManifoldPoint cp, CollisionObjectWrapper colObj0Wrap, int partId0, int index0, CollisionObjectWrapper colObj1Wrap, int partId1, int index1) {
 				callback1.Invoke(cp.PositionWorldOnA, cp.PositionWorldOnB, cp.NormalWorldOnB, cp.Distance, cp.Distance1, (BRigidBodyCollider)colObj0Wrap.CollisionObject.UserObject);
 				return 0;
 			}

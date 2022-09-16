@@ -9,40 +9,33 @@ namespace RhuEngine.Components
 {
 	public abstract class RawScrollUIRect : UIRect
 	{
-		[OnChanged(nameof(ScrollPosChange))]	
-		public Sync<Vector2f> ScrollPos;
+		[OnChanged(nameof(ApplyScrollMovement))]
+		public readonly Sync<Vector2f> ScrollPos;
 
-		public Sync<Vector2f> ScrollSpeed;
-		public virtual Vector2f MaxScroll => Vector2f.Inf;
+		public void ApplyScrollMovement() {
+			ScrollPos.Value = MathUtil.Clamp(ScrollPos.Value, MinScroll, MaxScroll);
+			ApplyMovement(ScrollPos.Value);
+		}
 
+		public readonly Sync<Vector2f> ScrollSpeed;
 
-		public virtual Vector2f MinScroll => Vector2f.NInf;
+		public Vector2f GetMaxScroll() {
+			return -new Vector2f(0, -CachedOverlapSize.y + CachedElementSize.y);
+		}
+		public Vector2f GetMinScroll() {
+			return -new Vector2f(CachedOverlapSize.x - CachedElementSize.x, 0);
+		}
+		public virtual Vector2f MaxScroll => GetMaxScroll();
+		public virtual Vector2f MinScroll => GetMinScroll();
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			ScrollSpeed.Value = Vector2f.One;
 		}
 
-		internal void ScrollPosChange() {
-			_childRects.SafeOperation((list) => {
-				foreach (var item in list) {
-					item.Scroll(ScrollPos.Value.XY_ + ParentRect.ScrollOffset);
-				}
-			});
-		}
-
-		public override void OnLoaded() {
-			base.OnLoaded();
-			ScrollPosChange();
-		}
-
-		[Exsposed]
-		public void Scroll(Vector2f scroll) {
-			scroll = scroll * ScrollSpeed.Value / Canvas.scale.Value.Xy;
-			if (!(scroll.x == 0 && scroll.y == 0)) {
-				var newvalue = ScrollPos.Value + scroll;
-				ScrollPos.Value = MathUtil.Clamp(newvalue, MinScroll, MaxScroll);
-			}
+		[Exposed]
+		public virtual void Scroll(Vector2f scrollpos) {
+			ScrollPos.Value += scrollpos;
 		}
 	}
 }

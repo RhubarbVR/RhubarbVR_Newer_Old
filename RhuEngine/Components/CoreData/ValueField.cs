@@ -3,9 +3,10 @@ using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.Components
 {
+	[GenericTypeConstraint()]
 	[Category(new string[] { "CoreData" })]
-	public class ValueField<T> : Component
+	public sealed class ValueField<T> : Component
 	{
-		public Sync<T> Value;
+		public readonly Sync<T> Value;
 	}
 }

@@ -9,7 +9,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Importers" })]
-	public class UnknownImporter : Importer {
+	public sealed class UnknownImporter : Importer {
 		public string path_url;
 
 		public bool isUrl;
@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 
 		//public SyncRef<UIWindow> Window;
 
-		public SyncRef<Entity> UI;
+		public readonly SyncRef<Entity> UI;
 
 		public override void Import(string path_url, bool isUrl, byte[] rawData) {
 			this.path_url = path_url;
@@ -47,7 +47,7 @@ namespace RhuEngine.Components
 			//}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public void RunImport(string data) {
 			var e = Type.GetType(data);
 			if(e != null) {

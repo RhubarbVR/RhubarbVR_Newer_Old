@@ -10,21 +10,21 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Assets\\StaticAssets" })]
-	public class StaticTexture : StaticAsset<RTexture2D>
+	[Category(new string[] { "Assets/StaticAssets" })]
+	public sealed class StaticTexture : StaticAsset<RTexture2D>
 	{
 
 		[Default(TexSample.Anisotropic)]
 		[OnChanged(nameof(TextValueChanged))]
-		public Sync<TexSample> sampleMode;
+		public readonly Sync<TexSample> sampleMode;
 
 		[Default(TexAddress.Wrap)]
 		[OnChanged(nameof(TextValueChanged))]
-		public Sync<TexAddress> addressMode;
+		public readonly Sync<TexAddress> addressMode;
 
 		[Default(3)]
 		[OnChanged(nameof(TextValueChanged))]
-		public Sync<int> anisoptropy;
+		public readonly Sync<int> anisoptropy;
 
 		private void TextValueChanged() {
 			if(Value is null) {
@@ -41,7 +41,7 @@ namespace RhuEngine.Components
 					return;
 				}
 				Load(null);
-				Load(new ImageSharpTexture(new MemoryStream(data), true).CreateTexture());
+				Load(RTexture2D.FromMemory(data));
 				TextValueChanged();
 			}
 			catch(Exception err) {

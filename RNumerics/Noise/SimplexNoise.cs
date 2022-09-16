@@ -2,7 +2,31 @@
 // https://github.com/WardBenjamin/SimplexNoise
 // Simplex Noise for C#
 // Copyright © Benjamin Ward 2019
-// See LICENSE
+// BSD 3-Clause License
+// Copyright(c) 2019, Benjamin Ward
+// All rights reserved.
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+// *Redistributions of source code must retain the above copyright notice, this
+//   list of conditions and the following disclaimer.
+// * Redistributions in binary form must reproduce the above copyright notice,
+//   this list of conditions and the following disclaimer in the documentation
+//   and/or other materials provided with the distribution.
+// * Neither the name of the copyright holder nor the names of its
+//   contributors may be used to endorse or promote products derived from
+//   this software without specific prior written permission.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES;
+// LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Simplex Noise implementation offering 1D, 2D, and 3D forms w/ values in the range of 0 to 255.
 // Based on work by Heikki Törmälä (2012) and Stefan Gustavson (2006).
 
@@ -16,7 +40,7 @@ namespace RNumerics.Noise
 	/// </summary>
 	public static class SimplexNoise
 	{
-		public static float[] Calc1D(int width, float scale) {
+		public static float[] Calc1D(in int width, in float scale) {
 			var values = new float[width];
 			for (var i = 0; i < width; i++) {
 				values[i] = (Generate(i * scale) * 128) + 128;
@@ -25,7 +49,7 @@ namespace RNumerics.Noise
 			return values;
 		}
 
-		public static float[,] Calc2D(int width, int height, float scale) {
+		public static float[,] Calc2D(in int width, in int height, in float scale) {
 			var values = new float[width, height];
 			for (var i = 0; i < width; i++) {
 				for (var j = 0; j < height; j++) {
@@ -36,7 +60,7 @@ namespace RNumerics.Noise
 			return values;
 		}
 
-		public static float[,,] Calc3D(int width, int height, int length, float scale) {
+		public static float[,,] Calc3D(in int width, in int height, in int length, in float scale) {
 			var values = new float[width, height, length];
 			for (var i = 0; i < width; i++) {
 				for (var j = 0; j < height; j++) {
@@ -49,15 +73,15 @@ namespace RNumerics.Noise
 			return values;
 		}
 
-		public static float CalcPixel1D(int x, float scale) {
+		public static float CalcPixel1D(in int x, in float scale) {
 			return (Generate(x * scale) * 128) + 128;
 		}
 
-		public static float CalcPixel2D(int x, int y, float scale) {
+		public static float CalcPixel2D(in int x, in int y, in float scale) {
 			return (Generate(x * scale, y * scale) * 128) + 128;
 		}
 
-		public static float CalcPixel3D(int x, int y, int z, float scale) {
+		public static float CalcPixel3D(in int x, in int y, in int z, in float scale) {
 			return (Generate(x * scale, y * scale, z * scale) * 128) + 128;
 		}
 
@@ -91,8 +115,8 @@ namespace RNumerics.Noise
 		/// </summary>
 		/// <param name="x"></param>
 		/// <returns></returns>
-		public static float Generate(float x) {
-			var i0 = FastFloor(x);
+		public static T Generate<T>(in T x) {
+			var i0 = FastFloor((dynamic)x);
 			var i1 = i0 + 1;
 			var x0 = x - i0;
 			var x1 = x0 - 1.0f;
@@ -115,7 +139,7 @@ namespace RNumerics.Noise
 		/// <param name="x"></param>
 		/// <param name="y"></param>
 		/// <returns></returns>
-		public static float Generate(float x, float y) {
+		public static float Generate(in float x, in float y) {
 			const float F2 = 0.366025403f; // F2 = 0.5*(sqrt(3.0)-1.0)
 			const float G2 = 0.211324865f; // G2 = (3.0-Math.sqrt(3.0))/6.0
 
@@ -187,7 +211,7 @@ namespace RNumerics.Noise
 		}
 
 
-		public static float Generate(float x, float y, float z) {
+		public static float Generate(in float x, in float y, in float z) {
 			// Simple skewing factors for the 3D case
 			const float F3 = 0.333333333f;
 			const float G3 = 0.166666667f;
@@ -292,7 +316,7 @@ namespace RNumerics.Noise
 
 
 		/// Helper function to compute the SimplexNoise value based on time, speed, magnitude and seed.
-		public static Vector3f Generate3D(float time, Vector3f speed, Vector3f magnitude, Vector3f seed) {
+		public static Vector3f Generate3D(in float time, in Vector3f speed, in Vector3f magnitude, in Vector3f seed) {
 			return new Vector3f(
 				Generate((time * speed.x) + seed.x) * magnitude.x,
 				Generate((time * speed.y) + seed.y) * magnitude.y,
@@ -301,7 +325,7 @@ namespace RNumerics.Noise
 		}
 
 		/// Helper function to compute the SimplexNoise value based on time, speed, magnitude and seed.
-		public static Vector2f Generate2D(float time, Vector2f speed, Vector2f magnitude, Vector2f seed) {
+		public static Vector2f Generate2D(in float time, in Vector2f speed, in Vector2f magnitude, in Vector2f seed) {
 			return new Vector2f(
 				Generate((time * speed.x) + seed.x) * magnitude.x,
 				Generate((time * speed.y) + seed.y) * magnitude.y
@@ -309,8 +333,12 @@ namespace RNumerics.Noise
 		}
 
 		/// Helper function to compute the SimplexNoise value based on time, speed, magnitude and seed.
-		public static float Generate1D(float time, float speed, float magnitude, float seed) {
+		public static float Generate1D(in float time, in float speed, in float magnitude, in float seed) {
 			return Generate((time * speed) + seed) * magnitude;
+		}
+
+		public static T Generate<T>(in float time, in T speed, in T magnitude, in T seed) {
+			return Generate(((dynamic)speed * time) + seed) * magnitude;
 		}
 
 		private static byte[] _perm;
@@ -344,16 +372,16 @@ namespace RNumerics.Noise
 			138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 		};
 
-		private static int FastFloor(float x) {
+		private static int FastFloor(in float x) {
 			return x > 0 ? (int)x : (int)x - 1;
 		}
 
-		private static int Mod(int x, int m) {
+		private static int Mod(in int x, in int m) {
 			var a = x % m;
 			return a < 0 ? a + m : a;
 		}
 
-		private static float Grad(int hash, float x) {
+		private static float Grad(in int hash, in float x) {
 			var h = hash & 15;
 			var grad = 1.0f + (h & 7);   // Gradient value 1.0, 2.0, ..., 8.0
 			if ((h & 8) != 0) {
@@ -363,21 +391,21 @@ namespace RNumerics.Noise
 			return grad * x;           // Multiply the gradient with the distance
 		}
 
-		private static float Grad(int hash, float x, float y) {
+		private static float Grad(in int hash, in float x, in float y) {
 			var h = hash & 7;      // Convert low 3 bits of hash code
 			var u = h < 4 ? x : y;  // into 8 simple gradient directions,
 			var v = h < 4 ? y : x;  // and compute the dot product with (x,y).
 			return ((h & 1) != 0 ? -u : u) + ((h & 2) != 0 ? -2.0f * v : 2.0f * v);
 		}
 
-		private static float Grad(int hash, float x, float y, float z) {
+		private static float Grad(in int hash, in float x, in float y, in float z) {
 			var h = hash & 15;     // Convert low 4 bits of hash code into 12 simple
 			var u = h < 8 ? x : y; // gradient directions, and compute dot product.
 			var v = h < 4 ? y : h is 12 or 14 ? x : z; // Fix repeats at h = 12 to 15
 			return ((h & 1) != 0 ? -u : u) + ((h & 2) != 0 ? -v : v);
 		}
 
-		private static float Grad(int hash, float x, float y, float z, float t) {
+		private static float Grad(in int hash, in float x, in float y, in float z, in float t) {
 			var h = hash & 31;      // Convert low 5 bits of hash code into 32 simple
 			var u = h < 24 ? x : y; // gradient directions, and compute dot product.
 			var v = h < 16 ? y : z;

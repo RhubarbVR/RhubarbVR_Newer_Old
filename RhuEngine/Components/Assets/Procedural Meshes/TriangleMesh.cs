@@ -5,10 +5,10 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class TriangleMesh : ProceduralMesh
+	public sealed class TriangleMesh : ProceduralMesh
 	{
-		public SyncObjList<Triangle> listOfTris;
-		public override void OnAttach() {
+		public readonly SyncObjList<Triangle> listOfTris;
+		protected override void OnAttach() {
 			base.OnAttach();
 			var tri = listOfTris.Add();
 			tri.a.ver.Value = new Vector3d(1, 0, 0);
@@ -43,9 +43,9 @@ namespace RhuEngine.Components
 
 		public class Triangle : SyncObject
 		{
-			public Vertex a;
-			public Vertex b;
-			public Vertex c;
+			public readonly Vertex a;
+			public readonly Vertex b;
+			public readonly Vertex c;
 
 			public void UpdateMesh()
 			{
@@ -58,16 +58,16 @@ namespace RhuEngine.Components
 		public class Vertex : SyncObject
 		{
 			[OnChanged(nameof(UpdateMesh))]
-			public Sync<Vector3d> ver;
+			public readonly Sync<Vector3d> ver;
 
 			[OnChanged(nameof(UpdateMesh))]
-			public Sync<Vector3f> norm;
+			public readonly Sync<Vector3f> norm;
 
 			[OnChanged(nameof(UpdateMesh))]
-			public Sync<Colorf> color;
+			public readonly Sync<Colorf> color;
 
 			[OnChanged(nameof(UpdateMesh))]
-			public SyncValueList<Vector2f> uv;
+			public readonly SyncValueList<Vector2f> uv;
 
 			private void UpdateMesh() 
 			{

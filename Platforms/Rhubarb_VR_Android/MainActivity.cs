@@ -26,7 +26,7 @@ namespace RhuEngine
 	// https://github.com/MonoGame/MonoGame/blob/31dca640482bc0c27aec8e51d6369612ce8577a2/MonoGame.Framework/Platform/Android/MonoGameAndroidGameView.cs
 	[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
 	[IntentFilter(new[] { Intent.ActionMain }, Categories = new[] { "com.oculus.intent.category.VR", Intent.CategoryLauncher })]
-	public class MainActivity : AppCompatActivity, ISurfaceHolderCallback2
+	public sealed class MainActivity : AppCompatActivity, ISurfaceHolderCallback2
 	{
 		Engine _app;
 		View _surface;
@@ -35,7 +35,7 @@ namespace RhuEngine
 			JavaSystem.LoadLibrary("openxr_loader");
 			JavaSystem.LoadLibrary("StereoKitC");
 			JavaSystem.LoadLibrary("opus");
-
+			JavaSystem.LoadLibrary("libbulletc");
 			// Set up a surface for StereoKit to draw on
 			Window.TakeSurface(this);
 			Window.SetFormat(Format.Unknown);
@@ -55,21 +55,22 @@ namespace RhuEngine
 
 		static bool _running = false;
 		void Run(IntPtr activityHandle) {
-				if (_running) {
-					return;
-				}
+			if (_running) {
+				return;
+			}
 
-				_running = true;
+			_running = true;
 			var runningtask = Task.Run(() => {
 				if ((ContextCompat.CheckSelfPermission(this, Manifest.Permission.RecordAudio) != Android.Content.PM.Permission.Granted) || (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != Android.Content.PM.Permission.Granted) || (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Android.Content.PM.Permission.Granted)) {
 					ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.RecordAudio, Manifest.Permission.WriteExternalStorage, Manifest.Permission.ReadExternalStorage }, 1);
 				}
 				var cap = new OutputCapture();
 				var skstereo = new RhuStereoKit();
-				_app = new Engine(skstereo,new string[] { "" }, cap, System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments));
+				_app = new Engine(skstereo, new string[] { "" }, cap, System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments));
 				if (_app == null) {
 					throw new System.Exception("StereoKit loader couldn't construct an instance of the App!");
 				}
+				_app.OnCloseEngine += () => SK.Shutdown();
 
 				// Initialize StereoKit, and the app
 				var settings = skstereo.Settings;
@@ -84,7 +85,6 @@ namespace RhuEngine
 
 				// Now loop until finished, and then shut down
 				while (SK.Step(_app.Step)) { }
-				cap.DisableSingleString = true;
 				_app.IsCloseing = true;
 				_app.Dispose();
 				SK.Shutdown();

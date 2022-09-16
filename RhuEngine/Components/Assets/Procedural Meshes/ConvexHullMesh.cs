@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.Text;
 
 using RhuEngine.WorldObjects;
+using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 
 namespace RhuEngine.Components
 {
-	public class ConvexHullMesh : ProceduralMesh
+	[Category(new string[] { "Assets/Procedural Meshes" })]
+	public sealed class ConvexHullMesh : ProceduralMesh
 	{
 		[OnChanged(nameof(LoadMesh))]
-		public SyncValueList<Vector3f> points = new SyncValueList<Vector3f>();
+		public readonly SyncValueList<Vector3f> points = new();
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> splitVerts;
+		public readonly Sync<bool> splitVerts;
 
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {

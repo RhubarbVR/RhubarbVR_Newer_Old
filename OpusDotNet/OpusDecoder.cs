@@ -5,7 +5,7 @@ namespace OpusDotNet
 	/// <summary>
 	/// Provides audio decoding with Opus.
 	/// </summary>
-	public class OpusDecoder : IDisposable
+	public sealed class OpusDecoder : IDisposable
 	{
 		private readonly SafeDecoderHandle _handle;
 		// Number of samples in the frame size, per channel.

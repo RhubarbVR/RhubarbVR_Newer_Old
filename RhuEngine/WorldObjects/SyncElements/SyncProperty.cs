@@ -5,13 +5,15 @@ using System.Runtime.CompilerServices;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public interface ISyncProperty
 	{
 		void Bind(string value, object from);
 	}
-	public class SyncProperty<T> : SyncObject, ILinkerMember<T>,ISyncProperty
+	public sealed class SyncProperty<T> : SyncObject, ILinkerMember<T>,ISyncProperty, ISyncMember
 	{
 		public Action<T> SetValue;
 		public Func<T> GetValue;
@@ -27,15 +29,18 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		[Exsposed]
+		[Exposed]
 		public T Value
 		{
 			get => GetValue.Invoke();
-			set => SetValue.Invoke(value);
+			set {
+				Changed.Invoke(this);
+				SetValue.Invoke(value);
+			}
 		}
 		public object Object { get => GetValue.Invoke(); set => SetValue.Invoke((T)value); }
-		
-		public override void InitializeMembers(bool networkedObject, bool deserializeFunc, Func<NetPointer> func) {
+
+		protected override void InitializeMembers(bool networkedObject, bool deserializeFunc, NetPointerUpdateDelegate func) {
 		}
 
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {

@@ -8,7 +8,7 @@ namespace RNumerics
 	// ported from WildMagic 5 
 	// https://www.geometrictools.com/Downloads/Downloads.html
 
-	public class DistPoint3Triangle3
+	public sealed class DistPoint3Triangle3
 	{
 		Vector3d _point;
 		public Vector3d Point
@@ -30,7 +30,7 @@ namespace RNumerics
 		public Vector3d TriangleBaryCoords;
 
 
-		public DistPoint3Triangle3(Vector3d PointIn, Triangle3d TriangleIn) {
+		public DistPoint3Triangle3(in Vector3d PointIn, in Triangle3d TriangleIn) {
 			_point = PointIn;
 			_triangle = TriangleIn;
 		}
@@ -60,10 +60,10 @@ namespace RNumerics
 			var edge0 = triangle.V1 - triangle.V0;
 			var edge1 = triangle.V2 - triangle.V0;
 			var a00 = edge0.LengthSquared;
-			var a01 = edge0.Dot(ref edge1);
+			var a01 = edge0.Dot( edge1);
 			var a11 = edge1.LengthSquared;
-			var b0 = diff.Dot(ref edge0);
-			var b1 = diff.Dot(ref edge1);
+			var b0 = diff.Dot( edge0);
+			var b1 = diff.Dot( edge1);
 			var c = diff.LengthSquared;
 			var det = Math.Abs((a00 * a11) - (a01 * a01));
 			var s = (a01 * b1) - (a11 * b0);

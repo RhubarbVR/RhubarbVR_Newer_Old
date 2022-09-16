@@ -1,8 +1,16 @@
 ﻿using System;
-
+using System.Reflection;
 namespace RhuEngine.WorldObjects.ECS
 {
-	public abstract class Component : SyncObject, IOffsetableElement
+	public interface IComponent : ISyncObject
+	{
+		Entity Entity { get; }
+		int Offset { get; }
+
+		void RunAttach();
+	}
+
+	public abstract class Component : SyncObject, IComponent, IOffsetableElement
 	{
 		[NoSave]
 		[NoShow]
@@ -11,7 +19,7 @@ namespace RhuEngine.WorldObjects.ECS
 		[NoSyncUpdate]
 		public Entity Entity { get; private set; }
 
-		public override void OnInitialize() {
+		protected override void OnInitialize() {
 			base.OnInitialize();
 			Entity = (Entity)Parent.Parent;
 			if (Entity.IsEnabled) {
@@ -23,12 +31,12 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		[Default(true)]
-		public Sync<bool> Enabled;
+		public readonly Sync<bool> Enabled;
 
 		[OnChanged(nameof(OnOrderOffsetChanged))]
-		public Sync<int> OrderOffset;
+		public readonly Sync<int> OrderOffset;
 
-		public void OnOrderOffsetChanged() {
+		protected void OnOrderOffsetChanged() {
 			OffsetChanged?.Invoke();
 		}
 
@@ -40,29 +48,66 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 
-		public virtual void AddListObject() {
+		internal void ListObjectUpdate(bool add) {
+			if (add && !IsDestroying) {
+				AddListObject();
+			}
+			else {
+				RemoveListObject();
+			}
+		}
+
+		protected virtual void AddListObject() {
 
 		}
 
-		public virtual void RemoveListObject() {
+		protected virtual void RemoveListObject() {
 
 		}
 
-		public virtual void OnAttach() {
+		public void RunAttach() {
+			OnAttach();
+		}
+
+		protected virtual void OnAttach() {
 
 		}
 
-		public virtual void Step() {
+		internal void RunRenderStep(bool isEnabled) {
+			AlwaysRenderStep();
+			if (isEnabled) {
+				RenderStep();
+			}
+		}
+		internal void RunStep(bool isEnabled) {
+			AlwaysStep();
+			if (isEnabled) {
+				Step();
+			}
+		}
+
+		protected virtual void RenderStep() {
 
 		}
-		public virtual void AlwaysStep() {
+		protected virtual void AlwaysRenderStep() {
+
+		}
+
+		protected virtual void Step() {
+
+		}
+		protected virtual void AlwaysStep() {
 
 		}
 
 		public event Action OffsetChanged;
 
-		public void AddWorldCoroutine(Action action) {
-			World.AddCoroutine(action);
+		public override void Dispose() {
+			base.Dispose();
+			try {
+				RemoveListObject();
+			}
+			catch { }
 		}
 	}
 }

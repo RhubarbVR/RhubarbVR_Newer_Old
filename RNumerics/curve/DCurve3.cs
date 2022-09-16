@@ -9,175 +9,175 @@ namespace RNumerics
 	/// DCurve3 is a 3D polyline, either open or closed (via .Closed)
 	/// Despite the D prefix, it is *not* dynamic
 	/// </summary>
-	public class DCurve3 : ISampledCurve3d
+	public sealed class DCurve3 : ISampledCurve3d
 	{
 		// [TODO] use dvector? or double-indirection indexing?
 		//   question is how to insert efficiently...
-		protected List<Vector3d> vertices;
+		private List<Vector3d> _vertices;
 		public bool Closed { get; set; }
 		public int Timestamp;
 
 		public DCurve3() {
-			vertices = new List<Vector3d>();
+			_vertices = new List<Vector3d>();
 			Closed = false;
 			Timestamp = 1;
 		}
 
-		public DCurve3(List<Vector3d> verticesIn, bool bClosed, bool bTakeOwnership = false) {
-			vertices = bTakeOwnership ? verticesIn : new List<Vector3d>(verticesIn);
+		public DCurve3(in List<Vector3d> verticesIn, in bool bClosed, in bool bTakeOwnership = false) {
+			_vertices = bTakeOwnership ? verticesIn : new List<Vector3d>(verticesIn);
 			Closed = bClosed;
 			Timestamp = 1;
 		}
-		public DCurve3(IEnumerable<Vector3d> verticesIn, bool bClosed) {
-			vertices = new List<Vector3d>(verticesIn);
+		public DCurve3(in IEnumerable<Vector3d> verticesIn, in bool bClosed) {
+			_vertices = new List<Vector3d>(verticesIn);
 			Closed = bClosed;
 			Timestamp = 1;
 		}
 
-		public DCurve3(DCurve3 copy) {
-			vertices = new List<Vector3d>(copy.vertices);
+		public DCurve3(in DCurve3 copy) {
+			_vertices = new List<Vector3d>(copy._vertices);
 			Closed = copy.Closed;
 			Timestamp = 1;
 		}
 
-		public DCurve3(ISampledCurve3d icurve) {
-			vertices = new List<Vector3d>(icurve.Vertices);
+		public DCurve3(in ISampledCurve3d icurve) {
+			_vertices = new List<Vector3d>(icurve.Vertices);
 			Closed = icurve.Closed;
 			Timestamp = 1;
 		}
 
-		public DCurve3(Polygon2d poly, int ix = 0, int iy = 1) {
+		public DCurve3(in Polygon2d poly, in int ix = 0, in int iy = 1) {
 			var NV = poly.VertexCount;
-			vertices = new List<Vector3d>(NV);
+			_vertices = new List<Vector3d>(NV);
 			for (var k = 0; k < NV; ++k) {
 				var v = Vector3d.Zero;
 				v[ix] = poly[k].x;
 				v[iy] = poly[k].y;
-				vertices.Add(v);
+				_vertices.Add(v);
 			}
 			Closed = true;
 			Timestamp = 1;
 		}
 
-		public void AppendVertex(Vector3d v) {
-			vertices.Add(v);
+		public void AppendVertex(in Vector3d v) {
+			_vertices.Add(v);
 			Timestamp++;
 		}
 
-		public int VertexCount => vertices.Count;
-		public int SegmentCount => Closed ? vertices.Count : vertices.Count - 1;
+		public int VertexCount => _vertices.Count;
+		public int SegmentCount => Closed ? _vertices.Count : _vertices.Count - 1;
 
-		public Vector3d GetVertex(int i) {
-			return vertices[i];
+		public Vector3d GetVertex(in int i) {
+			return _vertices[i];
 		}
-		public void SetVertex(int i, Vector3d v) {
-			vertices[i] = v;
+		public void SetVertex(in int i, in Vector3d v) {
+			_vertices[i] = v;
 			Timestamp++;
 		}
 
-		public void SetVertices(VectorArray3d v) {
-			vertices = new List<Vector3d>();
+		public void SetVertices(in VectorArray3d v) {
+			_vertices = new List<Vector3d>();
 			for (var i = 0; i < v.Count; ++i) {
-				vertices.Add(v[i]);
+				_vertices.Add(v[i]);
 			}
 
 			Timestamp++;
 		}
 
-		public void SetVertices(IEnumerable<Vector3d> v) {
-			vertices = new List<Vector3d>(v);
+		public void SetVertices(in IEnumerable<Vector3d> v) {
+			_vertices = new List<Vector3d>(v);
 			Timestamp++;
 		}
 
-		public void SetVertices(List<Vector3d> vertices, bool bTakeOwnership) {
+		public void SetVertices(in List<Vector3d> vertices, in bool bTakeOwnership) {
 			var dCurve3 = this;
-			dCurve3.vertices = bTakeOwnership ? vertices : new List<Vector3d>(vertices);
+			dCurve3._vertices = bTakeOwnership ? vertices : new List<Vector3d>(vertices);
 			Timestamp++;
 		}
 
 		public void ClearVertices() {
-			vertices = new List<Vector3d>();
+			_vertices = new List<Vector3d>();
 			Closed = false;
 			Timestamp++;
 		}
 
-		public void RemoveVertex(int idx) {
-			vertices.RemoveAt(idx);
+		public void RemoveVertex(in int idx) {
+			_vertices.RemoveAt(idx);
 			Timestamp++;
 		}
 
 		public void Reverse() {
-			vertices.Reverse();
+			_vertices.Reverse();
 			Timestamp++;
 		}
 
 
-		public Vector3d this[int key]
+		public Vector3d this[in int key]
 		{
-			get => vertices[key];
-			set { vertices[key] = value; Timestamp++; }
+			get => _vertices[key];
+			set { _vertices[key] = value; Timestamp++; }
 		}
 
-		public Vector3d Start => vertices[0];
-		public Vector3d End => Closed ? vertices[0] : vertices.Last();
+		public Vector3d Start => _vertices[0];
+		public Vector3d End => Closed ? _vertices[0] : _vertices.Last();
 
-		public IEnumerable<Vector3d> Vertices => vertices;
+		public IEnumerable<Vector3d> Vertices => _vertices;
 
 
-		public Segment3d GetSegment(int iSegment) {
-			return Closed ? new Segment3d(vertices[iSegment], vertices[(iSegment + 1) % vertices.Count])
-				: new Segment3d(vertices[iSegment], vertices[iSegment + 1]);
+		public Segment3d GetSegment(in int iSegment) {
+			return Closed ? new Segment3d(_vertices[iSegment], _vertices[(iSegment + 1) % _vertices.Count])
+				: new Segment3d(_vertices[iSegment], _vertices[iSegment + 1]);
 		}
 
 		public IEnumerable<Segment3d> SegmentItr() {
 			if (Closed) {
-				var NV = vertices.Count;
+				var NV = _vertices.Count;
 				for (var i = 0; i < NV; ++i) {
-					yield return new Segment3d(vertices[i], vertices[(i + 1) % NV]);
+					yield return new Segment3d(_vertices[i], _vertices[(i + 1) % NV]);
 				}
 			}
 			else {
-				var NV = vertices.Count - 1;
+				var NV = _vertices.Count - 1;
 				for (var i = 0; i < NV; ++i) {
-					yield return new Segment3d(vertices[i], vertices[i + 1]);
+					yield return new Segment3d(_vertices[i], _vertices[i + 1]);
 				}
 			}
 		}
 
-		public Vector3d PointAt(int iSegment, double fSegT) {
-			var seg = new Segment3d(vertices[iSegment], vertices[(iSegment + 1) % vertices.Count]);
+		public Vector3d PointAt(in int iSegment, in double fSegT) {
+			var seg = new Segment3d(_vertices[iSegment], _vertices[(iSegment + 1) % _vertices.Count]);
 			return seg.PointAt(fSegT);
 		}
 
 
 		public AxisAlignedBox3d GetBoundingBox() {
 			var box = AxisAlignedBox3d.Empty;
-			foreach (var v in vertices) {
+			foreach (var v in _vertices) {
 				box.Contain(v);
 			}
 
 			return box;
 		}
 
-		public double ArcLength => CurveUtils.ArcLength(vertices, Closed);
+		public double ArcLength => CurveUtils.ArcLength(_vertices, Closed);
 
-		public Vector3d Tangent(int i) {
-			return CurveUtils.GetTangent(vertices, i, Closed);
+		public Vector3d Tangent(in int i) {
+			return CurveUtils.GetTangent(_vertices, i, Closed);
 		}
 
-		public Vector3d Centroid(int i) {
+		public Vector3d Centroid(in int i) {
 			if (Closed) {
-				var NV = vertices.Count;
-				return i == 0 ? 0.5 * (vertices[1] + vertices[NV - 1]) : 0.5 * (vertices[(i + 1) % NV] + vertices[i - 1]);
+				var NV = _vertices.Count;
+				return i == 0 ? 0.5 * (_vertices[1] + _vertices[NV - 1]) : 0.5 * (_vertices[(i + 1) % NV] + _vertices[i - 1]);
 			}
 			else {
-				return i == 0 || i == vertices.Count - 1 ? vertices[i] : 0.5 * (vertices[i + 1] + vertices[i - 1]);
+				return i == 0 || i == _vertices.Count - 1 ? _vertices[i] : 0.5 * (_vertices[i + 1] + _vertices[i - 1]);
 			}
 		}
 
 
-		public Index2i Neighbours(int i) {
-			var NV = vertices.Count;
+		public Index2i Neighbours(in int i) {
+			var NV = _vertices.Count;
 			return Closed
 				? i == 0 ? new Index2i(NV - 1, 1) : new Index2i(i - 1, (i + 1) % NV)
 				: i == 0 ? new Index2i(-1, 1) : i == NV - 1 ? new Index2i(NV - 2, -1) : new Index2i(i - 1, i + 1);
@@ -187,20 +187,20 @@ namespace RNumerics
 		/// <summary>
 		/// Compute opening angle at vertex i in degrees
 		/// </summary>
-		public double OpeningAngleDeg(int i) {
+		public double OpeningAngleDeg(in int i) {
 			int prev = i - 1, next = i + 1;
 			if (Closed) {
-				var NV = vertices.Count;
+				var NV = _vertices.Count;
 				prev = (i == 0) ? NV - 1 : prev;
 				next %= NV;
 			}
 			else {
-				if (i == 0 || i == vertices.Count - 1) {
+				if (i == 0 || i == _vertices.Count - 1) {
 					return 180;
 				}
 			}
-			var e1 = vertices[prev] - vertices[i];
-			var e2 = vertices[next] - vertices[i];
+			var e1 = _vertices[prev] - _vertices[i];
+			var e2 = _vertices[next] - _vertices[i];
 			e1.Normalize();
 			e2.Normalize();
 			return Vector3d.AngleD(e1, e2);
@@ -210,12 +210,12 @@ namespace RNumerics
 		/// <summary>
 		/// Find nearest vertex to point p
 		/// </summary>
-		public int NearestVertex(Vector3d p) {
+		public int NearestVertex(in Vector3d p) {
 			var nearSqr = double.MaxValue;
 			var i = -1;
-			var N = vertices.Count;
+			var N = _vertices.Count;
 			for (var vi = 0; vi < N; ++vi) {
-				var distSqr = vertices[vi].DistanceSquared(ref p);
+				var distSqr = _vertices[vi].DistanceSquared(p);
 				if (distSqr < nearSqr) {
 					nearSqr = distSqr;
 					i = vi;
@@ -228,15 +228,15 @@ namespace RNumerics
 		/// <summary>
 		/// find squared distance from p to nearest segment on polyline
 		/// </summary>
-		public double DistanceSquared(Vector3d p, out int iNearSeg, out double fNearSegT) {
+		public double DistanceSquared(in Vector3d p, out int iNearSeg, out double fNearSegT) {
 			iNearSeg = -1;
 			fNearSegT = double.MaxValue;
 			var dist = double.MaxValue;
-			var N = Closed ? vertices.Count : vertices.Count - 1;
+			var N = Closed ? _vertices.Count : _vertices.Count - 1;
 			for (var vi = 0; vi < N; ++vi) {
 				var a = vi;
-				var b = (vi + 1) % vertices.Count;
-				var seg = new Segment3d(vertices[a], vertices[b]);
+				var b = (vi + 1) % _vertices.Count;
+				var seg = new Segment3d(_vertices[a], _vertices[b]);
 				var t = (p - seg.Center).Dot(seg.Direction);
 				var d = t >= seg.Extent
 					? seg.P1.DistanceSquared(p)
@@ -250,7 +250,7 @@ namespace RNumerics
 			}
 			return dist;
 		}
-		public double DistanceSquared(Vector3d p) {
+		public double DistanceSquared(in Vector3d p) {
 			return DistanceSquared(p, out var iseg, out var segt);
 		}
 
@@ -264,8 +264,8 @@ namespace RNumerics
 		/// 
 		/// [TODO] skip tiny segments?
 		/// </summary>
-		public DCurve3 ResampleSharpTurns(double sharp_thresh = 90, double flat_thresh = 189, double corner_t = 0.01) {
-			var NV = vertices.Count;
+		public DCurve3 ResampleSharpTurns(in double sharp_thresh = 90, in double flat_thresh = 189, in double corner_t = 0.01) {
+			var NV = _vertices.Count;
 			var resampled = new DCurve3() { Closed = Closed };
 			var prev_t = 1.0 - corner_t;
 			for (var k = 0; k < NV; ++k) {
@@ -274,14 +274,14 @@ namespace RNumerics
 					// ignore skip this vertex
 				}
 				else if (open_angle > sharp_thresh) {
-					resampled.AppendVertex(vertices[k]);
+					resampled.AppendVertex(_vertices[k]);
 				}
 				else {
-					var n = vertices[(k + 1) % NV];
-					var p = vertices[k == 0 ? NV - 1 : k - 1];
-					resampled.AppendVertex(Vector3d.Lerp(p, vertices[k], prev_t));
-					resampled.AppendVertex(vertices[k]);
-					resampled.AppendVertex(Vector3d.Lerp(vertices[k], n, corner_t));
+					var n = _vertices[(k + 1) % NV];
+					var p = _vertices[k == 0 ? NV - 1 : k - 1];
+					resampled.AppendVertex(Vector3d.Lerp(p, _vertices[k], prev_t));
+					resampled.AppendVertex(_vertices[k]);
+					resampled.AppendVertex(Vector3d.Lerp(_vertices[k], n, corner_t));
 				}
 			}
 			return resampled;

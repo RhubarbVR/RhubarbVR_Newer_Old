@@ -6,17 +6,17 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "User" })]
-	public class UserAudioManager : Component
+	public sealed class UserAudioManager : Component
 	{
-		public SyncRef<User> user;
+		public readonly SyncRef<User> user;
 
-		public Linker<float> audioVolume;
+		public readonly Linker<float> audioVolume;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			user.Target = World.GetLocalUser();
 		}
 
-		public override void Step() {
+		protected override void RenderStep() {
 			if (user.Target is null) {
 				return;
 			}

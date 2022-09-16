@@ -19,8 +19,10 @@ namespace RNumerics
 	//
 	// Currently poke-face and split-edge are supported, but not collapse or flip.
 	// 
-	public partial class NTMesh3 : IDeformableMesh
+	public sealed partial class NTMesh3 : IDeformableMesh
 	{
+		public bool IsTriangleMesh => true;
+
 		public IEnumerable<Vector3f> VertexPos() {
 			for (var i = 0; i < VertexCount; i++) {
 				yield return GetVertexf(i);
@@ -49,11 +51,11 @@ namespace RNumerics
 		DVector<int> _edges;
 		SmallListSet _edge_triangles;
 
-		public NTMesh3(bool bWantNormals = true, bool bWantColors = false, bool bWantTriGroups = false) {
+		public NTMesh3(in bool bWantNormals = true, in bool bWantColors = false, in bool bWantTriGroups = false) {
 			Allocate(bWantNormals, bWantColors, bWantTriGroups);
 		}
 
-		private void Allocate(bool bWantNormals, bool bWantColors, bool bWantTriGroups) {
+		private void Allocate(in bool bWantNormals, in bool bWantColors, in bool bWantTriGroups) {
 			_vertices = new DVector<double>();
 			if (bWantNormals) {
 				_normals = new DVector<float>();
@@ -83,11 +85,11 @@ namespace RNumerics
 
 
 
-		public NTMesh3(NTMesh3 copy) {
+		public NTMesh3(in NTMesh3 copy) {
 			Copy(copy, true, true);
 		}
 
-		public void Copy(NTMesh3 copy, bool bNormals = true, bool bColors = true) {
+		public void Copy(in NTMesh3 copy, in bool bNormals = true, in bool bColors = true) {
 			_vertices = new DVector<double>(copy._vertices);
 			_normals = (bNormals && copy._normals != null) ? new DVector<float>(copy._normals) : null;
 			_colors = (bColors && copy._colors != null) ? new DVector<float>(copy._colors) : null;
@@ -112,7 +114,7 @@ namespace RNumerics
 
 
 
-		void UpdateTimeStamp(bool bShapeChange) {
+		void UpdateTimeStamp(in bool bShapeChange) {
 			Timestamp++;
 			if (bShapeChange) {
 				ShapeTimestamp++;
@@ -142,13 +144,13 @@ namespace RNumerics
 
 		// info
 
-		public bool IsVertex(int vID) {
+		public bool IsVertex(in int vID) {
 			return _vertices_refcount.IsValid(vID);
 		}
-		public bool IsTriangle(int tID) {
+		public bool IsTriangle(in int tID) {
 			return _triangles_refcount.IsValid(tID);
 		}
-		public bool IsEdge(int eID) {
+		public bool IsEdge(in int eID) {
 			return _edges_refcount.IsValid(eID);
 		}
 
@@ -156,16 +158,16 @@ namespace RNumerics
 		// getters
 
 
-		public Vector3d GetVertex(int vID) {
+		public Vector3d GetVertex(in int vID) {
 			var i = 3 * vID;
 			return new Vector3d(_vertices[i], _vertices[i + 1], _vertices[i + 2]);
 		}
-		public Vector3f GetVertexf(int vID) {
+		public Vector3f GetVertexf(in int vID) {
 			var i = 3 * vID;
 			return new Vector3f((float)_vertices[i], (float)_vertices[i + 1], (float)_vertices[i + 2]);
 		}
 
-		public void SetVertex(int vID, Vector3d vNewPos) {
+		public void SetVertex(in int vID, in Vector3d vNewPos) {
 			Debug.Assert(vNewPos.IsFinite);     // this will really catch a lot of bugs...
 			var i = 3 * vID;
 			_vertices[i] = vNewPos.x;
@@ -174,7 +176,7 @@ namespace RNumerics
 			UpdateTimeStamp(true);
 		}
 
-		public Vector3f GetVertexNormal(int vID) {
+		public Vector3f GetVertexNormal(in int vID) {
 			if (_normals == null) {
 				return Vector3f.AxisY;
 			}
@@ -184,11 +186,11 @@ namespace RNumerics
 			}
 		}
 
-		public Vector2f GetVertexUV(int i, int channel) {
+		public Vector2f GetVertexUV(in int i, in int channel) {
 			return Vector2f.Zero;
 		}
 
-		public void SetVertexNormal(int vID, Vector3f vNewNormal) {
+		public void SetVertexNormal(in int vID, in Vector3f vNewNormal) {
 			if (HasVertexNormals) {
 				var i = 3 * vID;
 				_normals[i] = vNewNormal.x;
@@ -198,7 +200,7 @@ namespace RNumerics
 			}
 		}
 
-		public Vector3f GetVertexColor(int vID) {
+		public Vector3f GetVertexColor(in int vID) {
 			if (_colors == null) {
 				return Vector3f.One;
 			}
@@ -208,7 +210,7 @@ namespace RNumerics
 			}
 		}
 
-		public void SetVertexColor(int vID, Vector3f vNewColor) {
+		public void SetVertexColor(in int vID, in Vector3f vNewColor) {
 			if (HasVertexColors) {
 				var i = 3 * vID;
 				_colors[i] = vNewColor.x;
@@ -219,7 +221,7 @@ namespace RNumerics
 		}
 
 
-		public bool GetVertex(int vID, ref NewVertexInfo vinfo, bool bWantNormals, bool bWantColors) {
+		public bool GetVertex(in int vID, ref NewVertexInfo vinfo, in bool bWantNormals, in bool bWantColors) {
 			if (_vertices_refcount.IsValid(vID) == false) {
 				return false;
 			}
@@ -238,7 +240,7 @@ namespace RNumerics
 		}
 
 
-		public int GetVtxEdgeCount(int vID) {
+		public int GetVtxEdgeCount(in int vID) {
 			return _vertices_refcount.IsValid(vID) ? _vertex_edges.Count(vID) : -1;
 		}
 
@@ -252,7 +254,7 @@ namespace RNumerics
 			return max;
 		}
 
-		public NewVertexInfo GetVertexAll(int i) {
+		public NewVertexInfo GetVertexAll(in int i) {
 			var vi = new NewVertexInfo {
 				v = GetVertex(i)
 			};
@@ -286,17 +288,17 @@ namespace RNumerics
 			}
 		}
 
-		public Index3i GetTriangle(int tID) {
+		public Index3i GetTriangle(in int tID) {
 			var i = 3 * tID;
 			return new Index3i(_triangles[i], _triangles[i + 1], _triangles[i + 2]);
 		}
 
-		public Index3i GetTriEdges(int tID) {
+		public Index3i GetTriEdges(in int tID) {
 			var i = 3 * tID;
 			return new Index3i(_triangle_edges[i], _triangle_edges[i + 1], _triangle_edges[i + 2]);
 		}
 
-		public int GetTriEdge(int tid, int j) {
+		public int GetTriEdge(in int tid, in int j) {
 			return _triangle_edges[(3 * tid) + j];
 		}
 
@@ -317,12 +319,12 @@ namespace RNumerics
 
 
 
-		public int GetTriangleGroup(int tID) {
+		public int GetTriangleGroup(in int tID) {
 			return (_triangle_groups == null) ? -1
 				: (_triangles_refcount.IsValid(tID) ? _triangle_groups[tID] : 0);
 		}
 
-		public void SetTriangleGroup(int tid, int group_id) {
+		public void SetTriangleGroup(in int tid, in int group_id) {
 			if (_triangle_groups != null) {
 				_triangle_groups[tid] = group_id;
 				MaxGroupID = Math.Max(MaxGroupID, group_id + 1);
@@ -335,7 +337,7 @@ namespace RNumerics
 		}
 
 
-		public void GetTriVertices(int tID, ref Vector3d v0, ref Vector3d v1, ref Vector3d v2) {
+		public void GetTriVertices(in int tID, ref Vector3d v0, ref Vector3d v1, ref Vector3d v2) {
 			var ai = 3 * _triangles[3 * tID];
 			v0.x = _vertices[ai];
 			v0.y = _vertices[ai + 1];
@@ -350,22 +352,22 @@ namespace RNumerics
 			v2.z = _vertices[ci + 2];
 		}
 
-		public Vector3d GetTriVertex(int tid, int j) {
+		public Vector3d GetTriVertex(in int tid, in int j) {
 			var a = _triangles[(3 * tid) + j];
 			return new Vector3d(_vertices[3 * a], _vertices[(3 * a) + 1], _vertices[(3 * a) + 2]);
 		}
 
 
-		public Vector3d GetTriNormal(int tID) {
+		public Vector3d GetTriNormal(in int tID) {
 			Vector3d v0 = Vector3d.Zero, v1 = Vector3d.Zero, v2 = Vector3d.Zero;
 			GetTriVertices(tID, ref v0, ref v1, ref v2);
-			return MathUtil.Normal(ref v0, ref v1, ref v2);
+			return MathUtil.Normal( v0,  v1,  v2);
 		}
 
-		public double GetTriArea(int tID) {
+		public double GetTriArea(in int tID) {
 			Vector3d v0 = Vector3d.Zero, v1 = Vector3d.Zero, v2 = Vector3d.Zero;
 			GetTriVertices(tID, ref v0, ref v1, ref v2);
-			return MathUtil.Area(ref v0, ref v1, ref v2);
+			return MathUtil.Area( v0,  v1,  v2);
 		}
 
 		/// <summary>
@@ -373,17 +375,17 @@ namespace RNumerics
 		/// lookups and computes normal & area simultaneously. *However* does not produce
 		/// the same normal/area as separate calls, because of this.
 		/// </summary>
-		public void GetTriInfo(int tID, out Vector3d normal, out double fArea, out Vector3d vCentroid) {
+		public void GetTriInfo(in int tID, out Vector3d normal, out double fArea, out Vector3d vCentroid) {
 			Vector3d v0 = Vector3d.Zero, v1 = Vector3d.Zero, v2 = Vector3d.Zero;
 			GetTriVertices(tID, ref v0, ref v1, ref v2);
 			vCentroid = 1.0 / 3.0 * (v0 + v1 + v2);
-			normal = MathUtil.FastNormalArea(ref v0, ref v1, ref v2, out fArea);
+			normal = MathUtil.FastNormalArea( v0,  v1,  v2, out fArea);
 		}
 
 
 
 
-		public AxisAlignedBox3d GetTriBounds(int tID) {
+		public AxisAlignedBox3d GetTriBounds(in int tID) {
 			var vi = 3 * _triangles[3 * tID];
 			double x = _vertices[vi], y = _vertices[vi + 1], z = _vertices[vi + 2];
 			double minx = x, maxx = x, miny = y, maxy = y, minz = z, maxz = z;
@@ -417,7 +419,7 @@ namespace RNumerics
 		}
 
 
-		public Frame3f GetTriFrame(int tID, int nEdge = 0) {
+		public Frame3f GetTriFrame(in int tID, in int nEdge = 0) {
 			var ti = 3 * tID;
 			var a = _triangles[ti + (nEdge % 3)];
 			var b = _triangles[ti + ((nEdge + 1) % 3)];
@@ -426,7 +428,7 @@ namespace RNumerics
 			var v1 = new Vector3d(_vertices[3 * b], _vertices[(3 * b) + 1], _vertices[(3 * b) + 2]);
 			var v2 = new Vector3d(_vertices[3 * c], _vertices[(3 * c) + 1], _vertices[(3 * c) + 2]);
 			var edge = (Vector3f)(v1 - v0).Normalized;
-			var normal = (Vector3f)MathUtil.Normal(ref v0, ref v1, ref v2);
+			var normal = (Vector3f)MathUtil.Normal( v0,  v1,  v2);
 			var other = edge.Cross(normal);
 			var center = (Vector3f)(v0 + v1 + v2) / 3;
 			return new Frame3f(center, edge, other, normal);
@@ -436,11 +438,11 @@ namespace RNumerics
 
 
 
-		public Index2i GetEdgeV(int eID) {
+		public Index2i GetEdgeV(in int eID) {
 			var i = 2 * eID;
 			return new Index2i(_edges[i], _edges[i + 1]);
 		}
-		public bool GetEdgeV(int eID, ref Vector3d a, ref Vector3d b) {
+		public bool GetEdgeV(in int eID, ref Vector3d a, ref Vector3d b) {
 			var iv0 = 3 * _edges[2 * eID];
 			a.x = _vertices[iv0];
 			a.y = _vertices[iv0 + 1];
@@ -453,24 +455,24 @@ namespace RNumerics
 		}
 
 
-		public IEnumerable<int> EdgeTrianglesItr(int eID) {
+		public IEnumerable<int> EdgeTrianglesItr(in int eID) {
 			return _edge_triangles.ValueItr(eID);
 		}
 
-		public int EdgeTrianglesCount(int eID) {
+		public int EdgeTrianglesCount(in int eID) {
 			return _edge_triangles.Count(eID);
 		}
 
 
 		// return same indices as GetEdgeV, but oriented based on attached triangle
-		public Index2i GetOrientedBoundaryEdgeV(int eID) {
+		public Index2i GetOrientedBoundaryEdgeV(in int eID) {
 			if (_edges_refcount.IsValid(eID) && Edge_is_boundary(eID)) {
 				var ei = 2 * eID;
 				int a = _edges[ei], b = _edges[ei + 1];
 
 				var ti = _edge_triangles.First(eID);
 				var tri = new Index3i(_triangles[ti], _triangles[ti + 1], _triangles[ti + 2]);
-				var ai = IndexUtil.Find_edge_index_in_tri(a, b, ref tri);
+				var ai = IndexUtil.Find_edge_index_in_tri(a, b, tri);
 				return new Index2i(tri[ai], tri[(ai + 1) % 3]);
 			}
 			return InvalidEdge;
@@ -480,7 +482,7 @@ namespace RNumerics
 		// mesh-building
 
 
-		public int AppendVertex(Vector3d v) {
+		public int AppendVertex(in Vector3d v) {
 			return AppendVertex(new NewVertexInfo() {
 				v = v,
 				bHaveC = false,
@@ -488,7 +490,7 @@ namespace RNumerics
 				bHaveN = false
 			});
 		}
-		public int AppendVertex(NewVertexInfo info) {
+		public int AppendVertex(in NewVertexInfo info) {
 			var vid = _vertices_refcount.Allocate();
 			var i = 3 * vid;
 			_vertices.Insert(info.v[2], i + 2);
@@ -516,10 +518,10 @@ namespace RNumerics
 		}
 
 
-		public int AppendTriangle(int v0, int v1, int v2, int gid = -1) {
+		public int AppendTriangle(in int v0, in int v1, in int v2, in int gid = -1) {
 			return AppendTriangle(new Index3i(v0, v1, v2), gid);
 		}
-		public int AppendTriangle(Index3i tv, int gid = -1) {
+		public int AppendTriangle(in Index3i tv, in int gid = -1) {
 			if (IsVertex(tv[0]) == false || IsVertex(tv[1]) == false || IsVertex(tv[2]) == false) {
 				return INVALID_ID;
 			}
@@ -556,7 +558,7 @@ namespace RNumerics
 			return tid;
 		}
 		// helper fn for above, just makes code cleaner
-		void Add_tri_edge(int tid, int v0, int v1, int j, int eid) {
+		void Add_tri_edge(in int tid, in int v0, in int v1, in int j, int eid) {
 			if (eid != INVALID_ID) {
 				_edge_triangles.Insert(eid, tid);
 				_triangle_edges.Insert(eid, (3 * tid) + j);
@@ -571,7 +573,7 @@ namespace RNumerics
 
 
 
-		public void EnableVertexNormals(Vector3f initial_normal) {
+		public void EnableVertexNormals(in Vector3f initial_normal) {
 			if (HasVertexNormals) {
 				return;
 			}
@@ -590,7 +592,7 @@ namespace RNumerics
 			_normals = null;
 		}
 
-		public void EnableVertexColors(Vector3f initial_color) {
+		public void EnableVertexColors(in Vector3f initial_color) {
 			if (HasVertexColors) {
 				return;
 			}
@@ -610,7 +612,7 @@ namespace RNumerics
 		}
 
 
-		public void EnableTriangleGroups(int initial_group = 0) {
+		public void EnableTriangleGroups(in int initial_group = 0) {
 			if (HasTriangleGroups) {
 				return;
 			}
@@ -682,12 +684,12 @@ namespace RNumerics
 		// queries
 
 		// linear search through edges of vA
-		public int FindEdge(int vA, int vB) {
+		public int FindEdge(in int vA, in int vB) {
 			return Find_edge(vA, vB);
 		}
 
 		// faster than FindEdge
-		public int FindEdgeFromTri(int vA, int vB, int t) {
+		public int FindEdgeFromTri(in int vA, in int vB, in int t) {
 			return Find_edge_from_tri(vA, vB, t);
 		}
 
@@ -717,7 +719,7 @@ namespace RNumerics
 		}
 
 
-		public IEnumerable<int> VtxEdgesItr(int vID) {
+		public IEnumerable<int> VtxEdgesItr(in int vID) {
 			return _vertices_refcount.IsValid(vID) ? _vertex_edges.ValueItr(vID) : Enumerable.Empty<int>();
 		}
 
@@ -725,7 +727,7 @@ namespace RNumerics
 		/// <summary>
 		/// Returns count of boundary edges at vertex
 		/// </summary>
-		public int VtxBoundaryEdges(int vID) {
+		public int VtxBoundaryEdges(in int vID) {
 			if (_vertices_refcount.IsValid(vID)) {
 				var count = 0;
 				foreach (var eid in _vertex_edges.ValueItr(vID)) {
@@ -743,7 +745,7 @@ namespace RNumerics
 		/// e needs to be large enough (ie call VtxBoundaryEdges, or as large as max one-ring)
 		/// returns count, ie number of elements of e that were filled
 		/// </summary>
-		public int VtxAllBoundaryEdges(int vID, int[] e) {
+		public int VtxAllBoundaryEdges(in int vID, in int[] e) {
 			if (_vertices_refcount.IsValid(vID)) {
 				var count = 0;
 				foreach (var eid in _vertex_edges.ValueItr(vID)) {
@@ -762,35 +764,35 @@ namespace RNumerics
 
 
 
-		protected bool Tri_has_v(int tID, int vID) {
+		public bool Tri_has_v(in int tID, in int vID) {
 			var i = 3 * tID;
 			return _triangles[i] == vID
 				|| _triangles[i + 1] == vID
 				|| _triangles[i + 2] == vID;
 		}
 
-		protected bool Tri_is_boundary(int tID) {
+		public bool Tri_is_boundary(in int tID) {
 			var i = 3 * tID;
 			return Edge_is_boundary(_triangle_edges[i])
 				|| Edge_is_boundary(_triangle_edges[i + 1])
 				|| Edge_is_boundary(_triangle_edges[i + 2]);
 		}
 
-		protected bool Tri_has_neighbour_t(int tCheck, int tNbr) {
+		public bool Tri_has_neighbour_t(in int tCheck, in int tNbr) {
 			var i = 3 * tCheck;
 			return Edge_has_t(_triangle_edges[i], tNbr)
 				|| Edge_has_t(_triangle_edges[i + 1], tNbr)
 				|| Edge_has_t(_triangle_edges[i + 2], tNbr);
 		}
 
-		protected bool Tri_has_sequential_v(int tID, int vA, int vB) {
+		public bool Tri_has_sequential_v(in int tID, in int vA, in int vB) {
 			var i = 3 * tID;
 			int v0 = _triangles[i], v1 = _triangles[i + 1], v2 = _triangles[i + 2];
 			return (v0 == vA && v1 == vB) || (v1 == vA && v2 == vB) || (v2 == vA && v0 == vB);
 		}
 
 		//! returns edge ID
-		protected int Find_tri_neighbour_edge(int tID, int vA, int vB) {
+		public int Find_tri_neighbour_edge(in int tID, in int vA, in int vB) {
 			var i = 3 * tID;
 			int tv0 = _triangles[i], tv1 = _triangles[i + 1];
 			if (IndexUtil.Same_pair_unordered(tv0, tv1, vA, vB)) {
@@ -804,7 +806,7 @@ namespace RNumerics
 		}
 
 		// returns 0/1/2
-		protected int Find_tri_neighbour_index(int tID, int vA, int vB) {
+		public int Find_tri_neighbour_index(in int tID, in int vA, in int vB) {
 			var i = 3 * tID;
 			int tv0 = _triangles[i], tv1 = _triangles[i + 1];
 			if (IndexUtil.Same_pair_unordered(tv0, tv1, vA, vB)) {
@@ -816,34 +818,34 @@ namespace RNumerics
 		}
 
 
-		public bool IsNonManifoldEdge(int eid) {
+		public bool IsNonManifoldEdge(in int eid) {
 			return _edge_triangles.Count(eid) > 2;
 		}
-		public bool IsBoundaryEdge(int eid) {
+		public bool IsBoundaryEdge(in int eid) {
 			return _edge_triangles.Count(eid) == 1;
 		}
 
 
-		protected bool Edge_is_boundary(int eid) {
+		public bool Edge_is_boundary(in int eid) {
 			return _edge_triangles.Count(eid) == 1;
 		}
-		protected bool Edge_has_v(int eid, int vid) {
+		public bool Edge_has_v(in int eid, in int vid) {
 			var i = 2 * eid;
 			return (_edges[i] == vid) || (_edges[i + 1] == vid);
 		}
-		protected bool Edge_has_t(int eid, int tid) {
+		public bool Edge_has_t(in int eid, in int tid) {
 			return _edge_triangles.Contains(eid, tid);
 		}
-		protected int Edge_other_v(int eID, int vID) {
+		public int Edge_other_v(in int eID, in int vID) {
 			var i = 2 * eID;
 			int ev0 = _edges[i], ev1 = _edges[i + 1];
 			return (ev0 == vID) ? ev1 : ((ev1 == vID) ? ev0 : INVALID_ID);
 		}
 
-		public bool Vertex_is_boundary(int vID) {
+		public bool Vertex_is_boundary(in int vID) {
 			return IsBoundaryVertex(vID);
 		}
-		public bool IsBoundaryVertex(int vID) {
+		public bool IsBoundaryVertex(in int vID) {
 			foreach (var eid in _vertex_edges.ValueItr(vID)) {
 				if (_edge_triangles.Count(eid) == 1) {
 					return true;
@@ -853,14 +855,14 @@ namespace RNumerics
 		}
 
 
-		public bool IsBoundaryTriangle(int tID) {
+		public bool IsBoundaryTriangle(in int tID) {
 			var i = 3 * tID;
 			return IsBoundaryEdge(_triangle_edges[i]) || IsBoundaryEdge(_triangle_edges[i + 1]) || IsBoundaryEdge(_triangle_edges[i + 2]);
 		}
 
 
 
-		int Find_edge(int vA, int vB) {
+		int Find_edge(in int vA, in int vB) {
 			// [RMS] edge vertices must be sorted (min,max),
 			//   that means we only need one index-check in inner loop.
 			//   commented out code is robust to incorrect ordering, but slower.
@@ -878,7 +880,7 @@ namespace RNumerics
 			//return vertex_edges.Find(vI, (eid) => { return edges[4 * eid + 1] == vO; }, InvalidID);
 		}
 
-		int Find_edge_from_tri(int vA, int vB, int tID) {
+		int Find_edge_from_tri(in int vA, in int vB, in int tID) {
 			var i = 3 * tID;
 			int t0 = _triangles[i], t1 = _triangles[i + 1];
 			if (IndexUtil.Same_pair_unordered(vA, vB, t0, t1)) {
@@ -1011,20 +1013,20 @@ namespace RNumerics
 
 		// internal
 
-		public void Set_triangle(int tid, int v0, int v1, int v2) {
+		public void Set_triangle(in int tid, in int v0, in int v1, in int v2) {
 			var i = 3 * tid;
 			_triangles[i] = v0;
 			_triangles[i + 1] = v1;
 			_triangles[i + 2] = v2;
 		}
-		public void Set_triangle_edges(int tid, int e0, int e1, int e2) {
+		public void Set_triangle_edges(in int tid, in int e0, in int e1, in int e2) {
 			var i = 3 * tid;
 			_triangle_edges[i] = e0;
 			_triangle_edges[i + 1] = e1;
 			_triangle_edges[i + 2] = e2;
 		}
 
-		public int Add_edge(int vA, int vB, int tA, int tB = INVALID_ID) {
+		public int Add_edge(int vA, int vB, in int tA, in int tB = INVALID_ID) {
 			if (vB < vA) {
 				(vA, vB) = (vB, vA);
 			}
@@ -1048,7 +1050,7 @@ namespace RNumerics
 			return eid;
 		}
 
-		public int Replace_tri_vertex(int tID, int vOld, int vNew) {
+		public int Replace_tri_vertex(in int tID, in int vOld, in int vNew) {
 			var i = 3 * tID;
 			if (_triangles[i] == vOld) { _triangles[i] = vNew; return 0; }
 			if (_triangles[i + 1] == vOld) { _triangles[i + 1] = vNew; return 1; }
@@ -1056,7 +1058,7 @@ namespace RNumerics
 			return -1;
 		}
 
-		public int Add_triangle_only(int a, int b, int c, int e0, int e1, int e2) {
+		public int Add_triangle_only(in int a, in int b, in int c, in int e0, in int e1, in int e2) {
 			var tid = _triangles_refcount.Allocate();
 			var i = 3 * tid;
 			_triangles.Insert(c, i + 2);
@@ -1070,19 +1072,19 @@ namespace RNumerics
 
 
 
-		public void Allocate_vertex_edges_list(int vid) {
+		public void Allocate_vertex_edges_list(in int vid) {
 			if (vid < _vertex_edges.Size) {
 				_vertex_edges.Clear(vid);
 			}
 
 			_vertex_edges.AllocateAt(vid);
 		}
-		public List<int> Vertex_edges_list(int vid) {
+		public List<int> Vertex_edges_list(in int vid) {
 			return new List<int>(_vertex_edges.ValueItr(vid));
 		}
 
 
-		public void Allocate_edge_triangles_list(int eid) {
+		public void Allocate_edge_triangles_list(in int eid) {
 			if (eid < _edge_triangles.Size) {
 				_edge_triangles.Clear(eid);
 			}
@@ -1091,13 +1093,13 @@ namespace RNumerics
 		}
 
 
-		public void Set_edge_vertices(int eID, int a, int b) {
+		public void Set_edge_vertices(in int eID, in int a, in int b) {
 			var i = 2 * eID;
 			_edges[i] = Math.Min(a, b);
 			_edges[i + 1] = Math.Max(a, b);
 		}
 
-		public int Replace_edge_vertex(int eID, int vOld, int vNew) {
+		public int Replace_edge_vertex(in int eID, in int vOld, in int vNew) {
 			var i = 2 * eID;
 			int a = _edges[i], b = _edges[i + 1];
 			if (a == vOld) {
@@ -1116,20 +1118,20 @@ namespace RNumerics
 		}
 
 
-		public bool Replace_edge_triangle(int eID, int tOld, int tNew) {
+		public bool Replace_edge_triangle(in int eID, in int tOld, in int tNew) {
 			var found = _edge_triangles.Remove(eID, tOld);
 			_edge_triangles.Insert(eID, tNew);
 			return found;
 		}
 
-		public void Add_edge_triangle(int eID, int tID) {
+		public void Add_edge_triangle(in int eID, in int tID) {
 			_edge_triangles.Insert(eID, tID);
 		}
-		public bool Remove_edge_triangle(int eID, int tID) {
+		public bool Remove_edge_triangle(in int eID, in int tID) {
 			return _edge_triangles.Remove(eID, tID);
 		}
 
-		public int Replace_triangle_edge(int tID, int eOld, int eNew) {
+		public int Replace_triangle_edge(in int tID, in int eOld, in int eNew) {
 			var i = 3 * tID;
 			if (_triangle_edges[i] == eOld) {
 				_triangle_edges[i] = eNew;

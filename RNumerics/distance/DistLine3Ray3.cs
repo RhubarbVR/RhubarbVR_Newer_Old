@@ -8,7 +8,7 @@ namespace RNumerics
 	// ported from WildMagic 5 
 	// https://www.geometrictools.com/Downloads/Downloads.html
 
-	public class DistLine3Ray3
+	public sealed class DistLine3Ray3
 	{
 		Line3d _line;
 		public Line3d Line
@@ -32,15 +32,15 @@ namespace RNumerics
 		public double RayParameter;
 
 
-		public DistLine3Ray3(Ray3d rayIn, Line3d LineIn) {
+		public DistLine3Ray3(in Ray3d rayIn, in Line3d LineIn) {
 			_ray = rayIn;
 			_line = LineIn;
 		}
 
-		static public double MinDistance(Ray3d r, Line3d s) {
+		static public double MinDistance(in Ray3d r, in Line3d s) {
 			return new DistLine3Ray3(r, s).Get();
 		}
-		static public double MinDistanceLineParam(Ray3d r, Line3d s) {
+		static public double MinDistanceLineParam(in Ray3d r, in Line3d s) {
 			return new DistLine3Ray3(r, s).Compute().LineParameter;
 		}
 

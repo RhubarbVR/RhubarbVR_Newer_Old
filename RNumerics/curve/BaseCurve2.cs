@@ -10,7 +10,7 @@ namespace RNumerics
 		// Curve parameter is t where tmin <= t <= tmax.
 		protected double mTMin, mTMax;
 
-		public BaseCurve2(double tmin, double tmax) {
+		public BaseCurve2(in double tmin, in double tmax) {
 			mTMin = tmin;
 			mTMax = tmax;
 		}
@@ -25,7 +25,7 @@ namespace RNumerics
 		public double GetMaxTime() {
 			return mTMax;
 		}
-		public void SetTimeInterval(double tmin, double tmax) {
+		public void SetTimeInterval(in double tmin, in double tmax) {
 			if (tmin >= tmax) {
 				throw new Exception("Curve2.SetTimeInterval: invalid min/max");
 			}
@@ -35,13 +35,13 @@ namespace RNumerics
 		}
 
 		// Position and derivatives.
-		abstract public Vector2d GetPosition(double t);
-		abstract public Vector2d GetFirstDerivative(double t);
-		abstract public Vector2d GetSecondDerivative(double t);
-		abstract public Vector2d GetThirdDerivative(double t);
+		abstract public Vector2d GetPosition(in double t);
+		abstract public Vector2d GetFirstDerivative(in double t);
+		abstract public Vector2d GetSecondDerivative(in double t);
+		abstract public Vector2d GetThirdDerivative(in double t);
 
 		// Differential geometric quantities.
-		public double GetSpeed(double t) {
+		public double GetSpeed(in double t) {
 			var d1 = GetFirstDerivative(t);
 			return d1.Length;
 		}
@@ -51,7 +51,7 @@ namespace RNumerics
 			return (data as BaseCurve2).GetSpeed(t);
 		}
 
-		virtual public double GetLength(double t0, double t1) {
+		virtual public double GetLength(in double t0, in double t1) {
 			return t0 < mTMin || t0 > mTMax
 				? throw new Exception("BaseCurve2.GetLength: min t out of bounds: " + t0)
 				: t1 < mTMin || t1 > mTMax
@@ -66,18 +66,18 @@ namespace RNumerics
 			return GetLength(mTMin, mTMax);
 		}
 
-		public Vector2d GetTangent(double t) {
+		public Vector2d GetTangent(in double t) {
 			return GetFirstDerivative(t).Normalized;
 		}
-		public Vector2d GetNormal(double t) {
+		public Vector2d GetNormal(in double t) {
 			return GetFirstDerivative(t).Normalized.Perp;
 		}
-		public void GetFrame(double t, ref Vector2d position, ref Vector2d tangent, ref Vector2d normal) {
+		public void GetFrame(in double t, ref Vector2d position, ref Vector2d tangent, ref Vector2d normal) {
 			position = GetPosition(t);
 			tangent = GetFirstDerivative(t).Normalized;
 			normal = tangent.Perp;
 		}
-		public double GetCurvature(double t) {
+		public double GetCurvature(in double t) {
 			var der1 = GetFirstDerivative(t);
 			var der2 = GetSecondDerivative(t);
 			var speedSqr = der1.LengthSquared;
@@ -94,7 +94,7 @@ namespace RNumerics
 		}
 
 		// Inverse mapping of s = Length(t) given by t = Length^{-1}(s).
-		virtual public double GetTime(double length, int iterations = 32, double tolerance = (double)1e-06) {
+		virtual public double GetTime(in double length, in int iterations = 32, in double tolerance = (double)1e-06) {
 			if (length <= 0) {
 				return mTMin;
 			}
@@ -173,7 +173,7 @@ namespace RNumerics
 		}
 
 		// Subdivision.
-		public Vector2d[] SubdivideByTime(int numPoints) {
+		public Vector2d[] SubdivideByTime(in int numPoints) {
 			if (numPoints < 2) {
 				throw new Exception("BaseCurve2.SubdivideByTime: Subdivision requires at least two points, requested " + numPoints);
 			}

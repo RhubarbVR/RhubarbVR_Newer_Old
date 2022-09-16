@@ -2,7 +2,7 @@
 
 namespace RhuEngine.WorldObjects
 {
-	public class NoLoadAttribute : Attribute
+	public sealed class NoLoadAttribute : Attribute
 	{
 		public NoLoadAttribute() {
 		}

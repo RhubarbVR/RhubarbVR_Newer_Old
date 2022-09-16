@@ -7,8 +7,9 @@ using MessagePack.Formatters;
 
 namespace SharedModels.GameSpecific
 {
+
 	[Formatter]
-	public class StreamDataPackedformat : IMessagePackFormatter<StreamDataPacked>
+	public sealed class StreamDataPackedformat : IMessagePackFormatter<StreamDataPacked>
 	{
 		public void Serialize(ref MessagePackWriter writer, StreamDataPacked value, MessagePackSerializerOptions options) {
 			options.Resolver.GetFormatterWithVerify<byte[]>().Serialize(ref writer, value.Data, options);

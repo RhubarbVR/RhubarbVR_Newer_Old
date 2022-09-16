@@ -6,38 +6,38 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public class TrivialBox3Mesh : ProceduralMesh
+	public sealed class TrivialBox3Mesh : ProceduralMesh
 	{
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vector3f> Extent;
+		public readonly Sync<Vector3f> Extent;
 
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vector3f> Center;
+		public readonly Sync<Vector3f> Center;
 
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vector3f> AxisX;
+		public readonly Sync<Vector3f> AxisX;
 
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vector3f> AxisY;
+		public readonly Sync<Vector3f> AxisY;
 
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<Vector3f> AxisZ;
+		public readonly Sync<Vector3f> AxisZ;
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> NoSharedVertices;
-
-
-		[Default(true)]
-		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantUVs;
+		public readonly Sync<bool> NoSharedVertices;
 
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]
-		public Sync<bool> WantNormals;
+		public readonly Sync<bool> WantUVs;
 
-		public override void FirstCreation() {
+
+		[Default(true)]
+		[OnChanged(nameof(LoadMesh))]
+		public readonly Sync<bool> WantNormals;
+
+		protected override void FirstCreation() {
 			base.FirstCreation();
 			Extent.Value = new Vector3f(0.5f);
 			AxisX.Value = Vector3f.AxisX;

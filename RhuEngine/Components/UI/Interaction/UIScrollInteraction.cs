@@ -8,19 +8,20 @@ using System;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "UI\\Rects" })]
-	public class UIScrollInteraction : UIInteractionComponent
+	[Category(new string[] { "UI/Interaction" })]
+	public sealed class UIScrollInteraction : UIInteractionComponent
 	{
-		public Sync<bool> AllowOtherZones;
+		[Default(true)]
+		public readonly Sync<bool> AllowAltSwitch;
 
-		public Sync<Vector2f> MouseScrollSpeed;
+		public readonly Sync<Vector2f> MouseScrollSpeed;
 
-		public SyncDelegate<Action<Vector2f>> OnScroll;
+		public readonly SyncDelegate<Action<Vector2f>> OnScroll;
 
 		[Default(0.5f)]
-		public Sync<float> FingerPressForce;
+		public readonly Sync<float> GripPressForce;
 
-		public override void OnAttach() {
+		protected override void OnAttach() {
 			base.OnAttach();
 			MouseScrollSpeed.Value = Vector2f.One;
 		}
@@ -31,37 +32,41 @@ namespace RhuEngine.Components
 
 		public bool Hover = false;
 
-		public override void Step() {
+		protected override void Step() {
 			base.Step();
-			if(Rect is null) {
+			if (UIRect is null) {
 				return;
 			}
-			var HasFirst = false;
 			var firstLazer = true;
-			var hitposes = Rect.HitPoses(!AllowOtherZones.Value);
+			var hitposes = UIRect.GetRectHitData();
 			foreach (var item in hitposes) {
-				HasFirst = true;
-				if (firstLazer && item.Laser) {
-					if (RInput.Mouse.ScrollChange != Vector2f.Zero) {
-						Scroll(RInput.Mouse.ScrollChange * MouseScrollSpeed * 5);
+				if (firstLazer && item.Lazer) {
+					if (InputManager.MouseSystem.ScrollDelta != Vector2f.Zero) {
+						if (AllowAltSwitch && InputManager.KeyboardSystem.IsKeyDown(Key.Alt)) {
+							Scroll(new Vector2f(InputManager.MouseSystem.ScrollDelta.y, InputManager.MouseSystem.ScrollDelta.x) * MouseScrollSpeed);
+						}
+						else {
+							Scroll(InputManager.MouseSystem.ScrollDelta * MouseScrollSpeed);
+						}
+
 					}
 					firstLazer = false;
 				}
 			}
-			if (HasFirst) {
-				//DragScroll 
-				var scroll = Rect.ClickFingerChange(FingerPressForce.Value, !AllowOtherZones.Value);
-				var scrollavrage = Vector2f.Zero;
-				foreach (var item in scroll) {
-					if (scrollavrage == Vector2f.Zero) {
-						scrollavrage += item.Xy;
-					}
-				}
+			//if (HasFirst) {
+			//	//DragScroll 
+			//	var scroll = UIRect.ClickGripChange(GripPressForce.Value);
+			//	var scrollavrage = Vector2f.Zero;
+			//	foreach (var item in scroll) {
+			//		if (scrollavrage == Vector2f.Zero) {
+			//			scrollavrage += item.Xy;
+			//		}
+			//	}
 
-				if (scrollavrage != Vector2f.Zero) {
-					Scroll(scrollavrage * Rect.Canvas.scale.Value.Xy * -5);
-				}
-			}
+			//	if (scrollavrage != Vector2f.Zero) {
+			//		Scroll(scrollavrage * UIRect.Canvas.scale.Value.Xy * -5);
+			//	}
+			//}
 		}
 	}
 }

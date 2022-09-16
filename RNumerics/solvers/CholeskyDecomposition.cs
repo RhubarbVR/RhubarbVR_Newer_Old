@@ -14,14 +14,14 @@ namespace RNumerics
 	/// 
 	/// 
 	/// </summary>
-	public class CholeskyDecomposition
+	public sealed class CholeskyDecomposition
 	{
 		public DenseMatrix A;
 
 		public DenseMatrix L;
 
 
-		public CholeskyDecomposition(DenseMatrix m) {
+		public CholeskyDecomposition(in DenseMatrix m) {
 			A = m;
 		}
 
@@ -79,7 +79,7 @@ namespace RNumerics
 			L = new DenseMatrix(N, N);
 			var Lbuf = L.Buffer;
 
-			void compute_diag(int r) {
+			void compute_diag(in int r) {
 				double diag_dot = 0;
 				var ck = r * N;
 				var ck_stop = ck + r;
@@ -171,11 +171,9 @@ namespace RNumerics
 		/// Solve A*X=B via backsubstitution in cholesky factorization
 		/// Requires temporary vector Y
 		/// </summary>
-		public void Solve(double[] B, double[] X, double[] Y) {
+		public void Solve(in double[] B, in double[] X, double[] Y) {
 			var N = A.Rows;
-			if (Y == null) {
-				Y = new double[N];
-			}
+			Y ??= new double[N];
 
 			// first solve L * Y = B  (store Y in X)   via forward substitution
 			Y[0] = B[0] / L[0, 0];

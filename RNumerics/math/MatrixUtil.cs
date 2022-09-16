@@ -9,16 +9,16 @@ namespace RNumerics
 		public static double[] MakeIdentity3x3() {
 			return new double[9] { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
 		}
-		public static void SetIdentity3x3(double[] M) {
+		public static void SetIdentity3x3(in double[] M) {
 			Array.Clear(M, 0, 9);
 			M[0] = M[4] = M[8] = 1;
 		}
 
 
-		public static double[] MakeDiagonal3x3(double a, double b, double c) {
+		public static double[] MakeDiagonal3x3(in double a, in double b, in double c) {
 			return new double[9] { a, 0, 0, 0, b, 0, 0, 0, c };
 		}
-		public static void SetDiagonal3x3(double[] M, double a, double b, double c) {
+		public static void SetDiagonal3x3(in double[] M, in double a, in double b, in double c) {
 			Array.Clear(M, 0, 9);
 			M[0] = a;
 			M[4] = b;
@@ -26,7 +26,7 @@ namespace RNumerics
 		}
 
 		// assumption is matrix is row-major
-		public static double Determinant3x3(double[] M) {
+		public static double Determinant3x3(in double[] M) {
 			var co00 = (M[4] * M[8]) - (M[5] * M[7]);
 			var co10 = (M[5] * M[6]) - (M[3] * M[8]);
 			var co20 = (M[3] * M[7]) - (M[4] * M[6]);
@@ -35,12 +35,12 @@ namespace RNumerics
 		}
 
 
-		public static void Transpose3x3(double[] M) {
+		public static void Transpose3x3(in double[] M) {
 			(M[3], M[1]) = (M[1], M[3]);
 			(M[6], M[2]) = (M[2], M[6]);
 			(M[7], M[5]) = (M[5], M[7]);
 		}
-		public static void Transpose3x3(double[] M, double[] MTranspose) {
+		public static void Transpose3x3(in double[] M, in double[] MTranspose) {
 			MTranspose[0] = M[0];
 			MTranspose[1] = M[3];
 			MTranspose[2] = M[6];
@@ -52,7 +52,7 @@ namespace RNumerics
 		}
 
 		// C = A * B
-		public static void Multiply3x3(double[] A, double[] B, double[] C) {
+		public static void Multiply3x3(in double[] A, in double[] B, in double[] C) {
 			C[0] = (A[0] * B[0]) + (A[1] * B[3]) + (A[2] * B[6]);
 			C[1] = (A[0] * B[1]) + (A[1] * B[4]) + (A[2] * B[7]);
 			C[2] = (A[0] * B[2]) + (A[1] * B[5]) + (A[2] * B[8]);
@@ -65,7 +65,7 @@ namespace RNumerics
 		}
 
 
-		public static Vector3d Multiply3x3(double[] M, Vector3d vec) {
+		public static Vector3d Multiply3x3(in double[] M, in Vector3d vec) {
 			return new Vector3d(
 				(M[0] * vec.x) + (M[1] * vec.y) + (M[2] * vec.z),
 				(M[3] * vec.x) + (M[4] * vec.y) + (M[5] * vec.z),

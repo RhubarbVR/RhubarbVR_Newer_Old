@@ -5,14 +5,15 @@ using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.Components
 {
+	[UpdatingComponent]
 	[Category(new string[] { "CoreData" })]
-	public class ValueDriver<T> : Component, IUpdatingComponent
+	public sealed class ValueDriver<T> : Component
 	{
-		public Linker<T> driver;
+		public readonly Linker<T> driver;
 
-		public SyncRef<IValueSource<T>> source;
+		public readonly SyncRef<IValueSource<T>> source;
 
-		public override void Step() {
+		protected override void Step() {
 			if (driver.Linked) {
 				if (source.Target != null) {
 					driver.LinkedValue = source.Target.Value;

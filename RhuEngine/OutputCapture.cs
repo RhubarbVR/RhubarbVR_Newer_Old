@@ -8,58 +8,60 @@ using RhuEngine.Linker;
 
 namespace RhuEngine
 {
-	public class OutputCapture : TextWriter, IDisposable
+	public sealed class OutputCapture : TextWriter, IDisposable
 	{
 		public string LogsPath = null;
 
 		private StreamWriter _writer = null;
 
-		private readonly TextWriter _stdOutWriter;
+		public string InGameConsole = null;
 
-		public string[] consoleLines = new string[20];
+		private TextWriter _stdOutWriter;
 
-		public int ConsoleLangth
-		{
-			get => consoleLines.Length;
-			set => Array.Resize(ref consoleLines,value);
-		}
-
-		public string singleString = "null";
-
-		private readonly object _lineLock = new();
 
 		public int currentLine = 0;
 
 		public override Encoding Encoding => Encoding.ASCII;
 
-		// would crash when closing like this https://media.discordapp.net/attachments/805160377130156124/930605958344867890/unknown.png
-		public bool DisableSingleString { get; set; }
+		public event Action TextEdied;
 
-		public void WriteText(string data) {
-			lock (_lineLock) {
-				_writer?.Write(data);
-				foreach (var item in data.Split('\n')) {
-					if (!string.IsNullOrWhiteSpace(item)) {
-						for (var i = 0; i < consoleLines.Length - 1; i++) {
-							consoleLines[i] = consoleLines[i + 1];
-						}
-						consoleLines[consoleLines.Length - 1] = item;
-						currentLine++;
-					}
-					if (!DisableSingleString) {
-						singleString = string.Join("\n", consoleLines);
-					}
+		public int AmountOfNewLines;
+
+		public void RemoveNewLines(int amount) {
+			if(amount < 0) {
+				return;
+			}
+			var lastIndex = 0;
+			for (var i = 0; i < amount; i++) {
+				lastIndex = InGameConsole.IndexOf('\n', lastIndex) + 1;
+				if(lastIndex == -1) {
+					InGameConsole = null;
+					AmountOfNewLines = 0;
+					break;
 				}
 			}
+			InGameConsole = InGameConsole.Substring(lastIndex);
+			AmountOfNewLines -= amount;
 		}
 
-		public OutputCapture() {
-			RLog.Subscribe(LogCall);
-			_stdOutWriter = Console.Out;
-			Console.SetOut(this);
+		public void WriteText(string data) {
+			data = data.AutoBrakeLine();
+			var amountOfnewLines = data.Count((car) => car == '\n');
+			AmountOfNewLines += amountOfnewLines;
+			var consoleColor = RhuConsole.ForegroundColor;
+			if(consoleColor == ConsoleColor.Gray) {
+				consoleColor = ConsoleColor.White;
+			}
+			InGameConsole += $"<color{consoleColor}>{data.Replace("info", "<colorBlue>info</color>").Replace("error", "<colorRed>error</color>").Replace("diagnostic", "<colorMidnightBlue>diagnostic</color>").Replace("warn", "<coloryellow>warn</color>")}</clearstyle>";
+			RemoveNewLines(AmountOfNewLines - 35);
+			_writer?.Write(data);
+			TextEdied?.Invoke();
 		}
 
 		public void Start() {
+			RLog.Subscribe(LogCall);
+			_stdOutWriter = Console.Out;
+			Console.SetOut(this);
 			Directory.CreateDirectory(LogsPath);
 			_writer = new StreamWriter(LogsPath + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".txt") {
 				AutoFlush = true
@@ -73,8 +75,10 @@ namespace RhuEngine
 		public new void Dispose() 
 		{
 			RLog.Unsubscribe(LogCall);
-			base.Dispose();
+			_writer.Close();
 			_writer.Dispose();
+			_writer = null;
+			base.Dispose();
 		}
 
 		override public void Write(string output) {

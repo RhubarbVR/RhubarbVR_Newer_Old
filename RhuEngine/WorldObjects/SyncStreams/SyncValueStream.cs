@@ -3,6 +3,8 @@
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 
+using RNumerics;
+
 namespace RhuEngine.WorldObjects
 {
 	public class SyncValueStream<T> : SyncStream, ILinkerMember<T>, ISync, INetworkedObject, IChangeable
@@ -42,7 +44,7 @@ namespace RhuEngine.WorldObjects
 
 		public event Action<IChangeable> Changed;
 
-		public void SetValue(object value) {
+		public void SetValueForce(object value) {
 			lock (_locker) {
 				try {
 					Value = (T)value;
@@ -96,12 +98,14 @@ namespace RhuEngine.WorldObjects
 			return _value;
 		}
 
-		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
-			return SyncObjectSerializerObject.CommonValueSerialize(this, OnSave(syncObjectSerializerObject));
+		public object GetValue() {
+			return _value;
 		}
-
-		public override void Deserialize(IDataNode data, SyncObjectDeserializerObject syncObjectSerializerObject) {
-			_value = syncObjectSerializerObject.ValueDeserialize<T>((DataNodeGroup)data, this);
+		public Type GetValueType() {
+			return typeof(T);
+		}
+		public void SetValue(object data) {
+			Value = (T)data;
 		}
 	}
 }

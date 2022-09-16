@@ -7,5 +7,6 @@ namespace RhuEngine.Managers
 		public void Init(Engine engine);
 
 		public void Step();
+		public void RenderStep();
 	}
 }

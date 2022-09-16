@@ -2,83 +2,48 @@
 using System.Runtime.InteropServices;
 
 using RhuEngine.Physics;
+using BulletSharp;
+using System.IO;
+using System.Linq;
+using RhuEngine.Linker;
 
 namespace RBullet
-{   /// <summary>
-	/// Android Test
-	/// </summary>
-	public static class AndroidTest
+{
+	public sealed class BulletPhsyicsLink : PhysicsHelper.Physics<BulletRigidBodyCollider, BulletPhysicsSim, BulletColliderShape>
 	{
-		static bool? _isAndroid;
-		/// <summary>
-		/// Run Chech
-		/// </summary>
-		/// <returns>If it is anroid</returns>
-		public static bool Check() {
-			if (_isAndroid != null) {
-				return (bool)_isAndroid;
+		public BulletPhsyicsLink() : this(false) {
+
+		}
+
+
+		public BulletPhsyicsLink(bool loadlib) {
+			if (loadlib) {
+				return;
 			}
-			using (var process = new System.Diagnostics.Process()) {
-				process.StartInfo.FileName = "getprop";
-				process.StartInfo.Arguments = "ro.build.user";
-				process.StartInfo.RedirectStandardOutput = true;
-				process.StartInfo.UseShellExecute = false;
-				process.StartInfo.CreateNoWindow = true;
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
 				try {
-					process.Start();
-					var output = process.StandardOutput.ReadToEnd();
-					_isAndroid = string.IsNullOrEmpty(output) ? (bool?)false : (bool?)true;
+					//This works becases i have no idea where dlopen is in macos 
+					File.Copy("runtimes/MacOS/native/liblibbulletc.dylib", "liblibbulletc");
 				}
-				catch {
-					_isAndroid = false;
+				catch { }
+			}
+			else if (!Native.Load()) {
+				if (Environment.OSVersion.Platform == PlatformID.Unix) {
+					RLog.Info("Did not load lib at first");
+					var files = Directory.GetFiles("./../../", "*/*/linux-x64/native/libbulletc.so");
+					var filesarray = files.ToArray();
+					if (filesarray.Length == 0) {
+						throw new Exception("Failed to Find lib");
+					}
+					else {
+						File.Copy(filesarray[0], "./libbulletc.so");
+						RLog.Info("Did copy to try and get arround lib no loading");
+					}
 				}
-				return (bool)_isAndroid;
+				else {
+					throw new Exception("Failed to load lib");
+				}
 			}
-		}
-	}
-	static class NativeLib
-	{
-		static bool _loaded = false;
-		internal static bool Load() {
-			if (_loaded) {
-				return true;
-			}
-
-			// Android uses a different strategy for linking the DLL
-			if (AndroidTest.Check()) {
-				return true;
-			}
-
-			var arch = RuntimeInformation.OSArchitecture == Architecture.Arm64
-				? "arm64"
-				: "x64";
-			_loaded = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-				? LoadWindows(arch)
-				: LoadUnix(arch);
-			return _loaded;
-		}
-
-		[DllImport("kernel32", CharSet = CharSet.Unicode)]
-		static extern IntPtr LoadLibraryW(string fileName);
-		static bool LoadWindows(string arch) {
-			return LoadLibraryW("libbulletc") != IntPtr.Zero || LoadLibraryW($"runtimes/win-{arch}/native/libbulletc.dll") != IntPtr.Zero;
-		}
-
-
-		[DllImport("libdl", CharSet = CharSet.Ansi)]
-		static extern IntPtr dlopen(string fileName, int flags);
-		static bool LoadUnix(string arch) {
-			const int RTLD_NOW = 2;
-			return dlopen("libbulletc.so", RTLD_NOW) != IntPtr.Zero
-				|| dlopen($"./runtimes/linux-{arch}/native/libbulletc.so", RTLD_NOW) != IntPtr.Zero
-				|| dlopen($"{AppDomain.CurrentDomain.BaseDirectory}/runtimes/linux-{arch}/native/libbulletc.so", RTLD_NOW) != IntPtr.Zero;
-		}
-	}
-
-	public class BulletPhsyicsLink: PhysicsHelper.Physics<BulletRigidBodyCollider, BulletPhysicsSim, BulletColliderShape>
-    {
-		public BulletPhsyicsLink() {
-			NativeLib.Load();
 		}
 
 	}

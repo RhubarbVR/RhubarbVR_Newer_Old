@@ -7,17 +7,36 @@ using RhuEngine.WorldObjects.ECS;
 
 using TextCopy;
 using RhuEngine.Linker;
+using RhuEngine.Managers;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Assets\\Utils" })]
-	public class ClipBoardImport :Component, IUpdatingComponent
+	[UpdatingComponent]
+	[Category(new string[] { "Assets/Utils" })]
+	public sealed class ClipBoardImport :Component
 	{
-		public override void Step() {
+		protected override void OnLoaded() {
+			base.OnLoaded();
+			Engine.DragAndDrop += Engine_DragAndDrop;
+		}
+
+		private void Engine_DragAndDrop(System.Collections.Generic.List<string> obj) {
+			if (World.Focus != World.FocusLevel.Focused) {
+				return;
+			}
+			foreach (var item in obj) {
+				World.ImportString(item);
+			}
+		}
+
+		protected override void Step() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
-			if(RInput.Key(Key.V).IsJustActive() && RInput.Key(Key.Ctrl).IsActive()) {
+			if (Engine.HasKeyboard) {
+				return;
+			}
+			if(InputManager.KeyboardSystem.IsKeyJustDown(Key.V) && InputManager.KeyboardSystem.IsKeyDown(Key.Ctrl)) {
 				//ToDO inprove to have imgs and also have render bindings
 				var data = ClipboardService.GetText();
 				RLog.Info($"ClipBoard {data}");

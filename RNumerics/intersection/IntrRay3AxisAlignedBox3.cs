@@ -6,7 +6,7 @@ using System.Text;
 namespace RNumerics
 {
 	// adapted from IntrRay3Box3
-	public class IntrRay3AxisAlignedBox3
+	public sealed class IntrRay3AxisAlignedBox3
 	{
 		Ray3d _ray;
 		public Ray3d Ray
@@ -32,7 +32,7 @@ namespace RNumerics
 		public Vector3d Point0 = Vector3d.Zero;
 		public Vector3d Point1 = Vector3d.Zero;
 
-		public IntrRay3AxisAlignedBox3(Ray3d r, AxisAlignedBox3d b) {
+		public IntrRay3AxisAlignedBox3(in Ray3d r, in AxisAlignedBox3d b) {
 			_ray = r;
 			_box = b;
 		}
@@ -77,7 +77,7 @@ namespace RNumerics
 		/// test if ray intersects box.
 		/// expandExtents allows you to scale box for hit-testing purposes. 
 		/// </summary>
-		public static bool Intersects(ref Ray3d ray, ref AxisAlignedBox3d box, double expandExtents = 0) {
+		public static bool Intersects(ref Ray3d ray, ref AxisAlignedBox3d box, in double expandExtents = 0) {
 			var WdU = Vector3d.Zero;
 			var AWdU = Vector3d.Zero;
 			var DdU = Vector3d.Zero;
