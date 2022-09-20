@@ -55,6 +55,8 @@ namespace RhuEngine.WorldObjects
 		public ushort ID { get;private set; }
 		public NetPeer NetPeer { get; private set; }
 
+		public bool IsRelay => ID != 0;
+
 		public int latency = 0;
 
 		public Peer(NetPeer netPeer, Guid userID, ushort id = 0) {

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Reflection;
 
+using RhuEngine.Commads;
 using RhuEngine.DataStructure;
+using RhuEngine.Datatypes;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects.ECS;
 
@@ -63,13 +65,31 @@ namespace RhuEngine.WorldObjects
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
 			var nodeGroup = (DataNodeGroup)base.Serialize(syncObjectSerializerObject);
 			nodeGroup.SetValue("Method", new DataNode<string>(_method));
-			if (_type != null) {
-				nodeGroup.SetValue("Type", new DataNode<string>(_type.FullName));
-			}
-			else {
-				nodeGroup.SetValue("Type", new DataNode<string>(""));
-			}
+			nodeGroup.SetValue("Type", new DataNode<string>(_type?.FullName));
 			return nodeGroup;
+		}
+
+		protected override void BroadcastValue() {
+			if (IsLinkedTo || NoSync) {
+				return;
+			}
+			var data = new DataNodeGroup();
+			data["target"] = new DataNode<NetPointer>(_targetPointer);
+			data["_method"] = new DataNode<string>(_method);
+			data["_type"] = new DataNode<string>(_type?.FullName);
+			World.BroadcastDataToAll(this, data, LiteNetLib.DeliveryMethod.ReliableOrdered);
+		}
+
+		public override void Received(Peer sender, IDataNode data) {
+			if (IsLinkedTo || NoSync) {
+				return;
+			}
+			var datagroup = data as DataNodeGroup;
+			NetValue = ((DataNode<NetPointer>)datagroup["target"]).Value;
+			_method = ((DataNode<string>)datagroup["_method"]).Value;
+			var hello = ((DataNode<string>)datagroup["_type"]).Value;
+			_type = string.IsNullOrEmpty(hello) ? null : Type.GetType(hello, false, true);
+			BuildDelegate();
 		}
 
 		public override void Deserialize(IDataNode data, SyncObjectDeserializerObject syncObjectSerializerObject) {
@@ -77,7 +97,7 @@ namespace RhuEngine.WorldObjects
 			base.Deserialize(loadedData, syncObjectSerializerObject);
 			_method = ((DataNode<string>)loadedData.GetValue("Method")).Value;
 			var hello = ((DataNode<string>)loadedData.GetValue("Type")).Value;
-			_type = hello == "" ? null : Type.GetType(hello);
+			_type =  string.IsNullOrEmpty(hello) ? null : Type.GetType(hello,false,true);
 			BuildDelegate();
 		}
 
@@ -86,11 +106,14 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			try {
-				var _delegate = Delegate.CreateDelegate(typeof(T), base.Target, _method, false, true);
+				var _delegate = Delegate.CreateDelegate(typeof(T), base.Target, _method, false, false);
+				if (_delegate.GetMethodInfo().GetCustomAttribute<ExposedAttribute>() is null) {
+					throw new Exception("Method does not have Exsposed Attribute");
+				}
 				_delegateTarget = _delegate as T;
 			}
 			catch (Exception e) {
-				RLog.Err($"Failed To load Delegate Type {_type}  Method {_method} Error" + e.ToString());
+				RLog.Err($"Failed To load Delegate Type {_type}  Method {_method} Del{typeof(T).GetFormattedName()} Error" + e.ToString());
 				_type = null;
 				_method = "";
 				base.Target = null;

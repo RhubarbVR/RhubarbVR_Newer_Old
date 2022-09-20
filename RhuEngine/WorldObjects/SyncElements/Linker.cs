@@ -36,11 +36,12 @@
 		public void SetLinkerTarget(ILinkerMember<T> Target) {
 			base.Target = Target;
 		}
-		public override void OnChanged() {
+		public override void Bind() {
 			if (Target != null) {
 				Link();
 			}
 		}
+
 		private void Link() {
 			if (Linked) {
 				Unlink();

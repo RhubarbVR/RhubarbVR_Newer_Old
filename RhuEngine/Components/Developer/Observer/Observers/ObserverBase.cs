@@ -55,8 +55,13 @@ namespace RhuEngine.Components
 
 		public readonly AssetRef<RMaterial> Mat;
 
+		protected virtual void EveryUserOnLoad() {
+
+		}
+
 		protected void ChangeObserverd() {
 			if (LocalUser != MasterUser) {
+				EveryUserOnLoad();
 				return;
 			}
 			Entity.DestroyChildren();
@@ -65,6 +70,7 @@ namespace RhuEngine.Components
 			}
 			var uiBuilder = new UIBuilder(Entity, Mat.Target, Entity.UIRect?? BuildMainUIRect(), true,true);
 			LoadObservedUI(uiBuilder);
+			EveryUserOnLoad();
 		}
 		protected abstract UIRect BuildMainUIRect();
 

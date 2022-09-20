@@ -20,6 +20,7 @@ namespace RhuEngine.Components
 			}
 			if (user.userRoot.Target is null) {
 				var userEntity = Entity.AddChild("User");
+				userEntity.persistence.Value = false;
 				var userRoot = userEntity.AttachComponent<UserRoot>();
 				userEntity.AttachComponent<LocomotionManager>().user.Target = World.GetLocalUser();
 				var leftHand = userEntity.AddChild("LeftHand");

@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Developer/Observer/Observers/SyncElements" })]
 	public sealed class BoolSyncObserver : ValueObserverBase<bool>
 	{
-		public readonly SyncRef<CheckBox> CheckBox;
+		public readonly Linker<bool> CheckBox;
 
 		protected override void BuildUI(UIBuilder ui) {
 			ui.PushRectNoDepth(null, new Vector2f(0, 1f));
@@ -25,14 +25,15 @@ namespace RhuEngine.Components
 			var sprite = World.RootEntity.GetFirstComponentOrAttach<SpriteProvder>();
 			sprite.Texture.Target = iconMit.MainTexture.Target;
 			sprite.GridSize.Value = new Vector2i(26, 7);
-			CheckBox.Target = ui.AddGenaricCheckBox(iconMit, sprite);
+			var tempCheck = ui.AddGenaricCheckBox(iconMit, sprite);
+			CheckBox.Target = tempCheck.Open;
 			ValueChanged();
-			CheckBox.Target.StateChange.Target = ValueUpdate;
+			tempCheck.StateChange.Target = ValueUpdate;
 			ui.PopRect();
 			ui.PopRect();
 		}
 		[Exposed]
-		private void ValueUpdate(bool data) {
+		public void ValueUpdate(bool data) {
 			if(TargetElement is null) {
 				return;
 			}
@@ -40,10 +41,9 @@ namespace RhuEngine.Components
 		}
 
 		protected override void ValueChanged() {
-			if (CheckBox.Target is null) {
-				return;
+			if (CheckBox.Linked) {
+				CheckBox.LinkedValue = TargetElement.Value;
 			}
-			CheckBox.Target.Open.Value = TargetElement.Value;
 		}
 	}
 }

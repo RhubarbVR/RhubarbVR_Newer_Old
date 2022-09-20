@@ -14,11 +14,11 @@ namespace RhuEngine.WorldObjects
 
 	public class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, INetworkedObject, IChangeable, ISyncMember where T : class, IWorldObject
 	{
-		public object Object { get => _targetPointer; set => _targetPointer = (NetPointer)value; }
+		public object Object { get => Value; set => Value = (NetPointer)value; }
 
 		private readonly object _syncRefLock = new();
 
-		private NetPointer _targetPointer;
+		protected NetPointer _targetPointer;
 
 		public NetPointer NetValue
 		{
@@ -95,14 +95,14 @@ namespace RhuEngine.WorldObjects
 
 		}
 
-		private void BroadcastValue() {
+		protected virtual void BroadcastValue() {
 			if (IsLinkedTo || NoSync) {
 				return;
 			}
 			World.BroadcastDataToAll(this, new DataNode<NetPointer>(_targetPointer), LiteNetLib.DeliveryMethod.ReliableOrdered);
 		}
 
-		public void Received(Peer sender, IDataNode data) {
+		public virtual void Received(Peer sender, IDataNode data) {
 			if (IsLinkedTo || NoSync) {
 				return;
 			}

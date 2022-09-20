@@ -34,6 +34,9 @@ namespace RhuEngine.Components
 			}
 			editorValue.Target = wa.Item4;
 			wa.Item2.OnDoneEditing.Target += OnDoneEditing;
+		}
+
+		protected override void EveryUserOnLoad() {
 			if (TargetElement is IChangeable changeable) {
 				if (_changeable is not null) {
 					changeable.Changed -= Changeable_Changed;
@@ -42,10 +45,10 @@ namespace RhuEngine.Components
 				changeable.Changed += Changeable_Changed;
 				Changeable_Changed(null);
 			}
-
 		}
+
 		[Exposed]
-		private void NullButtonClick() {
+		public void NullButtonClick() {
 			try {
 				TargetElement.SetValue(null);
 			}catch {
@@ -63,7 +66,7 @@ namespace RhuEngine.Components
 		}
 
 		[Exposed]
-		private void OnDoneEditing() {
+		public void OnDoneEditing() {
 			if (TargetElement is null) {
 				return;
 			}

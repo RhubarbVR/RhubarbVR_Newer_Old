@@ -13,6 +13,7 @@ using RhuEngine.Physics;
 using RNumerics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using RhuEngine.Datatypes;
 
 namespace RhuEngine.WorldObjects
 {
@@ -38,51 +39,72 @@ namespace RhuEngine.WorldObjects
 
 		public void Initialize(bool networkedWorld, bool networkedObject, bool deserialize, bool isPersonalSpace) {
 			IsPersonalSpace = isPersonalSpace;
-			foreach (var item in GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)) {
-				if (typeof(SyncObject).IsAssignableFrom(item.FieldType) && item.GetCustomAttribute<NoLoadAttribute>() is null) {
-					var instance = (SyncObject)Activator.CreateInstance(item.FieldType);
-					instance.Initialize(this, this, item.Name, networkedObject, deserialize);
-					if (typeof(ISync).IsAssignableFrom(item.FieldType)) {
-						var startValue = item.GetCustomAttribute<DefaultAttribute>();
-						if (startValue != null) {
-							((ISync)instance).SetValueForce(startValue.Data);
-						}
+			try {
+				var data = typeof(World).GetFields(BindingFlags.Public | BindingFlags.Instance);
+				foreach (var item in data) {
+					if ((item.Attributes & FieldAttributes.InitOnly) == 0) {
+						continue;
 					}
-					if (typeof(IAssetRef).IsAssignableFrom(item.FieldType)) {
-						var startValue = item.GetCustomAttribute<OnAssetLoadedAttribute>();
-						if (startValue != null) {
-							((IAssetRef)instance).BindMethod(startValue.Data, this);
+					if ((item.GetCustomAttribute<NoLoadAttribute>() == null) && typeof(SyncObject).IsAssignableFrom(item.FieldType) && !((item.GetCustomAttribute<NoSaveAttribute>() != null) && (item.GetCustomAttribute<NoSyncAttribute>() != null))) {
+						var instance = (SyncObject)Activator.CreateInstance(item.FieldType);
+						instance.Initialize(this, this, item.Name, networkedObject, deserialize, null);
+						_disposables.Add(instance);
+						if (typeof(ISyncProperty).IsAssignableFrom(item.FieldType)) {
+							var startValue = item.GetCustomAttribute<BindPropertyAttribute>();
+							if (startValue != null) {
+								((ISyncProperty)instance).Bind(startValue.Data, this);
+							}
 						}
-					}
-					if (typeof(IChangeable).IsAssignableFrom(item.FieldType)) {
-						var startValue = item.GetCustomAttribute<OnChangedAttribute>();
-						if (startValue != null) {
-							var method = GetType().GetMethod(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-							if (method is null) {
-								RLog.Err($"Method {startValue.Data} not found");
+						if (typeof(ISync).IsAssignableFrom(item.FieldType)) {
+							var startValue = item.GetCustomAttribute<DefaultAttribute>();
+							if (startValue != null) {
+								((ISync)instance).SetValueForce(startValue.Data);
 							}
 							else {
-								var prams = method.GetParameters();
-								if (prams.Length == 0) {
-									((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[0] { });
-								}
-								else if (prams[0].ParameterType == typeof(IChangeable)) {
-									((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[1] { obj });
+								((ISync)instance).SetStartingObject();
+							}
+						}
+						if (typeof(IAssetRef).IsAssignableFrom(item.FieldType)) {
+							var startValue = item.GetCustomAttribute<OnAssetLoadedAttribute>();
+							if (startValue != null) {
+								((IAssetRef)instance).BindMethod(startValue.Data, this);
+							}
+						}
+						if (typeof(IChangeable).IsAssignableFrom(item.FieldType)) {
+							//RLog.Info($"Loaded Change Field {GetType().GetFormattedName()} , {item.Name} type {item.FieldType.GetFormattedName()}");
+							var startValue = item.GetCustomAttribute<OnChangedAttribute>();
+							if (startValue != null) {
+								var method = GetType().GetMethod(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+								if (method is null) {
+									throw new Exception($"Method {startValue.Data} not found");
 								}
 								else {
-									RLog.Err($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
+									var prams = method.GetParameters();
+									if (prams.Length == 0) {
+										((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[0] { });
+									}
+									else if (prams[0].ParameterType == typeof(IChangeable)) {
+										((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[1] { obj });
+									}
+									else {
+										throw new Exception($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
+									}
 								}
 							}
 						}
-					}
-					if (typeof(INetworkedObject).IsAssignableFrom(item.FieldType)) {
-						var startValue = item.GetCustomAttribute<NoSyncUpdateAttribute>();
-						if (startValue != null) {
-							((INetworkedObject)instance).NoSync = true;
+						if (typeof(INetworkedObject).IsAssignableFrom(item.FieldType)) {
+							var startValue = item.GetCustomAttribute<NoSyncUpdateAttribute>();
+							if (startValue != null) {
+								((INetworkedObject)instance).NoSync = true;
+							}
 						}
+						item.SetValue(this, instance);
 					}
-					item.SetValue(this, instance);
 				}
+			}
+			catch (Exception ex) {
+				RLog.Err("Failed to InitializeMembers" + ex.ToString());
+				throw new Exception("Failed to InitializeMembers", ex);
 			}
 			StartTime.Value = DateTime.UtcNow;
 			if (isPersonalSpace | !networkedWorld) {
@@ -141,12 +163,10 @@ namespace RhuEngine.WorldObjects
 		[NoShow]
 		public readonly Entity RootEntity;
 
-		[NoSync]
 		[NoSave]
 		[NoSyncUpdate]
 		public readonly Sync<string> SessionID;
 
-		[NoSync]
 		[NoSave]
 		[NoSyncUpdate]
 		public readonly Sync<string> WorldID;
@@ -317,6 +337,8 @@ namespace RhuEngine.WorldObjects
 		public bool IsDisposed { get; private set; }
 		public bool HasError { get; internal set; }
 
+		internal readonly List<IDisposable> _disposables = new();
+
 		public void Dispose() {
 			if (IsDisposed) {
 				return;
@@ -324,6 +346,9 @@ namespace RhuEngine.WorldObjects
 			IsDisposed = true;
 			IsDisposeing?.Invoke(this);
 			Task.Run(async () => {
+				foreach (var item in _disposables) {
+					item.Dispose();
+				}
 				assetSession.Dispose();
 				try {
 					worldManager.RemoveWorld(this);

@@ -138,7 +138,7 @@ namespace RhuEngine.WorldObjects
 				IsLoadingNet = false;
 			}
 			catch (Exception ex) {
-				LoadMsg = "Failed to Connected To Session " + ex.Message;
+				LoadMsg = "Failed to Connected To Session " + ex;
 			}
 		}
 
@@ -156,7 +156,7 @@ namespace RhuEngine.WorldObjects
 			for (var i = 0; i < Users.Count; i++) {
 				var user = Users[i];
 				if (user.IsConnected || user.IsLocalUser) {
-					MasterUser = (ushort)(i + 1);
+					MasterUser = (ushort)i;
 					break;
 				}
 			}

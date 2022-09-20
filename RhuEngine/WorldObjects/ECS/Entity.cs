@@ -348,41 +348,46 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		private void ParentChanged() {
-			if (World.RootEntity == this) {
-				GoBackToOld();
-				return;
-			}
+			try {
+				if (World.RootEntity == this) {
+					GoBackToOld();
+					return;
+				}
 
-			if (parent.Target == _internalParent) {
-				return;
-			}
+				if (parent.Target == _internalParent) {
+					return;
+				}
 
-			if (parent.Target.IsParrent(this)) {
-				GoBackToOld();
-				return;
-			}
-			if (World != parent.Target.World) {
-				RLog.Warn("tried to set parent from another world");
-				GoBackToOld();
-				return;
-			}
-			if (_internalParent == null) {
+				if (parent.Target.IsParrent(this)) {
+					GoBackToOld();
+					return;
+				}
+				if (World != parent.Target.World) {
+					RLog.Warn("tried to set parent from another world");
+					GoBackToOld();
+					return;
+				}
+				if (_internalParent == null) {
+					_internalParent = parent.Target;
+					ParentDepthUpdate();
+					TransValueChange();
+					return;
+				}
+				if (parent.Target == null) {
+					parent.Target = World.RootEntity;
+					ParentDepthUpdate();
+					return;
+				}
+				parent.Target.children.AddInternal(this);
+				_internalParent.children.RemoveInternal(this);
 				_internalParent = parent.Target;
 				ParentDepthUpdate();
+				ParentEnabledChange(_internalParent.IsEnabled);
 				TransValueChange();
-				return;
 			}
-			if (parent.Target == null) {
-				parent.Target = World.RootEntity;
-				ParentDepthUpdate();
-				return;
+			catch {
+
 			}
-			parent.Target.children.AddInternal(this);
-			_internalParent.children.RemoveInternal(this);
-			_internalParent = parent.Target;
-			ParentDepthUpdate();
-			ParentEnabledChange(_internalParent.IsEnabled);
-			TransValueChange();
 		}
 		[Exposed]
 		public void SetParent(Entity entity, bool preserverGlobal = true, bool resetPos = false) {

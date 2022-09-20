@@ -53,7 +53,11 @@ namespace RhuEngine.WorldObjects
 				}
 				var objrc = (T)Activator.CreateInstance(type);
 				objrc.Initialize(World, this, "List element", true, false);
-				objrc.Deserialize(nodeGroup.GetValue("ElementData"), new SyncObjectDeserializerObject(false));
+				var deserlizer = new SyncObjectDeserializerObject(false);
+				objrc.Deserialize(nodeGroup.GetValue("ElementData"), deserlizer);
+				foreach (var item in deserlizer.onLoaded) {
+					item?.Invoke();
+				}
 				return objrc;
 			}
 			else {

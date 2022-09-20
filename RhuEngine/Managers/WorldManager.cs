@@ -36,6 +36,7 @@ namespace RhuEngine.Managers
 		public World FocusedWorld { get => _focusedWorld; set { _focusedWorld = value; FocusedWorldChange(); } }
 
 		public bool SaveLocalWorld { get; set; } = true;
+		public bool LoadLocalWorld { get; set; } = true;
 
 		public float TotalStepTime { get; private set; }
 
@@ -48,6 +49,7 @@ namespace RhuEngine.Managers
 
 		public void Dispose() {
 			if (SaveLocalWorld) {
+				RLog.Info("Saving Local World");
 				try {
 					var data = LocalWorld.Serialize(new SyncObjectSerializerObject(false));
 					File.WriteAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld", new DataSaver(data).SaveStore());
@@ -152,7 +154,7 @@ namespace RhuEngine.Managers
 			world.Initialize(true, true, true, false);
 			world.SessionID.SetValueNoOnChangeAndNetworking(sessionID.ToString());
 			world.SessionName.SetValueNoOnChangeAndNetworking(sessionName);
-			Task.Run(() => world.StartNetworking(false));
+			Task.Run(async () => await world.StartNetworking(false));
 			worlds.Add(world);
 			OnWorldUpdateTaskBar?.Invoke();
 			ShowLoadingFeedback(world, focusLevel);
@@ -173,7 +175,7 @@ namespace RhuEngine.Managers
 				item?.Invoke();
 			}
 			if ((focusLevel != World.FocusLevel.PrivateOverlay) & !localWorld) {
-				Task.Run(() => world.StartNetworking(true));
+				Task.Run(async () => await world.StartNetworking(true));
 			}
 			worlds.Add(world);
 			ShowLoadingFeedback(world, focusLevel);
@@ -192,13 +194,33 @@ namespace RhuEngine.Managers
 			_loadingText.Width.Value = _loadingText.Height.Value = 0.35f;
 			_loadingText.StartingColor.Value = Colorf.White;
 			Engine.IntMsg = "Creating Local World";
-			LocalWorld = CreateNewWorld(World.FocusLevel.Focused, true);
-			Engine.IntMsg = "Loading Local World Data";
-			LocalWorld.SessionName.Value = "Local World";
-			LocalWorld.WorldName.Value = "Local World";
-			Engine.IntMsg = "Building Local World";
-			LocalWorld.BuildLocalWorld();
-			Engine.IntMsg = "Local World Made";
+			var loaddedData = false;
+			if (LoadLocalWorld && File.Exists(Engine.BaseDir + "LocalWorldTest.RWorld")) {
+				try {
+					Engine.IntMsg = "Loading Local World From Flie";
+					LocalWorld = LoadWorldFromBytes(World.FocusLevel.Focused, File.ReadAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld"), true);
+					LocalWorld.SessionName.Value = "Local World";
+					LocalWorld.WorldName.Value = "Local World";
+					Engine.IntMsg = "Loaded Local World From Flie";
+					loaddedData = true;
+				}
+				catch {
+					loaddedData = false;
+					Engine.IntMsg = "Failed loading Local World From Flie";
+					RLog.Err("Failed loading Local World From Flie");
+				}
+			}
+
+			if(!loaddedData) {
+				RLog.Info("Building Local World");
+				LocalWorld = CreateNewWorld(World.FocusLevel.Focused, true);
+				Engine.IntMsg = "Loading Local World Data";
+				LocalWorld.SessionName.Value = "Local World";
+				LocalWorld.WorldName.Value = "Local World";
+				Engine.IntMsg = "Building Local World";
+				LocalWorld.BuildLocalWorld();
+				Engine.IntMsg = "Local World Made";
+			}
 			while (LocalWorld.IsLoading) {
 				Engine.IntMsg = LocalWorld.LoadMsg;
 				Thread.Sleep(10);

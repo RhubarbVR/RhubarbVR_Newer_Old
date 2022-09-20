@@ -91,7 +91,11 @@ namespace RhuEngine.WorldObjects
 		public override T LoadElement(IDataNode data) {
 			var newElement = new T();
 			newElement.Initialize(World, this, "List Elemenet", true, false);
-			newElement.Deserialize(data, new SyncObjectDeserializerObject(false));
+			var deserlizer = new SyncObjectDeserializerObject(false);
+			newElement.Deserialize(data, deserlizer);
+			foreach (var item in deserlizer.onLoaded) {
+				item?.Invoke();
+			}
 			return newElement;
 		}
 

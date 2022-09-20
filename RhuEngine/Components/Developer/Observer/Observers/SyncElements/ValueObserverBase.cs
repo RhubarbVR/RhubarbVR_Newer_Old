@@ -17,6 +17,10 @@ namespace RhuEngine.Components
 
 		IChangeable _changeable;
 		protected override void LoadSideUI(UIBuilder ui) {
+			BuildUI(ui);
+		}
+
+		protected override void EveryUserOnLoad() {
 			if (TargetElement is IChangeable changeable) {
 				if (_changeable is not null) {
 					changeable.Changed -= Changeable_Changed;
@@ -25,7 +29,6 @@ namespace RhuEngine.Components
 				changeable.Changed += Changeable_Changed;
 				Changeable_Changed(null);
 			}
-			BuildUI(ui);
 		}
 
 		private void Changeable_Changed(IChangeable obj) {

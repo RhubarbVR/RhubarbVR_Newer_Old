@@ -120,6 +120,8 @@ namespace RhuEngine.WorldObjects
 			public override string Message => "Generic given is invalid";
 		}
 
+		public bool IsInitialized { get; private set; } = false;
+
 		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer = null) {
 			try {
 				if (GetType().GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && !world.IsPersonalSpace) {
@@ -177,6 +179,7 @@ namespace RhuEngine.WorldObjects
 				if (typeof(IGlobalStepable).IsAssignableFrom(GetType())) {
 					world.RegisterGlobalStepable((IGlobalStepable)this);
 				}
+				IsInitialized = true;
 			}
 			catch (Exception e) {
 				try {
