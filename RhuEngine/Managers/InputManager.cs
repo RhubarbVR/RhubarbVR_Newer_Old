@@ -42,6 +42,7 @@ namespace RhuEngine.Managers
 
 		public KeyboardSystem KeyboardSystem { get; private set; }
 		public MouseSystem MouseSystem { get; private set; }
+		public MicSystem MicSystem { get; private set; }
 
 		public Matrix HeadMatrix { get; set; }
 
@@ -53,9 +54,11 @@ namespace RhuEngine.Managers
 			KeyboardSystem = new KeyboardSystem(this);
 			MouseSystem = new MouseSystem(this);
 			screenInput = new ScreenInput(this);
+			MicSystem = new MicSystem(this);
 			_inputSystems = new IInputSystem[] {
 				KeyboardSystem,
 				MouseSystem,
+				MicSystem,
 			};
 			LoadInputActions();
 			_engine.EngineLink.LoadInput(this);

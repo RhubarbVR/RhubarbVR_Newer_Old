@@ -10,7 +10,7 @@ using NAudio.Wave;
 
 namespace RhuEngine.WorldObjects
 {
-	public abstract class AudioStream : SyncStream, INetworkedObject, IAssetProvider<IWaveProvider>, IGlobalStepable
+	public abstract class AudioStream : SyncStream, INetworkedObject, IAssetProvider<IWaveProvider>
 	{
 		public enum AudioFrameTime
 		{
@@ -81,6 +81,14 @@ namespace RhuEngine.WorldObjects
 
 		protected override void OnLoaded() {
 			UpdateFrameSize();
+
+		}
+
+		public IWaveProvider LoadedWaveProvider;
+
+		public void LoadInput(IWaveProvider input) {
+			LoadedWaveProvider = input;
+			Load(input);
 		}
 
 		public void LoadInput(string deviceName = null) {
@@ -91,21 +99,12 @@ namespace RhuEngine.WorldObjects
 				deviceName = Engine.MainMic;
 				Engine.MicChanged += LoadInput;
 			}
-			//if (!RMicrophone.Start(deviceName,out var rMicReader)) {
-			//	RLog.Err($"Failed to load Mic {deviceName ?? "System Default"}");
-			//	return;
-			//}
-			//_input = rMicReader;
-			//Load(_input.SoundClip);
-			//_output = null;
-			//_loadedDevice = true;
+			LoadInput(InputManager.MicSystem[deviceName]?.WaveProvider);
 		}
 
 		public override void Received(Peer sender, IDataNode data) {
-		
+
 		}
 
-		public void Step() {
-		}
 	}
 }

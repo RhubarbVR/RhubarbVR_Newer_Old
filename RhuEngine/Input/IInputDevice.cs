@@ -4,7 +4,12 @@ using System.Text;
 
 namespace RhuEngine.Input
 {
-	public interface INamedDevice
+	public interface IDefualtDevice : IInputDevice
+	{
+		public bool IsDefualt { get; }
+	}
+
+	public interface INamedDevice : IInputDevice
 	{
 		public string DeviceName { get; }
 	}
