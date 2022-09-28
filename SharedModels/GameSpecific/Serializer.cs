@@ -58,7 +58,7 @@ namespace SharedModels.GameSpecific
 	}
 	public static class Serializer
 	{
-		public static bool TryToRead<T>(byte[] data,out T value) {
+		public static bool TryToRead<T>(byte[] data, out T value) {
 			try {
 				value = MessagePackSerializer.Deserialize<T>(data, Options);
 				return true;
@@ -76,7 +76,12 @@ namespace SharedModels.GameSpecific
 
 
 		public static MessagePackSerializerOptions SerializerOptions() {
-			var data = from e in AppDomain.CurrentDomain.GetAssemblies().AsParallel().SelectMany(x => x.GetTypes())
+			var data = from e in AppDomain.CurrentDomain.GetAssemblies().AsParallel()
+					   .SelectMany(x => {
+				//Mono is broke and this is to get around it
+				try { return x.GetTypes(); }
+				catch { return Array.Empty<Type>(); }
+			})
 					   where typeof(IMessagePackFormatter).IsAssignableFrom(e)
 					   where e.GetCustomAttribute<FormatterAttribute>() is not null
 					   select (IMessagePackFormatter)Activator.CreateInstance(e);
@@ -95,7 +100,7 @@ namespace SharedModels.GameSpecific
 			return lz4Options;
 		}
 
-		public static bool TrySave<T>(T data,out byte[]  outData) {
+		public static bool TrySave<T>(T data, out byte[] outData) {
 			try {
 				outData = MessagePackSerializer.Serialize(data, Options);
 				return true;

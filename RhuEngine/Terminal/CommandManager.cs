@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,8 +13,12 @@ namespace RhuEngine
 		internal readonly Type[] _commands;
 
 		public CommandManager() {
+			var data = (Assembly a) => {
+				try { return a.GetTypes(); }
+				catch { return Array.Empty<Type>(); }
+			};
 			_commands = (from a in AppDomain.CurrentDomain.GetAssemblies()
-						 from t in a.GetTypes()
+						 from t in data(a)
 						 where typeof(Command).IsAssignableFrom(t)
 						 where t.IsClass && !t.IsAbstract
 						 select t).ToArray();
