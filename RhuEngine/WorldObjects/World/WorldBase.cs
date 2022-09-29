@@ -141,11 +141,6 @@ namespace RhuEngine.WorldObjects
 						if (GetLocalUser() is not null) {
 							GetLocalUser().isPresent.Value = true;
 						}
-						//ToDO: set focus on net api
-						//if (Engine.netApiManager.UserStatus is not null) {
-						//	Engine.netApiManager.UserStatus.CurrentSession = Guid.Parse(SessionID.Value);
-						//	Engine.netApiManager.UserStatus = Engine.netApiManager.UserStatus;
-						//}
 					}
 					else {
 						if (GetLocalUser() is not null) {

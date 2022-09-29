@@ -28,7 +28,15 @@ namespace RhuEngine.WorldObjects
 					lock (_syncRefLock) {
 						Unbind();
 						_targetPointer = value;
-						_target = (T)World.GetWorldObject(value);
+						var targetValue = World.GetWorldObject(value);
+						if(targetValue == null) {
+							_target = null;
+						}
+						else {
+							if (targetValue.GetType().IsAssignableTo(typeof(T))) {
+								_target = (T)targetValue;
+							}
+						}
 						Bind();
 					}
 				}

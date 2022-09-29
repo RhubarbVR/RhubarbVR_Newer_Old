@@ -28,7 +28,7 @@ namespace RhubarbCloudClient
 		public class ManagedUser
 		{
 			private readonly RhubarbAPIClient _client;
-			public Guid UserID => UserData.Id;
+			public Guid UserID => UserData?.Id??Guid.Empty;
 
 			public UserRelation Relation { get; private set; }
 

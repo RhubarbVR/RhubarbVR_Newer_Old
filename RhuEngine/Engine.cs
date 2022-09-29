@@ -225,6 +225,8 @@ namespace RhuEngine
 
 		public InputManager inputManager = new();
 
+		public DiscordManager discordManager = new();
+
 		public LocalisationManager localisationManager = new();
 
 		public MainSettingsObject MainSettings;
@@ -271,7 +273,7 @@ namespace RhuEngine
 				netApiManager = new NetApiManager((_userDataPathOverRide ?? BaseDir) + "/rhuCookie");
 				IntMsg = "Building AssetManager";
 				assetManager = new AssetManager(_cachePathOverRide);
-				_managers = new IManager[] { localisationManager, inputManager, netApiManager, assetManager, worldManager, uiManager };
+				_managers = new IManager[] { discordManager, localisationManager, inputManager, netApiManager, assetManager, worldManager, uiManager };
 				foreach (var item in _managers) {
 					IntMsg = $"Starting {item.GetType().Name}";
 					try {

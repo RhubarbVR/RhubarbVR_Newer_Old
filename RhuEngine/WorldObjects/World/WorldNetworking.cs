@@ -35,6 +35,8 @@ namespace RhuEngine.WorldObjects
 
 		public ushort MasterUser { get; set; } = 1;
 
+		public ushort ConnectedUserCount => (ushort)Users?.Where(x => ((User)x).IsConnected || ((User)x).IsLocalUser).Count();
+
 		public List<RelayPeer> relayServers = new();
 		public List<Peer> peers = new();
 

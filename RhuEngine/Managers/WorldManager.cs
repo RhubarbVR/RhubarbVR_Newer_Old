@@ -43,8 +43,11 @@ namespace RhuEngine.Managers
 		public PrivateSpaceManager PrivateSpaceManager { get; internal set; }
 
 		private readonly Stopwatch _stepStopwatch = new();
+		
+		public event Action<World> WorldChanged;
 
 		private void FocusedWorldChange() {
+			WorldChanged?.Invoke(FocusedWorld);
 		}
 
 		public void Dispose() {

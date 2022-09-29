@@ -349,6 +349,10 @@ namespace RhuEngine.WorldObjects.ECS
 
 		private void ParentChanged() {
 			try {
+				if (parent.Target is null) {
+					return;
+				}
+
 				if (World.RootEntity == this) {
 					GoBackToOld();
 					return;
