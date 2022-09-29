@@ -34,6 +34,9 @@ namespace RhuEngine.Commads
 		public override void RunCommand() {
 			if(args.Length == 1) {
 				Console.WriteLine("Need Object To Spawn");
+				foreach (var item in Enum.GetNames(typeof(SpawnObject))) {
+					Console.WriteLine(item);
+				}
 				return;
 			}
 			var spawntype = (SpawnObject)Enum.Parse(typeof(SpawnObject), args[1], true);
