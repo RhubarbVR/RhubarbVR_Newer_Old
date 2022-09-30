@@ -20,12 +20,12 @@ namespace RhuEngine.Linker
 
 	}
 
-	public interface IRenderLink<T>:IWorldLink where T : LinkedWorldComponent,new()
+	public interface IWorldLink<T>:IWorldLink where T : LinkedWorldComponent,new()
 	{
 		T LinkedComp { get; set; }
 	}
 
-	public abstract class EngineWorldLinkBase<T> : IRenderLink<T> where T : LinkedWorldComponent, new()
+	public abstract class EngineWorldLinkBase<T> : IWorldLink<T> where T : LinkedWorldComponent, new()
 	{
 		public T LinkedComp { get; set; }
 		public LinkedWorldComponent LinkCompGen { get => LinkedComp; set => LinkedComp = (T)value; }

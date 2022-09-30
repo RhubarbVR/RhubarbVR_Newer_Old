@@ -25,14 +25,14 @@ namespace RhuEngine.WorldObjects.ECS
 					return;
 				}
 				if (!loadedCasts.TryGetValue(GetType(), out var linker)) {
-					var generic = typeof(IRenderLink<>).MakeGenericType(GetType());
+					var generic = typeof(IWorldLink<>).MakeGenericType(GetType());
 					var types = from a in AppDomain.CurrentDomain.GetAssemblies()
 								from t in a.GetTypes()
 								where !t.IsAbstract && t.IsClass
 								where generic.IsAssignableFrom(t)
 								select t;
 					if (types.Count() != 1) {
-						RLog.Err("No linker found or to many found");
+						RLog.Err($"No linker found or to many found Amount:{types.Count()} Type {GetType().GetFormattedName()}");
 						throw new Exception("No linker found or to many found");
 					}
 					linker = types.First();
