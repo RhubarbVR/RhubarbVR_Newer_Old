@@ -389,3 +389,11 @@ FodyWeavers.xsd
 Platforms/Rhubarb_VR_DotNet/Properties/launchSettings.json
 .DS_Store
 */.DS_Store
+
+
+.godot/
+GoDotBuilds/
+RhubarbGodot/settings.json
+RhubarbGodot/rhuCookie
+RhubarbGodotLocalWorldTest.RWorld
+RhubarbGodot/Cache/

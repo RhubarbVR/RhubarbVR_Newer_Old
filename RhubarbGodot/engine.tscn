@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://cka8uoppbavol"]
+
+[ext_resource type="Script" path="res://EngineRunner.cs" id="1_p4nju"]
+
+[node name="Engine" type="Node3D" node_paths=PackedStringArray("Camera")]
+script = ExtResource("1_p4nju")
+Camera = NodePath("XrOrigin3d/XrCamera3d")
+
+[node name="XrOrigin3d" type="XROrigin3D" parent="."]
+
+[node name="XrCamera3d" type="XRCamera3D" parent="XrOrigin3d"]

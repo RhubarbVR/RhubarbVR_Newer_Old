@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32901.215
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RhubarbVR", "RhubarbVR.csproj", "{584EAD58-9949-40DF-BC14-4983F71DB01B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RhuEngine", "..\RhuEngine\RhuEngine.csproj", "{2B260FC9-6A7C-4685-8FCE-AEABE0CE6BB1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RBullet", "..\RBullet\RBullet.csproj", "{17613C01-3A62-4D35-880C-A15AE37CD1C3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		ExportDebug|Any CPU = ExportDebug|Any CPU
+		ExportRelease|Any CPU = ExportRelease|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Unity|Any CPU = Unity|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{584EAD58-9949-40DF-BC14-4983F71DB01B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{584EAD58-9949-40DF-BC14-4983F71DB01B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{584EAD58-9949-40DF-BC14-4983F71DB01B}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{584EAD58-9949-40DF-BC14-4983F71DB01B}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{584EAD58-9949-40DF-BC14-4983F71DB01B}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{584EAD58-9949-40DF-BC14-4983F71DB01B}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{584EAD58-9949-40DF-BC14-4983F71DB01B}.Release|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{584EAD58-9949-40DF-BC14-4983F71DB01B}.Release|Any CPU.Build.0 = ExportRelease|Any CPU
+		{584EAD58-9949-40DF-BC14-4983F71DB01B}.Unity|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{584EAD58-9949-40DF-BC14-4983F71DB01B}.Unity|Any CPU.Build.0 = ExportRelease|Any CPU
+		{2B260FC9-6A7C-4685-8FCE-AEABE0CE6BB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B260FC9-6A7C-4685-8FCE-AEABE0CE6BB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B260FC9-6A7C-4685-8FCE-AEABE0CE6BB1}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B260FC9-6A7C-4685-8FCE-AEABE0CE6BB1}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{2B260FC9-6A7C-4685-8FCE-AEABE0CE6BB1}.ExportRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{2B260FC9-6A7C-4685-8FCE-AEABE0CE6BB1}.ExportRelease|Any CPU.Build.0 = Release|Any CPU
+		{2B260FC9-6A7C-4685-8FCE-AEABE0CE6BB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B260FC9-6A7C-4685-8FCE-AEABE0CE6BB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B260FC9-6A7C-4685-8FCE-AEABE0CE6BB1}.Unity|Any CPU.ActiveCfg = Unity|Any CPU
+		{2B260FC9-6A7C-4685-8FCE-AEABE0CE6BB1}.Unity|Any CPU.Build.0 = Unity|Any CPU
+		{17613C01-3A62-4D35-880C-A15AE37CD1C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17613C01-3A62-4D35-880C-A15AE37CD1C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17613C01-3A62-4D35-880C-A15AE37CD1C3}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17613C01-3A62-4D35-880C-A15AE37CD1C3}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{17613C01-3A62-4D35-880C-A15AE37CD1C3}.ExportRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{17613C01-3A62-4D35-880C-A15AE37CD1C3}.ExportRelease|Any CPU.Build.0 = Release|Any CPU
+		{17613C01-3A62-4D35-880C-A15AE37CD1C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17613C01-3A62-4D35-880C-A15AE37CD1C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17613C01-3A62-4D35-880C-A15AE37CD1C3}.Unity|Any CPU.ActiveCfg = Unity|Any CPU
+		{17613C01-3A62-4D35-880C-A15AE37CD1C3}.Unity|Any CPU.Build.0 = Unity|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A5268E66-4037-4858-B7EE-1A86A2B60612}
+	EndGlobalSection
+EndGlobal
