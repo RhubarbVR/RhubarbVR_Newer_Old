@@ -35,10 +35,14 @@ namespace RhuEngine.Datatypes
 			try {
 				var temp = BitConverter.ToString(BitConverter.GetBytes(id).Reverse().ToArray()).Replace("-", "");
 
-				while (temp.Substring(0, 1) == "0") {
-					temp = temp.Substring(1);
+				if (!string.IsNullOrEmpty(temp)) {
+					while (!string.IsNullOrEmpty(temp) && temp.Substring(0, 1) == "0") {
+						temp = temp.Substring(1);
+					}
 				}
-
+				if (string.IsNullOrEmpty(temp)) {
+					temp = "0";
+				}
 				return temp;
 			}
 			catch {
@@ -51,7 +55,7 @@ namespace RhuEngine.Datatypes
 		}
 
 		public override bool Equals(object obj) {
-			return id.Equals(obj);
+			return obj is NetPointer pointer ? Equals(pointer) : id.Equals(obj);
 		}
 
 		public override int GetHashCode() {
@@ -61,6 +65,8 @@ namespace RhuEngine.Datatypes
 		public override string ToString() {
 			return HexString();
 		}
+
+		public static explicit operator NetPointer(string data) => new NetPointer(Convert.ToUInt64(data, 16));
 
 		public static bool operator ==(NetPointer a, NetPointer b) => a.Equals(b);
 		public static bool operator !=(NetPointer a, NetPointer b) => !a.Equals(b);

@@ -116,6 +116,9 @@ namespace RhubarbCloudClient
 
 
 		public async Task<ManagedUser> GetUser(Guid userID) {
+			if(userID == Guid.Empty) {
+				return null;
+			}
 			if (_loadedUsers.TryGetValue(userID, out var val)) {
 				return val;
 			}

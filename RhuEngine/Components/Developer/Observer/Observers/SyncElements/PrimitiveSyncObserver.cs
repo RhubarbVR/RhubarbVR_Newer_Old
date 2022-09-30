@@ -75,7 +75,6 @@ namespace RhuEngine.Components
 			}
 			try {
 				var data = Convert.ChangeType(editorValue.Target.Value, TargetElement.GetValueType());
-				;
 				TargetElement.SetValue(data);
 			}
 			catch {

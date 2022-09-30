@@ -23,6 +23,8 @@ using SharedModels.GameSpecific;
 using System.Reflection;
 using RhuEngine.Datatypes;
 using RhuEngine.Components;
+using RhuEngine.DataStructure;
+using System.Collections;
 
 namespace RhuEngine.GameTests.Tests
 {
@@ -63,6 +65,72 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsNotNull(newEntity);
 			return newEntity;
 		}
+
+		[TestMethod()]
+		public void WorldSaveTestNoSync() {
+			SetUpForNormalTest();
+			var localWorld = tester.app.worldManager.LocalWorld;
+			var data = localWorld.Serialize(new SyncObjectSerializerObject(false));
+			var savedData = new DataSaver(data).SaveStore();
+			var dataRead = new DataReader(savedData).Data;
+			AssertDataNodeAreTheSame(data, dataRead);
+			((IDisposable)tester).Dispose();
+		}
+
+		[TestMethod()]
+		public void WorldSaveTestSync() {
+			SetUpForNormalTest();
+			var localWorld = tester.app.worldManager.LocalWorld;
+			var data = localWorld.Serialize(new SyncObjectSerializerObject(true));
+			var savedData = new DataSaver(data).SaveStore();
+			var dataRead = new DataReader(savedData).Data;
+			AssertDataNodeAreTheSame(data, dataRead);
+			((IDisposable)tester).Dispose();
+		}
+
+		private void AssertDataNodeAreTheSame(IDataNode a,IDataNode b) {
+			Assert.AreEqual(a.GetType(), b.GetType());
+			if ((a is DataNodeGroup aGroup) && (b is DataNodeGroup bGroup)) {
+				var aListKey = aGroup._nodeGroup.ToArray();
+				var bListKey = bGroup._nodeGroup.ToArray();
+				Assert.AreEqual(aGroup._nodeGroup.Count, bGroup._nodeGroup.Count);
+				Assert.AreEqual(aListKey.Length, bListKey.Length);
+				for (var i = 0; i < aListKey.Length; i++) {
+					Assert.AreEqual(aListKey[i].Key, bListKey[i].Key);
+					AssertDataNodeAreTheSame(aListKey[i].Value, bListKey[i].Value);
+				}
+			}
+			else if ((a is DataNodeList aList) && (b is DataNodeList bList)) {
+				Assert.AreEqual(aList._nodeGroup.Count, bList._nodeGroup.Count);
+				for (var i = 0; i < aList._nodeGroup.Count; i++) {
+					AssertDataNodeAreTheSame(aList[i], bList[i]);
+				}
+			}
+			else if ((a is IDateNodeValue aValue) && (b is IDateNodeValue bValue)) {
+				Assert.AreEqual(aValue.Type, bValue.Type);
+				Assert.AreEqual(aValue.ObjectValue?.ToString(), bValue.ObjectValue?.ToString());
+			}
+		}
+
+
+		[TestMethod()]
+		public void EntiyAttachToSlelfCheck() {
+			var testEntityRoot = AttachEntity();
+			var self = testEntityRoot.AddChild("Self");
+			self.parent.Target = self;
+			Assert.AreNotEqual(self.parent.Target, self);
+		}
+
+		[TestMethod()]
+		public void EntiyAttachToChildOfSelfCheck() {
+			var testEntityRoot = AttachEntity();
+			var self = testEntityRoot.AddChild("Self");
+			var childofself = self.AddChild("Child of self");
+			self.parent.Target = childofself;
+			Assert.AreNotEqual(self.parent.Target, childofself);
+			Assert.AreNotEqual(self.parent.Target, self);
+		}
+
 		[TestMethod()]
 		public void StartNewTestWorldTest() {
 			StartNewTestWorld();

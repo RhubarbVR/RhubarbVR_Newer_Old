@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 using MessagePack;
 
@@ -7,8 +8,13 @@ using SharedModels.GameSpecific;
 
 namespace RhuEngine.DataStructure
 {
+	public interface IDateNodeValue {
+		public object ObjectValue { get; set; }
+		public Type Type { get; }
+	}
+
 	[MessagePackObject]
-	public sealed class DataNode<T> : IDataNode
+	public sealed class DataNode<T> : IDataNode, IDateNodeValue
 	{
 		public DataNode(T def = default) {
 			Value = def;
@@ -19,6 +25,11 @@ namespace RhuEngine.DataStructure
 		}
 		[Key(0)]
 		public T Value { get; set; }
+
+		[IgnoreMember]
+		public object ObjectValue { get => Value; set => Value = (T)value; }
+		[IgnoreMember]
+		public Type Type => typeof(T);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static implicit operator T(DataNode<T> data) => data.Value;

@@ -9,6 +9,8 @@ namespace RhuEngine.WorldObjects
 {
 	public interface ISyncRef : ISyncObject
 	{
+		NetPointer RawPointer { set; }
+
 		NetPointer NetValue { get; set; }
 	}
 
@@ -19,6 +21,8 @@ namespace RhuEngine.WorldObjects
 		private readonly object _syncRefLock = new();
 
 		protected NetPointer _targetPointer;
+
+		public NetPointer RawPointer { set => _targetPointer = value; }
 
 		public NetPointer NetValue
 		{
@@ -74,6 +78,23 @@ namespace RhuEngine.WorldObjects
 
 
 		private T _target;
+		internal void SetTargetNoChange(T value) {
+			lock (_syncRefLock) {
+					Unbind();
+					_targetPointer = value == null ? default : value.Pointer;
+					_target = value;
+					BroadcastValue();
+					Bind();
+			}
+		}
+		internal void SetTargetNoNetworkOrChange(T value) {
+			lock (_syncRefLock) {
+				Unbind();
+				_targetPointer = value == null ? default : value.Pointer;
+				_target = value;
+				Bind();
+			}
+		}
 
 		public IWorldObject TargetIWorldObject { get => Target; set { if (value is T data) { Target = data; } else { Target = null; } } }
 

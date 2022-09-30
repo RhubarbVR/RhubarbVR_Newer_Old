@@ -490,9 +490,7 @@ namespace RNumerics
 
 		public static bool operator ==(in Quaternionf a, in Quaternionf b) => a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
 		public static bool operator !=(in Quaternionf a, in Quaternionf b) => a.x != b.x || a.y != b.y || a.z != b.z || a.w != b.w;
-		public override bool Equals(object obj) {
-			return this == (Quaternionf)obj;
-		}
+
 		public override int GetHashCode() {
 			unchecked // Overflow is fine, just wrap
 			{
@@ -521,12 +519,14 @@ namespace RNumerics
 
 			return 0;
 		}
+
 		public bool Equals(Quaternionf other) {
-			return x == other.x && y == other.y && z == other.z && w == other.w;
+			return this == other;
 		}
 
-
-
+		public override bool Equals(object obj) {
+			return obj is Quaternionf data && data == this;
+		}
 
 
 		public bool EpsilonEqual(in Quaternionf q2, in float epsilon) {
@@ -722,10 +722,6 @@ namespace RNumerics
 		}
 		public string ToString(in string fmt) {
 			return string.Format("{0} {1} {2} {3}", x.ToString(fmt), y.ToString(fmt), z.ToString(fmt), w.ToString(fmt));
-		}
-
-		public TypeCode GetTypeCode() {
-			return TypeCode.Object;
 		}
 	}
 }

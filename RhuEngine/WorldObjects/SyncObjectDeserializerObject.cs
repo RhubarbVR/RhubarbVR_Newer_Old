@@ -48,7 +48,7 @@ namespace RhuEngine.WorldObjects
 			if (data == null) {
 				throw new Exception("Node did not exist when loading SyncRef");
 			}
-			@object.NetValue = ((DataNode<NetPointer>)data.GetValue("targetPointer")).Value;
+			@object.RawPointer = ((DataNode<NetPointer>)data.GetValue("targetPointer")).Value;
 			if (hasNewRefIDs) {
 				newRefIDs.Add(((DataNode<NetPointer>)data.GetValue("Pointer")).Value.GetID(), @object.Pointer.GetID());
 				if (toReassignLater.ContainsKey(((DataNode<NetPointer>)data.GetValue("Pointer")).Value.GetID())) {
@@ -57,13 +57,13 @@ namespace RhuEngine.WorldObjects
 					}
 				}
 				if (newRefIDs.ContainsKey(@object.NetValue.GetID())) {
-					@object.NetValue = new NetPointer(newRefIDs[@object.NetValue.GetID()]);
+					@object.RawPointer = new NetPointer(newRefIDs[@object.NetValue.GetID()]);
 				}
 				else {
 					if (!toReassignLater.ContainsKey(@object.NetValue.GetID())) {
 						toReassignLater.Add(@object.NetValue.GetID(), new List<Action<NetPointer>>());
 					}
-					toReassignLater[@object.NetValue.GetID()].Add((value) => @object.NetValue = value);
+					toReassignLater[@object.NetValue.GetID()].Add((value) => @object.RawPointer = value);
 				}
 
 			}
@@ -83,10 +83,9 @@ namespace RhuEngine.WorldObjects
 				onLoaded.Add(((ISyncObject)@object).RunOnLoad);
 			}
 			if (typeof(T) == typeof(Type)) {
-				if(((DataNode<string>)data.GetValue("Value")).Value is null) {
-					return (T)(object)null;
-				}
-				return (T)(object)Type.GetType(((DataNode<string>)data.GetValue("Value")).Value, false, false);
+				return ((DataNode<string>)data.GetValue("Value")).Value is null
+					? (T)(object)null
+					: (T)(object)Type.GetType(((DataNode<string>)data.GetValue("Value")).Value, false, false);
 			}
 			else {
 				if (typeof(T).IsEnum) {

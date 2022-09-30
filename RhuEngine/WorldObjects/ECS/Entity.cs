@@ -339,26 +339,30 @@ namespace RhuEngine.WorldObjects.ECS
 
 		private void GoBackToOld() {
 			if (parent.Target != _internalParent) {
-				parent.Target = _internalParent;
+				parent.SetTargetNoNetworkOrChange(_internalParent);
 			}
 		}
 
 		private bool IsParrent(Entity check) {
+			if(check.Depth > Depth) {
+				return false;
+			}
 			return (check == this) || (_internalParent?.IsParrent(check) ?? false);
 		}
 
 		private void ParentChanged() {
 			try {
-				if (parent.Target is null) {
-					return;
-				}
-
 				if (World.RootEntity == this) {
 					GoBackToOld();
 					return;
 				}
-
+				
 				if (parent.Target == _internalParent) {
+					return;
+				}
+
+				if (parent.Target == null) {
+					parent.Target = World.RootEntity;
 					return;
 				}
 
@@ -375,11 +379,6 @@ namespace RhuEngine.WorldObjects.ECS
 					_internalParent = parent.Target;
 					ParentDepthUpdate();
 					TransValueChange();
-					return;
-				}
-				if (parent.Target == null) {
-					parent.Target = World.RootEntity;
-					ParentDepthUpdate();
 					return;
 				}
 				parent.Target.children.AddInternal(this);
@@ -433,7 +432,7 @@ namespace RhuEngine.WorldObjects.ECS
 				_cachedGlobalMatrix = value;
 				_cachedLocalMatrix = newLocal;
 				GlobalTransformChange?.Invoke(this, true);
-				foreach (Entity item in children.Cast<Entity>()) {
+				foreach (var item in children.Cast<Entity>()) {
 					item.GlobalTransMark();
 				}
 			}
