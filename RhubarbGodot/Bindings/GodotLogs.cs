@@ -38,7 +38,10 @@ namespace RhubarbVR.Bindings
 					GD.Print(v);
 					break;
 			}
-			Callback?.Invoke(level, $"[{level.ToString().ToLower()}] " + v + "\n");
+			try {
+				Callback?.Invoke(level, $"[{level.ToString().ToLower()}] " + v + "\n");
+			}
+			catch { }
 		}
 
 		event Action<LogLevel, string> Callback;

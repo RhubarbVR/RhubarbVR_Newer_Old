@@ -72,7 +72,10 @@ namespace NullContext
 			RhuConsole.ForegroundColor = ConsoleColor.Gray;
 			Console.WriteLine(log);
 			_semaphore.Release();
-			Log?.Invoke(logLevel, logPreamble + log);
+			try {
+				Log?.Invoke(logLevel, logPreamble + log);
+			}
+			catch { }
 		}
 
 		public void Info(string value) {
