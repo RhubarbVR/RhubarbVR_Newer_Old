@@ -21,6 +21,14 @@ config/icon="res://icon.svg"
 
 project/assembly_name="RhubarbVR"
 
+[physics]
+
+3d/run_on_separate_thread=true
+
+[rendering]
+
+driver/threads/thread_model=2
+
 [xr]
 
 shaders/enabled=true

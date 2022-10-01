@@ -215,5 +215,8 @@ namespace RStereoKit
 
 		public void Init(RMesh rMesh) {
 		}
+
+		public void Dispose() {
+		}
 	}
 }

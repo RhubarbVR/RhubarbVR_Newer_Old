@@ -7,7 +7,7 @@ using RhuEngine.WorldObjects;
 using RNumerics;
 namespace RhuEngine.Linker
 {
-	public interface IRMesh
+	public interface IRMesh: IDisposable
 	{
 		public void LoadMeshData(IMesh mesh);
 		public void LoadMeshToRender();

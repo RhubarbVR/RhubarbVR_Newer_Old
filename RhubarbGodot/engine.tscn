@@ -2,10 +2,15 @@
 
 [ext_resource type="Script" path="res://EngineRunner.cs" id="1_p4nju"]
 
-[node name="Engine" type="Node3D" node_paths=PackedStringArray("Camera")]
+[node name="Engine" type="Node3D" node_paths=PackedStringArray("Camera", "Rigin", "AudioListener")]
 script = ExtResource("1_p4nju")
 Camera = NodePath("XrOrigin3d/XrCamera3d")
+Rigin = NodePath("XrOrigin3d")
+AudioListener = NodePath("AudioListener3d")
 
 [node name="XrOrigin3d" type="XROrigin3D" parent="."]
 
 [node name="XrCamera3d" type="XRCamera3D" parent="XrOrigin3d"]
+
+[node name="AudioListener3d" type="AudioListener3D" parent="."]
+current = true

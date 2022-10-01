@@ -9,6 +9,8 @@ using RhuEngine.Linker;
 using RhuEngine.Managers;
 using RhuEngine.Settings;
 
+using RNumerics;
+
 namespace RhubarbVR.Bindings
 {
 	public class GodotRenderSettings : RenderSettingsBase {
@@ -28,13 +30,13 @@ namespace RhubarbVR.Bindings
 
 		public bool SpawnPlayer => true;
 
-		public bool CanRender => false;
+		public bool CanRender => true;
 
 		public bool CanAudio => false;
 
 		public bool CanInput => false;
 
-		public string BackendID => "Godot";
+		public string BackendID => "Godot1.0.0";
 
 		public bool InVR => false;
 
@@ -59,8 +61,7 @@ namespace RhubarbVR.Bindings
 		public void LoadArgs() {
 			if (Engine._forceFlatscreen) {
 
-			}
-			else {
+			} else {
 
 			}
 		}
@@ -71,7 +72,15 @@ namespace RhubarbVR.Bindings
 
 		public void LoadStatics() {
 			RTime.Instance = EngineRunner;
-			new RBullet.BulletPhsyicsLink(true).RegisterPhysics();
+			RMesh.Instance = typeof(GodotMesh);
+			var data = new GodotTexture();
+			RTexture2D.Instance = data;
+			RRenderer.Instance = new GodotRender(EngineRunner);
+			RMaterial.Instance = new GoMat();
+			StaticMaterialManager.Instanances = new GodotStaticMats();
+			data.White = RTexture2D.FromColors(new Colorb[] { new Colorb(0, 1), new Colorb(0, 1), new Colorb(0, 1), new Colorb(0, 1) }, 2, 2, false);
+			RMesh.Quad = new RMesh(new GodotMesh(GodotMesh.MakeQuad()), false);
+			new RBullet.BulletPhsyicsLink().RegisterPhysics();
 		}
 
 		public void Start() {
