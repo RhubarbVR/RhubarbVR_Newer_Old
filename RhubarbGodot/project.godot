@@ -17,17 +17,46 @@ boot_splash/image="res://RhubarbVR2.png"
 boot_splash/bg_color=Color(0.0980392, 0.0980392, 0.0980392, 1)
 config/icon="res://icon.svg"
 
+[audio]
+
+driver/enable_input=true
+driver/mix_rate=48000
+
+[display]
+
+window/vsync/vsync_mode=0
+
 [dotnet]
 
 project/assembly_name="RhubarbVR"
 
-[physics]
+[filesystem]
 
-3d/run_on_separate_thread=true
+import/blender/enabled=false
+import/fbx/enabled=false
 
-[rendering]
+[input]
 
-driver/threads/thread_model=2
+MouseWeelUp={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":4,"pressed":false,"double_click":false,"script":null)
+]
+}
+MouseWeelDown={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":5,"pressed":false,"double_click":false,"script":null)
+]
+}
+MouseWeelLeft={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":6,"pressed":false,"double_click":false,"script":null)
+]
+}
+MouseWeelRight={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":7,"pressed":false,"double_click":false,"script":null)
+]
+}
 
 [xr]
 

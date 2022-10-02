@@ -12,7 +12,7 @@ namespace RhuEngine
 {
 	public sealed class ImageSharpTexture : IDisposable
 	{
-		public Image<Rgba32> Image { get; }
+		public Image<Rgba32> Image { get; private set; }
 		public bool Srgb { get; }
 
 		public int Width => Image.Width;
@@ -28,7 +28,7 @@ namespace RhuEngine
 			Image = image;
 			Srgb = srgb;
 		}
-		RTexture2D _texture2D;
+		public RTexture2D Texture2D { get; private set; }
 		public unsafe RTexture2D CreateTexture() {
 			var colors = new Colorb[Height * Width];
 			var hanndel = GCHandle.Alloc(colors, GCHandleType.Pinned);
@@ -40,11 +40,11 @@ namespace RhuEngine
 				((Rgba32*)pin)[i] = color;
 			});
 			hanndel.Free();
-			_texture2D = RTexture2D.FromColors(colors, Width, Height, Srgb);
-			return _texture2D;
+			Texture2D = RTexture2D.FromColors(colors, Width, Height, Srgb);
+			return Texture2D;
 		}
 		public unsafe RTexture2D UpdateTexture() {
-			if (_texture2D is null) {
+			if (Texture2D is null) {
 				throw new Exception("Not started");
 			}
 			var colors = new Colorb[Height * Width];
@@ -57,9 +57,15 @@ namespace RhuEngine
 				((Rgba32*)pin)[i] = color;
 			});
 			hanndel.Free();
-			_texture2D.SetColors(Width, Height, colors);
-			return _texture2D;
+			Texture2D.SetColors(Width, Height, colors);
+			return Texture2D;
 		}
+
+		public void UpdateImage(Image<Rgba32> image) {
+			Image?.Dispose();
+			Image = image;
+		}
+
 		public RTexture2D CreateTextureAndDisposes() {
 			var newtex = CreateTexture();
 			Dispose();

@@ -13,6 +13,7 @@ using Godot.Collections;
 using Array = Godot.Collections.Array;
 using SArray = System.Array;
 using NAudio.Wave;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings
 {
@@ -20,20 +21,41 @@ namespace RhubarbVR.Bindings
 	{
 		public void Draw(RMaterial loadingLogo, Matrix p, Colorf tint, int zDepth, RenderLayer layer, int submesh) {
 			if (loadingLogo.Target is GodotMaterial material) {
-				TempMeshDraw.Visible = true;
-				if(submesh <= -1) {
-					TempMeshDraw.MaterialOverride = material.GetMatarial(tint, zDepth);
-					for (var i = 0; i < TempMeshDraw.GetSurfaceOverrideMaterialCount(); i++) {
-						TempMeshDraw.SetSurfaceOverrideMaterial(i, null);
+				if (TempMeshDraw.Visible) {
+					var temperDraw = new MeshInstance3D();
+					EngineRunner._.AddChild(temperDraw);
+					temperDraw.Visible = true;
+					if (submesh <= -1) {
+						temperDraw.MaterialOverride = material.GetMatarial(tint, zDepth);
+						for (var i = 0; i < temperDraw.GetSurfaceOverrideMaterialCount(); i++) {
+							temperDraw.SetSurfaceOverrideMaterial(i, null);
+						}
 					}
+					else {
+						temperDraw.SetSurfaceOverrideMaterial(submesh, material.GetMatarial(tint, zDepth));
+						temperDraw.MaterialOverride = null;
+					}
+					temperDraw.Layers = (uint)(int)layer;
+					temperDraw.Mesh = LoadedMesh;
+					temperDraw.SetPos(p);
+					RenderThread.ExecuteOnStartOfFrame(() => temperDraw.Free());
 				}
 				else {
-					TempMeshDraw.SetSurfaceOverrideMaterial(submesh, material.GetMatarial(tint, zDepth));
-					TempMeshDraw.MaterialOverride = null;
+					TempMeshDraw.Visible = true;
+					if (submesh <= -1) {
+						TempMeshDraw.MaterialOverride = material.GetMatarial(tint, zDepth);
+						for (var i = 0; i < TempMeshDraw.GetSurfaceOverrideMaterialCount(); i++) {
+							TempMeshDraw.SetSurfaceOverrideMaterial(i, null);
+						}
+					}
+					else {
+						TempMeshDraw.SetSurfaceOverrideMaterial(submesh, material.GetMatarial(tint, zDepth));
+						TempMeshDraw.MaterialOverride = null;
+					}
+					TempMeshDraw.Layers = (uint)(int)layer;
+					TempMeshDraw.Mesh = LoadedMesh;
+					TempMeshDraw.SetPos(p);
 				}
-				TempMeshDraw.Layers = (uint)(int)layer;
-				TempMeshDraw.Mesh = LoadedMesh;
-				TempMeshDraw.SetPos(p);
 			}
 		}
 
@@ -42,7 +64,7 @@ namespace RhubarbVR.Bindings
 		public ArrayMesh LoadedMesh { get; private set; }
 		public MeshInstance3D TempMeshDraw { get; private set; }
 
-		public Mesh.BlendShapeMode shapeMode;
+		public Mesh.BlendShapeMode shapeMode = Mesh.BlendShapeMode.Relative;
 
 		public string Name;
 
@@ -50,38 +72,40 @@ namespace RhubarbVR.Bindings
 
 		public (Mesh.PrimitiveType, Array)[] subMeshes = SArray.Empty<(Mesh.PrimitiveType, Array)>();
 
-		private static (Mesh.PrimitiveType, Array) CreateSubmesh(RPrimitiveType rPrimitiveType, Vector3f[][] uvs, Array<int> indexs, Array<Vector3> vectors, Array<Vector3> normals, Array<Color> color, Array<float> tangents, Array<int> bones, Array<int> wights) {
+		private static (Mesh.PrimitiveType, Array) CreateSubmesh(RPrimitiveType rPrimitiveType, Vector3f[][] uvs, int[] indexs, Vector3[] vectors, Vector3[] normals, Color[] color, float[] tangents, int[] bones, float[] wights) {
+			if(vectors.Length == 0) {
+				return (Mesh.PrimitiveType.Points, null);
+			}
 			var arrays = new Array();
 			arrays.Resize((int)Mesh.ArrayType.Max);
-			arrays[(int)Mesh.ArrayType.Vertex] = vectors;
+			arrays[(int)Mesh.ArrayType.Vertex] = vectors.AsSpan();
 			if (normals is not null) {
-				arrays[(int)Mesh.ArrayType.Normal] = normals;
+				arrays[(int)Mesh.ArrayType.Normal] = normals.AsSpan();
 			}
 			if (tangents is not null) {
-				arrays[(int)Mesh.ArrayType.Tangent] = tangents;
+				arrays[(int)Mesh.ArrayType.Tangent] = tangents.AsSpan();
 			}
 			if (color is not null) {
-				arrays[(int)Mesh.ArrayType.Color] = color;
+				arrays[(int)Mesh.ArrayType.Color] = color.AsSpan();
 			}
 			if (bones is not null) {
-				arrays[(int)Mesh.ArrayType.Bones] = bones;
+				arrays[(int)Mesh.ArrayType.Bones] = bones.AsSpan();
 			}
 			if (wights is not null) {
-				arrays[(int)Mesh.ArrayType.Weights] = wights;
+				arrays[(int)Mesh.ArrayType.Weights] = wights.AsSpan();
 			}
-			arrays[(int)Mesh.ArrayType.Index] = indexs;
+			arrays[(int)Mesh.ArrayType.Index] = indexs.AsSpan();
 			for (var i = 0; i < uvs.Length; i++) {
 				if (i <= 1) {
-					var array = new Array<Vector2>();
-					array.Resize(uvs[i].Length);
+					var array = new Vector2[uvs[i].Length];
 					for (var e = 0; e < uvs[i].Length; e++) {
 						array[e] = new Vector2(uvs[i][e].x, uvs[i][e].y);
 					}
 					if (i == 0) {
-						arrays[(int)Mesh.ArrayType.TexUv] = array;
+						arrays[(int)Mesh.ArrayType.TexUv] = array.AsSpan();
 					}
 					else {
-						arrays[(int)Mesh.ArrayType.TexUv2] = array;
+						arrays[(int)Mesh.ArrayType.TexUv2] = array.AsSpan();
 					}
 
 				}
@@ -90,15 +114,14 @@ namespace RhubarbVR.Bindings
 					if (curentIndex > ((int)Mesh.ArrayType.Custom3)) {
 						break;
 					}
-					var array = new Array<float>();
-					array.Resize(uvs[i].Length * 3);
+					var array = new float[uvs[i].Length * 3];
 					for (var e = 0; e < uvs[i].Length; e++) {
 						var currentLoop = e * 3;
 						array[currentLoop] = uvs[i][e].x;
 						array[currentLoop + 1] = uvs[i][e].y;
 						array[currentLoop + 2] = uvs[i][e].z;
 					}
-					arrays[curentIndex] = array;
+					arrays[curentIndex] = array.AsSpan();
 				}
 			}
 			return (ToGodot(rPrimitiveType), arrays);
@@ -182,10 +205,10 @@ namespace RhubarbVR.Bindings
 
 			var normals = new Vector3[4]
 			{
-				-Vector3.Forward,
-				-Vector3.Forward,
-				-Vector3.Forward,
-				-Vector3.Forward
+				Vector3.Forward,
+				Vector3.Forward,
+				Vector3.Forward,
+				Vector3.Forward
 			};
 
 			var uv = new Vector3f[4]
@@ -196,7 +219,7 @@ namespace RhubarbVR.Bindings
 				new Vector3f(1, 0,0)
 			};
 			var uvs = new Vector3f[][] { uv };
-			var subMesh = CreateSubmesh(RPrimitiveType.Triangle, uvs, new Array<int>(tris), new Array<Vector3>(vertices), new Array<Vector3>(normals), null, null, null, null);
+			var subMesh = CreateSubmesh(RPrimitiveType.Triangle, uvs, tris, vertices, normals, null, null, null, null);
 			mesh.AddSurfaceFromArrays(subMesh.Item1, subMesh.Item2);
 			return mesh;
 		}
@@ -224,9 +247,9 @@ namespace RhubarbVR.Bindings
 		}
 
 		public void LoadMeshData(IMesh mesh) {
+			BlendShapeNames = SArray.Empty<string>();
+			subMeshes = SArray.Empty<(Mesh.PrimitiveType, Array)>();
 			if (mesh is null) {
-				BlendShapeNames = SArray.Empty<string>();
-				subMeshes = SArray.Empty<(Mesh.PrimitiveType, Array)>();
 				return;
 			}
 			if (mesh is IComplexMesh complexMesh) {
@@ -237,12 +260,9 @@ namespace RhubarbVR.Bindings
 				return;
 			}
 
-			var vertices = new Array<Vector3>();
-			vertices.Resize(mesh.VertexCount);
-			var normals = new Array<Vector3>();
-			normals.Resize(mesh.VertexCount);
-			var colors = new Array<Color>();
-			colors.Resize(mesh.VertexCount);
+			var vertices = new Vector3[mesh.VertexCount];
+			var normals = new Vector3[mesh.VertexCount];
+			var colors = new Color[mesh.VertexCount];
 			var cuv = new Vector3f[1][] { new Vector3f[mesh.VertexCount] };
 			for (var i = 0; i < mesh.VertexCount; i++) {
 				var vert = mesh.GetVertexAll(i);
@@ -251,7 +271,7 @@ namespace RhubarbVR.Bindings
 				cuv[0][i] = vert.bHaveUV && ((vert.uv?.Length ?? 0) > 0) ? new Vector3f(vert.uv[0].x, vert.uv[0].y, 0) : new Vector3f(0, 0, 0);
 				colors[i] = vert.bHaveC ? new Color(vert.c.x, vert.c.y, vert.c.z, 1f) : new Color(1f, 1f, 1f, 1f);
 			}
-			var indexs = new Array<int>(mesh.RenderIndices().ToArray());
+			var indexs = mesh.RenderIndices().ToArray();
 			subMeshes = new (Mesh.PrimitiveType, Array)[] { CreateSubmesh(RPrimitiveType.Triangle, cuv, indexs, vertices, normals, colors, null, null, null) };
 		}
 
@@ -264,15 +284,17 @@ namespace RhubarbVR.Bindings
 				LoadedMesh.AddBlendShape(item);
 			}
 			foreach (var item in subMeshes) {
-				LoadedMesh.AddSurfaceFromArrays(item.Item1, item.Item2);
+				if (item.Item2 is not null) {
+					LoadedMesh.AddSurfaceFromArrays(item.Item1, item.Item2);
+				}
 			}
 		}
 
 		public void Dispose() {
 			try {
 				EngineRunner._.RemoveMeshInst(TempMeshDraw);
-				TempMeshDraw.Dispose();
-				LoadedMesh.Dispose();
+				TempMeshDraw?.Free();
+				LoadedMesh?.Free();
 			}
 			catch { }
 		}

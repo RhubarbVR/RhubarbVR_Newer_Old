@@ -104,7 +104,9 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public override void Deserialize(IDataNode data, SyncObjectDeserializerObject syncObjectSerializerObject) {
-			_value = syncObjectSerializerObject.ValueDeserialize<T>((DataNodeGroup)data, this);
+			if(syncObjectSerializerObject.ValueDeserialize<T>((DataNodeGroup)data, this,out var tempvalue)) {
+				_value = tempvalue;
+			}
 			OnLoad(syncObjectSerializerObject);
 		}
 

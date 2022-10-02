@@ -13,6 +13,16 @@ namespace RhuEngine.Components
 	{
 		public T _material;
 
+		[OnChanged(nameof(RenderOrderOffsetUpdate))]
+		public readonly Sync<int> RenderOrderOffset;
+
+		protected void RenderOrderOffsetUpdate() {
+			if (_material is null) {
+				return;
+			}
+			RenderThread.ExecuteOnEndOfFrame(() => _material.Material.RenderOrderOffset = RenderOrderOffset); 
+		}
+
 		public virtual T GetMaterialFromLinker() {
 			return StaticMaterialManager.GetMaterial<T>();
 		}
@@ -27,6 +37,7 @@ namespace RhuEngine.Components
 				_material = GetMaterialFromLinker();
 				Load(_material.Material);
 				UpdateAll();
+				_material.Material.RenderOrderOffset = RenderOrderOffset;
 			});
 		}
 

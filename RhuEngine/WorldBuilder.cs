@@ -98,6 +98,8 @@ namespace RhuEngine
 			slight.AttachComponent<Light>().LightType.Value = RLightType.Spot;
 
 			var box = floor.AttachComponent<TrivialBox3Mesh>();
+			var noTrans = floor.AttachComponent<UnlitMaterial>();
+			noTrans.Transparency.Value = Transparency.None;
 			var size = 10;
 			Entity LastpowerCube = null;
 			for (var y = 0; y < size; y++) {
@@ -109,7 +111,7 @@ namespace RhuEngine
 						if (LastpowerCube is not null) {
 							PowerCube.SetParent(LastpowerCube);
 						}
-						AttachRender(box, mit, PowerCube, Colorf.RandomHue());
+						AttachRender(box, noTrans, PowerCube, Colorf.RandomHue());
 						PowerCube.AttachComponent<BoxShape>();
 						PowerCube.AttachComponent<Grabbable>();
 						LastpowerCube = PowerCube;

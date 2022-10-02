@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using RhubarbVR.Bindings.Input;
+
 using RhuEngine;
 using RhuEngine.Linker;
 using RhuEngine.Managers;
@@ -32,9 +34,9 @@ namespace RhubarbVR.Bindings
 
 		public bool CanRender => true;
 
-		public bool CanAudio => false;
+		public bool CanAudio => true;
 
-		public bool CanInput => false;
+		public bool CanInput => true;
 
 		public string BackendID => "Godot1.0.0";
 
@@ -67,7 +69,8 @@ namespace RhubarbVR.Bindings
 		}
 
 		public void LoadInput(InputManager manager) {
-
+			manager.LoadInputDriver<GodotKeyboard>();
+			manager.LoadInputDriver<GodotMouse>();
 		}
 
 		public void LoadStatics() {

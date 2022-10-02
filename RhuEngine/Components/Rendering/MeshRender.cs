@@ -21,6 +21,7 @@ namespace RhuEngine.Components
 		public readonly SyncObjList<AssetRef<RMaterial>> materials;
 
 		public readonly Sync<Colorf> colorLinear;
+		public readonly Sync<int> zOrderOffset;
 
 		[Default(RenderLayer.MainLayer)]
 		public readonly Sync<RenderLayer> renderLayer;

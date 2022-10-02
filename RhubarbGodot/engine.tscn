@@ -1,16 +1,21 @@
-[gd_scene load_steps=2 format=3 uid="uid://cka8uoppbavol"]
+[gd_scene load_steps=3 format=3 uid="uid://cka8uoppbavol"]
 
 [ext_resource type="Script" path="res://EngineRunner.cs" id="1_p4nju"]
+
+[sub_resource type="Environment" id="Environment_ljag0"]
+background_mode = 1
+background_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 
 [node name="Engine" type="Node3D" node_paths=PackedStringArray("Camera", "Rigin", "AudioListener")]
 script = ExtResource("1_p4nju")
 Camera = NodePath("XrOrigin3d/XrCamera3d")
 Rigin = NodePath("XrOrigin3d")
-AudioListener = NodePath("AudioListener3d")
+AudioListener = NodePath("XrOrigin3d/AudioListener3d")
 
 [node name="XrOrigin3d" type="XROrigin3D" parent="."]
 
 [node name="XrCamera3d" type="XRCamera3D" parent="XrOrigin3d"]
+environment = SubResource("Environment_ljag0")
 
-[node name="AudioListener3d" type="AudioListener3D" parent="."]
+[node name="AudioListener3d" type="AudioListener3D" parent="XrOrigin3d"]
 current = true

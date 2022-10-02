@@ -25,6 +25,7 @@ namespace RhuEngine.WorldObjects
 			if (hasNewRefIDs) {
 				if (newRefIDs == null) {
 					RLog.Warn($"Problem with {@object.GetType().FullName}");
+					return;
 				}
 				newRefIDs.Add(((DataNode<NetPointer>)data.GetValue("Pointer")).Value.GetID(), @object.Pointer.GetID());
 				if (toReassignLater.ContainsKey(((DataNode<NetPointer>)data.GetValue("Pointer")).Value.GetID())) {
@@ -46,7 +47,8 @@ namespace RhuEngine.WorldObjects
 
 		public void RefDeserialize(DataNodeGroup data, ISyncRef @object) {
 			if (data == null) {
-				throw new Exception("Node did not exist when loading SyncRef");
+				RLog.Warn("Node did not exist when loading SyncRef");
+				return;
 			}
 			@object.RawPointer = ((DataNode<NetPointer>)data.GetValue("targetPointer")).Value;
 			if (hasNewRefIDs) {
@@ -74,62 +76,76 @@ namespace RhuEngine.WorldObjects
 			onLoaded.Add(@object.RunOnLoad);
 		}
 
-		public T ValueDeserialize<T>(DataNodeGroup data, IWorldObject @object) {
+		public bool ValueDeserialize<T>(DataNodeGroup data, IWorldObject @object,out T value) {
 			if (data == null) {
-				throw new Exception($"Node did not exist when loading Sync value {@object.GetType().FullName}");
+				RLog.Warn($"Node did not exist when loading Sync value {@object.GetType().FullName}");
+				value = default(T);
+				return false;
 			}
 			BindPointer(data, @object);
 			if (typeof(ISyncObject).IsAssignableFrom(@object.GetType())) {
 				onLoaded.Add(((ISyncObject)@object).RunOnLoad);
 			}
 			if (typeof(T) == typeof(Type)) {
-				return ((DataNode<string>)data.GetValue("Value")).Value is null
+				value = ((DataNode<string>)data.GetValue("Value")).Value is null
 					? (T)(object)null
 					: (T)(object)Type.GetType(((DataNode<string>)data.GetValue("Value")).Value, false, false);
+				return true;
 			}
 			else {
 				if (typeof(T).IsEnum) {
 					var unType = typeof(T).GetEnumUnderlyingType();
 					if (unType == typeof(int)) {
-						return (T)(object)((DataNode<int>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<int>)data.GetValue("Value")).Value;
+						return true;
 					}
 					else if (unType == typeof(uint)) {
-						return (T)(object)((DataNode<uint>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<uint>)data.GetValue("Value")).Value;
+						return true;
 					}
 					else if (unType == typeof(bool)) {
-						return (T)(object)((DataNode<bool>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<bool>)data.GetValue("Value")).Value;
+						return true;
 					}
 					else if (unType == typeof(byte)) {
-						return (T)(object)((DataNode<byte>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<byte>)data.GetValue("Value")).Value;
+						return true;
 					}
 					else if (unType == typeof(sbyte)) {
-						return (T)(object)((DataNode<sbyte>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<sbyte>)data.GetValue("Value")).Value;
+						return true;
 					}
 					else if (unType == typeof(short)) {
-						return (T)(object)((DataNode<short>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<short>)data.GetValue("Value")).Value;
+						return true;
 					}
 					else if (unType == typeof(ushort)) {
-						return (T)(object)((DataNode<ushort>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<ushort>)data.GetValue("Value")).Value;
+						return true;
 					}
 					else if (unType == typeof(long)) {
-						return (T)(object)((DataNode<long>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<long>)data.GetValue("Value")).Value;
+						return true;
 					}
 					else if (unType == typeof(ulong)) {
-						return (T)(object)((DataNode<ulong>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<ulong>)data.GetValue("Value")).Value;
+						return true;
 					}
 					else {
 						throw new NotSupportedException();
 					}
 				}
 				else {
-					return ((DataNode<T>)data.GetValue("Value")).Value;
+					value = ((DataNode<T>)data.GetValue("Value")).Value;
+					return true;
 				}
 			}
 		}
 
 		public void ListDeserialize<T>(DataNodeGroup data, ISyncObjectList<T> @object) where T : ISyncObject, new() {
 			if (data == null) {
-				throw new Exception("Node did not exist when loading SyncObjList");
+				RLog.Warn("Node did not exist when loading SyncObjList");
+				return;
 			}
 			BindPointer(data, @object);
 			foreach (DataNodeGroup val in (DataNodeList)data.GetValue("list")) {
@@ -142,7 +158,8 @@ namespace RhuEngine.WorldObjects
 
 		public void AbstractListDeserialize<T>(DataNodeGroup data, IAbstractObjList<T> @object) where T : ISyncObject {
 			if (data == null) {
-				throw new Exception("Node did not exist when loading SyncAbstractObjList");
+				RLog.Warn("Node did not exist when loading SyncAbstractObjList");
+				return;
 			}
 			BindPointer(data, @object);
 			foreach (DataNodeGroup val in (DataNodeList)data.GetValue("list")) {
@@ -184,7 +201,8 @@ namespace RhuEngine.WorldObjects
 
 		public void Deserialize(DataNodeGroup data, IWorldObject @object) {
 			if (data == null) {
-				throw new Exception("Node did not exist when loading Node: " + @object.GetType().FullName);
+				RLog.Warn("Node did not exist when loading Node: " + @object.GetType().FullName);
+				return;
 			}
 			BindPointer(data,@object);
 			var fields = @object.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);

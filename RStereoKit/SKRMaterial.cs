@@ -158,63 +158,63 @@ namespace RStereoKit
 				UpdateMaterial(StereoKit.Material.Unlit.Copy());
 			}
 
-			public BasicRenderMode RenderMode { set => throw new NotImplementedException(); }
-			public RhuEngine.Linker.Cull CullMode { set => throw new NotImplementedException(); }
-			public float AlphaCutOut { set => throw new NotImplementedException(); }
-			public RTexture2D LitColorTexture { set => throw new NotImplementedException(); }
-			public Colorf LitColorTint { set => throw new NotImplementedException(); }
-			public RTexture2D ShadeColorTexture { set => throw new NotImplementedException(); }
-			public Colorf ShadeColorTint { set => throw new NotImplementedException(); }
-			public float ShadingToony { set => throw new NotImplementedException(); }
-			public RTexture2D NormalMap { set => throw new NotImplementedException(); }
-			public float Normal { set => throw new NotImplementedException(); }
-			public float ShadingShift { set => throw new NotImplementedException(); }
-			public RTexture2D ShadowReceiveMultiplierTexture { set => throw new NotImplementedException(); }
-			public float ShadowReceiveMultiplier { set => throw new NotImplementedException(); }
-			public RTexture2D LitShadeMixingMultiplierTexture { set => throw new NotImplementedException(); }
-			public float LitShadeMixingMultiplier { set => throw new NotImplementedException(); }
-			public float LightColorAttenuation { set => throw new NotImplementedException(); }
-			public float GLIntensity { set => throw new NotImplementedException(); }
-			public RTexture2D EmissionColorTexture { set => throw new NotImplementedException(); }
-			public Colorf EmissionColorTint { set => throw new NotImplementedException(); }
-			public RTexture2D MatCap { set => throw new NotImplementedException(); }
-			public RTexture2D RimColorTexture { set => throw new NotImplementedException(); }
-			public Colorf RimColorTint { set => throw new NotImplementedException(); }
-			public float LightingMix { set => throw new NotImplementedException(); }
-			public float FresnelPower { set => throw new NotImplementedException(); }
-			public float Lift { set => throw new NotImplementedException(); }
-			public IToonMaterial.OutLineType OutLineMode { set => throw new NotImplementedException(); }
-			public RTexture2D OutLineWidthTexture { set => throw new NotImplementedException(); }
-			public float OutLineWidth { set => throw new NotImplementedException(); }
-			public float WidthScaledMaxDistance { set => throw new NotImplementedException(); }
-			public bool FixedColor { set => throw new NotImplementedException(); }
-			public Colorf OutLineColor { set => throw new NotImplementedException(); }
-			public float OutLineLightingMix { set => throw new NotImplementedException(); }
-			public Vector2f Tilling { set => throw new NotImplementedException(); }
-			public Vector2f Offset { set => throw new NotImplementedException(); }
-			public RTexture2D AnimationMask { set => throw new NotImplementedException(); }
-			public Vector2f ScrollAnimation { set => throw new NotImplementedException(); }
-			public float RotationAnimation { set => throw new NotImplementedException(); }
-			public Vector2f LitColorTextureTilling { set => throw new NotImplementedException(); }
-			public Vector2f LitColorTextureOffset { set => throw new NotImplementedException(); }
-			public Vector2f ShadeColorTextureTilling { set => throw new NotImplementedException(); }
-			public Vector2f ShadeColorTextureOffset { set => throw new NotImplementedException(); }
-			public Vector2f NormalMapTilling { set => throw new NotImplementedException(); }
-			public Vector2f NormalMapOffset { set => throw new NotImplementedException(); }
-			public Vector2f ShadowReceiveMultiplierTextureTilling { set => throw new NotImplementedException(); }
-			public Vector2f ShadowReceiveMultiplierTextureOffset { set => throw new NotImplementedException(); }
-			public Vector2f LitShadeMixingMultiplierTextureTilling { set => throw new NotImplementedException(); }
-			public Vector2f LitShadeMixingMultiplierTextureOffset { set => throw new NotImplementedException(); }
-			public Vector2f EmissionColorTextureTilling { set => throw new NotImplementedException(); }
-			public Vector2f EmissionColorTextureOffset { set => throw new NotImplementedException(); }
-			public Vector2f MatCapTilling { set => throw new NotImplementedException(); }
-			public Vector2f MatCapOffset { set => throw new NotImplementedException(); }
-			public Vector2f RimColorTextureTilling { set => throw new NotImplementedException(); }
-			public Vector2f RimColorTextureOffset { set => throw new NotImplementedException(); }
-			public Vector2f OutLineWidthTextureTilling { set => throw new NotImplementedException(); }
-			public Vector2f OutLineWidthTextureOffset { set => throw new NotImplementedException(); }
-			public Vector2f AnimationMaskTilling { set => throw new NotImplementedException(); }
-			public Vector2f AnimationMaskOffset { set => throw new NotImplementedException(); }
+			public BasicRenderMode RenderMode  { get; set; }
+			public RhuEngine.Linker.Cull CullMode  { get; set; }
+			public float AlphaCutOut  { get; set; }
+			public RTexture2D LitColorTexture  { get; set; }
+			public Colorf LitColorTint  { get; set; }
+			public RTexture2D ShadeColorTexture  { get; set; }
+			public Colorf ShadeColorTint  { get; set; }
+			public float ShadingToony  { get; set; }
+			public RTexture2D NormalMap  { get; set; }
+			public float Normal  { get; set; }
+			public float ShadingShift  { get; set; }
+			public RTexture2D ShadowReceiveMultiplierTexture  { get; set; }
+			public float ShadowReceiveMultiplier  { get; set; }
+			public RTexture2D LitShadeMixingMultiplierTexture  { get; set; }
+			public float LitShadeMixingMultiplier  { get; set; }
+			public float LightColorAttenuation  { get; set; }
+			public float GLIntensity  { get; set; }
+			public RTexture2D EmissionColorTexture  { get; set; }
+			public Colorf EmissionColorTint  { get; set; }
+			public RTexture2D MatCap  { get; set; }
+			public RTexture2D RimColorTexture  { get; set; }
+			public Colorf RimColorTint  { get; set; }
+			public float LightingMix  { get; set; }
+			public float FresnelPower  { get; set; }
+			public float Lift  { get; set; }
+			public IToonMaterial.OutLineType OutLineMode  { get; set; }
+			public RTexture2D OutLineWidthTexture  { get; set; }
+			public float OutLineWidth  { get; set; }
+			public float WidthScaledMaxDistance  { get; set; }
+			public bool FixedColor  { get; set; }
+			public Colorf OutLineColor  { get; set; }
+			public float OutLineLightingMix  { get; set; }
+			public Vector2f Tilling  { get; set; }
+			public Vector2f Offset  { get; set; }
+			public RTexture2D AnimationMask  { get; set; }
+			public Vector2f ScrollAnimation  { get; set; }
+			public float RotationAnimation  { get; set; }
+			public Vector2f LitColorTextureTilling  { get; set; }
+			public Vector2f LitColorTextureOffset  { get; set; }
+			public Vector2f ShadeColorTextureTilling  { get; set; }
+			public Vector2f ShadeColorTextureOffset  { get; set; }
+			public Vector2f NormalMapTilling  { get; set; }
+			public Vector2f NormalMapOffset  { get; set; }
+			public Vector2f ShadowReceiveMultiplierTextureTilling  { get; set; }
+			public Vector2f ShadowReceiveMultiplierTextureOffset  { get; set; }
+			public Vector2f LitShadeMixingMultiplierTextureTilling  { get; set; }
+			public Vector2f LitShadeMixingMultiplierTextureOffset  { get; set; }
+			public Vector2f EmissionColorTextureTilling  { get; set; }
+			public Vector2f EmissionColorTextureOffset  { get; set; }
+			public Vector2f MatCapTilling  { get; set; }
+			public Vector2f MatCapOffset  { get; set; }
+			public Vector2f RimColorTextureTilling  { get; set; }
+			public Vector2f RimColorTextureOffset  { get; set; }
+			public Vector2f OutLineWidthTextureTilling  { get; set; }
+			public Vector2f OutLineWidthTextureOffset  { get; set; }
+			public Vector2f AnimationMaskTilling  { get; set; }
+			public Vector2f AnimationMaskOffset { get; set; }
 		}
 
 		public class UnlitMaterial : StaticMaterialBase<Material>, IUnlitMaterial
@@ -241,6 +241,7 @@ namespace RStereoKit
 			public RhuEngine.Linker.Transparency Transparency { set => YourData.Transparency = (StereoKit.Transparency)(int)value; }
 			public Colorf Tint { set => YourData[MatParamName.ColorTint] = new Color(value.r, value.g, value.b, value.a); }
 			public bool DullSided { set => YourData.FaceCull = (value) ? StereoKit.Cull.None : StereoKit.Cull.Back; }
+			public bool NoDepthTest { get; set; }
 		}
 		public IPBRMaterial CreatePBRMaterial() {
 			return new PBRMaterial();

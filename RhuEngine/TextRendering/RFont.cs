@@ -49,6 +49,8 @@ namespace RhuEngine
 			if (TargetFont is null) {
 				throw new Exception("Need a font to Make text");
 			}
+			texture2D?.Dispose();
+			texture2D = null;
 			texture2D = TargetFont?.RenderText(_text);
 			FontRectangle = TargetFont?.GetSizeOfText(_text) ?? new FontRectangle();
 			AspectRatio = FontRectangle.Width / FontRectangle.Height;

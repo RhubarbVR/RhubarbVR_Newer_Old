@@ -53,7 +53,8 @@ namespace RhuEngine.WorldObjects
 
 		public bool NoSync { get; set; }
 
-		private readonly object _locker = new();
+		public object Lock => _syncObjects.SyncRoot;
+
 		public void DisposeAtIndex(int index) {
 			_syncObjects[index].Dispose();
 		}
@@ -80,7 +81,7 @@ namespace RhuEngine.WorldObjects
 				var offset = (IChangeable)newElement;
 				offset.Changed += UpdateChildChanged;
 			}
-			lock (_locker) {
+			lock (_syncObjects.SyncRoot) {
 				var hasAdded = false;
 				for (var i = 0; i < _syncObjects.Count; i++) {
 					var elementOffset = 0;
@@ -129,7 +130,7 @@ namespace RhuEngine.WorldObjects
 				var offset = (IChangeable)value;
 				offset.Changed -= UpdateChildChanged;
 			}
-			lock (_locker) {
+			lock (_syncObjects.SyncRoot) {
 				_syncObjects.Remove(value);
 				FixAllNames();
 			}

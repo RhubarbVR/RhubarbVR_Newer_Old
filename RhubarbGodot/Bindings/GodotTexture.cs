@@ -13,6 +13,9 @@ using Godot.Collections;
 using Array = Godot.Collections.Array;
 using SArray = System.Array;
 using static RNumerics.Colorf;
+using static System.Net.Mime.MediaTypeNames;
+using System.Drawing;
+using Image = Godot.Image;
 
 namespace RhubarbVR.Bindings
 {
@@ -22,6 +25,7 @@ namespace RhubarbVR.Bindings
 		public RTexture2D White { get; set; }
 
 		public void Dispose(object tex) {
+			((Texture2D)tex).Free();
 		}
 
 		public int GetHeight(object target) {
@@ -33,7 +37,9 @@ namespace RhubarbVR.Bindings
 		}
 
 		public object Make(TexType dynamic, TexFormat rgba32Linear) {
-			return new Texture2D();
+			var newImage = new Image();
+			newImage.Create(2, 2, false, Image.Format.Rgba8);
+			return ImageTexture.CreateFromImage(newImage);
 		}
 
 		public static IEnumerable<byte> GetColorData(Colorb colorb) {
@@ -46,7 +52,9 @@ namespace RhubarbVR.Bindings
 		public object MakeFromColors(Colorb[] colors, int width, int height, bool srgb) {
 			var image = new Image();
 			image.CreateFromData(width, height, false, Image.Format.Rgba8, colors.SelectMany(GetColorData).ToArray());
-			return ImageTexture.CreateFromImage(image);
+			var newtex =  ImageTexture.CreateFromImage(image);
+			image.Free();
+			return newtex;
 		}
 
 		public void SetAddressMode(object target, TexAddress value) {
@@ -62,6 +70,7 @@ namespace RhubarbVR.Bindings
 				var newImage = new Image();
 				newImage.CreateFromData(width, height, true, Image.Format.Rgba8, rgbaData);
 				image.Update(newImage);
+				newImage.Free();
 			}
 		}
 
@@ -70,6 +79,7 @@ namespace RhubarbVR.Bindings
 				var newImage = new Image();
 				newImage.CreateFromData(width, height, false, Image.Format.Rgba8, rgbaData.SelectMany(GetColorData).ToArray());
 				image.Update(newImage);
+				newImage.Free();
 			}
 		}
 
@@ -78,7 +88,12 @@ namespace RhubarbVR.Bindings
 		}
 
 		public void SetSize(object tex, int width, int height) {
-
+			if (tex is ImageTexture image) {
+				var newImage = new Image();
+				newImage.Create(width, height, false, Image.Format.Rgba8);
+				image.Update(newImage);
+				newImage.Free();
+			}
 		}
 	}
 }

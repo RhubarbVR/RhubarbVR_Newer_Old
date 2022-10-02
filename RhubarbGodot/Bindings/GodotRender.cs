@@ -22,6 +22,10 @@ namespace RhubarbVR.Bindings
 		}
 		public static void SetPos(this Node3D node3D,Matrix matrix) {
 			matrix.Decompose(out var pos, out var rot, out var scale);
+			if (pos.IsAnyNan || rot.IsAnyNan || scale.IsAnyNan){
+				node3D.Transform = new Transform3D();
+				return;
+			}
 			var trans = node3D.Transform;
 			trans.basis = new Basis(new Quaternion(rot.x, rot.y, rot.z, rot.w)).Scaled(new Vector3(scale.x, scale.y, scale.z));
 			trans.origin = new Vector3(pos.x,pos.y,pos.z);
@@ -40,10 +44,10 @@ namespace RhubarbVR.Bindings
 		public EngineRunner EngineRunner { get; }
 
 		public Matrix GetCameraRootMatrix() {
-			return EngineRunner.Camera.GetPos();
+			return EngineRunner.Rigin.GetPos();
 		}
 		public void SetCameraRootMatrix(Matrix m) {
-			EngineRunner.Camera.SetPos(m);
+			EngineRunner.Rigin.SetPos(m);
 		}
 
 		public bool GetEnableSky() {

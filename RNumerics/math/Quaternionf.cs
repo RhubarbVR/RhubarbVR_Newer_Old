@@ -311,7 +311,8 @@ namespace RNumerics
 				}
 			}
 		}
-
+		[IgnoreMember]
+		public bool IsAnyNan => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z);
 
 		public float Angle(in Quaternionf e) {
 			return (float)Math.Acos(Math.Min(Math.Abs(Dot(e)), 1f)) * 2f * 57.29578f;
