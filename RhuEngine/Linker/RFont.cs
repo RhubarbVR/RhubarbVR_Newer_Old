@@ -370,7 +370,6 @@ namespace RhuEngine.Linker
 		public Colorf ShadowColor { get => Inst.ShadowColor; set => Inst.ShadowColor = value; }
 		public Vector2f ShadowOffset { get => Inst.ShadowOffset; set => Inst.ShadowOffset = value; }
 		public Vector2i Size { get => Inst.Size; set => Inst.Size = value; }
-
 		public RHorizontalAlignment HorizontalAlignment { get => Inst.HorizontalAlignment; set => Inst.HorizontalAlignment = value; }
 		public RVerticalAlignment VerticalAlignment { get => Inst.VerticalAlignment; set => Inst.VerticalAlignment = value; }
 		public RAutowrapMode AutowrapMode { get => Inst.AutowrapMode; set => Inst.AutowrapMode = value; }

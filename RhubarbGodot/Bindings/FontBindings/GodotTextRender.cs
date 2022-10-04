@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +10,7 @@ using Godot;
 
 using RhubarbVR.Bindings.TextureBindings;
 
+using RhuEngine;
 using RhuEngine.Linker;
 
 using RNumerics;
@@ -40,7 +41,7 @@ namespace RhubarbVR.Bindings.FontBindings
 		{
 			get => LoadedFont; set {
 				LoadedFont = value;
-				textDraw.LabelSettings.Font = ((GodotFont)value.Inst).FontFile;
+				textDraw.LabelSettings.Font = ((GodotFont)value?.Inst)?.FontFile;
 			}
 		}
 		public float LineSpacing { get => textDraw.LabelSettings.LineSpacing; set => textDraw.LabelSettings.LineSpacing = value; }
@@ -117,7 +118,16 @@ namespace RhubarbVR.Bindings.FontBindings
 		}
 
 		private void Update() {
+			if(textDraw is null) {
+				return;
+			}
+			if (subViewport is not null) {
+				subViewport.RenderTargetUpdateMode = SubViewport.UpdateMode.Once;
+			}
 			if (!AutoScale) {
+				return;
+			}
+			if (textDraw.LabelSettings.Font is null) {
 				return;
 			}
 			var SIZE = textDraw.LabelSettings.FontSize;
@@ -131,15 +141,17 @@ namespace RhubarbVR.Bindings.FontBindings
 		{
 			get => new RNumerics.Vector2i(subViewport.Size.x, subViewport.Size.y);
 			set {
-				subViewport.Size = new Godot.Vector2i(value.x, value.y);
-				textDraw.CustomMinimumSize = subViewport.Size;
+				if (!AutoScale) {
+					subViewport.Size = new Godot.Vector2i(value.x, value.y);
+					textDraw.CustomMinimumSize = subViewport.Size;
+				}
 				Update();
 			}
 		}
 
 		public IRTexture2D Init(RText text) {
 			subViewport = new SubViewport {
-				RenderTargetUpdateMode = SubViewport.UpdateMode.Always,
+				RenderTargetUpdateMode = SubViewport.UpdateMode.Once,
 				TransparentBg = true,
 				Disable3d = true,
 				GuiDisableInput = true,
