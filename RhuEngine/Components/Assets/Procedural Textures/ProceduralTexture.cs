@@ -3,6 +3,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
+using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
@@ -46,7 +47,7 @@ namespace RhuEngine.Components
 			RImageTexture2D.UpdateImage(_image);
 		}
 
-		protected void UpdateTexture(Colorb[] colors, int width,int height) {
+		protected void UpdateTexture(Colorb[] colors, int width, int height) {
 			_image.SetColors(width, height, colors);
 			RImageTexture2D.UpdateImage(_image);
 		}
@@ -61,8 +62,7 @@ namespace RhuEngine.Components
 
 		protected abstract void Generate();
 
-		protected override void OnLoaded() 
-		{
+		protected override void OnLoaded() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
@@ -73,16 +73,21 @@ namespace RhuEngine.Components
 			ComputeTexture();
 		}
 
-		protected void ComputeTexture() 
-		{
-			if (!Engine.EngineLink.CanRender) 
-			{
+		private void GenerateTask() {
+			lock (this) {
+				Generate();
+			}
+		}
+
+
+		protected void ComputeTexture() {
+			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
 
 			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
 				try {
-					Generate();
+					Task.Run(GenerateTask);
 				}
 				catch (Exception e) {
 #if DEBUG
