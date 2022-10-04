@@ -84,10 +84,7 @@ namespace RhuEngine.Components
 			if (_textMaterial is null) {
 				return;
 			}
-			var child = Matrix.S(new Vector3f(Size * _rText.AspectRatio, Size, Size));
-			var globnal = Entity.GlobalTrans;
-			var trains = child * globnal;
-			RMesh.Quad.Draw(_textMaterial.Material, trains, null, 0, RenderLayer.Text);
+			RMesh.Quad.Draw(_textMaterial.Material, Matrix.R(Quaternionf.Yawed180) * Matrix.S(new Vector3f(Size * _rText.AspectRatio, Size, Size)) * Entity.GlobalTrans, null, 0, RenderLayer.Text);
 		}
 
 		protected override void OnAttach() {

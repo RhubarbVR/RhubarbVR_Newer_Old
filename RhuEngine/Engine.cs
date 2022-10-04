@@ -284,13 +284,18 @@ namespace RhuEngine
 						throw ex;
 					}
 				}
+				IntMsg = $"{localisationManager?.GetLocalString("Common.Loaded")}\nEngine Started";
 				EngineStarting = false;
 				if (EngineLink.CanRender) {
-					StartingText?.Dispose();
-					StartingText = null;
-					LoadingLogo?.Dispose();
-					LoadingLogo = null;
-					RRenderer.EnableSky = true;
+					RenderThread.ExecuteOnStartOfFrame(() => {
+						StartingText?.Dispose();
+						StartingText = null;
+						StartingTextMit?.Dispose();
+						StartingTextMit = null;
+						LoadingLogo?.Dispose();
+						LoadingLogo = null;
+						RRenderer.EnableSky = true;
+					});
 				}
 				RLog.Info("Engine Started");
 				IntMsg = $"{localisationManager?.GetLocalString("Common.Loaded")}\nRunning First Step...";

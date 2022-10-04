@@ -67,44 +67,41 @@ namespace RhuEngine
 			var texture = new RImageTexture2D(img);
 			return texture;
 		}
-		public RTexture2D LoadTexture(string name) {
+		public RTexture2D LoadTexture(string name,bool compress,string fileEx) {
 			var img = new RImage(null);
-			using (var mem = new MemoryStream()) {
-				GetStaticResource(name).CopyTo(mem);
-				var bytes = mem.ToArray();
-				if (!img.LoadPng(bytes)) {
-					img.LoadJpg(bytes);
-				}
+			var resourse = GetStaticResourceStream(name);
+			img.Load(resourse, fileEx);
+			if (compress) {
+				img.Compress(RCompressMode.Bptc);
 			}
-			img.Compress(RCompressMode.Bptc);
 			var texture = new RImageTexture2D(img);
 			return texture;
 		}
 		private RTexture2D _rhubarbLogoV1;
 #if DEBUG
-		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("MilkSnake.png");
+		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("MilkSnake.png",true, "png");
 #else
-		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("RhubarbVR.png");
+		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("RhubarbVR.png",true, "png");
 #endif
 
 		private RTexture2D _rhubarbLogoV2;
 #if DEBUG
-		public RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("MilkSnake.png");
+		public RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("MilkSnake.png", true, "png");
 #else
-		public RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("RhubarbVR2.png");
+		public RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("RhubarbVR2.png",true, "png");
 #endif
 
 		private RTexture2D _grip;
 
-		public RTexture2D Grid => _grip ??= LoadTexture("Grid.jpg");
+		public RTexture2D Grid => _grip ??= LoadTexture("Grid.jpg", true, "jpg");
 
 		private RTexture2D _null;
 
-		public RTexture2D Null => _null ??= LoadTexture("nulltexture.jpg");
+		public RTexture2D Null => _null ??= LoadTexture("nulltexture.jpg", true, "jpg");
 
 		private RTexture2D _icons;
 
-		public RTexture2D Icons => _icons ??= LoadTexture("Icons.png");
+		public RTexture2D Icons => _icons ??= LoadTexture("Icons.png", false, "png");
 
 		private RFont _mainFont;
 		public RFont MainFont => _mainFont ??= LoadMainFont();

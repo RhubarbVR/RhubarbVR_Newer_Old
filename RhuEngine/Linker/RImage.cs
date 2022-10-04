@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Text;
 
@@ -371,6 +372,7 @@ namespace RhuEngine.Linker
 		Colorf GetPixel(int x, int y);
 		void SetPixel(int x, int y, Colorf color);
 		void AdjustBcs(float brightness, float contrast, float saturation);
+		bool Load(string path);
 
 		bool LoadPng(byte[] data);
 
@@ -447,7 +449,7 @@ namespace RhuEngine.Linker
 		}
 
 		public void Create(int width, int height, bool mipmaps, RFormat format) {
-			Inst.Create(Math.Max(2,width), Math.Max(2, height), mipmaps, format);
+			Inst.Create(Math.Max(2, width), Math.Max(2, height), mipmaps, format);
 		}
 		public void CreateWithData(int width, int height, bool mipmaps, RFormat format, byte[] data) {
 			Inst.CreateWithData(width, height, mipmaps, format, data);
@@ -555,6 +557,20 @@ namespace RhuEngine.Linker
 			Inst.AdjustBcs(brightness, contrast, saturation);
 		}
 
+		public bool Load(Stream data,string FileEX = "png") {
+			var temp = Path.GetTempFileName() + "." + FileEX;
+			var fileStream = File.OpenWrite(temp);
+			data.CopyTo(fileStream);
+			fileStream.Close();
+			fileStream.Dispose();
+			RLog.Info($"Temp Img file Created Path: {temp}");
+			return Load(temp);
+		}
+
+		public bool Load(string path) {
+			return Inst.Load(path);
+		}
+
 		public bool LoadPng(byte[] data) {
 			return Inst.LoadPng(data);
 		}
@@ -596,7 +612,7 @@ namespace RhuEngine.Linker
 				}
 			}
 		}
-		public void SetColors(int width, int height, Colorb[] colors,bool RebuildMipmaps = true) {
+		public void SetColors(int width, int height, Colorb[] colors, bool RebuildMipmaps = true) {
 			if (width * height != colors.Length) {
 				throw new InvalidOperationException("Colors have to many or to little");
 			}

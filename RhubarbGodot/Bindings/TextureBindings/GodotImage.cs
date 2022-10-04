@@ -227,5 +227,9 @@ namespace RhubarbVR.Bindings.TextureBindings
 		public void SrgbToLinear() {
 			Image.SrgbToLinear();
 		}
+
+		public bool Load(string path) {
+			return Image.Load(path) == Error.Ok;
+		}
 	}
 }

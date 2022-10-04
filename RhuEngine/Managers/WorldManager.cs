@@ -188,32 +188,34 @@ namespace RhuEngine.Managers
 		private WorldText _loadingText;
 		public void Init(Engine engine) {
 			Engine = engine;
-			Engine.IntMsg = "Creating Personal Space";
+			Engine.IntMsg = "Creating Personal Space World";
 			PrivateOverlay = CreateNewWorld(World.FocusLevel.PrivateOverlay);
-			Engine.IntMsg = "Done Creating Personal Space";
+			Engine.IntMsg = "Creating Private Space Manager";
 			PrivateOverlay.RootEntity.AddChild("PrivateSpace").AttachComponent<PrivateSpaceManager>();
+			Engine.IntMsg = "Creating Loading Text";
 			_loadingText = PrivateOverlay.RootEntity.AddChild("LoadingText").AttachComponent<WorldText>();
 			_loadingText.Size.Value = 0.35f;
-			Engine.IntMsg = "Creating Local World";
+			Engine.IntMsg = "Loading Local World";
 			var loaddedData = false;
 			if (LoadLocalWorld && File.Exists(Engine.BaseDir + "LocalWorldTest.RWorld")) {
 				try {
-					Engine.IntMsg = "Loading Local World From Flie";
+					Engine.IntMsg = "Loading Local World From File ";
 					LocalWorld = LoadWorldFromBytes(World.FocusLevel.Focused, File.ReadAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld"), true);
 					LocalWorld.SessionName.Value = "Local World";
 					LocalWorld.WorldName.Value = "Local World";
-					Engine.IntMsg = "Loaded Local World From Flie";
+					Engine.IntMsg = "Loaded Local World From File";
 					loaddedData = true;
 				}
 				catch {
 					loaddedData = false;
-					Engine.IntMsg = "Failed loading Local World From Flie";
+					Engine.IntMsg = "Failed loading Local World From Flie ";
 					RLog.Err("Failed loading Local World From Flie");
 				}
 			}
 
 			if(!loaddedData) {
 				RLog.Info("Building Local World");
+				Engine.IntMsg = "Making Local World";
 				LocalWorld = CreateNewWorld(World.FocusLevel.Focused, true);
 				Engine.IntMsg = "Loading Local World Data";
 				LocalWorld.SessionName.Value = "Local World";

@@ -73,13 +73,6 @@ namespace RhuEngine.Components
 			ComputeTexture();
 		}
 
-		private void GenerateTask() {
-			lock (this) {
-				Generate();
-			}
-		}
-
-
 		protected void ComputeTexture() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
@@ -87,7 +80,7 @@ namespace RhuEngine.Components
 
 			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
 				try {
-					Task.Run(GenerateTask);
+					Generate();
 				}
 				catch (Exception e) {
 #if DEBUG
