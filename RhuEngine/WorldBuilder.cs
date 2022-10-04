@@ -119,7 +119,6 @@ namespace RhuEngine
 			fontAtlis.AttachComponent<BoxShape>();
 			fontAtlis.AttachComponent<Grabbable>();
 			var data = fontAtlis.AttachMesh<TrivialBox3Mesh, UnlitMaterial>();
-			data.Item2.MainTexture.Target = fontAtlis.AttachComponent<FontAtlasTexture>();
 
 			var text = fontAtlis.AddChild("Text");
 			text.position.Value = new Vector3f(0, 1.5f, 0);

@@ -75,6 +75,7 @@ namespace RhuEngine
 		public RTexture2D CreateTextureAndDisposes() {
 			var newtex = CreateTexture();
 			Dispose();
+			RImage.Dispose();
 			return newtex;
 		}
 		public void Dispose() {

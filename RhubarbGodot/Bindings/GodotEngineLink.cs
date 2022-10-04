@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using RhubarbVR.Bindings.FontBindings;
 using RhubarbVR.Bindings.Input;
 using RhubarbVR.Bindings.TextureBindings;
 
@@ -76,6 +77,7 @@ namespace RhubarbVR.Bindings
 
 		public void LoadStatics() {
 			RTime.Instance = EngineRunner;
+			RFont.Instance = typeof(GodotFont); 
 			RMesh.Instance = typeof(GodotMesh);
 			RTexture.Instance = typeof(GodotTexture);
 			RTexture2D.Instance = typeof(GodotTexture2D);

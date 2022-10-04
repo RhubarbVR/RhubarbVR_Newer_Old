@@ -79,7 +79,7 @@ namespace RhuEngine.Components.PrivateSpace
 			editor.Item1.VerticalAlien.Value = EVerticalAlien.Center;
 			editor.Item2.OnDoneEditing.Target = DoneEdit;
 			_editorUiText = editor.Item1;
-			_editedValue = editor.Item4;
+			_editedValue = editor.Item3;
 			uiBuilder.SetOffsetMinMax(null, new Vector2f(0, 1));
 		}
 

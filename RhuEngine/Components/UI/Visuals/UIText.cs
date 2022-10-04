@@ -6,8 +6,6 @@ using RhuEngine.Linker;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using static RhuEngine.Components.DynamicTextRender;
-using SixLabors.Fonts;
 
 namespace RhuEngine.Components
 {
@@ -25,10 +23,8 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "UI/Visuals" })]
-	public sealed class UIText : MultiRenderUIComponent, ITextComp
+	public sealed class UIText : MultiRenderUIComponent
 	{
-		public DynamicTextRender TextRender => textRender;
-
 		public override Colorf[] RenderTint => throw new NotImplementedException();
 
 		public RMaterial[] materials = Array.Empty<RMaterial>();
@@ -60,8 +56,8 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<float> Leading;
 		[OnChanged(nameof(ForceUpdate))]
-		[Default(FontStyle.Regular)]
-		public readonly Sync<FontStyle> StartingStyle;
+		[Default(RFontStyle.None)]
+		public readonly Sync<RFontStyle> StartingStyle;
 
 		[OnChanged(nameof(ForceUpdate))]
 		[Default(10f)]
@@ -77,8 +73,6 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<Vector2f> MinClamp;
 
-		public DynamicTextRender textRender = new(true);
-
 		[Default(EVerticalAlien.Center)]
 		[OnChanged(nameof(ForceUpdate))]
 		public readonly Sync<EVerticalAlien> VerticalAlien;
@@ -93,19 +87,7 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			textRender.MaxClamp = MaxClamp;
-			textRender.MinClamp = MinClamp;
-			var newtext = Text.Value;
-			if (Password.Value) {
-				newtext = new string('●', newtext.Length);
-			}
-			if (newtext is null) {
-				newtext = NullString.Value;
-			}
-			if (string.IsNullOrEmpty(newtext)) {
-				newtext = EmptyString.Value;
-			}
-			textRender.LoadText(newtext, Font.Asset, Leading, StartingColor, StartingStyle, StatingSize, HorizontalAlien);
+		
 		}
 
 		protected override void OnAttach() {
@@ -117,36 +99,7 @@ namespace RhuEngine.Components
 		}
 
 		protected override void UpdateMesh() {
-			UpdateText();
-			materials = textRender.renderMits.ToArray();
-			StandaredBaseMesh = new SimpleMesh[textRender.simprendermeshes.Count];
-			for (var i = 0; i < textRender.simprendermeshes.Count; i++) {
-				StandaredBaseMesh[i] = textRender.simprendermeshes[i];
-				StandaredBaseMesh[i].Translate(-textRender.axisAlignedBox3F.Min.x, -textRender.axisAlignedBox3F.Min.y - 0.5f, 0.05f);
-				StandaredBaseMesh[i].Scale(1 / UIRect.Canvas.scale.Value.x, 1 / UIRect.Canvas.scale.Value.y, 1 / UIRect.Canvas.scale.Value.z);
-				var SizeOnCavas = new Vector2f(textRender.Width / UIRect.Canvas.scale.Value.x, textRender.Height / UIRect.Canvas.scale.Value.y);
-				if (FitText) {
-					var scaler = Math.Min(UIRect.CachedElementSize.x / SizeOnCavas.x, UIRect.CachedElementSize.y / SizeOnCavas.y);
-					StandaredBaseMesh[i].Scale(scaler);
-					SizeOnCavas *= scaler;
-				}
-				var y = VerticalAlien.Value switch {
-					EVerticalAlien.Bottom => 0,
-					EVerticalAlien.Center => (UIRect.CachedElementSize.y / 2) - (SizeOnCavas.y / 2),
-					EVerticalAlien.Top => UIRect.CachedElementSize.y - SizeOnCavas.y,
-					_ => 0,
-				};
-				var x = HorizontalAlien.Value switch {
-					EHorizontalAlien.Left => 0,
-					EHorizontalAlien.Middle => (UIRect.CachedElementSize.x / 2) - (SizeOnCavas.x / 2),
-					EHorizontalAlien.Right => UIRect.CachedElementSize.x - SizeOnCavas.x,
-					_ => 0,
-				};
-				StandaredBaseMesh[i].Translate(new Vector3d(x, y, UIRect.CachedDepth + 0.01));
-			}
-			if (!FitText) {
-				//Todo: Tell uirect to have defrentCHildSize
-			}
+
 		}
 	}
 }

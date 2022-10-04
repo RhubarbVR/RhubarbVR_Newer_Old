@@ -146,24 +146,24 @@ namespace RhubarbVR.Bindings.TextureBindings
 			return (new Vector2i(rect.Position.x, rect.Position.y), new Vector2i(rect.Size.x, rect.Size.y));
 		}
 
-		public void LoadBmp(byte[] data) {
-			Image.LoadBmpFromBuffer(data);
+		public bool LoadBmp(byte[] data) {
+			return Image.LoadBmpFromBuffer(data) == Error.Ok;
 		}
 
-		public void LoadJpg(byte[] data) {
-			Image.LoadJpgFromBuffer(data);
+		public bool LoadJpg(byte[] data) {
+			return Image.LoadJpgFromBuffer(data) == Error.Ok;
 		}
 
-		public void LoadPng(byte[] data) {
-			Image.LoadPngFromBuffer(data);
+		public bool LoadPng(byte[] data) {
+			return Image.LoadPngFromBuffer(data) == Error.Ok;
 		}
 
-		public void LoadTga(byte[] data) {
-			Image.LoadTgaFromBuffer(data);
+		public bool LoadTga(byte[] data) {
+			return Image.LoadTgaFromBuffer(data) == Error.Ok;
 		}
 
-		public void LoadWebp(byte[] data) {
-			Image.LoadWebpFromBuffer(data);
+		public bool LoadWebp(byte[] data) {
+			return Image.LoadWebpFromBuffer(data) == Error.Ok;
 		}
 
 		public void NormalMapToXy() {

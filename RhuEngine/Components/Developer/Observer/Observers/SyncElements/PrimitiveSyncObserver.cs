@@ -32,7 +32,7 @@ namespace RhuEngine.Components
 				ui.PopRect();
 				ui.PopRect();
 			}
-			editorValue.Target = wa.Item4;
+			editorValue.Target = wa.Item3;
 			wa.Item2.OnDoneEditing.Target += OnDoneEditing;
 		}
 

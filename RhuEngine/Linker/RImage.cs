@@ -372,13 +372,13 @@ namespace RhuEngine.Linker
 		void SetPixel(int x, int y, Colorf color);
 		void AdjustBcs(float brightness, float contrast, float saturation);
 
-		void LoadPng(byte[] data);
+		bool LoadPng(byte[] data);
 
-		void LoadJpg(byte[] data);
-		void LoadWebp(byte[] data);
+		bool LoadJpg(byte[] data);
+		bool LoadWebp(byte[] data);
 
-		void LoadTga(byte[] data);
-		void LoadBmp(byte[] data);
+		bool LoadTga(byte[] data);
+		bool LoadBmp(byte[] data);
 
 		void Init(RImage rTexture2D);
 
@@ -555,22 +555,22 @@ namespace RhuEngine.Linker
 			Inst.AdjustBcs(brightness, contrast, saturation);
 		}
 
-		public void LoadPng(byte[] data) {
-			Inst.LoadPng(data);
+		public bool LoadPng(byte[] data) {
+			return Inst.LoadPng(data);
 		}
 
-		public void LoadJpg(byte[] data) {
-			Inst.LoadJpg(data);
+		public bool LoadJpg(byte[] data) {
+			return Inst.LoadJpg(data);
 		}
-		public void LoadWebp(byte[] data) {
-			Inst.LoadWebp(data);
+		public bool LoadWebp(byte[] data) {
+			return Inst.LoadWebp(data);
 		}
 
-		public void LoadTga(byte[] data) {
-			Inst.LoadTga(data);
+		public bool LoadTga(byte[] data) {
+			return Inst.LoadTga(data);
 		}
-		public void LoadBmp(byte[] data) {
-			Inst.LoadBmp(data);
+		public bool LoadBmp(byte[] data) {
+			return Inst.LoadBmp(data);
 		}
 
 

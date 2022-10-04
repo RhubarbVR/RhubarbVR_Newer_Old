@@ -5,7 +5,6 @@ using RNumerics;
 using RhuEngine.Linker;
 using System.Collections.Generic;
 using System;
-using SixLabors.Fonts;
 
 namespace RhuEngine.Components
 {
@@ -118,7 +117,7 @@ namespace RhuEngine.Components
 				CurrentRect.OffsetLocalMax.Value = max ?? Vector2f.Zero;
 			}
 		}
-		public StandardLocale AddTextWithLocal(string text, float coloroffset = 0, float alpha = 1, float? size = null, FontStyle? fontStyle = null) {
+		public StandardLocale AddTextWithLocal(string text, float coloroffset = 0, float alpha = 1, float? size = null, RFontStyle? fontStyle = null) {
 			var uitext = AttachComponentToStack<UIText>();
 			var local = AttachComponentToStack<StandardLocale>();
 			local.Key.Value = text;
@@ -131,7 +130,7 @@ namespace RhuEngine.Components
 			colorassign.ColorShif.Value = coloroffset;
 			colorassign.TargetColor.Target = uitext.StartingColor;
 			if (fontStyle is not null) {
-				uitext.StartingStyle.Value = fontStyle ?? FontStyle.Regular;
+				uitext.StartingStyle.Value = fontStyle ?? RFontStyle.Regular;
 			}
 			return local;
 		}
@@ -159,7 +158,7 @@ namespace RhuEngine.Components
 			return checkbox;
 		}
 
-		public UIText AddText(string text, float? size = null, float coloroffset = 0, float alpha = 1, FontStyle? fontStyle = null, bool removeLocal = false) {
+		public UIText AddText(string text, float? size = null, float coloroffset = 0, float alpha = 1, RFontStyle? fontStyle = null, bool removeLocal = false) {
 			var uitext = AttachComponentToStack<UIText>();
 			var colorassing = AttachComponentToStack<UIColorAssign>();
 			colorassing.Alpha.Value = alpha;
@@ -175,7 +174,7 @@ namespace RhuEngine.Components
 				uitext.StatingSize.Value = size ?? 0;
 			}
 			if (fontStyle is not null) {
-				uitext.StartingStyle.Value = fontStyle ?? FontStyle.Regular;
+				uitext.StartingStyle.Value = fontStyle ?? RFontStyle.Regular;
 			}
 			return uitext;
 		}
@@ -230,7 +229,7 @@ namespace RhuEngine.Components
 			return buttonInteraction;
 		}
 
-		public (UIText, UITextEditorInteraction, UITextCurrsor, Sync<string>) AddTextEditor(string emptytext = "This Is Input", float coloroffset = 0, float alpha = 1, string defaultString = "",float padding=0.1f, float? size = null, float textcoloroffset = 0, float textalpha = 1,bool autopop = true, FontStyle? fontStyle = null, Vector2f? min = null, Vector2f? max = null) {
+		public (UIText, UITextEditorInteraction, Sync<string>) AddTextEditor(string emptytext = "This Is Input", float coloroffset = 0, float alpha = 1, string defaultString = "",float padding=0.1f, float? size = null, float textcoloroffset = 0, float textalpha = 1,bool autopop = true, RFontStyle? fontStyle = null, Vector2f? min = null, Vector2f? max = null) {
 			var button = AddButtonEvent(null, null, null, false, coloroffset,alpha, null, min, max);
 			PushRect(new Vector2f(0), new Vector2f(1), 0.05f);
 			SetOffsetMinMax(new Vector2f(padding), new Vector2f(-padding));
@@ -244,15 +243,11 @@ namespace RhuEngine.Components
 			var editor = AttachComponentToStack<UITextEditorInteraction>();
 			editor.Value.Target = uitext.Text;
 			button.Item2.Click.Target = editor.EditingClick;
-			var currsor = AttachComponentToStack<UITextCurrsor>();
-			currsor.TextCurrsor.Target = editor;
-			currsor.TextComp.Target = uitext;
-			currsor.Material.Target = MainMat;
 			if (autopop) {
 				PopRect();
 				PopRect();
 			}
-			return (uitext, editor, currsor, uitext.Text);
+			return (uitext, editor, uitext.Text);
 		}
 
 		public (UIText,UIButtonInteraction, ButtonEventManager) AddButtonEventLabled(string text, float? size = null, float textcoloroffset = 2, float textalpha = 1,  Action onClick = null, Action onPressing = null, Action onReleases = null, bool autoPop = true, float coloroffset = 0, float alpha = 1, bool? fullbox = null, Vector2f? min = null, Vector2f? max = null) {

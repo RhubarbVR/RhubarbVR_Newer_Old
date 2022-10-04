@@ -4,11 +4,40 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 using RhuEngine.Linker;
-using SixLabors.Fonts;
+using System.Threading.Tasks;
 
 namespace RhuEngine
 {
-	public sealed class StaticResources {
+	public sealed class StaticResources
+	{
+
+		public async Task LoadAllData() {
+#if DEBUG
+			var v1 = LoadTextureAsync("MilkSnake.png");
+#else
+			var v1 = LoadTextureAsync("RhubarbVR.png");
+#endif
+
+#if DEBUG
+			var v2 = LoadTextureAsync("MilkSnake.png");
+#else
+			var v2 = LoadTextureAsync("RhubarbVR2.png");
+#endif
+			var egrip = LoadTextureAsync("Grid.jpg");
+	
+			var enull = LoadTextureAsync("nulltexture.jpg");
+	
+			var eicons = LoadTextureAsync("Icons.png");
+
+			_rhubarbLogoV1 ??= await v1;
+			_rhubarbLogoV2 ??= await v2;
+
+			_grip ??= await egrip;
+			_null ??= await enull;
+			_icons ??= await eicons;
+
+		}
+
 		public static Stream GetStaticResourceStream(string name) {
 			return Assembly.GetCallingAssembly().GetManifestResourceStream("RhuEngine.Res." + name);
 		}
@@ -25,9 +54,31 @@ namespace RhuEngine
 				? File.OpenRead(Engine.BaseDir + "/override/" + name)
 				: GetStaticResourceStream(name);
 		}
-
+		public async Task<RTexture2D> LoadTextureAsync(string name) {
+			var img = new RImage(null);
+			using (var mem = new MemoryStream()) {
+				await GetStaticResource(name).CopyToAsync(mem);
+				var bytes = mem.ToArray();
+				if (!img.LoadPng(bytes)) {
+					img.LoadJpg(bytes);
+				}
+			}
+			img.Compress(RCompressMode.Bptc);
+			var texture = new RImageTexture2D(img);
+			return texture;
+		}
 		public RTexture2D LoadTexture(string name) {
-			return new ImageSharpTexture(GetStaticResource(name)).CreateTextureAndDisposes();
+			var img = new RImage(null);
+			using (var mem = new MemoryStream()) {
+				GetStaticResource(name).CopyTo(mem);
+				var bytes = mem.ToArray();
+				if (!img.LoadPng(bytes)) {
+					img.LoadJpg(bytes);
+				}
+			}
+			img.Compress(RCompressMode.Bptc);
+			var texture = new RImageTexture2D(img);
+			return texture;
 		}
 		private RTexture2D _rhubarbLogoV1;
 #if DEBUG
@@ -54,18 +105,24 @@ namespace RhuEngine
 		private RTexture2D _icons;
 
 		public RTexture2D Icons => _icons ??= LoadTexture("Icons.png");
-		
+
 		private RFont _mainFont;
 		public RFont MainFont => _mainFont ??= LoadMainFont();
 
+		private static RFont LoadFontFromStream(Stream stream) {
+			var font = new RFont(null);
+			font.LoadDynamicFont(stream);
+			return font;
+		}
+
 		private RFont LoadMainFont() {
-			var fonts = new FontCollection();
-			var main = fonts.Add(GetStaticResource("Fonts.NotoSans-Regular.ttf"));
-			fonts.Add(GetStaticResource("Fonts.NotoEmoji-Regular.ttf"));
-			fonts.Add(GetStaticResource("Fonts.NotoSansSymbols-Regular.ttf"));
-			fonts.Add(GetStaticResource("Fonts.NotoSansSymbols2-Regular.ttf"));
-			fonts.Add(GetStaticResource("Fonts.NotoSansEgyptianHieroglyphs-Regular.ttf"));
-			return new RFont(main.CreateFont(RFont.FONTSIZE), fonts);
+			var MainFont = new RFont(null);
+			MainFont.LoadDynamicFont(GetStaticResource("Fonts.NotoSans-Regular.ttf"));
+			MainFont.AddFallBack(LoadFontFromStream(GetStaticResource("Fonts.NotoEmoji-Regular.ttf")));
+			MainFont.AddFallBack(LoadFontFromStream(GetStaticResource("Fonts.NotoSansSymbols-Regular.ttf")));
+			MainFont.AddFallBack(LoadFontFromStream(GetStaticResource("Fonts.NotoSansSymbols2-Regular.ttf")));
+			MainFont.AddFallBack(LoadFontFromStream(GetStaticResource("Fonts.NotoSansEgyptianHieroglyphs-Regular.ttf")));
+			return MainFont;
 		}
 	}
 }
