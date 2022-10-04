@@ -63,6 +63,9 @@ namespace RhuEngine.Components
 
 		protected override void OnLoaded() 
 		{
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			_image = new RImage(null);
 			_image.Create(Size.Value.x, Size.Value.y, true, RFormat.Rgba8);
 			RImageTexture2D = new RImageTexture2D(Image);

@@ -19,6 +19,9 @@ namespace RhuEngine.Components
 
 		protected override void OnLoaded() {
 			base.OnLoaded();
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			_rImageTexture2D = new RImageTexture2D(null);
 			Load(_rImageTexture2D);
 		}
