@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using RhubarbVR.Bindings.Input;
+using RhubarbVR.Bindings.TextureBindings;
 
 using RhuEngine;
 using RhuEngine.Linker;
@@ -76,12 +77,16 @@ namespace RhubarbVR.Bindings
 		public void LoadStatics() {
 			RTime.Instance = EngineRunner;
 			RMesh.Instance = typeof(GodotMesh);
-			var data = new GodotTexture();
-			RTexture2D.Instance = data;
+			RTexture.Instance = typeof(GodotTexture);
+			RTexture2D.Instance = typeof(GodotTexture2D);
+			RImageTexture2D.Instance = typeof(GodotImageTexture2D);
+			RImage.Instance = typeof(GodotImage);
 			RRenderer.Instance = new GodotRender(EngineRunner);
 			RMaterial.Instance = new GoMat();
 			StaticMaterialManager.Instanances = new GodotStaticMats();
-			data.White = RTexture2D.FromColors(new Colorb[] { new Colorb(0, 1), new Colorb(0, 1), new Colorb(0, 1), new Colorb(0, 1) }, 2, 2, false);
+			var image = new RImage(null);
+			image.Create(2, 2, false, RFormat.Rgb8);
+			RTexture2D.White = new RImageTexture2D(image);
 			RMesh.Quad = new RMesh(new GodotMesh(GodotMesh.MakeQuad()), false);
 			new RBullet.BulletPhsyicsLink().RegisterPhysics();
 		}

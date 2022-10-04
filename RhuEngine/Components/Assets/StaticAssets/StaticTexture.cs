@@ -11,28 +11,16 @@ using RhuEngine.Linker;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/StaticAssets" })]
-	public sealed class StaticTexture : StaticAsset<RTexture2D>
+	public sealed class StaticTexture : StaticAsset<RTexture2D>,IRImageProvider
 	{
+		public RImage Image { get; private set; }
 
-		[Default(TexSample.Anisotropic)]
-		[OnChanged(nameof(TextValueChanged))]
-		public readonly Sync<TexSample> sampleMode;
+		private RImageTexture2D _rImageTexture2D;
 
-		[Default(TexAddress.Wrap)]
-		[OnChanged(nameof(TextValueChanged))]
-		public readonly Sync<TexAddress> addressMode;
-
-		[Default(3)]
-		[OnChanged(nameof(TextValueChanged))]
-		public readonly Sync<int> anisoptropy;
-
-		private void TextValueChanged() {
-			if(Value is null) {
-				return;
-			}
-			Value.Anisoptropy = anisoptropy;
-			Value.AddressMode = addressMode;
-			Value.SampleMode = sampleMode;
+		protected override void OnLoaded() {
+			base.OnLoaded();
+			_rImageTexture2D = new RImageTexture2D(null);
+			Load(_rImageTexture2D);
 		}
 
 		public override void LoadAsset(byte[] data) {
@@ -41,8 +29,10 @@ namespace RhuEngine.Components
 					return;
 				}
 				Load(null);
-				Load(RTexture2D.FromMemory(data));
-				TextValueChanged();
+				Image?.Dispose();
+				Image = new RImage(null);
+				Image.LoadWebp(data);
+				_rImageTexture2D.SetImage(Image);
 			}
 			catch(Exception err) {
 				RLog.Err($"Failed to load Static Texture Error {err}");

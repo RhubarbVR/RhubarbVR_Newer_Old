@@ -22,7 +22,7 @@ namespace RhuEngine.Components
 			var size = max - min;
 			var x = Texture.Asset.Width / GridSize.Value.x;
 			var y = Texture.Asset.Height / GridSize.Value.y;
-			return new Vector2i(x, y) * size;
+			return new Vector2i((int)x, (int)y) * size;
 		}
 
 		[Exposed]

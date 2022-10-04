@@ -27,7 +27,7 @@ namespace RhuEngine
 		}
 
 		public RTexture2D LoadTexture(string name) {
-			return RTexture2D.FromMemory(GetStaticResource(name));
+			return new ImageSharpTexture(GetStaticResource(name)).CreateTextureAndDisposes();
 		}
 		private RTexture2D _rhubarbLogoV1;
 #if DEBUG

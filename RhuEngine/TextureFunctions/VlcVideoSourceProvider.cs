@@ -15,7 +15,7 @@ namespace RhuEngine.VLC
 	public sealed class VlcVideoSourceProvider : INotifyPropertyChanged, IDisposable
 	{
 		public VlcVideoSourceProvider() {
-			VideoSource = new RTexture2D(TexType.Dynamic, TexFormat.Rgba32Linear);
+			VideoSource = new RTexture2D(null);
 		}
 		/// <summary>
 		/// The memory mapped file that contains the picture data
@@ -119,7 +119,7 @@ namespace RhuEngine.VLC
 			var size = pitches * lines;
 			_memoryMappedFile = MemoryMappedFile.CreateNew(null, size);
 			var handle = _memoryMappedFile.SafeMemoryMappedFileHandle.DangerousGetHandle();
-			VideoSource.SetSize((int)width, (int)height);
+			//VideoSource.SetSize((int)width, (int)height);
 			Pitches = (int)pitches;
 			_memoryMappedView = _memoryMappedFile.CreateViewAccessor();
 			var viewHandle = _memoryMappedView.SafeMemoryMappedViewHandle.DangerousGetHandle();
@@ -163,11 +163,11 @@ namespace RhuEngine.VLC
 				return;
 			}
 			if (VideoSource != null) {
-				Convert(VideoSource.Width * VideoSource.Height, userdata);
+				Convert((int)VideoSource.Width * (int)VideoSource.Height, userdata);
 				if (rgbaData.Length < VideoSource.Width * VideoSource.Height) {
 					return;
 				}
-				RUpdateManager.ExecuteOnStartOfFrame(this, () => VideoSource.SetColors(VideoSource.Width, VideoSource.Height, rgbaData));
+				//RUpdateManager.ExecuteOnStartOfFrame(this, () => VideoSource.SetColors(VideoSource.Width, VideoSource.Height, rgbaData));
 			}
 		}
 		#endregion

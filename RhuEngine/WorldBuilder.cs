@@ -54,13 +54,6 @@ namespace RhuEngine
 			unliotRender.RecevieShadows.Value = true;
 			unlitmit.AttachComponent<Grabbable>();
 			unlitmit.AttachComponent<SphereShape>();
-			var pbrmit = Mits.AddChild("PBR");
-			var (_, _, pbrRender) = pbrmit.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, PBRMaterial>();
-			pbrRender.CastShadows.Value = ShadowCast.On;
-			pbrRender.RecevieShadows.Value = true;
-			pbrmit.AttachComponent<Grabbable>();
-			pbrmit.AttachComponent<SphereShape>();
-			pbrmit.position.Value = new Vector3f(4f, 0f, 0f);
 
 			var lights = DebugStuff.AddChild("Lights");
 			lights.position.Value = new Vector3f(2f, 4f, -2f);

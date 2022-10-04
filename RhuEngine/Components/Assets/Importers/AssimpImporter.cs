@@ -206,41 +206,41 @@ namespace RhuEngine.Components
 			}
 			foreach (var item in scene.scene.Materials) {
 				if (item.IsPBRMaterial) {
-					var mat = entity.AttachComponent<PBRMaterial>();
-					scene.materials.Add(mat);
-					if (item.HasShininess) {
-						mat.Smoothness.Value = item.Shininess;
-					}
-					if (item.HasColorDiffuse) {
-						mat.AlbedoTint.Value = new Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, item.ColorDiffuse.A);
-					}
-					if (item.HasTextureDiffuse) {
-						try {
-							mat.DetailAlbedo.Target = scene.textures[item.TextureDiffuse.TextureIndex];
-						}
-						catch { }
-					}
-					if (item.HasTextureNormal) {
-						try {
-							mat.NormalMap.Target = scene.textures[item.TextureNormal.TextureIndex];
-						}
-						catch { }
-					}
-					if (item.HasTextureEmissive) {
-						try {
-							mat.EmissionTexture.Target = scene.textures[item.TextureEmissive.TextureIndex];
-						}
-						catch { }
-					}
-					if (item.HasColorDiffuse) {
-						mat.AlbedoTint.Value = new Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, item.ColorDiffuse.A);
-					}
-					if (item.HasTextureDiffuse) {
-						try {
-							mat.AlbedoTexture.Target = scene.textures[item.TextureDiffuse.TextureIndex];
-						}
-						catch { }
-					}
+					//var mat = entity.AttachComponent<PBRMaterial>();
+					//scene.materials.Add(mat);
+					//if (item.HasShininess) {
+					//	mat.Smoothness.Value = item.Shininess;
+					//}
+					//if (item.HasColorDiffuse) {
+					//	mat.AlbedoTint.Value = new Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, item.ColorDiffuse.A);
+					//}
+					//if (item.HasTextureDiffuse) {
+					//	try {
+					//		mat.DetailAlbedo.Target = scene.textures[item.TextureDiffuse.TextureIndex];
+					//	}
+					//	catch { }
+					//}
+					//if (item.HasTextureNormal) {
+					//	try {
+					//		mat.NormalMap.Target = scene.textures[item.TextureNormal.TextureIndex];
+					//	}
+					//	catch { }
+					//}
+					//if (item.HasTextureEmissive) {
+					//	try {
+					//		mat.EmissionTexture.Target = scene.textures[item.TextureEmissive.TextureIndex];
+					//	}
+					//	catch { }
+					//}
+					//if (item.HasColorDiffuse) {
+					//	mat.AlbedoTint.Value = new Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, item.ColorDiffuse.A);
+					//}
+					//if (item.HasTextureDiffuse) {
+					//	try {
+					//		mat.AlbedoTexture.Target = scene.textures[item.TextureDiffuse.TextureIndex];
+					//	}
+					//	catch { }
+					//}
 					RLog.Info($"Loaded PBR Material");
 				}
 				else {

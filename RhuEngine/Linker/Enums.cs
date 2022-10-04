@@ -4,6 +4,13 @@ using System.Text;
 
 namespace RhuEngine.Linker
 {
+	public enum RClockDirection : long
+	{
+		Clockwise,
+		Counterclockwise,
+		None
+	}
+
 	/// <summary>Severity of a log item.</summary>
 	public enum LogLevel
 	{
@@ -58,143 +65,6 @@ namespace RhuEngine.Linker
 		MainCam = MainLayer | Text | UI | Layer3,
 	}
 
-	/// <summary>Textures come in various types and flavors! These are bit-flags
-	/// that tell StereoKit what type of texture we want, and how the application
-	/// might use it!</summary>
-	[Flags]
-	public enum TexType
-	{
-		/// <summary>A standard color image, without any generated mip-maps.</summary>
-		ImageNomips = 1 << 0,
-		/// <summary>A size sided texture that's used for things like skyboxes,
-		/// environment maps, and reflection probes. It behaves like a texture
-		/// array with 6 textures.</summary>
-		Cubemap = 1 << 1,
-		/// <summary>This texture can be rendered to! This is great for textures
-		/// that might be passed in as a target to Renderer.Blit, or other
-		/// such situations.</summary>
-		Rendertarget = 1 << 2,
-		/// <summary>This texture contains depth data, not color data!</summary>
-		Depth = 1 << 3,
-		/// <summary>This texture will generate mip-maps any time the contents
-		/// change. Mip-maps are a list of textures that are each half the
-		/// size of the one before them! This is used to prevent textures from
-		/// 'sparkling' or aliasing in the distance.</summary>
-		Mips = 1 << 4,
-		/// <summary>This texture's data will be updated frequently from the
-		/// CPU (not renders)! This ensures the graphics card stores it
-		/// someplace where writes are easy to do quickly.</summary>
-		Dynamic = 1 << 5,
-		/// <summary>A standard color image that also generates mip-maps
-		/// automatically.</summary>
-		Image = ImageNomips | Mips,
-	}
-
-	/// <summary>What type of color information will the texture contain? A
-	/// good default here is Rgba32.</summary>
-	public enum TexFormat
-	{
-		/// <summary>A default zero value for TexFormat! Unitialized formats
-		/// will get this value and **** **** up so you know to assign it
-		/// properly :)</summary>
-		None = 0,
-		/// <summary>Red/Green/Blue/Transparency data channels, at 8 bits
-		/// per-channel in sRGB color space. This is what you'll want most of
-		/// the time you're dealing with color images! Matches well with the
-		/// Color32 struct! If you're storing normals, rough/metal, or
-		/// anything else, use Rgba32Linear.</summary>
-		Rgba32,
-		/// <summary>Red/Green/Blue/Transparency data channels, at 8 bits
-		/// per-channel in linear color space. This is what you'll want most
-		/// of the time you're dealing with color data! Matches well with the
-		/// Color32 struct.</summary>
-		Rgba32Linear,
-		/// <summary>Red/Green/Blue/Transparency data channels, at 8 bits
-		/// per-channel in linear color space. This is what you'll want most
-		/// of the time you're dealing with color data! Matches well with the
-		/// Color32 struct.</summary>
-		Bgra32,
-		/// <summary>Red/Green/Blue/Transparency data channels, at 8 bits
-		/// per-channel in linear color space. This is what you'll want most
-		/// of the time you're dealing with color data! Matches well with the
-		/// Color32 struct.</summary>
-		Bgra32Linear,
-		/// <summary>Red/Green/Blue/Transparency data channels, at 8 bits
-		/// per-channel in linear color space. This is what you'll want most
-		/// of the time you're dealing with color data! Matches well with the
-		/// Color32 struct.</summary>
-		Rg11b10,
-		/// <summary>Red/Green/Blue/Transparency data channels, at 8 bits
-		/// per-channel in linear color space. This is what you'll want most
-		/// of the time you're dealing with color data! Matches well with the
-		/// Color32 struct.</summary>
-		Rgb10a2,
-		/// <summary>TODO: remove during major version update</summary>
-		Rgba64,
-		/// <summary>A single channel of data, with 8 bits per-pixel! This
-		/// can be great when you're only using one channel, and want to
-		/// reduce memory usage. Values in the shader are always 0.0-1.0.</summary>
-		R8,
-		/// <summary>A single channel of data, with 16 bits per-pixel! This
-		/// is a good format for height maps, since it stores a fair bit of
-		/// information in it. Values in the shader are always 0.0-1.0.</summary>
-		R16,
-		/// <summary>A depth data format, 24 bits for depth data, and 8 bits
-		/// to store stencil information! Stencil data can be used for things
-		/// like clipping effects, deferred rendering, or shadow effects.</summary>
-		DepthStencil,
-		/// <summary>16 bits of depth is not a lot, but it can be enough if
-		/// your far clipping plane is pretty close. If you're seeing lots of
-		/// flickering where two objects overlap, you either need to bring
-		/// your far clip in, or switch to 32/24 bit depth.</summary>
-		Depth16,
-		/// <summary>16 bits of depth is not a lot, but it can be enough if
-		/// your far clipping plane is pretty close. If you're seeing lots of
-		/// flickering where two objects overlap, you either need to bring
-		/// your far clip in, or switch to 32/24 bit depth.</summary>
-		Rgba64u = Rgba64,
-	}
-
-	/// <summary>How does the shader grab pixels from the texture? Or more
-	/// specifically, how does the shader grab colors between the provided
-	/// pixels? If you'd like an in-depth explanation of these topics, check
-	/// out [this exploration of texture filtering](https://medium.com/@bgolus/sharper-mipmapping-using-shader-based-supersampling-ed7aadb47bec)
-	/// by graphics wizard Ben Golus.</summary>
-	public enum TexSample
-	{
-		/// <summary>Use a linear blend between adjacent pixels, this creates
-		/// a smooth, blurry look when texture resolution is too low.</summary>
-		Linear = 0,
-		/// <summary>Choose the nearest pixel's color! This makes your texture
-		/// look like pixel art if you're too close.</summary>
-		Point,
-		/// <summary>This helps reduce texture blurriness when a surface is
-		/// viewed at an extreme angle!</summary>
-		Anisotropic,
-	}
-
-	/// <summary>What happens when the shader asks for a texture coordinate
-	/// that's outside the texture?? Believe it or not, this happens plenty
-	/// often!</summary>
-	public enum TexAddress
-	{
-		/// <summary>Wrap the UV coordinate around to the other side of the
-		/// texture! This is basically like a looping texture, and is an
-		/// excellent default. If you can see weird bits of color at the edges
-		/// of your texture, this may be due to Wrap blending the color with
-		/// the other side of the texture, Clamp may be better in such cases.</summary>
-		Wrap = 0,
-		/// <summary>Clamp the UV coordinates to the edge of the texture!
-		/// This'll create color streaks that continue to forever. This is
-		/// actually really great for non-looping textures that you know will
-		/// always be accessed on the 0-1 range.</summary>
-		Clamp,
-		/// <summary>Like Wrap, but it reflects the image each time! Who needs
-		/// this? I'm not sure!! But the graphics card can do it, so now you
-		/// can too!</summary>
-		Mirror,
-	}
-
 	/// <summary>Also known as 'alpha' for those in the know. But there's
 	/// actually more than one type of transparency in rendering! The
 	/// horrors. We're keepin' it fairly simple for now, so you get three
@@ -215,71 +85,6 @@ namespace RhuEngine.Linker
 		/// buffer! This usually looks -really- glowy, so it makes for good
 		/// particles or lighting effects.</summary>
 		Add,
-	}
-
-	/// <summary>Culling is discarding an object from the render pipeline!
-	/// This enum describes how mesh faces get discarded on the graphics
-	/// card. With culling set to none, you can double the number of pixels
-	/// the GPU ends up drawing, which can have a big impact on performance.
-	/// None can be appropriate in cases where the mesh is designed to be
-	/// 'double sided'. Front can also be helpful when you want to flip a
-	/// mesh 'inside-out'!</summary>
-	public enum Cull
-	{
-		/// <summary>Discard if the back of the triangle face is pointing
-		/// towards the camera. This is the default behavior.</summary>
-		Back = 0,
-		/// <summary>Discard if the front of the triangle face is pointing
-		/// towards the camera. This is opposite the default behavior.</summary>
-		Front,
-		/// <summary>No culling at all! Draw the triangle regardless of which
-		/// way it's pointing.</summary>
-		None,
-	}
-
-
-	/// <summary>TODO: v0.4 This may need significant revision?
-	/// What type of data does this material parameter need? This is
-	/// used to tell the shader how large the data is, and where to attach it
-	/// to on the shader.</summary>
-	public enum MaterialParam
-	{
-		/// <summary>This is for use of hardtype</summary>
-		Unknown = 0,
-		/// <summary>A single 32 bit float value.</summary>
-		Float = 1,
-		Bool = 2,
-		/// <summary>A 2 component vector composed of floating point values.</summary>
-		Vector2 = 3,
-		/// <summary>A 3 component vector composed of floating point values.</summary>
-		Vector3 = 4,
-		/// <summary>A 4 component vector composed of floating point values.</summary>
-		Vector4 = 5,
-		/// <summary>A 4x4 matrix of floats.</summary>
-		Matrix = 6,
-		/// <summary>Texture information!</summary>
-		Texture = 7,
-		/// <summary>A 1 component vector composed of signed integers.</summary>
-		Int = 8,
-		/// <summary>A 2 component vector composed of signed integers.</summary>
-		Int2 = 9,
-		/// <summary>A 3 component vector composed of signed integers.</summary>
-		Int3 = 10,
-		/// <summary>A 4 component vector composed of signed integers.</summary>
-		Int4 = 11,
-		/// <summary>A 1 component vector composed of unsigned integers. This may also be a
-		/// boolean.</summary>
-		UInt = 12,
-		/// <summary>A 2 component vector composed of unsigned integers.</summary>
-		UInt2 = 13,
-		/// <summary>A 3 component vector composed of unsigned integers.</summary>
-		UInt3 = 14,
-		/// <summary>A 4 component vector composed of unsigned integers.</summary>
-		UInt4 = 15,
-		Cull = 16,
-		Transparency = 17,
-		TexAddress = 18,
-		TexSample = 19,
 	}
 
 
