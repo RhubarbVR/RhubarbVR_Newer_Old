@@ -106,25 +106,32 @@ namespace DataNodeReader
 				return;
 			}
 			saveToFile.Enabled = true;
-			treeView1.Nodes.Add(LoadTreeNode("Root", _node));
+			var sack = new List<(string AddedName, IDataNode dataNode, TreeNode parrent)> {
+				("Root", _node, treeView1.Nodes.Add("Holder"))
+			};
+			for (var i = 0; i < sack.Count; i++) {
+				LoadTreeNode(sack[i],sack);
+			}
+
 		}
 
-		private TreeNode LoadTreeNode(string AddedName,IDataNode dataNode) {
-			var node = new TreeNode(AddedName + " " + dataNode.GetType().GetFormattedName());
-			if (dataNode is DataNodeGroup dataNodeGroup) {
+		private void LoadTreeNode((string AddedName, IDataNode dataNode, TreeNode parrent) current, List<(string AddedName, IDataNode dataNode, TreeNode parrent)> stack) {
+			var node = new TreeNode(current.AddedName + " " + current.dataNode.GetType().GetFormattedName());
+			if (current.dataNode is DataNodeGroup dataNodeGroup) {
 				foreach (var item in dataNodeGroup._nodeGroup) {
-					node.Nodes.Add(LoadTreeNode(item.Key, item.Value));
-				}
-			}else if (dataNode is DataNodeList dataNodeList){
-				for (var i = 0; i < dataNodeList._nodeGroup.Count; i++) {
-					node.Nodes.Add(LoadTreeNode(i.ToString(), dataNodeList._nodeGroup[i]));
+					stack.Add((item.Key, item.Value, node));
 				}
 			}
-			else if (dataNode is IDateNodeValue dataValue) {
-				var ValueNode = node.Nodes.Add("Value", dataValue.ObjectValue.ToString());
+			else if (current.dataNode is DataNodeList dataNodeList){
+				for (var i = 0; i < dataNodeList._nodeGroup.Count; i++) {
+					stack.Add((i.ToString(), dataNodeList._nodeGroup[i], node));
+				}
+			}
+			else if (current.dataNode is IDateNodeValue dataValue) {
+				var ValueNode = node.Nodes.Add("Value", dataValue.ObjectValue?.ToString()??"Null");
 				ValueNode.Tag = dataValue;
 			}
-			return node;
+			current.parrent.Nodes.Add(node);
 		}
 	}
 }
