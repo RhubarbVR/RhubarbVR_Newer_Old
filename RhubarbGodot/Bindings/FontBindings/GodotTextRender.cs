@@ -27,7 +27,7 @@ namespace RhubarbVR.Bindings.FontBindings
 			subViewport.Free();
 		}
 
-		public const int SIZE = 32;
+		public const int SIZE = 96;
 
 		public IRTexture2D Init(RText text, RFont font) {
 			if (font.Inst is GodotFont gfont) {
@@ -36,9 +36,10 @@ namespace RhubarbVR.Bindings.FontBindings
 					TransparentBg = true,
 					Disable3d = true,
 					GuiDisableInput = true,
-					Msaa2d = Viewport.MSAA.Msaa8x,
+					Msaa2d = Viewport.MSAA.Disabled,
 					Scaling3dMode = Viewport.Scaling3DMode.Bilinear,
 					SdfScale = Viewport.SDFScale.Scale100Percent,
+					
 				};
 				textDraw = new Label {
 					LabelSettings = new LabelSettings {

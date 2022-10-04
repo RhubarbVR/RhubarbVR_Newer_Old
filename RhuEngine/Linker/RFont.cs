@@ -198,6 +198,7 @@ namespace RhuEngine.Linker
 		public bool LoadDynamicFont(Stream data) {
 			var temp = Path.GetTempFileName();
 			var fileStream = File.OpenWrite(temp);
+			TempFiles.AddTempFile(temp);
 			data.CopyTo(fileStream);
 			fileStream.Close();
 			fileStream.Dispose();

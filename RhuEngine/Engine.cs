@@ -405,6 +405,8 @@ namespace RhuEngine
 		public void Dispose() {
 			RLog.Info("Engine Disposed");
 			SaveSettings();
+			RLog.Info("CleanUpTemp");
+			TempFiles.CleanUpTempFiles();
 			foreach (var item in _managers) {
 				try {
 					item.Dispose();
@@ -416,6 +418,7 @@ namespace RhuEngine
 					}
 				}
 			}
+
 		}
 	}
 }

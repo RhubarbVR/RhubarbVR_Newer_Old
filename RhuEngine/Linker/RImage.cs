@@ -560,6 +560,7 @@ namespace RhuEngine.Linker
 		public bool Load(Stream data,string FileEX = "png") {
 			var temp = Path.GetTempFileName() + "." + FileEX;
 			var fileStream = File.OpenWrite(temp);
+			TempFiles.AddTempFile(temp);
 			data.CopyTo(fileStream);
 			fileStream.Close();
 			fileStream.Dispose();
