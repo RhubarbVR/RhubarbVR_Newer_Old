@@ -77,7 +77,8 @@ namespace RhubarbVR.Bindings
 
 		public void LoadStatics() {
 			RTime.Instance = EngineRunner;
-			RFont.Instance = typeof(GodotFont); 
+			RFont.Instance = typeof(GodotFont);
+			RText.Instance = typeof(GodotTextRender);
 			RMesh.Instance = typeof(GodotMesh);
 			RTexture.Instance = typeof(GodotTexture);
 			RTexture2D.Instance = typeof(GodotTexture2D);

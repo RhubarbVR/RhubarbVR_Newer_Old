@@ -193,9 +193,7 @@ namespace RhuEngine.Managers
 			Engine.IntMsg = "Done Creating Personal Space";
 			PrivateOverlay.RootEntity.AddChild("PrivateSpace").AttachComponent<PrivateSpaceManager>();
 			_loadingText = PrivateOverlay.RootEntity.AddChild("LoadingText").AttachComponent<WorldText>();
-			_loadingText.FitText.Value = true;
-			_loadingText.Width.Value = _loadingText.Height.Value = 0.35f;
-			_loadingText.StartingColor.Value = Colorf.White;
+			_loadingText.Size.Value = 0.35f;
 			Engine.IntMsg = "Creating Local World";
 			var loaddedData = false;
 			if (LoadLocalWorld && File.Exists(Engine.BaseDir + "LocalWorldTest.RWorld")) {

@@ -27,7 +27,9 @@ namespace RhubarbVR.Bindings
 				return;
 			}
 			var trans = node3D.Transform;
-			trans.basis = new Basis(new Quaternion(rot.x, rot.y, rot.z, rot.w)).Scaled(new Vector3(scale.x, scale.y, scale.z));
+			trans.basis = new Basis(new Quaternion(rot.x, rot.y, rot.z, rot.w)) {
+				Scale = new Vector3(scale.x, scale.y, scale.z)
+			};
 			trans.origin = new Vector3(pos.x,pos.y,pos.z);
 			node3D.Transform = trans;
 		}

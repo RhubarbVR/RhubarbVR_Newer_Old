@@ -261,7 +261,6 @@ namespace RhuEngine
 				};
 				StartingTextMit = StaticMaterialManager.GetMaterial<ITextMaterial>();
 				StartingTextMit.Texture = StartingText.texture2D;
-				StartingText.UpdatedTexture += () => StartingTextMit.Texture = StartingText?.texture2D;
 				RRenderer.EnableSky = false;
 				LoadingLogo = StaticMaterialManager.GetMaterial<IUnlitMaterial>();
 				LoadingLogo.Transparency = Transparency.Blend;

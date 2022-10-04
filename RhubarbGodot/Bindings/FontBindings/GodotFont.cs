@@ -51,6 +51,7 @@ namespace RhubarbVR.Bindings.FontBindings
 		}
 
 		public bool LoadDynamicFont(string path) {
+			FontFile.MsdfSize = 96;
 			return FontFile.LoadDynamicFont(path) == Error.Ok;
 		}
 

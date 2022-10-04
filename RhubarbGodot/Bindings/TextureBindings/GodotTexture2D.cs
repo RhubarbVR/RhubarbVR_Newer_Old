@@ -12,6 +12,14 @@ namespace RhubarbVR.Bindings.TextureBindings
 {
 	public class GodotTexture2D : GodotTexture, IRTexture2D
 	{
+		public GodotTexture2D(Texture2D texture2D) {
+			Texture = texture2D;
+		}
+
+		public GodotTexture2D() {
+
+		}
+
 		public long Height => Texture2D.GetHeight();
 
 		public long Width => Texture2D.GetWidth();
@@ -29,7 +37,7 @@ namespace RhubarbVR.Bindings.TextureBindings
 		public void Init(RTexture2D rTexture2D) {
 			RTexture2D = rTexture2D;
 			if (typeof(GodotTexture2D) == GetType()) {
-				Texture = new Texture2D();
+				Texture ??= new Texture2D();
 			}
 		}
 

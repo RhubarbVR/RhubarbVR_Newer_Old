@@ -13,49 +13,81 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Rendering" })]
 	public sealed class WorldText : LinkedWorldComponent
 	{
-		[Default(false)]
-		public readonly Sync<bool> FitText;
 		[Default(1f)]
-		public readonly Sync<float> Width;
-		[Default(1f)]
-		public readonly Sync<float> Height;
+		public readonly Sync<float> Size;
 		[Default("Text Here")]
 		[OnChanged(nameof(UpdateText))]
 		public readonly Sync<string> Text;
-		[OnAssetLoaded(nameof(UpdateText))]
+		[OnAssetLoaded(nameof(UpdateFont))]
 		public readonly AssetRef<RFont> Font;
-		[OnChanged(nameof(UpdateText))]
+
 		public readonly Sync<Colorf> StartingColor;
-		[Default(0.1f)]
-		[OnChanged(nameof(UpdateText))]
-		public readonly Sync<float> Leading;
-		[OnChanged(nameof(UpdateText))]
-		[Default(RFontStyle.Regular)]
-		public readonly Sync<RFontStyle> StartingStyle;
-
-		[OnChanged(nameof(UpdateText))]
-		[Default(10f)]
-		public readonly Sync<float> StatingSize;
-
-		[Default(EVerticalAlien.Center)]
-		[OnChanged(nameof(UpdateText))]
-		public readonly Sync<EVerticalAlien> VerticalAlien;
-
-		[Default(EHorizontalAlien.Middle)]
-		[OnChanged(nameof(UpdateText))]
-		public readonly Sync<EHorizontalAlien> HorizontalAlien;
 
 		[Default(RenderLayer.Text)]
 		public readonly Sync<RenderLayer> TargetRenderLayer;
 
+		private ITextMaterial _textMaterial;
+
+		private RText _rText;
+
+
+		private void UpdateFont() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				_rText?.Dispose();
+				_rText = null;
+				if (Font.Asset is null) {
+					return;
+				}
+				_rText = new RText(Font.Asset);
+				if (_textMaterial is null) {
+					return;
+				}
+				_textMaterial.Texture = _rText.texture2D;
+				_rText.Text = Text.Value;
+			});
+		}
 		private void UpdateText() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
+			if (_rText is null) {
+				return;
+			}
+			_rText.Text = Text.Value;
+		}
+
+		public override void Dispose() {
+			base.Dispose();
+			_rText?.Dispose();
+			_textMaterial?.Dispose();
+		}
+
+		protected override void OnLoaded() {
+			base.OnLoaded();
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
+			_textMaterial = StaticMaterialManager.GetMaterial<ITextMaterial>();
+			if (_rText is not null) {
+				_textMaterial.Texture = _rText.texture2D;
+			}
+			UpdateFont();
 		}
 
 		protected override void Render() {
-	
+			if (_rText is null) {
+				return;
+			}
+			if (_textMaterial is null) {
+				return;
+			}
+			var child = Matrix.S(new Vector3f(Size * _rText.AspectRatio, Size, Size));
+			var globnal = Entity.GlobalTrans;
+			var trains = child * globnal;
+			RMesh.Quad.Draw(_textMaterial.Material, trains, null, 0, RenderLayer.Text);
 		}
 
 		protected override void OnAttach() {

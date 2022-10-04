@@ -138,21 +138,33 @@ namespace RhuEngine.Linker
 
 	}
 
+	public interface IRText:IDisposable {
+		IRTexture2D Init(RText text, RFont font);
+
+		void SetText(string text);
+	}
+
 	public sealed class RText : IDisposable
 	{
-		internal RTexture2D texture2D;
-		private RFont _font;
+		public RTexture2D texture2D;
+
+		public static Type Instance { get; set; }
+
+		public IRText Inst { get; set; }
 
 		public RText(RFont font) {
-			_font = font;
+			Inst = (IRText)Activator.CreateInstance(Instance);
+			texture2D = new RTexture2D(Inst.Init(this, font));
 		}
 
-		public string Text { get; internal set; }
-		public float AspectRatio { get; internal set; }
-
-		public event Action UpdatedTexture;
+		public string Text
+		{
+			set => Inst.SetText(value);
+		}
+		public float AspectRatio => texture2D.Width / texture2D.Height;
 
 		public void Dispose() {
+			Inst.Dispose();
 		}
 	}
 
