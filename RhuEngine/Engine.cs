@@ -257,7 +257,9 @@ namespace RhuEngine
 			RLog.Info(IntMsg);
 			if (EngineLink.CanRender) {
 				StartingText = new RText(staticResources.MainFont) {
-					Text = "Starting"
+					Text = "Starting",
+					HorizontalAlignment = RHorizontalAlignment.Center,
+					VerticalAlignment = RVerticalAlignment.Center
 				};
 				StartingTextMit = StaticMaterialManager.GetMaterial<ITextMaterial>();
 				StartingTextMit.Texture = StartingText.texture2D;

@@ -138,10 +138,208 @@ namespace RhuEngine.Linker
 
 	}
 
-	public interface IRText:IDisposable {
-		IRTexture2D Init(RText text, RFont font);
+	public enum RHorizontalAlignment : long
+	{
+		//
+		// Summary:
+		//     Horizontal left alignment, usually for text-derived classes.
+		Left,
+		//
+		// Summary:
+		//     Horizontal center alignment, usually for text-derived classes.
+		Center,
+		//
+		// Summary:
+		//     Horizontal right alignment, usually for text-derived classes.
+		Right,
+		//
+		// Summary:
+		//     Expand row to fit width, usually for text-derived classes.
+		Fill
+	}
+	public enum RVerticalAlignment : long
+	{
+		//
+		// Summary:
+		//     Vertical top alignment, usually for text-derived classes.
+		Top,
+		//
+		// Summary:
+		//     Vertical center alignment, usually for text-derived classes.
+		Center,
+		//
+		// Summary:
+		//     Vertical bottom alignment, usually for text-derived classes.
+		Bottom,
+		//
+		// Summary:
+		//     Expand rows to fit height, usually for text-derived classes.
+		Fill
+	}
+	public enum RAutowrapMode : long
+	{
+		//
+		// Summary:
+		//     Autowrap is disabled.
+		Off,
+		//
+		// Summary:
+		//     Wraps the text inside the node's bounding rectangle by allowing to break lines
+		//     at arbitrary positions, which is useful when very limited space is available.
+		Arbitrary,
+		//
+		// Summary:
+		//     Wraps the text inside the node's bounding rectangle by soft-breaking between
+		//     words.
+		Word,
+		//
+		// Summary:
+		//     Behaves similarly to Godot.TextServer.AutowrapMode.Word, but force-breaks a word
+		//     if that single word does not fit in one line.
+		WordSmart
+	}
 
-		void SetText(string text);
+	public enum ROverrunBehavior : long
+	{
+		//
+		// Summary:
+		//     No text trimming is performed.
+		NoTrimming,
+		//
+		// Summary:
+		//     Trims the text per character.
+		TrimChar,
+		//
+		// Summary:
+		//     Trims the text per word.
+		TrimWord,
+		//
+		// Summary:
+		//     Trims the text per character and adds an ellipsis to indicate that parts are
+		//     hidden.
+		TrimEllipsis,
+		//
+		// Summary:
+		//     Trims the text per word and adds an ellipsis to indicate that parts are hidden.
+		TrimWordEllipsis
+	}
+	public enum RVisibleCharactersBehavior : long
+	{
+		//
+		// Summary:
+		//     Trims text before the shaping. e.g, increasing Godot.Label.VisibleCharacters
+		//     or Godot.RichTextLabel.VisibleCharacters value is visually identical to typing
+		//     the text.
+		CharsBeforeShaping,
+		//
+		// Summary:
+		//     Displays glyphs that are mapped to the first Godot.Label.VisibleCharacters or
+		//     Godot.RichTextLabel.VisibleCharacters characters from the beginning of the text.
+		CharsAfterShaping,
+		//
+		// Summary:
+		//     Displays Godot.Label.VisibleRatio or Godot.RichTextLabel.VisibleRatio glyphs,
+		//     starting from the left or from the right, depending on Godot.Control.LayoutDirection
+		//     value.
+		GlyphsAuto,
+		//
+		// Summary:
+		//     Displays Godot.Label.VisibleRatio or Godot.RichTextLabel.VisibleRatio glyphs,
+		//     starting from the left.
+		GlyphsLtr,
+		//
+		// Summary:
+		//     Displays Godot.Label.VisibleRatio or Godot.RichTextLabel.VisibleRatio glyphs,
+		//     starting from the right.
+		GlyphsRtl
+	}
+
+	public enum RTextDirection : long
+	{
+		//
+		// Summary:
+		//     Text writing direction is the same as layout direction.
+		Inherited = 3L,
+		//
+		// Summary:
+		//     Automatic text writing direction, determined from the current locale and text
+		//     content.
+		Auto = 0L,
+		//
+		// Summary:
+		//     Left-to-right text writing direction.
+		Ltr = 1L,
+		//
+		// Summary:
+		//     Right-to-left text writing direction.
+		Rtl = 2L
+	}
+
+	public enum RStructuredTextParser : long
+	{
+		//
+		// Summary:
+		//     Use default behavior. Same as STRUCTURED_TEXT_NONE unless specified otherwise
+		//     in the control description.
+		Default,
+		//
+		// Summary:
+		//     BiDi override for URI.
+		Uri,
+		//
+		// Summary:
+		//     BiDi override for file path.
+		File,
+		//
+		// Summary:
+		//     BiDi override for email.
+		Email,
+		//
+		// Summary:
+		//     BiDi override for lists.
+		//     Structured text options: list separator String.
+		List,
+		//
+		// Summary:
+		//     Use default Unicode BiDi algorithm.
+		None,
+		//
+		// Summary:
+		//     User defined structured text BiDi override function.
+		Custom
+	}
+
+	public interface IRText : IDisposable
+	{
+		IRTexture2D Init(RText text);
+		public bool AutoScale { get; set; }
+		public RFont Font { get; set; }
+		public string Text { get; set; }
+		public float LineSpacing { get; set; }
+		public int FontSize { get; set; }
+		public Colorf FontColor { get; set; }
+		public int OutlineSize { get; set; }
+		public Colorf OutlineColor { get; set; }
+		public int ShadowSize { get; set; }
+		public Colorf ShadowColor { get; set; }
+		public Vector2f ShadowOffset { get; set; }
+		public Vector2i Size { get; set; }
+
+		public RHorizontalAlignment HorizontalAlignment { get; set; }
+		public RVerticalAlignment VerticalAlignment { get; set; }
+		public RAutowrapMode AutowrapMode { get; set; }
+		public bool ClipText { get; set; }
+		public ROverrunBehavior TextOverrunBehavior { get; set; }
+		public bool Uppercase { get; set; }
+		public int LinesSkipped { get; set; }
+		public int MaxLinesVisible { get; set; }
+		public int VisibleCharacters { get; set; }
+		public RVisibleCharactersBehavior VisibleCharactersBehavior { get; set; }
+		public float VisibleRatio { get; set; }
+		public RTextDirection TextDirection { get; set; }
+		public string Language { get; set; }
+		public RStructuredTextParser StructuredTextBidiOverride { get; set; }
+
 	}
 
 	public sealed class RText : IDisposable
@@ -152,15 +350,42 @@ namespace RhuEngine.Linker
 
 		public IRText Inst { get; set; }
 
-		public RText(RFont font) {
+		public RText(RFont font, bool autoScale = true) {
 			Inst = (IRText)Activator.CreateInstance(Instance);
-			texture2D = new RTexture2D(Inst.Init(this, font));
+			texture2D = new RTexture2D(Inst.Init(this));
+			Font = font;
+			FontSize = 96;
+			AutoScale = autoScale;
 		}
 
-		public string Text
-		{
-			set => Inst.SetText(value);
-		}
+		public bool AutoScale { get => Inst.AutoScale; set => Inst.AutoScale = value; }
+		public RFont Font { get => Inst.Font; set => Inst.Font = value; }
+		public string Text { get => Inst.Text; set => Inst.Text = value; }
+		public float LineSpacing { get => Inst.LineSpacing; set => Inst.LineSpacing = value; }
+		public int FontSize { get => Inst.FontSize; set => Inst.FontSize = value; }
+		public Colorf FontColor { get => Inst.FontColor; set => Inst.FontColor = value; }
+		public int OutlineSize { get => Inst.OutlineSize; set => Inst.OutlineSize = value; }
+		public Colorf OutlineColor { get => Inst.OutlineColor; set => Inst.OutlineColor = value; }
+		public int ShadowSize { get => Inst.ShadowSize; set => Inst.ShadowSize = value; }
+		public Colorf ShadowColor { get => Inst.ShadowColor; set => Inst.ShadowColor = value; }
+		public Vector2f ShadowOffset { get => Inst.ShadowOffset; set => Inst.ShadowOffset = value; }
+		public Vector2i Size { get => Inst.Size; set => Inst.Size = value; }
+
+		public RHorizontalAlignment HorizontalAlignment { get => Inst.HorizontalAlignment; set => Inst.HorizontalAlignment = value; }
+		public RVerticalAlignment VerticalAlignment { get => Inst.VerticalAlignment; set => Inst.VerticalAlignment = value; }
+		public RAutowrapMode AutowrapMode { get => Inst.AutowrapMode; set => Inst.AutowrapMode = value; }
+		public bool ClipText { get => Inst.ClipText; set => Inst.ClipText = value; }
+		public ROverrunBehavior TextOverrunBehavior { get => Inst.TextOverrunBehavior; set => Inst.TextOverrunBehavior = value; }
+		public bool Uppercase { get => Inst.Uppercase; set => Inst.Uppercase = value; }
+		public int LinesSkipped { get => Inst.LinesSkipped; set => Inst.LinesSkipped = value; }
+		public int MaxLinesVisible { get => Inst.MaxLinesVisible; set => Inst.MaxLinesVisible = value; }
+		public int VisibleCharacters { get => Inst.VisibleCharacters; set => Inst.VisibleCharacters = value; }
+		public RVisibleCharactersBehavior VisibleCharactersBehavior { get => Inst.VisibleCharactersBehavior; set => Inst.VisibleCharactersBehavior = value; }
+		public float VisibleRatio { get => Inst.VisibleRatio; set => Inst.VisibleRatio = value; }
+		public RTextDirection TextDirection { get => Inst.TextDirection; set => Inst.TextDirection = value; }
+		public string Language { get => Inst.Language; set => Inst.Language = value; }
+		public RStructuredTextParser StructuredTextBidiOverride { get => Inst.StructuredTextBidiOverride; set => Inst.StructuredTextBidiOverride = value; }
+
 		public float AspectRatio => texture2D.Width / texture2D.Height;
 
 		public void Dispose() {
