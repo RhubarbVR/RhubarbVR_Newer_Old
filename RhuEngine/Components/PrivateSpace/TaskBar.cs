@@ -15,6 +15,7 @@ using RhuEngine.WorldObjects;
 using RhuEngine.Components.PrivateSpace;
 using System.Globalization;
 using System.Reflection;
+using RhuEngine.Components.Visuals;
 
 namespace RhuEngine.Components
 {
@@ -49,13 +50,13 @@ namespace RhuEngine.Components
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public UICanvas uICanvas;
+		public UI3DCanvas uICanvas;
 
 		[NoSave]
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public UICanvas startCanvas;
+		public UI3DCanvas startCanvas;
 
 		[NoSave]
 		[NoSync]
@@ -89,13 +90,13 @@ namespace RhuEngine.Components
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public CustomScrollUIRect scrollRect;
+		public CustomScrollUI3DRect scrollRect;
 
 		[NoSave]
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public CustomScrollUIRect scrollRectTwo;
+		public CustomScrollUI3DRect scrollRectTwo;
 		public List<ITaskBarItem> taskBarItems = new();
 
 		[NoSave]
@@ -163,25 +164,25 @@ namespace RhuEngine.Components
 
 		public readonly Linker<string> TimeText;
 
-		public (Entity, UIRect) AddButton(Entity were, Vector2i iconindex, Action<ButtonEvent> action, float paddingoffset = 0, float yoffset = 0) {
+		public (Entity, UI3DRect) AddButton(Entity were, Vector2i iconindex, Action<ButtonEvent> action, float paddingoffset = 0, float yoffset = 0) {
 			var child = were.AddChild("childEliment");
-			var rectTwo = child.AttachComponent<UIRect>();
+			var rectTwo = child.AttachComponent<UI3DRect>();
 			rectTwo.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
 			rectTwo.AnchorMax.Value = new Vector2f(0.9f, 0.9f);
-			var img = child.AttachComponent<UIRectangle>();
-			var colorassign = child.AttachComponent<UIColorAssign>();
+			var img = child.AttachComponent<UI3DRectangle>();
+			var colorassign = child.AttachComponent<ColorAssign>();
 			colorassign.Alpha.Value = 0.5f;
 			colorassign.ColorShif.Value = 0.5f;
 			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 			img.AddRoundingSettings();
 			var icon = child.AddChild("Icon");
-			var iconrect = icon.AttachComponent<UIRect>();
+			var iconrect = icon.AttachComponent<UI3DRect>();
 			iconrect.AnchorMin.Value = new Vector2f(PADDING + paddingoffset, PADDING + paddingoffset + yoffset);
 			iconrect.AnchorMax.Value = new Vector2f(1 - (PADDING + paddingoffset), 1 - (PADDING + paddingoffset) + yoffset);
-			var spriterender = icon.AttachComponent<UISprite>();
+			var spriterender = icon.AttachComponent<UI3DSprite>();
 			if (!(iconindex == new Vector2i(16, 0) || iconindex == new Vector2i(7, 6))) {
-				colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
+				colorassign = NotificationEntiy.AttachComponent<ColorAssign>();
 				colorassign.ColorShif.Value = 1.9f;
 				colorassign.TargetColor.Target = spriterender.Tint;
 			}
@@ -190,29 +191,29 @@ namespace RhuEngine.Components
 			spriterender.PosMin.Value = iconindex;
 			spriterender.PosMax.Value = iconindex;
 			if (action != null) {
-				var buttoninter = child.AttachComponent<UIButtonInteraction>();
+				var buttoninter = child.AttachComponent<UI3DButtonInteraction>();
 				buttoninter.ButtonEvent.Target = action;
 			}
 			return (child, iconrect);
 		}
 
-		public (Entity, UIRect) AddButton(Entity were, RTexture2D textue, Action<ButtonEvent> action, float paddingoffset = 0, float yoffset = 0) {
+		public (Entity, UI3DRect) AddButton(Entity were, RTexture2D textue, Action<ButtonEvent> action, float paddingoffset = 0, float yoffset = 0) {
 			var child = were.AddChild("childEliment");
-			var rectTwo = child.AttachComponent<UIRect>();
+			var rectTwo = child.AttachComponent<UI3DRect>();
 			rectTwo.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
 			rectTwo.AnchorMax.Value = new Vector2f(0.9f, 0.9f);
-			var img = child.AttachComponent<UIRectangle>();
-			var colorassign = child.AttachComponent<UIColorAssign>();
+			var img = child.AttachComponent<UI3DRectangle>();
+			var colorassign = child.AttachComponent<ColorAssign>();
 			colorassign.Alpha.Value = 0.5f;
 			colorassign.ColorShif.Value = 0.5f;
 			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 			img.AddRoundingSettings();
 			var icon = child.AddChild("Icon");
-			var iconrect = icon.AttachComponent<UIRect>();
+			var iconrect = icon.AttachComponent<UI3DRect>();
 			iconrect.AnchorMin.Value = new Vector2f(PADDING + paddingoffset, PADDING + paddingoffset + yoffset);
 			iconrect.AnchorMax.Value = new Vector2f(1 - (PADDING + paddingoffset), 1 - (PADDING + paddingoffset) + yoffset);
-			var spriterender = icon.AttachComponent<UIImage>();
+			var spriterender = icon.AttachComponent<UI3Dmage>();
 			var assetProvider = child.AttachComponent<RawAssetProvider<RTexture2D>>();
 			assetProvider.LoadAsset(textue);
 			var mmit = child.AttachComponent<UnlitMaterial>();
@@ -220,7 +221,7 @@ namespace RhuEngine.Components
 			mit.MainTexture.Target = assetProvider;
 			spriterender.Material.Target = mmit;
 			if (action != null) {
-				child.AttachComponent<UIButtonInteraction>().ButtonEvent.Target = action;
+				child.AttachComponent<UI3DButtonInteraction>().ButtonEvent.Target = action;
 			}
 			return (icon, iconrect);
 		}
@@ -244,7 +245,7 @@ namespace RhuEngine.Components
 
 		public void AddTaskBarItem(ITaskBarItem taskBarItem, string appenedText) {
 			var element = TaskBarItems.AddChild("listElementHolder");
-			var rect = element.AttachComponent<UIRect>();
+			var rect = element.AttachComponent<UI3DRect>();
 			rect.AnchorMin.Value = Vector2f.Zero;
 			rect.AnchorMax.Value = new Vector2f(0.15f, 1);
 			var delegatecall = element.AttachComponent<DelegateCall>();
@@ -256,7 +257,7 @@ namespace RhuEngine.Components
 				? AddButton(element, taskBarItem.Icon ?? new Vector2i(7, 5), buttonevent.Call, padding, padding)
 				: AddButton(element, taskBarItem.Texture, buttonevent.Call, padding, padding);
 			if (taskBarItem.CanCloses) {
-				var eventComp = child.parent.Target.AttachComponent<UIHoverInteraction>();
+				var eventComp = child.parent.Target.AttachComponent<UI3DHoverInteraction>();
 				var onhover = element.AttachComponent<DelegateCall>();
 				var unHover = element.AttachComponent<DelegateCall>();
 				var closeeButtpon = element.AttachComponent<DelegateCall>();
@@ -272,7 +273,7 @@ namespace RhuEngine.Components
 				eventComp.OnHover.Target += onhover.CallDelegate;
 				eventComp.OnUnHover.Target += unHover.CallDelegate;
 				var closebutton = child.parent.Target.AddChild("CloseButton");
-				var closeRect = closebutton.AttachComponent<UIRect>();
+				var closeRect = closebutton.AttachComponent<UI3DRect>();
 				closeRect.AnchorMax.Value = new Vector2f(1f);
 				closeRect.AnchorMin.Value = new Vector2f(0.65f);
 				closebutton.enabled.Value = false;
@@ -281,14 +282,14 @@ namespace RhuEngine.Components
 				unHover.action = () => closebutton.enabled.Value = false;
 			}
 			var text = child.AddChild("Text");
-			var textrect = text.AttachComponent<UIRect>();
+			var textrect = text.AttachComponent<UI3DRect>();
 			textrect.AnchorMin.Value = new Vector2f(0.1f, 0f);
 			textrect.AnchorMax.Value = new Vector2f(0.9f, 0.5f);
 			textrect.Depth.Value += 0.02f;
 
-			var uitext = text.AttachComponent<UIText>();
+			var uitext = text.AttachComponent<UI3DText>();
 			uitext.Text.Value = taskBarItem.Name;
-			var colorassign = text.AttachComponent<UIColorAssign>();
+			var colorassign = text.AttachComponent<ColorAssign>();
 			colorassign.ColorShif.Value = 1.9f;
 			colorassign.TargetColor.Target = uitext.StartingColor;
 
@@ -302,12 +303,12 @@ namespace RhuEngine.Components
 			uitext.HorizontalAlien.Value = EHorizontalAlien.Middle;
 			if (taskBarItem.ShowOpenFlag) {
 				var openoverlay = child.AddChild("IsOpenOverlay");
-				var openoverlayrect = openoverlay.AttachComponent<UIRect>();
+				var openoverlayrect = openoverlay.AttachComponent<UI3DRect>();
 				openoverlayrect.Depth.Value += 0.01f;
 				openoverlayrect.AnchorMin.Value = new Vector2f(0.1f, 0.1f);
 				openoverlayrect.AnchorMax.Value = new Vector2f(0.9f, 0.15f);
-				var img = openoverlay.AttachComponent<UIRectangle>();
-				colorassign = openoverlay.AttachComponent<UIColorAssign>();
+				var img = openoverlay.AttachComponent<UI3DRectangle>();
+				colorassign = openoverlay.AttachComponent<ColorAssign>();
 				colorassign.Alpha.Value = 0.5f;
 				colorassign.ColorShif.Value = 0.7f;
 				colorassign.TargetColor.Target = img.Tint;
@@ -340,12 +341,12 @@ namespace RhuEngine.Components
 
 		private void LoadStart(Entity mainentity) {
 			StartEntity = mainentity.AddChild("Start");
-			var startrect = StartEntity.AttachComponent<UIRect>();
+			var startrect = StartEntity.AttachComponent<UI3DRect>();
 			startrect.AnchorMax.Value = new Vector2f(0.3f, 1f);
 			var min = StartEntity.AttachComponent<StartMenu>();
 			min.BuildStart(this, startrect, mit, iconMit, sprite);
-			var img = StartEntity.AttachComponent<UIRectangle>();
-			var colorassign = StartEntity.AttachComponent<UIColorAssign>();
+			var img = StartEntity.AttachComponent<UI3DRectangle>();
+			var colorassign = StartEntity.AttachComponent<ColorAssign>();
 			colorassign.Alpha.Value = 0.9f;
 			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
@@ -353,35 +354,35 @@ namespace RhuEngine.Components
 
 		private void LoadAudio(Entity mainentity) {
 			AudioEntiy = mainentity.AddChild("Audio");
-			var startrect = AudioEntiy.AttachComponent<UIRect>();
+			var startrect = AudioEntiy.AttachComponent<UI3DRect>();
 			startrect.AnchorMax.Value = new Vector2f(0.4f, 0.45f);
 			startrect.AnchorMin.Value = new Vector2f(0.1f, 0f);
-			var img = AudioEntiy.AttachComponent<UIRectangle>();
-			var colorassign = AudioEntiy.AttachComponent<UIColorAssign>();
+			var img = AudioEntiy.AttachComponent<UI3DRectangle>();
+			var colorassign = AudioEntiy.AttachComponent<ColorAssign>();
 			colorassign.Alpha.Value = 0.9f;
 			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 		}
 		private void LoadNotification(Entity mainentity) {
 			NotificationEntiy = mainentity.AddChild("Notify");
-			var startrect = NotificationEntiy.AttachComponent<UIRect>();
+			var startrect = NotificationEntiy.AttachComponent<UI3DRect>();
 			startrect.AnchorMin.Value = new Vector2f(0.7f, 0f);
 
-			var img = NotificationEntiy.AttachComponent<UIRectangle>();
-			var colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
+			var img = NotificationEntiy.AttachComponent<UI3DRectangle>();
+			var colorassign = NotificationEntiy.AttachComponent<ColorAssign>();
 			colorassign.Alpha.Value = 0.9f;
 			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 		}
 		public void AddStartAndNotification() {
-			startCanvas = Entity.AddChild("TopOver").AttachComponent<UICanvas>();
+			startCanvas = Entity.AddChild("TopOver").AttachComponent<UI3DCanvas>();
 			startCanvas.scale.Value = new Vector3f(16, 6.5f, 1);
-			var rectTwo = startCanvas.Entity.AttachComponent<CuttingUIRect>();
+			var rectTwo = startCanvas.Entity.AttachComponent<CuttingUI3DRect>();
 			rectTwo.AnchorMin.Value = Vector2f.Zero;
 			rectTwo.AnchorMax.Value = Vector2f.One;
 
 			var mainentity = startCanvas.Entity.AddChild("scroll");
-			scrollRectTwo = mainentity.AttachComponent<CustomScrollUIRect>();
+			scrollRectTwo = mainentity.AttachComponent<CustomScrollUI3DRect>();
 			LoadAudio(mainentity);
 			LoadStart(mainentity);
 			LoadNotification(mainentity);
@@ -390,7 +391,7 @@ namespace RhuEngine.Components
 
 		protected override void OnAttach() {
 			ProgramsHolder = World.RootEntity.AddChild("Programms");
-			uICanvas = Entity.AddChild("Canvas").AttachComponent<UICanvas>();
+			uICanvas = Entity.AddChild("Canvas").AttachComponent<UI3DCanvas>();
 			Engine.SettingsUpdate += Engine_SettingsUpdate;
 			uICanvas.scale.Value = new Vector3f(16, 1.25f, 1);
 			mit = Entity.AttachComponent<UnlitMaterial>();
@@ -408,22 +409,22 @@ namespace RhuEngine.Components
 			Engine_SettingsUpdate();
 
 			//BackGround
-			var rectTwo = uICanvas.Entity.AttachComponent<CuttingUIRect>();
+			var rectTwo = uICanvas.Entity.AttachComponent<CuttingUI3DRect>();
 			rectTwo.AnchorMin.Value = Vector2f.Zero;
 			rectTwo.AnchorMax.Value = Vector2f.One;
 
 			var mainentity = uICanvas.Entity.AddChild("scroll");
-			scrollRect = mainentity.AttachComponent<CustomScrollUIRect>();
+			scrollRect = mainentity.AttachComponent<CustomScrollUI3DRect>();
 			mainentity = mainentity.AddChild("scroll");
-			mainentity.AttachComponent<UIRect>();
-			var img = mainentity.AttachComponent<UIRectangle>();
-			var colorassign = mainentity.AttachComponent<UIColorAssign>();
+			mainentity.AttachComponent<UI3DRect>();
+			var img = mainentity.AttachComponent<UI3DRectangle>();
+			var colorassign = mainentity.AttachComponent<ColorAssign>();
 			colorassign.Alpha.Value = 0.9f;
 			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 
 			var leftSide = mainentity.AddChild("leftSide");
-			var leftSideList = leftSide.AttachComponent<HorizontalList>();
+			var leftSideList = leftSide.AttachComponent<UI3DHorizontalList>();
 			leftSideList.AnchorMin.Value = Vector2f.Zero;
 			leftSideList.AnchorMax.Value = new Vector2f(0.20f, 1);
 			leftSideList.Depth.Value = 0;
@@ -435,17 +436,17 @@ namespace RhuEngine.Components
 #endif
 			AddButton(leftSide, new Vector2i(8, 3), OpenSoundOptions);
 			var listentitHolder = mainentity.AddChild("listentitHolder");
-			var listentitHolderrect = listentitHolder.AttachComponent<CuttingUIRect>();
+			var listentitHolderrect = listentitHolder.AttachComponent<CuttingUI3DRect>();
 			listentitHolderrect.AnchorMin.Value = new Vector2f(0.20f, 0.1f);
 			listentitHolderrect.AnchorMax.Value = new Vector2f(0.8f, 0.9f);
-			var interaction = mainentity.AttachComponent<UIScrollInteraction>();
-			var img4 = listentitHolder.AttachComponent<UIRectangle>();
+			var interaction = mainentity.AttachComponent<UI3DScrollInteraction>();
+			var img4 = listentitHolder.AttachComponent<UI3DRectangle>();
 			var scroller = listentitHolder.AddChild("Scroller");
-			var scrollerrect = scroller.AttachComponent<BasicScrollRect>();
+			var scrollerrect = scroller.AttachComponent<BasicScrollUI3DRect>();
 			var listentit = scroller.AddChild("list");
-			var list = listentit.AttachComponent<HorizontalList>();
+			var list = listentit.AttachComponent<UI3DHorizontalList>();
 			interaction.OnScroll.Target += scrollerrect.Scroll;
-			var colorassign2 = listentit.AttachComponent<UIColorAssign>();
+			var colorassign2 = listentit.AttachComponent<ColorAssign>();
 			colorassign2.Alpha.Value = 0.5f;
 			colorassign2.ColorShif.Value = 0.3f;
 			colorassign2.TargetColor.Target = img4.Tint;
@@ -454,43 +455,43 @@ namespace RhuEngine.Components
 			TaskBarItems = listentit;
 
 			var RightSide = mainentity.AddChild("RightSide");
-			var RightSideList = RightSide.AttachComponent<UIRect>();
+			var RightSideList = RightSide.AttachComponent<UI3DRect>();
 			RightSideList.AnchorMin.Value = new Vector2f(0.81f, 0.1f);
 			RightSideList.AnchorMax.Value = new Vector2f(0.99f, 0.9f);
 
 			var child = RightSide.AddChild("childEliment");
-			var rectTwo2 = child.AttachComponent<UIRect>();
+			var rectTwo2 = child.AttachComponent<UI3DRect>();
 			rectTwo2.AnchorMin.Value = new Vector2f(0f);
 			rectTwo2.AnchorMax.Value = new Vector2f(0.4f, 1f);
-			img = child.AttachComponent<UIRectangle>();
-			colorassign = child.AttachComponent<UIColorAssign>();
+			img = child.AttachComponent<UI3DRectangle>();
+			colorassign = child.AttachComponent<ColorAssign>();
 			colorassign.Alpha.Value = 0.5f;
 			colorassign.ColorShif.Value = 0.3f;
 			colorassign.TargetColor.Target = img.Tint;
 			img.Material.Target = mit;
 			img.AddRoundingSettings();
 			var icon = child.AddChild("Icon");
-			var iconrect = icon.AttachComponent<UIRect>();
+			var iconrect = icon.AttachComponent<UI3DRect>();
 			iconrect.AnchorMin.Value = new Vector2f(PADDING, PADDING);
 			iconrect.AnchorMax.Value = new Vector2f(1 - PADDING, 1 - PADDING);
-			var spriterender = icon.AttachComponent<UISprite>();
+			var spriterender = icon.AttachComponent<UI3DSprite>();
 			spriterender.Sprite.Target = sprite;
 			spriterender.Material.Target = iconMit;
 			var iconindex = new Vector2i(2, 0);
-			colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
+			colorassign = NotificationEntiy.AttachComponent<ColorAssign>();
 			colorassign.ColorShif.Value = 1.9f;
 			colorassign.TargetColor.Target = spriterender.Tint;
 			spriterender.PosMin.Value = iconindex;
 			spriterender.PosMax.Value = iconindex;
-			child.AttachComponent<UIButtonInteraction>().ButtonEvent.Target = OpenNotifications;
+			child.AttachComponent<UI3DButtonInteraction>().ButtonEvent.Target = OpenNotifications;
 
 
 			var child3 = RightSide.AddChild("childEliment");
-			rectTwo2 = child3.AttachComponent<UIRect>();
+			rectTwo2 = child3.AttachComponent<UI3DRect>();
 			rectTwo2.AnchorMin.Value = new Vector2f(0.5f, 0);
-			var text = child3.AttachComponent<UIText>();
+			var text = child3.AttachComponent<UI3DText>();
 			TimeText.SetLinkerTarget(text.Text);
-			colorassign = NotificationEntiy.AttachComponent<UIColorAssign>();
+			colorassign = NotificationEntiy.AttachComponent<ColorAssign>();
 			colorassign.ColorShif.Value = 1.9f;
 			colorassign.TargetColor.Target = text.StartingColor;
 			WorldManager.OnWorldUpdateTaskBar += RegTaskBarItemsUpdate;

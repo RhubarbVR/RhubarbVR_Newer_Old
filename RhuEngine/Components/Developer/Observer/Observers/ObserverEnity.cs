@@ -12,10 +12,10 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Developer/Observer/Observers" })]
 	public sealed class ObserverEnity : ObserverBase<Entity>
 	{
-		protected override UIRect BuildMainUIRect() {
-			return Entity.AttachComponent<UIRect>();
+		protected override UI3DRect BuildMainUIRect() {
+			return Entity.AttachComponent<UI3DRect>();
 		}
-		protected override void LoadObservedUI(UIBuilder ui) {
+		protected override void LoadObservedUI(UI3DBuilder ui) {
 			if (TargetElement is null) {
 				return;
 			}
@@ -34,7 +34,7 @@ namespace RhuEngine.Components
 			ui.PopRect();
 			ui.PushRect(new Vector2f(1f, 1f), null, 0);
 			ui.SetOffsetMinMax(new Vector2f(-2f, -ELMENTHIGHTSIZE), null);
-			ui.AttachChildRect<HorizontalList>(null, null, 0).Fit.Value = true;
+			ui.AttachChildRect<UI3DHorizontalList>(null, null, 0).Fit.Value = true;
 			ui.AddButtonEventLabled("Delete");
 			ui.AddButtonEventLabled("Add Child");
 			ui.PopRect();
@@ -42,7 +42,7 @@ namespace RhuEngine.Components
 			ui.PushRect(null, null, 0);
 			ui.SetOffsetMinMax(null, new Vector2f(0, -ELMENTHIGHTSIZE));
 			ui.PushRectNoDepth(null, null);
-			ui.AttachChildRect<VerticalList>(new Vector2f(0.1f, 0f));
+			ui.AttachChildRect<UI3DVerticalList>(new Vector2f(0.1f, 0f));
 			var data = TargetElement.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
 			foreach (var item in data) {
 				if (item.GetCustomAttribute<NoShowAttribute>() is not null) {
@@ -65,10 +65,10 @@ namespace RhuEngine.Components
 			ui.PopRect();
 			ui.PopRect();
 			ui.PushRectNoDepth(null, new Vector2f(1f, 0.5f));
-			ui.AttachChildRect<CuttingUIRect>();
-			var scroll = ui.AttachComponentToStack<UIScrollInteraction>();
-			scroll.OnScroll.Target = ui.AttachChildRect<BasicScrollRect>().Scroll;
-			ui.AttachChildRect<VerticalList>(null, null, 0.1f);
+			ui.AttachChildRect<CuttingUI3DRect>();
+			var scroll = ui.AttachComponentToStack<UI3DScrollInteraction>();
+			scroll.OnScroll.Target = ui.AttachChildRect<BasicScrollUI3DRect>().Scroll;
+			ui.AttachChildRect<UI3DVerticalList>(null, null, 0.1f);
 			foreach (var item in TargetElement.components) {
 				var observer = item.GetObserver();
 				if (observer is not null) {

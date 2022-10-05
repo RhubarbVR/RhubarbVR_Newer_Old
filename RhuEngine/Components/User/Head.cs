@@ -3,6 +3,7 @@ using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 using RhuEngine.Linker;
+using RhuEngine.Components.Visuals;
 
 namespace RhuEngine.Components
 {
@@ -32,7 +33,7 @@ namespace RhuEngine.Components
 			entity.rotation.Value = Quaternionf.CreateFromEuler(0, 90, 0);
 			invr.isNotVR.Target = entity.enabled;
 			var (mesh,mrit,render) = entity.AttachMeshWithMeshRender<SpriteMesh, UnlitMaterial>();
-			var colorer = entity.AttachComponent<UIColorAssign>();
+			var colorer = entity.AttachComponent<ColorAssign>();
 			colorer.TargetColor.Target = render.colorLinear;
 			colorer.ColorShif.Value = 1.9f;
 			colorer.Alpha.Value = 0.9f;

@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 	{
 		public readonly Linker<bool> CheckBox;
 
-		protected override void BuildUI(UIBuilder ui) {
+		protected override void BuildUI(UI3DBuilder ui) {
 			ui.PushRectNoDepth(null, new Vector2f(0, 1f));
 			ui.SetOffsetMinMax(null, new Vector2f(ELMENTHIGHTSIZE, 0));
 			ui.PushRectNoDepth(new Vector2f(0.1f, 0f), new Vector2f(0.9f, 1f));

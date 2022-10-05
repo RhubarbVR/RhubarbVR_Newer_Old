@@ -51,17 +51,17 @@ namespace RhuEngine.Components.PrivateSpace
 		[NoSave]
 		[NoSync]
 		[NoSyncUpdate]
-		private UIText _text;
+		private UI3DText _text;
 		[NoLoad]
 		[NoSave]
 		[NoSync]
 		[NoSyncUpdate]
-		private UIText _editorUiText;
+		private UI3DText _editorUiText;
 
 		public override void LoadUI(Entity uiRoot) {
-			var ma = uiRoot.AttachComponent<UIRect>();
+			var ma = uiRoot.AttachComponent<UI3DRect>();
 			var mit = window.MainMit.Target;
-			var uiBuilder = new UIBuilder(uiRoot, mit, ma,true);
+			var uiBuilder = new UI3DBuilder(uiRoot, mit, ma,true);
 			uiBuilder.PushRect(null,null,0);
 			uiBuilder.PushRect(null, null, 0);
 			uiBuilder.SetOffsetMinMax(new Vector2f(0.2f, 1), null);

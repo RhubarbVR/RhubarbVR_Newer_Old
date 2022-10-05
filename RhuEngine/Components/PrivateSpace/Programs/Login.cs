@@ -62,22 +62,22 @@ namespace RhuEngine.Components.PrivateSpace
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public UIText Password;
+		public UI3DText Password;
 		[NoSave]
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public UIText ConfPassword;
+		public UI3DText ConfPassword;
 		[NoSave]
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public UIText UserName;
+		public UI3DText UserName;
 		[NoSave]
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public UIText Email;
+		public UI3DText Email;
 
 
 		[Exposed]
@@ -151,9 +151,9 @@ namespace RhuEngine.Components.PrivateSpace
 			Engine.netApiManager.Client.HasGoneOfline += () => Close();
 
 			window.CloseButton.Value = false;
-			var ma = uiRoot.AttachComponent<UIRect>();
+			var ma = uiRoot.AttachComponent<UI3DRect>();
 			var mit = window.MainMit.Target;
-			var uiBuilder = new UIBuilder(uiRoot, mit, ma,true);
+			var uiBuilder = new UI3DBuilder(uiRoot, mit, ma,true);
 			uiBuilder.PushRect(new Vector2f(0.5f,0.6f), new Vector2f(0.5f, 0.6f),0);
 			var windowSize = new Vector2f(2.5f, 3.25f);
 			uiBuilder.SetOffsetMinMax(-windowSize, windowSize);
@@ -164,7 +164,7 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PopRect();
 			uiBuilder.PushRect(new Vector2f(0, 0), new Vector2f(1, 0.85f),0);
 			uiBuilder.PushRect(new Vector2f(0.01f), new Vector2f(0.99f),0);
-			var list = uiBuilder.AttachChildRect<VerticalList>();
+			var list = uiBuilder.AttachChildRect<UI3DVerticalList>();
 			list.Fit.Value = true;
 			list.Depth.Value = 0f;
 

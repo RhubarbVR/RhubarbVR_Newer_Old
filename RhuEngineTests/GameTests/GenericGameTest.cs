@@ -464,7 +464,7 @@ namespace RhuEngine.GameTests.Tests
 				var entity = rootEntity.AddChild($"TEst{i}");
 				entity.AttachComponent<MeshRender>();
 				entity.AttachComponent<Grabbable>();
-				entity.AttachComponent<UIRect>();
+				entity.AttachComponent<UI3DRect>();
 				entity.AttachComponent<Spinner>();
 				entity.AttachComponent<RawECMAScript>();
 			}

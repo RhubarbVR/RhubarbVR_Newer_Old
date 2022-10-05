@@ -106,18 +106,18 @@ namespace RhuEngine.Components
 				WinEntit.rotation.Value = Quaternionf.Pitched.Inverse;
 				WinEntit.position.Value = new Vector3f(1,1, 1);
 				var gabable = WinEntit.AttachComponent<Grabbable>();
-				var attachComp = WinEntit.AttachComponent<UICanvas>();
+				var attachComp = WinEntit.AttachComponent<UI3DCanvas>();
 				attachComp.scale.Value = new Vector3f(2, 5, 1);
 				var uimit = WinEntit.AttachComponent<UnlitMaterial>();
 				uimit.DullSided.Value = true;
-				var uiBuilder = new UIBuilder(WinEntit, uimit);
+				var uiBuilder = new UI3DBuilder(WinEntit, uimit);
 				uiBuilder.PushRect();
 				uiBuilder.AddRectangle(0,0.9f,true);
 
-				var grabAction = uiBuilder.AttachComponentToStack<UIGrabInteraction>();
+				var grabAction = uiBuilder.AttachComponentToStack<UI3DGrabInteraction>();
 				grabAction.Grabeded.Target = gabable.RemoteGrab;
 
-				var list = uiBuilder.AttachChildRect<VerticalList>();
+				var list = uiBuilder.AttachChildRect<UI3DVerticalList>();
 				list.Fit.Value = true;
 
 				uiBuilder.PushRect();

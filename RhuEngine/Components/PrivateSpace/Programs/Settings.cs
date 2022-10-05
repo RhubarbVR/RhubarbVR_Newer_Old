@@ -24,9 +24,9 @@ namespace RhuEngine.Components.PrivateSpace
 		public override bool LocalName => true;
 
 		public override void LoadUI(Entity uiRoot) {
-			var ma = uiRoot.AttachComponent<UIRect>();
+			var ma = uiRoot.AttachComponent<UI3DRect>();
 			var mit = window.MainMit.Target;
-			var uiBuilder = new UIBuilder(uiRoot, mit, ma,true);
+			var uiBuilder = new UI3DBuilder(uiRoot, mit, ma,true);
 			uiBuilder.PushRect(new Vector2f(.25f), new Vector2f(.75f));
 			uiBuilder.AddGenaricCheckBox(window.IconMit.Target, window.IconSprite.Target);
 		}

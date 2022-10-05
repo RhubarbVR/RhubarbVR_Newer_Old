@@ -11,12 +11,12 @@ namespace RhuEngine.Components
 	public abstract class ValueObserverBase<T> : ObserverSyncElement<ILinkerMember<T>>
 	{
 
-		protected abstract void BuildUI(UIBuilder ui);
+		protected abstract void BuildUI(UI3DBuilder ui);
 
 		protected abstract void ValueChanged();
 
 		IChangeable _changeable;
-		protected override void LoadSideUI(UIBuilder ui) {
+		protected override void LoadSideUI(UI3DBuilder ui) {
 			BuildUI(ui);
 		}
 

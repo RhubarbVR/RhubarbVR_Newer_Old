@@ -11,10 +11,10 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Developer/Observer/Observers" })]
 	public sealed class ObserverComponent : ObserverBase<Component>
 	{
-		protected override UIRect BuildMainUIRect() {
-			return Entity.AttachComponent<VerticalList>();
+		protected override UI3DRect BuildMainUIRect() {
+			return Entity.AttachComponent<UI3DVerticalList>();
 		}
-		protected override void LoadObservedUI(UIBuilder ui) {
+		protected override void LoadObservedUI(UI3DBuilder ui) {
 			if(TargetElement is null) {
 				return;
 			}

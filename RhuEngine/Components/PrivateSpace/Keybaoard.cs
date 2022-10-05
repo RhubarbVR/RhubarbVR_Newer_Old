@@ -26,7 +26,7 @@ namespace RhuEngine.Components
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public UICanvas uICanvas;
+		public UI3DCanvas uICanvas;
 		[NoSave]
 		[NoSync]
 		[NoLoad]
@@ -50,7 +50,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(LoadKeyboard))]
 		public readonly Sync<KeyBoardLayOutSelection> CurrentLayout;
 		protected override void OnAttach() {
-			uICanvas = Entity.AddChild("Canvas").AttachComponent<UICanvas>();
+			uICanvas = Entity.AddChild("Canvas").AttachComponent<UI3DCanvas>();
 			uICanvas.scale.Value = new Vector3f(10f, 3.3f, 1);
 			mit = Entity.AttachComponent<UnlitMaterial>();
 			mit.DullSided.Value = true;
@@ -93,8 +93,8 @@ namespace RhuEngine.Components
 			}
 			RLog.Info("Starting Building keyboard");
 			try {
-				var uiBuilder = new UIBuilder(uICanvas.Entity, mit);
-				var grabber = uiBuilder.CurretRectEntity.AttachComponent<UIGrabInteraction>();
+				var uiBuilder = new UI3DBuilder(uICanvas.Entity, mit);
+				var grabber = uiBuilder.CurretRectEntity.AttachComponent<UI3DGrabInteraction>();
 				grabber.Grabeded.Target = grabable.RemoteGrab;
 				uiBuilder.PushRect();
 				uiBuilder.AddRectangle(0, 0.9f, true);

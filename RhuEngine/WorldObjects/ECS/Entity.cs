@@ -132,7 +132,7 @@ namespace RhuEngine.WorldObjects.ECS
 				_hasUpdatingComponentSave = !_hasUpdatingComponentSave;
 				UpdateEnableList();
 			}
-			UIRect = GetFirstComponent<UIRect>();
+			UIRect = GetFirstComponent<UI3DRect>();
 		}
 
 		private void OnOrderOffsetChange() {
@@ -536,7 +536,7 @@ namespace RhuEngine.WorldObjects.ECS
 		[NoSync]
 		[NoLoad]
 		[UnExsposed]
-		public UIRect UIRect { get; private set; }
+		public UI3DRect UIRect { get; private set; }
 
 		public Entity() {
 		}

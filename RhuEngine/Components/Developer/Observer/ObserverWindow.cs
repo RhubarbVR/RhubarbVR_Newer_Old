@@ -32,7 +32,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			var ob = addTo.AddChild("Observer");
-			ob.AttachComponent<UIRect>();
+			ob.AttachComponent<UI3DRect>();
 			CurrentObserver.Target = ob.AttachComponent<IObserver>(type);
 			var mit = TargetWindow.Target?.MainMit.Target;
 			if (mit is null) {
@@ -55,7 +55,7 @@ namespace RhuEngine.Components
 			newWindow.PinChanged.Target = PinWindow;
 			newWindow.MinimizeButton.Value = false;
 			newWindow.Canvas.Target.scale.Value *= new Vector3f(1, 1.5f, 1);
-			newWindow.PannelRoot.Target?.GetFirstComponentOrAttach<UIRect>();
+			newWindow.PannelRoot.Target?.GetFirstComponentOrAttach<UI3DRect>();
 		}
 
 		[Exposed]

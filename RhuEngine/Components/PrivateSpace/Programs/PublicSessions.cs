@@ -22,7 +22,7 @@ namespace RhuEngine.Components.PrivateSpace
 		public override string ProgramName => "Programs.PublicSessions.Name";
 
 		public override bool LocalName => true;
-		private UIBuilder _uiBuilder;
+		private UI3DBuilder _uiBuilder;
 		[Exposed]
 		public void JoinSession(string id,string name) {
 			if(Guid.TryParse(id, out var data)) {
@@ -43,7 +43,7 @@ namespace RhuEngine.Components.PrivateSpace
 					_uiBuilder.PushRectNoDepth();
 					_uiBuilder.PushRect(null, null, 0);
 					_uiBuilder.PushRect(new Vector2f(0.1f), new Vector2f(0.9f));
-					var button = _uiBuilder.AttachComponentToStack<UIButtonInteraction>();
+					var button = _uiBuilder.AttachComponentToStack<UI3DButtonInteraction>();
 					var buttonEvent = _uiBuilder.AttachComponentToStack<ButtonEventManager>();
 					button.ButtonEvent.Target = buttonEvent.Call;
 					var sessionJoin = _uiBuilder.AttachComponentToStack<AddTwoValuePram<string, string>>();
@@ -70,17 +70,17 @@ namespace RhuEngine.Components.PrivateSpace
 		}
 
 		public override void LoadUI(Entity uiRoot) {
-			var ma = uiRoot.AttachComponent<UIRect>();
+			var ma = uiRoot.AttachComponent<UI3DRect>();
 			var mit = window.MainMit.Target;
-			_uiBuilder = new UIBuilder(uiRoot, mit, ma,true);
+			_uiBuilder = new UI3DBuilder(uiRoot, mit, ma,true);
 			_uiBuilder.PushRect();
 			_uiBuilder.PushRectNoDepth(new Vector2f(0,0.9f));
 			_uiBuilder.AddButtonEventLabled("Common.Refresh", null, 2, 1, Refresh,null,null,true,0.1f,0.9f);
 			_uiBuilder.PopRect();
 			_uiBuilder.PushRectNoDepth(null,new Vector2f(1f,0.9f));
-			_uiBuilder.AttachChildRect<CuttingUIRect>(null, null, 0);
-			var scroller = _uiBuilder.AttachComponentToStack<UIScrollInteraction>();
-			var grid = _uiBuilder.AttachChildRect<Grid>();
+			_uiBuilder.AttachChildRect<CuttingUI3DRect>(null, null, 0);
+			var scroller = _uiBuilder.AttachComponentToStack<UI3DScrollInteraction>();
+			var grid = _uiBuilder.AttachChildRect<UI3DGrid>();
 			scroller.OnScroll.Target = grid.Scroll;
 			Refresh();
 		}

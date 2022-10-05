@@ -13,7 +13,7 @@ namespace RhuEngine.Components
 	{
 		public readonly SyncRef<ILinkerMember<string>> editorValue;
 		IChangeable _changeable;
-		protected override void LoadSideUI(UIBuilder ui) {
+		protected override void LoadSideUI(UI3DBuilder ui) {
 			var type = TargetElement.GetValue()?.GetType();
 			var canBeNull = !(type?.IsValueType ?? false);
 			if (canBeNull) {

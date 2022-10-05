@@ -66,14 +66,14 @@ namespace RhuEngine.Components
 
 		}
 
-		public void BuildStart(TaskBar taskBar, UIRect parentrect, AssetProvider<RMaterial> mit, AssetProvider<RMaterial> iconsMit, SpriteProvder iconsSprite) {
+		public void BuildStart(TaskBar taskBar, UI3DRect parentrect, AssetProvider<RMaterial> mit, AssetProvider<RMaterial> iconsMit, SpriteProvder iconsSprite) {
 			_taskBar = taskBar;
-			var uibuilder = new UIBuilder(Entity, mit, parentrect, true);
+			var uibuilder = new UI3DBuilder(Entity, mit, parentrect, true);
 			var buttonColor = new Colorf(0.1f, 0.8f);
-			var scroller = uibuilder.AttachComponentToStack<UIScrollInteraction>();
-			uibuilder.AttachChildRect<CuttingUIRect>(new Vector2f(0), new Vector2f(0.5f, 1), 0);
-			var itemScroller = uibuilder.AttachChildRect<BasicScrollRect>(null, null, 0);
-			var itemslist = uibuilder.AttachChildRect<VerticalList>(null, null, 0);
+			var scroller = uibuilder.AttachComponentToStack<UI3DScrollInteraction>();
+			uibuilder.AttachChildRect<CuttingUI3DRect>(new Vector2f(0), new Vector2f(0.5f, 1), 0);
+			var itemScroller = uibuilder.AttachChildRect<BasicScrollUI3DRect>(null, null, 0);
+			var itemslist = uibuilder.AttachChildRect<UI3DVerticalList>(null, null, 0);
 			scroller.OnScroll.Target = itemScroller.Scroll;
 			var programs =
 						 from assem in AppDomain.CurrentDomain.GetAssemblies().AsParallel()
@@ -116,7 +116,7 @@ namespace RhuEngine.Components
 			uibuilder.PopRect();
 			uibuilder.PopRect();
 
-			var list = uibuilder.AttachChildRect<VerticalList>(new Vector2f(0.5f, 0), new Vector2f(1), 0);
+			var list = uibuilder.AttachChildRect<UI3DVerticalList>(new Vector2f(0.5f, 0), new Vector2f(1), 0);
 			list.Fit.Value = true;
 
 			uibuilder.PushRect(null, null, 0);

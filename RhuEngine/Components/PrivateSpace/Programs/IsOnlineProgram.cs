@@ -44,13 +44,13 @@ namespace RhuEngine.Components.PrivateSpace
 		public void CheckIfOnline() {
 			Task.Run(Engine.netApiManager.Client.Check);
 		}
-		UIText _uIText;
+		UI3DText _uIText;
 		public override void LoadUI(Entity uiRoot) {
 			Engine.netApiManager.Client.HasGoneOnline += () => Close();
 			window.CloseButton.Value = false;
-			var ma = uiRoot.AttachComponent<UIRect>();
+			var ma = uiRoot.AttachComponent<UI3DRect>();
 			var mit = window.MainMit.Target;
-			var uiBuilder = new UIBuilder(uiRoot, mit, ma,true);
+			var uiBuilder = new UI3DBuilder(uiRoot, mit, ma,true);
 			uiBuilder.PushRectNoDepth(new Vector2f(0.1f, 0.3f), new Vector2f(0.9f, 0.9f));
 			uiBuilder.PushRectNoDepth(new Vector2f(0f, 0.5f));
 			uiBuilder.AddImg(World.RootEntity.GetFirstComponentOrAttach<RhubarbLogo>()).Item2.Transparency.Value = Transparency.Blend;

@@ -91,7 +91,7 @@ namespace RhuEngine.Components
 			}
 			try {
 				if (world.PhysicsSim.RayTest(ref Frompos, ref ToPos, out var collider, out var hitnormal, out var hitpointworld)) {
-					if (collider.CustomObject is UICanvas uIComponent) {
+					if (collider.CustomObject is UI3DCanvas uIComponent) {
 						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
 						uIComponent.ProcessHitTouch(handed, hitnormal, hitpointworld, handedSide);
 					}
@@ -127,7 +127,7 @@ namespace RhuEngine.Components
 		public bool RunLaserCastInWorld(World world, ref Vector3f headFrompos, ref Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side) {
 			if (world.PhysicsSim.RayTest(ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
 
-				if (collider.CustomObject is UICanvas uIComponent) {
+				if (collider.CustomObject is UI3DCanvas uIComponent) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.005f), new Colorf(1, 1, 0, 0.5f));
 					uIComponent.ProcessHitLazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
 				}

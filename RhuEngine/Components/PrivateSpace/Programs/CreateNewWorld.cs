@@ -43,9 +43,9 @@ namespace RhuEngine.Components.PrivateSpace
 		}
 
 		public override void LoadUI(Entity uiRoot) {
-			var ma = uiRoot.AttachComponent<UIRect>();
+			var ma = uiRoot.AttachComponent<UI3DRect>();
 			var mit = window.MainMit.Target;
-			var uiBuilder = new UIBuilder(uiRoot, mit, ma,true);
+			var uiBuilder = new UI3DBuilder(uiRoot, mit, ma,true);
 			uiBuilder.PushRect();
 			var button = uiBuilder.AddButton();
 			button.ButtonEvent.Target = CreateNewWorld;

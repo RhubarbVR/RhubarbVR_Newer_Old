@@ -221,7 +221,7 @@ namespace RhuEngine
 
 		public AssetManager assetManager;
 
-		public UIManager uiManager = new();
+		public UI3DManager uiManager = new();
 
 		public InputManager inputManager = new();
 

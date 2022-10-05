@@ -9,17 +9,17 @@ namespace RhuEngine.Components
 {
 	public abstract class ObserverSyncElement<T> : ObserverBase<T> where T : class, ISyncMember
 	{
-		protected override UIRect BuildMainUIRect() {
-			var rect = Entity.AttachComponent<UIRect>();
+		protected override UI3DRect BuildMainUIRect() {
+			var rect = Entity.AttachComponent<UI3DRect>();
 			rect.AnchorMin.Value = new Vector2f(0, 0);
 			rect.AnchorMax.Value = new Vector2f(1f, 0f);
 			rect.OffsetMin.Value = new Vector2f(0, -ELMENTHIGHTSIZE);
 			return rect;
 		}
 
-		protected abstract void LoadSideUI(UIBuilder ui);
+		protected abstract void LoadSideUI(UI3DBuilder ui);
 
-		protected override void LoadObservedUI(UIBuilder ui) {
+		protected override void LoadObservedUI(UI3DBuilder ui) {
 			if (TargetElement is null) {
 				return;
 			}

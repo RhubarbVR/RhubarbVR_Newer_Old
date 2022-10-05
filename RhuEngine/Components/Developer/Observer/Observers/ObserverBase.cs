@@ -68,13 +68,13 @@ namespace RhuEngine.Components
 			if(Entity.parent.Target is null) {
 				return;
 			}
-			var uiBuilder = new UIBuilder(Entity, Mat.Target, Entity.UIRect?? BuildMainUIRect(), true,true);
+			var uiBuilder = new UI3DBuilder(Entity, Mat.Target, Entity.UIRect?? BuildMainUIRect(), true,true);
 			LoadObservedUI(uiBuilder);
 			EveryUserOnLoad();
 		}
-		protected abstract UIRect BuildMainUIRect();
+		protected abstract UI3DRect BuildMainUIRect();
 
-		protected abstract void LoadObservedUI(UIBuilder ui);
+		protected abstract void LoadObservedUI(UI3DBuilder ui);
 
 		public void SetObserverd(IWorldObject target) {
 			Observerd.TargetIWorldObject = target;

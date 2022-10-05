@@ -8,6 +8,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using System.Threading;
 using System.Threading.Tasks;
+using RhuEngine.Components.Visuals;
 
 namespace RhuEngine
 {
@@ -21,9 +22,9 @@ namespace RhuEngine
 			var coloider = floor.AttachComponent<CylinderShape>();
 			var (mesh, mit, render) = floor.AttachMeshWithMeshRender<CylinderMesh, UnlitMaterial>();
 			mit.Transparency.Value = Transparency.Blend;
-			var colorFollower = floor.AttachComponent<UIColorAssign>();
+			var colorFollower = floor.AttachComponent<ColorAssign>();
 			colorFollower.Alpha.Value = 0.75f;
-			colorFollower.Color.Value = UIColorAssign.ColorSelection.Primary;
+			colorFollower.Color.Value = ColorAssign.ColorSelection.Primary;
 			colorFollower.ColorShif.Value = 0.1f;
 			colorFollower.TargetColor.Target = render.colorLinear;
 			mesh.TopRadius.Value = 4;
