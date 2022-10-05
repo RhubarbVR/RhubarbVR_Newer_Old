@@ -15,6 +15,7 @@ AudioListener = NodePath("XrOrigin3d/AudioListener3d")
 [node name="XrOrigin3d" type="XROrigin3D" parent="."]
 
 [node name="XrCamera3d" type="XRCamera3D" parent="XrOrigin3d"]
+cull_mask = 15
 environment = SubResource("Environment_ljag0")
 
 [node name="AudioListener3d" type="AudioListener3D" parent="XrOrigin3d"]
