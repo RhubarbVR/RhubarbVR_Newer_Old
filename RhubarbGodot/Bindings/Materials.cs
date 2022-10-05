@@ -189,7 +189,8 @@ namespace RhubarbVR.Bindings
 			set {
 				YourData?.UpdateData((data) => {
 					if (data is StandardMaterial3D material3D) {
-						material3D.NoDepthTest = value;
+						material3D.NoDepthTest = true;
+						material3D.DepthDrawMode = BaseMaterial3D.DepthDrawModeEnum.Disabled;
 					}
 				});
 			}

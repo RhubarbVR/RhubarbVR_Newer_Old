@@ -17,6 +17,200 @@ using RhuEngine;
 
 namespace RhubarbVR.Bindings
 {
+	public struct BoneWeight
+	{
+		private float m_Weight0;
+
+		private float m_Weight1;
+
+		private float m_Weight2;
+
+		private float m_Weight3;
+
+		private int m_BoneIndex0;
+
+		private int m_BoneIndex1;
+
+		private int m_BoneIndex2;
+
+		private int m_BoneIndex3;
+
+		//
+		// Summary:
+		//     Skinning weight for first bone.
+		public float weight0
+		{
+			get {
+				return m_Weight0;
+			}
+			set {
+				m_Weight0 = value;
+			}
+		}
+
+		//
+		// Summary:
+		//     Skinning weight for second bone.
+		public float weight1
+		{
+			get {
+				return m_Weight1;
+			}
+			set {
+				m_Weight1 = value;
+			}
+		}
+
+		//
+		// Summary:
+		//     Skinning weight for third bone.
+		public float weight2
+		{
+			get {
+				return m_Weight2;
+			}
+			set {
+				m_Weight2 = value;
+			}
+		}
+
+		//
+		// Summary:
+		//     Skinning weight for fourth bone.
+		public float weight3
+		{
+			get {
+				return m_Weight3;
+			}
+			set {
+				m_Weight3 = value;
+			}
+		}
+
+		//
+		// Summary:
+		//     Index of first bone.
+		public int boneIndex0
+		{
+			get {
+				return m_BoneIndex0;
+			}
+			set {
+				m_BoneIndex0 = value;
+			}
+		}
+
+		//
+		// Summary:
+		//     Index of second bone.
+		public int boneIndex1
+		{
+			get {
+				return m_BoneIndex1;
+			}
+			set {
+				m_BoneIndex1 = value;
+			}
+		}
+
+		//
+		// Summary:
+		//     Index of third bone.
+		public int boneIndex2
+		{
+			get {
+				return m_BoneIndex2;
+			}
+			set {
+				m_BoneIndex2 = value;
+			}
+		}
+
+		//
+		// Summary:
+		//     Index of fourth bone.
+		public int boneIndex3
+		{
+			get {
+				return m_BoneIndex3;
+			}
+			set {
+				m_BoneIndex3 = value;
+			}
+		}
+
+		public void Normalize() {
+			float totalWeight = this.weight0 + this.weight1 + this.weight2 + this.weight3;
+			if (totalWeight > 0f) {
+				float num = 1f / totalWeight;
+				this.weight0 *= num;
+				this.weight1 *= num;
+				this.weight2 *= num;
+				this.weight3 *= num;
+			}
+		}
+
+		public void AddBone(int boneIndex, float boneWeight) {
+			var targetLayer = -1;
+			var smallestValue = float.MaxValue;
+			for (int i = 0; i < 4; i++) {
+				var currentLayerWeight = i switch {
+					0 => this.weight0,
+					1 => this.weight1,
+					2 => this.weight2,
+					_ => this.weight3,
+				};
+				if (currentLayerWeight < smallestValue) {
+					smallestValue = currentLayerWeight;
+					targetLayer = i;
+				}
+			}
+			if (boneWeight > smallestValue) {
+				switch (targetLayer) {
+					case 0:
+						this.weight0 = boneWeight;
+						this.boneIndex0 = boneIndex;
+						break;
+					case 1:
+						this.weight1 = boneWeight;
+						this.boneIndex1 = boneIndex;
+						break;
+					case 2:
+						this.weight2 = boneWeight;
+						this.boneIndex2 = boneIndex;
+						break;
+					case 3:
+						this.weight3 = boneWeight;
+						this.boneIndex3 = boneIndex;
+						break;
+					default:
+						break;
+				}
+			}
+		}
+
+		public override int GetHashCode() {
+			return boneIndex0.GetHashCode() ^ (boneIndex1.GetHashCode() << 2) ^ (boneIndex2.GetHashCode() >> 2) ^ (boneIndex3.GetHashCode() >> 1) ^ (weight0.GetHashCode() << 5) ^ (weight1.GetHashCode() << 4) ^ (weight2.GetHashCode() >> 4) ^ (weight3.GetHashCode() >> 3);
+		}
+
+		public override bool Equals(object other) {
+			return other is BoneWeight && Equals((BoneWeight)other);
+		}
+
+		public bool Equals(BoneWeight other) {
+			return boneIndex0.Equals(other.boneIndex0) && boneIndex1.Equals(other.boneIndex1) && boneIndex2.Equals(other.boneIndex2) && boneIndex3.Equals(other.boneIndex3) && new Vector4(weight0, weight1, weight2, weight3).Equals(new Vector4(other.weight0, other.weight1, other.weight2, other.weight3));
+		}
+
+		public static bool operator ==(BoneWeight lhs, BoneWeight rhs) {
+			return lhs.boneIndex0 == rhs.boneIndex0 && lhs.boneIndex1 == rhs.boneIndex1 && lhs.boneIndex2 == rhs.boneIndex2 && lhs.boneIndex3 == rhs.boneIndex3 && new Vector4(lhs.weight0, lhs.weight1, lhs.weight2, lhs.weight3) == new Vector4(rhs.weight0, rhs.weight1, rhs.weight2, rhs.weight3);
+		}
+
+		public static bool operator !=(BoneWeight lhs, BoneWeight rhs) {
+			return !(lhs == rhs);
+		}
+	}
+
+
 	public class GodotMesh : IRMesh
 	{
 		public void Draw(RMaterial loadingLogo, Matrix p, Colorf tint, int zDepth, RenderLayer layer, int submesh) {
@@ -72,8 +266,15 @@ namespace RhubarbVR.Bindings
 
 		public (Mesh.PrimitiveType, Array)[] subMeshes = SArray.Empty<(Mesh.PrimitiveType, Array)>();
 
-		private static (Mesh.PrimitiveType, Array) CreateSubmesh(RPrimitiveType rPrimitiveType, Vector3f[][] uvs, int[] indexs, Vector3[] vectors, Vector3[] normals, Color[] color, float[] tangents, int[] bones, float[] wights) {
-			if(vectors.Length == 0) {
+		private static IEnumerable<float> GetData(Vector4 data) {
+			yield return data.x;
+			yield return data.y;
+			yield return data.z;
+			yield return data.w;
+		}
+
+		private static (Mesh.PrimitiveType, Array) CreateSubmesh(RPrimitiveType rPrimitiveType, Vector3f[][] uvs, int[] indexs, Vector3[] vectors, Vector3[] normals, Color[] color, Vector4[] tangents, int[] bones, float[] wights) {
+			if (vectors.Length == 0) {
 				return (Mesh.PrimitiveType.Points, null);
 			}
 			var arrays = new Array();
@@ -83,7 +284,7 @@ namespace RhubarbVR.Bindings
 				arrays[(int)Mesh.ArrayType.Normal] = normals.AsSpan();
 			}
 			if (tangents is not null) {
-				arrays[(int)Mesh.ArrayType.Tangent] = tangents.AsSpan();
+				arrays[(int)Mesh.ArrayType.Tangent] = tangents.SelectMany(GetData).ToArray().AsSpan();
 			}
 			if (color is not null) {
 				arrays[(int)Mesh.ArrayType.Color] = color.AsSpan();
@@ -235,7 +436,7 @@ namespace RhubarbVR.Bindings
 
 		public void Init(RMesh rMesh) {
 			RMesh = rMesh;
-			if(LoadedMesh is not null) {
+			if (LoadedMesh is not null) {
 				return;
 			}
 			Name = Guid.NewGuid().ToString();
@@ -253,6 +454,122 @@ namespace RhubarbVR.Bindings
 				return;
 			}
 			if (mesh is IComplexMesh complexMesh) {
+				var cvertices = new Vector3[complexMesh.Vertices.Count];
+				for (var i = 0; i < complexMesh.Vertices.Count; i++) {
+					cvertices[i] = new Vector3(complexMesh.Vertices[i].x, complexMesh.Vertices[i].y, complexMesh.Vertices[i].z);
+				}
+				var cnormals = new Vector3[complexMesh.Normals.Count];
+				for (var i = 0; i < complexMesh.Normals.Count; i++) {
+					cnormals[i] = new Vector3(complexMesh.Normals[i].x, complexMesh.Normals[i].y, complexMesh.Normals[i].z);
+				}
+				var ctangents = new Vector4[complexMesh.Tangents.Count];
+				for (var i = 0; i < complexMesh.Tangents.Count; i++) {
+					var tangent = complexMesh.Tangents[i];
+					var crossnt = complexMesh.Normals[i].Cross(tangent);
+					ctangents[i] = new Vector4(tangent.x, tangent.y, tangent.z, (crossnt.Dot(complexMesh.BiTangents[i]) <= 0f) ? 1 : (-1));
+				}
+				var cuve = new Vector3f[complexMesh.TexCoords.Length][];
+				for (var i = 0; i < complexMesh.TexCoords.Length; i++) {
+					if (complexMesh.TexCoords[i].Count == 0) {
+						System.Array.Resize(ref cuve, i);
+						break;
+					}
+					cuve[i] = new Vector3f[complexMesh.Vertices.Count];
+					for (var x = 0; x < complexMesh.Vertices.Count; x++) {
+						if (complexMesh.TexCoords[i].Count > i) {
+							cuve[i][x] = (new Vector3f(complexMesh.TexCoords[i][x].x, complexMesh.TexCoords[i][x].y, complexMesh.TexCoords[i][x].z));
+						}
+					}
+				}
+				var colorAmount = 0;
+				if (complexMesh.Colors.Length > 0) {
+					colorAmount = complexMesh.Colors[0].Count;
+				}
+				var ccolors = new Color[colorAmount];
+				if (complexMesh.Colors.Length > 0) {
+					Parallel.For(0, complexMesh.Colors[0].Count, (i) => ccolors[i] = new Color(complexMesh.Colors[0][i].r, complexMesh.Colors[0][i].g, complexMesh.Colors[0][i].b, complexMesh.Colors[0][i].a));
+				}
+				if (cnormals.Length == 0) {
+					cnormals = null;
+				}
+				if (ccolors.Length == 0) {
+					ccolors = null;
+				}
+				if (ctangents.Length == 0) {
+					ctangents = null;
+				}
+				BoneWeight[] BoneVertexWights = null;
+				if (complexMesh.HasBones) {
+					BoneVertexWights = new BoneWeight[complexMesh.VertexCount];
+					var BoneIndex = 0;
+					foreach (var Bone in complexMesh.Bones) {
+						foreach (var vertexWe in Bone.VertexWeights) {
+							BoneVertexWights[vertexWe.VertexID].AddBone(BoneIndex, vertexWe.Weight);
+						}
+						BoneIndex++;
+					}
+				}
+				int[] bones = null;
+				float[] wights = null;
+				if (BoneVertexWights is not null) {
+					bones = new int[BoneVertexWights.Length * 4];
+					wights = new float[BoneVertexWights.Length * 4];
+					for (int i = 0; i < BoneVertexWights.Length; i++) {
+						var currentondex = i * 4;
+						var currentBone = BoneVertexWights[i];
+						currentBone.Normalize();
+						bones[currentondex] = currentBone.boneIndex0;
+						bones[currentondex + 1] = currentBone.boneIndex1;
+						bones[currentondex + 2] = currentBone.boneIndex2;
+						bones[currentondex + 3] = currentBone.boneIndex3;
+						wights[currentondex] = currentBone.weight0;
+						wights[currentondex + 1] = currentBone.weight1;
+						wights[currentondex + 2] = currentBone.weight2;
+						wights[currentondex + 3] = currentBone.weight3;
+					}
+				}
+
+
+
+				//if (complexMesh.HasMeshAttachments) {
+				//	blendShapeFrames = new BlendShapeFrame[complexMesh.MeshAttachments.Count()];
+				//	var current = 0;
+				//	foreach (var item in complexMesh.MeshAttachments) {
+				//		try {
+				//			blendShapeFrames[current].vertices = new Vector3[complexMesh.VertexCount];
+				//			var smallist = Math.Min(item.Vertices.Count, complexMesh.VertexCount);
+				//			for (int i = 0; i < smallist; i++) {
+				//				blendShapeFrames[current].vertices[i] = new Vector3(item.Vertices[i].x, item.Vertices[i].y, item.Vertices[i].z) - cvertices[i];
+				//			}
+				//			blendShapeFrames[current].normals = new Vector3[complexMesh.VertexCount];
+				//			var smallistnorm = Math.Min(item.Normals.Count, complexMesh.VertexCount);
+				//			for (int i = 0; i < smallistnorm; i++) {
+				//				blendShapeFrames[current].normals[i] = new Vector3(item.Normals[i].x, item.Normals[i].y, item.Normals[i].z) - cnormals[i];
+				//			}
+				//			blendShapeFrames[current].tangents = new Vector3[complexMesh.VertexCount];
+				//			var smallitsTang = Math.Min(complexMesh.Tangents.Count, complexMesh.VertexCount);
+				//			for (int i = 0; i < smallitsTang; i++) {
+				//				var tangent = item.Tangents[i];
+				//				blendShapeFrames[current].tangents[i] = new Vector3(tangent.x - ctangents[i].x, tangent.y - ctangents[i].y, tangent.z - ctangents[i].z);
+				//			}
+				//			blendShapeFrames[current].name = item.Name;
+				//			blendShapeFrames[current].wight = item.Weight;
+				//			current++;
+				//		}
+				//		catch { }
+				//	}
+				//}
+
+				Name = "Complex Mesh:" + complexMesh.MeshName;
+				subMeshes = new (Mesh.PrimitiveType, Array)[complexMesh.SubMeshes.Count() + 1];
+				var indes = LoadIndexs(complexMesh.PrimitiveType, complexMesh.Faces).ToArray();
+				subMeshes[0] = CreateSubmesh(complexMesh.PrimitiveType, cuve, indes, cvertices, cnormals, ccolors, ctangents, bones, wights);
+				var currentIndex = 0;
+				foreach (var item in complexMesh.SubMeshes) {
+					currentIndex++;
+					indes = LoadIndexs(item.PrimitiveType, item.Faces).ToArray();
+					subMeshes[currentIndex] = CreateSubmesh(complexMesh.PrimitiveType, cuve, indes, cvertices, cnormals, ccolors, ctangents, bones, wights);
+				}
 				return;
 			}
 			if (!mesh.IsTriangleMesh) {

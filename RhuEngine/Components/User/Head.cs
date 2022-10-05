@@ -42,7 +42,7 @@ namespace RhuEngine.Components
 			mrit.MainTexture.Target = ea;
 			mrit.Transparency.Value = Transparency.Blend;
 			RenderThread.ExecuteOnEndOfFrame(() => mrit._material.NoDepthTest = true);
-			mrit.RenderOrderOffset.Value = 1000000000;
+			mrit.RenderOrderOffset.Value = 100;
 			sprite.GridSize.Value = new Vector2i(26, 7);
 			mesh.Dimensions.Value = new Vector2f(1.25f);
 			mesh.Sprite.Target = sprite;

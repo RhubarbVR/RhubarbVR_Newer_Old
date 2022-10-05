@@ -269,7 +269,7 @@ namespace RhuEngine.Components
 			}
 			RenderComponents.SafeOperation((renderComs) => {
 				foreach (var item in renderComs) {
-					item.Render(matrix, (int)Entity.Depth);
+					item.Render(matrix, (int)Entity.Depth - (int)(CachedCanvas.Entity).Depth);
 				}
 			});
 			foreach (Entity item in Entity.children) {
