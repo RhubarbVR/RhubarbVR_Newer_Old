@@ -299,8 +299,6 @@ namespace RhuEngine.Components
 				local.TargetValue.Target = uitext.Text;
 				local.Key.Value = taskBarItem.Name;
 			}
-			uitext.VerticalAlien.Value = EVerticalAlien.Center;
-			uitext.HorizontalAlien.Value = EHorizontalAlien.Middle;
 			if (taskBarItem.ShowOpenFlag) {
 				var openoverlay = child.AddChild("IsOpenOverlay");
 				var openoverlayrect = openoverlay.AttachComponent<UI3DRect>();

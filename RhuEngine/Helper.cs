@@ -246,11 +246,13 @@ namespace RhuEngine
 
 		public static Entity GetClosedEntity(this IWorldObject worldObject) {
 			try {
-				return (Entity)worldObject;
+				if(worldObject is Entity entity) {
+					return entity;
+				}
 			}
 			catch {
-				return worldObject?.Parent?.GetClosedEntity();
 			}
+			return worldObject?.Parent?.GetClosedEntity();
 		}
 
 		public static User GetClosedUser(this IWorldObject worldObject) {

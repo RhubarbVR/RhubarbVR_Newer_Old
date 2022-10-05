@@ -159,7 +159,6 @@ namespace RhuEngine.Components
 			rectoffset.AnchorMin.Value = new Vector2f(0.1f);
 			var text = headerTextSide.AttachComponent<UI3DText>();
 			NameLink.Target = text.Text;
-			text.VerticalAlien.Value = EVerticalAlien.Bottom;
 			var colorassign = Entity.AttachComponent<ColorAssign>();
 			colorassign.ColorShif.Value = 1.9f;
 			colorassign.TargetColor.Target = text.StartingColor;

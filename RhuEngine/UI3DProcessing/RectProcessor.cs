@@ -12,9 +12,9 @@ using RNumerics;
 
 namespace RhuEngine.UI3DProcessing
 {
-	public sealed class RectProcessor
+	public sealed class UI3DRectProcessor
 	{
-		public RectProcessor(UI3DManager uIManager) {
+		public UI3DRectProcessor(UI3DManager uIManager) {
 			UIManager = uIManager;
 		}
 

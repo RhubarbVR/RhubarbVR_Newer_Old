@@ -66,8 +66,6 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PushRect(null, null, 0);
 			uiBuilder.SetOffsetMinMax(new Vector2f(0.2f, 1), null);
 			_text = uiBuilder.AddText("Failed To Load console data", null, 1.8f, 1, null, true);
-			_text.HorizontalAlien.Value = EHorizontalAlien.Left;
-			_text.VerticalAlien.Value = EVerticalAlien.Bottom;
 			_text.MinClamp.Value = new Vector2f(5, float.MinValue);
 			Engine.outputCapture.TextEdied += OutputCapture_TextEdied;
 			Engine.commandManager.PasswordEvent = PasswordInput;
@@ -75,8 +73,6 @@ namespace RhuEngine.Components.PrivateSpace
 			uiBuilder.PopRect();
 			uiBuilder.PushRect(null,new Vector2f(1,0), 0);
 			var editor = uiBuilder.AddTextEditor("", 0.2f, 0.9f, "", 0.1f, null, 1.9f);
-			editor.Item1.HorizontalAlien.Value = EHorizontalAlien.Left;
-			editor.Item1.VerticalAlien.Value = EVerticalAlien.Center;
 			editor.Item2.OnDoneEditing.Target = DoneEdit;
 			_editorUiText = editor.Item1;
 			_editedValue = editor.Item3;

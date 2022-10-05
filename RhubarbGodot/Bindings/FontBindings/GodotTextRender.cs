@@ -130,11 +130,15 @@ namespace RhubarbVR.Bindings.FontBindings
 			if (textDraw.LabelSettings.Font is null) {
 				return;
 			}
-			var SIZE = textDraw.LabelSettings.FontSize;
-			var size = textDraw.LabelSettings.Font.GetMultilineStringSize(textDraw.Text, textDraw.HorizontalAlignment, -1, SIZE, textDraw.MaxLinesVisible, TextServer.LineBreakFlag.Mandatory | TextServer.LineBreakFlag.WordBound, TextServer.JustificationFlag.Kashida | TextServer.JustificationFlag.WordBound);
-			textDraw.CustomMinimumSize = (Vector2i)(size) + new Vector2i(SIZE, SIZE);
-			textDraw.Position = new Vector2i(SIZE / 2, SIZE / 2);
-			subViewport.Size = (Vector2i)(size) + new Vector2i(SIZE, SIZE);
+			lock (this) {
+				lock (textDraw.LabelSettings.Font) {
+					var SIZE = textDraw.LabelSettings.FontSize;
+					var size = textDraw.LabelSettings.Font.GetMultilineStringSize(textDraw.Text, textDraw.HorizontalAlignment, -1, SIZE, textDraw.MaxLinesVisible, TextServer.LineBreakFlag.Mandatory | TextServer.LineBreakFlag.WordBound, TextServer.JustificationFlag.Kashida | TextServer.JustificationFlag.WordBound);
+					textDraw.CustomMinimumSize = (Vector2i)(size) + new Vector2i(SIZE, SIZE);
+					textDraw.Position = new Vector2i(SIZE / 2, SIZE / 2);
+					subViewport.Size = (Vector2i)(size) + new Vector2i(SIZE, SIZE);
+				}
+			}
 		}
 
 		public RNumerics.Vector2i Size

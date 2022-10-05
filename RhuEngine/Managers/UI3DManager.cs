@@ -15,7 +15,7 @@ namespace RhuEngine.Managers
 	{
 		public readonly SafeList<UI3DRect> Rects = new();
 		public bool ReOrder;
-		public RectProcessor RectProcessor;
+		public UI3DRectProcessor RectProcessor;
 		public readonly HashSet<UI3DRect> UpdatedRects = new();
 		public void AddUpdatedRectComponent(UI3DRect comp) {
 			UpdatedRects.Add(comp);
@@ -65,7 +65,7 @@ namespace RhuEngine.Managers
 
 		public void Init(Engine engine) {
 			Engine = engine;
-			RectProcessor = new RectProcessor(this);
+			RectProcessor = new UI3DRectProcessor(this);
 			RLog.Info($"UI Manager sees {Environment.ProcessorCount} Threads");
 			SingleThread = Environment.ProcessorCount <= 2;
 			if (SingleThread) {
