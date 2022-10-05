@@ -10,11 +10,9 @@ using RhuEngine.WorldObjects;
 using Godot;
 namespace RhubarbVR.Bindings.ComponentLinking
 {
-
-	public abstract class WorldPositionLinked<T, T2> : EngineWorldLinkBase<T> where T : LinkedWorldComponent, new() where T2 : Node3D , new()
+	public abstract class WorldNodeLinked<T, T2> : EngineWorldLinkBase<T> where T : LinkedWorldComponent, new() where T2 : Node, new()
 	{
 		public T2 node;
-
 		public abstract string ObjectName { get; }
 
 		public override void Init() {
@@ -22,15 +20,26 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				Name = ObjectName
 			};
 			EngineRunner._.AddChild(node);
-			LinkedComp.Entity.GlobalTransformChange += Entity_GlobalTransformChange;
-			StartContinueInit();
-			UpdatePosThisFrame = true;
 		}
 		public abstract void StartContinueInit();
 
 		public override void Remove() {
-			node?.Dispose();
+			node?.Free();
 		}
+
+
+	}
+
+
+	public abstract class WorldPositionLinked<T, T2> : WorldNodeLinked<T,T2> where T : LinkedWorldComponent, new() where T2 : Node3D , new()
+	{
+		public override void Init() {
+			base.Init();
+			LinkedComp.Entity.GlobalTransformChange += Entity_GlobalTransformChange;
+			StartContinueInit();
+			UpdatePosThisFrame = true;
+		}
+
 
 		public override void Started() {
 			node?.SetVisible(true);
@@ -52,6 +61,5 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				UpdatePosThisFrame = false;
 			}
 		}
-
 	}
 }
