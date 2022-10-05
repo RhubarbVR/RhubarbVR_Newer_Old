@@ -25,7 +25,7 @@ namespace RhuEngine.Components
 				}
 			}
 			_image.SetColors(colors[0].Length, colors.Length, fullcolors);
-			RImageTexture2D.UpdateImage(_image);
+			RImageTexture2D.UpdateImageAutoSet(_image);
 		}
 
 		protected void UpdateTexture(Colorb[][] colors) {
@@ -36,7 +36,7 @@ namespace RhuEngine.Components
 				}
 			}
 			_image.SetColors(colors[0].Length, colors.Length, fullcolors);
-			RImageTexture2D.UpdateImage(_image);
+			RImageTexture2D.UpdateImageAutoSet(_image);
 		}
 		protected void UpdateTexture(Colorf[] colors, int width, int height) {
 			var fullColors = new Colorb[colors.Length];
@@ -44,12 +44,12 @@ namespace RhuEngine.Components
 				fullColors[i] = colors[i].ToBytes();
 			}
 			_image.SetColors(width, height, fullColors);
-			RImageTexture2D.UpdateImage(_image);
+			RImageTexture2D.UpdateImageAutoSet(_image);
 		}
 
 		protected void UpdateTexture(Colorb[] colors, int width, int height) {
 			_image.SetColors(width, height, colors);
-			RImageTexture2D.UpdateImage(_image);
+			RImageTexture2D.UpdateImageAutoSet(_image);
 		}
 
 		[OnChanged(nameof(ComputeTexture))]
@@ -77,8 +77,7 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-
-			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
+			RenderThread.ExecuteOnStartOfFrame(this, () => {
 				try {
 					Generate();
 				}

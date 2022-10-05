@@ -19,9 +19,22 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		public override void StartContinueInit() {
 			base.StartContinueInit();
-
+			LinkedComp.Armature.Changed += Armature_Changed;
+			Armature_Changed(null);
 		}
 
+		private void Armature_Changed(IChangeable obj) {
+			return; //Todo fix armature problems
+			var target = LinkedComp.Armature.Target?.WorldLink;
+			if (target is null) {
+				node.Skeleton = null;
+				return;
+			}
+
+			if (target is ArmatureLink armature) {
+				node.Skeleton = armature.node.GetPath();
+			}
+		}
 	}
 
 	public class MeshRenderLinkBase<T> : WorldPositionLinked<T, MeshInstance3D> where T : MeshRender, new()

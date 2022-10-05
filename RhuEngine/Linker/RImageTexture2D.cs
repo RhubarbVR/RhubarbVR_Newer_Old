@@ -58,5 +58,14 @@ namespace RhuEngine.Linker
 			_targetImage = rImage;
 		}
 
+		public void UpdateImageAutoSet(RImage rImage) {
+			if(ImageTexture2D.Width != rImage.Width || ImageTexture2D.Height != rImage.Height) {
+				SetImage(rImage);
+			}
+			else {
+				UpdateImage(rImage);
+			}
+		}
+
 	}
 }
