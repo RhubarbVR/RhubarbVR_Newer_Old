@@ -8,6 +8,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.Normal)]
 	[Category(new string[] { "User" })]
+	[AllowedOnWorldRoot]
 	public sealed class SimpleSpawn : Component
 	{
 		protected override void Step() {

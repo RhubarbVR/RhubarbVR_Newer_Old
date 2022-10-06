@@ -9,6 +9,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Materials" })]
+	[AllowedOnWorldRoot]
 	public sealed class DynamicMaterial : AssetProvider<RMaterial>
 	{
 		[OnAssetLoaded(nameof(LoadMaterial))]

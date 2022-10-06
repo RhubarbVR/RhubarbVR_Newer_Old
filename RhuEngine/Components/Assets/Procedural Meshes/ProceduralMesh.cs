@@ -5,6 +5,7 @@ using System;
 
 namespace RhuEngine.Components
 {
+	[AllowedOnWorldRoot]
 	public abstract class ProceduralMesh : AssetProvider<RMesh>
 	{
 		public RMesh loadedMesh = null;

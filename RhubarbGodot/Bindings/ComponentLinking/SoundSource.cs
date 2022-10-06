@@ -10,7 +10,7 @@ using RhuEngine.Components;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
-	public class SoundSourceLink : WorldPositionLinked<RhuEngine.Components.SoundSource, Node3D>
+	public sealed class SoundSourceLink : WorldPositionLinked<RhuEngine.Components.SoundSource, Node3D>
 	{
 		public override string ObjectName => "Sound";
 

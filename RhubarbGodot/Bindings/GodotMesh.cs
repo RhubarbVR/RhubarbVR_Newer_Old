@@ -19,146 +19,66 @@ namespace RhubarbVR.Bindings
 {
 	public struct BoneWeight
 	{
-		private float m_Weight0;
-
-		private float m_Weight1;
-
-		private float m_Weight2;
-
-		private float m_Weight3;
-
-		private int m_BoneIndex0;
-
-		private int m_BoneIndex1;
-
-		private int m_BoneIndex2;
-
-		private int m_BoneIndex3;
-
 		//
 		// Summary:
 		//     Skinning weight for first bone.
-		public float weight0
-		{
-			get {
-				return m_Weight0;
-			}
-			set {
-				m_Weight0 = value;
-			}
-		}
+		public float Weight0 { get; set; }
 
 		//
 		// Summary:
 		//     Skinning weight for second bone.
-		public float weight1
-		{
-			get {
-				return m_Weight1;
-			}
-			set {
-				m_Weight1 = value;
-			}
-		}
+		public float Weight1 { get; set; }
 
 		//
 		// Summary:
 		//     Skinning weight for third bone.
-		public float weight2
-		{
-			get {
-				return m_Weight2;
-			}
-			set {
-				m_Weight2 = value;
-			}
-		}
+		public float Weight2 { get; set; }
 
 		//
 		// Summary:
 		//     Skinning weight for fourth bone.
-		public float weight3
-		{
-			get {
-				return m_Weight3;
-			}
-			set {
-				m_Weight3 = value;
-			}
-		}
+		public float Weight3 { get; set; }
 
 		//
 		// Summary:
 		//     Index of first bone.
-		public int boneIndex0
-		{
-			get {
-				return m_BoneIndex0;
-			}
-			set {
-				m_BoneIndex0 = value;
-			}
-		}
+		public int BoneIndex0 { get; set; }
 
 		//
 		// Summary:
 		//     Index of second bone.
-		public int boneIndex1
-		{
-			get {
-				return m_BoneIndex1;
-			}
-			set {
-				m_BoneIndex1 = value;
-			}
-		}
+		public int BoneIndex1 { get; set; }
 
 		//
 		// Summary:
 		//     Index of third bone.
-		public int boneIndex2
-		{
-			get {
-				return m_BoneIndex2;
-			}
-			set {
-				m_BoneIndex2 = value;
-			}
-		}
+		public int BoneIndex2 { get; set; }
 
 		//
 		// Summary:
 		//     Index of fourth bone.
-		public int boneIndex3
-		{
-			get {
-				return m_BoneIndex3;
-			}
-			set {
-				m_BoneIndex3 = value;
-			}
-		}
+		public int BoneIndex3 { get; set; }
 
 		public void Normalize() {
-			float totalWeight = this.weight0 + this.weight1 + this.weight2 + this.weight3;
+			var totalWeight = Weight0 + Weight1 + Weight2 + Weight3;
 			if (totalWeight > 0f) {
-				float num = 1f / totalWeight;
-				this.weight0 *= num;
-				this.weight1 *= num;
-				this.weight2 *= num;
-				this.weight3 *= num;
+				var num = 1f / totalWeight;
+				Weight0 *= num;
+				Weight1 *= num;
+				Weight2 *= num;
+				Weight3 *= num;
 			}
 		}
 
 		public void AddBone(int boneIndex, float boneWeight) {
 			var targetLayer = -1;
 			var smallestValue = float.MaxValue;
-			for (int i = 0; i < 4; i++) {
+			for (var i = 0; i < 4; i++) {
 				var currentLayerWeight = i switch {
-					0 => this.weight0,
-					1 => this.weight1,
-					2 => this.weight2,
-					_ => this.weight3,
+					0 => Weight0,
+					1 => Weight1,
+					2 => Weight2,
+					_ => Weight3,
 				};
 				if (currentLayerWeight < smallestValue) {
 					smallestValue = currentLayerWeight;
@@ -168,20 +88,20 @@ namespace RhubarbVR.Bindings
 			if (boneWeight > smallestValue) {
 				switch (targetLayer) {
 					case 0:
-						this.weight0 = boneWeight;
-						this.boneIndex0 = boneIndex;
+						Weight0 = boneWeight;
+						BoneIndex0 = boneIndex;
 						break;
 					case 1:
-						this.weight1 = boneWeight;
-						this.boneIndex1 = boneIndex;
+						Weight1 = boneWeight;
+						BoneIndex1 = boneIndex;
 						break;
 					case 2:
-						this.weight2 = boneWeight;
-						this.boneIndex2 = boneIndex;
+						Weight2 = boneWeight;
+						BoneIndex2 = boneIndex;
 						break;
 					case 3:
-						this.weight3 = boneWeight;
-						this.boneIndex3 = boneIndex;
+						Weight3 = boneWeight;
+						BoneIndex3 = boneIndex;
 						break;
 					default:
 						break;
@@ -190,28 +110,24 @@ namespace RhubarbVR.Bindings
 		}
 
 		public override int GetHashCode() {
-			return boneIndex0.GetHashCode() ^ (boneIndex1.GetHashCode() << 2) ^ (boneIndex2.GetHashCode() >> 2) ^ (boneIndex3.GetHashCode() >> 1) ^ (weight0.GetHashCode() << 5) ^ (weight1.GetHashCode() << 4) ^ (weight2.GetHashCode() >> 4) ^ (weight3.GetHashCode() >> 3);
+			return BoneIndex0.GetHashCode() ^ (BoneIndex1.GetHashCode() << 2) ^ (BoneIndex2.GetHashCode() >> 2) ^ (BoneIndex3.GetHashCode() >> 1) ^ (Weight0.GetHashCode() << 5) ^ (Weight1.GetHashCode() << 4) ^ (Weight2.GetHashCode() >> 4) ^ (Weight3.GetHashCode() >> 3);
 		}
 
 		public override bool Equals(object other) {
-			return other is BoneWeight && Equals((BoneWeight)other);
+			return other is BoneWeight weight && Equals(weight);
 		}
 
 		public bool Equals(BoneWeight other) {
-			return boneIndex0.Equals(other.boneIndex0) && boneIndex1.Equals(other.boneIndex1) && boneIndex2.Equals(other.boneIndex2) && boneIndex3.Equals(other.boneIndex3) && new Vector4(weight0, weight1, weight2, weight3).Equals(new Vector4(other.weight0, other.weight1, other.weight2, other.weight3));
+			return BoneIndex0.Equals(other.BoneIndex0) && BoneIndex1.Equals(other.BoneIndex1) && BoneIndex2.Equals(other.BoneIndex2) && BoneIndex3.Equals(other.BoneIndex3) && new Vector4(Weight0, Weight1, Weight2, Weight3).Equals(new Vector4(other.Weight0, other.Weight1, other.Weight2, other.Weight3));
 		}
 
-		public static bool operator ==(BoneWeight lhs, BoneWeight rhs) {
-			return lhs.boneIndex0 == rhs.boneIndex0 && lhs.boneIndex1 == rhs.boneIndex1 && lhs.boneIndex2 == rhs.boneIndex2 && lhs.boneIndex3 == rhs.boneIndex3 && new Vector4(lhs.weight0, lhs.weight1, lhs.weight2, lhs.weight3) == new Vector4(rhs.weight0, rhs.weight1, rhs.weight2, rhs.weight3);
-		}
+		public static bool operator ==(BoneWeight lhs, BoneWeight rhs) => lhs.BoneIndex0 == rhs.BoneIndex0 && lhs.BoneIndex1 == rhs.BoneIndex1 && lhs.BoneIndex2 == rhs.BoneIndex2 && lhs.BoneIndex3 == rhs.BoneIndex3 && new Vector4(lhs.Weight0, lhs.Weight1, lhs.Weight2, lhs.Weight3) == new Vector4(rhs.Weight0, rhs.Weight1, rhs.Weight2, rhs.Weight3);
 
-		public static bool operator !=(BoneWeight lhs, BoneWeight rhs) {
-			return !(lhs == rhs);
-		}
+		public static bool operator !=(BoneWeight lhs, BoneWeight rhs) => !(lhs == rhs);
 	}
 
 
-	public class GodotMesh : IRMesh
+	public sealed class GodotMesh : IRMesh
 	{
 		public void Draw(RMaterial loadingLogo, Matrix p, Colorf tint, int zDepth, RenderLayer layer, int submesh) {
 			if (loadingLogo.Target is GodotMaterial material) {
@@ -514,18 +430,18 @@ namespace RhubarbVR.Bindings
 				if (BoneVertexWights is not null) {
 					bones = new int[BoneVertexWights.Length * 4];
 					wights = new float[BoneVertexWights.Length * 4];
-					for (int i = 0; i < BoneVertexWights.Length; i++) {
+					for (var i = 0; i < BoneVertexWights.Length; i++) {
 						var currentondex = i * 4;
 						var currentBone = BoneVertexWights[i];
 						currentBone.Normalize();
-						bones[currentondex] = currentBone.boneIndex0;
-						bones[currentondex + 1] = currentBone.boneIndex1;
-						bones[currentondex + 2] = currentBone.boneIndex2;
-						bones[currentondex + 3] = currentBone.boneIndex3;
-						wights[currentondex] = currentBone.weight0;
-						wights[currentondex + 1] = currentBone.weight1;
-						wights[currentondex + 2] = currentBone.weight2;
-						wights[currentondex + 3] = currentBone.weight3;
+						bones[currentondex] = currentBone.BoneIndex0;
+						bones[currentondex + 1] = currentBone.BoneIndex1;
+						bones[currentondex + 2] = currentBone.BoneIndex2;
+						bones[currentondex + 3] = currentBone.BoneIndex3;
+						wights[currentondex] = currentBone.Weight0;
+						wights[currentondex + 1] = currentBone.Weight1;
+						wights[currentondex + 2] = currentBone.Weight2;
+						wights[currentondex + 3] = currentBone.Weight3;
 					}
 				}
 

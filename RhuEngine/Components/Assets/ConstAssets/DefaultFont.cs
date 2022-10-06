@@ -4,6 +4,7 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/ConstAssets" })]
+	[AllowedOnWorldRoot]
 	public sealed class MainFont : AssetProvider<RFont>
 	{
 		RFont _font;

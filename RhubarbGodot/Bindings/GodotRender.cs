@@ -34,7 +34,7 @@ namespace RhubarbVR.Bindings
 			node3D.Transform = trans;
 		}
 	}
-	public class GodotRender : IRRenderer
+	public sealed class GodotRender : IRRenderer
 	{
 
 		public GodotRender(EngineRunner engineRunner) {

@@ -15,7 +15,6 @@ using RhuEngine.WorldObjects;
 using RhuEngine.Components.PrivateSpace;
 using System.Globalization;
 using System.Reflection;
-using RhuEngine.Components.Visuals;
 
 namespace RhuEngine.Components
 {

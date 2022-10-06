@@ -293,5 +293,15 @@ namespace RhuEngine
 				? worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null"
 				: $"{comp.GetType().GetFormattedName()} attached to " + (worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null");
 		}
+
+		public static Type GetHighestAttributeInherit<T>(this Type type) where T:Attribute {
+			if (type.GetCustomAttribute<T>() is not null) {
+				return type;
+			}
+			if(type.GetCustomAttribute<T>(true) is null) {
+				return null;
+			}
+			return type.BaseType?.GetHighestAttributeInherit<T>();
+		}
 	}
 }

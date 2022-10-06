@@ -14,6 +14,8 @@ using RhubarbVR.Bindings.Input;
 
 public partial class EngineRunner : Node3D, IRTime
 {
+	[Export]
+	public SubViewport ThowAway;
 
 	[Export]
 	public XRCamera3D Camera;

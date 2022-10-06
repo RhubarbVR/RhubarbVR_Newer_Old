@@ -34,7 +34,7 @@ namespace RhubarbVR.Bindings
 	}
 
 
-	public class GodotMaterial
+	public sealed class GodotMaterial
 	{
 		public Material Material;
 
@@ -92,7 +92,7 @@ namespace RhubarbVR.Bindings
 		}
 	}
 
-	public class GoMat : IRMaterial
+	public sealed class GoMat : IRMaterial
 	{
 		public IEnumerable<RMaterial.RMatParamInfo> GetAllParamInfo(object tex) {
 			yield break;
@@ -113,7 +113,7 @@ namespace RhubarbVR.Bindings
 		}
 	}
 
-	public class GodotStaticMats : IStaticMaterialManager
+	public sealed class GodotStaticMats : IStaticMaterialManager
 	{
 		public ITextMaterial CreateTextMaterial() {
 			return new GodotText();
@@ -126,7 +126,7 @@ namespace RhubarbVR.Bindings
 
 
 
-	public class GodotUnlit : StaticMaterialBase<GodotMaterial>, IUnlitMaterial
+	public sealed class GodotUnlit : StaticMaterialBase<GodotMaterial>, IUnlitMaterial
 	{
 		public GodotUnlit() {
 			var newUnlit = new StandardMaterial3D {
@@ -197,7 +197,7 @@ namespace RhubarbVR.Bindings
 		}
 	}
 
-	public class GodotText : StaticMaterialBase<GodotMaterial>, ITextMaterial
+	public sealed class GodotText : StaticMaterialBase<GodotMaterial>, ITextMaterial
 	{
 		public GodotText() {
 			var newUnlit = new StandardMaterial3D {

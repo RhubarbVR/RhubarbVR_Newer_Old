@@ -8,7 +8,6 @@ using RNumerics;
 using RhuEngine.Linker;
 using System.Threading;
 using System.Threading.Tasks;
-using RhuEngine.Components.Visuals;
 
 namespace RhuEngine
 {
@@ -34,10 +33,42 @@ namespace RhuEngine
 			var spinningCubes = world.RootEntity.AddChild("SpinningCubes");
 			spinningCubes.position.Value = new Vector3f(0, 0.5f, 0);
 			AttachSpiningCubes(spinningCubes);
-#if DEBUG || UNITY
+#if DEBUG
 
 			var DebugStuff = floor.AddChild("DebugStuff");
 			DebugStuff.position.Value = new Vector3f(-1.5f, 0f, -1f);
+			var SubviewPortCam = DebugStuff.AddChild("Camera");
+			var subViewPOrtdata = SubviewPortCam.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var SubviewPort = SubviewPortCam.AddChild("SubviewPort");
+			var ee1 = SubviewPort.AddChild("test");
+			ee1.AttachComponent<UIElement>();
+			var ee2 = ee1.AddChild("test");
+			ee2.AttachComponent<UIElement>();
+			var ee3 = ee2.AddChild("test");
+			ee3.position.Value = new Vector3f(10, 10, 10);
+			ee3.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
+
+
+			SubviewPort.position.Value = new Vector3f(-1.5f, 0f, -1f);
+			var viewport = SubviewPort.AttachComponent<Viewport>();
+			viewport.OwnWorld3D.Value = true;
+			subViewPOrtdata.Item2.MainTexture.Target = viewport;
+
+			var trauns = SubviewPort.AddChild("trauns");
+			trauns.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
+			var e1 = trauns.AddChild("test");
+			var e2 = e1.AddChild("test");
+			var eee = e2.AttachComponent<UIElement>();
+			eee.Rotation.Value = 100;
+			var e3 = e2.AddChild("test");
+			e3.AttachComponent<UIElement>();
+			var e4 = e3.AddChild("test");
+
+			e4.position.Value = new Vector3f(1, 1, 1);
+			var e5 = e4.AddChild("test");
+			e5.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
+
+
 
 			var TempComps = DebugStuff.AddChild("RenderComps");
 			TempComps.position.Value = new Vector3f(0f, 3f, 4f);

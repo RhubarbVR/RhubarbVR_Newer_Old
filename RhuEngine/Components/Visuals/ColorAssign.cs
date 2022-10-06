@@ -5,7 +5,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using System;
 
-namespace RhuEngine.Components.Visuals
+namespace RhuEngine.Components
 {
 	[Category(new string[] { "Visuals" })]
 	public sealed class ColorAssign : Component

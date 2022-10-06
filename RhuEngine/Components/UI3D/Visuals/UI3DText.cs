@@ -6,7 +6,6 @@ using RhuEngine.Linker;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using RhuEngine.Components.Visuals;
 
 namespace RhuEngine.Components
 {

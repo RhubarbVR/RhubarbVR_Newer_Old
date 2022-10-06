@@ -6,8 +6,9 @@
 background_mode = 1
 background_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 
-[node name="Engine" type="Node3D" node_paths=PackedStringArray("Camera", "Rigin", "AudioListener")]
+[node name="Engine" type="Node3D" node_paths=PackedStringArray("ThowAway", "Camera", "Rigin", "AudioListener")]
 script = ExtResource("1_p4nju")
+ThowAway = NodePath("ThrowAway")
 Camera = NodePath("XrOrigin3d/XrCamera3d")
 Rigin = NodePath("XrOrigin3d")
 AudioListener = NodePath("XrOrigin3d/AudioListener3d")
@@ -20,3 +21,9 @@ environment = SubResource("Environment_ljag0")
 
 [node name="AudioListener3d" type="AudioListener3D" parent="XrOrigin3d"]
 current = true
+
+[node name="ThrowAway" type="SubViewport" parent="."]
+disable_3d = true
+size = Vector2i(2, 2)
+render_target_clear_mode = 1
+render_target_update_mode = 0

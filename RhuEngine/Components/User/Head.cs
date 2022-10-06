@@ -3,7 +3,6 @@ using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 using RhuEngine.Linker;
-using RhuEngine.Components.Visuals;
 
 namespace RhuEngine.Components
 {

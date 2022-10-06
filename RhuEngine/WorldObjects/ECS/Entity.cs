@@ -9,7 +9,7 @@ namespace RhuEngine.WorldObjects.ECS
 {
 	public sealed class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox
 	{
-		private uint CompDepth => (_internalParent?.Depth + 1) ?? 0;
+		private uint CompDepth => (InternalParent?.Depth + 1) ?? 0;
 
 		public uint Depth { get; private set; }
 
@@ -52,7 +52,7 @@ namespace RhuEngine.WorldObjects.ECS
 						box = BoundsUtil.Combined(box, scale);
 					}
 				}
-				foreach (Entity item in children.Cast<Entity>()) {
+				foreach (var item in children.Cast<Entity>()) {
 					var element = item.Bounds;
 					element.Translate(item.GlobalTrans.Translation);
 					element.Rotate(item.GlobalTrans.Rotation);
@@ -87,15 +87,15 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 		public void ParentDepthUpdate() {
 			Depth = CompDepth;
-			foreach (Entity child in children.Cast<Entity>()) {
+			foreach (var child in children.Cast<Entity>()) {
 				child.ParentDepthUpdate();
 			}
 		}
 
 		internal void SetGlobalMatrixPysics(Matrix matrix) {
 			var parentMatrix = Matrix.S(Vector3f.One);
-			if (_internalParent != null) {
-				parentMatrix = _internalParent.GlobalTrans;
+			if (InternalParent != null) {
+				parentMatrix = InternalParent.GlobalTrans;
 			}
 			var newLocal = matrix * parentMatrix.Inverse;
 			newLocal.Decompose(out var newtranslation, out var newrotation, out var newscale);
@@ -133,6 +133,37 @@ namespace RhuEngine.WorldObjects.ECS
 				UpdateEnableList();
 			}
 			UIRect = GetFirstComponent<UI3DRect>();
+			ViewportUpdate();
+			UpdateCanvasItem();
+		}
+
+		public event Action ViewportUpdateEvent;
+		public event Action CanvasItemUpdateEvent;
+
+		private void UpdateCanvasItem() {
+			var oldCanvasItem = CanvasItem;
+			CanvasItem = GetFirstComponent<CanvasItem>();
+			CanvasItem ??= InternalParent?.CanvasItem;
+			//Takes 2 frames for linker to load
+			RenderThread.ExecuteOnStartOfFrame(() => RenderThread.ExecuteOnEndOfFrame(() => CanvasItemUpdateEvent?.Invoke()));
+			if (oldCanvasItem != CanvasItem) {
+				foreach (var item in children.Cast<Entity>()) {
+					item.UpdateCanvasItem();
+				}
+			}
+		}
+
+		private void ViewportUpdate() {
+			var oldViewPort = Viewport;
+			Viewport = GetFirstComponent<Viewport>();
+			Viewport ??= InternalParent?.Viewport;
+			//Takes 2 frames for linker to load
+			RenderThread.ExecuteOnStartOfFrame(()=>RenderThread.ExecuteOnEndOfFrame(() => ViewportUpdateEvent?.Invoke()));	
+			if (oldViewPort != Viewport) {
+				foreach (var item in children.Cast<Entity>()) {
+					item.ViewportUpdate();
+				}
+			}
 		}
 
 		private void OnOrderOffsetChange() {
@@ -222,7 +253,7 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 		[Exposed]
 		public Matrix LocalToGlobal(Matrix point, bool Child = true) {
-			return point * (Child ? GlobalTrans : _internalParent?.GlobalTrans ?? Matrix.Identity);
+			return point * (Child ? GlobalTrans : InternalParent?.GlobalTrans ?? Matrix.Identity);
 		}
 		public void LocalToGlobal(Matrix point, bool Child, out Vector3f translation, out Quaternionf rotation, out Vector3f scale) {
 			LocalToGlobal(point, Child).Decompose(out translation, out rotation, out scale);
@@ -250,14 +281,14 @@ namespace RhuEngine.WorldObjects.ECS
 		[NoSync]
 		[NoLoad]
 		[UnExsposed]
-		private Entity _internalParent;
+		public Entity InternalParent { get; private set; }
 
 		private Matrix _cachedGlobalMatrix = Matrix.S(1);
 
 		private Matrix _cachedLocalMatrix = Matrix.S(1);
 
 		public bool CheckIfParented(Entity entity) {
-			return entity == this || (_internalParent?.CheckIfParented(entity) ?? false);
+			return entity == this || (InternalParent?.CheckIfParented(entity) ?? false);
 		}
 
 		public bool parentEnabled = true;
@@ -308,6 +339,8 @@ namespace RhuEngine.WorldObjects.ECS
 			base.OnLoaded();
 			UpdateEnableList();
 			TransValueChange();
+			ViewportUpdate();
+			UpdateCanvasItem();
 		}
 
 		public void ParentEnabledChange(bool _parentEnabled) {
@@ -338,16 +371,16 @@ namespace RhuEngine.WorldObjects.ECS
 		public bool IsEnabled => parentEnabled && enabled.Value && !IsDestroying && !IsRemoved;
 
 		private void GoBackToOld() {
-			if (parent.Target != _internalParent) {
-				parent.SetTargetNoNetworkOrChange(_internalParent);
+			if (parent.Target != InternalParent) {
+				parent.SetTargetNoNetworkOrChange(InternalParent);
 			}
 		}
 
 		private bool IsParrent(Entity check) {
-			if(check.Depth > Depth) {
+			if (check.Depth > Depth) {
 				return false;
 			}
-			return (check == this) || (_internalParent?.IsParrent(check) ?? false);
+			return (check == this) || (InternalParent?.IsParrent(check) ?? false);
 		}
 
 		private void ParentChanged() {
@@ -356,8 +389,8 @@ namespace RhuEngine.WorldObjects.ECS
 					GoBackToOld();
 					return;
 				}
-				
-				if (parent.Target == _internalParent) {
+
+				if (parent.Target == InternalParent) {
 					return;
 				}
 
@@ -375,17 +408,17 @@ namespace RhuEngine.WorldObjects.ECS
 					GoBackToOld();
 					return;
 				}
-				if (_internalParent == null) {
-					_internalParent = parent.Target;
+				if (InternalParent == null) {
+					InternalParent = parent.Target;
 					ParentDepthUpdate();
 					TransValueChange();
 					return;
 				}
 				parent.Target.children.AddInternal(this);
-				_internalParent.children.RemoveInternal(this);
-				_internalParent = parent.Target;
+				InternalParent.children.RemoveInternal(this);
+				InternalParent = parent.Target;
 				ParentDepthUpdate();
-				ParentEnabledChange(_internalParent.IsEnabled);
+				ParentEnabledChange(InternalParent.IsEnabled);
 				TransValueChange();
 			}
 			catch {
@@ -414,15 +447,15 @@ namespace RhuEngine.WorldObjects.ECS
 		{
 			get {
 				if (_dirtyGlobal) {
-					_cachedGlobalMatrix = LocalTrans * _internalParent?.GlobalTrans ?? Matrix.Identity;
+					_cachedGlobalMatrix = LocalTrans * InternalParent?.GlobalTrans ?? Matrix.Identity;
 					_dirtyGlobal = false;
 				}
 				return _cachedGlobalMatrix;
 			}
 			set {
 				var parentMatrix = Matrix.S(Vector3f.One);
-				if (_internalParent != null) {
-					parentMatrix = _internalParent.GlobalTrans;
+				if (InternalParent != null) {
+					parentMatrix = InternalParent.GlobalTrans;
 				}
 				var newLocal = value * parentMatrix.Inverse;
 				newLocal.Decompose(out var newtranslation, out var newrotation, out var newscale);
@@ -449,8 +482,8 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 			set {
 				var parentMatrix = Matrix.S(Vector3f.One);
-				if (_internalParent != null) {
-					parentMatrix = _internalParent.GlobalTrans;
+				if (InternalParent != null) {
+					parentMatrix = InternalParent.GlobalTrans;
 				}
 				value.Decompose(out var newtranslation, out var newrotation, out var newscale);
 				position.SetValueNoOnChange(newtranslation);
@@ -538,6 +571,19 @@ namespace RhuEngine.WorldObjects.ECS
 		[UnExsposed]
 		public UI3DRect UIRect { get; private set; }
 
+		[NoShow]
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[UnExsposed]
+		public Viewport Viewport { get; private set; }
+
+		[NoShow]
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[UnExsposed]
+		public CanvasItem CanvasItem { get; private set; }
 		public Entity() {
 		}
 	}

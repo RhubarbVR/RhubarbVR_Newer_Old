@@ -11,7 +11,7 @@ using RhuEngine.Linker;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
-	public class ArmatureLink : WorldPositionLinked<Armature, Skeleton3D>
+	public sealed class ArmatureLink : WorldPositionLinked<Armature, Skeleton3D>
 	{
 		public override string ObjectName => "Armature";
 

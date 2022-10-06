@@ -4,7 +4,6 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
 using System;
-using RhuEngine.Components.Visuals;
 
 namespace RhuEngine.Components
 {

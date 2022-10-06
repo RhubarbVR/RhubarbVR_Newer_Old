@@ -1,14 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<AssemblyName>RhuEngineDebug</AssemblyName>
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
 		<AssemblyName>RhuEngine</AssemblyName>
 		<Optimize>True</Optimize>
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Unity|AnyCPU'">
 		<AssemblyName>RhuEngine</AssemblyName>
 		<Optimize>True</Optimize>
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup>
 		<Configurations>Debug;Release;Unity</Configurations>

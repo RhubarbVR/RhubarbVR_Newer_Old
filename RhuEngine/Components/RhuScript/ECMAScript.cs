@@ -14,7 +14,6 @@ using System.Threading;
 
 namespace RhuEngine.Components
 {
-
 	public abstract class ProceduralECMAScript : ECMAScript
 	{
 	}

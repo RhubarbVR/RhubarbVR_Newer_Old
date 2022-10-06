@@ -13,7 +13,7 @@ using RhuEngine.WorldObjects;
 namespace RhubarbVR.Bindings.ComponentLinking
 {
 
-	public class SkinnedMeshRenderLink : MeshRenderLinkBase<SkinnedMeshRender>
+	public sealed class SkinnedMeshRenderLink : MeshRenderLinkBase<SkinnedMeshRender>
 	{
 		public override string ObjectName => "SkinnedMeshRender";
 
@@ -37,7 +37,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 	}
 
-	public class MeshRenderLinkBase<T> : WorldPositionLinked<T, MeshInstance3D> where T : MeshRender, new()
+	public abstract class MeshRenderLinkBase<T> : WorldPositionLinked<T, MeshInstance3D> where T : MeshRender, new()
 	{
 		public override string ObjectName => "MeshRender";
 
@@ -124,7 +124,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 	}
 
-	public class MeshRenderLink : MeshRenderLinkBase<MeshRender>
+	public sealed class MeshRenderLink : MeshRenderLinkBase<MeshRender>
 	{
 
 	}
