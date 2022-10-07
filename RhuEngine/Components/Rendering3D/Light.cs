@@ -20,8 +20,7 @@ namespace RhuEngine.Components
 		Soft,
 	}
 
-	[Supported(SupportedFancyFeatures.Lighting)]
-	[Category(new string[] { "Rendering" })]
+	[Category(new string[] { "Rendering3D" })]
 	public sealed class Light : LinkedWorldComponent
 	{
 		[Default(RLightType.Point)]
@@ -46,7 +45,6 @@ namespace RhuEngine.Components
 
 		public readonly Sync<ShadowMode> ShadowType;
 
-		[Supported(SupportedFancyFeatures.LightCookie)]
 		public readonly AssetRef<RTexture2D> LightCookie;
 
 		public readonly Sync<RenderLayer> Culling;

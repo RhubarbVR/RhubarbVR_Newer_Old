@@ -28,8 +28,6 @@ namespace RhubarbVR.Bindings
 			EngineRunner = engineRunner;
 		}
 
-		public SupportedFancyFeatures SupportedFeatures => SupportedFancyFeatures.Basic;
-
 		public bool ForceLibLoad => false;
 
 		public bool SpawnPlayer => true;

@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Visuals/UI3DAssemblers" })]
-	public sealed class CheckBox : Component
+	public sealed class CheckBox3D : Component
 	{
 		[OnChanged(nameof(OpenChange))]
 		public readonly Linker<Vector2i> Minicon;

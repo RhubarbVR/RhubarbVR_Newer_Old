@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 {
 
 	[NotLinkedRenderingComponent]
-	[Category(new string[] { "Rendering" })]
+	[Category(new string[] { "Rendering3D" })]
 	public sealed class WorldText : LinkedWorldComponent
 	{
 		[Default(1f)]
@@ -72,9 +72,9 @@ namespace RhuEngine.Components
 		[Default(-1)]
 		[OnChanged(nameof(UpdatePrams))]
 		public readonly Sync<int> VisibleCharacters;
-		[Default(RVisibleCharactersBehavior.CharsBeforeShaping)]
+		[Default(Linker.RVisibleCharactersBehavior.CharsBeforeShaping)]
 		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<RVisibleCharactersBehavior> VisibleCharactersBehavior;
+		public readonly Sync<Linker.RVisibleCharactersBehavior> VisibleCharactersBehavior;
 		[Default(1f)]
 		[OnChanged(nameof(UpdatePrams))]
 		public readonly Sync<float> VisibleRatio;

@@ -38,6 +38,7 @@ namespace RhuEngine
 			var DebugStuff = floor.AddChild("DebugStuff");
 			DebugStuff.position.Value = new Vector3f(-1.5f, 0f, -1f);
 			var SubviewPortCam = DebugStuff.AddChild("Camera");
+			SubviewPortCam.position.Value = new Vector3f(-1f, 1f, 1f);
 			var subViewPOrtdata = SubviewPortCam.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
 			var SubviewPort = SubviewPortCam.AddChild("SubviewPort");
 			var ee1 = SubviewPort.AddChild("test");
@@ -54,6 +55,10 @@ namespace RhuEngine
 			viewport.OwnWorld3D.Value = true;
 			subViewPOrtdata.Item2.MainTexture.Target = viewport;
 
+			var camera = SubviewPort.AddChild("Camera");
+			var cam = camera.AttachComponent<Camera3D>();
+			camera.position.Value = new Vector3f(0, 0, -5);
+			camera.rotation.Value = Quaternionf.Yawed180;
 			var trauns = SubviewPort.AddChild("trauns");
 			trauns.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
 			var e1 = trauns.AddChild("test");
@@ -63,7 +68,8 @@ namespace RhuEngine
 			var e3 = e2.AddChild("test");
 			e3.AttachComponent<UIElement>();
 			var e4 = e3.AddChild("test");
-
+			var testElement = e4.AddChild("test");
+			testElement.AttachComponent<ColorPickerContainer>();
 			e4.position.Value = new Vector3f(1, 1, 1);
 			var e5 = e4.AddChild("test");
 			e5.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();

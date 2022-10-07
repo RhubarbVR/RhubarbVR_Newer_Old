@@ -6,13 +6,13 @@ using RNumerics;
 using System.Linq;
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Rendering" })]
+	[Category(new string[] { "Rendering3D" })]
 	public sealed class Armature : LinkedWorldComponent
 	{
 		public readonly SyncObjList<SyncRef<Entity>> ArmatureEntitys;
 	}
 
-	[Category(new string[] { "Rendering" })]
+	[Category(new string[] { "Rendering3D" })]
 	public sealed class SkinnedMeshRender : MeshRender
 	{
 		public class BlendShape : SyncObject

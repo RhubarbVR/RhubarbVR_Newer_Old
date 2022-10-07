@@ -101,7 +101,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Material_LoadChange(RMaterial obj) {
-			node.Material = obj?.Target is GodotMaterial godotMaterial ? (godotMaterial?.Material) : null;
+			node.Material = LinkedComp.Material.Asset?.Target is GodotMaterial godotMaterial ? (godotMaterial?.Material) : null;
 		}
 
 		private void UseParentMaterial_Changed(IChangeable obj) {
@@ -160,6 +160,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 	{
 		public T2 node;
 		public abstract string ObjectName { get; }
+		public virtual bool GoToEngineRoot => true;
 
 		public override void Init() {
 			node = new T2 {
@@ -180,13 +181,26 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					node.Owner = ee.node;
 				}
 				else {
-					EngineRunner._.AddChild(node);
-					node.Owner = EngineRunner._;
+					if (GoToEngineRoot) {
+						EngineRunner._.AddChild(node);
+						node.Owner = EngineRunner._;
+					}
+					else {
+						EngineRunner._.ThowAway.AddChild(node);
+						node.Owner = EngineRunner._.ThowAway;
+					}
+
 				}
 			}
 			else {
-				EngineRunner._.AddChild(node);
-				node.Owner = EngineRunner._;
+				if (GoToEngineRoot) {
+					EngineRunner._.AddChild(node);
+					node.Owner = EngineRunner._;
+				}
+				else {
+					EngineRunner._.ThowAway.AddChild(node);
+					node.Owner = EngineRunner._.ThowAway;
+				}
 			}
 		}
 

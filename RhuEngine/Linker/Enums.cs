@@ -59,10 +59,32 @@ namespace RhuEngine.Linker
 		Layer8 = 1 << 8,
 		/// <summary>Render layer 9.</summary>
 		Layer9 = 1 << 9,
+		/// <summary>Render layer 10.</summary>
+		Layer10 = 1 << 10,
+		/// <summary>Render layer 11.</summary>
+		Layer11 = 1 << 11,
+		/// <summary>Render layer 12.</summary>
+		Layer12 = 1 << 12,
+		/// <summary>Render layer 13.</summary>
+		Layer13 = 1 << 13,
+		/// <summary>Render layer 14.</summary>
+		Layer14 = 1 << 14,
+		/// <summary>Render layer 15.</summary>
+		Layer15 = 1 << 15,
+		/// <summary>Render layer 16.</summary>
+		Layer16 = 1 << 16,
+		/// <summary>Render layer 17.</summary>
+		Layer17 = 1 << 17,
+		/// <summary>Render layer 18.</summary>
+		Layer18 = 1 << 18,
+		/// <summary>Render layer 19.</summary>
+		Layer19 = 1 << 19,
+		/// <summary>Render layer 20.</summary>
+		Layer20 = 1 << 20,
 		/// <summary>This is a flag that specifies all possible layers. If you
 		/// want to render all layers, then this is the layer filter
 		/// you would use. This is the default for render filtering.</summary>
-		MainCam = MainLayer | Text | UI | Layer3,
+		MainCam = MainLayer | Text | UI | Layer3 | Layer4 | Layer5 | Layer6,
 	}
 
 	/// <summary>Also known as 'alpha' for those in the know. But there's

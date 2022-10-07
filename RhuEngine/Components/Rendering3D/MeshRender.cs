@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 		ShadowsOnly
 	}
 
-	[Category(new string[] { "Rendering" })]
+	[Category(new string[] { "Rendering3D" })]
 	public class MeshRender : LinkedWorldComponent, IWorldBoundingBox
 	{
 		public readonly AssetRef<RMesh> mesh;
@@ -26,20 +26,16 @@ namespace RhuEngine.Components
 		[Default(RenderLayer.MainLayer)]
 		public readonly Sync<RenderLayer> renderLayer;
 
-		[Supported(SupportedFancyFeatures.Lighting)]
 		[Default(ShadowCast.Off)]
 		public readonly Sync<ShadowCast> CastShadows;
 
-		[Supported(SupportedFancyFeatures.Lighting)]
 		[Default(false)]
 		public readonly Sync<bool> RecevieShadows;
 
 		[Default(false)]
-		[Supported(SupportedFancyFeatures.ReflectionProbes)]
 		public readonly Sync<bool> ReflectionProbs;
 
 		[Default(false)]
-		[Supported(SupportedFancyFeatures.LightProbeGroup)]
 		public readonly Sync<bool> LightProbs;
 
 		public AxisAlignedBox3f Bounds => mesh.Asset?.BoundingBox??AxisAlignedBox3f.CenterZero;

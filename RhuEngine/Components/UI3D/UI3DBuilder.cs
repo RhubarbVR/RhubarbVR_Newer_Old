@@ -135,17 +135,17 @@ namespace RhuEngine.Components
 			return local;
 		}
 
-		public CheckBox AddGenaricCheckBox(IAssetProvider<RMaterial> asset, SpriteProvder psprite, float coloroffset = 1.9f, float alpha = 0.9f, Vector2f? min = null, Vector2f? max = null) {
+		public CheckBox3D AddGenaricCheckBox(IAssetProvider<RMaterial> asset, SpriteProvder psprite, float coloroffset = 1.9f, float alpha = 0.9f, Vector2f? min = null, Vector2f? max = null) {
 			return AddCheckBox(new Vector2i(2,1), new Vector2i(2,1), new Vector2i(1, 1), new Vector2i(1, 1),asset,psprite,coloroffset,alpha,min,max);
 		}
 
-		public CheckBox AddCheckBox(Vector2i openmin, Vector2i openmax, Vector2i closemin, Vector2i closemax, IAssetProvider<RMaterial> asset, SpriteProvder psprite, float coloroffset = 1.9f, float alpha = 0.9f, Vector2f? min = null, Vector2f? max = null) {
+		public CheckBox3D AddCheckBox(Vector2i openmin, Vector2i openmax, Vector2i closemin, Vector2i closemax, IAssetProvider<RMaterial> asset, SpriteProvder psprite, float coloroffset = 1.9f, float alpha = 0.9f, Vector2f? min = null, Vector2f? max = null) {
 			AttachChildRect<UI3DRect>(min, max);
 			var buttonInteraction = AttachComponentToStack<UI3DButtonInteraction>();
 			AddRectangle((-((coloroffset/2)-0.5f)) + 0.5f,alpha);
 			PushRect();
 			var sprite = AddSprit(openmin, openmax, asset, psprite, coloroffset, alpha);
-			var checkbox = AttachComponentToStack<CheckBox>();
+			var checkbox = AttachComponentToStack<CheckBox3D>();
 			checkbox.MaxClose.Value = closemax;
 			checkbox.MinClose.Value = closemin;
 			checkbox.MaxOpen.Value = openmax;
