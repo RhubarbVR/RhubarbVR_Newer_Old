@@ -63,13 +63,9 @@ namespace RhuEngine
 			trauns.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
 			var e1 = trauns.AddChild("test");
 			var e2 = e1.AddChild("test");
-			var eee = e2.AttachComponent<UIElement>();
-			eee.Rotation.Value = 100;
 			var e3 = e2.AddChild("test");
-			e3.AttachComponent<UIElement>();
 			var e4 = e3.AddChild("test");
 			var testElement = e4.AddChild("test");
-			testElement.AttachComponent<ColorPickerContainer>();
 			e4.position.Value = new Vector3f(1, 1, 1);
 			var e5 = e4.AddChild("test");
 			e5.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();

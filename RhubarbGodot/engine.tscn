@@ -23,6 +23,8 @@ current = true
 [node name="AudioListener3d" type="AudioListener3D" parent="XrOrigin3d"]
 current = true
 
+[node name="Camera2d" type="Camera2D" parent="XrOrigin3d"]
+
 [node name="ThrowAway" type="SubViewport" parent="."]
 disable_3d = true
 size = Vector2i(2, 2)

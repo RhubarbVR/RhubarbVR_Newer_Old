@@ -175,5 +175,10 @@ namespace RhuEngine.Components
 		[Default(RCursorShape.Arrow)]
 		public readonly Sync<RCursorShape> CursorShape;
 
+		protected override void OnAttach() {
+			base.OnAttach();
+			Scale.Value = Vector2f.One;
+		}
+
 	}
 }
