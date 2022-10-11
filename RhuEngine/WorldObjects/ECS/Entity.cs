@@ -12,7 +12,7 @@ namespace RhuEngine.WorldObjects.ECS
 		private uint CompDepth => (InternalParent?.Depth + 1) ?? 0;
 
 		public uint Depth { get; private set; }
-
+		[NoShow]
 		public readonly SyncObjList<Entity> children;
 		[OnChanged(nameof(ParentChanged))]
 		public readonly SyncRef<Entity> parent;
@@ -39,6 +39,7 @@ namespace RhuEngine.WorldObjects.ECS
 		public override bool Persistence => persistence.Value;
 
 		[OnChanged(nameof(OnComponentChange))]
+		[NoShow]
 		public readonly SyncAbstractObjList<IComponent> components;
 		[Exposed]
 		public AxisAlignedBox3f Bounds

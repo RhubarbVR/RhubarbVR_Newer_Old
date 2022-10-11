@@ -47,7 +47,7 @@ namespace RhuEngine.Components
 
 	public abstract class ObserverBase<T> : Component, IObserver where T : class, IWorldObject
 	{
-		public const int ELMENTHIGHTSIZE = 65;
+		public const int ELMENTHIGHTSIZE = 16;
 		public T TargetElement => Observerd.Target;
 
 		[OnChanged(nameof(ChangeObserverd))]

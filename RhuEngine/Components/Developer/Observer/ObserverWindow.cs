@@ -17,7 +17,7 @@ namespace RhuEngine.Components
 		public readonly SyncRef<Window> TargetWindow;
 		public readonly SyncRef<Entity> LastLocation;
 		public readonly SyncRef<Viewport> MainViewPort;
-		public readonly SyncRef<UIElement> RootUIElement;
+		public readonly SyncRef<ScrollContainer> RootUIElement;
 		public readonly SyncRef<IObserver> CurrentObserver;
 
 		private void ChangeObserverd() {
@@ -29,11 +29,13 @@ namespace RhuEngine.Components
 			if (type is null) {
 				return;
 			}
-			var addTo = MainViewPort.Target.Entity;
+			var addTo = RootUIElement.Target?.Entity;
 			if (addTo is null) {
 				return;
 			}
-			CurrentObserver.Target = addTo.AttachComponent<IObserver>(type);
+			var child = addTo.AddChild(type.GetFormattedName());
+			child.AttachComponent<BoxContainer>().Vertical.Value = true;
+			CurrentObserver.Target = child.AttachComponent<IObserver>(type);
 			CurrentObserver.Target.SetObserverd(Observerd.Target);
 		}
 
@@ -65,7 +67,7 @@ namespace RhuEngine.Components
 			var visual = root2dUI.AttachComponent<UI3DRectangle>();
 			visual.Material.Target = uiMit;
 			visual.Tint.Value = Colorf.White;
-			var root = root2dUI.AddChild("Root").AttachComponent<UIElement>();
+			var root = root2dUI.AddChild("Root").AttachComponent<ScrollContainer>();
 			var copyer = root2dUI.AttachComponent<ValueCopy<Vector2i>>();
 			copyer.Source.Target = mainViewPort.Size;
 			copyer.Target.Target = root.MinSize;

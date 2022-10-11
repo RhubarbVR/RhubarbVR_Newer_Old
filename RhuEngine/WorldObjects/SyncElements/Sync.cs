@@ -51,7 +51,50 @@ namespace RhuEngine.WorldObjects
 			if (IsLinkedTo || NoSync) {
 				return;
 			}
-			World.BroadcastDataToAll(this, typeof(T).IsEnum ? new DataNode<int>((int)(object)_value) : new DataNode<T>(_value), LiteNetLib.DeliveryMethod.ReliableOrdered);
+			var inputType = typeof(T);
+			IDataNode Value;
+			if (inputType == typeof(Type)) {
+				Value = new DataNode<string>(((Type)(object)_value)?.FullName);
+			}
+			else {
+				if (inputType.IsEnum) {
+					var unType = inputType.GetEnumUnderlyingType();
+					if (unType == typeof(int)) {
+						Value = new DataNode<int>((int)(object)_value);
+					}
+					else if (unType == typeof(uint)) {
+						Value = new DataNode<uint>((uint)(object)_value);
+					}
+					else if (unType == typeof(bool)) {
+						Value = new DataNode<bool>((bool)(object)_value);
+					}
+					else if (unType == typeof(byte)) {
+						Value = new DataNode<byte>((byte)(object)_value);
+					}
+					else if (unType == typeof(sbyte)) {
+						Value = new DataNode<sbyte>((sbyte)(object)_value);
+					}
+					else if (unType == typeof(short)) {
+						Value = new DataNode<short>((short)(object)_value);
+					}
+					else if (unType == typeof(ushort)) {
+						Value = new DataNode<ushort>((ushort)(object)_value);
+					}
+					else if (unType == typeof(long)) {
+						Value = new DataNode<long>((long)(object)_value);
+					}
+					else if (unType == typeof(ulong)) {
+						Value = new DataNode<ulong>((ulong)(object)_value);
+					}
+					else {
+						throw new NotSupportedException();
+					}
+				}
+				else {
+					Value = new DataNode<T>(_value);
+				}
+			}
+			World.BroadcastDataToAll(this, Value, LiteNetLib.DeliveryMethod.ReliableOrdered);
 		}
 		public void Received(Peer sender, IDataNode data) {
 			if (IsLinkedTo || NoSync) {

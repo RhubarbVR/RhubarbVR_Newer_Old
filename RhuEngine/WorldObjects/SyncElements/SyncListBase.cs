@@ -137,6 +137,8 @@ namespace RhuEngine.WorldObjects
 			Changed?.Invoke(this);
 		}
 
+		public event Action OnReorderList;
+
 		private void ReorderList() {
 			if (IsRemoved) {
 				return;
@@ -151,6 +153,7 @@ namespace RhuEngine.WorldObjects
 				_syncObjects.Insert(index, item);
 			}
 			Changed?.Invoke(this);
+			OnReorderList?.Invoke();
 		}
 
 		internal void BroadcastAdd(T data) {

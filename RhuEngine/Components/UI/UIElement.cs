@@ -178,6 +178,8 @@ namespace RhuEngine.Components
 		protected override void OnAttach() {
 			base.OnAttach();
 			Scale.Value = Vector2f.One;
+			Max.Value = Vector2f.One;
+			Min.Value = Vector2f.Zero;
 		}
 
 	}

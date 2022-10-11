@@ -30,9 +30,18 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			};
 			LinkedComp.Entity.ViewportUpdateEvent += UpdateParrent;
 			LinkedComp.Entity.CanvasItemUpdateEvent += UpdateParrent;
+			LinkedComp.Entity.children.OnReorderList += Children_OnReorderList;
 			UpdateParrent();
 			LoadCanvasItemLink();
 			StartContinueInit();
+		}
+
+		private void Children_OnReorderList() {
+			foreach (Entity item in LinkedComp.Entity.children) {
+				if (item?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
+					node.MoveChild(canvasItem.CanvasItem, -1);
+				}
+			}
 		}
 
 		public virtual void UpdateParrent() {

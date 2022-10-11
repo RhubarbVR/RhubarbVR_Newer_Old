@@ -15,12 +15,11 @@ namespace RhuEngine.Components
 			if (TargetElement is null) {
 				return;
 			}
-			ui.PushElement<UIElement>();
+			var table = ui.PushElement<TextLabel>();
 			ui.Min = new Vector2f(0, 1);
 			ui.MinSize = new Vector2i(0, ELMENTHIGHTSIZE);
-			var table = ui.PushElement<TextLabel>();
-			table.Text.Value = TargetElement.GetType().GetFormattedName();
-			ui.Pop();
+			table.TextSize.Value = ELMENTHIGHTSIZE;
+			table.Text.Value = TargetElement.Name + " : " + TargetElement.GetType().GetFormattedName();
 			ui.Pop();
 			var data = TargetElement.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
 			foreach (var item in data) {
@@ -35,7 +34,9 @@ namespace RhuEngine.Components
 					continue;
 				}
 				if (item.GetValue(TargetElement) is IWorldObject objec) {
-					var newOBserver = ui.Entity.AddChild(objec.Name).AttachComponent<IObserver>(newObserver);
+					var element = ui.Entity.AddChild(objec.Name);
+					element.AttachComponent<BoxContainer>().Vertical.Value = true;
+					var newOBserver = element.AttachComponent<IObserver>(newObserver);
 					newOBserver.SetObserverd(objec);
 				}
 			}

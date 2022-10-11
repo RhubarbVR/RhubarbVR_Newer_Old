@@ -10,6 +10,7 @@ using RhubarbVR.Bindings.TextureBindings;
 
 using RhuEngine.Components;
 using RhuEngine.Linker;
+using RhuEngine.WorldObjects.ECS;
 
 using Viewport = RhuEngine.Components.Viewport;
 
@@ -92,7 +93,18 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.SendInputEvent = UpdateInput;
 			LinkedComp.ClearBackGroundCalled = ClearCalled;
 			LinkedComp.RenderFrameCalled = RenderFrameCalled;
+			LinkedComp.Entity.children.OnReorderList += Children_OnReorderList;
 		}
+
+
+		private void Children_OnReorderList() {
+			foreach (Entity item in LinkedComp.Entity.children) {
+				if (item?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
+					node.MoveChild(canvasItem.CanvasItem, -1);
+				}
+			}
+		}
+
 		private void RenderFrameCalled() {
 			switch (node.RenderTargetUpdateMode) {
 				case SubViewport.UpdateMode.Disabled:
@@ -120,7 +132,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void UpdateInput(RNumerics.Vector2f pos) {
-			if (IsInputUpdate) {
+			if (_isInputUpdate) {
 				node.RenderTargetUpdateMode = SubViewport.UpdateMode.Once;
 			}
 
@@ -274,12 +286,12 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			node.UseOcclusionCulling = LinkedComp.UseOcclusionCulling.Value;
 		}
 
-		private bool IsInputUpdate = false;
+		private bool _isInputUpdate = false;
 
 		private void UpdateMode_Changed(RhuEngine.WorldObjects.IChangeable obj) {
 			switch (LinkedComp.UpdateMode.Value) {
 				case RUpdateMode.InputUpdate:
-					IsInputUpdate = true;
+					_isInputUpdate = true;
 					node.RenderTargetUpdateMode = SubViewport.UpdateMode.Once;
 					break;
 				case RUpdateMode.Always:
