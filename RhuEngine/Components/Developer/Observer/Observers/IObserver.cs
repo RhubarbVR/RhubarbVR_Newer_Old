@@ -8,27 +8,28 @@ using System;
 
 namespace RhuEngine.Components
 {
-	public static class ObserverHelper {
+	public static class ObserverHelper
+	{
 
 		public static Type GetObserverFromType(this Type checktype) {
 			if (!typeof(IWorldObject).IsAssignableFrom(checktype)) {
 				return null;
 			}
-			if (typeof(Entity).IsAssignableFrom(checktype)) { 
-				return typeof(ObserverEnity);
-			}
-			if (typeof(Component).IsAssignableFrom(checktype)) {
-				return typeof(ObserverComponent);
-			}
-			if (typeof(ISyncMember).IsAssignableFrom(checktype)) {
-				if (typeof(ILinkerMember<bool>).IsAssignableFrom(checktype)) {
-					return typeof(BoolSyncObserver);
-				}
-				if (typeof(ISync).IsAssignableFrom(checktype)) {
-					return typeof(PrimitiveSyncObserver);
-				}
-				return null;
-			}
+			//if (typeof(Entity).IsAssignableFrom(checktype)) {
+			//	return typeof(ObserverEnity);
+			//}
+			//if (typeof(Component).IsAssignableFrom(checktype)) {
+			//	return typeof(ObserverComponent);
+			//}
+			//if (typeof(ISyncMember).IsAssignableFrom(checktype)) {
+			//	if (typeof(ILinkerMember<bool>).IsAssignableFrom(checktype)) {
+			//		return typeof(BoolSyncObserver);
+			//	}
+			//	if (typeof(ISync).IsAssignableFrom(checktype)) {
+			//		return typeof(PrimitiveSyncObserver);
+			//	}
+			//	return null;
+			//}
 			return typeof(ObserverWorldObject);
 		}
 
@@ -42,18 +43,15 @@ namespace RhuEngine.Components
 	{
 		public void SetObserverd(IWorldObject target);
 
-		public IObserver SetUIRectAndMat(IAssetProvider<RMaterial> mat);
 	}
 
 	public abstract class ObserverBase<T> : Component, IObserver where T : class, IWorldObject
 	{
-		public const float ELMENTHIGHTSIZE = 0.65f;
+		public const int ELMENTHIGHTSIZE = 65;
 		public T TargetElement => Observerd.Target;
 
 		[OnChanged(nameof(ChangeObserverd))]
 		public readonly SyncRef<T> Observerd;
-
-		public readonly AssetRef<RMaterial> Mat;
 
 		protected virtual void EveryUserOnLoad() {
 
@@ -65,24 +63,20 @@ namespace RhuEngine.Components
 				return;
 			}
 			Entity.DestroyChildren();
-			if(Entity.parent.Target is null) {
+			if (Entity.parent.Target is null) {
 				return;
 			}
-			var uiBuilder = new UI3DBuilder(Entity, Mat.Target, Entity.UIRect?? BuildMainUIRect(), true,true);
+			var uiBuilder = new UIBuilder2D(Entity);
 			LoadObservedUI(uiBuilder);
 			EveryUserOnLoad();
 		}
-		protected abstract UI3DRect BuildMainUIRect();
 
-		protected abstract void LoadObservedUI(UI3DBuilder ui);
+		protected abstract void LoadObservedUI(UIBuilder2D ui);
 
 		public void SetObserverd(IWorldObject target) {
 			Observerd.TargetIWorldObject = target;
 		}
 
-		public IObserver SetUIRectAndMat(IAssetProvider<RMaterial> mat) {
-			Mat.Target = mat;
-			return this;
-		}
+
 	}
 }

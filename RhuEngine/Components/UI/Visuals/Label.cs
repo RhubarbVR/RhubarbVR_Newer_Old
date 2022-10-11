@@ -18,6 +18,7 @@ namespace RhuEngine.Components
 	[Category("UI/Container/Visuals")]
 	public class TextLabel : UIVisuals
 	{
+		public readonly Sync<string> Text;
 		public readonly Sync<int> LineSpacing;
 		public readonly AssetRef<RFont> Font;
 		public readonly Sync<int> TextSize;
@@ -39,6 +40,11 @@ namespace RhuEngine.Components
 		[Default(1f)]public readonly Sync<float> VisibleRatio;
 		public readonly Sync<RTextDirection> TextDir;
 		public readonly Sync<string> Language;
+
+		protected override void OnAttach() {
+			base.OnAttach();
+			Font.Target = World.RootEntity.GetFirstComponentOrAttach<MainFont>();
+		}
 
 	}
 }

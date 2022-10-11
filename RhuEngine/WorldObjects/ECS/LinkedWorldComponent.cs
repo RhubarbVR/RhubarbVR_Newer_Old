@@ -75,6 +75,7 @@ namespace RhuEngine.WorldObjects.ECS
 		public override void Dispose() {
 			World.FoucusChanged -= World_FoucusChanged;
 			World.UnregisterWorldLinkObject(this);
+			WorldLink?.Remove();
 			base.Dispose();
 		}
 

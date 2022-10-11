@@ -43,6 +43,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.VisibleRatio.Changed += VisibleRatio_Changed;
 			LinkedComp.TextDir.Changed += TextDir_Changed;
 			LinkedComp.Language.Changed += Language_Changed;
+			LinkedComp.Text.Changed += Text_Changed;
+			Text_Changed(null);
 			LineSpacing_Changed(null);
 			Font_LoadChange(null);
 			TextSize_Changed(null);
@@ -65,6 +67,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			TextDir_Changed(null);
 			Language_Changed(null);
 
+		}
+
+		private void Text_Changed(IChangeable obj) {
+			node.Text = LinkedComp.Text.Value;
 		}
 
 		private void Font_LoadChange(RFont obj) {

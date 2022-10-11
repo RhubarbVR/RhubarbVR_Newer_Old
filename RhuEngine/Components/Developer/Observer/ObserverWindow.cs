@@ -16,6 +16,8 @@ namespace RhuEngine.Components
 
 		public readonly SyncRef<Window> TargetWindow;
 		public readonly SyncRef<Entity> LastLocation;
+		public readonly SyncRef<Viewport> MainViewPort;
+		public readonly SyncRef<UIElement> RootUIElement;
 		public readonly SyncRef<IObserver> CurrentObserver;
 
 		private void ChangeObserverd() {
@@ -24,23 +26,14 @@ namespace RhuEngine.Components
 			}
 			CurrentObserver.Target?.Entity.Destroy();
 			var type = Observerd.Target?.GetObserver();
-			if(type is null) {
+			if (type is null) {
 				return;
 			}
-			var addTo = TargetWindow.Target?.PannelRoot.Target;
+			var addTo = MainViewPort.Target.Entity;
 			if (addTo is null) {
 				return;
 			}
-			var ob = addTo.AddChild("Observer");
-			ob.AttachComponent<UI3DRect>();
-			CurrentObserver.Target = ob.AttachComponent<IObserver>(type);
-			var mit = TargetWindow.Target?.MainMit.Target;
-			if (mit is null) {
-				mit =  Entity.AttachComponent<UnlitMaterial>();
-				mit.DullSided.Value = true;
-				mit.Transparency.Value = Transparency.Blend;
-			}
-			CurrentObserver.Target.SetUIRectAndMat(mit);
+			CurrentObserver.Target = addTo.AttachComponent<IObserver>(type);
 			CurrentObserver.Target.SetObserverd(Observerd.Target);
 		}
 
@@ -56,6 +49,29 @@ namespace RhuEngine.Components
 			newWindow.MinimizeButton.Value = false;
 			newWindow.Canvas.Target.scale.Value *= new Vector3f(1, 1.5f, 1);
 			newWindow.PannelRoot.Target?.GetFirstComponentOrAttach<UI3DRect>();
+			if(newWindow.PannelRoot.Target is null) {
+				return;
+			}
+			var root2dUI = newWindow.PannelRoot.Target.AddChild("2DUiRoot");
+			root2dUI.AttachComponent<UI3DRect>();
+			Viewport mainViewPort;
+			var input = root2dUI.AttachComponent<UI3DInputInteraction>();
+			input.InputInterface.Target = mainViewPort = MainViewPort.Target = root2dUI.AttachComponent<Viewport>();
+			mainViewPort.Disable3D.Value = true;
+			mainViewPort.TransparentBG.Value = true;
+			var uiMit = root2dUI.AttachComponent<UnlitMaterial>();
+			uiMit.MainTexture.Target = mainViewPort;
+			uiMit.Transparency.Value = Transparency.Blend;
+			var visual = root2dUI.AttachComponent<UI3DRectangle>();
+			visual.Material.Target = uiMit;
+			visual.Tint.Value = Colorf.White;
+			var root = root2dUI.AddChild("Root").AttachComponent<UIElement>();
+			var copyer = root2dUI.AttachComponent<ValueCopy<Vector2i>>();
+			copyer.Source.Target = mainViewPort.Size;
+			copyer.Target.Target = root.MinSize;
+			input.SizeSeter.Target = mainViewPort.Size;
+			mainViewPort.UpdateMode.Value = RUpdateMode.InputUpdate;
+			RootUIElement.Target = root;
 		}
 
 		[Exposed]

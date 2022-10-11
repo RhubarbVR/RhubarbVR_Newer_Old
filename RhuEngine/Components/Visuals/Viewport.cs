@@ -155,9 +155,18 @@ namespace RhuEngine.Components
 		Shadows_256,
 		Shadows_1024,
 	}
+
+	public interface IInputInterface:IWorldObject {
+		/// <summary>
+		/// Sends input as a 0,1 value
+		/// </summary>
+		/// <param name="pos"></param>
+		void SendInput(Vector2f pos);
+	}
+
 	[SingleComponentLock]
 	[Category(new string[] { "Visuals" })]
-	public sealed class Viewport : LinkedWorldComponent , IAssetProvider<RTexture2D>
+	public sealed class Viewport : LinkedWorldComponent , IAssetProvider<RTexture2D>,IInputInterface
 	{
 		public readonly Sync<Vector2i> Size;
 		public readonly Sync<Vector2i> Size2DOverride;
@@ -255,6 +264,12 @@ namespace RhuEngine.Components
 		public override void Dispose() {
 			Load(null);
 			base.Dispose();
+		}
+
+		public Action<Vector2f> SendInputEvent;
+
+		public void SendInput(Vector2f pos) {
+			SendInputEvent?.Invoke(pos);
 		}
 	}
 }

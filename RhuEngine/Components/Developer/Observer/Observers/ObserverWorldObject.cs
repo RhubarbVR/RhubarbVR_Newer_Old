@@ -11,18 +11,17 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Developer/Observer/Observers" })]
 	public sealed class ObserverWorldObject : ObserverBase<IWorldObject>
 	{
-		protected override UI3DRect BuildMainUIRect() {
-			return Entity.AttachComponent<UI3DVerticalList>();
-		}
-		protected override void LoadObservedUI(UI3DBuilder ui) {
-			if(TargetElement is null) {
+		protected override void LoadObservedUI(UIBuilder2D ui) {
+			if (TargetElement is null) {
 				return;
 			}
-			ui.PushRect(new Vector2f(0, 1),null, 0.01f);
-			ui.SetOffsetMinMax(new Vector2f(0, -ELMENTHIGHTSIZE));
-			ui.AddRectangle(0.2f,0.8f);
-			ui.AddText(TargetElement.GetType().GetFormattedName(), null, 2, 1, null, true);
-			ui.PopRect();
+			ui.PushElement<UIElement>();
+			ui.Min = new Vector2f(0, 1);
+			ui.MinSize = new Vector2i(0, ELMENTHIGHTSIZE);
+			var table = ui.PushElement<TextLabel>();
+			table.Text.Value = TargetElement.GetType().GetFormattedName();
+			ui.Pop();
+			ui.Pop();
 			var data = TargetElement.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
 			foreach (var item in data) {
 				if (item.GetCustomAttribute<NoShowAttribute>() is not null) {
@@ -32,12 +31,11 @@ namespace RhuEngine.Components
 					continue;
 				}
 				var newObserver = item.FieldType.GetObserverFromType();
-				if(newObserver is null) {
+				if (newObserver is null) {
 					continue;
 				}
 				if (item.GetValue(TargetElement) is IWorldObject objec) {
-					var newOBserver = ui.CurretRectEntity.AddChild(objec.Name).AttachComponent<IObserver>(newObserver);
-					newOBserver.SetUIRectAndMat(ui.MainMat);
+					var newOBserver = ui.Entity.AddChild(objec.Name).AttachComponent<IObserver>(newObserver);
 					newOBserver.SetObserverd(objec);
 				}
 			}

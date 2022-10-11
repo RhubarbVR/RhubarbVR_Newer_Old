@@ -89,6 +89,41 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			QuadTwo_Changed(null);
 			QuadThree_Changed(null);
 			LinkedComp.Load(new RTexture2D(new GodotTexture2D(node.GetTexture())));
+			LinkedComp.SendInputEvent = UpdateInput;
+			LinkedComp.ClearBackGroundCalled = ClearCalled;
+			LinkedComp.RenderFrameCalled = RenderFrameCalled;
+		}
+		private void RenderFrameCalled() {
+			switch (node.RenderTargetUpdateMode) {
+				case SubViewport.UpdateMode.Disabled:
+					node.RenderTargetUpdateMode = SubViewport.UpdateMode.Once;
+					break;
+				case SubViewport.UpdateMode.Once:
+					node.RenderTargetUpdateMode = SubViewport.UpdateMode.Once;
+					break;
+				default:
+					break;
+			}
+		}
+
+		private void ClearCalled() {
+			switch (node.RenderTargetClearMode) {
+				case SubViewport.ClearMode.Never:
+					node.RenderTargetClearMode = SubViewport.ClearMode.Once;
+					break;
+				case SubViewport.ClearMode.Once:
+					node.RenderTargetClearMode = SubViewport.ClearMode.Once;
+					break;
+				default:
+					break;
+			}
+		}
+
+		private void UpdateInput(RNumerics.Vector2f pos) {
+			if (IsInputUpdate) {
+				node.RenderTargetUpdateMode = SubViewport.UpdateMode.Once;
+			}
+
 		}
 
 		private void QuadThree_Changed(RhuEngine.WorldObjects.IChangeable obj) {
@@ -321,7 +356,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Size2DOverride_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.Size2dOverride = new Vector2i(Math.Max(2, LinkedComp.Size2DOverride.Value.x), Math.Max(2, LinkedComp.Size2DOverride.Value.y));
+			node.Size2dOverride = new Vector2i(LinkedComp.Size2DOverride.Value.x, LinkedComp.Size2DOverride.Value.y);
 		}
 
 		private void Size_Changed(RhuEngine.WorldObjects.IChangeable obj) {

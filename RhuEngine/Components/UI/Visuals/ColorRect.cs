@@ -10,6 +10,10 @@ namespace RhuEngine.Components
 	[Category("UI/Container/Visuals")]
 	public class ColorRect : UIVisuals
 	{
-		public readonly Sync<Colorf> Color; 
+		public readonly Sync<Colorf> Color;
+		protected override void OnAttach() {
+			base.OnAttach();
+			Color.Value = Colorf.White;
+		}
 	}
 }
