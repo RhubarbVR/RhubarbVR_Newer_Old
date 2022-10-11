@@ -151,9 +151,9 @@ namespace RhuEngine.Components
 		public readonly Sync<Vector2f> MinOffset;
 		public readonly Sync<Vector2f> MaxOffset;
 
-		[Default(RGrowHorizontal.Right)]
+		[Default(RGrowHorizontal.Both)]
 		public readonly Sync<RGrowHorizontal> GrowHorizontal;
-		[Default(RGrowVertical.Bottom)]
+		[Default(RGrowVertical.Both)]
 		public readonly Sync<RGrowVertical> GrowVertical;
 
 		public readonly Sync<float> Rotation;

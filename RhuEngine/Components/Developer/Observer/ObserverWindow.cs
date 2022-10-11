@@ -34,7 +34,11 @@ namespace RhuEngine.Components
 				return;
 			}
 			var child = addTo.AddChild(type.GetFormattedName());
-			child.AttachComponent<BoxContainer>().Vertical.Value = true;
+			var copyer = child.AttachComponent<ValueCopy<Vector2i>>();
+			var boxCon = child.AttachComponent<BoxContainer>();
+			boxCon.Vertical.Value = true;
+			copyer.Target.Target = boxCon.MinSize;
+			copyer.Source.Target = RootUIElement.Target.MinSize;
 			CurrentObserver.Target = child.AttachComponent<IObserver>(type);
 			CurrentObserver.Target.SetObserverd(Observerd.Target);
 		}
@@ -58,6 +62,7 @@ namespace RhuEngine.Components
 			root2dUI.AttachComponent<UI3DRect>();
 			Viewport mainViewPort;
 			var input = root2dUI.AttachComponent<UI3DInputInteraction>();
+			input.PixelPerMeter.Value = 1024;
 			input.InputInterface.Target = mainViewPort = MainViewPort.Target = root2dUI.AttachComponent<Viewport>();
 			mainViewPort.Disable3D.Value = true;
 			mainViewPort.TransparentBG.Value = true;

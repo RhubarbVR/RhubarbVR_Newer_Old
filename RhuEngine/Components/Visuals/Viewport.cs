@@ -7,14 +7,16 @@ using System;
 
 namespace RhuEngine.Components
 {
-	public enum RMsaa {
+	public enum RMsaa
+	{
 		Disabled,
 		TwoX,
 		FourX,
 		EightX,
 	}
 
-	public enum RClearMode {
+	public enum RClearMode
+	{
 		Never,
 		Always,
 	}
@@ -133,7 +135,8 @@ namespace RhuEngine.Components
 		Mirror,
 	}
 
-	public enum RSDFOversize {
+	public enum RSDFOversize
+	{
 		_100,
 		_120,
 		_150,
@@ -156,17 +159,18 @@ namespace RhuEngine.Components
 		Shadows_1024,
 	}
 
-	public interface IInputInterface:IWorldObject {
+	public interface IInputInterface : IWorldObject
+	{
 		/// <summary>
 		/// Sends input as a 0,1 value
 		/// </summary>
 		/// <param name="pos"></param>
-		void SendInput(Vector2f pos);
+		void SendInput(Vector2f pos, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur);
 	}
 
 	[SingleComponentLock]
 	[Category(new string[] { "Visuals" })]
-	public sealed class Viewport : LinkedWorldComponent , IAssetProvider<RTexture2D>,IInputInterface
+	public sealed class Viewport : LinkedWorldComponent, IAssetProvider<RTexture2D>, IInputInterface
 	{
 		public readonly Sync<Vector2i> Size;
 		public readonly Sync<Vector2i> Size2DOverride;
@@ -266,10 +270,10 @@ namespace RhuEngine.Components
 			base.Dispose();
 		}
 
-		public Action<Vector2f> SendInputEvent;
+		public Action<Vector2f, Handed, int, bool, bool, bool, bool> SendInputEvent;
 
-		public void SendInput(Vector2f pos) {
-			SendInputEvent?.Invoke(pos);
+		public void SendInput(Vector2f pos, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
+			SendInputEvent?.Invoke(pos, side, current, isLazer, IsClickedPrime, IsClickedSecod, IsClickedTur);
 		}
 	}
 }

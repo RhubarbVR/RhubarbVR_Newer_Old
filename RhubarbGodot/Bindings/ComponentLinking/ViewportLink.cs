@@ -96,6 +96,33 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.Entity.children.OnReorderList += Children_OnReorderList;
 		}
 
+		private void UpdateInput(RNumerics.Vector2f pos, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
+			if (_isInputUpdate) {
+				node.RenderTargetUpdateMode = SubViewport.UpdateMode.Once;
+			}
+			var buttonMask = MouseButton.None;
+			if (IsClickedPrime) {
+				buttonMask |= MouseButton.MaskLeft;
+			}
+			if (IsClickedSecod) {
+				buttonMask |= MouseButton.MaskRight;
+			}
+			if (IsClickedTur) {
+				buttonMask |= MouseButton.MaskMiddle;
+			}
+			var mouseButton = new InputEventMouseButton {
+				Device = (current * ((int)side + 1)) + 10,
+				Position = new Vector2(pos.x, pos.y) * node.Size,
+				ButtonMask = buttonMask,
+				Pressed = buttonMask != MouseButton.None,
+			};
+			var mousePos = new InputEventMouseMotion {
+				Device = (current * ((int)side + 1)) + 10,
+				Position = new Vector2(pos.x, pos.y) * node.Size,
+			};
+			node.PushInput(mouseButton, true);
+			node.PushInput(mousePos, true);
+		}
 
 		private void Children_OnReorderList() {
 			foreach (Entity item in LinkedComp.Entity.children) {
@@ -129,13 +156,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				default:
 					break;
 			}
-		}
-
-		private void UpdateInput(RNumerics.Vector2f pos) {
-			if (_isInputUpdate) {
-				node.RenderTargetUpdateMode = SubViewport.UpdateMode.Once;
-			}
-
 		}
 
 		private void QuadThree_Changed(RhuEngine.WorldObjects.IChangeable obj) {

@@ -16,14 +16,18 @@ namespace RhuEngine.Components
 	{
 		[Default(true)]
 		public readonly Sync<bool> Laserable;
-
+		[Default(0.5f)]
+		public readonly Sync<float> PrimaryNeededForce;
+		[Default(0.5f)]
+		public readonly Sync<float> GripNeededForce;
+		[Default(0.5f)]
+		public readonly Sync<float> SecodaryNeededForce;
 		[Default(true)]
 		public readonly Sync<bool> Touchable;
 
 		[Default(true)]
 		public readonly Sync<bool> CustomTochable;
-		//[Default(1024)]
-		[Default(512)]
+		[Default(1024)]
 		public readonly Sync<int> PixelPerMeter;
 
 		public readonly Linker<Vector2i> SizeSeter;
@@ -46,19 +50,22 @@ namespace RhuEngine.Components
 				var pos = item.HitPointOnCanvas;
 				pos -= UIRect.TrueMin;
 				pos /= UIRect.TrueMax - UIRect.TrueMin;
+				var isPrime = item.PressForce >= PrimaryNeededForce.Value;
+				var isSec = item.GripForces >= GripNeededForce.Value;
+				var isMed = InputManager.GetInputAction(InputTypes.Secondary).HandedValue(item.Side) >= SecodaryNeededForce.Value;
 				if (item.Lazer) {
 					if (Laserable) {
-						InputInterface.Target?.SendInput(pos);
+						InputInterface.Target?.SendInput(pos, item.Side, (int)item.TouchUndex, true, isPrime, isSec, isMed);
 					}
 				}
 				else if (item.CustomTouch) {
 					if (CustomTochable) {
-						InputInterface.Target?.SendInput(pos);
+						InputInterface.Target?.SendInput(pos, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
 					}
 				}
 				else {
 					if (Touchable) {
-						InputInterface.Target?.SendInput(pos);
+						InputInterface.Target?.SendInput(pos, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
 					}
 				}
 			}

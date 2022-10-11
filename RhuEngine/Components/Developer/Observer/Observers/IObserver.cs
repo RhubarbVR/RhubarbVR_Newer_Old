@@ -21,15 +21,15 @@ namespace RhuEngine.Components
 			//if (typeof(Component).IsAssignableFrom(checktype)) {
 			//	return typeof(ObserverComponent);
 			//}
-			//if (typeof(ISyncMember).IsAssignableFrom(checktype)) {
-			//	if (typeof(ILinkerMember<bool>).IsAssignableFrom(checktype)) {
-			//		return typeof(BoolSyncObserver);
-			//	}
-			//	if (typeof(ISync).IsAssignableFrom(checktype)) {
-			//		return typeof(PrimitiveSyncObserver);
-			//	}
-			//	return null;
-			//}
+			if (typeof(ISyncMember).IsAssignableFrom(checktype)) {
+				//if (typeof(ILinkerMember<bool>).IsAssignableFrom(checktype)) {
+				//	return typeof(BoolSyncObserver);
+				//}
+				if (typeof(ISync).IsAssignableFrom(checktype)) {
+					return typeof(PrimitiveSyncObserver);
+				}
+				return null;
+			}
 			return typeof(ObserverWorldObject);
 		}
 
@@ -47,7 +47,7 @@ namespace RhuEngine.Components
 
 	public abstract class ObserverBase<T> : Component, IObserver where T : class, IWorldObject
 	{
-		public const int ELMENTHIGHTSIZE = 16;
+		public const int ELMENTHIGHTSIZE = 32;
 		public T TargetElement => Observerd.Target;
 
 		[OnChanged(nameof(ChangeObserverd))]
