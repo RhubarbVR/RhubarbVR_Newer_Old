@@ -57,6 +57,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.QuadOne.Changed += QuadOne_Changed;
 			LinkedComp.QuadTwo.Changed += QuadTwo_Changed;
 			LinkedComp.QuadThree.Changed += QuadThree_Changed;
+			LinkedComp.GUIDisableInput.Changed += GUIDisableInput_Changed;
+			GUIDisableInput_Changed(null);
 			Size_Changed(null);
 			Size2DOverride_Changed(null);
 			Size2DOverrideStretch_Changed(null);
@@ -94,33 +96,42 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.ClearBackGroundCalled = ClearCalled;
 			LinkedComp.RenderFrameCalled = RenderFrameCalled;
 			LinkedComp.Entity.children.OnReorderList += Children_OnReorderList;
+			node.GuiEmbedSubwindows = true;
+		}
+
+		private void GUIDisableInput_Changed(RhuEngine.WorldObjects.IChangeable obj) {
+			node.GuiDisableInput = LinkedComp.GUIDisableInput.Value;
 		}
 
 		private void UpdateInput(RNumerics.Vector2f pos, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
 			if (_isInputUpdate) {
 				node.RenderTargetUpdateMode = SubViewport.UpdateMode.Once;
 			}
-			var buttonMask = MouseButton.None;
-			if (IsClickedPrime) {
-				buttonMask |= MouseButton.MaskLeft;
-			}
-			if (IsClickedSecod) {
-				buttonMask |= MouseButton.MaskRight;
-			}
-			if (IsClickedTur) {
-				buttonMask |= MouseButton.MaskMiddle;
-			}
-			var mouseButton = new InputEventMouseButton {
+			var mouseButtonTur = new InputEventMouseButton {
 				Device = (current * ((int)side + 1)) + 10,
-				Position = new Vector2(pos.x, pos.y) * node.Size,
-				ButtonMask = buttonMask,
-				Pressed = buttonMask != MouseButton.None,
+				Position = new Vector2(pos.x, 1f - pos.y) * node.Size,
+				Pressed = IsClickedTur,
+				ButtonIndex = MouseButton.Middle
 			};
+			node.PushInput(mouseButtonTur, true);
+			var mouseButtonSecod = new InputEventMouseButton {
+				Device = (current * ((int)side + 1)) + 10,
+				Position = mouseButtonTur.Position,
+				Pressed = IsClickedSecod,
+				ButtonIndex = MouseButton.Right
+			};
+			node.PushInput(mouseButtonSecod, true);
+			var mouseButtonIsClickedPrime = new InputEventMouseButton {
+				Device = (current * ((int)side + 1)) + 10,
+				Position = mouseButtonTur.Position,
+				Pressed = IsClickedPrime,
+				ButtonIndex = MouseButton.Left
+			};
+			node.PushInput(mouseButtonIsClickedPrime, true);
 			var mousePos = new InputEventMouseMotion {
 				Device = (current * ((int)side + 1)) + 10,
-				Position = new Vector2(pos.x, pos.y) * node.Size,
+				Position = mouseButtonTur.Position,
 			};
-			node.PushInput(mouseButton, true);
 			node.PushInput(mousePos, true);
 		}
 

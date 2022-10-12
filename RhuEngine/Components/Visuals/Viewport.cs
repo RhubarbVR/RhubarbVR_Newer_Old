@@ -184,6 +184,8 @@ namespace RhuEngine.Components
 
 		public readonly Sync<bool> TransparentBG;
 
+		public readonly Sync<bool> GUIDisableInput;
+
 		public readonly Sync<bool> Snap2DTransformsToPixels;
 		public readonly Sync<bool> Snap2DVerticesToPixels;
 		[Default(RMsaa.Disabled)]

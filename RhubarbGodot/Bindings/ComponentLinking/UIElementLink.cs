@@ -36,6 +36,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.InputFilter.Changed += InputFilter_Changed;
 			LinkedComp.ForceScrollEventPassing.Changed += ForceScrollEventPassing_Changed;
 			LinkedComp.CursorShape.Changed += CursorShape_Changed;
+			LinkedComp.FocusMode.Changed += FocusMode_Changed;
 			ClipContents_Changed(null);
 			MinSize_Changed(null);
 			LayoutDir_Changed(null);
@@ -55,6 +56,15 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			InputFilter_Changed(null);
 			ForceScrollEventPassing_Changed(null);
 			CursorShape_Changed(null);
+			FocusMode_Changed(null);
+		}
+
+		private void FocusMode_Changed(IChangeable obj) {
+			node.FocusMode = LinkedComp.FocusMode.Value switch {
+				RFocusMode.Click => FocusModeEnum.Click,
+				RFocusMode.All => FocusModeEnum.All,
+				_ => FocusModeEnum.None,
+			};
 		}
 
 		private void CursorShape_Changed(IChangeable obj) {

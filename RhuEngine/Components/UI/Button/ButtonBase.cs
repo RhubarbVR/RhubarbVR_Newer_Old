@@ -29,5 +29,10 @@ namespace RhuEngine.Components
 		public readonly Sync<RButtonActionMode> ActionMode;
 		public readonly Sync<RButtonMask> ButtonMask;
 		public readonly Sync<bool> KeepPressedOutside;
+
+		protected override void OnAttach() {
+			base.OnAttach();
+			FocusMode.Value = RFocusMode.All;
+		}
 	}
 }

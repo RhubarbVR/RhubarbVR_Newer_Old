@@ -138,6 +138,12 @@ namespace RhuEngine.Components
 		Help
 	}
 
+	public enum RFocusMode {
+		None,
+		Click,
+		All
+	}
+
 	[Category("UI")]
 	public class UIElement : CanvasItem
 	{
@@ -167,6 +173,8 @@ namespace RhuEngine.Components
 		public readonly Sync<float> StretchRatio;
 		[Default(true)]
 		public readonly Sync<bool> AutoTranslate;
+		[Default(RFocusMode.None)]
+		public readonly Sync<RFocusMode> FocusMode;
 
 		[Default(RInputFilter.Stop)]
 		public readonly Sync<RInputFilter> InputFilter;

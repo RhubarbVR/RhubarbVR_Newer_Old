@@ -23,10 +23,12 @@ namespace RhuEngine.Components
 		protected override void LoadObservedUI(UIBuilder2D ui) {
 			ui.MinSize = new Vector2i(0, (int)(ELMENTHIGHTSIZE * 1.5f));
 			var UIElement = ui.PushElement<UIElement>();
+			UIElement.InputFilter.Value = RInputFilter.Pass;
 			UIElement.HorizontalFilling.Value = RFilling.Fill;
 			UIElement.VerticalFilling.Value = RFilling.Fill;
 
 			var trains = ui.PushElement<TextLabel>();
+			trains.InputFilter.Value = RInputFilter.Pass;
 			trains.TextSize.Value = ELMENTHIGHTSIZE;
 			trains.Text.Value = TargetElement.Name;
 			trains.HorizontalAlignment.Value = RHorizontalAlignment.Right;

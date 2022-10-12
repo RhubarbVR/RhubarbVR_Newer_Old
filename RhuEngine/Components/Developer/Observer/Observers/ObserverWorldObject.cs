@@ -35,7 +35,10 @@ namespace RhuEngine.Components
 				}
 				if (item.GetValue(TargetElement) is IWorldObject objec) {
 					var element = ui.Entity.AddChild(objec.Name);
-					element.AttachComponent<BoxContainer>().Vertical.Value = true;
+					var boxXo = element.AttachComponent<BoxContainer>();
+					boxXo.Vertical.Value = true;
+					boxXo.InputFilter.Value = RInputFilter.Pass;
+
 					var newOBserver = element.AttachComponent<IObserver>(newObserver);
 					newOBserver.SetObserverd(objec);
 				}

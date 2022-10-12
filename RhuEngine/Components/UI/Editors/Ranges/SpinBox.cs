@@ -16,5 +16,10 @@ namespace RhuEngine.Components
 		public readonly Sync<string> Prefix;
 		public readonly Sync<string> Suffix;
 		public readonly Sync<double> ArrowStep;
+
+		protected override void OnAttach() {
+			base.OnAttach();
+			FocusMode.Value = RFocusMode.All;
+		}
 	}
 }

@@ -20,5 +20,6 @@ namespace RhuEngine.Components
 		public readonly Sync<bool> AllowGreater;
 		public readonly Sync<bool> AllowLesser;
 
+
 	}
 }

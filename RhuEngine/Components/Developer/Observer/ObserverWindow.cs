@@ -36,6 +36,7 @@ namespace RhuEngine.Components
 			var child = addTo.AddChild(type.GetFormattedName());
 			var copyer = child.AttachComponent<ValueCopy<Vector2i>>();
 			var boxCon = child.AttachComponent<BoxContainer>();
+			boxCon.FocusMode.Value = RFocusMode.Click;
 			boxCon.Vertical.Value = true;
 			copyer.Target.Target = boxCon.MinSize;
 			copyer.Source.Target = RootUIElement.Target.MinSize;

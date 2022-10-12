@@ -16,5 +16,10 @@ namespace RhuEngine.Components
 		public readonly Sync<bool> Scrollable;
 		public readonly Sync<int> TickCount;
 		public readonly Sync<bool> TickOnBorders;
+
+		protected override void OnAttach() {
+			base.OnAttach();
+			FocusMode.Value = RFocusMode.All;
+		}
 	}
 }

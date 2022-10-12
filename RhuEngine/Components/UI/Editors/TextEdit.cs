@@ -43,5 +43,9 @@ namespace RhuEngine.Components
 		public readonly Sync<RTextDirection> TextDir;
 		public readonly Sync<string> Language;
 
+		protected override void OnAttach() {
+			base.OnAttach();
+			FocusMode.Value = RFocusMode.All;
+		}
 	}
 }
