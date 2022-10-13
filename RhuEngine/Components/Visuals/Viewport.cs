@@ -165,7 +165,7 @@ namespace RhuEngine.Components
 		/// Sends input as a 0,1 value
 		/// </summary>
 		/// <param name="pos"></param>
-		void SendInput(Vector2f pos, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur);
+		void SendInput(Vector2f pos, Vector2f Tilt, float PressForce, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur);
 	}
 
 	[SingleComponentLock]
@@ -272,10 +272,10 @@ namespace RhuEngine.Components
 			base.Dispose();
 		}
 
-		public Action<Vector2f, Handed, int, bool, bool, bool, bool> SendInputEvent;
+		public Action<Vector2f, Vector2f, float, Handed, int, bool, bool, bool, bool> SendInputEvent;
 
-		public void SendInput(Vector2f pos, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
-			SendInputEvent?.Invoke(pos, side, current, isLazer, IsClickedPrime, IsClickedSecod, IsClickedTur);
+		public void SendInput(Vector2f pos, Vector2f Tilt, float PressForce, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
+			SendInputEvent?.Invoke(pos, Tilt, PressForce, side, current, isLazer, IsClickedPrime, IsClickedSecod, IsClickedTur);
 		}
 	}
 }

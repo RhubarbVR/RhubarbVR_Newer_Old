@@ -18,7 +18,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public override string ObjectName => "CheckBox";
 
 		public override void StartContinueInit() {
-
 		}
 	}
 }

@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 using Godot;
 
+using NAudio.CoreAudioApi;
+
 using RhubarbVR.Bindings.TextureBindings;
 
 using RhuEngine.Components;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects.ECS;
+
+using SixLabors.ImageSharp.Processing;
 
 using Viewport = RhuEngine.Components.Viewport;
 
@@ -20,8 +24,114 @@ namespace RhubarbVR.Bindings.ComponentLinking
 	{
 		public override string ObjectName => "Viewport";
 
-		public override void Render() {
+		public class InputAction
+		{
+			public RNumerics.Vector2f Pos;
+			public RNumerics.Vector2f LastPos;
 
+			public RNumerics.Vector2f Tilt;
+			public float PressForce;
+
+			public bool IsClickedPrime;
+			public bool IsClickedPrimeLastFrame;
+			public float IsClickedPrimeTimeStateChange;
+
+
+			public bool IsClickedSecod;
+			public bool IsClickedSecodLastFrame;
+			public float IsClickedSecodTimeStateChange;
+
+			public bool IsClickedTur;
+			public bool IsClickedTurLastFrame;
+			public float IsClickedTurTimeStateChange;
+
+		}
+
+		public Dictionary<int, InputAction> InputActions = new();
+
+		public const float TimeForDoubleClick = 0.25f;
+
+		public override void Render() {
+			foreach (var item in InputActions) {
+				var value = item.Value;
+				var id = item.Key;
+
+				var buttonMask = MouseButton.None;
+				if (value.IsClickedPrime) {
+					buttonMask |= MouseButton.MaskLeft;
+				}
+				if (value.IsClickedSecod) {
+					buttonMask |= MouseButton.MaskRight;
+				}
+				if (value.IsClickedTur) {
+					buttonMask |= MouseButton.MaskMiddle;
+				}
+				var inputMove = new InputEventMouseMotion {
+					Position = new Vector2(value.Pos.x, value.Pos.y),
+					Device = id,
+					Pressure = value.PressForce,
+					ButtonMask = buttonMask,
+					Velocity = new Vector2(value.Pos.x, value.Pos.y) - new Vector2(value.LastPos.x, value.LastPos.y),
+					Tilt = new Vector2(value.Tilt.x, value.Tilt.y),
+				};
+				node.PushInput(inputMove, true);
+
+				value.LastPos = value.Pos;
+
+				if (value.IsClickedPrime != value.IsClickedPrimeLastFrame) {
+					var primeinputButton = new InputEventMouseButton {
+						Device = id,
+						ButtonIndex = MouseButton.Left,
+						ButtonMask = MouseButton.MaskLeft,
+						Pressed = value.IsClickedPrime,
+						DoubleClick = value.IsClickedPrimeTimeStateChange <= TimeForDoubleClick,
+						Position = new Vector2(value.Pos.x, value.Pos.y),
+					};
+					node.PushInput(primeinputButton, true);
+					value.IsClickedPrimeTimeStateChange = 0;
+				}
+				else {
+					value.IsClickedPrimeTimeStateChange += RTime.Elapsedf;
+				}
+
+				if (value.IsClickedSecod != value.IsClickedSecodLastFrame) {
+					var secinputButton = new InputEventMouseButton {
+						Device = id,
+						ButtonIndex = MouseButton.Right,
+						ButtonMask = MouseButton.MaskRight,
+						Pressed = value.IsClickedSecod,
+						DoubleClick = value.IsClickedSecodTimeStateChange <= TimeForDoubleClick,
+						Position = new Vector2(value.Pos.x, value.Pos.y),
+					};
+					node.PushInput(secinputButton, true);
+					value.IsClickedSecodTimeStateChange = 0;
+				}
+				else {
+					value.IsClickedSecodTimeStateChange += RTime.Elapsedf;
+				}
+
+
+				if (value.IsClickedTur != value.IsClickedTurLastFrame) {
+					var turinputButton = new InputEventMouseButton {
+						Device = id,
+						ButtonIndex = MouseButton.Middle,
+						ButtonMask = MouseButton.MaskMiddle,
+						Pressed = value.IsClickedTur,
+						DoubleClick = value.IsClickedTurTimeStateChange <= TimeForDoubleClick,
+						Position = new Vector2(value.Pos.x, value.Pos.y),
+					};
+					node.PushInput(turinputButton, true);
+					value.IsClickedTurTimeStateChange = 0;
+				}
+				else {
+					value.IsClickedTurTimeStateChange += RTime.Elapsedf;
+				}
+
+				value.IsClickedPrimeLastFrame = value.IsClickedPrime;
+				value.IsClickedSecodLastFrame = value.IsClickedSecod;
+				value.IsClickedTurLastFrame = value.IsClickedTur;
+
+			}
 		}
 
 		public override void StartContinueInit() {
@@ -103,36 +213,21 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			node.GuiDisableInput = LinkedComp.GUIDisableInput.Value;
 		}
 
-		private void UpdateInput(RNumerics.Vector2f pos, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
+		private void UpdateInput(RNumerics.Vector2f pos, RNumerics.Vector2f Tilt, float PressForce, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
 			if (_isInputUpdate) {
 				node.RenderTargetUpdateMode = SubViewport.UpdateMode.Once;
 			}
-			var mouseButtonTur = new InputEventMouseButton {
-				Device = (current * ((int)side + 1)) + 10,
-				Position = new Vector2(pos.x, 1f - pos.y) * node.Size,
-				Pressed = IsClickedTur,
-				ButtonIndex = MouseButton.Middle
-			};
-			node.PushInput(mouseButtonTur, true);
-			var mouseButtonSecod = new InputEventMouseButton {
-				Device = (current * ((int)side + 1)) + 10,
-				Position = mouseButtonTur.Position,
-				Pressed = IsClickedSecod,
-				ButtonIndex = MouseButton.Right
-			};
-			node.PushInput(mouseButtonSecod, true);
-			var mouseButtonIsClickedPrime = new InputEventMouseButton {
-				Device = (current * ((int)side + 1)) + 10,
-				Position = mouseButtonTur.Position,
-				Pressed = IsClickedPrime,
-				ButtonIndex = MouseButton.Left
-			};
-			node.PushInput(mouseButtonIsClickedPrime, true);
-			var mousePos = new InputEventMouseMotion {
-				Device = (current * ((int)side + 1)) + 10,
-				Position = mouseButtonTur.Position,
-			};
-			node.PushInput(mousePos, true);
+			var deviceid = (current * ((int)side + 1)) + 10;
+			if (!InputActions.TryGetValue(deviceid, out var inputAction)) {
+				inputAction = new InputAction();
+				InputActions.Add(deviceid, inputAction);
+			}
+			inputAction.Pos = new RNumerics.Vector2f(pos.x * node.Size.x, (1f - pos.y) * node.Size.y);
+			inputAction.PressForce = PressForce;
+			inputAction.Tilt = Tilt;
+			inputAction.IsClickedPrime = IsClickedPrime;
+			inputAction.IsClickedSecod = IsClickedSecod;
+			inputAction.IsClickedTur = IsClickedTur;
 		}
 
 		private void Children_OnReorderList() {

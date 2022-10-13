@@ -78,7 +78,6 @@ namespace RhuEngine.Components
 			copyer.Source.Target = mainViewPort.Size;
 			copyer.Target.Target = root.MinSize;
 			input.SizeSeter.Target = mainViewPort.Size;
-			mainViewPort.UpdateMode.Value = RUpdateMode.InputUpdate;
 			RootUIElement.Target = root;
 		}
 

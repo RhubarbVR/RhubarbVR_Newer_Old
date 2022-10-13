@@ -30,6 +30,8 @@ namespace RhuEngine.Components
 		[Default(1024)]
 		public readonly Sync<int> PixelPerMeter;
 
+		public readonly Sync<Vector2f> Tilt;
+
 		public readonly Linker<Vector2i> SizeSeter;
 
 		public readonly SyncRef<IInputInterface> InputInterface;
@@ -55,17 +57,17 @@ namespace RhuEngine.Components
 				var isMed = InputManager.GetInputAction(InputTypes.Secondary).HandedValue(item.Side) >= SecodaryNeededForce.Value;
 				if (item.Lazer) {
 					if (Laserable) {
-						InputInterface.Target?.SendInput(pos, item.Side, (int)item.TouchUndex, true, isPrime, isSec, isMed);
+						InputInterface.Target?.SendInput(pos, Tilt.Value, item.PressForce, item.Side, (int)item.TouchUndex, true, isPrime, isSec, isMed);
 					}
 				}
 				else if (item.CustomTouch) {
 					if (CustomTochable) {
-						InputInterface.Target?.SendInput(pos, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
+						InputInterface.Target?.SendInput(pos, Tilt.Value, item.PressForce, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
 					}
 				}
 				else {
 					if (Touchable) {
-						InputInterface.Target?.SendInput(pos, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
+						InputInterface.Target?.SendInput(pos, Tilt.Value, item.PressForce, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
 					}
 				}
 			}
