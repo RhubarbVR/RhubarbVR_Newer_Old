@@ -50,6 +50,8 @@ namespace RhuEngine.Components
 	[SingleComponentLock]
 	public abstract class CanvasItem : LinkedWorldComponent
 	{
+		protected override bool AddToUpdateList => false;
+
 		public readonly Sync<Colorf> Modulate;
 		public readonly Sync<Colorf> ModulateSelf;
 
