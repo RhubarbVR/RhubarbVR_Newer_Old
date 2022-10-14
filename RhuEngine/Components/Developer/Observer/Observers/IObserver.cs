@@ -22,10 +22,60 @@ namespace RhuEngine.Components
 			//	return typeof(ObserverComponent);
 			//}
 			if (typeof(ISyncMember).IsAssignableFrom(checktype)) {
-				//if (typeof(ILinkerMember<bool>).IsAssignableFrom(checktype)) {
-				//	return typeof(BoolSyncObserver);
-				//}
+				if (typeof(ILinkerMember<bool>).IsAssignableFrom(checktype)) {
+					return typeof(BoolSyncObserver);
+				}
+				if (typeof(ILinkerMember<byte>).IsAssignableFrom(checktype)) {
+					return typeof(NumberSyncObserver<byte>);
+				}
+				if (typeof(ILinkerMember<char>).IsAssignableFrom(checktype)) {
+					return typeof(NumberSyncObserver<char>);
+				}
+				if (typeof(ILinkerMember<double>).IsAssignableFrom(checktype)) {
+					return typeof(NumberSyncObserver<double>);
+				}
+				if (typeof(ILinkerMember<short>).IsAssignableFrom(checktype)) {
+					return typeof(NumberSyncObserver<short>);
+				}
+				if (typeof(ILinkerMember<int>).IsAssignableFrom(checktype)) {
+					return typeof(NumberSyncObserver<int>);
+				}
+				if (typeof(ILinkerMember<long>).IsAssignableFrom(checktype)) {
+					return typeof(NumberSyncObserver<long>);
+				}
+				if (typeof(ILinkerMember<sbyte>).IsAssignableFrom(checktype)) {
+					return typeof(NumberSyncObserver<sbyte>);
+				}
+				if (typeof(ILinkerMember<float>).IsAssignableFrom(checktype)) {
+					return typeof(NumberSyncObserver<float>);
+				}
+				if (typeof(ILinkerMember<ushort>).IsAssignableFrom(checktype)) {
+					return typeof(NumberSyncObserver<ushort>);
+				}
+				if (typeof(ILinkerMember<uint>).IsAssignableFrom(checktype)) {
+					return typeof(NumberSyncObserver<uint>);
+				}
+				if (typeof(ILinkerMember<ulong>).IsAssignableFrom(checktype)) {
+					return typeof(NumberSyncObserver<ulong>);
+				}
+				if (typeof(ILinkerMember<string>).IsAssignableFrom(checktype)) {
+					return typeof(PrimitiveSyncObserver);
+				}
+				if (typeof(ILinkerMember<Type>).IsAssignableFrom(checktype)) {
+					return typeof(PrimitiveSyncObserver);
+				}
+				if (typeof(ILinkerMember<decimal>).IsAssignableFrom(checktype)) {
+					return typeof(PrimitiveSyncObserver);
+				}
 				if (typeof(ISync).IsAssignableFrom(checktype)) {
+					if (checktype.IsGenericType) {
+						var innerTypes = checktype.GetGenericArguments();
+						if (innerTypes.Length == 1) {
+							if (innerTypes[0].IsValueType) {
+								return typeof(MultiNumberSyncObserver<>).MakeGenericType(innerTypes[0]);
+							}
+						}
+					}
 					return typeof(PrimitiveSyncObserver);
 				}
 				return null;

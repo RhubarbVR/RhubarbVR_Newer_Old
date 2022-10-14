@@ -63,16 +63,22 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.KeyboardBindAction = KeyboardBindAction;
 			node.FocusEntered += Node_FocusEntered;
 			node.FocusExited += Node_FocusExited;
+			foreach (var item in node.GetChildren(true)) {
+				if (item is Control control) {
+					control.FocusEntered += Node_FocusEntered;
+					control.FocusExited += Node_FocusExited;
+				}
+			}
 			if (LinkedComp.Engine.staticResources.MainFont.Inst is GodotFont font) {
 				node.Theme ??= new Theme();
 				node.Theme.DefaultFont = font.FontFile;
 			}
 		}
-		private void Node_FocusExited() {
+		protected void Node_FocusExited() {
 			LinkedComp.Engine.KeyboardInteractionUnBind(LinkedComp);
 		}
 
-		private void Node_FocusEntered() {
+		protected void Node_FocusEntered() {
 			if (FreeKeyboard) {
 				LinkedComp.Engine.KeyboardInteractionBind(LinkedComp);
 			}
@@ -84,6 +90,11 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		private void KeyboardUnBindAction() {
 			node.ReleaseFocus();
+			foreach (var item in node.GetChildren(true)) {
+				if (item is Control control) {
+					control.ReleaseFocus();
+				}
+			}
 		}
 
 		private void FocusMode_Changed(IChangeable obj) {

@@ -10,5 +10,9 @@ namespace RhuEngine.Components
 	[Category("UI/Button")]
 	public class CheckButton : Button
 	{
+		protected override void OnAttach() {
+			base.OnAttach();
+			ToggleMode.Value = true;
+		}
 	}
 }

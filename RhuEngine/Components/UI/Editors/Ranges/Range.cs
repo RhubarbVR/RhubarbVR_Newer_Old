@@ -19,7 +19,7 @@ namespace RhuEngine.Components
 		public readonly Sync<bool> Rounded;
 		public readonly Sync<bool> AllowGreater;
 		public readonly Sync<bool> AllowLesser;
-
+		public readonly SyncDelegate ValueUpdated;
 
 	}
 }

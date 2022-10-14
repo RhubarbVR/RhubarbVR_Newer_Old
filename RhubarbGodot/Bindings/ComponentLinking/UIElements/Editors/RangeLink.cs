@@ -35,6 +35,12 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			Rounded_Changed(null);
 			AllowGreater_Changed(null);
 			AllowLesser_Changed(null);
+			node.ValueChanged += Node_ValueChanged;
+		}
+
+		private void Node_ValueChanged(double value) {
+			LinkedComp.Value.Value = value;
+			LinkedComp.ValueUpdated.Target?.Invoke();
 		}
 
 		private void AllowLesser_Changed(IChangeable obj) {
@@ -54,7 +60,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Value_Changed(IChangeable obj) {
-			node.Value = LinkedComp.Value.Value;
+			if (node.Value != LinkedComp.Value.Value) {
+				node.Value = LinkedComp.Value.Value;
+			}
 		}
 
 		private void PageValue_Changed(IChangeable obj) {
