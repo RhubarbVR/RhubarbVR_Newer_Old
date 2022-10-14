@@ -19,6 +19,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Editors")]
+	[UpdateLevel(UpdateEnum.Normal)]
 	public class LineEdit : UIElement
 	{
 		public override string EditString => Text.Value;
@@ -55,6 +56,17 @@ namespace RhuEngine.Components
 		public readonly Sync<bool> CaretMidGrapheme;
 		public readonly Sync<RTextDirection> TextDir;
 		public readonly Sync<string> Language;
+		[Default(true)]
+		public readonly Sync<bool> FocusLossOnEnter;
+
+		protected override void Step() {
+			base.Step();
+			if(Engine.KeyboardInteraction == this) {
+				if (Engine.inputManager.KeyboardSystem.IsKeyJustDown(Key.Return) && !Engine.inputManager.KeyboardSystem.IsKeyDown(Key.Shift)) {
+					KeyboardUnBind();
+				}
+			}
+		}
 
 		protected override void OnAttach() {
 			base.OnAttach();
