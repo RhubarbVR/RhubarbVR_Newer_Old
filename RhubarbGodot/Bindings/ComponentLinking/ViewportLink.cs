@@ -8,9 +8,11 @@ using Godot;
 
 using NAudio.CoreAudioApi;
 
+using RhubarbVR.Bindings.Input;
 using RhubarbVR.Bindings.TextureBindings;
 
 using RhuEngine.Components;
+using RhuEngine.Input;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects.ECS;
 
@@ -49,9 +51,35 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		public Dictionary<int, InputAction> InputActions = new();
 
-		public const float TimeForDoubleClick = 0.25f;
-
+		public const float TIME_FOR_DOUBLE_CLICK = 0.25f;
 		public override void Render() {
+			if (LinkedComp.Engine.KeyboardInteraction is UIElement element && element.Entity.Viewport == LinkedComp) {
+				foreach (var item in KeyboardSystem._keys) {
+					var time = LinkedComp.InputManager.KeyboardSystem.GetStateChangeTime(item);
+					if (time is 0 or > 0.5f) {
+						var keyInput = new InputEventKey {
+							Pressed = LinkedComp.InputManager.KeyboardSystem.IsKeyDown(item),
+							Echo = !LinkedComp.InputManager.KeyboardSystem.IsKeyJustDown(item),
+							Keycode = GodotKeyboard.ToGodotKey(item),
+							AltPressed = LinkedComp.InputManager.KeyboardSystem.IsKeyDown(RhuEngine.Linker.Key.Alt),
+							CtrlPressed = LinkedComp.InputManager.KeyboardSystem.IsKeyDown(RhuEngine.Linker.Key.Ctrl),
+							ShiftPressed = LinkedComp.InputManager.KeyboardSystem.IsKeyDown(RhuEngine.Linker.Key.Shift),
+
+						};
+						node.PushInput(keyInput, true);
+					}
+				}
+				foreach (var item in LinkedComp.InputManager.KeyboardSystem.TypeDelta.EnumerateRunes()) {
+					var keyInput = new InputEventKey {
+						Pressed = true,
+						AltPressed = LinkedComp.InputManager.KeyboardSystem.IsKeyDown(RhuEngine.Linker.Key.Alt),
+						CtrlPressed = LinkedComp.InputManager.KeyboardSystem.IsKeyDown(RhuEngine.Linker.Key.Ctrl),
+						ShiftPressed = LinkedComp.InputManager.KeyboardSystem.IsKeyDown(RhuEngine.Linker.Key.Shift),
+						Unicode = item.Value
+					};
+					node.PushInput(keyInput, true);
+				}
+			}
 			foreach (var item in InputActions) {
 				var value = item.Value;
 				var id = item.Key;
@@ -84,7 +112,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 						ButtonIndex = MouseButton.Left,
 						ButtonMask = MouseButton.MaskLeft,
 						Pressed = value.IsClickedPrime,
-						DoubleClick = value.IsClickedPrimeTimeStateChange <= TimeForDoubleClick,
+						DoubleClick = value.IsClickedPrimeTimeStateChange <= TIME_FOR_DOUBLE_CLICK,
 						Position = new Vector2(value.Pos.x, value.Pos.y),
 					};
 					node.PushInput(primeinputButton, true);
@@ -100,7 +128,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 						ButtonIndex = MouseButton.Right,
 						ButtonMask = MouseButton.MaskRight,
 						Pressed = value.IsClickedSecod,
-						DoubleClick = value.IsClickedSecodTimeStateChange <= TimeForDoubleClick,
+						DoubleClick = value.IsClickedSecodTimeStateChange <= TIME_FOR_DOUBLE_CLICK,
 						Position = new Vector2(value.Pos.x, value.Pos.y),
 					};
 					node.PushInput(secinputButton, true);
@@ -117,7 +145,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 						ButtonIndex = MouseButton.Middle,
 						ButtonMask = MouseButton.MaskMiddle,
 						Pressed = value.IsClickedTur,
-						DoubleClick = value.IsClickedTurTimeStateChange <= TimeForDoubleClick,
+						DoubleClick = value.IsClickedTurTimeStateChange <= TIME_FOR_DOUBLE_CLICK,
 						Position = new Vector2(value.Pos.x, value.Pos.y),
 					};
 					node.PushInput(turinputButton, true);

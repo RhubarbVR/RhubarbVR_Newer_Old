@@ -66,7 +66,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			VisibleRatio_Changed(null);
 			TextDir_Changed(null);
 			Language_Changed(null);
-
 		}
 
 		private void Text_Changed(IChangeable obj) {

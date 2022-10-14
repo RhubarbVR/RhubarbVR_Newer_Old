@@ -263,9 +263,17 @@ namespace RhuEngine.Components
 		}
 
 		public void ProcessHitTouch(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, Handed handed) {
+			hitnormal = Entity.GlobalTrans.Rotation.Inverse * hitnormal;
+			if (hitnormal.z < 0) {
+				return;
+			}
 			AddHitData(new HitData(touchUndex, hitnormal, hitpointworld, handed));
 		}
 		public void ProcessHitLazer(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForces, Handed side) {
+			hitnormal = Entity.GlobalTrans.Rotation.Inverse * hitnormal;
+			if(hitnormal.z < 0) {
+				return;
+			}
 			AddHitData(new HitData(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side));
 		}
 

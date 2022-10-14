@@ -21,6 +21,8 @@ namespace RhuEngine.Components
 	[Category("UI/Editors")]
 	public class LineEdit : UIElement
 	{
+		public override string EditString => Text.Value;
+
 		public readonly Sync<string> Text;
 		public readonly Sync<string> PlaceholderText;
 		public readonly Sync<RHorizontalAlignment> Alignment;

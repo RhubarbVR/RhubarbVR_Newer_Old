@@ -17,6 +17,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 {
 	public sealed class LineEditLink : UIElementLinkBase<RhuEngine.Components.LineEdit, Godot.LineEdit>
 	{
+		protected override bool FreeKeyboard => true;
+
 		public override string ObjectName => "LineEdit";
 
 		public override void StartContinueInit() {
@@ -70,7 +72,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			TextDir_Changed(null);
 			Language_Changed(null);
 		}
-
+		
 		private void RightIcon_LoadChange(RTexture2D obj) {
 			node.RightIcon = LinkedComp.RightIcon.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
 		}

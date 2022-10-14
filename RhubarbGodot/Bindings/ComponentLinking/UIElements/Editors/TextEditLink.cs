@@ -221,6 +221,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 	public sealed class TextEditLink : TextEditBase<RhuEngine.Components.TextEdit, Godot.TextEdit>
 	{
+		protected override bool FreeKeyboard => true;
+
 		public override string ObjectName => "TextEdit";
 
 		public override void StartContinueInit() {

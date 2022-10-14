@@ -4,6 +4,7 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
 using System;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RhuEngine.Components
 {
@@ -16,6 +17,7 @@ namespace RhuEngine.Components
 		public readonly Sync<string> Prefix;
 		public readonly Sync<string> Suffix;
 		public readonly Sync<double> ArrowStep;
+		public override string EditString => Value.Value.ToString();
 
 		protected override void OnAttach() {
 			base.OnAttach();

@@ -161,6 +161,10 @@ namespace RhuEngine
 		}
 
 		public void KeyboardInteractionBind(IKeyboardInteraction uITextEditorInteraction) {
+			if (KeyboardInteraction == uITextEditorInteraction) {
+				KeyBoardUpdate();
+				return;
+			}
 			KeyboardInteraction?.KeyboardUnBind();
 			KeyboardInteraction = uITextEditorInteraction;
 			KeyBoardUpdate();

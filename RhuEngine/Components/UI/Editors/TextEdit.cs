@@ -10,6 +10,8 @@ namespace RhuEngine.Components
 	[Category("UI/Editors")]
 	public class TextEdit : UIElement
 	{
+		public override string EditString => Text.Value;
+
 		public readonly Sync<string> Text;
 		public readonly Sync<string> PlaceHolderText;
 		[Default(true)]public readonly Sync<bool> Editable;

@@ -15,6 +15,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 {
 	public abstract class UIElementLinkBase<T, T2> : CanvasItemNodeLinked<T, T2> where T : UIElement, new() where T2 : Control, new()
 	{
+		protected virtual bool FreeKeyboard => false;
 		public override void Init() {
 			base.Init();
 			LinkedComp.ClipContents.Changed += ClipContents_Changed;
@@ -57,6 +58,27 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			ForceScrollEventPassing_Changed(null);
 			CursorShape_Changed(null);
 			FocusMode_Changed(null);
+			LinkedComp.KeyboardUnBindAction = KeyboardUnBindAction;
+			LinkedComp.KeyboardBindAction = KeyboardBindAction;
+			node.FocusEntered += Node_FocusEntered;
+			node.FocusExited += Node_FocusExited;
+		}
+		private void Node_FocusExited() {
+			LinkedComp.Engine.KeyboardInteractionUnBind(LinkedComp);
+		}
+
+		private void Node_FocusEntered() {
+			if (FreeKeyboard) {
+				LinkedComp.Engine.KeyboardInteractionBind(LinkedComp);
+			}
+		}
+
+		private void KeyboardBindAction() {
+			node.GrabFocus();
+		}
+
+		private void KeyboardUnBindAction() {
+			node.ReleaseFocus();
 		}
 
 		private void FocusMode_Changed(IChangeable obj) {

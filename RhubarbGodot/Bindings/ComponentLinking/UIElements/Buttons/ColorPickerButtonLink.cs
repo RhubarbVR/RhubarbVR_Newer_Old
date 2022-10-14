@@ -16,6 +16,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 	public sealed class ColorPickerButtonLink : Button<RhuEngine.Components.ColorPickerButton, Godot.ColorPickerButton>
 	{
 		public override string ObjectName => "ColorPickerButton";
+		protected override bool FreeKeyboard => true;
 
 		public override void StartContinueInit() {
 			LinkedComp.Color.Changed += Color_Changed;

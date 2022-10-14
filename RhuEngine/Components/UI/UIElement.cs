@@ -4,10 +4,12 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
 using System;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RhuEngine.Components
 {
-	public enum RLayoutDir {
+	public enum RLayoutDir
+	{
 		Inherited,
 		Locale,
 		Left_to_Right,
@@ -138,15 +140,32 @@ namespace RhuEngine.Components
 		Help
 	}
 
-	public enum RFocusMode {
+	public enum RFocusMode
+	{
 		None,
 		Click,
 		All
 	}
 
 	[Category("UI")]
-	public class UIElement : CanvasItem
+	public class UIElement : CanvasItem, IKeyboardInteraction
 	{
+		public Matrix WorldPos => Entity.GlobalTrans;
+
+		public virtual string EditString => null;
+
+		public Action KeyboardBindAction;
+		public Action KeyboardUnBindAction;
+
+		public void KeyboardBind() {
+			KeyboardBindAction?.Invoke();
+		}
+
+		public void KeyboardUnBind() {
+			KeyboardUnBindAction?.Invoke();
+		}
+
+
 		public readonly Sync<bool> ClipContents;
 		public readonly Sync<Vector2i> MinSize;
 		public readonly Sync<RLayoutDir> LayoutDir;

@@ -16,6 +16,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 	public sealed class SpinBoxLink : RangeBase<RhuEngine.Components.SpinBox, Godot.SpinBox>
 	{
 		public override string ObjectName => "SpinBox";
+		protected override bool FreeKeyboard => true;
 
 		public override void StartContinueInit() {
 			LinkedComp.Editable.Changed += Editable_Changed;
