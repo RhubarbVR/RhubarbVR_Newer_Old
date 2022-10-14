@@ -259,7 +259,9 @@ namespace RhuEngine
 				StartingText = new RText(staticResources.MainFont) {
 					Text = "Starting",
 					HorizontalAlignment = RHorizontalAlignment.Center,
-					VerticalAlignment = RVerticalAlignment.Center
+					VerticalAlignment = RVerticalAlignment.Center,
+					AutoScale = false,
+					Size = new Vector2i(1080, 420),
 				};
 				StartingTextMit = StaticMaterialManager.GetMaterial<ITextMaterial>();
 				StartingTextMit.Texture = StartingText.texture2D;
