@@ -53,8 +53,22 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(ChangeObserverd))]
 		public readonly SyncRef<T> Observerd;
 
-		protected virtual void EveryUserOnLoad() {
+		protected abstract void LoadValueIn();
+		protected void LoadChangeUpdate(IChangeable changeable) {
+			LoadValueIn();
+		}
 
+		IChangeable _lastChangeable;
+
+		protected virtual void EveryUserOnLoad() {
+			if(TargetElement is IChangeable changeable) {
+				if (_lastChangeable is not null) {
+					_lastChangeable.Changed -= LoadChangeUpdate; 
+				}
+				_lastChangeable = changeable;
+				changeable.Changed += LoadChangeUpdate;
+			}
+			LoadValueIn();
 		}
 
 		protected void ChangeObserverd() {

@@ -23,12 +23,40 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.ActionMode.Changed += ActionMode_Changed;
 			LinkedComp.ButtonMask.Changed += ButtonMask_Changed;
 			LinkedComp.KeepPressedOutside.Changed += KeepPressedOutside_Changed;
+			node.ButtonDown += Node_ButtonDown;
+			node.ButtonUp += Node_ButtonUp;
+			node.Pressed += Node_Pressed;
+			node.Toggled += Node_Toggled;
 			Disabled_Changed(null);
 			ToggleMode_Changed(null);
 			ButtonPressed_Changed(null);
 			ActionMode_Changed(null);
 			ButtonMask_Changed(null);
 			KeepPressedOutside_Changed(null);
+		}
+
+		private void SendState() {
+			LinkedComp.ButtonPressed.Value = node.ButtonPressed;
+		}
+
+		private void Node_ButtonDown() {
+			SendState();
+			LinkedComp.ButtonDown.Target?.Invoke();
+		}
+
+		private void Node_ButtonUp() {
+			SendState();
+			LinkedComp.ButtonUp.Target?.Invoke();
+		}
+
+		private void Node_Pressed() {
+			SendState();
+			LinkedComp.Pressed.Target?.Invoke();
+		}
+
+		private void Node_Toggled(bool buttonPressed) {
+			SendState();
+			LinkedComp.Toggled.Target?.Invoke(buttonPressed);
 		}
 
 		private void KeepPressedOutside_Changed(IChangeable obj) {
@@ -57,7 +85,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void ButtonPressed_Changed(IChangeable obj) {
-			node.ButtonPressed = LinkedComp.ButtonPressed.Value;
+			if (node.ButtonPressed != LinkedComp.ButtonPressed.Value) {
+				node.ButtonPressed = LinkedComp.ButtonPressed.Value;
+			}
 		}
 
 		private void ToggleMode_Changed(IChangeable obj) {

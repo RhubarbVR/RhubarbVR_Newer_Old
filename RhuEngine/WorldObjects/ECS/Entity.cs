@@ -7,7 +7,7 @@ using RhuEngine.Components;
 
 namespace RhuEngine.WorldObjects.ECS
 {
-	public sealed class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox
+	public sealed class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox, IChangeable
 	{
 		private uint CompDepth => (InternalParent?.Depth + 1) ?? 0;
 
@@ -16,8 +16,13 @@ namespace RhuEngine.WorldObjects.ECS
 		public readonly SyncObjList<Entity> children;
 		[OnChanged(nameof(ParentChanged))]
 		public readonly SyncRef<Entity> parent;
+
 		[Default("Entity")]
+		[OnChanged(nameof(NameChange))]
 		public readonly Sync<string> name;
+		private void NameChange() {
+			Changed?.Invoke(this);
+		}
 		public override string Name => name.Value;
 
 		[OnChanged(nameof(TransValueChange))]
@@ -443,6 +448,8 @@ namespace RhuEngine.WorldObjects.ECS
 		public event Action<Entity, bool> GlobalTransformChange;
 
 		public event Action OffsetChanged;
+		public event Action<IChangeable> Changed;
+
 		[Exposed]
 		public Matrix GlobalTrans
 		{

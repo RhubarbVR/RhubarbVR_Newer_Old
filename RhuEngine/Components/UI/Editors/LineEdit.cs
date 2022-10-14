@@ -24,6 +24,9 @@ namespace RhuEngine.Components
 	{
 		public override string EditString => Text.Value;
 
+		public readonly SyncDelegate<Action<string>> TextChange;
+		public readonly SyncDelegate TextSubmitted;
+
 		public readonly Sync<string> Text;
 		public readonly Sync<string> PlaceholderText;
 		public readonly Sync<RHorizontalAlignment> Alignment;

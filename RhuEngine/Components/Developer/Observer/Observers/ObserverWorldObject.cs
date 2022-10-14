@@ -11,15 +11,16 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Developer/Observer/Observers" })]
 	public sealed class ObserverWorldObject : ObserverBase<IWorldObject>
 	{
+		public readonly Linker<string> LableText;
 		protected override void LoadObservedUI(UIBuilder2D ui) {
 			if (TargetElement is null) {
 				return;
 			}
 			var table = ui.PushElement<TextLabel>();
+			LableText.Target = table.Text;
 			ui.Min = new Vector2f(0, 1);
 			ui.MinSize = new Vector2i(0, ELMENTHIGHTSIZE);
 			table.TextSize.Value = ELMENTHIGHTSIZE;
-			table.Text.Value = TargetElement.Name + " : " + TargetElement.GetType().GetFormattedName();
 			ui.Pop();
 			var data = TargetElement.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
 			foreach (var item in data) {
@@ -42,6 +43,13 @@ namespace RhuEngine.Components
 					var newOBserver = element.AttachComponent<IObserver>(newObserver);
 					newOBserver.SetObserverd(objec);
 				}
+			}
+		}
+
+		protected override void LoadValueIn() {
+			if (LableText.Linked) {
+				LableText.LinkedValue = TargetElement.Name + " : " + TargetElement.GetType().GetFormattedName();
+
 			}
 		}
 	}

@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace RhuEngine.Components
 {
-	public abstract class PrimitiveBase<T>:ObserverBase<Sync<T>>
+	public abstract class PrimitiveBase<T> : EditingField<Sync<T>>
 	{
 	}
 }

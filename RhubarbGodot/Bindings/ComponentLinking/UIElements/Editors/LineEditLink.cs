@@ -71,8 +71,19 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			CaretMidGrapheme_Changed(null);
 			TextDir_Changed(null);
 			Language_Changed(null);
+			node.TextChanged += Node_TextChanged;
+			node.TextSubmitted += Node_TextSubmitted;
 		}
-		
+
+		private void Node_TextSubmitted(string newText) {
+			LinkedComp.Text.Value = newText;
+			LinkedComp.TextSubmitted?.Target?.Invoke();
+		}
+
+		private void Node_TextChanged(string newText) {
+			LinkedComp.TextChange?.Target?.Invoke(newText);
+		}
+
 		private void RightIcon_LoadChange(RTexture2D obj) {
 			node.RightIcon = LinkedComp.RightIcon.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
 		}

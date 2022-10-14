@@ -5,43 +5,80 @@ using RNumerics;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
 using System.Reflection;
+using RhuEngine.Commads;
+using System;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Observer/Observers/Primitives" })]
-	public class PrimitiveSyncObserver : ObserverBase<ISync>
+	public class PrimitiveSyncObserver : EditingField<ISync>
 	{
-		[OnChanged(nameof(LinkerLoaded))]
-		public readonly Linker<string> linker;
+		public readonly Linker<string> Linker;
+		public readonly Linker<string> PlaceHolderText;
 
-		private void LinkerLoaded() {
-			if (linker.Linked) {
-				linker.LinkedValue = TargetElement?.GetValue()?.ToString() ?? " NULL ";
+		public readonly SyncRef<LineEdit> Editor;
+
+		protected override void LoadEditor(UIBuilder2D ui) {
+			var isNUllable = TargetElement?.GetValueType()?.IsNullable() ?? false;
+			var lineEditor = ui.PushElement<LineEdit>();
+			lineEditor.ClearButtonEnabled.Value = isNUllable;
+			PlaceHolderText.Target = lineEditor.PlaceholderText;
+			Editor.Target = lineEditor;
+			Linker.Target = lineEditor.Text;
+			lineEditor.TextSubmitted.Target = TextSubmitted;
+			ui.Pop();
+			if (isNUllable) {
+				var lablebutton = ui.PushElement<Button>();
+				lablebutton.Pressed.Target = NullPress;
+				lineEditor.MaxOffset.Value = new Vector2f(-40, 0);
+				lablebutton.MinOffset.Value = new Vector2f(-35, 0);
+				lablebutton.Min.Value = new Vector2f(1, 0);
+				lablebutton.Text.Value = "🚫";
+				ui.Pop();
 			}
 		}
 
-		protected override void LoadObservedUI(UIBuilder2D ui) {
-			ui.MinSize = new Vector2i(0, (int)(ELMENTHIGHTSIZE * 1.5f));
-			var UIElement = ui.PushElement<UIElement>();
-			UIElement.InputFilter.Value = RInputFilter.Pass;
-			UIElement.HorizontalFilling.Value = RFilling.Fill;
-			UIElement.VerticalFilling.Value = RFilling.Fill;
+		[Exposed]
+		public void NullPress() {
+			try {
+				TargetElement.SetValue(null);
+			}
+			catch {
 
-			var trains = ui.PushElement<TextLabel>();
-			trains.InputFilter.Value = RInputFilter.Pass;
-			trains.TextSize.Value = ELMENTHIGHTSIZE;
-			trains.Text.Value = TargetElement.Name;
-			trains.HorizontalAlignment.Value = RHorizontalAlignment.Right;
-			trains.VerticalAlignment.Value = RVerticalAlignment.Center;
-			ui.Pop();
-			var lineEditor = ui.PushElement<LineEdit>();
-			linker.Target = lineEditor.Text;
-			lineEditor.MinSize.Value = new Vector2i(0, (int)(ELMENTHIGHTSIZE * 1.5f) - 5);
-			trains.Max.Value = new Vector2f(0.49f, 1f);
-			lineEditor.Min.Value = new Vector2f(0.51f, 0f);
+			}
+			LoadValueIn();
+		}
 
-			ui.Pop();
-			ui.Pop();
+
+		[Exposed]
+		public void TextSubmitted() {
+			try {
+				var data = Convert.ChangeType(Editor.Target?.Text.Value, TargetElement.GetValueType());
+				TargetElement.SetValue(data);
+			}
+			catch {
+
+			}
+			LoadValueIn();
+		}
+
+		protected override void LoadValueIn() {
+			if (Linker.Linked) {
+				if (Editor.Target?.Text.IsLinkedTo ?? false) {
+					var newValue = TargetElement?.GetValue()?.ToString();
+					Editor.Target.Text.Value = newValue;
+					if (newValue is null) {
+						if (PlaceHolderText.Linked) {
+							PlaceHolderText.LinkedValue = "NULL";
+						}
+					}
+					else {
+						if (PlaceHolderText.Linked) {
+							PlaceHolderText.LinkedValue = "";
+						}
+					}
+				}
+			}
 		}
 	}
 }

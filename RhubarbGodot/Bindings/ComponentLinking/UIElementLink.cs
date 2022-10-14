@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhubarbVR.Bindings.FontBindings;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -62,6 +63,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.KeyboardBindAction = KeyboardBindAction;
 			node.FocusEntered += Node_FocusEntered;
 			node.FocusExited += Node_FocusExited;
+			if (LinkedComp.Engine.staticResources.MainFont.Inst is GodotFont font) {
+				node.Theme ??= new Theme();
+				node.Theme.DefaultFont = font.FontFile;
+			}
 		}
 		private void Node_FocusExited() {
 			LinkedComp.Engine.KeyboardInteractionUnBind(LinkedComp);

@@ -4,10 +4,12 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
 using System;
+using NAudio.SoundFont;
 
 namespace RhuEngine.Components
 {
-	public enum RButtonActionMode {
+	public enum RButtonActionMode
+	{
 		Press,
 		Relases
 	}
@@ -29,6 +31,12 @@ namespace RhuEngine.Components
 		public readonly Sync<RButtonActionMode> ActionMode;
 		public readonly Sync<RButtonMask> ButtonMask;
 		public readonly Sync<bool> KeepPressedOutside;
+
+		public readonly SyncDelegate ButtonDown;
+		public readonly SyncDelegate ButtonUp;
+		public readonly SyncDelegate Pressed;
+		public readonly SyncDelegate<Action<bool>> Toggled;
+
 
 		protected override void OnAttach() {
 			base.OnAttach();
