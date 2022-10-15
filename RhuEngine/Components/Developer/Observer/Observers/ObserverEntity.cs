@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Observer/Observers" })]
-	public sealed class ObserverWorldObject : ObserverBase<IWorldObject>
+	public sealed class ObserverEntity : ObserverBase<Entity>
 	{
 		public readonly Linker<string> LableText;
 		protected override async Task LoadObservedUI(UIBuilder2D ui) {
@@ -45,6 +45,12 @@ namespace RhuEngine.Components
 					await newOBserver.SetObserverd(objec);
 				}
 			}
+			var compelement = ui.Entity.AddChild("Components");
+			var compboxXo = compelement.AttachComponent<BoxContainer>();
+			compboxXo.Vertical.Value = true;
+			compboxXo.InputFilter.Value = RInputFilter.Pass;
+			var compnewOBserver = compelement.AttachComponent<IObserver>(TargetElement.components.GetObserver());
+			await compnewOBserver.SetObserverd(TargetElement.components);
 		}
 
 		protected override void LoadValueIn() {

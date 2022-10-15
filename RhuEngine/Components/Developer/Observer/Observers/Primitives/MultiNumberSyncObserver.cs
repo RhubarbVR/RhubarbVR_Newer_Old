@@ -9,6 +9,7 @@ using RhuEngine.Commads;
 using System;
 using System.Linq;
 using MessagePack;
+using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
@@ -114,7 +115,7 @@ namespace RhuEngine.Components
 			ui.Pop();
 		}
 
-		protected override void LoadEditor(UIBuilder2D ui) {
+		protected override Task LoadEditor(UIBuilder2D ui) {
 			Fileds = typeof(T).GetFields().Where(x => x.GetCustomAttribute<KeyAttribute>() is not null).ToArray();
 			AmountOfFileds = Fileds.Length;
 			if (AmountOfFileds <= 1) {
@@ -136,6 +137,7 @@ namespace RhuEngine.Components
 				ui.Pop();
 			}
 			ui.Pop();
+			return Task.CompletedTask;
 		}
 
 		[Exposed]

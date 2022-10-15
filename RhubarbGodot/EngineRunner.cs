@@ -89,7 +89,6 @@ public partial class EngineRunner : Node3D, IRTime
 		engine?.Step();
 		TypeDelta = "";
 		MouseDelta = Vector2f.Zero;
-		ScrollDelta = Vector2f.Zero;
 		if (!Input.IsKeyPressed(Godot.Key.Backspace)) {
 			BackSpaceTimer = 0;
 		}
@@ -105,7 +104,6 @@ public partial class EngineRunner : Node3D, IRTime
 
 	public float Elapsedf => (float)GetProcessDeltaTime();
 
-	public Vector2f ScrollDelta { get; internal set; }
 	public Vector2f MouseDelta { get; internal set; }
 	public Vector2f MousePos { get; internal set; }
 
@@ -166,8 +164,6 @@ public partial class EngineRunner : Node3D, IRTime
 				TypeDelta += newString.Remove(clearFrom);
 			}
 		}
-		var weely = Input.GetActionRawStrength("MouseWeelUp") - Input.GetActionRawStrength("MouseWeelDown");
-		var weelx = Input.GetActionRawStrength("MouseWeelRight") - Input.GetActionRawStrength("MouseWeelLeft");
-		ScrollDelta = new Vector2f(weelx, weely);
+
 	}
 }

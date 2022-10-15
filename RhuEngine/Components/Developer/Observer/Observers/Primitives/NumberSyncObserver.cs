@@ -7,6 +7,7 @@ using RhuEngine.Physics;
 using System.Reflection;
 using RhuEngine.Commads;
 using System;
+using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
@@ -16,7 +17,7 @@ namespace RhuEngine.Components
 	{
 		public readonly SyncRef<SpinBox> TargetSpinBox;
 		public readonly Linker<double> Linker;
-		protected override void LoadEditor(UIBuilder2D ui) {
+		protected override Task LoadEditor(UIBuilder2D ui) {
 			var numberEditor = ui.PushElement<SpinBox>();
 			Linker.Target = numberEditor.Value;
 			TargetSpinBox.Target = numberEditor;
@@ -103,6 +104,7 @@ namespace RhuEngine.Components
 			}
 			numberEditor.ValueUpdated.Target = ValueUpdated;
 			ui.Pop();
+			return Task.CompletedTask;
 		}
 
 		[Exposed]

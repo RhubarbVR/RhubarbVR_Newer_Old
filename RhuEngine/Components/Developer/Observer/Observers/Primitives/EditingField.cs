@@ -6,13 +6,14 @@ using RhuEngine.Linker;
 using RhuEngine.Physics;
 using System.Reflection;
 using static RNumerics.Units;
+using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
 	public abstract class EditingField<T> : ObserverBase<T> where T : class, IWorldObject
 	{
 
-		protected override void LoadObservedUI(UIBuilder2D ui) {
+		protected override async Task LoadObservedUI(UIBuilder2D ui) {
 			ui.MinSize = new Vector2i(0, (int)(ELMENTHIGHTSIZE * 1.5f));
 			var UIElement = ui.PushElement<UIElement>();
 			UIElement.InputFilter.Value = RInputFilter.Pass;
@@ -30,12 +31,12 @@ namespace RhuEngine.Components
 			holder.MinSize.Value = new Vector2i(0, (int)(ELMENTHIGHTSIZE * 1.5f) - 5);
 			trains.Max.Value = new Vector2f(0.49f, 1f);
 			holder.Min.Value = new Vector2f(0.51f, 0f);
-			LoadEditor(ui);
+			await LoadEditor(ui);
 			ui.Pop();
 			ui.Pop();
 		}
 
 
-		protected abstract void LoadEditor(UIBuilder2D ui);
+		protected abstract Task LoadEditor(UIBuilder2D ui);
 	}
 }

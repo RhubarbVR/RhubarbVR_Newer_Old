@@ -7,6 +7,7 @@ using RhuEngine.Physics;
 using System.Reflection;
 using RhuEngine.Commads;
 using System;
+using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
@@ -18,7 +19,7 @@ namespace RhuEngine.Components
 
 		public readonly SyncRef<LineEdit> Editor;
 
-		protected override void LoadEditor(UIBuilder2D ui) {
+		protected override Task LoadEditor(UIBuilder2D ui) {
 			var isNUllable = TargetElement?.GetValueType()?.IsNullable() ?? false;
 			var lineEditor = ui.PushElement<LineEdit>();
 			lineEditor.ClearButtonEnabled.Value = isNUllable;
@@ -36,6 +37,7 @@ namespace RhuEngine.Components
 				lablebutton.Text.Value = "🚫";
 				ui.Pop();
 			}
+			return Task.CompletedTask;
 		}
 
 		[Exposed]

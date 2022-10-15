@@ -5,6 +5,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
 using System;
+using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
@@ -15,12 +16,12 @@ namespace RhuEngine.Components
 			if (!typeof(IWorldObject).IsAssignableFrom(checktype)) {
 				return null;
 			}
-			//if (typeof(Entity).IsAssignableFrom(checktype)) {
-			//	return typeof(ObserverEnity);
-			//}
-			//if (typeof(Component).IsAssignableFrom(checktype)) {
-			//	return typeof(ObserverComponent);
-			//}
+			if (typeof(Entity).IsAssignableFrom(checktype)) {
+				return typeof(ObserverEntity);
+			}
+			if (typeof(Component).IsAssignableFrom(checktype)) {
+				return typeof(ObserverComponent);
+			}
 			if (typeof(ISyncMember).IsAssignableFrom(checktype)) {
 				if (typeof(ILinkerMember<bool>).IsAssignableFrom(checktype)) {
 					return typeof(BoolSyncObserver);
@@ -71,6 +72,9 @@ namespace RhuEngine.Components
 					if (checktype.IsGenericType) {
 						var innerTypes = checktype.GetGenericArguments();
 						if (innerTypes.Length == 1) {
+							if (innerTypes[0].IsEnum) {
+								return typeof(PrimitiveSyncObserver);
+							}
 							if (innerTypes[0].IsValueType) {
 								return typeof(MultiNumberSyncObserver<>).MakeGenericType(innerTypes[0]);
 							}
@@ -78,7 +82,14 @@ namespace RhuEngine.Components
 					}
 					return typeof(PrimitiveSyncObserver);
 				}
-				return null;
+				if (typeof(ISyncList).IsAssignableFrom(checktype)) {
+					if (checktype.IsGenericType) {
+						var innerTypes = checktype.GetGenericArguments();
+						if (innerTypes.Length == 1) {
+							return typeof(ObserverListBase<>).MakeGenericType(innerTypes[0]);
+						}
+					}
+				}
 			}
 			return typeof(ObserverWorldObject);
 		}
@@ -91,7 +102,7 @@ namespace RhuEngine.Components
 
 	public interface IObserver : IComponent
 	{
-		public void SetObserverd(IWorldObject target);
+		public Task SetObserverd(IWorldObject target);
 
 	}
 
@@ -100,7 +111,7 @@ namespace RhuEngine.Components
 		public const int ELMENTHIGHTSIZE = 32;
 		public T TargetElement => Observerd.Target;
 
-		[OnChanged(nameof(ChangeObserverd))]
+		[OnChanged(nameof(RunChangeObserverd))]
 		public readonly SyncRef<T> Observerd;
 
 		protected abstract void LoadValueIn();
@@ -111,9 +122,9 @@ namespace RhuEngine.Components
 		IChangeable _lastChangeable;
 
 		protected virtual void EveryUserOnLoad() {
-			if(TargetElement is IChangeable changeable) {
+			if (TargetElement is IChangeable changeable) {
 				if (_lastChangeable is not null) {
-					_lastChangeable.Changed -= LoadChangeUpdate; 
+					_lastChangeable.Changed -= LoadChangeUpdate;
 				}
 				_lastChangeable = changeable;
 				changeable.Changed += LoadChangeUpdate;
@@ -121,7 +132,11 @@ namespace RhuEngine.Components
 			LoadValueIn();
 		}
 
-		protected void ChangeObserverd() {
+		public void RunChangeObserverd() {
+			Task.Run(ChangeObserverd);
+		}
+
+		protected async Task ChangeObserverd() {
 			if (LocalUser != MasterUser) {
 				EveryUserOnLoad();
 				return;
@@ -131,14 +146,15 @@ namespace RhuEngine.Components
 				return;
 			}
 			var uiBuilder = new UIBuilder2D(Entity);
-			LoadObservedUI(uiBuilder);
+			await LoadObservedUI(uiBuilder);
 			EveryUserOnLoad();
 		}
 
-		protected abstract void LoadObservedUI(UIBuilder2D ui);
+		protected abstract Task LoadObservedUI(UIBuilder2D ui);
 
-		public void SetObserverd(IWorldObject target) {
-			Observerd.TargetIWorldObject = target;
+		public Task SetObserverd(IWorldObject target) {
+			Observerd.SetTargetNoChange(target as T);
+			return ChangeObserverd();
 		}
 
 

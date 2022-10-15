@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Observer/Observers" })]
-	public sealed class ObserverWorldObject : ObserverBase<IWorldObject>
+	public sealed class ObserverComponent : ObserverBase<Component>
 	{
 		public readonly Linker<string> LableText;
 		protected override async Task LoadObservedUI(UIBuilder2D ui) {

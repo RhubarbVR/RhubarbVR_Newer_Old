@@ -11,7 +11,11 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public interface ISyncObjectList<T> : ISyncObject
+	public interface ISyncObjectList : ISyncObject {
+
+	}
+
+	public interface ISyncObjectList<T> : ISyncObjectList
 	{
 		public T Add(bool networkedObject = false, bool deserialize = false);
 	}

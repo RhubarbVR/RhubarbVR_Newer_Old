@@ -11,7 +11,17 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public abstract class SyncListBase<T> : SyncObject, INetworkedObject, IEnumerable<ISyncObject> , IChangeable, ISyncMember where T : ISyncObject
+	public interface ISyncList : INetworkedObject, IEnumerable<ISyncObject>, IChangeable, ISyncMember
+	{
+		int Count { get; }
+		object Lock { get; }
+
+		event Action OnReorderList;
+
+		void DestroyAtIndex(int index);
+		void DisposeAtIndex(int index);
+	}
+	public abstract class SyncListBase<T> : SyncObject, ISyncList, INetworkedObject, IEnumerable<ISyncObject>, IChangeable, ISyncMember where T : ISyncObject
 	{
 		private readonly SynchronizedCollection<T> _syncObjects = new(5);
 
@@ -47,7 +57,7 @@ namespace RhuEngine.WorldObjects
 		[Exposed]
 		public T this[int i] => _syncObjects[i];
 
-		public T this[NetPointer pointer] => _syncObjects.Where((val)=> val.Pointer == pointer).First();
+		public T this[NetPointer pointer] => _syncObjects.Where((val) => val.Pointer == pointer).First();
 
 		public int Count => _syncObjects.Count;
 
@@ -85,7 +95,7 @@ namespace RhuEngine.WorldObjects
 				var hasAdded = false;
 				for (var i = 0; i < _syncObjects.Count; i++) {
 					var elementOffset = 0;
-					if(_syncObjects[i] is IOffsetableElement ielementOffset){
+					if (_syncObjects[i] is IOffsetableElement ielementOffset) {
 						elementOffset = ielementOffset.Offset;
 					}
 					if (!hasAdded) {
@@ -114,7 +124,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		private void NewElement_OnDispose(object obj) {
-			if(obj is T castedObject) {
+			if (obj is T castedObject) {
 				RemoveInternal(castedObject);
 				BroadcastRemove(castedObject);
 			}

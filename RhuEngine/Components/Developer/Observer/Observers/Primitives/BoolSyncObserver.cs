@@ -7,6 +7,7 @@ using RhuEngine.Physics;
 using System.Reflection;
 using RhuEngine.Commads;
 using System;
+using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
@@ -16,7 +17,7 @@ namespace RhuEngine.Components
 	{
 		public readonly SyncRef<CheckBox> TargetCheckBox;
 		public readonly Linker<bool> Linker;
-		protected override void LoadEditor(UIBuilder2D ui) {
+		protected override Task LoadEditor(UIBuilder2D ui) {
 			ui.PushElement<UIElement>();
 			var check = ui.PushElement<CheckBox>();
 			check.Max.Value = new Vector2f(0, 1);
@@ -26,6 +27,7 @@ namespace RhuEngine.Components
 			TargetCheckBox.Target = check;
 			ui.Pop();
 			ui.Pop();
+			return Task.CompletedTask;
 		}
 
 		[Exposed]

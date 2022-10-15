@@ -52,6 +52,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public Dictionary<int, InputAction> InputActions = new();
 
 		public const float TIME_FOR_DOUBLE_CLICK = 0.25f;
+
 		public override void Render() {
 			if (LinkedComp.Engine.KeyboardInteraction is UIElement element && element.Entity.Viewport == LinkedComp) {
 				foreach (var item in KeyboardSystem._keys) {
@@ -105,6 +106,46 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				node.PushInput(inputMove, true);
 
 				value.LastPos = value.Pos;
+
+				var scroll = LinkedComp.Engine.inputManager.MouseSystem.ScrollDelta;
+
+				if (scroll.y > 0) {
+					var scrollweel = new InputEventMouseButton {
+						Device = id,
+						ButtonIndex = MouseButton.WheelUp,
+						Pressed = true,
+						Position = new Vector2(value.Pos.x, value.Pos.y),
+					};
+					node.PushInput(scrollweel, true);
+				}
+				if (scroll.y < 0) {
+					var scrollweel = new InputEventMouseButton {
+						Device = id,
+						ButtonIndex = MouseButton.WheelDown,
+						Pressed = true,
+						Position = new Vector2(value.Pos.x, value.Pos.y),
+					};
+					node.PushInput(scrollweel, true);
+				}
+				if (scroll.x > 0) {
+					var scrollweel = new InputEventMouseButton {
+						Device = id,
+						ButtonIndex = MouseButton.WheelRight,
+						Pressed = true,
+						Position = new Vector2(value.Pos.x, value.Pos.y),
+					};
+					node.PushInput(scrollweel, true);
+				}
+				if (scroll.x < 0) {
+					var scrollweel = new InputEventMouseButton {
+						Device = id,
+						ButtonIndex = MouseButton.WheelLeft,
+						Pressed = true,
+						Position = new Vector2(value.Pos.x, value.Pos.y),
+					};
+					node.PushInput(scrollweel, true);
+				}
+
 
 				if (value.IsClickedPrime != value.IsClickedPrimeLastFrame) {
 					var primeinputButton = new InputEventMouseButton {
