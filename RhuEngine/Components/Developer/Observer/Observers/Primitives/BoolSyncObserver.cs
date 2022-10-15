@@ -32,6 +32,9 @@ namespace RhuEngine.Components
 
 		[Exposed]
 		public void ValueUpdated(bool value) {
+			if (!ValueLoadedIn) {
+				return;
+			}
 			try {
 				if (Linker.Linked) {
 					if (TargetCheckBox.Target?.ButtonPressed.IsLinkedTo ?? false) {
@@ -48,11 +51,14 @@ namespace RhuEngine.Components
 			LoadValueIn();
 		}
 
+		protected bool ValueLoadedIn = false;
+
 		protected override void LoadValueIn() {
 			if (Linker.Linked) {
 				if (TargetCheckBox.Target?.ButtonPressed.IsLinkedTo ?? false) {
 					try {
 						TargetCheckBox.Target.ButtonPressed.Value = TargetElement.Value;
+						ValueLoadedIn = true;
 					}
 					catch { }
 				}

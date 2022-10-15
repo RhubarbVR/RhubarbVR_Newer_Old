@@ -39,9 +39,13 @@ namespace RhuEngine.Components
 			}
 			return Task.CompletedTask;
 		}
+		protected bool ValueLoadedIn = false;
 
 		[Exposed]
 		public void NullPress() {
+			if (!ValueLoadedIn) {
+				return;
+			}
 			try {
 				TargetElement.SetValue(null);
 			}
@@ -54,6 +58,9 @@ namespace RhuEngine.Components
 
 		[Exposed]
 		public void TextSubmitted() {
+			if (!ValueLoadedIn) {
+				return;
+			}
 			try {
 				var data = Convert.ChangeType(Editor.Target?.Text.Value, TargetElement.GetValueType());
 				TargetElement.SetValue(data);

@@ -28,8 +28,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			node = new T2 {
 				Name = ObjectName
 			};
-			LinkedComp.Entity.ViewportUpdateEvent += UpdateParrent;
-			LinkedComp.Entity.CanvasItemUpdateEvent += UpdateParrent;
+			LinkedComp.Entity.ViewportUpdateEvent += NotifyParrentUpdate;
+			LinkedComp.Entity.CanvasItemUpdateEvent += NotifyParrentUpdate;
 			LinkedComp.Entity.children.OnReorderList += Children_OnReorderList;
 			UpdateParrent();
 			LoadCanvasItemLink();
@@ -42,6 +42,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					node.MoveChild(canvasItem.CanvasItem, -1);
 				}
 			}
+		}
+
+		public void NotifyParrentUpdate() {
+			RenderThread.ExecuteOnStartOfFrame(this, UpdateParrent);
 		}
 
 		public virtual void UpdateParrent() {

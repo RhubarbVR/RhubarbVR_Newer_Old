@@ -107,8 +107,14 @@ namespace RhuEngine.Components
 			return Task.CompletedTask;
 		}
 
+		protected bool ValueLoadedIn = false;
+
+
 		[Exposed]
 		public void ValueUpdated() {
+			if (!ValueLoadedIn) {
+				return;
+			}
 			try {
 				if (typeof(T) == typeof(bool)) {
 					TargetElement.SetValue(TargetSpinBox.Target.Value.Value == 1);
@@ -134,6 +140,7 @@ namespace RhuEngine.Components
 						}
 						var data = (double)Convert.ChangeType(TargetElement.Value, typeof(double));
 						TargetSpinBox.Target.Value.Value = data;
+						ValueLoadedIn = true;
 					}
 					catch { }
 				}

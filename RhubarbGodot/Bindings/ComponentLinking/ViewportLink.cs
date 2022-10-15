@@ -85,6 +85,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				var value = item.Value;
 				var id = item.Key;
 
+
 				var buttonMask = MouseButton.None;
 				if (value.IsClickedPrime) {
 					buttonMask |= MouseButton.MaskLeft;
@@ -104,6 +105,18 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					Tilt = new Vector2(value.Tilt.x, value.Tilt.y),
 				};
 				node.PushInput(inputMove, true);
+
+
+
+				if (value.IsClickedPrime & value.IsClickedPrimeLastFrame) {
+					var dragEvent = new InputEventScreenDrag {
+						Device = id,
+						Position = new Vector2(value.Pos.x, value.Pos.y),
+						Relative = new Vector2(value.Pos.x, value.Pos.y) - new Vector2(value.LastPos.x, value.LastPos.y),
+					};
+					node.PushInput(dragEvent, true);
+				}
+
 
 				value.LastPos = value.Pos;
 

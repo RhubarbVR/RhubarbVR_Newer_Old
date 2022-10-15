@@ -4,6 +4,7 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
+using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
@@ -11,7 +12,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Developer/Observer" })]
 	public sealed class ObserverWindow : Component
 	{
-		[OnChanged(nameof(ChangeObserverd))]
+		[OnChanged(nameof(ChangeObserverdCall))]
 		public readonly SyncRef<IWorldObject> Observerd;
 
 		public readonly SyncRef<Window> TargetWindow;
@@ -20,7 +21,11 @@ namespace RhuEngine.Components
 		public readonly SyncRef<ScrollContainer> RootUIElement;
 		public readonly SyncRef<IObserver> CurrentObserver;
 
-		private void ChangeObserverd() {
+		public void ChangeObserverdCall() {
+			Task.Run(ChangeObserverd);
+		}
+
+		private async Task ChangeObserverd() {
 			if (LocalUser != MasterUser) {
 				return;
 			}
@@ -41,7 +46,7 @@ namespace RhuEngine.Components
 			copyer.Target.Target = boxCon.MinSize;
 			copyer.Source.Target = RootUIElement.Target.MinSize;
 			CurrentObserver.Target = child.AttachComponent<IObserver>(type);
-			CurrentObserver.Target.SetObserverd(Observerd.Target);
+			await CurrentObserver.Target.SetObserverd(Observerd.Target);
 		}
 
 		protected override void OnAttach() {

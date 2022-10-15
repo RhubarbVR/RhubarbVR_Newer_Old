@@ -140,8 +140,14 @@ namespace RhuEngine.Components
 			return Task.CompletedTask;
 		}
 
+		protected bool ValueLoadedIn = false;
+
+
 		[Exposed]
 		public void ValueUpdated(int index) {
+			if (!ValueLoadedIn) {
+				return;
+			}
 			if (SpinBoxes.Count != AmountOfFileds) {
 				return;
 			}
@@ -188,6 +194,7 @@ namespace RhuEngine.Components
 					}
 					catch { }
 				}
+				ValueLoadedIn = true;
 			}
 			catch { }
 		}
