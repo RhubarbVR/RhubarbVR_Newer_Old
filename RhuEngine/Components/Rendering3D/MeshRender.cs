@@ -15,19 +15,14 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "Rendering3D" })]
-	public class MeshRender : LinkedWorldComponent, IWorldBoundingBox
+	public class MeshRender : GeometryInstance3D, IWorldBoundingBox
 	{
 		public readonly AssetRef<RMesh> mesh;
+
 		public readonly SyncObjList<AssetRef<RMaterial>> materials;
 
 		public readonly Sync<Colorf> colorLinear;
 		public readonly Sync<int> zOrderOffset;
-
-		[Default(RenderLayer.MainLayer)]
-		public readonly Sync<RenderLayer> renderLayer;
-
-		[Default(ShadowCast.Off)]
-		public readonly Sync<ShadowCast> CastShadows;
 
 		[Default(false)]
 		public readonly Sync<bool> RecevieShadows;
@@ -39,7 +34,6 @@ namespace RhuEngine.Components
 		public readonly Sync<bool> LightProbs;
 
 		public AxisAlignedBox3f Bounds => mesh.Asset?.BoundingBox??AxisAlignedBox3f.CenterZero;
-
 		protected override void FirstCreation() {
 			base.FirstCreation();
 			colorLinear.Value = Colorf.White;

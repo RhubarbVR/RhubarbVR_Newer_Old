@@ -147,6 +147,15 @@ namespace RhuEngine.Components
 		All
 	}
 
+	public interface IKeyboardInteraction
+	{
+		public void KeyboardBind();
+		public void KeyboardUnBind();
+		public Matrix WorldPos { get; }
+
+		public string EditString { get; }
+	}
+
 	[Category("UI")]
 	public class UIElement : CanvasItem, IKeyboardInteraction
 	{

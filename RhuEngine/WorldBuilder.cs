@@ -156,14 +156,14 @@ namespace RhuEngine
 
 			var text = fontAtlis.AddChild("Text");
 			text.position.Value = new Vector3f(0, 1.5f, 0);
-			text.AttachComponent<WorldText>();
+			text.AttachComponent<TextLabel3D>();
 
 			var text2 = fontAtlis.AddChild("Text2");
 			text2.position.Value = new Vector3f(0, 2.5f, 0);
-			text2.AttachComponent<WorldText>().Text.Value = "This is another\nBit of Text";
+			text2.AttachComponent<TextLabel3D>().Text.Value = "This is another\nBit of Text";
 			var text8 = fontAtlis.AddChild("Text8");
 			text8.position.Value = new Vector3f(1, 0, 0);
-			text8.AttachComponent<WorldText>().Text.Value = "<color=red>Wa<colorblue>Trains<size=50>Trains";
+			text8.AttachComponent<TextLabel3D>().Text.Value = "<color=red>Wa<colorblue>Trains<size=50>Trains";
 			var textureStuff = testCubes.AddChild("Texture Stuff");
 			var dfg = textureStuff.AddChild("DFG-Noise");
 			dfg.position.Value = new Vector3f(2, 0, 0);

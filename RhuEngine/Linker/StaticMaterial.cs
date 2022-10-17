@@ -6,10 +6,6 @@ using RNumerics;
 
 namespace RhuEngine.Linker
 {
-	public interface ITextMaterial : IStaticMaterial
-	{
-		public RTexture2D Texture { set; }
-	}
 
 	public enum BasicRenderMode
 	{
@@ -32,7 +28,6 @@ namespace RhuEngine.Linker
 	}
 	public interface IStaticMaterialManager
 	{
-		public ITextMaterial CreateTextMaterial();
 		public IUnlitMaterial CreateUnlitMaterial();
 	}
 
@@ -44,9 +39,6 @@ namespace RhuEngine.Linker
 		public static T GetMaterial<T>() where T : IStaticMaterial {
 			if (typeof(T) == typeof(IUnlitMaterial)) {
 				return (T)Instanances.CreateUnlitMaterial();
-			}
-			if (typeof(T) == typeof(ITextMaterial)) {
-				return (T)Instanances.CreateTextMaterial();
 			}
 			return default;
 		}

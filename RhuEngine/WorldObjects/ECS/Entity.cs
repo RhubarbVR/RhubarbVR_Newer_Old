@@ -138,7 +138,6 @@ namespace RhuEngine.WorldObjects.ECS
 				_hasUpdatingComponentSave = !_hasUpdatingComponentSave;
 				UpdateEnableList();
 			}
-			UIRect = GetFirstComponent<UI3DRect>();
 			ViewportUpdate();
 			UpdateCanvasItem();
 		}
@@ -572,12 +571,6 @@ namespace RhuEngine.WorldObjects.ECS
 				World.UnregisterUpdatingEntity(this);
 			}
 		}
-		[NoShow]
-		[NoSave]
-		[NoSync]
-		[NoLoad]
-		[UnExsposed]
-		public UI3DRect UIRect { get; private set; }
 
 		[NoShow]
 		[NoSave]

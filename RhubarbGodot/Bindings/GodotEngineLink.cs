@@ -88,7 +88,7 @@ namespace RhubarbVR.Bindings
 			var image = new RImage(null);
 			image.Create(2, 2, false, RFormat.Rgb8);
 			RTexture2D.White = new RImageTexture2D(image);
-			RMesh.Quad = new RMesh(new GodotMesh(GodotMesh.MakeQuad()), false);
+			RTempQuad.Instance = typeof(GodotTempMeshRender);
 			new RBullet.BulletPhsyicsLink().RegisterPhysics();
 		}
 

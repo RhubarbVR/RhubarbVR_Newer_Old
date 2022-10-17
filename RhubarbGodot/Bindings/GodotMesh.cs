@@ -17,6 +17,81 @@ using RhuEngine;
 
 namespace RhubarbVR.Bindings
 {
+
+	public sealed class GodotTempMeshRender : IRTempQuad
+	{
+		public static ArrayMesh MakeQuad() {
+			ArrayMesh mesh = new();
+
+			var vertices = new Vector3[4]
+			{
+				new Vector3(-0.5f,-0.5f,0),
+				new Vector3(0.5f,-0.5f,0),
+				new Vector3(0.5f, 0.5f,0),
+				new Vector3(-0.5f, 0.5f,0)
+			};
+
+			var tris = new int[6]
+			{
+				2, 1, 0,
+				3, 2, 0
+			};
+
+			var normals = new Vector3[4]
+			{
+				Vector3.Forward,
+				Vector3.Forward,
+				Vector3.Forward,
+				Vector3.Forward
+			};
+
+			var uv = new Vector3f[4]
+			{
+				new Vector3f(1, 1,0),
+				new Vector3f(0, 1,0),
+				new Vector3f(0, 0,0),
+				new Vector3f(1, 0,0)
+			};
+			var uvs = new Vector3f[][] { uv };
+			var subMesh = GodotMesh.CreateSubmesh(RPrimitiveType.Triangle, uvs, tris, vertices, normals, null, null, null, null);
+			mesh.AddSurfaceFromArrays(subMesh.Item1, subMesh.Item2);
+			return mesh;
+		}
+
+		public Matrix Pos { get => instance3D.GetPos(); set => instance3D.SetPos(value); }
+		public bool Visible { get => instance3D.Visible; set => instance3D.Visible = value; }
+
+		private RMaterial _targetRhubarbMit;
+		public RMaterial Material
+		{
+			get => _targetRhubarbMit; set {
+				_targetRhubarbMit = value;
+				if (_targetRhubarbMit.Target is GodotMaterial godotMaterial) {
+					instance3D.MaterialOverride = godotMaterial.Material;
+				}
+			}
+		}
+
+		public void Dispose() {
+			instance3D.Free();
+		}
+
+		public MeshInstance3D instance3D;
+		public RTempQuad Target;
+
+		public ArrayMesh targetMesh;
+
+		public void Init(RTempQuad text) {
+			Target = text;
+			instance3D = new MeshInstance3D();
+			targetMesh ??= MakeQuad();
+			instance3D.Mesh = targetMesh;
+			EngineRunner._.AddChild(instance3D);
+		}
+	}
+
+
+
 	public struct BoneWeight
 	{
 		//
@@ -129,50 +204,9 @@ namespace RhubarbVR.Bindings
 
 	public sealed class GodotMesh : IRMesh
 	{
-		public void Draw(RMaterial loadingLogo, Matrix p, Colorf tint, int zDepth, RenderLayer layer, int submesh) {
-			if (loadingLogo.Target is GodotMaterial material) {
-				if (TempMeshDraw.Visible) {
-					var temperDraw = new MeshInstance3D();
-					EngineRunner._.AddChild(temperDraw);
-					temperDraw.Visible = true;
-					if (submesh <= -1) {
-						temperDraw.MaterialOverride = material.GetMatarial(tint, zDepth);
-						for (var i = 0; i < temperDraw.GetSurfaceOverrideMaterialCount(); i++) {
-							temperDraw.SetSurfaceOverrideMaterial(i, null);
-						}
-					}
-					else {
-						temperDraw.SetSurfaceOverrideMaterial(submesh, material.GetMatarial(tint, zDepth));
-						temperDraw.MaterialOverride = null;
-					}
-					temperDraw.Layers = (uint)(int)layer;
-					temperDraw.Mesh = LoadedMesh;
-					temperDraw.SetPos(p);
-					RenderThread.ExecuteOnStartOfFrame(() => temperDraw.Free());
-				}
-				else {
-					TempMeshDraw.Visible = true;
-					if (submesh <= -1) {
-						TempMeshDraw.MaterialOverride = material.GetMatarial(tint, zDepth);
-						for (var i = 0; i < TempMeshDraw.GetSurfaceOverrideMaterialCount(); i++) {
-							TempMeshDraw.SetSurfaceOverrideMaterial(i, null);
-						}
-					}
-					else {
-						TempMeshDraw.SetSurfaceOverrideMaterial(submesh, material.GetMatarial(tint, zDepth));
-						TempMeshDraw.MaterialOverride = null;
-					}
-					TempMeshDraw.Layers = (uint)(int)layer;
-					TempMeshDraw.Mesh = LoadedMesh;
-					TempMeshDraw.SetPos(p);
-				}
-			}
-		}
-
 		public RMesh RMesh { get; private set; }
 
 		public ArrayMesh LoadedMesh { get; private set; }
-		public MeshInstance3D TempMeshDraw { get; private set; }
 
 		public Mesh.BlendShapeMode shapeMode = Mesh.BlendShapeMode.Relative;
 
@@ -189,7 +223,7 @@ namespace RhubarbVR.Bindings
 			yield return data.w;
 		}
 
-		private static (Mesh.PrimitiveType, Array) CreateSubmesh(RPrimitiveType rPrimitiveType, Vector3f[][] uvs, int[] indexs, Vector3[] vectors, Vector3[] normals, Color[] color, Vector4[] tangents, int[] bones, float[] wights) {
+		public static (Mesh.PrimitiveType, Array) CreateSubmesh(RPrimitiveType rPrimitiveType, Vector3f[][] uvs, int[] indexs, Vector3[] vectors, Vector3[] normals, Color[] color, Vector4[] tangents, int[] bones, float[] wights) {
 			if (vectors.Length == 0) {
 				return (Mesh.PrimitiveType.Points, null);
 			}
@@ -303,51 +337,8 @@ namespace RhubarbVR.Bindings
 			};
 		}
 
-		public static ArrayMesh MakeQuad() {
-			ArrayMesh mesh = new();
-
-			var vertices = new Vector3[4]
-			{
-				new Vector3(-0.5f,-0.5f,0),
-				new Vector3(0.5f,-0.5f,0),
-				new Vector3(0.5f, 0.5f,0),
-				new Vector3(-0.5f, 0.5f,0)
-			};
-
-			var tris = new int[6]
-			{
-				2, 1, 0,
-				3, 2, 0
-			};
-
-			var normals = new Vector3[4]
-			{
-				Vector3.Forward,
-				Vector3.Forward,
-				Vector3.Forward,
-				Vector3.Forward
-			};
-
-			var uv = new Vector3f[4]
-			{
-				new Vector3f(1, 1,0),
-				new Vector3f(0, 1,0),
-				new Vector3f(0, 0,0),
-				new Vector3f(1, 0,0)
-			};
-			var uvs = new Vector3f[][] { uv };
-			var subMesh = CreateSubmesh(RPrimitiveType.Triangle, uvs, tris, vertices, normals, null, null, null, null);
-			mesh.AddSurfaceFromArrays(subMesh.Item1, subMesh.Item2);
-			return mesh;
-		}
-
-
 		public GodotMesh(ArrayMesh loaded) {
 			LoadedMesh = loaded;
-			TempMeshDraw = new MeshInstance3D {
-				Mesh = LoadedMesh
-			};
-			EngineRunner._.AddMeshInst(TempMeshDraw);
 		}
 
 		public void Init(RMesh rMesh) {
@@ -357,10 +348,6 @@ namespace RhubarbVR.Bindings
 			}
 			Name = Guid.NewGuid().ToString();
 			LoadedMesh = new ArrayMesh();
-			TempMeshDraw = new MeshInstance3D {
-				Mesh = LoadedMesh
-			};
-			EngineRunner._.AddMeshInst(TempMeshDraw);
 		}
 
 		public void LoadMeshData(IMesh mesh) {
@@ -525,8 +512,6 @@ namespace RhubarbVR.Bindings
 
 		public void Dispose() {
 			try {
-				EngineRunner._.RemoveMeshInst(TempMeshDraw);
-				TempMeshDraw?.Free();
 				LoadedMesh?.Free();
 			}
 			catch { }

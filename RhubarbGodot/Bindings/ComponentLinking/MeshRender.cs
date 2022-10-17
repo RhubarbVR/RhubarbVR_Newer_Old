@@ -10,6 +10,10 @@ using RhuEngine.Components;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
 
+using RNumerics;
+
+using static Godot.GeometryInstance3D;
+
 namespace RhubarbVR.Bindings.ComponentLinking
 {
 
@@ -37,7 +41,114 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 	}
 
-	public abstract class MeshRenderLinkBase<T> : WorldPositionLinked<T, MeshInstance3D> where T : MeshRender, new()
+	public abstract class GeometryInstance3DBase<T, T2> : VisualInstance3DBase<T, T2> where T : RhuEngine.Components.GeometryInstance3D, new() where T2 : Godot.GeometryInstance3D, new()
+	{
+		public override void Init() {
+			base.Init();
+			LinkedComp.CastShadows.Changed += CastShadows_Changed;
+			LinkedComp.Transparency.Changed += Transparency_Changed;
+			LinkedComp.ExtraCullMargin.Changed += ExtraCullMargin_Changed;
+			LinkedComp.IgnoreOcclusionCulling.Changed += IgnoreOcclusionCulling_Changed;
+			LinkedComp.GlobalIlluminationMode.Changed += GlobalIlluminationMode_Changed;
+			LinkedComp.LightMapScale.Changed += LightMapScale_Changed;
+			LinkedComp.VisibilityBegin.Changed += VisibilityBegin_Changed;
+			LinkedComp.VisibilityBeginMargin.Changed += VisibilityBeginMargin_Changed;
+			LinkedComp.VisibilityEnd.Changed += VisibilityEnd_Changed;
+			LinkedComp.VisibilityEndMargin.Changed += VisibilityEndMargin_Changed;
+			LinkedComp.FadeMode.Changed += FadeMode_Changed;
+			Transparency_Changed(null);
+			ExtraCullMargin_Changed(null);
+			IgnoreOcclusionCulling_Changed(null);
+			GlobalIlluminationMode_Changed(null);
+			LightMapScale_Changed(null);
+			VisibilityBegin_Changed(null);
+			VisibilityBeginMargin_Changed(null);
+			VisibilityEnd_Changed(null);
+			VisibilityEndMargin_Changed(null);
+			FadeMode_Changed(null);
+			CastShadows_Changed(null);
+		}
+
+		private void FadeMode_Changed(IChangeable obj) {
+			node.VisibilityRangeFadeMode = LinkedComp.FadeMode.Value switch {
+				RFadeMode.Self => VisibilityRangeFadeModeEnum.Self,
+				RFadeMode.Dependencies => VisibilityRangeFadeModeEnum.Dependencies,
+				_ => VisibilityRangeFadeModeEnum.Disabled,
+			};
+		}
+
+		private void VisibilityEndMargin_Changed(IChangeable obj) {
+			node.VisibilityRangeEndMargin = LinkedComp.VisibilityEndMargin.Value;
+		}
+
+		private void VisibilityEnd_Changed(IChangeable obj) {
+			node.VisibilityRangeEnd = LinkedComp.VisibilityEnd.Value;
+		}
+
+		private void VisibilityBeginMargin_Changed(IChangeable obj) {
+			node.VisibilityRangeBeginMargin = LinkedComp.VisibilityBeginMargin.Value;
+		}
+
+		private void VisibilityBegin_Changed(IChangeable obj) {
+			node.VisibilityRangeBegin = LinkedComp.VisibilityBegin.Value;
+		}
+
+		private void LightMapScale_Changed(IChangeable obj) {
+			node.GiLightmapScale = LinkedComp.LightMapScale.Value switch {
+				RLightMapScale.TwoX => LightmapScale.Scale2x,
+				RLightMapScale.FourX => LightmapScale.Scale4x,
+				RLightMapScale.EightX => LightmapScale.Scale8x,
+				_ => LightmapScale.Scale1x,
+			};
+		}
+
+		private void GlobalIlluminationMode_Changed(IChangeable obj) {
+			node.GiMode = LinkedComp.GlobalIlluminationMode.Value switch {
+				RGlobalIlluminationMode.Static => GIMode.Static,
+				RGlobalIlluminationMode.Dynamic => GIMode.Dynamic,
+				_ => GIMode.Disabled,
+			};
+		}
+
+		private void IgnoreOcclusionCulling_Changed(IChangeable obj) {
+			node.IgnoreOcclusionCulling = LinkedComp.IgnoreOcclusionCulling.Value;
+		}
+
+		private void ExtraCullMargin_Changed(IChangeable obj) {
+			node.ExtraCullMargin = LinkedComp.ExtraCullMargin.Value;
+		}
+
+		private void Transparency_Changed(IChangeable obj) {
+			node.Transparency = LinkedComp.Transparency.Value;
+		}
+
+		private void CastShadows_Changed(IChangeable obj) {
+			node.CastShadow = LinkedComp.CastShadows.Value switch {
+				ShadowCast.On => Godot.GeometryInstance3D.ShadowCastingSetting.On,
+				ShadowCast.TwoSided => Godot.GeometryInstance3D.ShadowCastingSetting.DoubleSided,
+				ShadowCast.ShadowsOnly => Godot.GeometryInstance3D.ShadowCastingSetting.ShadowsOnly,
+				_ => Godot.GeometryInstance3D.ShadowCastingSetting.Off,
+			};
+		}
+
+
+	}
+
+	public abstract class VisualInstance3DBase<T, T2> : WorldPositionLinked<T, T2> where T : RhuEngine.Components.VisualInstance3D, new() where T2 : Godot.VisualInstance3D, new()
+	{
+		public override void Init() {
+			base.Init();
+			LinkedComp.renderLayer.Changed += RenderLayer_Changed;
+			RenderLayer_Changed(null);
+		}
+
+		private void RenderLayer_Changed(IChangeable obj) {
+			node.Layers = (uint)(int)LinkedComp.renderLayer.Value;
+		}
+
+	}
+
+	public abstract class MeshRenderLinkBase<T> : GeometryInstance3DBase<T, MeshInstance3D> where T : MeshRender, new()
 	{
 		public override string ObjectName => "MeshRender";
 
@@ -46,26 +157,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.materials.Changed += Materials_Changed;
 			LinkedComp.colorLinear.Changed += MatUpdate;
 			LinkedComp.zOrderOffset.Changed += MatUpdate;
-			LinkedComp.renderLayer.Changed += RenderLayer_Changed;
-			LinkedComp.CastShadows.Changed += CastShadows_Changed;
 			Materials_Changed(null);
-			RenderLayer_Changed(null);
 			MatUpdate(null);
-			CastShadows_Changed(null);
 			Mesh_LoadChange(LinkedComp.mesh.Asset);
-		}
-
-		private void CastShadows_Changed(IChangeable obj) {
-			node.CastShadow = LinkedComp.CastShadows.Value switch {
-				ShadowCast.On => GeometryInstance3D.ShadowCastingSetting.On,
-				ShadowCast.TwoSided => GeometryInstance3D.ShadowCastingSetting.DoubleSided,
-				ShadowCast.ShadowsOnly => GeometryInstance3D.ShadowCastingSetting.ShadowsOnly,
-				_ => GeometryInstance3D.ShadowCastingSetting.Off,
-			};
-		}
-
-		private void RenderLayer_Changed(IChangeable obj) {
-			node.Layers = (uint)(int)LinkedComp.renderLayer.Value;
 		}
 
 		public List<AssetRef<RMaterial>> BoundTo = new();

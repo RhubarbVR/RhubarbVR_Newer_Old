@@ -27,6 +27,7 @@ using RhuEngine.DataStructure;
 using System.Collections;
 using Assimp.Unmanaged;
 using System.Runtime.InteropServices;
+using static RBullet.BPhysicsSim;
 
 namespace RhuEngine.GameTests.Tests
 {
@@ -464,7 +465,6 @@ namespace RhuEngine.GameTests.Tests
 				var entity = rootEntity.AddChild($"TEst{i}");
 				entity.AttachComponent<MeshRender>();
 				entity.AttachComponent<Grabbable>();
-				entity.AttachComponent<UI3DRect>();
 				entity.AttachComponent<Spinner>();
 				entity.AttachComponent<RawECMAScript>();
 			}
@@ -619,7 +619,7 @@ namespace RhuEngine.GameTests.Tests
 								RunComponentTest(comp);
 							}
 							catch {
-								if (testes.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) {
+								if ((testes.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) && (testes.GetCustomAttribute<OverlayOnlyAttribute>(true) == null)) {
 									throw;
 								}
 							}
@@ -641,7 +641,7 @@ namespace RhuEngine.GameTests.Tests
 						RunComponentTest(comp);
 					}
 					catch {
-						if (item.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) {
+						if ((item.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) && (item.GetCustomAttribute<OverlayOnlyAttribute>(true) == null)) {
 							throw;
 						}
 					}

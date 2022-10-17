@@ -9,187 +9,78 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace RhuEngine.Components
 {
-
-	[NotLinkedRenderingComponent]
-	[Category(new string[] { "Rendering3D" })]
-	public sealed class WorldText : LinkedWorldComponent
+	public enum RBillboardOptions {
+		Disabled, 
+		Enabled, 
+		YBillboard,
+	}
+	public enum RTextAlphaCutout
 	{
-		[Default(1f)]
-		public readonly Sync<float> Size;
-		public readonly Sync<Vector2i> SizeVector;
-		[Default("Text Here")]
-		[OnChanged(nameof(UpdateText))]
-		public readonly Sync<string> Text;
-		[OnAssetLoaded(nameof(UpdatePrams))]
-		public readonly AssetRef<RFont> Font;
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<Colorf> FontColor;
+		Disabled,
+		Discard,
+		Opaque_PrePass
+	}
+	public enum RTextVerticalAlignment
+	{
+		//
+		// Summary:
+		//     Vertical top alignment, usually for text-derived classes.
+		Top,
+		//
+		// Summary:
+		//     Vertical center alignment, usually for text-derived classes.
+		Center,
+		//
+		// Summary:
+		//     Vertical bottom alignment, usually for text-derived classes.
+		Bottom,
+	}
+
+	[Category(new string[] { "Rendering3D" })]
+	public sealed class TextLabel3D : GeometryInstance3D
+	{
+		[Default(0.005f)]
+		public readonly Sync<float> PixelSize;
+		public readonly Sync<Vector2i> TextOffset;
+		public readonly Sync<RBillboardOptions> Billboard;
+		public readonly Sync<bool> Shaded;
 		[Default(true)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<bool> AutoScale;
-		[Default(3f)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<float> LineSpacing;
+		public readonly Sync<bool> DoubleSided;
+		public readonly Sync<bool> NoDepthTest;
+		public readonly Sync<bool> FixSize;
+		public readonly Sync<RTextAlphaCutout> AlphaCutout;
+		[Default(0.5f)]
+		public readonly Sync<float> AlphaScissorThreshold;
+		public readonly Sync<RElementTextureFilter> TextureFilter;
+		public readonly Sync<int> RenderPriority;
+		[Default(-1)]
+		public readonly Sync<int> OutlineRenderPriority;
+		public readonly Sync<Colorf> Modulate;
+		public readonly Sync<Colorf> OutlineModulate;
+		[Default("Text")]
+		public readonly Sync<string> Text;
+		public readonly AssetRef<RFont> Font;
 		[Default(96)]
-		[OnChanged(nameof(UpdatePrams))]
 		public readonly Sync<int> FontSize;
-		[Default(0)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<int> OutlineSize;
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<Colorf> OutlineColor;
-		[Default(1)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<int> ShadowSize;
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<Colorf> ShadowColor;
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<Vector2f> ShadowOffset;
+		[Default(12)]
+		public readonly Sync<int> OutLineSize;
 		[Default(RHorizontalAlignment.Center)]
-		[OnChanged(nameof(UpdatePrams))]
 		public readonly Sync<RHorizontalAlignment> HorizontalAlignment;
-		[Default(RVerticalAlignment.Center)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<RVerticalAlignment> VerticalAlignment;
-		[Default(RAutowrapMode.Off)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<RAutowrapMode> AutowrapMode;
-		[Default(false)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<bool> ClipText;
-		[Default(ROverrunBehavior.NoTrimming)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<ROverrunBehavior> TextOverrunBehavior;
-		[Default(false)]
-		[OnChanged(nameof(UpdatePrams))]
+		[Default(RTextVerticalAlignment.Center)]
+		public readonly Sync<RTextVerticalAlignment> VerticalAlignment;
 		public readonly Sync<bool> Uppercase;
-		[Default(0)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<int> LinesSkipped;
-		[Default(-1)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<int> MaxLinesVisible;
-		[Default(-1)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<int> VisibleCharacters;
-		[Default(Linker.RVisibleCharactersBehavior.CharsBeforeShaping)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<Linker.RVisibleCharactersBehavior> VisibleCharactersBehavior;
-		[Default(1f)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<float> VisibleRatio;
-		[Default(RTextDirection.Auto)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<RTextDirection> TextDirection;
-		[Default("")]
-		[OnChanged(nameof(UpdatePrams))]
+		public readonly Sync<int> LineSpacing;
+		public readonly Sync<RAutowrapMode> TextAutoWrap;
+		[Default(500)]
+		public readonly Sync<int> Width;
+		public readonly Sync<RTextDirection> TextDir;
 		public readonly Sync<string> Language;
-		[Default(RStructuredTextParser.Default)]
-		[OnChanged(nameof(UpdatePrams))]
-		public readonly Sync<RStructuredTextParser> StructuredTextBidiOverride;
-		[Default(RenderLayer.Text)]
-		public readonly Sync<RenderLayer> TargetRenderLayer;
-
-		private ITextMaterial _textMaterial;
-
-		private RText _rText;
 
 		protected override void OnAttach() {
 			base.OnAttach();
+			Modulate.Value = Colorf.White;
+			OutlineModulate.Value = Colorf.Black;
 			Font.Target = World.RootEntity.GetFirstComponentOrAttach<MainFont>();
-			ShadowOffset.Value = Vector2f.Zero;
-			ShadowColor.Value = Colorf.Black;
-			SizeVector.Value = Vector2i.One;
-			OutlineColor.Value = Colorf.White;
-			FontColor.Value = Colorf.White;
 		}
-
-		private void UpdateAll() {
-			if (!Engine.EngineLink.CanRender) {
-				return;
-			}
-			UpdatePramsRaw();
-			UpdateText();
-		}
-
-		private void UpdatePramsRaw() {
-			if (!Engine.EngineLink.CanRender) {
-				return;
-			}
-			if (_rText is null) {
-				return;
-			}
-			_rText.Font = Font.Asset;
-			_rText.AutoScale = AutoScale;
-			_rText.LineSpacing = LineSpacing;
-			_rText.FontSize = FontSize;
-			_rText.FontColor = FontColor;
-			_rText.OutlineSize = OutlineSize;
-			_rText.OutlineColor = OutlineColor;
-			_rText.ShadowSize = ShadowSize;
-			_rText.ShadowColor = ShadowColor;
-			_rText.ShadowOffset = ShadowOffset;
-			_rText.Size = SizeVector;
-			_rText.HorizontalAlignment = HorizontalAlignment;
-			_rText.VerticalAlignment = VerticalAlignment;
-			_rText.AutowrapMode = AutowrapMode;
-			_rText.ClipText = ClipText;
-			_rText.TextOverrunBehavior = TextOverrunBehavior;
-			_rText.Uppercase = Uppercase;
-			_rText.LinesSkipped = LinesSkipped;
-			_rText.MaxLinesVisible = MaxLinesVisible;
-			_rText.VisibleCharacters = VisibleCharacters;
-			_rText.VisibleCharactersBehavior = VisibleCharactersBehavior;
-			_rText.VisibleRatio = VisibleRatio;
-			_rText.TextDirection = TextDirection;
-			_rText.Language = Language;
-			_rText.StructuredTextBidiOverride = StructuredTextBidiOverride;
-		}
-
-		private void UpdatePrams() {
-			RenderThread.ExecuteOnStartOfFrame(this, UpdatePramsRaw);
-		}
-
-
-		private void UpdateText() {
-			if (!Engine.EngineLink.CanRender) {
-				return;
-			}
-			if (_rText is null) {
-				return;
-			}
-			_rText.Text = Text.Value;
-		}
-
-		public override void Dispose() {
-			base.Dispose();
-			_rText?.Dispose();
-			_textMaterial?.Dispose();
-		}
-
-		protected override void OnLoaded() {
-			base.OnLoaded();
-			if (!Engine.EngineLink.CanRender) {
-				return;
-			}
-			RenderThread.ExecuteOnStartOfFrame(() => {
-				_textMaterial = StaticMaterialManager.GetMaterial<ITextMaterial>();
-				_rText = new RText(null);
-				_textMaterial.Texture = _rText.texture2D;
-				UpdateAll();
-			});
-		}
-
-		protected override void Render() {
-			if (_rText is null) {
-				return;
-			}
-			if (_textMaterial is null) {
-				return;
-			}
-			RMesh.Quad.Draw(_textMaterial.Material, Matrix.R(Quaternionf.Yawed180) * Matrix.S(new Vector3f(Size * _rText.AspectRatio, Size, Size)) * Entity.GlobalTrans, null, 0, RenderLayer.Text);
-		}
-
-
 	}
 }

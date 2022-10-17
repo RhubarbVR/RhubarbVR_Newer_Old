@@ -225,8 +225,6 @@ namespace RhuEngine
 
 		public AssetManager assetManager;
 
-		public UI3DManager uiManager = new();
-
 		public InputManager inputManager = new();
 
 		public DiscordManager discordManager = new();
@@ -250,7 +248,8 @@ namespace RhuEngine
 		public Thread startingthread;
 
 		public RText StartingText;
-		public ITextMaterial StartingTextMit;
+		public RTempQuad StartingLogo;
+
 		public bool IsInVR => EngineLink.InVR;
 
 		public void Init(bool RunStartThread = true) {
@@ -264,23 +263,21 @@ namespace RhuEngine
 					Text = "Starting",
 					HorizontalAlignment = RHorizontalAlignment.Center,
 					VerticalAlignment = RVerticalAlignment.Center,
-					AutoScale = false,
-					Size = new Vector2i(1080, 420),
 				};
-				StartingTextMit = StaticMaterialManager.GetMaterial<ITextMaterial>();
-				StartingTextMit.Texture = StartingText.texture2D;
 				RRenderer.EnableSky = false;
+				StartingLogo = new RTempQuad();
 				LoadingLogo = StaticMaterialManager.GetMaterial<IUnlitMaterial>();
 				LoadingLogo.Transparency = Transparency.Blend;
 				LoadingLogo.DullSided = true;
 				LoadingLogo.Texture = staticResources.RhubarbLogoV2;
+				StartingLogo.Material = LoadingLogo.Material;
 			}
 			var startcode = () => {
 				IntMsg = "Building NetApiManager";
 				netApiManager = new NetApiManager((_userDataPathOverRide ?? BaseDir) + "/rhuCookie");
 				IntMsg = "Building AssetManager";
 				assetManager = new AssetManager(_cachePathOverRide);
-				_managers = new IManager[] { discordManager, localisationManager, inputManager, netApiManager, assetManager, worldManager, uiManager };
+				_managers = new IManager[] { discordManager, localisationManager, inputManager, netApiManager, assetManager, worldManager };
 				foreach (var item in _managers) {
 					IntMsg = $"Starting {item.GetType().Name}";
 					try {
@@ -289,17 +286,17 @@ namespace RhuEngine
 					catch (Exception ex) {
 						RLog.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
 						IntMsg = $"Failed to start {item.GetType().GetFormattedName()} Error:{ex}";
-						throw ex;
+						return;
 					}
 				}
 				IntMsg = $"{localisationManager?.GetLocalString("Common.Loaded")}\nEngine Started";
 				EngineStarting = false;
 				if (EngineLink.CanRender) {
 					RenderThread.ExecuteOnStartOfFrame(() => {
+						StartingLogo?.Dispose();
+						StartingLogo = null;
 						StartingText?.Dispose();
 						StartingText = null;
-						StartingTextMit?.Dispose();
-						StartingTextMit = null;
 						LoadingLogo?.Dispose();
 						LoadingLogo = null;
 						RRenderer.EnableSky = true;
@@ -341,11 +338,9 @@ namespace RhuEngine
 						var rootMatrix = Matrix.TR(_loadingPos, Quaternionf.LookAt(EngineLink.CanInput ? headMat.Translation : Vector3f.Zero, _loadingPos));
 						if (StartingText is not null) {
 							StartingText.Text = $"{localisationManager?.GetLocalString("Common.Loading")}\n{IntMsg}";
-							if (StartingTextMit is not null) {
-								RMesh.Quad.Draw(StartingTextMit?.Material, Matrix.TS(0, -0.2f, 0, new Vector3f(StartingText?.AspectRatio ?? 1, 1, 1) / 7) * rootMatrix);
-							}
+							StartingText.Pos = Matrix.TS(0, -0.2f, 0, new Vector3f(-0.1f, 0.1f, 0.1f)) * rootMatrix;
 							if (LoadingLogo is not null) {
-								RMesh.Quad.Draw(LoadingLogo?.Material, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
+								StartingLogo.Pos = Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix;
 							}
 						}
 					}

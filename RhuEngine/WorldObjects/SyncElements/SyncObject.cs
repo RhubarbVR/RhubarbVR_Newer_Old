@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
+using RhuEngine.Components;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 using RhuEngine.Linker;
@@ -124,6 +125,9 @@ namespace RhuEngine.WorldObjects
 
 		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer = null) {
 			try {
+				if (GetType().GetCustomAttribute<OverlayOnlyAttribute>(true) != null && !(world.IsOverlayWorld || world.IsPersonalSpace)) {
+					throw new InvalidOperationException("This SyncObject is OverlayOnly");
+				}
 				if (GetType().GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && !world.IsPersonalSpace) {
 					throw new InvalidOperationException("This SyncObject is PrivateSpaceOnly");
 				}

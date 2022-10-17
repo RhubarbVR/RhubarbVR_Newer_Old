@@ -311,81 +311,36 @@ namespace RhuEngine.Linker
 
 	public interface IRText : IDisposable
 	{
-		IRTexture2D Init(RText text);
-		public bool AutoScale { get; set; }
+		void Init(RText text);
+		public Matrix Pos { get; set; }
 		public RFont Font { get; set; }
 		public string Text { get; set; }
-		public float LineSpacing { get; set; }
 		public int FontSize { get; set; }
-		public Colorf FontColor { get; set; }
-		public int OutlineSize { get; set; }
-		public Colorf OutlineColor { get; set; }
-		public int ShadowSize { get; set; }
-		public Colorf ShadowColor { get; set; }
-		public Vector2f ShadowOffset { get; set; }
-		public Vector2i Size { get; set; }
-
 		public RHorizontalAlignment HorizontalAlignment { get; set; }
 		public RVerticalAlignment VerticalAlignment { get; set; }
-		public RAutowrapMode AutowrapMode { get; set; }
-		public bool ClipText { get; set; }
-		public ROverrunBehavior TextOverrunBehavior { get; set; }
-		public bool Uppercase { get; set; }
-		public int LinesSkipped { get; set; }
-		public int MaxLinesVisible { get; set; }
-		public int VisibleCharacters { get; set; }
-		public RVisibleCharactersBehavior VisibleCharactersBehavior { get; set; }
-		public float VisibleRatio { get; set; }
-		public RTextDirection TextDirection { get; set; }
-		public string Language { get; set; }
-		public RStructuredTextParser StructuredTextBidiOverride { get; set; }
 
 	}
 
 	public sealed class RText : IDisposable
 	{
-		public RTexture2D texture2D;
 
 		public static Type Instance { get; set; }
 
 		public IRText Inst { get; set; }
 
-		public RText(RFont font, bool autoScale = true) {
+		public RText(RFont font) {
 			Inst = (IRText)Activator.CreateInstance(Instance);
-			texture2D = new RTexture2D(Inst.Init(this));
+			Inst.Init(this);
 			Font = font;
 			FontSize = 96;
-			AutoScale = autoScale;
 		}
-
-		public bool AutoScale { get => Inst.AutoScale; set => Inst.AutoScale = value; }
+		public Matrix Pos { get => Inst.Pos; set => Inst.Pos = value; }
 		public RFont Font { get => Inst.Font; set => Inst.Font = value; }
 		public string Text { get => Inst.Text; set => Inst.Text = value; }
-		public float LineSpacing { get => Inst.LineSpacing; set => Inst.LineSpacing = value; }
 		public int FontSize { get => Inst.FontSize; set => Inst.FontSize = value; }
-		public Colorf FontColor { get => Inst.FontColor; set => Inst.FontColor = value; }
-		public int OutlineSize { get => Inst.OutlineSize; set => Inst.OutlineSize = value; }
-		public Colorf OutlineColor { get => Inst.OutlineColor; set => Inst.OutlineColor = value; }
-		public int ShadowSize { get => Inst.ShadowSize; set => Inst.ShadowSize = value; }
-		public Colorf ShadowColor { get => Inst.ShadowColor; set => Inst.ShadowColor = value; }
-		public Vector2f ShadowOffset { get => Inst.ShadowOffset; set => Inst.ShadowOffset = value; }
-		public Vector2i Size { get => Inst.Size; set => Inst.Size = value; }
+
 		public RHorizontalAlignment HorizontalAlignment { get => Inst.HorizontalAlignment; set => Inst.HorizontalAlignment = value; }
 		public RVerticalAlignment VerticalAlignment { get => Inst.VerticalAlignment; set => Inst.VerticalAlignment = value; }
-		public RAutowrapMode AutowrapMode { get => Inst.AutowrapMode; set => Inst.AutowrapMode = value; }
-		public bool ClipText { get => Inst.ClipText; set => Inst.ClipText = value; }
-		public ROverrunBehavior TextOverrunBehavior { get => Inst.TextOverrunBehavior; set => Inst.TextOverrunBehavior = value; }
-		public bool Uppercase { get => Inst.Uppercase; set => Inst.Uppercase = value; }
-		public int LinesSkipped { get => Inst.LinesSkipped; set => Inst.LinesSkipped = value; }
-		public int MaxLinesVisible { get => Inst.MaxLinesVisible; set => Inst.MaxLinesVisible = value; }
-		public int VisibleCharacters { get => Inst.VisibleCharacters; set => Inst.VisibleCharacters = value; }
-		public RVisibleCharactersBehavior VisibleCharactersBehavior { get => Inst.VisibleCharactersBehavior; set => Inst.VisibleCharactersBehavior = value; }
-		public float VisibleRatio { get => Inst.VisibleRatio; set => Inst.VisibleRatio = value; }
-		public RTextDirection TextDirection { get => Inst.TextDirection; set => Inst.TextDirection = value; }
-		public string Language { get => Inst.Language; set => Inst.Language = value; }
-		public RStructuredTextParser StructuredTextBidiOverride { get => Inst.StructuredTextBidiOverride; set => Inst.StructuredTextBidiOverride = value; }
-
-		public float AspectRatio => texture2D.Width / texture2D.Height;
 
 		public void Dispose() {
 			Inst.Dispose();

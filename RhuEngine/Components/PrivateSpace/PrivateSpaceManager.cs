@@ -23,39 +23,13 @@ namespace RhuEngine.Components
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public TaskBar taskBar;
-		[NoSave]
-		[NoSync]
-		[NoLoad]
-		[NoSyncUpdate]
-		public Entity TaskBarHolder;
-		[NoSave]
-		[NoSync]
-		[NoLoad]
-		[NoSyncUpdate]
-		public KeyBoard keyBoard;
-		[NoSave]
-		[NoSync]
-		[NoLoad]
-		[NoSyncUpdate]
-		public Entity KeyBoardHolder;
+		public Entity DashMover;
+
 
 		protected override void OnAttach() {
 			base.OnAttach();
-			var TaskBarHoldermover = World.RootEntity.AddChild("TaskBarMover");
-			TaskBarHoldermover.AttachComponent<UserInterfacePositioner>();
-			TaskBarHolder = TaskBarHoldermover.AddChild("TaskBarHolder");
-			taskBar = TaskBarHolder.AddChild("TaskBar").AttachComponent<TaskBar>();
-			if (Engine.EngineLink.CanRender) {
-				RUpdateManager.ExecuteOnStartOfFrame(() => RUpdateManager.ExecuteOnEndOfFrame(() => {
-					if (LocalUser.userRoot.Target is null) {
-						return;
-					}
-					KeyBoardHolder = LocalUser.userRoot.Target.Entity.AddChild("KeyBoardHolder");
-					KeyBoardHolder.enabled.Value = false;
-					keyBoard = KeyBoardHolder.AddChild("KeyBoard").AttachComponent<KeyBoard>();
-				}));
-			}
+			DashMover = World.RootEntity.AddChild("TaskBarMover");
+			DashMover.AttachComponent<UserInterfacePositioner>();
 		}
 
 		protected override void OnLoaded() {
@@ -91,10 +65,6 @@ namespace RhuEngine.Components
 			}
 			try {
 				if (world.PhysicsSim.RayTest(ref Frompos, ref ToPos, out var collider, out var hitnormal, out var hitpointworld)) {
-					if (collider.CustomObject is UI3DCanvas uIComponent) {
-						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-						uIComponent.ProcessHitTouch(handed, hitnormal, hitpointworld, handedSide);
-					}
 					if (collider.CustomObject is PhysicsObject physicsObject) {
 						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
 						physicsObject.Touch(handed, hitnormal, hitpointworld, handedSide);
@@ -126,11 +96,6 @@ namespace RhuEngine.Components
 
 		public bool RunLaserCastInWorld(World world, ref Vector3f headFrompos, ref Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side) {
 			if (world.PhysicsSim.RayTest(ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
-
-				if (collider.CustomObject is UI3DCanvas uIComponent) {
-					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.005f), new Colorf(1, 1, 0, 0.5f));
-					uIComponent.ProcessHitLazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
-				}
 				if (collider.CustomObject is PhysicsObject physicsObject) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
 					physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
@@ -142,8 +107,8 @@ namespace RhuEngine.Components
 						}
 						var ReletiveEntity = syncObject.World.GetLocalUser()?.userRoot.Target?.head.Target ?? syncObject.World.RootEntity;
 						var observer = (syncObject.World.GetLocalUser()?.userRoot.Target?.Entity.parent.Target ?? syncObject.World.RootEntity).AddChild("Observer");
-						observer.AttachComponent<ObserverWindow>().Observerd.Target = syncObject.GetClosedEntity();
-						observer.GlobalTrans = Matrix.T(-0.5f, -0.5f, -1) * ReletiveEntity.GlobalTrans;
+						//observer.AttachComponent<ObserverWindow>().Observerd.Target = syncObject.GetClosedEntity();
+						//observer.GlobalTrans = Matrix.T(-0.5f, -0.5f, -1) * ReletiveEntity.GlobalTrans;
 					}
 				}
 				return true;
@@ -203,11 +168,7 @@ namespace RhuEngine.Components
 		}
 
 		public void KeyBoardUpdate(Matrix openLocation) {
-			if (keyBoard is null) {
-				return;
-			}
-			KeyBoardHolder.enabled.Value = Engine.HasKeyboard;
-			keyBoard.uICanvas.Entity.GlobalTrans = Matrix.T(new Vector3f(0, -0.25f, 0.1f)) * openLocation;
+			
 		}
 	}
 }

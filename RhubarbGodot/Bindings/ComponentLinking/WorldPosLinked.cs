@@ -71,8 +71,14 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					node.Owner = ee.node;
 				}
 				else {
-					EngineRunner._.ThowAway.AddChild(node);
-					node.Owner = EngineRunner._.ThowAway;
+					if (LinkedComp.World.IsPersonalSpace) {
+						EngineRunner._.AddChild(node);
+						node.Owner = EngineRunner._;
+					}
+					else {
+						EngineRunner._.ThowAway.AddChild(node);
+						node.Owner = EngineRunner._.ThowAway;
+					}
 				}
 			}
 		}
@@ -82,12 +88,20 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public override void Remove() {
 			node?.Free();
 		}
+#pragma warning disable CS0618 // Type or member is obsolete
+
 		public override void Started() {
-			node?.SetVisible(true);
+			if (node is null) {
+				return;
+			}
+			node.Visible = true;
 		}
 
 		public override void Stopped() {
-			node?.SetVisible(false);
+			if (node is null) {
+				return;
+			}
+			node.Visible = false;
 		}
 
 		private void LoadCanvasItemLink() {

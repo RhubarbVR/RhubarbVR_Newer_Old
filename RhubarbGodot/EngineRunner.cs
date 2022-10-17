@@ -40,15 +40,7 @@ public partial class EngineRunner : Node3D, IRTime
 
 	public GodotEngineLink link;
 
-	public Node3D MeshHolder;
-
 	public override void _Ready() {
-		if (MeshHolder is null) {
-			MeshHolder = new Node3D {
-				Name = "Mesh Holder"
-			};
-			AddChild(MeshHolder);
-		}
 		if (RLog.Instance == null) {
 			RLog.Instance = new GodotLogs();
 		}
@@ -81,11 +73,6 @@ public partial class EngineRunner : Node3D, IRTime
 	}
 
 	public override void _Process(double delta) {
-		lock (_meshInstance3Ds) {
-			foreach (var item in _meshInstance3Ds) {
-				item.Visible = false;
-			}
-		}
 		engine?.Step();
 		TypeDelta = "";
 		MouseDelta = Vector2f.Zero;
@@ -124,21 +111,6 @@ public partial class EngineRunner : Node3D, IRTime
 		}
 		catch (Exception ex) {
 			RLog.Err("Failed to start Rhubarb CleanUp " + ex.ToString());
-		}
-	}
-
-	readonly List<MeshInstance3D> _meshInstance3Ds = new();
-
-	internal void RemoveMeshInst(MeshInstance3D tempMeshDraw) {
-		lock (_meshInstance3Ds) {
-			_meshInstance3Ds.Remove(tempMeshDraw);
-		}
-	}
-
-	internal void AddMeshInst(MeshInstance3D tempMeshDraw) {
-		lock (_meshInstance3Ds) {
-			_meshInstance3Ds.Add(tempMeshDraw);
-			MeshHolder.AddChild(tempMeshDraw);
 		}
 	}
 

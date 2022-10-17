@@ -6,7 +6,7 @@ using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.Components.PrivateSpace
 {
-	[PrivateSpaceOnly]
+	[OverlayOnly]
 	public sealed class RawAssetProvider<A>:AssetProvider<A> where A : class
 	{
 		public void LoadAsset(A asset) {

@@ -22,6 +22,7 @@ namespace RhuEngine.WorldObjects
 		public PhysicsSim PhysicsSim { get; set; }
 
 		public bool IsLoading => (IsDeserializing || IsLoadingNet) & !HasError;
+		public bool IsOverlayWorld => worldManager.OverlayWorld == this;
 
 		public bool IsPersonalSpace { get; private set; }
 

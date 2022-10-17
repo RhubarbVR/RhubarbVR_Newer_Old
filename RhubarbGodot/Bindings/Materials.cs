@@ -115,10 +115,6 @@ namespace RhubarbVR.Bindings
 
 	public sealed class GodotStaticMats : IStaticMaterialManager
 	{
-		public ITextMaterial CreateTextMaterial() {
-			return new GodotText();
-		}
-
 		public IUnlitMaterial CreateUnlitMaterial() {
 			return new GodotUnlit();
 		}
@@ -191,31 +187,6 @@ namespace RhubarbVR.Bindings
 					if (data is StandardMaterial3D material3D) {
 						material3D.NoDepthTest = true;
 						material3D.DepthDrawMode = BaseMaterial3D.DepthDrawModeEnum.Disabled;
-					}
-				});
-			}
-		}
-	}
-
-	public sealed class GodotText : StaticMaterialBase<GodotMaterial>, ITextMaterial
-	{
-		public GodotText() {
-			var newUnlit = new StandardMaterial3D {
-				Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
-				BlendMode = BaseMaterial3D.BlendModeEnum.Mix,
-				ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
-				CullMode = BaseMaterial3D.CullModeEnum.Disabled,
-			};
-			UpdateMaterial(new GodotMaterial(newUnlit));
-		}
-
-		public RTexture2D Texture
-		{
-			set {
-				var texture = ((GodotTexture2D)value?.Inst)?.Texture2D;
-				YourData?.UpdateData((data) => {
-					if (data is StandardMaterial3D material3D) {
-						material3D.AlbedoTexture = texture;
 					}
 				});
 			}
