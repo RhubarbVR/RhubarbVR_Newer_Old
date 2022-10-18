@@ -286,6 +286,7 @@ namespace RhuEngine
 					catch (Exception ex) {
 						RLog.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
 						IntMsg = $"Failed to start {item.GetType().GetFormattedName()} Error:{ex}";
+						throw ex;
 						return;
 					}
 				}

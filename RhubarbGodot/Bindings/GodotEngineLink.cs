@@ -80,6 +80,7 @@ namespace RhubarbVR.Bindings
 			RMesh.Instance = typeof(GodotMesh);
 			RTexture.Instance = typeof(GodotTexture);
 			RTexture2D.Instance = typeof(GodotTexture2D);
+			RAtlasTexture.Instance = typeof(GodotAtlasTexture);
 			RImageTexture2D.Instance = typeof(GodotImageTexture2D);
 			RImage.Instance = typeof(GodotImage);
 			RRenderer.Instance = new GodotRender(EngineRunner);

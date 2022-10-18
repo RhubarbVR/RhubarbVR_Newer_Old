@@ -5,6 +5,7 @@ using System.Reflection;
 using System.IO;
 using RhuEngine.Linker;
 using System.Threading.Tasks;
+using RNumerics;
 
 namespace RhuEngine
 {
@@ -24,9 +25,9 @@ namespace RhuEngine
 			var v2 = LoadTextureAsync("RhubarbVR2.png");
 #endif
 			var egrip = LoadTextureAsync("Grid.jpg");
-	
+
 			var enull = LoadTextureAsync("nulltexture.jpg");
-	
+
 			var eicons = LoadTextureAsync("Icons.png");
 
 			_rhubarbLogoV1 ??= await v1;
@@ -67,7 +68,7 @@ namespace RhuEngine
 			var texture = new RImageTexture2D(img);
 			return texture;
 		}
-		public RTexture2D LoadTexture(string name,bool compress,string fileEx) {
+		public RTexture2D LoadTexture(string name, bool compress, string fileEx) {
 			var img = new RImage(null);
 			var resourse = GetStaticResourceStream(name);
 			img.Load(resourse, fileEx);
@@ -79,7 +80,7 @@ namespace RhuEngine
 		}
 		private RTexture2D _rhubarbLogoV1;
 #if DEBUG
-		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("MilkSnake.png",true, "png");
+		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("MilkSnake.png", true, "png");
 #else
 		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("RhubarbVR.png",true, "png");
 #endif
@@ -111,6 +112,18 @@ namespace RhuEngine
 			font.LoadDynamicFont(stream);
 			return font;
 		}
+
+		private RhubarbAtlasSheet _rhubarbAtlasSheet;
+
+		private RhubarbAtlasSheet BuildStack() {
+			var data = new RhubarbAtlasSheet {
+				Atlas = Icons,
+				GridSize = new Vector2i(26, 7)
+			};
+			return data;
+		}
+
+		public RhubarbAtlasSheet IconSheet => _rhubarbAtlasSheet ??= BuildStack();
 
 		private RFont LoadMainFont() {
 			var MainFont = new RFont(null);

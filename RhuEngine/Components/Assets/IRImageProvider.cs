@@ -6,7 +6,8 @@ using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.Components
 {
-	public interface IRImageProvider {
+	public interface IRImageProvider
+	{
 		public RImage Image { get; }
 	}
 

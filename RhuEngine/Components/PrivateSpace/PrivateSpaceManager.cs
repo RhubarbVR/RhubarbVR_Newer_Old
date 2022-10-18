@@ -12,6 +12,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
 using RhuEngine.WorldObjects;
+using RhuEngine.Components.PrivateSpace;
 
 namespace RhuEngine.Components
 {
@@ -25,11 +26,28 @@ namespace RhuEngine.Components
 		[NoSyncUpdate]
 		public Entity DashMover;
 
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIElement RootScreenElement;
 
 		protected override void OnAttach() {
 			base.OnAttach();
 			DashMover = World.RootEntity.AddChild("TaskBarMover");
 			DashMover.AttachComponent<UserInterfacePositioner>();
+			var screen = World.RootEntity.AddChild("RootScreen");
+			RootScreenElement = screen.AttachComponent<UIElement>();
+			var iconTex = screen.AddChild("Center Icon").AttachComponent<TextureRect>();
+			var size = new Vector2f(0.075f);
+			iconTex.Min.Value = new Vector2f(0.5f, 0.5f) - (size / 2);
+			iconTex.Max.Value = new Vector2f(0.5f, 0.5f) + (size / 2);
+			iconTex.StrechMode.Value = RStrechMode.KeepAspectCenter;
+			iconTex.IgnoreTextureSize.Value = true;
+			screen.AttachComponent<IsInVR>().isNotVR.Target = screen.enabled;
+			var dataee = iconTex.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+			dataee.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Cursor));
+			iconTex.Texture.Target = dataee;
 		}
 
 		protected override void OnLoaded() {
@@ -168,7 +186,7 @@ namespace RhuEngine.Components
 		}
 
 		public void KeyBoardUpdate(Matrix openLocation) {
-			
+
 		}
 	}
 }
