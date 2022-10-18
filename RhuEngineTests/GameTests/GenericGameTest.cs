@@ -57,7 +57,6 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsNotNull(world);
 			world.RootEntity.AttachComponent<MainFont>();
 			world.RootEntity.AttachComponent<IconsTex>();
-			world.RootEntity.AttachComponent<SpriteProvder>();
 			world.RootEntity.AttachComponent<TrivialBox3Mesh>();
 			return world;
 		}
