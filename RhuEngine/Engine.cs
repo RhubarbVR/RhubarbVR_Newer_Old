@@ -286,7 +286,7 @@ namespace RhuEngine
 					catch (Exception ex) {
 						RLog.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
 						IntMsg = $"Failed to start {item.GetType().GetFormattedName()} Error:{ex}";
-						throw ex;
+						//throw ex;
 						return;
 					}
 				}
@@ -318,6 +318,32 @@ namespace RhuEngine
 			}
 		}
 
+		private bool _mouseFree = true;
+
+		public bool MouseFree
+		{
+			get => _mouseFree;
+			set {
+				_mouseFree = value;
+				MouseFreeStateUpdate();
+			}
+		}
+
+		public void MouseFreeStateUpdate() {
+			try {
+				if (IsInVR) {
+					inputManager.MouseSystem.MouseHidden = false;
+					inputManager.MouseSystem.MouseLocked = false;
+				}
+				else {
+					inputManager.MouseSystem.MouseHidden = _mouseFree;
+					inputManager.MouseSystem.MouseLocked = _mouseFree;
+				}
+			}
+			catch { }
+		}
+
+
 		private Vector3f _oldPlayerPos = Vector3f.Zero;
 		private Vector3f _loadingPos = Vector3f.Zero;
 
@@ -326,11 +352,7 @@ namespace RhuEngine
 			if (EngineStarting) {
 				if (EngineLink.CanRender) {
 					try {
-						var headMat = inputManager.HeadMatrix;
-						if (!IsInVR) {
-							RRenderer.CameraRoot = Matrix.Identity;
-							headMat = Matrix.T(Vector3f.Forward / 10);
-						}
+						var headMat = RRenderer.GetMainViewMatrix;
 						var textpos = Matrix.T(Vector3f.Forward * 0.5f) * (EngineLink.CanInput ? headMat : Matrix.S(1));
 						var playerPos = RRenderer.CameraRoot.Translation;
 						_loadingPos += playerPos - _oldPlayerPos;

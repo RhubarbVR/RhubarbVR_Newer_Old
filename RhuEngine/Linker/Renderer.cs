@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using RNumerics;
 
 namespace RhuEngine.Linker
@@ -16,6 +17,9 @@ namespace RhuEngine.Linker
 
 		public Matrix GetCameraRootMatrix();
 
+		public Matrix GetCameraLocalMatrix();
+		public void SetCameraLocalMatrix(Matrix m);
+
 		public void SetCameraRootMatrix(Matrix m);
 	}
 
@@ -27,6 +31,13 @@ namespace RhuEngine.Linker
 			get => Instance.GetEnableSky();
 			set => Instance.SetEnableSky(value);
 		}
+		public static Matrix LocalCam
+		{
+			get => Instance.GetCameraLocalMatrix();
+			set => Instance.SetCameraLocalMatrix(value);
+		}
+		public static Matrix GetMainViewMatrix => LocalCam * CameraRoot;
+
 		public static Matrix CameraRoot
 		{
 			get => Instance.GetCameraRootMatrix();

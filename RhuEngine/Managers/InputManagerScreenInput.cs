@@ -28,27 +28,16 @@ namespace RhuEngine.Managers
 			public bool MouseFree { get; set; }
 			public InputManager InputManager { get; }
 
-			public Matrix CamPos
-			{
-				get => _camPos;
-				set {
-					_camPos = value;
-					RRenderer.CameraRoot = InputManager.HeadMatrix * CamPos;
-				}
-			}
-
 			public ScreenInput(InputManager inputManager) {
 				InputManager = inputManager;
 				UnFreeMouse();
 			}
 			public void FreeMouse() {
-				InputManager.MouseSystem.MouseHidden = false;
-				InputManager.MouseSystem.MouseLocked = false;
+				Engine.MainEngine.MouseFree = false;
 				MouseFree = true;
 			}
 			public void UnFreeMouse() {
-				InputManager.MouseSystem.MouseHidden = true;
-				InputManager.MouseSystem.MouseLocked = true;
+				Engine.MainEngine.MouseFree = true;
 				MouseFree = false;
 			}
 
@@ -69,7 +58,7 @@ namespace RhuEngine.Managers
 					yawpitch.y = MathUtil.Clamp(yawpitch.y, -PITCH, PITCH);
 				}
 				var headData = Matrix.TR(pos, Quaternionf.CreateFromEuler(yawpitch.x, yawpitch.y, 0));
-				InputManager.HeadMatrix = headData;
+				RRenderer.LocalCam = headData;
 			}
 		}
 

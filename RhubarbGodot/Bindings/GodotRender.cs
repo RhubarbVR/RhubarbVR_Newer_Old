@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Godot;
+
 using RhuEngine.Linker;
 
 using RNumerics;
@@ -20,9 +21,9 @@ namespace RhubarbVR.Bindings
 			var rot = node3D.Transform.basis.GetRotationQuaternion();
 			return Matrix.TRS(new Vector3f(pos.x, pos.y, pos.z), new Quaternionf(rot.x, rot.y, rot.z, rot.w), new Vector3f(scale.x, scale.y, scale.z));
 		}
-		public static void SetPos(this Node3D node3D,Matrix matrix) {
+		public static void SetPos(this Node3D node3D, Matrix matrix) {
 			matrix.Decompose(out var pos, out var rot, out var scale);
-			if (pos.IsAnyNan || rot.IsAnyNan || scale.IsAnyNan){
+			if (pos.IsAnyNan || rot.IsAnyNan || scale.IsAnyNan) {
 				node3D.Transform = new Transform3D();
 				return;
 			}
@@ -30,7 +31,7 @@ namespace RhubarbVR.Bindings
 			trans.basis = new Basis(new Quaternion(rot.x, rot.y, rot.z, rot.w)) {
 				Scale = new Vector3(scale.x, scale.y, scale.z)
 			};
-			trans.origin = new Vector3(pos.x,pos.y,pos.z);
+			trans.origin = new Vector3(pos.x, pos.y, pos.z);
 			node3D.Transform = trans;
 		}
 	}
@@ -58,6 +59,14 @@ namespace RhubarbVR.Bindings
 
 		public void SetEnableSky(bool e) {
 
+		}
+
+		public Matrix GetCameraLocalMatrix() {
+			return EngineRunner.Camera.GetPos();
+		}
+
+		public void SetCameraLocalMatrix(Matrix m) {
+			EngineRunner.Camera.SetPos(m);
 		}
 	}
 }

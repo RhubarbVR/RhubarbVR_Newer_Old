@@ -63,12 +63,14 @@ namespace RhubarbVR.Bindings
 				RLog.Info("Is in VR");
 				InVR = true;
 				VRChange?.Invoke(true);
+				Engine.MouseFreeStateUpdate();
 			}
 			else {
 				EngineRunner.GetViewport().UseXr = false;
 				RLog.Info("Not in VR");
 				InVR = false;
 				VRChange?.Invoke(false);
+				Engine.MouseFreeStateUpdate();
 			}
 		}
 
@@ -89,7 +91,7 @@ namespace RhubarbVR.Bindings
 					XRServer.PrimaryInterface.Initialize();
 					RLog.Info("Initialize VR");
 				}
-				RenderThread.ExecuteOnStartOfFrame(()=>RenderThread.ExecuteOnStartOfFrame(VRStateUpdate));
+				VRStateUpdate();
 			}
 		}
 

@@ -44,7 +44,7 @@ namespace RhuEngine.Managers
 		public MouseSystem MouseSystem { get; private set; }
 		public MicSystem MicSystem { get; private set; }
 
-		public Matrix HeadMatrix { get; set; }
+		public Matrix HeadMatrix => RRenderer.LocalCam;
 
 		public void Dispose() {
 		}

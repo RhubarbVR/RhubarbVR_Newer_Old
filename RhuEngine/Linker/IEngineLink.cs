@@ -4,6 +4,8 @@ using System.Text;
 
 using RhuEngine.Managers;
 
+using RNumerics;
+
 namespace RhuEngine.Linker
 {
 	public interface IEngineLink

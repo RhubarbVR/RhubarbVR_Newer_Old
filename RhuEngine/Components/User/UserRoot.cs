@@ -56,12 +56,7 @@ namespace RhuEngine.Components
 						Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
 					}
 					if (Engine.EngineLink.CanRender) {
-						if (Engine.IsInVR) {
-							RRenderer.CameraRoot = Entity.GlobalTrans;
-						}
-						else {
-							Engine.inputManager.screenInput.CamPos = Entity.GlobalTrans;
-						}
+						RRenderer.CameraRoot = Entity.GlobalTrans;
 					}
 				}
 
