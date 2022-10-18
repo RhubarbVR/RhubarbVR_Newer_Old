@@ -32,8 +32,26 @@ namespace RhuEngine.Components
 		[NoSyncUpdate]
 		public UIElement RootScreenElement;
 
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public RawAssetProvider<RTexture2D> CurrsorTexture;
+
+		private RhubarbAtlasSheet.RhubarbIcons _currentIcon;
+		public RhubarbAtlasSheet.RhubarbIcons CurrentIcon
+		{
+			get => _currentIcon; set {
+				_currentIcon = value;
+				if (Engine.EngineLink.CanRender) {
+					CurrsorTexture.LoadAsset(Engine.staticResources.IconSheet.GetElement(_currentIcon));
+				}
+			}
+		}
+
 		protected override void OnAttach() {
 			base.OnAttach();
+
 			DashMover = World.RootEntity.AddChild("TaskBarMover");
 			DashMover.AttachComponent<UserInterfacePositioner>();
 			var screen = World.RootEntity.AddChild("RootScreen");
@@ -45,9 +63,8 @@ namespace RhuEngine.Components
 			iconTex.StrechMode.Value = RStrechMode.KeepAspectCenter;
 			iconTex.IgnoreTextureSize.Value = true;
 			screen.AttachComponent<IsInVR>().isNotVR.Target = screen.enabled;
-			var dataee = iconTex.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
-			dataee.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Cursor));
-			iconTex.Texture.Target = dataee;
+			iconTex.Texture.Target = CurrsorTexture = iconTex.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+			CurrentIcon = RhubarbAtlasSheet.RhubarbIcons.Cursor;
 		}
 
 		protected override void OnLoaded() {
