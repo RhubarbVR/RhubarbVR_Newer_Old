@@ -21,11 +21,6 @@ namespace RhuEngine
 			var coloider = floor.AttachComponent<CylinderShape>();
 			var (mesh, mit, render) = floor.AttachMeshWithMeshRender<CylinderMesh, UnlitMaterial>();
 			mit.Transparency.Value = Transparency.Blend;
-			var colorFollower = floor.AttachComponent<ColorAssign>();
-			colorFollower.Alpha.Value = 0.75f;
-			colorFollower.Color.Value = ColorAssign.ColorSelection.Primary;
-			colorFollower.ColorShif.Value = 0.1f;
-			colorFollower.TargetColor.Target = render.colorLinear;
 			mesh.TopRadius.Value = 4;
 			mesh.BaseRadius.Value = 3.5f;
 			mesh.Height.Value = 0.25f;
@@ -160,7 +155,9 @@ namespace RhuEngine
 
 			var text2 = fontAtlis.AddChild("Text2");
 			text2.position.Value = new Vector3f(0, 2.5f, 0);
-			text2.AttachComponent<TextLabel3D>().Text.Value = "This is another\nBit of Text";
+			var textRender = text2.AttachComponent<TextLabel3D>();
+			textRender.Text.Value = "This is another\nBit of Text \nwith Billboard";
+			textRender.Billboard.Value = RBillboardOptions.Enabled;
 			var text8 = fontAtlis.AddChild("Text8");
 			text8.position.Value = new Vector3f(1, 0, 0);
 			text8.AttachComponent<TextLabel3D>().Text.Value = "<color=red>Wa<colorblue>Trains<size=50>Trains";

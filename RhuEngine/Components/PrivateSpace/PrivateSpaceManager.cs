@@ -38,15 +38,27 @@ namespace RhuEngine.Components
 		[NoSyncUpdate]
 		public RawAssetProvider<RTexture2D> CurrsorTexture;
 
-		private RhubarbAtlasSheet.RhubarbIcons _currentIcon;
-		public RhubarbAtlasSheet.RhubarbIcons CurrentIcon
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public TextureRect IconTexRender;
+
+		private RhubarbAtlasSheet.RhubarbIcons _cursorIcon;
+		public RhubarbAtlasSheet.RhubarbIcons CursorIcon
 		{
-			get => _currentIcon; set {
-				_currentIcon = value;
+			get => _cursorIcon; set {
+				_cursorIcon = value;
 				if (Engine.EngineLink.CanRender) {
-					CurrsorTexture.LoadAsset(Engine.staticResources.IconSheet.GetElement(_currentIcon));
+					CurrsorTexture.LoadAsset(Engine.staticResources.IconSheet.GetElement(_cursorIcon));
 				}
 			}
+		}
+
+		public Colorf CursorColor
+		{
+			get => IconTexRender.Modulate.Value;
+			set => IconTexRender.Modulate.Value = value;
 		}
 
 		protected override void OnAttach() {
@@ -56,25 +68,32 @@ namespace RhuEngine.Components
 			DashMover.AttachComponent<UserInterfacePositioner>();
 			var screen = World.RootEntity.AddChild("RootScreen");
 			RootScreenElement = screen.AttachComponent<UIElement>();
-			var iconTex = screen.AddChild("Center Icon").AttachComponent<TextureRect>();
+			IconTexRender = screen.AddChild("Center Icon").AttachComponent<TextureRect>();
 			var size = new Vector2f(0.075f);
-			iconTex.Min.Value = new Vector2f(0.5f, 0.5f) - (size / 2);
-			iconTex.Max.Value = new Vector2f(0.5f, 0.5f) + (size / 2);
-			iconTex.StrechMode.Value = RStrechMode.KeepAspectCenter;
-			iconTex.IgnoreTextureSize.Value = true;
-			screen.AttachComponent<IsInVR>().isNotVR.Target = screen.enabled;
-			iconTex.Texture.Target = CurrsorTexture = iconTex.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
-			CurrentIcon = RhubarbAtlasSheet.RhubarbIcons.Cursor;
+			IconTexRender.Min.Value = new Vector2f(0.5f, 0.5f) - (size / 2);
+			IconTexRender.Max.Value = new Vector2f(0.5f, 0.5f) + (size / 2);
+			IconTexRender.StrechMode.Value = RStrechMode.KeepAspectCenter;
+			IconTexRender.IgnoreTextureSize.Value = true;
+			Entity.AttachComponent<IsInVR>().isNotVR.Target = screen.enabled;
+			IconTexRender.Texture.Target = CurrsorTexture = IconTexRender.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+			CursorIcon = RhubarbAtlasSheet.RhubarbIcons.Cursor;
+			CursorColor = new Colorf(222, 222, 222, 240);
 		}
 
 		protected override void OnLoaded() {
 			base.OnLoaded();
 			WorldManager.PrivateSpaceManager = this;
 		}
+
 		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
+
+			if (InputManager.GetInputAction(InputTypes.VRChange).JustActivated() && Engine.EngineLink.LiveVRChange) {
+				Engine.EngineLink.ChangeVR(!Engine.IsInVR);
+			}
+
 			var head = LocalUser.userRoot.Target?.head.Target;
 			var left = LocalUser.userRoot.Target?.leftController.Target;
 			var right = LocalUser.userRoot.Target?.rightController.Target;

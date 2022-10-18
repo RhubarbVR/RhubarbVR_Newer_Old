@@ -16,7 +16,7 @@ namespace RhuEngine.Managers
 {
 	public sealed partial class InputManager : IManager
 	{
-
+		public UserInputAction VRChange { get; private set; }
 		public UserInputAction MoveSpeed { get; private set; }
 		public UserInputAction Back { get; private set; }
 		public UserInputAction Forward { get; private set; }
@@ -60,11 +60,13 @@ namespace RhuEngine.Managers
 				InputTypes.Grab => Grab,
 				InputTypes.UnlockMouse => UnlockMouse,
 				InputTypes.ObserverOpen => ObserverOpen,
+				InputTypes.VRChange => VRChange,
 				_ => null,
 			};
 		}
 
 		private void LoadInputActions() {
+			VRChange = new UserInputAction(this);
 			MoveSpeed = new UserInputAction(this);
 			Back = new UserInputAction(this);
 			Forward = new UserInputAction(this);
@@ -88,6 +90,7 @@ namespace RhuEngine.Managers
 		}
 
 		private void UpdateInputActions() {
+			VRChange.Update();
 			MoveSpeed.Update();
 			Back.Update();
 			Forward.Update();
@@ -114,9 +117,10 @@ namespace RhuEngine.Managers
 			if(_engine.MainSettings is null) {
 				return;
 			}
-			if(MoveSpeed is null) {
+			if(VRChange is null) {
 				return;
 			}
+			VRChange.BindedAction = _engine.MainSettings.InputSettings.VRChange;
 			MoveSpeed.BindedAction = _engine.MainSettings.InputSettings.Sprint;
 			Back.BindedAction = _engine.MainSettings.InputSettings.Back;
 			Forward.BindedAction = _engine.MainSettings.InputSettings.Forward;

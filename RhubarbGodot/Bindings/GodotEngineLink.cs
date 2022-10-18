@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Godot;
+
 using RhubarbVR.Bindings.FontBindings;
 using RhubarbVR.Bindings.Input;
 using RhubarbVR.Bindings.TextureBindings;
@@ -15,9 +17,12 @@ using RhuEngine.Settings;
 
 using RNumerics;
 
+using Engine = RhuEngine.Engine;
+
 namespace RhubarbVR.Bindings
 {
-	public class GodotRenderSettings : RenderSettingsBase {
+	public class GodotRenderSettings : RenderSettingsBase
+	{
 
 	}
 
@@ -40,9 +45,9 @@ namespace RhubarbVR.Bindings
 
 		public string BackendID => "Godot1.0.0";
 
-		public bool InVR => false;
+		public bool InVR { get; set; }
 
-		public bool LiveVRChange => false;
+		public bool LiveVRChange => true;
 
 		public Type RenderSettingsType => typeof(GodotRenderSettings);
 
@@ -52,19 +57,45 @@ namespace RhubarbVR.Bindings
 
 		public Engine Engine;
 
+		private void VRStateUpdate() {
+			if (XRServer.PrimaryInterface?.IsInitialized() ?? false) {
+				EngineRunner.GetViewport().UseXr = true;
+				RLog.Info("Is in VR");
+				InVR = true;
+				VRChange?.Invoke(true);
+			}
+			else {
+				EngineRunner.GetViewport().UseXr = false;
+				RLog.Info("Not in VR");
+				InVR = false;
+				VRChange?.Invoke(false);
+			}
+		}
+
 		public void BindEngine(Engine engine) {
 			Engine = engine;
+			VRStateUpdate();
 		}
 
 		public void ChangeVR(bool value) {
-
+			if (value != InVR) {
+				if (InVR) {
+					XRServer.PrimaryInterface.Uninitialize();
+					RLog.Info("Uninitialize VR");
+				}
+				else {
+					//Dont know why it works but it does
+					XRServer.PrimaryInterface.Initialize();
+					XRServer.PrimaryInterface.Initialize();
+					RLog.Info("Initialize VR");
+				}
+				RenderThread.ExecuteOnStartOfFrame(()=>RenderThread.ExecuteOnStartOfFrame(VRStateUpdate));
+			}
 		}
 
 		public void LoadArgs() {
-			if (Engine._forceFlatscreen) {
-
-			} else {
-
+			if (Engine._forceFlatscreen && InVR) {
+				ChangeVR(false);
 			}
 		}
 

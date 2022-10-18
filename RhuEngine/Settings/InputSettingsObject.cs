@@ -36,6 +36,9 @@ namespace RhuEngine.Settings
 		[SettingsField("Movment Settings")]
 		public MovmentSettings MovmentSettings = new();
 
+		[SettingsField("VRChange")]
+		public InputAction VRChange = new(new[] { new[] { "Key.F6" } });
+
 		[SettingsField("Sprint")]
 		public InputAction Sprint = new(new[] { new[] { "Key.Shift" } });
 

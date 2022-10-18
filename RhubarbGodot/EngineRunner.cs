@@ -73,6 +73,12 @@ public partial class EngineRunner : Node3D, IRTime
 	}
 
 	public override void _Process(double delta) {
+		//Dont Like this but it works
+		if (!link.InVR) {
+			Camera.Position = Vector3.Zero;
+			Camera.Rotation = Vector3.Zero;
+		}
+		//Dont Like this but it works
 		engine?.Step();
 		TypeDelta = "";
 		MouseDelta = Vector2f.Zero;

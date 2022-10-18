@@ -176,12 +176,12 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Max_Changed(IChangeable obj) {
-			node.AnchorTop = 1 - LinkedComp.Max.Value.y;
+			node.AnchorBottom = LinkedComp.Max.Value.y;
 			node.AnchorRight = LinkedComp.Max.Value.x;
 		}
 
 		private void Min_Changed(IChangeable obj) {
-			node.AnchorBottom = 1 - LinkedComp.Min.Value.y;
+			node.AnchorTop = LinkedComp.Min.Value.y;
 			node.AnchorLeft = LinkedComp.Min.Value.x;
 		}
 

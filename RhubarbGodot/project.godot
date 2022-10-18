@@ -37,4 +37,5 @@ import/fbx/enabled=false
 
 [xr]
 
+openxr/enabled=true
 shaders/enabled=true

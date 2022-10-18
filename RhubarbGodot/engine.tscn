@@ -11,7 +11,7 @@ script = ExtResource("1_p4nju")
 ThowAway = NodePath("ThrowAway")
 Camera = NodePath("XrOrigin3d/XrCamera3d")
 Rigin = NodePath("XrOrigin3d")
-AudioListener = NodePath("XrOrigin3d/AudioListener3d")
+AudioListener = NodePath("XrOrigin3d/XrCamera3d/AudioListener3d")
 
 [node name="XrOrigin3d" type="XROrigin3D" parent="."]
 
@@ -20,7 +20,7 @@ cull_mask = 127
 environment = SubResource("Environment_ljag0")
 current = true
 
-[node name="AudioListener3d" type="AudioListener3D" parent="XrOrigin3d"]
+[node name="AudioListener3d" type="AudioListener3D" parent="XrOrigin3d/XrCamera3d"]
 current = true
 
 [node name="ThrowAway" type="SubViewport" parent="."]
