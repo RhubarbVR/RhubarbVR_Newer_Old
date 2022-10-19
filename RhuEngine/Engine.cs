@@ -330,7 +330,7 @@ namespace RhuEngine
 		}
 
 		public void MouseFreeStateUpdate() {
-			try {
+			if(inputManager?.MouseSystem is not null) { 
 				if (IsInVR) {
 					inputManager.MouseSystem.MouseHidden = false;
 					inputManager.MouseSystem.MouseLocked = false;
@@ -340,7 +340,6 @@ namespace RhuEngine
 					inputManager.MouseSystem.MouseLocked = _mouseFree;
 				}
 			}
-			catch { }
 		}
 
 

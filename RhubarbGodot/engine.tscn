@@ -12,6 +12,7 @@ ThowAway = NodePath("ThrowAway")
 Camera = NodePath("XrOrigin3d/XrCamera3d")
 Rigin = NodePath("XrOrigin3d")
 AudioListener = NodePath("XrOrigin3d/XrCamera3d/AudioListener3d")
+StartInVR = true
 
 [node name="XrOrigin3d" type="XROrigin3D" parent="."]
 

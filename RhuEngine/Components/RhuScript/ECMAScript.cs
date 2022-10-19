@@ -19,7 +19,7 @@ namespace RhuEngine.Components
 	}
 
 
-	public sealed class RawECMAScript: ECMAScript
+	public sealed class RawECMAScript : ECMAScript
 	{
 
 		[Default(@"
@@ -125,7 +125,7 @@ namespace RhuEngine.Components
 				options.TimeoutInterval(TimeSpan.FromSeconds(1));
 				options.MaxStatements(1580);
 				options.SetTypeResolver(new TypeResolver {
-					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType()))&& !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
+					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType())) && !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
 				});
 				options.Strict = true;
 			});

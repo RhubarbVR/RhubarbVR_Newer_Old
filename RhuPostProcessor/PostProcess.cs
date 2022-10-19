@@ -351,7 +351,7 @@ namespace RhuPostProcessor
 		}
 
 		public bool IsBasedOff(TypeDefinition typeDefinition, string type = "RhuEngine.WorldObjects.SyncObject") {
-			var parrentType = typeDefinition.BaseType;
+			var parrentType = typeDefinition?.BaseType;
 			return parrentType != null && (parrentType.FullName == type || IsBasedOff(parrentType.Resolve(), type));
 		}
 		public TypeReference? voidType;

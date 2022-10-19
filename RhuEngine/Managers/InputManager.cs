@@ -17,6 +17,18 @@ namespace RhuEngine.Managers
 	{
 		private Engine _engine;
 
+		private event Action OnInputManagerLoaded;
+
+		public void OnLoaded(Action action) {
+			if (IsLoaded) {
+				action();
+			}
+			else {
+				OnInputManagerLoaded += action;
+			}
+		}
+
+
 		private readonly List<IInputDevice> _inputDevices = new();
 		private IInputSystem[] _inputSystems = Array.Empty<IInputSystem>();
 
@@ -39,7 +51,7 @@ namespace RhuEngine.Managers
 				disposable.Dispose();
 			}
 		}
-
+		public XRInputSystem XRInputSystem { get; private set; }
 		public KeyboardSystem KeyboardSystem { get; private set; }
 		public MouseSystem MouseSystem { get; private set; }
 		public MicSystem MicSystem { get; private set; }
@@ -49,21 +61,27 @@ namespace RhuEngine.Managers
 		public void Dispose() {
 		}
 
+		public bool IsLoaded { get; private set; } = false;
+
 		public void Init(Engine engine) {
 			_engine = engine;
+			XRInputSystem = new XRInputSystem(this);
 			KeyboardSystem = new KeyboardSystem(this);
 			MouseSystem = new MouseSystem(this);
-			screenInput = new ScreenInput(this);
 			MicSystem = new MicSystem(this);
 			_inputSystems = new IInputSystem[] {
+				XRInputSystem,
 				KeyboardSystem,
 				MouseSystem,
 				MicSystem,
 			};
+			screenInput = new ScreenInput(this);
 			LoadInputActions();
 			_engine.EngineLink.LoadInput(this);
 			SettingsUpdateInputActions();
 			_engine.SettingsUpdate += SettingsUpdateInputActions;
+			OnInputManagerLoaded?.Invoke();
+			IsLoaded = true;
 		}
 		public void RenderStep() {
 			foreach (var item in _inputSystems) {
@@ -80,6 +98,7 @@ namespace RhuEngine.Managers
 				? _engine.MainSettings.InputSettings.RightHanded ? Handed.Right : Handed.Left
 				: _engine.MainSettings.InputSettings.RightHanded ? Handed.Left : Handed.Right;
 		}
+
 		private float GetActionStringValue(string v) {
 			return Math.Min(GetActionStringValue(v, Handed.Left) + GetActionStringValue(v, Handed.Right) + GetActionStringValue(v, Handed.Max), 1f);
 		}

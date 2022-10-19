@@ -74,20 +74,70 @@ namespace RhubarbVR.Bindings
 			}
 		}
 
+		private void LoadAllTrackers() {
+			var trackers = XRServer.GetTrackers((int)XRServer.TrackerType.Any);
+			foreach (var item in trackers) {
+				XRServer_TrackerAdded((string)item.Key, (long)((XRPositionalTracker)item.Value).Type);
+			}
+		}
+
 		public void BindEngine(Engine engine) {
 			Engine = engine;
 			VRStateUpdate();
+			engine.inputManager.OnLoaded(LoadVRInput);
+		}
+
+		private void LoadVRInput() {
+			RLog.Info("Loading VRInput");
+			XRServer.TrackerAdded += XRServer_TrackerAdded;
+			XRServer.TrackerRemoved += XRServer_TrackerRemoved;
+			if(XRServer.PrimaryInterface is OpenXRInterface xRInterface) {
+				xRInterface.SessionStopping += XRInterface_SessionStopping;
+				xRInterface.SessionFocussed += XRInterface_SessionFocussed;
+			}
+			LoadAllTrackers();
+		}
+
+		private void XRInterface_SessionFocussed() {
+			RLog.Info("XR session Focused");
+		}
+
+		private void XRInterface_SessionStopping() {
+			RLog.Info("XR session Closed closing");
+			Engine.Close();
+		}
+
+		public readonly Dictionary<string, GodotXRTracker> Trackers = new();
+
+		private void XRServer_TrackerRemoved(StringName trackerName, long type) {
+			if (Trackers.ContainsKey(trackerName)) {
+				Engine.inputManager.RemoveInputDriver(Trackers[trackerName]);
+			}
+			else {
+				RLog.Warn("Tracker Not Found to Removed Name:" + trackerName + " Type:" + (XRServer.TrackerType)type);
+			}
+		}
+
+		private void XRServer_TrackerAdded(StringName trackerName, long type) {
+			if (Trackers.ContainsKey(trackerName)) {
+				RLog.Warn("Tracker Allready added Name:" + trackerName + " Type:" + (XRServer.TrackerType)type);
+			}
+			else {
+				var newTracker = new GodotXRTracker(XRServer.GetTracker(trackerName));
+				Trackers.Add(trackerName, newTracker);
+				Engine.inputManager.LoadInputDriver(newTracker);
+			}
 		}
 
 		public void ChangeVR(bool value) {
 			if (value != InVR) {
 				if (InVR) {
+					//WTF
 					XRServer.PrimaryInterface.Uninitialize();
+					XRServer.PrimaryInterface.Initialize();
 					RLog.Info("Uninitialize VR");
 				}
 				else {
-					//Dont know why it works but it does
-					XRServer.PrimaryInterface.Initialize();
 					XRServer.PrimaryInterface.Initialize();
 					RLog.Info("Initialize VR");
 				}
