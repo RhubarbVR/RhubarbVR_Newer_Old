@@ -72,6 +72,8 @@ public partial class EngineRunner : Node3D, IRTime
 		engine.Init();
 	}
 
+	public string Typer;
+
 	public override void _Process(double delta) {
 		//Dont Like this but it works
 		if (!link.InVR) {
@@ -82,9 +84,6 @@ public partial class EngineRunner : Node3D, IRTime
 		engine?.Step();
 		TypeDelta = "";
 		MouseDelta = Vector2f.Zero;
-		if (!Input.IsKeyPressed(Godot.Key.Backspace)) {
-			BackSpaceTimer = 0;
-		}
 	}
 
 	public override void _ExitTree() {
@@ -122,8 +121,6 @@ public partial class EngineRunner : Node3D, IRTime
 
 	public string TypeDelta = "";
 
-	public uint BackSpaceTimer;
-
 	public override void _Input(InputEvent @event) {
 		if (@event is InputEventMouseMotion mouseMotion) {
 			MousePos = new Vector2f(mouseMotion.Position.x, mouseMotion.Position.y);
@@ -133,10 +130,9 @@ public partial class EngineRunner : Node3D, IRTime
 			var newString = System.Text.Encoding.UTF8.GetString(BitConverter.GetBytes(key.Unicode));
 			var clearFrom = newString.IndexOf('\0', 0);
 			if(key.Keycode == Godot.Key.Backspace) {
-				if (BackSpaceTimer is > 10 or 0) {
+				if (key.Pressed) {
 					TypeDelta += "\b";
 				}
-				BackSpaceTimer++;
 			}
 			else {
 				TypeDelta += newString.Remove(clearFrom);

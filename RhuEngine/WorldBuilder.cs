@@ -21,6 +21,7 @@ namespace RhuEngine
 			var coloider = floor.AttachComponent<CylinderShape>();
 			var (mesh, mit, render) = floor.AttachMeshWithMeshRender<CylinderMesh, UnlitMaterial>();
 			mit.Transparency.Value = Transparency.Blend;
+			mit.Tint.Value = new Colorf(10, 10, 10, 150);
 			mesh.TopRadius.Value = 4;
 			mesh.BaseRadius.Value = 3.5f;
 			mesh.Height.Value = 0.25f;
