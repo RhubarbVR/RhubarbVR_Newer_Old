@@ -35,8 +35,8 @@ namespace RhuEngine.Components
 			var tempBack = InputManager.GetInputAction(InputTypes.Back).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
 			var pos = new Vector3f(tempRight - tempLeft, tempFlyUp - tempFlyDown, -tempForward + tempBack) * speed;
 			var Rotspeed = AllowMultiplier ? MathUtil.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
-			var tempRotateRight = InputManager.GetInputAction(InputTypes.RotateLeft).HandedValue(InputManager.GetHand(!isMain)) * RTime.Elapsedf;
-			var tempRotateLeft = InputManager.GetInputAction(InputTypes.RotateRight).HandedValue(InputManager.GetHand(!isMain)) * RTime.Elapsedf;
+			var tempRotateRight = InputManager.GetInputAction(InputTypes.RotateLeft).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
+			var tempRotateLeft = InputManager.GetInputAction(InputTypes.RotateRight).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
 			var rot = Quaternionf.CreateFromEuler((tempRotateRight - tempRotateLeft) * RotationSpeed, 0, 0);
 			var AddToMatrix = Matrix.T(pos);
 			switch (Engine.inputManager.GetHand(isMain)) {

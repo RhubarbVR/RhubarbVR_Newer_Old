@@ -64,10 +64,10 @@ namespace RhuEngine.Settings
 		public InputAction FlyDown = new(new[] { new[] { "Key.Q" } });
 
 		[SettingsField("RotateLeft")]
-		public InputAction RotateLeft = new(new[] { new[] { "Key.Z" }, new[] { "XR.Main.secondary.-x" } });
+		public InputAction RotateLeft = new(new[] { new[] { "Key.Z" }, new[] { "XR.Secondary.Primary.-x" } });
 
 		[SettingsField("RotateRight")]
-		public InputAction RotateRight = new(new[] { new[] { "Key.X" }, new[] { "XR.Main.secondary.x" } });
+		public InputAction RotateRight = new(new[] { new[] { "Key.X" }, new[] { "XR.Secondary.Primary.x" } });
 
 		[SettingsField("ObjectPull")]
 		public InputAction ObjectPull = new(new[] { new[] { "Mouse.Scroll.y-" }, new[] { "XR.Main.Primary.-y" } });
