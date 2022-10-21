@@ -63,8 +63,6 @@ namespace RhubarbVR.Bindings.Input
 
 	}
 
-
-
 	public class GodotXRTracker : ITrackerDevice
 	{
 		public XRPositionalTracker Tracker;
@@ -74,6 +72,97 @@ namespace RhubarbVR.Bindings.Input
 			foreach (TrackerPos item in Enum.GetValues(typeof(TrackerPos))) {
 				dictionary.Add(item, new GodotXRPos(tracker, item));
 			}
+			Tracker.ButtonPressed += Tracker_ButtonPressed;
+			tracker.ButtonReleased += Tracker_ButtonReleased;
+			tracker.InputAxisChanged += Tracker_InputAxisChanged;
+			tracker.InputValueChanged += Tracker_InputValueChanged;
+		}
+
+		private void Tracker_InputValueChanged(string name, double value) {
+#if DEBUG
+			RLog.Info("Value Input " + name);
+#endif
+			if (_doubleinputs.ContainsKey(name)) {
+				_doubleinputs[name] = value;
+			}
+			else {
+				_doubleinputs.Add(name, value);
+			}
+		}
+
+		private void Tracker_InputAxisChanged(string name, Vector2 vector) {
+#if DEBUG
+			RLog.Info("Axis Input " + name);
+#endif
+			if (_vectorinputs.ContainsKey(name)) {
+				_vectorinputs[name] = new Vector2f(vector.x,vector.y);
+			}
+			else {
+				_vectorinputs.Add(name, new Vector2f(vector.x, vector.y));
+			}
+		}
+
+		private readonly System.Collections.Generic.Dictionary<string, Vector2f> _vectorinputs = new();
+
+		private readonly System.Collections.Generic.Dictionary<string, double> _doubleinputs = new();
+
+		private readonly System.Collections.Generic.Dictionary<string, bool> _boolinputs = new();
+
+		private void Tracker_ButtonReleased(string name) {
+#if DEBUG
+			RLog.Info("Button Released " + name);
+#endif
+			if (_boolinputs.ContainsKey(name)) {
+				_boolinputs[name] = false;
+			}
+			else {
+				_boolinputs.Add(name, false);
+			}
+		}
+
+		private void Tracker_ButtonPressed(string name) {
+#if DEBUG
+			RLog.Info("Button Press " + name);
+#endif
+			if (_boolinputs.ContainsKey(name)) {
+				_boolinputs[name] = true;
+			}
+			else {
+				_boolinputs.Add(name, true);
+			}
+		}
+		public bool BoolInput(string Input) {
+			return _boolinputs[Input];
+		}
+		public double DoubleInput(string Input) {
+			return _doubleinputs[Input];
+		}
+
+		public Vector2f VectorInput(string Input) {
+			return _vectorinputs[Input];
+		}
+		public IEnumerable<string> Inputs() {
+			foreach (var item in _boolinputs.Keys) {
+				yield return item;
+			}
+			foreach (var item in _doubleinputs.Keys) {
+				yield return item;
+			}
+			foreach (var item in _vectorinputs.Keys) {
+				yield return item;
+			}
+		}
+
+		public bool HasBoolInput(string Input) {
+			return _boolinputs.ContainsKey(Input);
+		}
+
+		public bool HasDoubleInput(string Input) {
+			return _doubleinputs.ContainsKey(Input);
+		}
+
+		public bool HasVectorInput(string Input) {
+			return _vectorinputs.ContainsKey(Input);
 		}
 
 		public System.Collections.Generic.Dictionary<TrackerPos, IPos> dictionary = new();

@@ -73,16 +73,23 @@ namespace RhuEngine.Components
 			Entity.rotation.Value = pos.Rotation;
 			Entity.position.Value = pos.Position;
 
-
 			if (Mesh.Target is null) {
 				return;
 			}
-			if (HitAny) {
-				Mesh.Target.Endpoint.Value = Entity.GlobalPointToLocal(HitPoint);
+
+			if (Side.Value == Handed.Left) {
+				if (World.worldManager.PrivateSpaceManager.DisableLeftLaser) {
+					return;
+				}
 			}
 			else {
-				Mesh.Target.Endpoint.Value = new Vector3d(0, 0, -100);
+				if (World.worldManager.PrivateSpaceManager.DisableRightLaser) {
+					return;
+				}
 			}
+
+			Mesh.Target.Endpoint.Value = HitAny ? (Vector3d)Entity.GlobalPointToLocal(HitPoint) : new Vector3d(0, 0, -100);
+
 			if (Currsor.Target is null) {
 				return;
 			}

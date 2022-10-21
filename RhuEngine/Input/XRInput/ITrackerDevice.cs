@@ -43,7 +43,8 @@ namespace RhuEngine.Input.XRInput
 		Any = 0xFF
 	}
 
-	public enum TrackerPos {
+	public enum TrackerPos
+	{
 		None,
 		Default,
 		Aim,
@@ -51,7 +52,8 @@ namespace RhuEngine.Input.XRInput
 		Skeleton
 	}
 
-	public interface IPos {
+	public interface IPos
+	{
 		public bool HasPos { get; }
 
 		public Vector3f Position { get; }
@@ -61,6 +63,19 @@ namespace RhuEngine.Input.XRInput
 	public interface ITrackerDevice : INamedDevice
 	{
 		public IPos this[TrackerPos target] { get; }
+
+		public bool HasBoolInput(string Input);
+
+		public bool BoolInput(string Input);
+
+		public IEnumerable<string> Inputs();
+
+		public bool HasDoubleInput(string Input);
+
+		public double DoubleInput(string Input);
+		public bool HasVectorInput(string Input);
+
+		public Vector2f VectorInput(string Input);
 
 		public TrackerType TrackerType { get; }
 

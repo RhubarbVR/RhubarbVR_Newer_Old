@@ -10,6 +10,7 @@ using RhuEngine.Settings;
 using RhuEngine.Linker;
 using RNumerics;
 using RhuEngine.Input;
+using RhuEngine.Input.XRInput;
 
 namespace RhuEngine.Managers
 {
@@ -192,6 +193,60 @@ namespace RhuEngine.Managers
 							return scrollAction();
 						}
 					}
+				}
+			}
+			var dir = "";
+			if (data.Length > 3) {
+				dir = data[3];
+			}
+			if (device == "xr") {
+				Func<ITrackerDevice> target = null;
+				if(second == "main") {
+					target = () => XRInputSystem.GetHand(GetHand(true));
+				}
+				if (second == "secondary") {
+					target = () => XRInputSystem.GetHand(GetHand(false));
+				}
+				if (int.TryParse(second, out var selectedIndex)) {
+					target = () => XRInputSystem.Trackers.Count <= selectedIndex ? null : XRInputSystem.Trackers[selectedIndex];
+				}
+				if (second == "left" || handed == Handed.Left) {
+					target = () => XRInputSystem.GetHand(Handed.Left);
+				}
+				if (second == "right" || handed == Handed.Right) {
+					target = () => XRInputSystem.GetHand(Handed.Right);
+				}
+				if (target is not null) {
+					var inputAction = () => {
+						var targetDevice = target();
+						if(targetDevice is null) {
+							return 0f;
+						}
+						if (targetDevice.HasBoolInput(thread)) {
+							return targetDevice.BoolInput(thread)?1f:0f;
+						}
+						if (targetDevice.HasDoubleInput(thread)) {
+							return (float)targetDevice.DoubleInput(thread);
+						}
+						if (targetDevice.HasVectorInput(thread)) {
+							var data = targetDevice.VectorInput(thread);
+							if (dir is "x") {
+								return data.x;
+							}
+							else if (dir is "x-" or "-x") {
+								return -data.x;
+							}
+							if (dir is "y") {
+								return data.y;
+							}
+							else if (dir is "y-" or "-y") {
+								return -data.y;
+							}
+						}
+						return 0f;
+					};
+					_actions.Add(lookValue, inputAction);
+					return inputAction();
 				}
 			}
 			_actions.Add(lookValue, ReturnZero);

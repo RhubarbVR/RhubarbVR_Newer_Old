@@ -13,6 +13,7 @@ config_version=5
 config/name="RhubarbVR"
 run/main_scene="res://engine.tscn"
 config/features=PackedStringArray("4.0", "C#", "Forward Plus")
+boot_splash/show_image=false
 boot_splash/image="res://RhubarbVR2.png"
 boot_splash/bg_color=Color(0.0980392, 0.0980392, 0.0980392, 1)
 config/icon="res://icon.svg"
