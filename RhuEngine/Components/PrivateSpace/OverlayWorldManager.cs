@@ -18,6 +18,6 @@ namespace RhuEngine.Components
 	[OverlayOnly]
 	public sealed class OverlayWorldManager : Component
 	{
-	
+		
 	}
 }

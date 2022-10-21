@@ -22,7 +22,6 @@ namespace RhuEngine.Components
 		public readonly SyncObjList<AssetRef<RMaterial>> materials;
 
 		public readonly Sync<Colorf> colorLinear;
-		public readonly Sync<int> zOrderOffset;
 
 		[Default(false)]
 		public readonly Sync<bool> RecevieShadows;

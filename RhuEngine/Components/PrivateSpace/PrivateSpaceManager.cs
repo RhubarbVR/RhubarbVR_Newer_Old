@@ -24,6 +24,18 @@ namespace RhuEngine.Components
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
+		public Lazer Leftlazer;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Lazer Rightlazer;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
 		public Entity DashMover;
 
 		[NoSave]
@@ -63,7 +75,25 @@ namespace RhuEngine.Components
 
 		protected override void OnAttach() {
 			base.OnAttach();
-
+			Task.Run(async () => {
+				if (!Engine.EngineLink.SpawnPlayer) {
+					return;
+				}
+				Entity user;
+				while (true) {
+					user = LocalUser.userRoot.Target?.Entity;
+					if (user is not null) {
+						break;
+					}
+					await Task.Delay(100);
+				}
+				var entLeftlazer = user.AddChild("LeftLazer");
+				Leftlazer = entLeftlazer.AttachComponent<Lazer>();
+				Leftlazer.Side.Value = Handed.Left;
+				var entRightlazer = user.AddChild("RightLazer");
+				Rightlazer = entRightlazer.AttachComponent<Lazer>();
+				Rightlazer.Side.Value = Handed.Right;
+			});
 			DashMover = World.RootEntity.AddChild("TaskBarMover");
 			DashMover.AttachComponent<UserInterfacePositioner>();
 			var screen = World.RootEntity.AddChild("RootScreen");
@@ -95,16 +125,17 @@ namespace RhuEngine.Components
 			}
 
 			var head = LocalUser.userRoot.Target?.head.Target;
-			var left = LocalUser.userRoot.Target?.leftController.Target;
-			var right = LocalUser.userRoot.Target?.rightController.Target;
-
 			if (head != null) {
 				if (!Engine.IsInVR && !Engine.inputManager.screenInput.MouseFree) {
 					UpdateHeadLazer(head);
 				}
 				if (Engine.IsInVR) {
-					UpdateLazer(left, Handed.Left);
-					UpdateLazer(right, Handed.Right);
+					if (Leftlazer is not null) {
+						UpdateLazer(Leftlazer.Entity, Handed.Left, Leftlazer);
+					}
+					if (Rightlazer is not null) {
+						UpdateLazer(Rightlazer.Entity, Handed.Right, Rightlazer);
+					}
 				}
 				//Todo: fingerPos
 				//UpdateTouch(RInput.Hand(Handed.Right).Wrist, 2, Handed.Right);
@@ -148,8 +179,9 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public bool RunLaserCastInWorld(World world, ref Vector3f headFrompos, ref Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side) {
+		public bool RunLaserCastInWorld(World world, ref Vector3f headFrompos, ref Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side, ref Vector3f hitPointWorld) {
 			if (world.PhysicsSim.RayTest(ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
+				hitPointWorld = hitpointworld;
 				if (collider.CustomObject is PhysicsObject physicsObject) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
 					physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
@@ -174,7 +206,8 @@ namespace RhuEngine.Components
 		public bool DisableLeftLaser;
 
 		public bool DisableHeadLaser;
-		public void UpdateLazer(Entity heand, Handed handed) {
+
+		public void UpdateLazer(Entity heand, Handed handed, Lazer lazer) {
 			if (handed == Handed.Left) {
 				if (DisableLeftLaser) {
 					return;
@@ -193,13 +226,31 @@ namespace RhuEngine.Components
 			World.DrawDebugSphere(headToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
 			var vheadFrompos = headFrompos.Translation;
 			var vheadToPos = headToPos.Translation;
-			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed)) {
-
+			var hitPrivate = false;
+			var hitOverlay = false;
+			var hitFocus = false;
+			var hitPoint = Vector3f.Zero;
+			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint)) {
+				hitPrivate = true;
 			}
-			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed)) {
-
+			else if (RunLaserCastInWorld(World.worldManager.OverlayWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint)) {
+				hitOverlay = true;
 			}
+			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint)) {
+				hitFocus = true;
+			}
+			lazer.HitFocus = hitFocus;
+			lazer.HitOverlay = hitOverlay;
+			lazer.HitPrivate = hitPrivate;
+			lazer.HitPoint = hitPoint;
 		}
+
+		public Vector3f HeadLaserHitPoint;
+		public bool HeadLazerHitPrivate;
+		public bool HeadLazerHitOverlay;
+		public bool HeadLazerHitFocus;
+
+		public bool HeadLazerHitAny => HeadLazerHitFocus | HeadLazerHitOverlay | HeadLazerHitFocus;
 
 		public void UpdateHeadLazer(Entity head) {
 			if (DisableHeadLaser) {
@@ -213,12 +264,23 @@ namespace RhuEngine.Components
 			World.DrawDebugSphere(headToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
 			var vheadFrompos = headFrompos.Translation;
 			var vheadToPos = headToPos.Translation;
-			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max)) {
-
+			var hitPrivate = false;
+			var hitOverlay = false;
+			var hitFocus = false;
+			var hitPoint = Vector3f.Zero;
+			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint)) {
+				hitPrivate = true;
 			}
-			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max)) {
-
+			else if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint)) {
+				hitOverlay = true;
 			}
+			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint)) {
+				hitFocus = true;
+			}
+			HeadLaserHitPoint = hitPoint;
+			HeadLazerHitPrivate = hitPrivate;
+			HeadLazerHitOverlay = hitOverlay;
+			HeadLazerHitFocus = hitFocus;
 		}
 
 		public void KeyBoardUpdate(Matrix openLocation) {

@@ -38,11 +38,11 @@ namespace RhubarbVR.Bindings
 	{
 		public Material Material;
 
-		public System.Collections.Generic.Dictionary<(Color, int), Material> Others = new();
+		public System.Collections.Generic.Dictionary<Color, Material> Others = new();
 		public void UpdateColor(Color newColor) {
 			Material.SetColor(newColor);
 			foreach (var item in Others) {
-				item.Value.SetColor(item.Key.Item1 * newColor);
+				item.Value.SetColor(item.Key * newColor);
 			}
 		}
 		public void UpdateData(Action<Material> data) {
@@ -52,30 +52,16 @@ namespace RhubarbVR.Bindings
 			}
 		}
 
-		private int _offset;
-		public int RenderPriorityOffset
-		{
-			get => _offset;
-			set {
-				Material.RenderPriority = Material.RenderPriority - _offset + value;
-				foreach (var item in Others) {
-					item.Value.RenderPriority = Material.RenderPriority + item.Key.Item2;
-				}
-				_offset = value;
-			}
-		}
-
-		public Material GetMatarial(Colorf tint, int zDepth) {
-			if (tint == Colorf.White && zDepth == 0) {
+		public Material GetMatarial(Colorf tint) {
+			if (tint == Colorf.White) {
 				return Material;
 			}
-			var target = (new Color(tint.r, tint.g, tint.b, tint.a), zDepth);
+			var target = new Color(tint.r, tint.g, tint.b, tint.a);
 			if (Others.ContainsKey(target)) {
 				return Others[target];
 			}
 			var newMat = (Material)Material.Duplicate();
-			newMat.RenderPriority += zDepth;
-			newMat.SetColor(target.Item1 * Material.GetColor());
+			newMat.SetColor(target * Material.GetColor());
 			Others.Add(target, newMat);
 			return newMat;
 		}
@@ -98,6 +84,10 @@ namespace RhubarbVR.Bindings
 			yield break;
 		}
 
+		public int GetRenderPriority(object ex) {
+			return ((GodotMaterial)ex).Material.RenderPriority;
+		}
+
 		public object Make(RShader rShader) {
 			return new GodotMaterial();
 		}
@@ -106,10 +96,8 @@ namespace RhubarbVR.Bindings
 
 		}
 
-		public void SetRenderQueueOffset(object mit, int tex) {
-			if(mit is GodotMaterial material) {
-				material.RenderPriorityOffset = tex;
-			}
+		public void SetRenderPriority(object ex, int renderPri) {
+			((GodotMaterial)ex).UpdateData((mit) => mit.RenderPriority = renderPri);
 		}
 	}
 
@@ -185,6 +173,7 @@ namespace RhubarbVR.Bindings
 			set {
 				YourData?.UpdateData((data) => {
 					if (data is StandardMaterial3D material3D) {
+						material3D.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
 						material3D.NoDepthTest = true;
 						material3D.DepthDrawMode = BaseMaterial3D.DepthDrawModeEnum.Disabled;
 					}

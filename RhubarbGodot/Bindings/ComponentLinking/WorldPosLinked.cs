@@ -235,6 +235,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		public override void Remove() {
 			node?.Free();
+			node = null;
 		}
 
 

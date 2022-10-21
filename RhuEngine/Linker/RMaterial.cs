@@ -6,7 +6,8 @@ namespace RhuEngine.Linker
 {
 	public interface IRMaterial
 	{
-		public void SetRenderQueueOffset(object mit, int tex);
+		public int GetRenderPriority(object ex);
+		public void SetRenderPriority(object ex, int renderPri);
 
 		public object Make(RShader rShader);
 		public void Pram(object ex, string tex, object value);
@@ -27,16 +28,28 @@ namespace RhuEngine.Linker
 
 	public partial class RMaterial : IDisposable
 	{
-
-		public int RenderOrderOffset
+		public int RenderPriority
 		{
-			set { Instance.SetRenderQueueOffset(Target, value); PramChanged?.Invoke(this); }
+			set {
+				lock (this) {
+					Instance.SetRenderPriority(Target, value);
+					UpdatePrams();
+				}
+			}
+			get {
+				lock (this) {
+					return Instance.GetRenderPriority(Target);
+				}
+			}
 		}
 
+
 		public void UpdatePrams() {
-			RenderThread.ExecuteOnEndOfFrame(this, () =>
-				PramChanged?.Invoke(this)
-			);
+			lock (this) {
+				RenderThread.ExecuteOnEndOfFrame(this, () =>
+					PramChanged?.Invoke(this)
+				);
+			}
 		}
 
 		public event Action<RMaterial> PramChanged;

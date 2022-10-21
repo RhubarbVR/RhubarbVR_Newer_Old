@@ -291,7 +291,7 @@ namespace RhuEngine.WorldObjects
 
 		private readonly List<IGrouping<uint, Entity>> _sorrtedEntity = new();
 
-		private  bool _sortEntitys;
+		private bool _sortEntitys;
 
 		public void Step() {
 			_netManager?.PollEvents();

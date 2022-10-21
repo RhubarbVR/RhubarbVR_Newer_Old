@@ -17,13 +17,6 @@ namespace RhuEngine.Components
 
 		public readonly SyncAbstractObjList<PramInfo> Prams;
 
-		[OnChanged(nameof(UpdateRenderOrder))]
-		public readonly Sync<int> RenderOrderOffset;
-
-		public void UpdateRenderOrder() {
-			_material.RenderOrderOffset = RenderOrderOffset;
-		}
-
 		public void UpdatePram(string pram, object data) {
 			if (_material is not null) {
 				_material[pram] = data;
