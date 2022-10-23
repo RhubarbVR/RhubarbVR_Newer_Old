@@ -165,17 +165,13 @@ namespace RhubarbVR.Bindings.Input
 			return _vectorinputs.ContainsKey(Input);
 		}
 
+		public void TriggerHapticPulse(float frequency, float amplitude, float duration_sec, float delay_sec) {
+			XRServer.PrimaryInterface?.TriggerHapticPulse("haptic", Tracker.Name, frequency, amplitude, duration_sec, delay_sec);
+		}
+
 		public System.Collections.Generic.Dictionary<TrackerPos, IPos> dictionary = new();
 
-		public IPos this[TrackerPos target]
-		{
-			get {
-				if (dictionary.ContainsKey(target)) {
-					return dictionary[target];
-				}
-				return null;
-			}
-		}
+		public IPos this[TrackerPos target] => dictionary.ContainsKey(target) ? dictionary[target] : null;
 
 		public TrackerType TrackerType => (TrackerType)Tracker.Type;
 

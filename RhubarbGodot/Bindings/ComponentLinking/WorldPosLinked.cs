@@ -34,12 +34,20 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			UpdateParrent();
 			LoadCanvasItemLink();
 			StartContinueInit();
+			Children_OnReorderList();
 		}
 
 		private void Children_OnReorderList() {
 			foreach (Entity item in LinkedComp.Entity.children) {
 				if (item?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
-					node.MoveChild(canvasItem.CanvasItem, -1);
+					if (canvasItem.CanvasItem.GetParent() == CanvasItem) {
+						node.MoveChild(canvasItem.CanvasItem, -1);
+					}
+					else {
+						CanvasItem.AddChild(canvasItem.CanvasItem);
+						canvasItem.CanvasItem.Owner = CanvasItem;
+						node.MoveChild(canvasItem.CanvasItem, -1);
+					}
 				}
 			}
 		}
@@ -88,8 +96,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public override void Remove() {
 			node?.Free();
 		}
-#pragma warning disable CS0618 // Type or member is obsolete
 
+#pragma warning disable CS0618 // Type or member is obsolete
 		public override void Started() {
 			if (node is null) {
 				return;

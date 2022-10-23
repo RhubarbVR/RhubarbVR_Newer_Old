@@ -84,5 +84,7 @@ namespace RhuEngine.Input.XRInput
 		public string Description { get; }
 
 		public Handed Hand { get; }
+
+		public void TriggerHapticPulse(float frequency, float amplitude, float duration_sec, float delay_sec);
 	}
 }

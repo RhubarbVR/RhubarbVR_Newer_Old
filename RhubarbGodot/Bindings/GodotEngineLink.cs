@@ -133,12 +133,12 @@ namespace RhubarbVR.Bindings
 			if (value != InVR) {
 				if (InVR) {
 					//WTF
-					XRServer.PrimaryInterface.Uninitialize();
-					XRServer.PrimaryInterface.Initialize();
+					XRServer.PrimaryInterface?.Uninitialize();
+					XRServer.PrimaryInterface?.Initialize();
 					RLog.Info("Uninitialize VR");
 				}
 				else {
-					XRServer.PrimaryInterface.Initialize();
+					XRServer.PrimaryInterface?.Initialize();
 					RLog.Info("Initialize VR");
 				}
 				VRStateUpdate();

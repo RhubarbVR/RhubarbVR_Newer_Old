@@ -14,6 +14,7 @@ using RhuEngine.Physics;
 using RhuEngine.WorldObjects;
 using RhuEngine.Components.PrivateSpace;
 using RhuEngine.Input.XRInput;
+using System.Reflection;
 
 namespace RhuEngine.Components
 {
@@ -35,10 +36,12 @@ namespace RhuEngine.Components
 		public readonly SyncRef<CurvedTubeMesh> Mesh;
 		public readonly SyncRef<UnlitMaterial> Material;
 		public readonly SyncRef<Sprite3D> Currsor;
-
+		public readonly SyncRef<Entity> Render;
 		protected override void OnAttach() {
 			base.OnAttach();
-			var sprite = Currsor.Target = Entity.AddChild("Currsor").AttachComponent<Sprite3D>();
+			var render = Entity.AddChild("Render");
+			Render.Target = render;
+			var sprite = Currsor.Target = render.AddChild("Currsor").AttachComponent<Sprite3D>();
 			sprite.texture.Target = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
 			sprite.HFrames.Value = 26;
 			sprite.VFrames.Value = 7;
@@ -48,7 +51,7 @@ namespace RhuEngine.Components
 			sprite.RenderPriority.Value = int.MaxValue;
 			sprite.Billboard.Value = RBillboardOptions.Enabled;
 			sprite.FixedSize.Value = true;
-			var data = Entity.AttachMeshWithMeshRender<CurvedTubeMesh, UnlitMaterial>();
+			var data = render.AttachMeshWithMeshRender<CurvedTubeMesh, UnlitMaterial>();
 			data.Item1.StartHandle.Value /= 10;
 			data.Item1.EndHandle.Value /= 10;
 			Mesh.Target = data.Item1;
@@ -65,7 +68,7 @@ namespace RhuEngine.Components
 
 		protected override void Step() {
 			base.Step();
-			Entity.enabled.Value = Engine.EngineLink.InVR;
+			Render.Target.enabled.Value = Engine.EngineLink.InVR;
 			if (!Engine.EngineLink.InVR) {
 				return;
 			}
