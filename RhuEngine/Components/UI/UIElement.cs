@@ -32,9 +32,9 @@ namespace RhuEngine.Components
 	{
 		None = 0,
 		Fill = 1,
-		ShrinkCenter = 2,
-		ShrinkEnd = 4,
-		Expand = 8,
+		Expand = 2,
+		ShrinkCenter = 4,
+		ShrinkEnd = 8,
 	}
 
 	public enum RInputFilter

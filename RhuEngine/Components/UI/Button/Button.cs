@@ -36,6 +36,7 @@ namespace RhuEngine.Components
 		public readonly Sync<RButtonAlignment> Alignment;
 		public readonly Sync<ROverrunBehavior> TextOverrunBehavior;
 		public readonly Sync<RButtonAlignment> IconAlignment;
+		public readonly Sync<bool> ExpandIcon;
 		public readonly Sync<RTextDirection> TextDir;
 		public readonly Sync<string> Language;
 

@@ -28,6 +28,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.IconAlignment.Changed += IconAlignment_Changed;
 			LinkedComp.TextDir.Changed += TextDir_Changed;
 			LinkedComp.Language.Changed += Language_Changed;
+			LinkedComp.ExpandIcon.Changed += ExpandIcon_Changed;
+			ExpandIcon_Changed(null);
 			Text_Changed(null);
 			Icon_LoadChange(null);
 			Flat_Changed(null);
@@ -37,6 +39,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			IconAlignment_Changed(null);
 			TextDir_Changed(null);
 			Language_Changed(null);
+		}
+
+		private void ExpandIcon_Changed(IChangeable obj) {
+			node.ExpandIcon = LinkedComp.ExpandIcon.Value;
 		}
 
 		private void Icon_LoadChange(RTexture2D obj) {

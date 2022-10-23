@@ -166,13 +166,13 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void MaxOffset_Changed(IChangeable obj) {
-			node.OffsetTop = LinkedComp.MaxOffset.Value.y;
-			node.OffsetRight = LinkedComp.MaxOffset.Value.x;
+			node.OffsetBottom = LinkedComp.MaxOffset.Value.y;
+			node.OffsetLeft = LinkedComp.MaxOffset.Value.x;
 		}
 
 		private void MinOffset_Changed(IChangeable obj) {
-			node.OffsetBottom = LinkedComp.MinOffset.Value.y;
-			node.OffsetLeft = LinkedComp.MinOffset.Value.x;
+			node.OffsetTop = LinkedComp.MinOffset.Value.y;
+			node.OffsetRight = LinkedComp.MinOffset.Value.x;
 		}
 
 		private void Max_Changed(IChangeable obj) {
