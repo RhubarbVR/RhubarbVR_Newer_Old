@@ -115,6 +115,7 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			Changed?.Invoke(this);
+			OnReorderList?.Invoke();
 		}
 
 		private void FixAllNames() {

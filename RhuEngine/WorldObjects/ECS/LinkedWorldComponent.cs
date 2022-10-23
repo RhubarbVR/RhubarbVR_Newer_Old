@@ -43,12 +43,18 @@ namespace RhuEngine.WorldObjects.ECS
 				WorldLink = (IWorldLink)Activator.CreateInstance(linker);
 				WorldLink.LinkCompGen = this;
 				WorldLink.Init();
+				World_FoucusChanged();
 			});
 		}
 		protected override void OnLoaded() {
 			base.OnLoaded();
 			BuildRenderLink();
 			World.FoucusChanged += World_FoucusChanged;
+			Enabled.Changed += Enabled_Changed;
+		}
+
+		private void Enabled_Changed(IChangeable obj) {
+			World_FoucusChanged();
 		}
 
 		private void World_FoucusChanged() {
@@ -56,7 +62,12 @@ namespace RhuEngine.WorldObjects.ECS
 				WorldLink?.Stopped();
 			}
 			else {
-				WorldLink?.Started();
+				if (Entity.IsEnabled && Enabled.Value) {
+					WorldLink?.Started();
+				}
+				else {
+					WorldLink?.Stopped();
+				}
 			}
 		}
 
@@ -68,7 +79,12 @@ namespace RhuEngine.WorldObjects.ECS
 				WorldLink?.Stopped();
 			}
 			else {
-				WorldLink?.Started();
+				if (Entity.IsEnabled && Enabled.Value) {
+					WorldLink?.Started();
+				}
+				else {
+					WorldLink?.Stopped();
+				}
 			}
 		}
 		protected override void RemoveListObject() {

@@ -15,6 +15,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 	public interface ICanvasItemNodeLinked
 	{
 		CanvasItem CanvasItem { get; }
+
+		void Children_OnReorderList();
 	}
 
 	public abstract class CanvasItemNodeLinked<T, T2> : EngineWorldLinkBase<T>, ICanvasItemNodeLinked where T : RhuEngine.Components.CanvasItem, new() where T2 : CanvasItem, new()
@@ -31,13 +33,14 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.Entity.ViewportUpdateEvent += NotifyParrentUpdate;
 			LinkedComp.Entity.CanvasItemUpdateEvent += NotifyParrentUpdate;
 			LinkedComp.Entity.children.OnReorderList += Children_OnReorderList;
+			LinkedComp.Entity.OnParentChanged += NotifyParrentUpdate;
 			UpdateParrent();
 			LoadCanvasItemLink();
 			StartContinueInit();
 			Children_OnReorderList();
 		}
 
-		private void Children_OnReorderList() {
+		public void Children_OnReorderList() {
 			foreach (Entity item in LinkedComp.Entity.children) {
 				if (item?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
 					if (canvasItem.CanvasItem.GetParent() == CanvasItem) {
@@ -63,8 +66,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			var addToViewPort = false;
 			if (LinkedComp.Entity.InternalParent?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
 				if (canvasItem.CanvasItem != node) {
-					canvasItem.CanvasItem.AddChild(node);
-					node.Owner = canvasItem.CanvasItem;
+					canvasItem.Children_OnReorderList();
 				}
 				else {
 					addToViewPort = true;
@@ -77,6 +79,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				if (LinkedComp.Entity.Viewport?.WorldLink is ViewportLink ee) {
 					ee.node.AddChild(node);
 					node.Owner = ee.node;
+				}
+				else if (LinkedComp.Entity.InternalParent?.Viewport?.WorldLink is ViewportLink eee) {
+					eee.node.AddChild(node);
+					node.Owner = eee.node;
 				}
 				else {
 					if (LinkedComp.World.IsPersonalSpace) {
@@ -97,7 +103,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			node?.Free();
 		}
 
-#pragma warning disable CS0618 // Type or member is obsolete
 		public override void Started() {
 			if (node is null) {
 				return;

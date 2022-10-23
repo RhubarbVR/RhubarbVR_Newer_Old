@@ -20,6 +20,7 @@ namespace RhuEngine.Components
 	[UpdateLevel(UpdateEnum.Normal)]
 	public sealed class PrivateSpaceManager : Component
 	{
+
 		[NoSave]
 		[NoSync]
 		[NoLoad]
@@ -48,6 +49,12 @@ namespace RhuEngine.Components
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
+		public UIElement UserInterface;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
 		public RawAssetProvider<RTexture2D> CurrsorTexture;
 
 		[NoSave]
@@ -55,6 +62,18 @@ namespace RhuEngine.Components
 		[NoLoad]
 		[NoSyncUpdate]
 		public TextureRect IconTexRender;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Viewport VRViewPort;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UserInterfaceManager UserInterfaceManager;
 
 		private RhubarbAtlasSheet.RhubarbIcons _cursorIcon;
 		public RhubarbAtlasSheet.RhubarbIcons CursorIcon
@@ -99,6 +118,9 @@ namespace RhuEngine.Components
 			var screen = World.RootEntity.AddChild("RootScreen");
 			RootScreenElement = screen.AttachComponent<UIElement>();
 			IconTexRender = screen.AddChild("Center Icon").AttachComponent<TextureRect>();
+			IconTexRender.Entity.orderOffset.Value = -100;
+			UserInterface = screen.AddChild("UserInterface").AttachComponent<UIElement>();
+			UserInterfaceManager = DashMover.AttachComponent<UserInterfaceManager>();
 			var size = new Vector2f(0.075f);
 			IconTexRender.Min.Value = new Vector2f(0.5f, 0.5f) - (size / 2);
 			IconTexRender.Max.Value = new Vector2f(0.5f, 0.5f) + (size / 2);
@@ -108,6 +130,13 @@ namespace RhuEngine.Components
 			IconTexRender.Texture.Target = CurrsorTexture = IconTexRender.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 			CursorIcon = RhubarbAtlasSheet.RhubarbIcons.Cursor;
 			CursorColor = new Colorf(222, 222, 222, 240);
+			VRViewPort = World.RootEntity.AddChild("VRViewPort").AttachComponent<Viewport>();
+			VRViewPort.Enabled.Value = false;
+			VRViewPort.Size.Value = new Vector2i(1920, 1080);
+			VRViewPort.UpdateMode.Value = RUpdateMode.Always;
+			UserInterfaceManager.PrivateSpaceManager = this;
+			UserInterfaceManager.UserInterface = UserInterface;
+			UserInterfaceManager.LoadInterface();
 		}
 
 		protected override void OnLoaded() {

@@ -401,6 +401,7 @@ namespace RhuEngine.WorldObjects.ECS
 
 				if (parent.Target == null) {
 					parent.Target = World.RootEntity;
+					OnParentChanged?.Invoke();
 					return;
 				}
 
@@ -411,12 +412,14 @@ namespace RhuEngine.WorldObjects.ECS
 				if (World != parent.Target.World) {
 					RLog.Warn("tried to set parent from another world");
 					GoBackToOld();
+					OnParentChanged?.Invoke();
 					return;
 				}
 				if (InternalParent == null) {
 					InternalParent = parent.Target;
 					ParentDepthUpdate();
 					TransValueChange();
+					OnParentChanged?.Invoke();
 					return;
 				}
 				parent.Target.children.AddInternal(this);
@@ -425,11 +428,15 @@ namespace RhuEngine.WorldObjects.ECS
 				ParentDepthUpdate();
 				ParentEnabledChange(InternalParent.IsEnabled);
 				TransValueChange();
+				OnParentChanged?.Invoke();
 			}
 			catch {
 
 			}
 		}
+
+		public event Action OnParentChanged;
+
 		[Exposed]
 		public void SetParent(Entity entity, bool preserverGlobal = true, bool resetPos = false) {
 			var mach = GlobalTrans;
