@@ -304,7 +304,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				inputAction = new InputAction();
 				InputActions.Add(deviceid, inputAction);
 			}
-			inputAction.Pos = new RNumerics.Vector2f(pos.x * node.Size.x, (1f - pos.y) * node.Size.y);
+			inputAction.Pos = new RNumerics.Vector2f(pos.x * node.Size.x, pos.y * node.Size.y);
 			inputAction.PressForce = PressForce;
 			inputAction.Tilt = Tilt;
 			inputAction.IsClickedPrime = IsClickedPrime;

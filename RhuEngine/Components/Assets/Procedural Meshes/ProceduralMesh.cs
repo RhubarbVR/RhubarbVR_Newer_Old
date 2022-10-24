@@ -9,7 +9,10 @@ namespace RhuEngine.Components
 	public abstract class ProceduralMesh : AssetProvider<RMesh>
 	{
 		public RMesh loadedMesh = null;
+		public SimpleMesh LoadedSimpleMesh { get; private set; }
+
 		public void GenMesh(IMesh mesh) {
+			LoadedSimpleMesh = mesh is SimpleMesh simple ? simple : null;
 			if (loadedMesh == null) {
 				loadedMesh = new RMesh(mesh, false);
 				Load(loadedMesh);

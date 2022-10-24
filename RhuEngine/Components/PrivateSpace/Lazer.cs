@@ -54,13 +54,15 @@ namespace RhuEngine.Components
 			var data = render.AttachMeshWithMeshRender<CurvedTubeMesh, UnlitMaterial>();
 			data.Item1.StartHandle.Value /= 10;
 			data.Item1.EndHandle.Value /= 10;
+			data.Item2.Transparency.Value = Transparency.Blend;
+			data.Item2.DullSided.Value = true;
 			Mesh.Target = data.Item1;
 			Material.Target = data.Item2;
 			RenderThread.ExecuteOnStartOfFrame(() => {
 				RenderThread.ExecuteOnEndOfFrame(() => {
 					RenderThread.ExecuteOnStartOfFrame(() => {
 						data.Item2._material.NoDepthTest = true;
-						data.Item2._material.Material.RenderPriority = int.MaxValue;
+						data.Item2._material.Material.RenderPriority += 100;
 					});
 				});
 			});

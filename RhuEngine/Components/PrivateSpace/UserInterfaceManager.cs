@@ -89,9 +89,9 @@ namespace RhuEngine.Components
 			UImaterial.Transparency.Value = Transparency.Blend;
 			UImaterial.MainTexture.Target = PrivateSpaceManager.VRViewPort;
 			VrElements = Entity.AddChild("VrElements");
-			var mest = VrElements.AddChild("Stuff").AttachMesh<TrivialBox3Mesh>(UImaterial);
-			mest.Entity.scale.Value = Vector3f.One / 3;
-			VrElements.enabled.Value = false;
+			var target = VrElements.AddChild("Stuff").AttachMesh<CanvasMesh>(UImaterial);
+			target.InputInterface.Target = PrivateSpaceManager.VRViewPort;
+			VrElements.enabled.Value = false; 
 			Engine.EngineLink.VRChange += EngineLink_VRChange;
 
 			var TaskBar = RootUIEntity.AddChild("TaskBar").AttachComponent<UIElement>();
