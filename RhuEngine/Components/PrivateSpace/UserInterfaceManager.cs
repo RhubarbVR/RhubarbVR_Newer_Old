@@ -81,6 +81,9 @@ namespace RhuEngine.Components
 		public Entity RootUIEntity => UserInterface.Entity;
 
 		internal void LoadInterface() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			UImaterial = Entity.AttachComponent<UnlitMaterial>();
 			UImaterial.DullSided.Value = true;
 			UImaterial.Transparency.Value = Transparency.Blend;
