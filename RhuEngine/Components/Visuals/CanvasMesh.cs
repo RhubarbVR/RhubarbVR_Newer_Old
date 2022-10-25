@@ -29,7 +29,12 @@ namespace RhuEngine.Components
 
 		[Default(true)]
 		public readonly Sync<bool> CustomTochable;
-
+		[OnChanged(nameof(LoadMesh))]
+		public readonly Sync<Vector2i> Resolution;
+		[OnChanged(nameof(LoadMesh))]
+		public readonly Sync<Vector2i> MinOffset;
+		[OnChanged(nameof(LoadMesh))]
+		public readonly Sync<Vector2i> MaxOffset;
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<Vector3f> Scale;
 		[OnChanged(nameof(LoadMesh))]
@@ -70,8 +75,10 @@ namespace RhuEngine.Components
 		public override void ComputeMesh() {
 			PhysicsCollider?.Remove();
 			PhysicsCollider = null;
-			var rectSize = Max.Value - Min.Value;
-			var rectMin = Min.Value;
+			var min = Min.Value + ((Vector2f)MinOffset.Value/ (Vector2f)Resolution.Value);
+			var max = Max.Value + ((Vector2f)MaxOffset.Value / (Vector2f)Resolution.Value);
+			var rectSize = max - min;
+			var rectMin = min;
 			var newMeshGen = new TrivialRectGenerator {
 				IndicesMap = new Index2i(1, 2),
 			};
@@ -131,6 +138,7 @@ namespace RhuEngine.Components
 			base.OnAttach();
 			Scale.Value = new Vector3f(16, 9, 1);
 			Max.Value = Vector2f.One;
+
 		}
 
 		protected override void OnLoaded() {

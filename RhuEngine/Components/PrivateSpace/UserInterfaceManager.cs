@@ -90,6 +90,9 @@ namespace RhuEngine.Components
 			UImaterial.MainTexture.Target = PrivateSpaceManager.VRViewPort;
 			VrElements = Entity.AddChild("VrElements");
 			var target = VrElements.AddChild("Stuff").AttachMesh<CanvasMesh>(UImaterial);
+			target.Resolution.Value = PrivateSpaceManager.VRViewPort.Size.Value;
+			target.Min.Value = new Vector2f(0, 1);
+			target.MinOffset.Value = new Vector2i(0, -100);
 			target.InputInterface.Target = PrivateSpaceManager.VRViewPort;
 			VrElements.enabled.Value = false; 
 			Engine.EngineLink.VRChange += EngineLink_VRChange;
