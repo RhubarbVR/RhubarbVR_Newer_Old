@@ -43,14 +43,14 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public void Children_OnReorderList() {
 			foreach (Entity item in LinkedComp.Entity.children) {
 				if (item?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
-					if (canvasItem.CanvasItem.GetParent() == CanvasItem) {
+					if (canvasItem?.CanvasItem?.GetParent() == CanvasItem) {
 						node.MoveChild(canvasItem.CanvasItem, -1);
 					}
 					else {
-						if(CanvasItem == canvasItem.CanvasItem) {
+						if(CanvasItem == canvasItem?.CanvasItem) {
 							continue;
 						}
-						canvasItem.CanvasItem.GetParent()?.RemoveChild(node);
+						canvasItem.CanvasItem?.GetParent()?.RemoveChild(node);
 						CanvasItem.AddChild(canvasItem.CanvasItem);
 						canvasItem.CanvasItem.Owner = CanvasItem;
 						node.MoveChild(canvasItem.CanvasItem, -1);
@@ -104,7 +104,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public abstract void StartContinueInit();
 
 		public override void Remove() {
-			node?.Free();
+			node?.QueueFree();
+			node = null;
 		}
 
 		public override void Started() {
@@ -251,7 +252,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public abstract void StartContinueInit();
 
 		public override void Remove() {
-			node?.Free();
+			node?.QueueFree();
 			node = null;
 		}
 

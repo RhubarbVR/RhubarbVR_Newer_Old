@@ -17,6 +17,7 @@ using System.Globalization;
 
 namespace RhuEngine.Components
 {
+
 	[PrivateSpaceOnly]
 	[UpdateLevel(UpdateEnum.Normal)]
 	public sealed class UserInterfaceManager : Component
@@ -71,6 +72,18 @@ namespace RhuEngine.Components
 			OpenCloseDash = !OpenCloseDash;
 		}
 
+		[Exposed]
+		public void ToggleStart(bool startState) {
+#if DEBUG
+			if (startState) {
+				RLog.Info("Opened Start");
+			}
+			else {
+				RLog.Info("Closed Start");
+			}
+#endif
+		}
+
 		private void EngineLink_VRChange(bool obj) {
 			UserInterface.Entity.parent.Target = Engine.IsInVR ? PrivateSpaceManager.VRViewPort.Entity : PrivateSpaceManager.RootScreenElement.Entity;
 			PrivateSpaceManager.VRViewPort.UpdateMode.Value = OpenCloseDash && Engine.IsInVR ? RUpdateMode.Always : RUpdateMode.Disable;
@@ -91,8 +104,8 @@ namespace RhuEngine.Components
 			VrElements = Entity.AddChild("VrElements");
 			var target = VrElements.AddChild("Stuff").AttachMesh<CanvasMesh>(UImaterial);
 			target.Resolution.Value = PrivateSpaceManager.VRViewPort.Size.Value;
-			target.Min.Value = new Vector2f(0, 1);
-			target.MinOffset.Value = new Vector2i(0, -100);
+			target.Max.Value = new Vector2f(1, 0);
+			target.MaxOffset.Value = new Vector2i(0, 100);
 			target.InputInterface.Target = PrivateSpaceManager.VRViewPort;
 			VrElements.enabled.Value = false; 
 			Engine.EngineLink.VRChange += EngineLink_VRChange;
@@ -113,16 +126,18 @@ namespace RhuEngine.Components
 			BuildLeftTaskBar(leftElement);
 			BuildCenterTaskBar(centerElement);
 			BuildRightTaskBar(rightElement);
-			UserInterface.Enabled.Value = false;
 			EngineLink_VRChange(Engine.IsInVR);
 		}
 
+
 		private void BuildLeftTaskBar(UIElement left) {
 			var holder = left.Entity.AddChild("Holder").AttachComponent<BoxContainer>();
-			holder.MinOffset.Value = new Vector2f(8, 8);
-			holder.MaxOffset.Value = new Vector2f(-8, -8);
+			holder.MinOffset.Value = new Vector2f(-8, 8);
+			holder.MaxOffset.Value = new Vector2f(8, -8);
 			var startButton = holder.Entity.AddChild("StartButton").AttachComponent<Button>();
 			startButton.IconAlignment.Value = RButtonAlignment.Center;
+			startButton.ToggleMode.Value = true;
+			startButton.Toggled.Target = ToggleStart;
 			startButton.ExpandIcon.Value = true;
 			var starticon = startButton.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 			starticon.Load(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.RhubarbVR));
@@ -152,14 +167,14 @@ namespace RhuEngine.Components
 
 		private void BuildRightTaskBar(UIElement right) {
 			var holder = right.Entity.AddChild("Holder").AttachComponent<BoxContainer>();
-			holder.MinOffset.Value = new Vector2f(8, 8);
-			holder.MaxOffset.Value = new Vector2f(-8, -8);
+			holder.MinOffset.Value = new Vector2f(-8, 8);
+			holder.MaxOffset.Value = new Vector2f(8, -8);
 			var notificationButton = holder.Entity.AddChild("NotificationButton").AttachComponent<Button>();
 			var notificationicon = notificationButton.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 			notificationicon.Load(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Bell));
 			notificationButton.Icon.Target = notificationicon;
 			_textLabel = holder.Entity.AddChild("Label").AttachComponent<TextLabel>();
-			_textLabel.Text.Value = "40:54 AM\r\n90/13/2022\r\nFPS:2000";
+			_textLabel.Text.Value = "40:54 AM\n90/13/2022\nFPS:2000";
 			_textLabel.TextSize.Value = 16;
 			notificationButton.IconAlignment.Value = RButtonAlignment.Center;
 			notificationButton.ExpandIcon.Value = true;
@@ -182,7 +197,7 @@ namespace RhuEngine.Components
 			var date = DateTime.Now;
 			var sysFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
 			var sysFormatTime = CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern;
-			_textLabel.Text.Value = $"{date.ToString(sysFormatTime, CultureInfo.InvariantCulture)}\r\n{date.ToString(sysFormat, CultureInfo.InvariantCulture)}\r\nFPS:{1 / RTime.Elapsedf:f0}";
+			_textLabel.Text.Value = $"{date.ToString(sysFormatTime, CultureInfo.InvariantCulture)}\n{date.ToString(sysFormat, CultureInfo.InvariantCulture)}\nFPS:{1 / RTime.Elapsedf:f0}";
 		}
 	}
 }

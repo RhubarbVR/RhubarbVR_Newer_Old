@@ -31,8 +31,23 @@ namespace RhuEngine
 			AttachSpiningCubes(spinningCubes);
 #if DEBUG
 
+
 			var DebugStuff = floor.AddChild("DebugStuff");
 			DebugStuff.position.Value = new Vector3f(-1.5f, 0f, -1f);
+
+			var SubviewPortCame = DebugStuff.AddChild("Camera");
+			SubviewPortCame.position.Value = new Vector3f(4f, 2f, -2f);
+			var subViewPOrtdatae = SubviewPortCame.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var SubviewPorte = SubviewPortCame.AddChild("SubviewPort");
+			var viewporte = SubviewPorte.AttachComponent<Viewport>();
+			viewporte.OwnWorld3D.Value = false;
+			viewporte.Size.Value *= 2;
+			subViewPOrtdatae.Item2.MainTexture.Target = viewporte;
+			var cameras = SubviewPorte.AddChild("Camera").AttachComponent<Camera3D>();
+			cameras.Entity.rotation.Value = Quaternionf.Yawed180 * Quaternionf.Rolled180;
+
+
+
 			var SubviewPortCam = DebugStuff.AddChild("Camera");
 			SubviewPortCam.position.Value = new Vector3f(-1f, 1f, 1f);
 			var subViewPOrtdata = SubviewPortCam.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();

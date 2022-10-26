@@ -3,6 +3,8 @@ using RhuEngine.WorldObjects.ECS;
 
 using RhuEngine.Linker;
 using RNumerics;
+using DiscordRPC;
+
 namespace RhuEngine.Components
 {
 	public abstract class LocomotionModule : Component
@@ -34,9 +36,10 @@ namespace RhuEngine.Components
 		public float RotateRight => Engine.inputManager.GetInputAction(InputTypes.RotateRight).RawValue() * RTime.Elapsedf;
 
 		public Entity UserRootEnity => World.GetLocalUser()?.userRoot.Target?.Entity;
+		public UserRoot UserRoot => World.GetLocalUser()?.userRoot.Target;
 
-		public void ProcessGlobalRotToUserRootMovement(Matrix addingMatrix,Matrix globalmat) {
-			if(UserRootEnity is null) {
+		public void ProcessGlobalRotToUserRootMovement(Matrix addingMatrix, Matrix globalmat) {
+			if (UserRootEnity is null) {
 				return;
 			}
 			var childM = UserRootEnity.GlobalToLocal(globalmat);
@@ -44,6 +47,11 @@ namespace RhuEngine.Components
 			var userRootAdd = childM.Inverse * targetHeadM;
 			UserRootEnity.LocalTrans = userRootAdd * UserRootEnity.LocalTrans;
 		}
-
+		public void SetUserRootGlobal(Matrix pos) {
+			if (UserRootEnity is null) {
+				return;
+			}
+			UserRootEnity.GlobalTrans = pos;
+		}
 	}
 }

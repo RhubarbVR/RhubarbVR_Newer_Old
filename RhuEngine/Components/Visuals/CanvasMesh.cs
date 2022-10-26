@@ -111,8 +111,7 @@ namespace RhuEngine.Components
 
 			foreach (var item in hitDatas) {
 				var pos = item.HitPointOnCanvas;
-				pos -= Min.Value;
-				pos /= Max.Value - Min.Value;
+				
 				var isPrime = item.PressForce >= PrimaryNeededForce.Value;
 				var isSec = item.GripForces >= GripNeededForce.Value;
 				var isMed = InputManager.GetInputAction(InputTypes.Secondary).HandedValue(item.Side) >= SecodaryNeededForce.Value;

@@ -289,6 +289,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.RenderFrameCalled = RenderFrameCalled;
 			LinkedComp.Entity.children.OnReorderList += Children_OnReorderList;
 			node.GuiEmbedSubwindows = true;
+			Children_OnReorderList();
 		}
 
 		private void GUIDisableInput_Changed(RhuEngine.WorldObjects.IChangeable obj) {
@@ -315,7 +316,15 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		private void Children_OnReorderList() {
 			foreach (Entity item in LinkedComp.Entity.children) {
 				if (item?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
-					node.MoveChild(canvasItem.CanvasItem, -1);
+					if (canvasItem?.CanvasItem?.GetParent() == node) {
+						node.MoveChild(canvasItem.CanvasItem, -1);
+					}
+					else {
+						canvasItem.CanvasItem?.GetParent()?.RemoveChild(node);
+						node.AddChild(canvasItem.CanvasItem);
+						canvasItem.CanvasItem.Owner = node;
+						node.MoveChild(canvasItem.CanvasItem, -1);
+					}
 				}
 			}
 		}

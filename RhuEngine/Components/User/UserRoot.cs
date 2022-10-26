@@ -46,22 +46,7 @@ namespace RhuEngine.Components
 				Entity.rotation.Value = userRot?.Value ?? Quaternionf.Identity;
 				return;
 			}
-			if (World.IsPersonalSpace) {
-				if (WorldManager.FocusedWorld?.GetLocalUser()?.userRoot.Target is not null) {
-					if (WorldManager.FocusedWorld is null) {
-						return;
-					}
-					var focusUserRoot = WorldManager.FocusedWorld.GetLocalUser().userRoot.Target;
-					if (focusUserRoot is not null) {
-						Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
-					}
-					if (Engine.EngineLink.CanRender) {
-						RRenderer.CameraRoot = Entity.GlobalTrans;
-					}
-				}
-
-			}
-			else {
+			if (!World.IsPersonalSpace) {
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("UserScale").Value = Entity.scale.Value;
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("UserPos").Value = Entity.position.Value;
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>("UserRot").Value = Entity.rotation.Value;

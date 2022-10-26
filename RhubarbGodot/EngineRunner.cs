@@ -30,6 +30,9 @@ public partial class EngineRunner : Node3D, IRTime
 	[Export]
 	public bool StartInVR = false;
 
+	[Export]
+	public bool StartDebugVisuals = false;
+
 	public Engine engine;
 
 	[ThreadStatic]
@@ -65,6 +68,9 @@ public partial class EngineRunner : Node3D, IRTime
 		var args = new List<string>(Environment.GetCommandLineArgs());
 		if (!StartInVR) {
 			args.Add("--no-vr");
+		}
+		if (StartDebugVisuals) {
+			args.Add("--debug-visuals");
 		}
 		var appPath = Environment.CurrentDirectory + "/";
 		RLog.Info("App Path: " + appPath);

@@ -37,19 +37,20 @@ namespace RhuEngine.Components
 			var Rotspeed = AllowMultiplier ? MathUtil.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
 			var tempRotateRight = InputManager.GetInputAction(InputTypes.RotateLeft).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
 			var tempRotateLeft = InputManager.GetInputAction(InputTypes.RotateRight).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
-			var rot = Quaternionf.CreateFromEuler((tempRotateRight - tempRotateLeft) * RotationSpeed, 0, 0);
 			var AddToMatrix = Matrix.T(pos);
-			switch (Engine.inputManager.GetHand(isMain)) {
-				case Handed.Left:
-					ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot.Target?.leftController.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
-					break;
-				case Handed.Right:
-					ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot.Target?.rightController.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
-					break;
-				default:
-					break;
+			var handPos = InputManager.XRInputSystem.GetHand(Engine.inputManager.GetHand(isMain))[Input.XRInput.TrackerPos.Aim];
+			if (!isMain) {
+				if (UserRoot.head.Target is null) {
+					return;
+				}
+				var headPos = Matrix.T(UserRoot.head.Target.position.Value) * UserRootEnity.GlobalTrans;
+				var headLocal = headPos * UserRootEnity.GlobalTrans.Inverse;
+				var newHEadPos = Matrix.R(Quaternionf.CreateFromEuler((tempRotateRight - tempRotateLeft) * RotationSpeed, 0, 0)) * headPos;
+				SetUserRootGlobal(headLocal.Inverse * newHEadPos);
 			}
-			UserRootEnity.rotation.Value *= rot;
+			else {
+				ProcessGlobalRotToUserRootMovement(AddToMatrix, Matrix.TR(handPos.Position, handPos.Rotation) * UserRootEnity.GlobalTrans);
+			}
 		}
 
 		private void ProcessHeadBased() {

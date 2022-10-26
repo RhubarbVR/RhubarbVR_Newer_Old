@@ -274,6 +274,7 @@ namespace RhuEngine.Managers
 					RLog.Err($"Failed to render step world {worlds[i].WorldDebugName}. Error: {ex}");
 				}
 			}
+			UpdateCameraPos();
 			UpdateJoinMessage();
 		}
 
@@ -312,6 +313,25 @@ namespace RhuEngine.Managers
 			}
 			catch (Exception ex) {
 				RLog.Err("Failed to update joining msg text Error: " + ex.ToString());
+			}
+		}
+
+		private void UpdateCameraPos() {
+			if (FocusedWorld?.GetLocalUser()?.userRoot.Target is not null) {
+				if (FocusedWorld is null) {
+					return;
+				}
+				var focusUserRoot = FocusedWorld.GetLocalUser().userRoot.Target;
+				var Entity = PrivateOverlay.GetLocalUser()?.userRoot.Target?.Entity;
+				if (Entity is null) {
+					return;
+				}
+				if (focusUserRoot is not null) {
+					Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
+				}
+				if (Engine.EngineLink.CanRender) {
+					RRenderer.CameraRoot = Entity.GlobalTrans;
+				}
 			}
 		}
 

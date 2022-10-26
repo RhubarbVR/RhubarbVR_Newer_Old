@@ -85,7 +85,7 @@ namespace RhuEngine.Settings
 		public InputAction ContextMenu = new(new[] { new[] { "Key.T" } });
 
 		[SettingsField("Primary")]
-		public InputAction Primary = new(new[] { new[] { "Key.MouseLeft" }, new[] { "XR.Main.Triger" } });
+		public InputAction Primary = new(new[] { new[] { "Key.MouseLeft" }, new[] { "XR.Main.Trigger" } });
 
 		[SettingsField("Secondary")]
 		public InputAction Secondary = new(new[] { new[] { "Key.MouseCenter" }, new[] { "XR.Main.Primary_Click" } });

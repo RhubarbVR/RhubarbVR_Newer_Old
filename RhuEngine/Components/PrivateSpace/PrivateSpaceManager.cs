@@ -120,6 +120,7 @@ namespace RhuEngine.Components
 			IconTexRender = screen.AddChild("Center Icon").AttachComponent<TextureRect>();
 			IconTexRender.Entity.orderOffset.Value = -100;
 			UserInterface = screen.AddChild("UserInterface").AttachComponent<UIElement>();
+			UserInterface.Enabled.Value = false;
 			UserInterfaceManager = DashMover.AttachComponent<UserInterfaceManager>();
 			var size = new Vector2f(0.075f);
 			IconTexRender.Min.Value = new Vector2f(0.5f, 0.5f) - (size / 2);
