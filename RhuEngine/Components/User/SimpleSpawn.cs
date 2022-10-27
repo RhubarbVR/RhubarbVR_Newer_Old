@@ -30,7 +30,7 @@ namespace RhuEngine.Components
 				leftComp.hand.Value = Handed.Left;
 				leftComp.user.Target = World.GetLocalUser();
 				userRoot.leftController.Target = leftHand;
-				if (!World.IsPersonalSpace) {
+				if (!(World.IsPersonalSpace || World.IsOverlayWorld)) {
 					var r = leftHand.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
 					r.Item1.Radius.Value = 0.03f / 2;
 					r.Item3.colorLinear.Value = Colorf.RhubarbRed;
@@ -40,7 +40,7 @@ namespace RhuEngine.Components
 				var rightComp = rightHand.AttachComponent<Hand>();
 				rightComp.hand.Value = Handed.Right;
 				rightComp.user.Target = World.GetLocalUser();
-				if (!World.IsPersonalSpace) {
+				if (!(World.IsPersonalSpace || World.IsOverlayWorld)) {
 					var l = rightHand.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
 					l.Item1.Radius.Value = 0.03f / 2;
 					l.Item3.colorLinear.Value = Colorf.RhubarbGreen;
@@ -49,7 +49,7 @@ namespace RhuEngine.Components
 				var head = userEntity.AddChild("Head");
 				head.AttachComponent<GrabbableHolder>().InitializeGrabHolder(Handed.Max);
 				head.AttachComponent<Head>().user.Target = World.GetLocalUser();
-				if (!World.IsPersonalSpace) {
+				if (!(World.IsPersonalSpace || World.IsOverlayWorld)) {
 					var thing = head.AddChild("Render").AttachMeshWithMeshRender<CylinderMesh, UnlitMaterial>();
 					thing.Item3.colorLinear.Value = user.UserName.GetHashHue();
 					var mesh = thing.Item1;

@@ -85,6 +85,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			Language_Changed(null);
 		}
 
+
 		private void Language_Changed(IChangeable obj) {
 			node.Language = LinkedComp.Language.Value;
 		}

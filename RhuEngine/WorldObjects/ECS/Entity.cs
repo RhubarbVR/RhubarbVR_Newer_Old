@@ -69,6 +69,23 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 
+		public void RotateToUpVector(Entity space) {
+			var roatation = GlobalToLocal(space.GlobalTrans).Rotation;
+			var temp = roatation.AxisY;
+			var localDirection = Vector3f.Zero;
+			var num = -1f;
+			for (var i = 0; i < 6; i++) {
+				var a = Vector3f.Zero.SetComponent((i <= 2) ? 1 : (-1), i % 3);
+				var num2 = a.Dot(temp);
+				if (num2 > num) {
+					localDirection = a;
+					num = num2;
+				}
+			}
+			var look = Quaternionf.FromToRotation(rotation.Value * localDirection, rotation.Value * temp);
+			rotation.Value = look * rotation.Value;
+		}
+
 
 		public void DestroyChildren() {
 			children.Clear();

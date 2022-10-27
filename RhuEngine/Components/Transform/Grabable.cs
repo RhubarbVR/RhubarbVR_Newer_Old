@@ -4,6 +4,7 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
 using System;
+using RhuEngine.Input.XRInput;
 
 namespace RhuEngine.Components
 {
@@ -27,7 +28,7 @@ namespace RhuEngine.Components
 		public Handed GabbedSide => grabbableHolder.Target.source.Value;
 
 		public bool LaserGrabbed;
-		public Vector3f StartingPos;
+		public Matrix StartingPos;
 
 		public bool Grabbed => (grabbableHolder.Target is not null) && (grabbingUser.Target is not null);
 
@@ -112,7 +113,13 @@ namespace RhuEngine.Components
 				grabbableHolder.Target.GrabbedObjects.Add(this);
 			}
 			catch { }
-			StartingPos = Entity.position.Value;
+			var LocalToUser = LocalUser.userRoot.Target.Entity.GlobalToLocal(Entity.GlobalTrans);
+			var aimPos = InputManager.XRInputSystem.GetHand(obj.source.Value)?[Input.XRInput.TrackerPos.Aim];
+			var aimPosMatrix = Matrix.TR(aimPos?.Position??Vector3f.Zero, aimPos?.Rotation??Quaternionf.Identity);
+			if (aimPos is null) {
+				aimPosMatrix = Matrix.Identity;
+			}
+			StartingPos = LocalToUser * aimPosMatrix.Inverse;
 		}
 		[Exposed]
 		public void RemoteGrab(Handed hand) {
@@ -135,13 +142,20 @@ namespace RhuEngine.Components
 			}
 			var pushBackAndForth = InputManager.ObjectPush.HandedValue(GabbedSide) - InputManager.ObjectPull.HandedValue(GabbedSide);
 			var rotate = InputManager.RotateRight.HandedValue(GabbedSide) - InputManager.RotateLeft.HandedValue(GabbedSide);
-			Entity.rotation.Value = Quaternionf.CreateFromEuler(rotate * RTime.Elapsedf * 50, 0, 0) * Entity.rotation.Value;
-			Entity.position.Value += StartingPos * pushBackAndForth * RTime.Elapsedf * 3;
-			var xAreSame = (StartingPos.x > 0) == (Entity.position.Value.x > 0);
-			var yAreSame = (StartingPos.y > 0) == (Entity.position.Value.y > 0);
-			var zAreSame = (StartingPos.z > 0) == (Entity.position.Value.z > 0);
-			if (!(xAreSame && yAreSame && zAreSame)) {
+			var aimPos = InputManager.XRInputSystem.GetHand(grabbableHolder.Target.source.Value)?[Input.XRInput.TrackerPos.Aim];
+			var aimPosMatrix = Matrix.TR(aimPos?.Position??Vector3f.Zero, aimPos?.Rotation??Quaternionf.Identity) * LocalUser.userRoot.Target.Entity.GlobalTrans;
+			if (aimPos is null) {
+				aimPosMatrix = LocalUser.userRoot.Target.head.Target.GlobalTrans;
+			}
+			Entity.GlobalTrans = Matrix.RS(Quaternionf.CreateFromEuler(rotate * RTime.Elapsedf * 25, 0, 0) * Entity.GlobalTrans.Rotation, Entity.GlobalTrans.Scale) * Matrix.T(Entity.GlobalTrans.Translation);
+			var localPos = Entity.GlobalTrans * aimPosMatrix.Inverse;
+			localPos.Translation -= new Vector3f(0, 0, pushBackAndForth) * RTime.Elapsedf;
+			if(localPos.Translation.z >= -0.01f) {
 				LaserGrabbed = false;
+			}
+			Entity.GlobalTrans = localPos * aimPosMatrix;
+			if(InputManager.Primary.HandedValue(GabbedSide) > 0.5) {
+				Entity.RotateToUpVector(LocalUser.userRoot.Target.Entity);
 			}
 		}
 	}
