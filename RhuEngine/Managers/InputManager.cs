@@ -147,61 +147,60 @@ namespace RhuEngine.Managers
 			}
 			var thread = data[2];
 
-			if (handed == Handed.Max) {
-				if (device == "mouse") {
-					if (second == "scroll") {
-						if (thread is "x") {
-							var scrollAction = () => MouseSystem.ScrollDelta.x;
-							_actions.Add(lookValue, scrollAction);
-							return scrollAction();
-						}
-						else if (thread is "x-" or "-x") {
-							var scrollAction = () => -MouseSystem.ScrollDelta.x;
-							_actions.Add(lookValue, scrollAction);
-							return scrollAction();
-						}
-						if (thread is "y") {
-							var scrollAction = () => MouseSystem.ScrollDelta.y;
-							_actions.Add(lookValue, scrollAction);
-							return scrollAction();
-						}
-						else if (thread is "y-" or "-y") {
-							var scrollAction = () => -MouseSystem.ScrollDelta.y;
-							_actions.Add(lookValue, scrollAction);
-							return scrollAction();
-						}
+			if (device == "mouse") {
+				if (second == "scroll") {
+					if (thread is "x") {
+						var scrollAction = () => MouseSystem.ScrollDelta.x;
+						_actions.Add(lookValue, scrollAction);
+						return scrollAction();
 					}
-					if (second == "pos") {
-						if (thread is "x") {
-							var scrollAction = () => MouseSystem.MouseDelta.x;
-							_actions.Add(lookValue, scrollAction);
-							return scrollAction();
-						}
-						else if (thread is "x-" or "-x") {
-							var scrollAction = () => -MouseSystem.MouseDelta.x;
-							_actions.Add(lookValue, scrollAction);
-							return scrollAction();
-						}
-						if (thread is "y") {
-							var scrollAction = () => MouseSystem.MouseDelta.y;
-							_actions.Add(lookValue, scrollAction);
-							return scrollAction();
-						}
-						else if (thread is "y-" or "-y") {
-							var scrollAction = () => -MouseSystem.MouseDelta.y;
-							_actions.Add(lookValue, scrollAction);
-							return scrollAction();
-						}
+					else if (thread is "x-" or "-x") {
+						var scrollAction = () => -MouseSystem.ScrollDelta.x;
+						_actions.Add(lookValue, scrollAction);
+						return scrollAction();
+					}
+					if (thread is "y") {
+						var scrollAction = () => MouseSystem.ScrollDelta.y;
+						_actions.Add(lookValue, scrollAction);
+						return scrollAction();
+					}
+					else if (thread is "y-" or "-y") {
+						var scrollAction = () => -MouseSystem.ScrollDelta.y;
+						_actions.Add(lookValue, scrollAction);
+						return scrollAction();
+					}
+				}
+				if (second == "pos") {
+					if (thread is "x") {
+						var scrollAction = () => MouseSystem.MouseDelta.x;
+						_actions.Add(lookValue, scrollAction);
+						return scrollAction();
+					}
+					else if (thread is "x-" or "-x") {
+						var scrollAction = () => -MouseSystem.MouseDelta.x;
+						_actions.Add(lookValue, scrollAction);
+						return scrollAction();
+					}
+					if (thread is "y") {
+						var scrollAction = () => MouseSystem.MouseDelta.y;
+						_actions.Add(lookValue, scrollAction);
+						return scrollAction();
+					}
+					else if (thread is "y-" or "-y") {
+						var scrollAction = () => -MouseSystem.MouseDelta.y;
+						_actions.Add(lookValue, scrollAction);
+						return scrollAction();
 					}
 				}
 			}
+
 			var dir = "";
 			if (data.Length > 3) {
 				dir = data[3];
 			}
 			if (device == "xr") {
 				Func<ITrackerDevice> target = null;
-				if(second == "main") {
+				if (second == "main") {
 					target = () => XRInputSystem.GetHand(GetHand(true));
 				}
 				if (second == "secondary") {
@@ -219,11 +218,11 @@ namespace RhuEngine.Managers
 				if (target is not null) {
 					var inputAction = () => {
 						var targetDevice = target();
-						if(targetDevice is null) {
+						if (targetDevice is null) {
 							return 0f;
 						}
 						if (targetDevice.HasBoolInput(thread)) {
-							return targetDevice.BoolInput(thread)?1f:0f;
+							return targetDevice.BoolInput(thread) ? 1f : 0f;
 						}
 						if (targetDevice.HasDoubleInput(thread)) {
 							return (float)targetDevice.DoubleInput(thread);

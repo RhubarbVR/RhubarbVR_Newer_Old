@@ -82,17 +82,6 @@ namespace RhuEngine.Components
 				return;
 			}
 
-			if (Side.Value == Handed.Left) {
-				if (World.worldManager.PrivateSpaceManager.DisableLeftLaser) {
-					return;
-				}
-			}
-			else {
-				if (World.worldManager.PrivateSpaceManager.DisableRightLaser) {
-					return;
-				}
-			}
-
 			Mesh.Target.Endpoint.Value = HitAny ? (Vector3d)Entity.GlobalPointToLocal(HitPoint) : new Vector3d(0, 0, -100);
 
 			if (Currsor.Target is null) {

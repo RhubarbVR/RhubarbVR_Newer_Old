@@ -92,8 +92,15 @@ namespace RhuEngine.Components
 			set => IconTexRender.Modulate.Value = value;
 		}
 
+		public GrabbableHolderCombiner Head;
+		public GrabbableHolderCombiner Left;
+		public GrabbableHolderCombiner Right;
+
 		protected override void OnAttach() {
 			base.OnAttach();
+			Head = new GrabbableHolderCombiner(Handed.Max, WorldManager);
+			Left = new GrabbableHolderCombiner(Handed.Left, WorldManager);
+			Right = new GrabbableHolderCombiner(Handed.Right, WorldManager);
 			Task.Run(async () => {
 				if (!Engine.EngineLink.SpawnPlayer) {
 					return;
@@ -241,23 +248,8 @@ namespace RhuEngine.Components
 			}
 			return false;
 		}
-		public bool DisableRightLaser;
-
-		public bool DisableLeftLaser;
-
-		public bool DisableHeadLaser;
 
 		public void UpdateLazer(Entity heand, Handed handed, Lazer lazer) {
-			if (handed == Handed.Left) {
-				if (DisableLeftLaser) {
-					return;
-				}
-			}
-			else {
-				if (DisableRightLaser) {
-					return;
-				}
-			}
 			var PressForce = Engine.inputManager.GetInputAction(InputTypes.Primary).HandedValue(handed);
 			var GripForce = Engine.inputManager.GetInputAction(InputTypes.Grab).HandedValue(handed);
 			var headPos = heand.GlobalTrans;
@@ -293,9 +285,6 @@ namespace RhuEngine.Components
 		public bool HeadLazerHitAny => HeadLazerHitFocus | HeadLazerHitOverlay | HeadLazerHitFocus;
 
 		public void UpdateHeadLazer(Entity head) {
-			if (DisableHeadLaser) {
-				return;
-			}
 			var PressForce = Engine.inputManager.GetInputAction(InputTypes.Primary).HandedValue(Handed.Max);
 			var GripForce = Engine.inputManager.GetInputAction(InputTypes.Grab).HandedValue(Handed.Max);
 			var headPos = head.GlobalTrans;

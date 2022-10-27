@@ -163,7 +163,7 @@ namespace RhuEngine.WorldObjects.ECS
 			Viewport = GetFirstComponent<Viewport>();
 			Viewport ??= InternalParent?.Viewport;
 			//Takes 2 frames for linker to load
-			RenderThread.ExecuteOnStartOfFrame(()=>RenderThread.ExecuteOnEndOfFrame(() => ViewportUpdateEvent?.Invoke()));	
+			RenderThread.ExecuteOnStartOfFrame(() => RenderThread.ExecuteOnEndOfFrame(() => ViewportUpdateEvent?.Invoke()));
 			if (oldViewPort != Viewport) {
 				foreach (var item in children.Cast<Entity>()) {
 					item.ViewportUpdate();

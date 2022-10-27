@@ -22,15 +22,7 @@ namespace RhubarbVR.Bindings.Input
 
 		public Vector2f MouseDelta => EngineRunner._.MouseDelta;
 
-		public Vector2f ScrollDelta
-		{
-			get {
-
-				var weely = (Input.IsMouseButtonPressed(MouseButton.WheelUp) ? 1f : 0f) - (Input.IsMouseButtonPressed(MouseButton.WheelDown) ? 1f : 0f);
-				var weelx = (Input.IsMouseButtonPressed(MouseButton.WheelRight) ? 1f : 0f) - (Input.IsMouseButtonPressed(MouseButton.WheelLeft) ? 1f : 0f);
-				return new Vector2f(weelx, weely);
-			}
-		}
+		public Vector2f ScrollDelta => EngineRunner._.MouseScrollDelta;
 
 		public bool GetIsDown(MouseKeys key) {
 			return key switch {

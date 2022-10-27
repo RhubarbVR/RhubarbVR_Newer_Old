@@ -68,7 +68,12 @@ namespace RNumerics
 		public static Vector2f Abs(in Vector2f vector2f) {
 			return new Vector2f(Math.Abs(vector2f.x), Math.Abs(vector2f.y));
 		}
-
+		public static Vector3d Abs(in Vector3d vector2d) {
+			return new Vector3d(Math.Abs(vector2d.x), Math.Abs(vector2d.y), Math.Abs(vector2d.z));
+		}
+		public static Vector3f Abs(in Vector3f vector2d) {
+			return new Vector3f(Math.Abs(vector2d.x), Math.Abs(vector2d.y), Math.Abs(vector2d.z));
+		}
 
 		public static int ModuloClamp(int f, in int N) {
 			while (f < 0) {

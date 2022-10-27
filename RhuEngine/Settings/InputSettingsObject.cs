@@ -40,7 +40,7 @@ namespace RhuEngine.Settings
 		public InputAction VRChange = new(new[] { new[] { "Key.F6" } });
 
 		[SettingsField("Sprint")]
-		public InputAction Sprint = new(new[] { new[] { "Key.Shift" } });
+		public InputAction Sprint = new(new[] { new[] { "Key.Shift" }, new[] { "XR.Main.Trigger" } });
 
 		[SettingsField("Back")]
 		public InputAction Back = new(new[] { new[] { "Key.S" }, new[] { "XR.Main.Primary.y-" } });
@@ -53,7 +53,7 @@ namespace RhuEngine.Settings
 
 		[SettingsField("Right")]
 		public InputAction Right = new(new[] { new[] { "Key.D" }, new[] { "XR.Main.Primary.x" } });
-		
+
 		[SettingsField("Jump")]
 		public InputAction Jump = new(new[] { new[] { "Key.Space" } });
 
@@ -76,13 +76,13 @@ namespace RhuEngine.Settings
 		public InputAction ObjectPush = new(new[] { new[] { "Mouse.Scroll.y" }, new[] { "XR.Main.Primary.y" } });
 
 		[SettingsField("OpenDash")]
-		public InputAction OpenDash = new(new[] { new[] { "Key.Esc" }, new[] { "Key.Ctrl", "Key.Space" }, new[] { "XR.Main.Menu_Button" } });
+		public InputAction OpenDash = new(new[] { new[] { "Key.Esc" }, new[] { "Key.Ctrl", "Key.Space" } });
 
 		[SettingsField("ChangeWorld")]
 		public InputAction ChangeWorld = new(new[] { new[] { "Key.Ctrl", "Key.Tab" } });
 
 		[SettingsField("ContextMenu")]
-		public InputAction ContextMenu = new(new[] { new[] { "Key.T" } });
+		public InputAction ContextMenu = new(new[] { new[] { "Key.T" }, new[] { "XR.Main.Menu_Button" } });
 
 		[SettingsField("Primary")]
 		public InputAction Primary = new(new[] { new[] { "Key.MouseLeft" }, new[] { "XR.Main.Trigger" } });

@@ -81,7 +81,13 @@ public partial class EngineRunner : Node3D, IRTime
 
 	public string Typer;
 
+	public Vector2f MouseScrollDelta;
+	public Vector2f MouseScrollPos;
+	public Vector2f LastMouseScrollPos;
+
 	public override void _Process(double delta) {
+		MouseScrollDelta = MouseScrollPos - LastMouseScrollPos;
+		LastMouseScrollPos = MouseScrollPos;
 		//Dont Like this but it works
 		if (!link.InVR) {
 			Camera.Position = Vector3.Zero;
@@ -132,6 +138,20 @@ public partial class EngineRunner : Node3D, IRTime
 		if (@event is InputEventMouseMotion mouseMotion) {
 			MousePos = new Vector2f(mouseMotion.Position.x, mouseMotion.Position.y);
 			MouseDelta = new Vector2f(mouseMotion.Relative.x, mouseMotion.Relative.y);
+		}
+		if(@event is InputEventMouseButton button) {
+			if(button.ButtonIndex == MouseButton.WheelUp) {
+				MouseScrollPos += new Vector2f(0,1);
+			}
+			if (button.ButtonIndex == MouseButton.WheelDown) {
+				MouseScrollPos += new Vector2f(0, -1);
+			}
+			if (button.ButtonIndex == MouseButton.WheelRight) {
+				MouseScrollPos += new Vector2f(1, 0);
+			}
+			if (button.ButtonIndex == MouseButton.WheelLeft) {
+				MouseScrollPos += new Vector2f(-1, 0);
+			}
 		}
 		if (@event is InputEventKey key) {
 			var newString = System.Text.Encoding.UTF8.GetString(BitConverter.GetBytes(key.Unicode));
