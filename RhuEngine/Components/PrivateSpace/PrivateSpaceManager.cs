@@ -153,6 +153,9 @@ namespace RhuEngine.Components
 			WorldManager.PrivateSpaceManager = this;
 		}
 
+		private float _contextMenuHoldTime = 0f;
+		private bool _updateDashState;
+		private Handed _contextHand;
 		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
@@ -160,6 +163,43 @@ namespace RhuEngine.Components
 
 			if (InputManager.GetInputAction(InputTypes.VRChange).JustActivated() && Engine.EngineLink.LiveVRChange) {
 				Engine.EngineLink.ChangeVR(!Engine.IsInVR);
+			}
+
+			if (InputManager.GetInputAction(InputTypes.ChangeWorld).JustActivated()) {
+				//Todo World Rotation
+			}
+
+			if (InputManager.GetInputAction(InputTypes.ContextMenu).JustActivated()) {
+				_contextMenuHoldTime = 0;
+				_updateDashState = false;
+				var mainContextHandValue = InputManager.GetInputAction(InputTypes.ContextMenu).HandedValue(Handed.Max);
+				_contextHand = Handed.Max;
+				if (mainContextHandValue < InputManager.GetInputAction(InputTypes.ContextMenu).HandedValue(Handed.Left)) {
+					mainContextHandValue = InputManager.GetInputAction(InputTypes.ContextMenu).HandedValue(Handed.Left);
+					_contextHand = Handed.Left;
+				}
+				if (mainContextHandValue < InputManager.GetInputAction(InputTypes.ContextMenu).HandedValue(Handed.Right)) {
+					mainContextHandValue = InputManager.GetInputAction(InputTypes.ContextMenu).HandedValue(Handed.Right);
+					_contextHand = Handed.Right;
+				}
+			}
+			if (InputManager.GetInputAction(InputTypes.ContextMenu).Activated()) {
+				_contextMenuHoldTime += RTime.Elapsedf;
+			}
+			if (InputManager.GetInputAction(InputTypes.ContextMenu).JustDeActivated() && !_updateDashState) {
+				_contextMenuHoldTime = 0;
+				_updateDashState = false;
+#if DEBUG
+				RLog.Info($"Toggle Context Menu {_contextHand}");
+#endif
+			}
+			if (!_updateDashState) {
+				//Update hand progress
+				
+			}
+			if(_contextMenuHoldTime >= 0.5f && !_updateDashState) {
+				_updateDashState = true;
+				UserInterfaceManager.ToggleDash();
 			}
 
 			var head = LocalUser.userRoot.Target?.head.Target;

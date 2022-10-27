@@ -245,6 +245,10 @@ namespace RhuEngine.Managers
 				return _lastFrame == 0 & _thisFrame != 0;
 			}
 
+			public bool JustDeActivated() {
+				return _lastFrame != 0 & _thisFrame == 0;
+			}
+
 			public float HandedValue(Handed handed) {
 				return handed switch {
 					Handed.Left => LeftRawValue(),

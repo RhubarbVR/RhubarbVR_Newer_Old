@@ -146,106 +146,110 @@ namespace RhuEngine.Managers
 				return 0f;
 			}
 			var thread = data[2];
+			if (handed == Handed.Max) {
 
-			if (device == "mouse") {
-				if (second == "scroll") {
-					if (thread is "x") {
-						var scrollAction = () => MouseSystem.ScrollDelta.x;
-						_actions.Add(lookValue, scrollAction);
-						return scrollAction();
+				if (device == "mouse") {
+					if (second == "scroll") {
+						if (thread is "x") {
+							var scrollAction = () => MouseSystem.ScrollDelta.x;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+						else if (thread is "x-" or "-x") {
+							var scrollAction = () => -MouseSystem.ScrollDelta.x;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+						if (thread is "y") {
+							var scrollAction = () => MouseSystem.ScrollDelta.y;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+						else if (thread is "y-" or "-y") {
+							var scrollAction = () => -MouseSystem.ScrollDelta.y;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
 					}
-					else if (thread is "x-" or "-x") {
-						var scrollAction = () => -MouseSystem.ScrollDelta.x;
-						_actions.Add(lookValue, scrollAction);
-						return scrollAction();
-					}
-					if (thread is "y") {
-						var scrollAction = () => MouseSystem.ScrollDelta.y;
-						_actions.Add(lookValue, scrollAction);
-						return scrollAction();
-					}
-					else if (thread is "y-" or "-y") {
-						var scrollAction = () => -MouseSystem.ScrollDelta.y;
-						_actions.Add(lookValue, scrollAction);
-						return scrollAction();
-					}
-				}
-				if (second == "pos") {
-					if (thread is "x") {
-						var scrollAction = () => MouseSystem.MouseDelta.x;
-						_actions.Add(lookValue, scrollAction);
-						return scrollAction();
-					}
-					else if (thread is "x-" or "-x") {
-						var scrollAction = () => -MouseSystem.MouseDelta.x;
-						_actions.Add(lookValue, scrollAction);
-						return scrollAction();
-					}
-					if (thread is "y") {
-						var scrollAction = () => MouseSystem.MouseDelta.y;
-						_actions.Add(lookValue, scrollAction);
-						return scrollAction();
-					}
-					else if (thread is "y-" or "-y") {
-						var scrollAction = () => -MouseSystem.MouseDelta.y;
-						_actions.Add(lookValue, scrollAction);
-						return scrollAction();
+					if (second == "pos") {
+						if (thread is "x") {
+							var scrollAction = () => MouseSystem.MouseDelta.x;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+						else if (thread is "x-" or "-x") {
+							var scrollAction = () => -MouseSystem.MouseDelta.x;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+						if (thread is "y") {
+							var scrollAction = () => MouseSystem.MouseDelta.y;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
+						else if (thread is "y-" or "-y") {
+							var scrollAction = () => -MouseSystem.MouseDelta.y;
+							_actions.Add(lookValue, scrollAction);
+							return scrollAction();
+						}
 					}
 				}
 			}
+			if (handed != Handed.Max) {
 
-			var dir = "";
-			if (data.Length > 3) {
-				dir = data[3];
-			}
-			if (device == "xr") {
-				Func<ITrackerDevice> target = null;
-				if (second == "main") {
-					target = () => XRInputSystem.GetHand(GetHand(true));
+				var dir = "";
+				if (data.Length > 3) {
+					dir = data[3];
 				}
-				if (second == "secondary") {
-					target = () => XRInputSystem.GetHand(GetHand(false));
-				}
-				if (int.TryParse(second, out var selectedIndex)) {
-					target = () => XRInputSystem.Trackers.Count <= selectedIndex ? null : XRInputSystem.Trackers[selectedIndex];
-				}
-				if (second == "left" || handed == Handed.Left) {
-					target = () => XRInputSystem.GetHand(Handed.Left);
-				}
-				if (second == "right" || handed == Handed.Right) {
-					target = () => XRInputSystem.GetHand(Handed.Right);
-				}
-				if (target is not null) {
-					var inputAction = () => {
-						var targetDevice = target();
-						if (targetDevice is null) {
+				if (device == "xr") {
+					Func<ITrackerDevice> target = null;
+					if (second == "main") {
+						target = () => XRInputSystem.GetHand(GetHand(true));
+					}
+					if (second == "secondary") {
+						target = () => XRInputSystem.GetHand(GetHand(false));
+					}
+					if (int.TryParse(second, out var selectedIndex)) {
+						target = () => XRInputSystem.Trackers.Count <= selectedIndex ? null : XRInputSystem.Trackers[selectedIndex];
+					}
+					if (second == "left" || handed == Handed.Left) {
+						target = () => XRInputSystem.GetHand(Handed.Left);
+					}
+					if (second == "right" || handed == Handed.Right) {
+						target = () => XRInputSystem.GetHand(Handed.Right);
+					}
+					if (target is not null) {
+						var inputAction = () => {
+							var targetDevice = target();
+							if (targetDevice is null) {
+								return 0f;
+							}
+							if (targetDevice.HasBoolInput(thread)) {
+								return targetDevice.BoolInput(thread) ? 1f : 0f;
+							}
+							if (targetDevice.HasDoubleInput(thread)) {
+								return (float)targetDevice.DoubleInput(thread);
+							}
+							if (targetDevice.HasVectorInput(thread)) {
+								var data = targetDevice.VectorInput(thread);
+								if (dir is "x") {
+									return data.x;
+								}
+								else if (dir is "x-" or "-x") {
+									return -data.x;
+								}
+								if (dir is "y") {
+									return data.y;
+								}
+								else if (dir is "y-" or "-y") {
+									return -data.y;
+								}
+							}
 							return 0f;
-						}
-						if (targetDevice.HasBoolInput(thread)) {
-							return targetDevice.BoolInput(thread) ? 1f : 0f;
-						}
-						if (targetDevice.HasDoubleInput(thread)) {
-							return (float)targetDevice.DoubleInput(thread);
-						}
-						if (targetDevice.HasVectorInput(thread)) {
-							var data = targetDevice.VectorInput(thread);
-							if (dir is "x") {
-								return data.x;
-							}
-							else if (dir is "x-" or "-x") {
-								return -data.x;
-							}
-							if (dir is "y") {
-								return data.y;
-							}
-							else if (dir is "y-" or "-y") {
-								return -data.y;
-							}
-						}
-						return 0f;
-					};
-					_actions.Add(lookValue, inputAction);
-					return inputAction();
+						};
+						_actions.Add(lookValue, inputAction);
+						return inputAction();
+					}
 				}
 			}
 			_actions.Add(lookValue, ReturnZero);
