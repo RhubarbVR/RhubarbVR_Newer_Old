@@ -115,7 +115,7 @@ namespace RhuEngine.Components
 			catch { }
 			var LocalToUser = LocalUser.userRoot.Target.Entity.GlobalToLocal(Entity.GlobalTrans);
 			var aimPos = InputManager.XRInputSystem.GetHand(obj.source.Value)?[Input.XRInput.TrackerPos.Aim];
-			var aimPosMatrix = Matrix.TR(aimPos?.Position??Vector3f.Zero, aimPos?.Rotation??Quaternionf.Identity);
+			var aimPosMatrix = Matrix.TR(aimPos?.Position ?? Vector3f.Zero, aimPos?.Rotation ?? Quaternionf.Identity);
 			if (aimPos is null) {
 				aimPosMatrix = Matrix.Identity;
 			}
@@ -143,18 +143,18 @@ namespace RhuEngine.Components
 			var pushBackAndForth = InputManager.ObjectPush.HandedValue(GabbedSide) - InputManager.ObjectPull.HandedValue(GabbedSide);
 			var rotate = InputManager.RotateRight.HandedValue(GabbedSide) - InputManager.RotateLeft.HandedValue(GabbedSide);
 			var aimPos = InputManager.XRInputSystem.GetHand(grabbableHolder.Target.source.Value)?[Input.XRInput.TrackerPos.Aim];
-			var aimPosMatrix = Matrix.TR(aimPos?.Position??Vector3f.Zero, aimPos?.Rotation??Quaternionf.Identity) * LocalUser.userRoot.Target.Entity.GlobalTrans;
+			var aimPosMatrix = Matrix.TR(aimPos?.Position ?? Vector3f.Zero, aimPos?.Rotation ?? Quaternionf.Identity) * LocalUser.userRoot.Target.Entity.GlobalTrans;
 			if (aimPos is null) {
 				aimPosMatrix = LocalUser.userRoot.Target.head.Target.GlobalTrans;
 			}
 			Entity.GlobalTrans = Matrix.RS(Quaternionf.CreateFromEuler(rotate * RTime.Elapsedf * 25, 0, 0) * Entity.GlobalTrans.Rotation, Entity.GlobalTrans.Scale) * Matrix.T(Entity.GlobalTrans.Translation);
 			var localPos = Entity.GlobalTrans * aimPosMatrix.Inverse;
 			localPos.Translation -= new Vector3f(0, 0, pushBackAndForth) * RTime.Elapsedf;
-			if(localPos.Translation.z >= -0.01f) {
+			if (localPos.Translation.z >= -0.01f) {
 				LaserGrabbed = false;
 			}
 			Entity.GlobalTrans = localPos * aimPosMatrix;
-			if(InputManager.Primary.HandedValue(GabbedSide) > 0.5) {
+			if (InputManager.Primary.HandedValue(GabbedSide) > 0.5) {
 				Entity.RotateToUpVector(LocalUser.userRoot.Target.Entity);
 			}
 		}
