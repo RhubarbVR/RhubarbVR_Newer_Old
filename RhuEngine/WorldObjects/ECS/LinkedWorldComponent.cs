@@ -75,17 +75,7 @@ namespace RhuEngine.WorldObjects.ECS
 			if (AddToUpdateList) {
 				World.RegisterWorldLinkObject(this);
 			}
-			if (World.Focus == World.FocusLevel.Background) {
-				WorldLink?.Stopped();
-			}
-			else {
-				if (Entity.IsEnabled && Enabled.Value) {
-					WorldLink?.Started();
-				}
-				else {
-					WorldLink?.Stopped();
-				}
-			}
+			World_FoucusChanged();
 		}
 		protected override void RemoveListObject() {
 			if (AddToUpdateList) {

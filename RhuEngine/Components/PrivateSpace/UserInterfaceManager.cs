@@ -14,6 +14,7 @@ using RhuEngine.Physics;
 using RhuEngine.WorldObjects;
 using RhuEngine.Components.PrivateSpace;
 using System.Globalization;
+using System.Collections;
 
 namespace RhuEngine.Components
 {
@@ -33,6 +34,18 @@ namespace RhuEngine.Components
 		[NoLoad]
 		[NoSyncUpdate]
 		public UIElement UserInterface;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public CanvasMesh StartVRElement;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIElement Start;
 
 		[NoSave]
 		[NoSync]
@@ -82,6 +95,8 @@ namespace RhuEngine.Components
 				RLog.Info("Closed Start");
 			}
 #endif
+			StartVRElement.Entity.enabled.Value = startState;
+			Start.Entity.enabled.Value = startState;
 		}
 
 		private void EngineLink_VRChange(bool obj) {
@@ -102,12 +117,25 @@ namespace RhuEngine.Components
 			UImaterial.Transparency.Value = Transparency.Blend;
 			UImaterial.MainTexture.Target = PrivateSpaceManager.VRViewPort;
 			VrElements = Entity.AddChild("VrElements");
-			var target = VrElements.AddChild("Stuff").AttachMesh<CanvasMesh>(UImaterial);
-			target.Resolution.Value = PrivateSpaceManager.VRViewPort.Size.Value;
-			target.Max.Value = new Vector2f(1, 0);
-			target.MaxOffset.Value = new Vector2i(0, 100);
-			target.InputInterface.Target = PrivateSpaceManager.VRViewPort;
-			VrElements.enabled.Value = false; 
+			var taskBarVRElement = VrElements.AddChild("TaskBarVR").AttachMesh<CanvasMesh>(UImaterial);
+			taskBarVRElement.Resolution.Value = PrivateSpaceManager.VRViewPort.Size.Value;
+			taskBarVRElement.Max.Value = new Vector2f(1, 0);
+			taskBarVRElement.MaxOffset.Value = new Vector2i(0, 100);
+			taskBarVRElement.InputInterface.Target = PrivateSpaceManager.VRViewPort;
+
+			StartVRElement = VrElements.AddChild("StartVR").AttachMesh<CanvasMesh>(UImaterial);
+			StartVRElement.TopOffset.Value = false;
+			StartVRElement.FrontBindRadus.Value += 1f;
+			StartVRElement.Scale.Value += new Vector3f(1, 0, 0);
+			StartVRElement.Min.Value = new Vector2f(0, 0);
+			StartVRElement.Max.Value = new Vector2f(0, 0);
+			StartVRElement.MaxOffset.Value = new Vector2i(350, 544);
+			StartVRElement.MinOffset.Value = new Vector2i(0, 100);
+
+			StartVRElement.Resolution.Value = PrivateSpaceManager.VRViewPort.Size.Value;
+			StartVRElement.InputInterface.Target = PrivateSpaceManager.VRViewPort;
+
+			VrElements.enabled.Value = false;
 			Engine.EngineLink.VRChange += EngineLink_VRChange;
 
 			var TaskBar = RootUIEntity.AddChild("TaskBar").AttachComponent<UIElement>();
@@ -127,8 +155,30 @@ namespace RhuEngine.Components
 			BuildCenterTaskBar(centerElement);
 			BuildRightTaskBar(rightElement);
 			EngineLink_VRChange(Engine.IsInVR);
+
+			Start = RootUIEntity.AddChild("Start").AttachComponent<UIElement>();
+			BuildStartMenu(Start);
+			ToggleStart(false);
 		}
 
+		private void BuildStartMenu(UIElement start) {
+			start.Min.Value = new Vector2f(0, 1);
+			start.Max.Value = new Vector2f(0, 1);
+			start.MinOffset.Value = new Vector2f(350, -544);
+			start.MaxOffset.Value = new Vector2f(0, -100);
+			start.Entity.AddChild("BackGround").AttachComponent<Panel>();
+
+
+			//var sideBar = start.Entity.AddChild("SideBar").AttachComponent<BoxContainer>();
+			//sideBar.Vertical.Value = true;
+			//sideBar.Alignment.Value = RBoxContainerAlignment.End;
+			//sideBar.Max.Value = new Vector2f(0, 1);
+			//sideBar.Min.Value = new Vector2f(0, 0);
+			//sideBar.MaxOffset.Value = new Vector2f(8, 0);
+			//sideBar.MinOffset.Value = new Vector2f(93, 0);
+			//sideBar.GrowVertical.Value = RGrowVertical.Both;
+
+		}
 
 		private void BuildLeftTaskBar(UIElement left) {
 			var holder = left.Entity.AddChild("Holder").AttachComponent<BoxContainer>();
@@ -191,7 +241,7 @@ namespace RhuEngine.Components
 			if (InputManager.OpenDash.JustActivated()) {
 				ToggleDash();
 			}
-			if(_textLabel is null) {
+			if (_textLabel is null) {
 				return;
 			}
 			var date = DateTime.Now;

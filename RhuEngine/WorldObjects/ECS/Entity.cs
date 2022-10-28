@@ -366,10 +366,6 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		public void ParentEnabledChange(bool _parentEnabled) {
-			if (!enabled.Value) {
-				return;
-			}
-
 			if (_parentEnabled != parentEnabled) {
 				parentEnabled = _parentEnabled;
 				foreach (var entity in children.Cast<Entity>()) {
