@@ -321,8 +321,6 @@ namespace RhuEngine.Managers
 			}
 		}
 
-		private Matrix _lastCamPos;
-
 		private void UpdateCameraPos() {
 			if (FocusedWorld?.GetLocalUser()?.userRoot.Target is not null) {
 				if (FocusedWorld is null) {
@@ -331,13 +329,6 @@ namespace RhuEngine.Managers
 				var focusUserRoot = FocusedWorld.GetLocalUser().userRoot.Target;
 				var Entity = PrivateOverlay.GetLocalUser()?.userRoot.Target?.Entity;
 				var EntityTwo = OverlayWorld.GetLocalUser()?.userRoot.Target?.Entity;
-				//Todo Remove and make camera actually have latest position
-				//if (Engine.EngineLink.CanRender) {
-				//	var cameraPos = focusUserRoot.Entity.GlobalTrans.Translation - _lastCamPos.Translation;
-				//	var camraRot = focusUserRoot.Entity.GlobalTrans.Rotation * _lastCamPos.Rotation.Inverse;
-				//	RRenderer.CameraRoot = Matrix.TRS(focusUserRoot.Entity.GlobalTrans.Translation + cameraPos, camraRot * focusUserRoot.Entity.GlobalTrans.Rotation, focusUserRoot.Entity.GlobalTrans.Scale);
-				//	_lastCamPos = focusUserRoot.Entity.GlobalTrans;
-				//}
 				if (Engine.EngineLink.CanRender) {
 					RRenderer.CameraRoot = focusUserRoot.Entity.GlobalTrans;
 				}
