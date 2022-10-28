@@ -252,6 +252,13 @@
     "Actions.ChangeVR.Disable": "Leave VR",
     "Programs.PublicSessions.Name": "Public Sessions",
 
+
+    "Status.Online": "Online",
+    "Status.Idle": "Idle",
+    "Status.DoNotDisturb": "DoNotDisturb",
+    "Status.Stream": "Stream",
+    "Status.Offline": "Offline",
+
     "Free.Of": "{0} free of {1}",
     "Messaging.CreateDm": "Create DM",
     "Messaging.CreateGroupDm": "Create Group DM",
