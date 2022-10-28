@@ -47,7 +47,7 @@ namespace RhubarbVR.Bindings
 
 		public bool InVR { get; set; }
 
-		public bool LiveVRChange => true;
+		public bool LiveVRChange { get; set; }
 
 		public Type RenderSettingsType => typeof(GodotRenderSettings);
 
@@ -62,6 +62,7 @@ namespace RhubarbVR.Bindings
 				EngineRunner.GetViewport().UseXr = true;
 				RLog.Info("Is in VR");
 				InVR = true;
+				LiveVRChange |= InVR;
 				VRChange?.Invoke(true);
 				Engine.MouseFreeStateUpdate();
 			}
@@ -69,6 +70,7 @@ namespace RhubarbVR.Bindings
 				EngineRunner.GetViewport().UseXr = false;
 				RLog.Info("Not in VR");
 				InVR = false;
+				LiveVRChange |= InVR;
 				VRChange?.Invoke(false);
 				Engine.MouseFreeStateUpdate();
 			}
@@ -91,7 +93,7 @@ namespace RhubarbVR.Bindings
 			RLog.Info("Loading VRInput");
 			XRServer.TrackerAdded += XRServer_TrackerAdded;
 			XRServer.TrackerRemoved += XRServer_TrackerRemoved;
-			if(XRServer.PrimaryInterface is OpenXRInterface xRInterface) {
+			if (XRServer.PrimaryInterface is OpenXRInterface xRInterface) {
 				xRInterface.SessionStopping += XRInterface_SessionStopping;
 				xRInterface.SessionFocussed += XRInterface_SessionFocussed;
 			}

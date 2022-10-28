@@ -168,17 +168,44 @@ namespace RhuEngine.Components
 			start.MaxOffset.Value = new Vector2f(0, -100);
 			start.Entity.AddChild("BackGround").AttachComponent<Panel>();
 
+			var sideBar = start.Entity.AddChild("SideBar").AttachComponent<BoxContainer>();
+			sideBar.Vertical.Value = true;
+			sideBar.Alignment.Value = RBoxContainerAlignment.End;
+			sideBar.Max.Value = new Vector2f(0, 1);
+			sideBar.Min.Value = new Vector2f(0, 0);
+			sideBar.MaxOffset.Value = new Vector2f(8, 0);
+			sideBar.MinOffset.Value = new Vector2f(93, 0);
+			sideBar.GrowVertical.Value = RGrowVertical.Both;
 
-			//var sideBar = start.Entity.AddChild("SideBar").AttachComponent<BoxContainer>();
-			//sideBar.Vertical.Value = true;
-			//sideBar.Alignment.Value = RBoxContainerAlignment.End;
-			//sideBar.Max.Value = new Vector2f(0, 1);
-			//sideBar.Min.Value = new Vector2f(0, 0);
-			//sideBar.MaxOffset.Value = new Vector2f(8, 0);
-			//sideBar.MinOffset.Value = new Vector2f(93, 0);
-			//sideBar.GrowVertical.Value = RGrowVertical.Both;
+			void AddSideButton(string buttonName, RTexture2D rTexture2D, Action clickAction = null) {
+				var sideBarButton = sideBar.Entity.AddChild(buttonName).AttachComponent<Button>();
+				sideBarButton.MinSize.Value = new Vector2i(0, 84);
+				sideBarButton.IconAlignment.Value = RButtonAlignment.Center;
+				sideBarButton.ExpandIcon.Value = true;
+				var textureRef = sideBar.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+				var actionProvider = sideBar.Entity.AttachComponent<DelegateCall>();
+				actionProvider.action = clickAction;
+				sideBarButton.Icon.Target = textureRef;
+				textureRef.LoadAsset(rTexture2D);
+				if (clickAction != null) {
+					sideBarButton.Pressed.Target = actionProvider.CallDelegate;
+				}
+			}
 
+			AddSideButton("Profile", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.User), () => { 
+				//Show Profile Settings
+			});
+			if (Engine.EngineLink.LiveVRChange) {
+				AddSideButton("VRSwitch", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.VRHeadset), () => Engine.EngineLink.ChangeVR(!Engine.IsInVR));
+			}
+			else {
+				sideBar.Entity.AddChild("VRSwitch").AttachComponent<UIElement>().MinSize.Value = new Vector2i(0, 84);
+			}
+			AddSideButton("Files", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Folder), () => { });
+			AddSideButton("Settings", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Settings), () => { });
+			AddSideButton("Exit", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Shutdown), () => Engine.Close());
 		}
+
 
 		private void BuildLeftTaskBar(UIElement left) {
 			var holder = left.Entity.AddChild("Holder").AttachComponent<BoxContainer>();
