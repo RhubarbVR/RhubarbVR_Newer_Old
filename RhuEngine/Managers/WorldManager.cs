@@ -17,6 +17,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using DataModel.Enums;
 using Esprima;
+using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.Managers
 {
@@ -266,7 +267,12 @@ namespace RhuEngine.Managers
 		}
 
 		public void RenderStep() {
+			var hasRan = false;
 			for (var i = worlds.Count - 1; i >= 0; i--) {
+				if ((worlds[i].IsOverlayWorld || worlds[i].IsPersonalSpace) && !hasRan) {
+					hasRan = true;
+					UpdateCameraPos();
+				}
 				try {
 					worlds[i].RenderStep();
 				}
@@ -274,12 +280,11 @@ namespace RhuEngine.Managers
 					RLog.Err($"Failed to render step world {worlds[i].WorldDebugName}. Error: {ex}");
 				}
 			}
-			UpdateCameraPos();
 			UpdateJoinMessage();
 		}
 
-		private Vector3f _oldPlayerPos = Vector3f.Zero;
 		private Vector3f _loadingPos = Vector3f.Zero;
+
 		private void UpdateJoinMessage() {
 			if (_loadingText is null) {
 				return;
@@ -316,6 +321,8 @@ namespace RhuEngine.Managers
 			}
 		}
 
+		private Matrix _lastCamPos;
+
 		private void UpdateCameraPos() {
 			if (FocusedWorld?.GetLocalUser()?.userRoot.Target is not null) {
 				if (FocusedWorld is null) {
@@ -323,15 +330,26 @@ namespace RhuEngine.Managers
 				}
 				var focusUserRoot = FocusedWorld.GetLocalUser().userRoot.Target;
 				var Entity = PrivateOverlay.GetLocalUser()?.userRoot.Target?.Entity;
-				if (Entity is null) {
-					return;
-				}
-				if (focusUserRoot is not null) {
-					Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
-				}
+				var EntityTwo = OverlayWorld.GetLocalUser()?.userRoot.Target?.Entity;
+				//Todo Remove and make camera actually have latest position
 				if (Engine.EngineLink.CanRender) {
-					RRenderer.CameraRoot = Entity.GlobalTrans;
+					var cameraPos = focusUserRoot.Entity.GlobalTrans.Translation - _lastCamPos.Translation;
+					var camraRot = focusUserRoot.Entity.GlobalTrans.Rotation * _lastCamPos.Rotation.Inverse;
+					RRenderer.CameraRoot = Matrix.TRS(focusUserRoot.Entity.GlobalTrans.Translation + cameraPos, camraRot * focusUserRoot.Entity.GlobalTrans.Rotation, focusUserRoot.Entity.GlobalTrans.Scale);
+					_lastCamPos = focusUserRoot.Entity.GlobalTrans;
 				}
+
+				CopyPosToWorld(Entity, focusUserRoot);
+				CopyPosToWorld(EntityTwo, focusUserRoot);
+			}
+		}
+
+		private void CopyPosToWorld(Entity Entity, UserRoot focusUserRoot) {
+			if (Entity is null) {
+				return;
+			}
+			if (focusUserRoot is not null) {
+				Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
 			}
 		}
 

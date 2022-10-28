@@ -168,6 +168,64 @@ namespace RhuEngine.Components
 			start.MaxOffset.Value = new Vector2f(0, -100);
 			start.Entity.AddChild("BackGround").AttachComponent<Panel>();
 
+
+			var main = start.Entity.AddChild("Main").AttachComponent<BoxContainer>();
+			main.Vertical.Value = true;
+			main.Min.Value = Vector2f.Zero;
+			main.Max.Value = Vector2f.Zero;
+			main.MinOffset.Value = new Vector2f(97,8);
+			main.MaxOffset.Value = new Vector2f(343,443);
+
+			var profileElement = main.Entity.AddChild("Profile").AttachComponent<UIElement>();
+			profileElement.Entity.enabled.Value = false;
+			profileElement.MinSize.Value = new Vector2i(0, 178);
+			profileElement.Entity.AddChild("BackGround").AttachComponent<Panel>();
+			var profileBox = profileElement.Entity.AddChild("Data").AttachComponent<BoxContainer>();
+			profileBox.Vertical.Value = true;
+			var UsernameLabel = profileBox.Entity.AddChild("UserName").AttachComponent<TextLabel>();
+			UsernameLabel.TextSize.Value = 41;
+			UsernameLabel.Text.Value = "Username";
+
+			var StatusButtons = profileBox.Entity.AddChild("StatusButtons").AttachComponent<BoxContainer>();
+			StatusButtons.Alignment.Value = RBoxContainerAlignment.Center;
+			Button AddStatusButton(string buttonName, RTexture2D rTexture2D, Action clickAction = null) {
+				var statusButton = StatusButtons.Entity.AddChild(buttonName).AttachComponent<Button>();
+				statusButton.MinSize.Value = new Vector2i(32, 32);
+				statusButton.ToggleMode.Value = true;
+				statusButton.IconAlignment.Value = RButtonAlignment.Center;
+				statusButton.ExpandIcon.Value = true;
+				var textureRef = StatusButtons.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+				var actionProvider = StatusButtons.Entity.AttachComponent<DelegateCall>();
+				actionProvider.action = clickAction;
+				statusButton.Icon.Target = textureRef;
+				textureRef.LoadAsset(rTexture2D);
+				if (clickAction != null) {
+					statusButton.Pressed.Target = actionProvider.CallDelegate;
+				}
+				return statusButton;
+			}
+			AddStatusButton("Online", null, null);
+			AddStatusButton("Idle", null, null);
+			AddStatusButton("DoNotDisturb", null, null);
+			AddStatusButton("Stream", null, null);
+			AddStatusButton("Offline", null, null).ButtonPressed.Value = true;
+
+			var ststusLineEdit = profileBox.Entity.AddChild("StatusField").AttachComponent<LineEdit>();
+			var ststusLineEditlocale = ststusLineEdit.Entity.AttachComponent<StandardLocale>();
+			ststusLineEditlocale.TargetValue.Target = ststusLineEdit.PlaceholderText;
+			ststusLineEditlocale.Key.Value = "Common.CustomStatus";
+			ststusLineEdit.HorizontalFilling.Value = RFilling.ShrinkCenter;
+			ststusLineEdit.MinSize.Value = new Vector2i(230, 35);
+
+
+			var logoutButton = profileBox.Entity.AddChild("logoutButton").AttachComponent<Button>();
+			var locale = logoutButton.Entity.AttachComponent<StandardLocale>();
+			locale.TargetValue.Target = logoutButton.Text;
+			locale.Key.Value = "Common.Logout";
+			logoutButton.HorizontalFilling.Value = RFilling.ShrinkCenter;
+			logoutButton.MinSize.Value = new Vector2i(230, 35);
+
+
 			var sideBar = start.Entity.AddChild("SideBar").AttachComponent<BoxContainer>();
 			sideBar.Vertical.Value = true;
 			sideBar.Alignment.Value = RBoxContainerAlignment.End;
@@ -192,9 +250,7 @@ namespace RhuEngine.Components
 				}
 			}
 
-			AddSideButton("Profile", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.User), () => { 
-				//Show Profile Settings
-			});
+			AddSideButton("Profile", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.User), () => profileElement.Entity.enabled.Value = !profileElement.Entity.enabled.Value);
 			if (Engine.EngineLink.LiveVRChange) {
 				AddSideButton("VRSwitch", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.VRHeadset), () => Engine.EngineLink.ChangeVR(!Engine.IsInVR));
 			}

@@ -491,6 +491,8 @@ namespace RhuEngine.WorldObjects.ECS
 				scale.SetValueNoOnChange(newscale);
 				_cachedGlobalMatrix = value;
 				_cachedLocalMatrix = newLocal;
+				_dirtyGlobal = false;
+				_dirtyLocal = false;
 				GlobalTransformChange?.Invoke(this, true);
 				foreach (var item in children.Cast<Entity>()) {
 					item.GlobalTransMark();
@@ -508,16 +510,14 @@ namespace RhuEngine.WorldObjects.ECS
 				return _cachedLocalMatrix;
 			}
 			set {
-				var parentMatrix = Matrix.S(Vector3f.One);
-				if (InternalParent != null) {
-					parentMatrix = InternalParent.GlobalTrans;
-				}
 				value.Decompose(out var newtranslation, out var newrotation, out var newscale);
 				position.SetValueNoOnChange(newtranslation);
 				rotation.SetValueNoOnChange(newrotation);
 				scale.SetValueNoOnChange(newscale);
-				_cachedGlobalMatrix = value * parentMatrix;
+				_cachedGlobalMatrix = value * InternalParent?.GlobalTrans ?? Matrix.Identity;
 				_cachedLocalMatrix = value;
+				_dirtyGlobal = false;
+				_dirtyLocal = false;
 				GlobalTransformChange?.Invoke(this, true);
 				foreach (var item in children.Cast<Entity>()) {
 					item.GlobalTransMark();

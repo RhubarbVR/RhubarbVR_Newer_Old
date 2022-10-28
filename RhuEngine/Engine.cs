@@ -386,13 +386,13 @@ namespace RhuEngine
 						item.RenderStep();
 					}
 					catch (Exception ex) {
-						RLog.Err($"Failed to step {item.GetType().GetFormattedName()} Error: {ex}");
+						RLog.Err($"Failed to render step {item.GetType().GetFormattedName()} Error: {ex}");
 						throw ex;
 					}
 				}
 			}
 			catch (Exception wa) {
-				RLog.Err("GameStep Error" + wa.ToString());
+				RLog.Err("Render Step Error" + wa.ToString());
 			}
 		}
 
