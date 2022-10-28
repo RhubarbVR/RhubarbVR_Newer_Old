@@ -45,6 +45,7 @@ public partial class EngineRunner : Node3D, IRTime
 	public GodotEngineLink link;
 
 	public override void _Ready() {
+		SetProcessInternal(true);
 		if (RLog.Instance == null) {
 			RLog.Instance = new GodotLogs();
 		}
@@ -85,18 +86,22 @@ public partial class EngineRunner : Node3D, IRTime
 	public Vector2f MouseScrollPos;
 	public Vector2f LastMouseScrollPos;
 
+	public override void _Notification(long what) {
+		if (what == Node.NotificationInternalProcess) {
+			MouseScrollDelta = MouseScrollPos - LastMouseScrollPos;
+			LastMouseScrollPos = MouseScrollPos;
+			engine?.Step();
+			TypeDelta = "";
+			MouseDelta = Vector2f.Zero;
+		}
+	}
+
 	public override void _Process(double delta) {
-		MouseScrollDelta = MouseScrollPos - LastMouseScrollPos;
-		LastMouseScrollPos = MouseScrollPos;
 		//Dont Like this but it works
 		if (!link.InVR) {
-			Camera.Position = Vector3.Zero;
-			Camera.Rotation = Vector3.Zero;
+			Camera.SetPos(RRenderer.LocalCam);
 		}
 		//Dont Like this but it works
-		engine?.Step();
-		TypeDelta = "";
-		MouseDelta = Vector2f.Zero;
 	}
 
 	public override void _ExitTree() {

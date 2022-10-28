@@ -332,13 +332,15 @@ namespace RhuEngine.Managers
 				var Entity = PrivateOverlay.GetLocalUser()?.userRoot.Target?.Entity;
 				var EntityTwo = OverlayWorld.GetLocalUser()?.userRoot.Target?.Entity;
 				//Todo Remove and make camera actually have latest position
+				//if (Engine.EngineLink.CanRender) {
+				//	var cameraPos = focusUserRoot.Entity.GlobalTrans.Translation - _lastCamPos.Translation;
+				//	var camraRot = focusUserRoot.Entity.GlobalTrans.Rotation * _lastCamPos.Rotation.Inverse;
+				//	RRenderer.CameraRoot = Matrix.TRS(focusUserRoot.Entity.GlobalTrans.Translation + cameraPos, camraRot * focusUserRoot.Entity.GlobalTrans.Rotation, focusUserRoot.Entity.GlobalTrans.Scale);
+				//	_lastCamPos = focusUserRoot.Entity.GlobalTrans;
+				//}
 				if (Engine.EngineLink.CanRender) {
-					var cameraPos = focusUserRoot.Entity.GlobalTrans.Translation - _lastCamPos.Translation;
-					var camraRot = focusUserRoot.Entity.GlobalTrans.Rotation * _lastCamPos.Rotation.Inverse;
-					RRenderer.CameraRoot = Matrix.TRS(focusUserRoot.Entity.GlobalTrans.Translation + cameraPos, camraRot * focusUserRoot.Entity.GlobalTrans.Rotation, focusUserRoot.Entity.GlobalTrans.Scale);
-					_lastCamPos = focusUserRoot.Entity.GlobalTrans;
+					RRenderer.CameraRoot = focusUserRoot.Entity.GlobalTrans;
 				}
-
 				CopyPosToWorld(Entity, focusUserRoot);
 				CopyPosToWorld(EntityTwo, focusUserRoot);
 			}
