@@ -186,7 +186,9 @@ namespace RhuEngine
 		public event Action SettingsUpdate;
 
 		public void UpdateSettings() {
-			RRenderer.Fov = MainSettings.Fov;
+			if (EngineLink.CanRender) {
+				RRenderer.Fov = MainSettings.Fov;
+			}
 			SettingsUpdate?.Invoke();
 		}
 
@@ -222,6 +224,7 @@ namespace RhuEngine
 		public bool DebugVisuals { get; private set; }
 
 		public NetApiManager netApiManager;
+
 		public WindowManager windowManager = new();
 
 		public WorldManager worldManager = new();
@@ -333,7 +336,7 @@ namespace RhuEngine
 		}
 
 		public void MouseFreeStateUpdate() {
-			if(inputManager?.MouseSystem is not null) { 
+			if (inputManager?.MouseSystem is not null) {
 				if (IsInVR) {
 					inputManager.MouseSystem.MouseHidden = false;
 					inputManager.MouseSystem.MouseLocked = false;
