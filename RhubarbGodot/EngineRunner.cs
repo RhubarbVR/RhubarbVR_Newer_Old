@@ -36,13 +36,26 @@ public partial class EngineRunner : Node3D, IRTime
 	public Engine engine;
 
 	[ThreadStatic]
-	public bool IsMainThread = false;
+	public static bool IsMainThread = false;
 
 	public static EngineRunner _;
 
 	public OutputCapture outputCapture;
 
 	public GodotEngineLink link;
+
+	private readonly List<Action> _runOnMainThread = new();
+
+	public void RunOnMainThread(Action action) {
+		if (IsMainThread) {
+			action?.Invoke();
+		}
+		else {
+			lock (_runOnMainThread) {
+				_runOnMainThread.Add(action);
+			}
+		}
+	}
 
 	public override void _Ready() {
 		SetProcessInternal(true);
@@ -97,6 +110,12 @@ public partial class EngineRunner : Node3D, IRTime
 	}
 
 	public override void _Process(double delta) {
+		lock (_runOnMainThread) {
+			foreach (var item in _runOnMainThread) {
+				item?.Invoke();
+			}
+			_runOnMainThread.Clear();
+		}
 		//Dont Like this but it works
 		if (!link.InVR) {
 			Camera.SetPos(RRenderer.LocalCam);
