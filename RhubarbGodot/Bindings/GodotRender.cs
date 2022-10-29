@@ -45,6 +45,7 @@ namespace RhubarbVR.Bindings
 		public float MinClip { get => EngineRunner.Camera.Near; set => EngineRunner.Camera.Near = value; }
 		public float FarClip { get => EngineRunner.Camera.Far; set => EngineRunner.Camera.Far = value; }
 		public EngineRunner EngineRunner { get; }
+		public float Fov { get => EngineRunner.Camera.Fov; set => EngineRunner.Camera.Fov = value; }
 
 		public Matrix GetCameraRootMatrix() {
 			return EngineRunner.Rigin.GetPos();

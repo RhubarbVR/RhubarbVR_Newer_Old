@@ -150,6 +150,7 @@ namespace RhuEngine
 			var thedata = (MainSettingsObject)Activator.CreateInstance(theType);
 			MainSettings = lists.Count == 0 ? thedata : SettingsManager.LoadSettingsObject(thedata, lists.ToArray());
 			MainSettings.RenderSettings.RenderSettingsChange?.Invoke();
+			RRenderer.Fov = thedata.Fov;
 		}
 
 		public bool HasKeyboard => KeyboardInteraction is not null;
@@ -185,6 +186,7 @@ namespace RhuEngine
 		public event Action SettingsUpdate;
 
 		public void UpdateSettings() {
+			RRenderer.Fov = MainSettings.Fov;
 			SettingsUpdate?.Invoke();
 		}
 
@@ -220,6 +222,7 @@ namespace RhuEngine
 		public bool DebugVisuals { get; private set; }
 
 		public NetApiManager netApiManager;
+		public WindowManager windowManager = new();
 
 		public WorldManager worldManager = new();
 
@@ -277,7 +280,7 @@ namespace RhuEngine
 				netApiManager = new NetApiManager((_userDataPathOverRide ?? BaseDir) + "/rhuCookie");
 				IntMsg = "Building AssetManager";
 				assetManager = new AssetManager(_cachePathOverRide);
-				_managers = new IManager[] { discordManager, localisationManager, inputManager, netApiManager, assetManager, worldManager };
+				_managers = new IManager[] { discordManager, windowManager, localisationManager, inputManager, netApiManager, assetManager, worldManager };
 				foreach (var item in _managers) {
 					IntMsg = $"Starting {item.GetType().Name}";
 					try {

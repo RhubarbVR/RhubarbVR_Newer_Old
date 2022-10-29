@@ -22,6 +22,16 @@ namespace RhuEngine.Components
 		[Default(ECollisionFilterGroups.AllNormal)]
 		public readonly Sync<ECollisionFilterGroups> Group;
 
+		[Default(RCursorShape.Arrow)]
+		public readonly Sync<RCursorShape> CursorShape;
+
+		protected override void OnAttach() {
+			base.OnAttach();
+			if(Entity.GetFirstComponent<Grabbable>() is not null) {
+				CursorShape.Value = RCursorShape.Move;
+			}
+		}
+
 		public abstract ColliderShape PysicsBuild();
 		public void RebuildPysics() {
 			RUpdateManager.ExecuteOnEndOfFrame(this, () => {

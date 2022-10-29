@@ -33,6 +33,13 @@ namespace RhuEngine.Components
 		public bool Grabbed => (grabbableHolder.Target is not null) && (grabbingUser.Target is not null);
 
 
+		protected override void OnAttach() {
+			base.OnAttach();
+			foreach (var item in Entity.GetAllComponents<PhysicsObject>()) {
+				item.CursorShape.Value = RCursorShape.Move;
+			}
+		}
+
 		public void DestroyGrabbedObject() {
 			if (!CanNotDestroy.Value) {
 				Entity.Destroy();

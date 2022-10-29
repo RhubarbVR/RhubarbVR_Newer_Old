@@ -15,6 +15,7 @@ using RhuEngine.WorldObjects;
 using RhuEngine.Components.PrivateSpace;
 using RhuEngine.Input.XRInput;
 using System.Reflection;
+using System.Security.Policy;
 
 namespace RhuEngine.Components
 {
@@ -37,6 +38,17 @@ namespace RhuEngine.Components
 		public readonly SyncRef<UnlitMaterial> Material;
 		public readonly SyncRef<Sprite3D> Currsor;
 		public readonly SyncRef<Entity> Render;
+
+		public RhubarbAtlasSheet.RhubarbIcons CurrsorIcon
+		{
+			set {
+				if(Currsor.Target is null) {
+					return;
+				}
+				Currsor.Target.Frame.Value = (int)value;
+			}
+		}
+
 		protected override void OnAttach() {
 			base.OnAttach();
 			var render = Entity.AddChild("Render");
@@ -45,7 +57,6 @@ namespace RhuEngine.Components
 			sprite.texture.Target = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
 			sprite.HFrames.Value = 26;
 			sprite.VFrames.Value = 7;
-			sprite.Frame.Value = (int)RhubarbAtlasSheet.RhubarbIcons.Cursor;
 			sprite.PixelSize.Value = 0.00010f;
 			sprite.NoDepthTest.Value = true;
 			sprite.RenderPriority.Value += 101;

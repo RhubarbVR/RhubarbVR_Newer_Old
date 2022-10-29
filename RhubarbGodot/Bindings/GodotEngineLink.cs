@@ -21,9 +21,26 @@ using Engine = RhuEngine.Engine;
 
 namespace RhubarbVR.Bindings
 {
+	public sealed class GodotWindow : IWindow
+	{
+		public Window window;
+
+		public GodotWindow() {
+
+		}
+
+		public GodotWindow(Window window) {
+			this.window = window;
+		}
+
+		public int Width { get => window.Size.x; set => window.Size = new Godot.Vector2i(value, window.Size.y); }
+		public int Height { get => window.Size.y; set => window.Size = new Godot.Vector2i(window.Size.x, value); }
+		public string Title { get => window.Title; set => window.Title = value; }
+		public RNumerics.Vector2i Position { get => new RNumerics.Vector2i(window.Position.x, window.Position.y); set => window.Position = new Godot.Vector2i(value.x, value.y); }
+	}
+
 	public class GodotRenderSettings : RenderSettingsBase
 	{
-
 	}
 
 
@@ -176,6 +193,9 @@ namespace RhubarbVR.Bindings
 			RTexture2D.White = new RImageTexture2D(image);
 			RTempQuad.Instance = typeof(GodotTempMeshRender);
 			new RBullet.BulletPhsyicsLink().RegisterPhysics();
+			if (EngineRunner._.GetViewport() is Window window) {
+				Engine.windowManager.LoadWindow(new GodotWindow(window));
+			}
 		}
 
 		public void Start() {

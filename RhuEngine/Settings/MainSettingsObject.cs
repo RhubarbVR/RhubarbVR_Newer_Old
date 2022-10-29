@@ -17,8 +17,12 @@ namespace RhuEngine.Settings
 	public abstract class MainSettingsObject : SettingsObject
 	{
 		public abstract RenderSettingsBase RenderSettings { get; }
+
 		[SettingsField("Input Settings")]
 		public InputSettingsObject InputSettings = new();
+
+		[SettingsField("Desktop Fov")]
+		public float Fov = 90;
 
 		[SettingsField("Three Letter Language Name")]
 		public string ThreeLetterLanguageName = null;

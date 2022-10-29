@@ -6,16 +6,21 @@ using RhuEngine.Input.XRInput;
 using RhuEngine.Linker;
 using RhuEngine.Managers;
 
+using RNumerics;
+
 namespace RhuEngine.Input
 {
 	public sealed class XRInputSystem : IInputSystem
 	{
 		public InputManager InputManager { get; set; }
+		public Vector3f HeadPos => Head?[TrackerPos.Default]?.Position ?? Vector3f.Zero;
+		public Quaternionf HeadRot => Head?[TrackerPos.Default]?.Rotation ?? Quaternionf.Identity;
 
 		public VirtualKeyboardInput virtualKeyboard;
 
 		public readonly List<ITrackerDevice> Trackers = new();
 
+		public ITrackerDevice Head;
 		public ITrackerDevice LeftHand;
 		public ITrackerDevice RightHand;
 
@@ -25,7 +30,7 @@ namespace RhuEngine.Input
 		}
 
 		public void RemoveDevice(IInputDevice inputDevice) {
-			if(inputDevice is ITrackerDevice target) {
+			if (inputDevice is ITrackerDevice target) {
 				Trackers.Remove(target);
 			}
 		}
@@ -38,6 +43,9 @@ namespace RhuEngine.Input
 				}
 				if (target.Hand == Handed.Right) {
 					RightHand = target;
+				}
+				if (target.TrackerType == TrackerType.Head) {
+					Head = target;
 				}
 #if DEBUG
 				RLog.Info($@" Tracker Loaded

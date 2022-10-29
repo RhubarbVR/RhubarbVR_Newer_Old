@@ -29,14 +29,18 @@ namespace RhuEngine.Components
 				return;
 			}
 			if (World.IsPersonalSpace) {
-				Entity.LocalTrans = InputManager.HeadMatrix;
+				Entity.LocalTrans = Engine.IsInVR
+					? Matrix.TR(InputManager.XRInputSystem.HeadPos, InputManager.XRInputSystem.HeadRot)
+					: InputManager.ScreenHeadMatrix;
 			}
 			else {
 				if (user.Target is null) {
 					return;
 				}
 				if (user.Target == LocalUser) {
-					Entity.LocalTrans = InputManager.HeadMatrix;
+					Entity.LocalTrans = Engine.IsInVR
+						? Matrix.TR(InputManager.XRInputSystem.HeadPos, InputManager.XRInputSystem.HeadRot)
+						: InputManager.ScreenHeadMatrix;
 					user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>("HeadPos").Value = Entity.position.Value;
 					user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>("HeadRot").Value = Entity.rotation.Value;
 				}

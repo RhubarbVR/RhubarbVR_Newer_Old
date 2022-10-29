@@ -161,6 +161,7 @@ namespace RhuEngine.Components
 
 	public interface IInputInterface : IWorldObject
 	{
+		RCursorShape RCursorShape { get; }
 		/// <summary>
 		/// Sends input as a 0,1 value
 		/// </summary>
@@ -266,6 +267,8 @@ namespace RhuEngine.Components
 		}
 
 		public bool Loaded { get; private set; } = false;
+
+		public RCursorShape RCursorShape { get; set; }
 
 		public override void Dispose() {
 			Load(null);

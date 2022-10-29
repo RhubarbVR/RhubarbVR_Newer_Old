@@ -12,6 +12,7 @@ namespace RhuEngine.Settings
 
 	public abstract class RenderSettingsBase:SettingsObject
 	{
+
 		public Action RenderSettingsChange;
 	}
 }

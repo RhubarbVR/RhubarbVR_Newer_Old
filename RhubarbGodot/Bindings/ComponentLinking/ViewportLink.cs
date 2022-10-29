@@ -214,6 +214,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				value.IsClickedTurLastFrame = value.IsClickedTur;
 
 			}
+			LinkedComp.RCursorShape = (RCursorShape)Godot.Input.GetCurrentCursorShape();
 		}
 
 		public override void StartContinueInit() {

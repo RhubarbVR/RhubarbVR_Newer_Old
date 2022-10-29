@@ -13,6 +13,8 @@ using RhuEngine.Linker;
 using RhuEngine.Physics;
 using RhuEngine.WorldObjects;
 using RhuEngine.Components.PrivateSpace;
+using RhuEngine.Managers;
+using DiscordRPC;
 
 namespace RhuEngine.Components
 {
@@ -96,35 +98,28 @@ namespace RhuEngine.Components
 		public GrabbableHolderCombiner Left;
 		public GrabbableHolderCombiner Right;
 
+
+		public void BuildLazers() {
+			var user = LocalUser.userRoot.Target?.Entity;
+			var entLeftlazer = user.AddChild("LeftLazer");
+			Leftlazer = entLeftlazer.AttachComponent<Lazer>();
+			Leftlazer.Side.Value = Handed.Left;
+			var entRightlazer = user.AddChild("RightLazer");
+			Rightlazer = entRightlazer.AttachComponent<Lazer>();
+			Rightlazer.Side.Value = Handed.Right;
+		}
+
 		protected override void OnAttach() {
 			base.OnAttach();
 			Head = new GrabbableHolderCombiner(Handed.Max, WorldManager);
 			Left = new GrabbableHolderCombiner(Handed.Left, WorldManager);
 			Right = new GrabbableHolderCombiner(Handed.Right, WorldManager);
-			Task.Run(async () => {
-				if (!Engine.EngineLink.SpawnPlayer) {
-					return;
-				}
-				Entity user;
-				while (true) {
-					user = LocalUser.userRoot.Target?.Entity;
-					if (user is not null) {
-						break;
-					}
-					await Task.Delay(100);
-				}
-				var entLeftlazer = user.AddChild("LeftLazer");
-				Leftlazer = entLeftlazer.AttachComponent<Lazer>();
-				Leftlazer.Side.Value = Handed.Left;
-				var entRightlazer = user.AddChild("RightLazer");
-				Rightlazer = entRightlazer.AttachComponent<Lazer>();
-				Rightlazer.Side.Value = Handed.Right;
-			});
 			DashMover = World.RootEntity.AddChild("TaskBarMover");
 			DashMover.AttachComponent<UserInterfacePositioner>();
 			var screen = World.RootEntity.AddChild("RootScreen");
 			RootScreenElement = screen.AttachComponent<UIElement>();
 			IconTexRender = screen.AddChild("Center Icon").AttachComponent<TextureRect>();
+			InputManager.screenInput.MouseStateUpdate += (newState) => IconTexRender.Entity.enabled.Value = !newState;
 			IconTexRender.Entity.orderOffset.Value = -100;
 			UserInterface = screen.AddChild("UserInterface").AttachComponent<UIElement>();
 			UserInterface.Enabled.Value = false;
@@ -156,20 +151,25 @@ namespace RhuEngine.Components
 		private float _contextMenuHoldTime = 0f;
 		private bool _updateDashState;
 		private Handed _contextHand;
+
+		public void WorldCycling() {
+			WorldManager.WorldCycling();
+		}
+
 		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
 			}
 
-			if (InputManager.GetInputAction(InputTypes.VRChange).JustActivated() && Engine.EngineLink.LiveVRChange) {
+			if (InputManager.GetInputAction(InputTypes.VRChange).JustActivated() && Engine.EngineLink.LiveVRChange && !Engine.HasKeyboard) {
 				Engine.EngineLink.ChangeVR(!Engine.IsInVR);
 			}
 
-			if (InputManager.GetInputAction(InputTypes.ChangeWorld).JustActivated()) {
-				//Todo World Rotation
+			if (InputManager.GetInputAction(InputTypes.ChangeWorld).JustActivated() && !Engine.HasKeyboard) {
+				WorldCycling();
 			}
 
-			if (InputManager.GetInputAction(InputTypes.ContextMenu).JustActivated()) {
+			if (InputManager.GetInputAction(InputTypes.ContextMenu).JustActivated() && !Engine.HasKeyboard) {
 				_contextMenuHoldTime = 0;
 				_updateDashState = false;
 				var mainContextHandValue = InputManager.GetInputAction(InputTypes.ContextMenu).HandedValue(Handed.Max);
@@ -183,7 +183,7 @@ namespace RhuEngine.Components
 					_contextHand = Handed.Right;
 				}
 			}
-			if (InputManager.GetInputAction(InputTypes.ContextMenu).Activated()) {
+			if (InputManager.GetInputAction(InputTypes.ContextMenu).Activated() && !Engine.HasKeyboard) {
 				_contextMenuHoldTime += RTime.Elapsedf;
 			}
 			if (InputManager.GetInputAction(InputTypes.ContextMenu).JustDeActivated() && !_updateDashState) {
@@ -195,16 +195,16 @@ namespace RhuEngine.Components
 			}
 			if (!_updateDashState) {
 				//Update hand progress
-				
+
 			}
-			if(_contextMenuHoldTime >= 0.5f && !_updateDashState) {
+			if (_contextMenuHoldTime >= 0.5f && !_updateDashState) {
 				_updateDashState = true;
 				UserInterfaceManager.ToggleDash();
 			}
 
 			var head = LocalUser.userRoot.Target?.head.Target;
 			if (head != null) {
-				if (!Engine.IsInVR && !Engine.inputManager.screenInput.MouseFree) {
+				if (!Engine.IsInVR) {
 					UpdateHeadLazer(head);
 				}
 				if (Engine.IsInVR) {
@@ -261,32 +261,61 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public bool RunLaserCastInWorld(World world, ref Vector3f headFrompos, ref Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side, ref Vector3f hitPointWorld) {
+		public bool RunLaserCastInWorld(World world, ref Vector3f headFrompos, ref Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side, ref Vector3f hitPointWorld, ref RCursorShape rCursorShape) {
 			if (world.PhysicsSim.RayTest(ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
 				hitPointWorld = hitpointworld;
 				if (collider.CustomObject is CanvasMesh uIComponent) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.005f), new Colorf(1, 1, 0, 0.5f));
 					uIComponent.ProcessHitLazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
+					rCursorShape = uIComponent.InputInterface.Target?.RCursorShape ?? RCursorShape.Arrow;
 				}
 				if (collider.CustomObject is PhysicsObject physicsObject) {
 					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
 					physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
-				}
-				if (collider.CustomObject is IWorldObject syncObject) {
-					if (InputManager.ObserverOpen.JustActivated() && !Engine.HasKeyboard) {
-						if (syncObject.World.IsPersonalSpace) {
-							return true;
-						}
-						var ReletiveEntity = syncObject.World.GetLocalUser()?.userRoot.Target?.head.Target ?? syncObject.World.RootEntity;
-						var observer = (syncObject.World.GetLocalUser()?.userRoot.Target?.Entity.parent.Target ?? syncObject.World.RootEntity).AddChild("Observer");
-						//observer.AttachComponent<ObserverWindow>().Observerd.Target = syncObject.GetClosedEntity();
-						//observer.GlobalTrans = Matrix.T(-0.5f, -0.5f, -1) * ReletiveEntity.GlobalTrans;
-					}
-
+					rCursorShape = physicsObject.CursorShape.Value;
 				}
 				return true;
 			}
 			return false;
+		}
+
+		public static RhubarbAtlasSheet.RhubarbIcons GetIcon(RCursorShape rCursorShape) {
+			switch (rCursorShape) {
+				//case RCursorShape.Ibeam:
+				//	return RhubarbAtlasSheet.RhubarbIcons.Ibeam;
+				case RCursorShape.PointingHand:
+					return RhubarbAtlasSheet.RhubarbIcons.CursorCircle;
+				//case RCursorShape.Cross:
+				//	break;
+				//case RCursorShape.Wait:
+				//	break;
+				//case RCursorShape.Busy:
+				//	break;
+				//case RCursorShape.Drag:
+				//	break;
+				//case RCursorShape.CanDrop:
+				//	break;
+				//case RCursorShape.Forbidden:
+				//	break;
+				//case RCursorShape.Vsize:
+				//	break;
+				//case RCursorShape.Hsize:
+				//	break;
+				//case RCursorShape.Bdiagsize:
+				//	break;
+				//case RCursorShape.Fdiagsize:
+				//	break;
+				case RCursorShape.Move:
+					return RhubarbAtlasSheet.RhubarbIcons.CursorMove;
+				//case RCursorShape.Vsplit:
+				//	break;
+				//case RCursorShape.Hsplit:
+				//	break;
+				//case RCursorShape.Help:
+				//	break;
+				default:
+					return RhubarbAtlasSheet.RhubarbIcons.Cursor;
+			}
 		}
 
 		public void UpdateLazer(Entity heand, Handed handed, Lazer lazer) {
@@ -302,15 +331,17 @@ namespace RhuEngine.Components
 			var hitOverlay = false;
 			var hitFocus = false;
 			var hitPoint = Vector3f.Zero;
-			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint)) {
+			var currsor = RCursorShape.Arrow;
+			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor)) {
 				hitPrivate = true;
 			}
-			else if (RunLaserCastInWorld(World.worldManager.OverlayWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint)) {
+			else if (RunLaserCastInWorld(World.worldManager.OverlayWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor)) {
 				hitOverlay = true;
 			}
-			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint)) {
+			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor)) {
 				hitFocus = true;
 			}
+			lazer.CurrsorIcon = GetIcon(currsor);
 			lazer.HitFocus = hitFocus;
 			lazer.HitOverlay = hitOverlay;
 			lazer.HitPrivate = hitPrivate;
@@ -337,15 +368,20 @@ namespace RhuEngine.Components
 			var hitOverlay = false;
 			var hitFocus = false;
 			var hitPoint = Vector3f.Zero;
-			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint)) {
+			var currsor = RCursorShape.Arrow;
+			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
 				hitPrivate = true;
 			}
-			else if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint)) {
+			else if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
 				hitOverlay = true;
 			}
-			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint)) {
+			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
 				hitFocus = true;
 			}
+			CursorIcon = GetIcon(currsor);
+			InputManager.MouseSystem.SetCurrsor(currsor, null);
+			RootScreenElement.CursorShape.Value = currsor;
+			UserInterface.CursorShape.Value = currsor;
 			HeadLaserHitPoint = hitPoint;
 			HeadLazerHitPrivate = hitPrivate;
 			HeadLazerHitOverlay = hitOverlay;

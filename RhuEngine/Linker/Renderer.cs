@@ -8,6 +8,8 @@ namespace RhuEngine.Linker
 {
 	public interface IRRenderer
 	{
+		public float Fov { get; set; }
+
 		public float MinClip { get; set; }
 
 		public float FarClip { get; set; }
@@ -29,6 +31,7 @@ namespace RhuEngine.Linker
 			set => Instance.SetEnableSky(value);
 		}
 		public static Matrix LocalCam { get; set; } = Matrix.Identity;
+
 		public static Matrix GetMainViewMatrix => LocalCam * CameraRoot;
 
 		public static Matrix CameraRoot
@@ -46,6 +49,12 @@ namespace RhuEngine.Linker
 		{
 			get => Instance.FarClip;
 			set => Instance.FarClip = value;
+		}
+
+		public static float Fov
+		{
+			get => Instance.Fov;
+			set => Instance.Fov = value;
 		}
 	}
 }

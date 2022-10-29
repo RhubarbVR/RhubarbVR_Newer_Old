@@ -41,6 +41,7 @@ namespace RhuEngine.Components
 		protected override void OnAttach() {
 			base.OnAttach();
 			FocusMode.Value = RFocusMode.All;
+			CursorShape.Value = RCursorShape.PointingHand;
 		}
 	}
 }

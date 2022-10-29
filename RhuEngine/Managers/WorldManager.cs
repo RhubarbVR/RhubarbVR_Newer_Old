@@ -296,23 +296,23 @@ namespace RhuEngine.Managers
 			try {
 				if (_isRunning.Count != 0) {
 					var world = _isRunning.Peek();
-					var textpos = Matrix.T(Vector3f.Forward * 0.35f) * Matrix.T(0, -0.1f, 0) * Engine.inputManager.HeadMatrix;
+					var textpos = Matrix.T(Vector3f.Forward * 0.35f) * Matrix.T(0, -0.1f, 0) * Engine.inputManager.ScreenHeadMatrix;
 					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 3.5f, 1);
 					var userPOS = PrivateOverlay.GetLocalUser().userRoot.Target?.Entity.GlobalTrans ?? Matrix.Identity;
 					if (world.IsLoading && !world.IsDisposed) {
 						_loadingText.Text.Value = $"{Engine.localisationManager.GetLocalString("Common.LoadingWorld")}\n {Engine.localisationManager.GetLocalString(world.LoadMsg)}";
-						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.HeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
+						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.ScreenHeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}
 					if (!world.HasError) {
 						_loadingText.Text.Value = $"{Engine.localisationManager.GetLocalString("Common.LoadedWorld")}";
-						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.HeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
+						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.ScreenHeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}
 					else {
 						var errorMsg = world.IsNetworked && world.IsJoiningSession
 							? Engine.localisationManager.GetLocalString("Common.FailedToJoinWorld")
 							: Engine.localisationManager.GetLocalString("Common.FailedToLoadWorld");
 						_loadingText.Text.Value = $"{errorMsg} {(Engine.netApiManager.Client.User?.UserName == null ? ", JIM" : "")}\n {Engine.localisationManager.GetLocalString(world.LoadMsg)}";
-						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.HeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
+						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.ScreenHeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}
 				}
 			}
@@ -353,6 +353,23 @@ namespace RhuEngine.Managers
 			worlds.Remove(world);
 			world.Dispose();
 			OnWorldUpdateTaskBar?.Invoke();
+		}
+
+		public void WorldCycling() {
+			RLog.Info("WorldCycling");
+			var currentIndex = worlds.IndexOf(FocusedWorld) + 1;
+			for (var i = currentIndex; i < worlds.Count; i++) {
+				if (worlds[i].Focus is World.FocusLevel.Background or World.FocusLevel.Focused) {
+					worlds[i].Focus = World.FocusLevel.Focused;
+					return;
+				}
+			}
+			for (var i = 0; i < worlds.Count; i++) {
+				if (worlds[i].Focus is World.FocusLevel.Background or World.FocusLevel.Focused) {
+					worlds[i].Focus = World.FocusLevel.Focused;
+					return;
+				}
+			}
 		}
 	}
 }

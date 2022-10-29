@@ -69,6 +69,9 @@ namespace RhuEngine.Components
 				userRoot.user.Target = World.GetLocalUser();
 				user.userRoot.Target = userRoot;
 				RLog.Info("User Made");
+				if (World.IsPersonalSpace) {
+					World.worldManager.PrivateSpaceManager.BuildLazers();
+				}
 			}
 		}
 	}
