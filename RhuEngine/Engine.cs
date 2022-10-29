@@ -150,7 +150,9 @@ namespace RhuEngine
 			var thedata = (MainSettingsObject)Activator.CreateInstance(theType);
 			MainSettings = lists.Count == 0 ? thedata : SettingsManager.LoadSettingsObject(thedata, lists.ToArray());
 			MainSettings.RenderSettings.RenderSettingsChange?.Invoke();
-			RRenderer.Fov = thedata.Fov;
+			if (EngineLink.CanRender) {
+				RRenderer.Fov = thedata.Fov;
+			}
 		}
 
 		public bool HasKeyboard => KeyboardInteraction is not null;
