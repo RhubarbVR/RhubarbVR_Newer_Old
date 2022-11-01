@@ -131,7 +131,7 @@ namespace RhuEngine.Managers
 		public void Init(Engine engine) {
 			_engine = engine;
 			if (windowManagerLink is null) {
-				return;// Stop no window manager
+				return;//Stop no window manager
 			}
 			MainWindow.FilesDropped += MainWindow_FilesDropped;
 		}
