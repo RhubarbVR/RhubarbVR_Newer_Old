@@ -57,7 +57,16 @@ namespace RhuEngine.Components
 
 		public readonly Sync<bool> ShowBehindParent;
 		public readonly Sync<bool> TopLevel;
-		public readonly Sync<bool> ClipChildren;
+
+		public enum ClipChildrenMode
+		{
+			Disabled,
+			Only,
+			AndDraw,
+			Max
+		}
+
+		public readonly Sync<ClipChildrenMode> ClipChildren;
 
 		[Default(RLightMask.Layer_0)]
 		public readonly Sync<RLightMask> LightMask;

@@ -24,7 +24,6 @@ namespace RhuEngine.Components
 		[Default(true)]public readonly Sync<bool> Threading;
 		[Default(500)]public readonly Sync<int> ProgressBarDelay;
 		public readonly Sync<bool> TextSelectionEnabled;
-		public readonly Sync<bool> OverrideSelectedFontColor;
 		[Default(true)]public readonly Sync<bool> DeselectingOnFocusLossEnabled;
 		public readonly Sync<RVisibleCharactersBehavior> VisibleCharactersBehavior;
 		[Default(1f)]public readonly Sync<float> VisibleRatio;

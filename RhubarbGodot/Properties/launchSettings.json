@@ -2,7 +2,7 @@
   "profiles": {
     "RhubarbVR": {
       "commandName": "Executable",
-      "executablePath": "C:\\Users\\Faolan\\Desktop\\GoDot\\Godot_v4.0-beta3_mono_win64\\Godot_v4.0-beta3_mono_win64.exe",
+      "executablePath": "C:\\Users\\Faolan\\Desktop\\GoDot\\Godot_v4.0-beta3_mono_win64\\Godot_v4.0-beta4_mono_win64.exe",
       "commandLineArgs": "--path ./ --xr-mode off",
       "workingDirectory": "C:\\Projects\\RhubarbVR\\RhubarbVR\\RhubarbGodot"
     }

@@ -182,7 +182,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void ClipChildren_Changed(IChangeable obj) {
-			node.ClipChildren = LinkedComp.ClipChildren.Value;
+			node.ClipChildren = (CanvasItem.ClipChildrenMode)LinkedComp.ClipChildren.Value;
 		}
 
 		private void TopLevel_Changed(IChangeable obj) {

@@ -67,7 +67,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			_image = new RImage(null);
-			_image.Create(Size.Value.x, Size.Value.y, true, RFormat.Rgba8);
+			_image.Create(Math.Max(Size.Value.x, 2), Math.Max(Size.Value.y, 2), true, RFormat.Rgba8);
 			RImageTexture2D = new RImageTexture2D(Image);
 			Load(RImageTexture2D);
 			ComputeTexture();
@@ -77,8 +77,12 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
+
 			RenderThread.ExecuteOnStartOfFrame(this, () => {
 				try {
+					if (_image is null) {
+						return;
+					}
 					Generate();
 				}
 				catch (Exception e) {

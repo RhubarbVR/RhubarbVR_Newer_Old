@@ -26,6 +26,9 @@ namespace RhubarbVR.Bindings.TextureBindings
 			}
 			else {
 				if (target is GodotImage image) {
+					if (image.Image.IsEmpty()) {
+						throw new Exception("Image Empty");
+					}
 					Texture = ImageTexture.CreateFromImage(image.Image);
 					Texture ??= new ImageTexture();
 				}

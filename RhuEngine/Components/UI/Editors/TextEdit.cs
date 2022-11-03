@@ -32,7 +32,6 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public readonly Sync<bool> MiddleMousePasteEnabled;
 		public readonly Sync<bool> WrapText;
-		public readonly Sync<bool> OverrideSelectFontColor;
 		public readonly Sync<bool> HighlightAllOccurrences;
 		public readonly Sync<bool> HighlightCurrentLine;
 		public readonly Sync<bool> DrawControlChars;

@@ -81,11 +81,11 @@ namespace RhubarbVR.Bindings.TextureBindings
 		}
 
 		public void Create(int width, int height, bool mipmaps, RFormat format) {
-			Image.Create(width, height, mipmaps, (Image.Format)format);
+			Image = Image.Create(width, height, mipmaps, (Image.Format)format);
 		}
 
 		public void CreateWithData(int width, int height, bool mipmaps, RFormat format, byte[] data) {
-			Image.CreateFromData(width, height, mipmaps, (Image.Format)format, data);
+			Image = Image.CreateFromData(width, height, mipmaps, (Image.Format)format, data);
 		}
 
 		public void Crop(int width, int height) {

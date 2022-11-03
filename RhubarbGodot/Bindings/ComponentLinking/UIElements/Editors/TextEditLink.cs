@@ -30,7 +30,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.VirtualKeyboardEnabled.Changed += VirtualKeyboardEnabled_Changed;
 			LinkedComp.MiddleMousePasteEnabled.Changed += MiddleMousePasteEnabled_Changed;
 			LinkedComp.WrapText.Changed += WrapText_Changed;
-			LinkedComp.OverrideSelectFontColor.Changed += OverrideSelectFontColor_Changed;
 			LinkedComp.HighlightAllOccurrences.Changed += HighlightAllOccurrences_Changed;
 			LinkedComp.HighlightCurrentLine.Changed += HighlightCurrentLine_Changed;
 			LinkedComp.DrawControlChars.Changed += DrawControlChars_Changed;
@@ -62,7 +61,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			VirtualKeyboardEnabled_Changed(null);
 			MiddleMousePasteEnabled_Changed(null);
 			WrapText_Changed(null);
-			OverrideSelectFontColor_Changed(null);
 			HighlightAllOccurrences_Changed(null);
 			HighlightCurrentLine_Changed(null);
 			DrawControlChars_Changed(null);
@@ -169,10 +167,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		private void HighlightAllOccurrences_Changed(IChangeable obj) {
 			node.HighlightAllOccurrences = LinkedComp.HighlightAllOccurrences.Value;
-		}
-
-		private void OverrideSelectFontColor_Changed(IChangeable obj) {
-			node.OverrideSelectedFontColor = LinkedComp.OverrideSelectFontColor.Value;
 		}
 
 		private void WrapText_Changed(IChangeable obj) {

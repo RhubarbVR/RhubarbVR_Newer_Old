@@ -33,7 +33,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.Threading.Changed += Threading_Changed;
 			LinkedComp.ProgressBarDelay.Changed += ProgressBarDelay_Changed;
 			LinkedComp.TextSelectionEnabled.Changed += TextSelectionEnabled_Changed;
-			LinkedComp.OverrideSelectedFontColor.Changed += OverrideSelectedFontColor_Changed;
 			LinkedComp.DeselectingOnFocusLossEnabled.Changed += DeselectingOnFocusLossEnabled_Changed;
 			LinkedComp.VisibleCharactersBehavior.Changed += VisibleCharactersBehavior_Changed;
 			LinkedComp.VisibleRatio.Changed += VisibleRatio_Changed;
@@ -53,7 +52,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			Threading_Changed(null);
 			ProgressBarDelay_Changed(null);
 			TextSelectionEnabled_Changed(null);
-			OverrideSelectedFontColor_Changed(null);
 			DeselectingOnFocusLossEnabled_Changed(null);
 			VisibleCharactersBehavior_Changed(null);
 			VisibleRatio_Changed(null);
@@ -92,9 +90,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			node.DeselectOnFocusLossEnabled = LinkedComp.DeselectingOnFocusLossEnabled.Value;
 		}
 
-		private void OverrideSelectedFontColor_Changed(IChangeable obj) {
-			node.OverrideSelectedFontColor = LinkedComp.OverrideSelectedFontColor.Value;
-		}
 
 		private void TextSelectionEnabled_Changed(IChangeable obj) {
 			node.SelectionEnabled = LinkedComp.TextSelectionEnabled.Value;
