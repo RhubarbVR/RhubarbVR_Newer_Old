@@ -23,6 +23,9 @@ namespace RhuEngine.Components
 		}
 
 		public void LoadMesh() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
 			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
 				try {
 					ComputeMesh();

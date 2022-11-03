@@ -27,7 +27,7 @@ namespace RhuEngine.Components
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public PrivateSpaceManager PrivateSpaceManager;
+		public PrivateSpaceManager _PrivateSpaceManager;
 
 		[NoSave]
 		[NoSync]
@@ -57,13 +57,16 @@ namespace RhuEngine.Components
 		[NoLoad]
 		[NoSyncUpdate]
 		public UnlitMaterial UImaterial;
+
+		public readonly List<PrivateSpaceTaskbarItem> privateSpaceTaskbarItems = new();
+
 		public bool OpenCloseDash
 		{
 			get => UserInterface.Enabled.Value;
 			set {
 				UserInterface.Enabled.Value = value;
 				VrElements.enabled.Value = value && Engine.IsInVR;
-				PrivateSpaceManager.VRViewPort.UpdateMode.Value = value && Engine.IsInVR ? RUpdateMode.Always : RUpdateMode.Disable;
+				_PrivateSpaceManager.VRViewPort.UpdateMode.Value = value && Engine.IsInVR ? RUpdateMode.Always : RUpdateMode.Disable;
 				if (value) {
 					InputManager.screenInput.FreeMouse();
 				}
@@ -106,10 +109,10 @@ namespace RhuEngine.Components
 		}
 
 		private void EngineLink_VRChange(bool obj) {
-			UserInterface.Entity.parent.Target = Engine.IsInVR ? PrivateSpaceManager.VRViewPort.Entity : PrivateSpaceManager.RootScreenElement.Entity;
-			PrivateSpaceManager.VRViewPort.UpdateMode.Value = OpenCloseDash && Engine.IsInVR ? RUpdateMode.Always : RUpdateMode.Disable;
+			UserInterface.Entity.parent.Target = Engine.IsInVR ? _PrivateSpaceManager.VRViewPort.Entity : _PrivateSpaceManager.RootScreenElement.Entity;
+			_PrivateSpaceManager.VRViewPort.UpdateMode.Value = OpenCloseDash && Engine.IsInVR ? RUpdateMode.Always : RUpdateMode.Disable;
 			VrElements.enabled.Value = OpenCloseDash && Engine.IsInVR;
-			PrivateSpaceManager.VRViewPort.Enabled.Value = Engine.IsInVR;
+			_PrivateSpaceManager.VRViewPort.Enabled.Value = Engine.IsInVR;
 		}
 
 		public Entity RootUIEntity => UserInterface.Entity;
@@ -121,13 +124,13 @@ namespace RhuEngine.Components
 			UImaterial = Entity.AttachComponent<UnlitMaterial>();
 			UImaterial.DullSided.Value = true;
 			UImaterial.Transparency.Value = Transparency.Blend;
-			UImaterial.MainTexture.Target = PrivateSpaceManager.VRViewPort;
+			UImaterial.MainTexture.Target = _PrivateSpaceManager.VRViewPort;
 			VrElements = Entity.AddChild("VrElements");
 			var taskBarVRElement = VrElements.AddChild("TaskBarVR").AttachMesh<CanvasMesh>(UImaterial);
-			taskBarVRElement.Resolution.Value = PrivateSpaceManager.VRViewPort.Size.Value;
+			taskBarVRElement.Resolution.Value = _PrivateSpaceManager.VRViewPort.Size.Value;
 			taskBarVRElement.Max.Value = new Vector2f(1, 0);
 			taskBarVRElement.MaxOffset.Value = new Vector2i(0, 100);
-			taskBarVRElement.InputInterface.Target = PrivateSpaceManager.VRViewPort;
+			taskBarVRElement.InputInterface.Target = _PrivateSpaceManager.VRViewPort;
 
 			StartVRElement = VrElements.AddChild("StartVR").AttachMesh<CanvasMesh>(UImaterial);
 			StartVRElement.TopOffset.Value = false;
@@ -138,8 +141,8 @@ namespace RhuEngine.Components
 			StartVRElement.MaxOffset.Value = new Vector2i(350, 544);
 			StartVRElement.MinOffset.Value = new Vector2i(0, 100);
 
-			StartVRElement.Resolution.Value = PrivateSpaceManager.VRViewPort.Size.Value;
-			StartVRElement.InputInterface.Target = PrivateSpaceManager.VRViewPort;
+			StartVRElement.Resolution.Value = _PrivateSpaceManager.VRViewPort.Size.Value;
+			StartVRElement.InputInterface.Target = _PrivateSpaceManager.VRViewPort;
 
 			VrElements.enabled.Value = false;
 			Engine.EngineLink.VRChange += EngineLink_VRChange;
@@ -179,8 +182,8 @@ namespace RhuEngine.Components
 			main.Vertical.Value = true;
 			main.Min.Value = Vector2f.Zero;
 			main.Max.Value = Vector2f.Zero;
-			main.MinOffset.Value = new Vector2f(97,8);
-			main.MaxOffset.Value = new Vector2f(343,443);
+			main.MinOffset.Value = new Vector2f(97, 8);
+			main.MaxOffset.Value = new Vector2f(343, 443);
 
 			_profileElement = main.Entity.AddChild("Profile").AttachComponent<UIElement>();
 			_profileElement.Entity.enabled.Value = false;
@@ -299,12 +302,26 @@ namespace RhuEngine.Components
 			audioButton.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
 
 		}
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public BoxContainer _taskbarElementHolder;
+
 		private void BuildCenterTaskBar(UIElement center) {
 			var backGorund = center.Entity.AddChild("Panel").AttachComponent<ColorRect>();
 			backGorund.MinOffset.Value = new Vector2f(0, 8);
 			backGorund.MaxOffset.Value = new Vector2f(0, -8);
 			backGorund.Color.Value = new Colorf(50, 50, 50, 150);
 
+			var scrollCont = center.Entity.AddChild("Scroll").AttachComponent<ScrollContainer>();
+			scrollCont.MinOffset.Value = new Vector2f(0, -44);
+			scrollCont.MaxOffset.Value = new Vector2f(0, 44);
+
+			_taskbarElementHolder = scrollCont.Entity.AddChild("Box").AttachComponent<BoxContainer>();
+			_taskbarElementHolder.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
+			_taskbarElementHolder.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
 		}
 		[NoSave]
 		[NoSync]

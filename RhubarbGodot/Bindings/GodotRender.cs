@@ -47,6 +47,20 @@ namespace RhubarbVR.Bindings
 		public EngineRunner EngineRunner { get; }
 		public float Fov { get => EngineRunner.Camera.Fov; set => EngineRunner.Camera.Fov = value; }
 
+		public bool PassthroughSupport => XRServer.PrimaryInterface?.IsPassthroughSupported() ?? false;
+
+		public bool PassthroughMode
+		{
+			get => XRServer.PrimaryInterface?.IsPassthroughEnabled() ?? false; set {
+				if (value) {
+					XRServer.PrimaryInterface?.StartPassthrough();
+				}
+				else {
+					XRServer.PrimaryInterface?.StopPassthrough();
+				}
+			}
+		}
+
 		public Matrix GetCameraRootMatrix() {
 			return EngineRunner.Rigin.GetPos();
 		}

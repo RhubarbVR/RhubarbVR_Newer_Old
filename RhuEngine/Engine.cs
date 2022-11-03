@@ -267,6 +267,14 @@ namespace RhuEngine
 			IntMsg = $"Engine started Can Render {EngineLink.CanRender} Can Audio {EngineLink.CanAudio} Can input {EngineLink.CanInput}";
 			RLog.Info(IntMsg);
 			if (EngineLink.CanRender) {
+				if (RRenderer.PassthroughSupport) {
+					RLog.Info("Passthrough Supported");
+				}
+				else {
+					RLog.Info("Passthrough not Supported");
+				}
+			}
+			if (EngineLink.CanRender) {
 				StartingText = new RText(staticResources.MainFont) {
 					Text = "Starting",
 					HorizontalAlignment = RHorizontalAlignment.Center,

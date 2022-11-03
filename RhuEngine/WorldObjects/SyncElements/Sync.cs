@@ -116,7 +116,21 @@ namespace RhuEngine.WorldObjects
 		public void SetValueForce(object value) {
 			lock (_locker) {
 				try {
-					_value = (T)value;
+					if (value?.GetType() == typeof(float) && typeof(T) == typeof(double)) {
+						value = (double)(float)value;
+					}
+					else if (value?.GetType() == typeof(int) && typeof(T) == typeof(uint)) {
+						value = (uint)(int)value;
+					}
+					else if (value?.GetType() == typeof(int) && typeof(T) == typeof(double)) {
+						value = (double)(int)value;
+					}
+					else if (value?.GetType() == typeof(double) && typeof(T) == typeof(float)) {
+						value = (float)(double)value;
+					}
+					else {
+						_value = (T)value;
+					}
 				}
 				catch { }
 			}

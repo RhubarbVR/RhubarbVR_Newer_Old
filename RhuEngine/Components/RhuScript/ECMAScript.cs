@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 	{
 	}
 
-
+	[Category(new string[] { "RhuScript" })]
 	public sealed class RawECMAScript : ECMAScript
 	{
 

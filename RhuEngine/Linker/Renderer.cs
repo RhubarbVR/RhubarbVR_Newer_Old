@@ -14,6 +14,9 @@ namespace RhuEngine.Linker
 
 		public float FarClip { get; set; }
 
+		public bool PassthroughSupport { get; }
+		public bool PassthroughMode { get; set; }
+
 		public bool GetEnableSky();
 		public void SetEnableSky(bool e);
 
@@ -50,6 +53,13 @@ namespace RhuEngine.Linker
 			get => Instance.FarClip;
 			set => Instance.FarClip = value;
 		}
+		public static bool PassthroughMode
+		{
+			get => Instance.PassthroughMode;
+			set => Instance.PassthroughMode = value;
+		}
+
+		public static bool PassthroughSupport => Instance.PassthroughSupport;
 
 		public static float Fov
 		{

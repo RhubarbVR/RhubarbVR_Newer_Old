@@ -50,6 +50,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 						if(CanvasItem == canvasItem?.CanvasItem) {
 							continue;
 						}
+						if(canvasItem.CanvasItem is null) {
+							continue;
+						}
 						canvasItem.CanvasItem?.GetParent()?.RemoveChild(node);
 						CanvasItem.AddChild(canvasItem.CanvasItem);
 						canvasItem.CanvasItem.Owner = CanvasItem;

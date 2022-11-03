@@ -27,6 +27,12 @@ namespace RhuEngine.Components
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
+		public UserProgramManager _ProgramManager;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
 		public Lazer Leftlazer;
 
 		[NoSave]
@@ -138,9 +144,10 @@ namespace RhuEngine.Components
 			VRViewPort.TransparentBG.Value = true;
 			VRViewPort.Size.Value = new Vector2i(1920, 1080);
 			VRViewPort.UpdateMode.Value = RUpdateMode.Always;
-			UserInterfaceManager.PrivateSpaceManager = this;
+			UserInterfaceManager._PrivateSpaceManager = this;
 			UserInterfaceManager.UserInterface = UserInterface;
 			UserInterfaceManager.LoadInterface();
+			_ProgramManager = Entity.AttachComponent<UserProgramManager>();
 		}
 
 		protected override void OnLoaded() {

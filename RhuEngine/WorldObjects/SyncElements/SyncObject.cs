@@ -17,8 +17,7 @@ namespace RhuEngine.WorldObjects
 {
 	public delegate NetPointer NetPointerUpdateDelegate();
 
-	public abstract class SyncObject : ISyncObject
-	{
+	public abstract class SyncObject : ISyncObject {
 		private readonly HashSet<IDisposable> _disposables = new();
 
 		public void AddDisposable(IDisposable disposable) {
@@ -32,7 +31,8 @@ namespace RhuEngine.WorldObjects
 				_disposables.Remove(disposable);
 			}
 		}
-
+		public UserProgramManager ProgramManager => WorldManager?.PrivateSpaceManager?._ProgramManager;
+		public PrivateSpaceManager PrivateSpaceManager => WorldManager?.PrivateSpaceManager;
 		public User LocalUser => World.GetLocalUser();
 		public User MasterUser => World.GetMasterUser();
 		public InputManager InputManager => Engine.inputManager;
@@ -59,7 +59,7 @@ namespace RhuEngine.WorldObjects
 
 		public Engine Engine => WorldManager.Engine;
 
-		public WorldManager WorldManager => World.worldManager;
+		public WorldManager WorldManager => World?.worldManager;
 
 		public World World
 		{
@@ -105,7 +105,7 @@ namespace RhuEngine.WorldObjects
 				}
 				item?.Dispose();
 			}
-			World.UnRegisterWorldObject(this);
+			World?.UnRegisterWorldObject(this);
 		}
 
 		protected virtual void FirstCreation() {
