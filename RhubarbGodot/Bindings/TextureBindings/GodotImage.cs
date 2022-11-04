@@ -28,9 +28,11 @@ namespace RhubarbVR.Bindings.TextureBindings
 		public Image Image { get; set; }
 
 		public RImage RImage { get; set; }
+
 		public void Dispose() {
 			Image.Free();
 		}
+
 		public void Init(RImage rTexture2D) {
 			RImage = rTexture2D;
 			Image ??= new Image();
