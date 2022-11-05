@@ -36,14 +36,6 @@ namespace RhuEngine.Components
 			if (_linkedTarget != null) {
 				_linkedTarget.Changed -= TargetChange;
 			}
-			var sourceChange = false;
-			var targetChange = false;
-			if (_linkedSource == Source.Target) {
-				sourceChange = true;
-			}
-			if (_linkedTarget == Target.Target) {
-				targetChange = true;
-			}
 			_linkedSource = Source.Target;
 			_linkedTarget = Target.Target;
 			if (_linkedSource is not null) {
@@ -52,12 +44,7 @@ namespace RhuEngine.Components
 			if (_linkedTarget is not null) {
 				_linkedTarget.Changed += TargetChange;
 			}
-			if (sourceChange) {
-				SourceChange(null);
-			}
-			if (targetChange) {
-				TargetChange(null);
-			}
+			SourceChange(null);
 		}
 	}
 }

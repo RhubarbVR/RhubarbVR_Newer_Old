@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(UpdateData))]
 		public readonly Sync<string> Title;
 
-		public readonly SyncRef<Viewport> ViewPort;
+		public readonly SyncRef<Viewport> Viewport;
 
 		[OnAssetLoaded(nameof(UpdateData))]
 		public readonly AssetRef<RTexture2D> IconTexture;
@@ -34,7 +34,7 @@ namespace RhuEngine.Components
 		public override event Action OnUpdatedData;
 		public override event Action OnUpdatePosAndScale;
 
-		public override RTexture2D Texture => ViewPort.Target?.Value;
+		public override RTexture2D Texture => Viewport.Target?.Value;
 
 		public override string WindowTitle => Title.Value;
 
@@ -44,6 +44,8 @@ namespace RhuEngine.Components
 		public override Vector2i SizePixels { get => Size.Value; set => Size.Value = value; }
 
 		public override bool CanClose => WindowCanClose.Value;
+
+		public override Viewport TargetViewport => Viewport.Target;
 
 		public void UpdateData() {
 			OnUpdatedData?.Invoke();
@@ -59,7 +61,7 @@ namespace RhuEngine.Components
 		protected override void OnAttach() {
 			base.OnAttach();
 			Size.Value = new Vector2i(512);
-			var viewPort = ViewPort.Target = Entity.AttachComponent<Viewport>();
+			var viewPort = Viewport.Target = Entity.AttachComponent<Viewport>();
 			ViewPortSizeLink.Target = viewPort.Size;
 		}
 

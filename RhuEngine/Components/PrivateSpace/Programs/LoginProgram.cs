@@ -20,6 +20,7 @@ namespace RhuEngine.Components
 
 		public override void StartProgram(object[] args = null, Stream file = null, string mimetype = null, string ex = null) {
 			AddWindow(null, null, false, false);
+			RebuildUI();
 		}
 
 		public void RebuildUI() {

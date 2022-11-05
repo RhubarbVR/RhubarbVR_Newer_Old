@@ -127,10 +127,14 @@ namespace RhuEngine.Components
 			UImaterial.MainTexture.Target = _PrivateSpaceManager.VRViewPort;
 			VrElements = Entity.AddChild("VrElements");
 			var taskBarVRElement = VrElements.AddChild("TaskBarVR").AttachMesh<CanvasMesh>(UImaterial);
-			taskBarVRElement.Resolution.Value = _PrivateSpaceManager.VRViewPort.Size.Value;
+			var e = VrElements.AttachComponent<ValueCopy<Vector2i>>();
+			e.Target.Target = taskBarVRElement.Resolution;
+			e.Source.Target = _PrivateSpaceManager.VRViewPort.Size;
 			taskBarVRElement.Max.Value = new Vector2f(1, 0);
 			taskBarVRElement.MaxOffset.Value = new Vector2i(0, 100);
 			taskBarVRElement.InputInterface.Target = _PrivateSpaceManager.VRViewPort;
+			
+
 
 			StartVRElement = VrElements.AddChild("StartVR").AttachMesh<CanvasMesh>(UImaterial);
 			StartVRElement.TopOffset.Value = false;
@@ -141,7 +145,9 @@ namespace RhuEngine.Components
 			StartVRElement.MaxOffset.Value = new Vector2i(350, 544);
 			StartVRElement.MinOffset.Value = new Vector2i(0, 100);
 
-			StartVRElement.Resolution.Value = _PrivateSpaceManager.VRViewPort.Size.Value;
+			var ee = VrElements.AttachComponent<ValueCopy<Vector2i>>();
+			ee.Target.Target = StartVRElement.Resolution;
+			ee.Source.Target = _PrivateSpaceManager.VRViewPort.Size;
 			StartVRElement.InputInterface.Target = _PrivateSpaceManager.VRViewPort;
 
 			VrElements.enabled.Value = false;

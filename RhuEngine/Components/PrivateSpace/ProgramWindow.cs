@@ -12,6 +12,8 @@ namespace RhuEngine.Components
 {
 	public abstract class ProgramWindow : Component
 	{
+		public abstract Viewport TargetViewport { get; }
+
 		public abstract RTexture2D Texture { get; }
 
 		public abstract string WindowTitle { get; }

@@ -28,7 +28,12 @@ namespace RhubarbVR.Bindings
 		public IWindow CreateNewWindow() {
 			var newWindow = new GodotWindow();
 			EngineRunner._.RunOnMainThread(() => {
-				var newWin = new Window();
+				var newWin = new Window {
+					TransparentBg = true
+				};
+				var con = new ConnectedViewport();
+				newWin.AddChild(con);
+				con.SetAnchorsPreset(Control.LayoutPreset.FullRect);
 				EngineRunner._.AddChild(newWin);
 				newWindow.LoadInValue(newWin);
 			});
@@ -71,9 +76,11 @@ namespace RhubarbVR.Bindings
 		public bool Unfocusable { get => window.Unfocusable; set => window.Unfocusable = value; }
 		public bool PopupWindow { get => window.PopupWindow; set => window.PopupWindow = value; }
 		public bool ExtendToTitle { get => window.ExtendToTitle; set => window.ExtendToTitle = value; }
-
+		public RhuEngine.Components.Viewport Viewport { get => window.GetChild<ConnectedViewport>(0).Viewport; set => window.GetChild<ConnectedViewport>(0).Viewport = value; }
 
 		public event Action<IWindow> OnLoadedIn;
+
+		public event Action SizeChanged { add => window.SizeChanged += value; remove => window.SizeChanged -= value; }
 		public event Action<string[]> FilesDropped { add => window.FilesDropped += new(value); remove => window.FilesDropped -= new(value); }
 		public event Action MouseEntered { add => window.MouseEntered += new(value); remove => window.MouseEntered -= new(value); }
 		public event Action MouseExited { add => window.MouseExited += new(value); remove => window.MouseExited -= new(value); }

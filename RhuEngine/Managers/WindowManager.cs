@@ -95,6 +95,7 @@ namespace RhuEngine.Managers
 		public Vector2i MinSize { get; set; }
 		public Vector2i MaxSize { get; set; }
 
+		public Viewport Viewport { get; set; }
 		public bool CanDraw();
 		public bool HasFocus();
 		public void GrabFocus();
@@ -110,6 +111,8 @@ namespace RhuEngine.Managers
 		public event Action VisibilityChanged;
 		public event Action AboutToPopup;
 		public event Action TitlebarChanged;
+		public event Action SizeChanged;
+
 	}
 
 	public interface IWindowManagerLink

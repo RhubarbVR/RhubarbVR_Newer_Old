@@ -144,6 +144,18 @@ namespace RhuEngine.Components
 			VRViewPort.TransparentBG.Value = true;
 			VRViewPort.Size.Value = new Vector2i(1920, 1080);
 			VRViewPort.UpdateMode.Value = RUpdateMode.Always;
+
+			// It is here in our hearts
+
+			//var e = Engine.windowManager.CreateNewWindow(1920, 1080);
+			//e.WaitOnLoadedIn((win) => {
+			//	win.Transparent = true;
+			//	win.SizeChanged += () => {
+			//		VRViewPort.Size.Value = win.Size;
+			//	};
+			//	win.Viewport = VRViewPort;
+			//});
+
 			UserInterfaceManager._PrivateSpaceManager = this;
 			UserInterfaceManager.UserInterface = UserInterface;
 			UserInterfaceManager.LoadInterface();
