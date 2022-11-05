@@ -47,6 +47,14 @@ namespace RhuEngine.Components
 		Mirror
 	}
 
+	public interface ICanvasItemLinked
+	{
+		public event Action VisibilityChanged;
+		public event Action Hidden;
+		public event Action ItemRectChanged;
+	}
+
+
 	[SingleComponentLock]
 	public abstract class CanvasItem : LinkedWorldComponent
 	{
@@ -77,6 +85,48 @@ namespace RhuEngine.Components
 
 		public readonly Sync<bool> UseParentMaterial;
 		public readonly AssetRef<RMaterial> Material;
+
+		public event Action VisibilityChanged
+		{
+			add {
+				if (WorldLink is ICanvasItemLinked val) {
+					val.VisibilityChanged += value;
+				}
+			}
+			remove {
+				if (WorldLink is ICanvasItemLinked val) {
+					val.VisibilityChanged -= value;
+				}
+			}
+		}
+
+		public event Action Hidden
+		{
+			add {
+				if (WorldLink is ICanvasItemLinked val) {
+					val.Hidden += value;
+				}
+			}
+			remove {
+				if (WorldLink is ICanvasItemLinked val) {
+					val.Hidden -= value;
+				}
+			}
+		}
+
+		public event Action ItemRectChanged
+		{
+			add {
+				if (WorldLink is ICanvasItemLinked val) {
+					val.ItemRectChanged += value;
+				}
+			}
+			remove {
+				if (WorldLink is ICanvasItemLinked val) {
+					val.ItemRectChanged -= value;
+				}
+			}
+		}
 
 		protected override void OnAttach() {
 			base.OnAttach();

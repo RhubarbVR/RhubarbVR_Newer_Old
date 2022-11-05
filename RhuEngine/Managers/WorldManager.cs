@@ -217,7 +217,6 @@ namespace RhuEngine.Managers
 					RLog.Err("Failed loading Local World From Flie");
 				}
 			}
-
 			if (!loaddedData) {
 				RLog.Info("Building Local World");
 				Engine.IntMsg = "Making Local World";

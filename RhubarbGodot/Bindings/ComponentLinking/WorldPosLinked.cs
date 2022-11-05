@@ -19,9 +19,14 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		void Children_OnReorderList();
 	}
 
-	public abstract class CanvasItemNodeLinked<T, T2> : EngineWorldLinkBase<T>, ICanvasItemNodeLinked where T : RhuEngine.Components.CanvasItem, new() where T2 : CanvasItem, new()
+	public abstract class CanvasItemNodeLinked<T, T2> : EngineWorldLinkBase<T>, RhuEngine.Components.ICanvasItemLinked, ICanvasItemNodeLinked where T : RhuEngine.Components.CanvasItem, new() where T2 : CanvasItem, new()
 	{
 		public T2 node;
+
+		public event Action VisibilityChanged { add => node.VisibilityChanged += value; remove => node.VisibilityChanged -= value; }
+		public event Action Hidden { add => node.Hidden += value; remove => node.Hidden -= value; }
+		public event Action ItemRectChanged { add => node.ItemRectChanged += value; remove => node.ItemRectChanged -= value; }
+
 		public abstract string ObjectName { get; }
 
 		public CanvasItem CanvasItem => node;
@@ -47,10 +52,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 						node.MoveChild(canvasItem.CanvasItem, -1);
 					}
 					else {
-						if(CanvasItem == canvasItem?.CanvasItem) {
+						if (CanvasItem == canvasItem?.CanvasItem) {
 							continue;
 						}
-						if(canvasItem.CanvasItem is null) {
+						if (canvasItem.CanvasItem is null) {
 							continue;
 						}
 						canvasItem.CanvasItem?.GetParent()?.RemoveChild(node);

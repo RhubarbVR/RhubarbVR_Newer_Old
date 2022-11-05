@@ -14,9 +14,102 @@ using RhubarbVR.Bindings.FontBindings;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
-	public abstract class UIElementLinkBase<T, T2> : CanvasItemNodeLinked<T, T2> where T : UIElement, new() where T2 : Control, new()
+	public abstract class UIElementLinkBase<T, T2> : CanvasItemNodeLinked<T, T2>, IUIElementLinked where T : UIElement, new() where T2 : Control, new()
 	{
 		protected virtual bool FreeKeyboard => false;
+
+		public event Action FocusEntered
+		{
+			add {
+				if (LinkedComp is IUIElementLinked val) {
+					val.FocusEntered += value;
+				}
+			}
+			remove {
+				if (LinkedComp is IUIElementLinked val) {
+					val.FocusEntered -= value;
+				}
+			}
+		}
+		public event Action FocusExited
+		{
+			add {
+				if (LinkedComp is IUIElementLinked val) {
+					val.FocusExited += value;
+				}
+			}
+			remove {
+				if (LinkedComp is IUIElementLinked val) {
+					val.FocusExited -= value;
+				}
+			}
+		}
+		public event Action Resized
+		{
+			add {
+				if (LinkedComp is IUIElementLinked val) {
+					val.Resized += value;
+				}
+			}
+			remove {
+				if (LinkedComp is IUIElementLinked val) {
+					val.Resized -= value;
+				}
+			}
+		}
+		public event Action SizeFlagsChanged
+		{
+			add {
+				if (LinkedComp is IUIElementLinked val) {
+					val.SizeFlagsChanged += value;
+				}
+			}
+			remove {
+				if (LinkedComp is IUIElementLinked val) {
+					val.SizeFlagsChanged -= value;
+				}
+			}
+		}
+		public event Action MinimumSizeChanged
+		{
+			add {
+				if (LinkedComp is IUIElementLinked val) {
+					val.MinimumSizeChanged += value;
+				}
+			}
+			remove {
+				if (LinkedComp is IUIElementLinked val) {
+					val.MinimumSizeChanged -= value;
+				}
+			}
+		}
+		public event Action InputEntered
+		{
+			add {
+				if (LinkedComp is IUIElementLinked val) {
+					val.InputEntered += value;
+				}
+			}
+			remove {
+				if (LinkedComp is IUIElementLinked val) {
+					val.InputEntered -= value;
+				}
+			}
+		}
+		public event Action InputExited
+		{
+			add {
+				if (LinkedComp is IUIElementLinked val) {
+					val.InputExited += value;
+				}
+			}
+			remove {
+				if (LinkedComp is IUIElementLinked val) {
+					val.InputExited -= value;
+				}
+			}
+		}
+
 		public override void Init() {
 			base.Init();
 			LinkedComp.ClipContents.Changed += ClipContents_Changed;
@@ -146,7 +239,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Rotation_Changed(IChangeable obj) {
-			node.Rotation = LinkedComp.Rotation.Value * RNumerics.MathUtil.DEG_2_RADF;	
+			node.Rotation = LinkedComp.Rotation.Value * RNumerics.MathUtil.DEG_2_RADF;
 		}
 
 		private void GrowVertical_Changed(IChangeable obj) {

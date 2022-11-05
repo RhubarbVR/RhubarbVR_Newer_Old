@@ -156,6 +156,17 @@ namespace RhuEngine.Components
 		public string EditString { get; }
 	}
 
+	public interface IUIElementLinked
+	{
+		public event Action FocusEntered;
+		public event Action FocusExited;
+		public event Action Resized;
+		public event Action SizeFlagsChanged;
+		public event Action MinimumSizeChanged;
+		public event Action InputEntered;
+		public event Action InputExited;
+	}
+
 	[Category("UI")]
 	public class UIElement : CanvasItem, IKeyboardInteraction
 	{
@@ -172,6 +183,98 @@ namespace RhuEngine.Components
 
 		public void KeyboardUnBind() {
 			KeyboardUnBindAction?.Invoke();
+		}
+
+		public event Action FocusEntered
+		{
+			add {
+				if (WorldLink is IUIElementLinked val) {
+					val.FocusEntered += value;
+				}
+			}
+			remove {
+				if (WorldLink is IUIElementLinked val) {
+					val.FocusEntered -= value;
+				}
+			}
+		}
+		public event Action FocusExited
+		{
+			add {
+				if (WorldLink is IUIElementLinked val) {
+					val.FocusExited += value;
+				}
+			}
+			remove {
+				if (WorldLink is IUIElementLinked val) {
+					val.FocusExited -= value;
+				}
+			}
+		}
+		public event Action Resized
+		{
+			add {
+				if (WorldLink is IUIElementLinked val) {
+					val.Resized += value;
+				}
+			}
+			remove {
+				if (WorldLink is IUIElementLinked val) {
+					val.Resized -= value;
+				}
+			}
+		}
+		public event Action SizeFlagsChanged
+		{
+			add {
+				if (WorldLink is IUIElementLinked val) {
+					val.SizeFlagsChanged += value;
+				}
+			}
+			remove {
+				if (WorldLink is IUIElementLinked val) {
+					val.SizeFlagsChanged -= value;
+				}
+			}
+		}
+		public event Action MinimumSizeChanged
+		{
+			add {
+				if (WorldLink is IUIElementLinked val) {
+					val.MinimumSizeChanged += value;
+				}
+			}
+			remove {
+				if (WorldLink is IUIElementLinked val) {
+					val.MinimumSizeChanged -= value;
+				}
+			}
+		}
+		public event Action InputEntered
+		{
+			add {
+				if (WorldLink is IUIElementLinked val) {
+					val.InputEntered += value;
+				}
+			}
+			remove {
+				if (WorldLink is IUIElementLinked val) {
+					val.InputEntered -= value;
+				}
+			}
+		}
+		public event Action InputExited
+		{
+			add {
+				if (WorldLink is IUIElementLinked val) {
+					val.InputExited += value;
+				}
+			}
+			remove {
+				if (WorldLink is IUIElementLinked val) {
+					val.InputExited -= value;
+				}
+			}
 		}
 
 
