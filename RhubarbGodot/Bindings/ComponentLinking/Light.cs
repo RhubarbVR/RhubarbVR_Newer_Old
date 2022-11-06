@@ -10,7 +10,7 @@ using RhuEngine.Components;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
-	public class GodotLight : WorldPositionLinked<Light, Node3D>
+	public sealed class GodotLight : WorldPositionLinked<Light, Node3D>
 	{
 		public override string ObjectName => "Light";
 

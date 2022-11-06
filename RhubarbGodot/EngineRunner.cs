@@ -16,6 +16,9 @@ public partial class EngineRunner : Node3D, IRTime
 {
 
 	[Export]
+	public SubViewport ThowAway;
+
+	[Export]
 	public XRCamera3D Camera;
 
 	[Export]
@@ -27,10 +30,13 @@ public partial class EngineRunner : Node3D, IRTime
 	[Export]
 	public bool StartInVR = false;
 
+	[Export]
+	public bool StartDebugVisuals = false;
+
 	public Engine engine;
 
 	[ThreadStatic]
-	public bool IsMainThread = false;
+	public static bool IsMainThread = false;
 
 	public static EngineRunner _;
 
@@ -38,15 +44,21 @@ public partial class EngineRunner : Node3D, IRTime
 
 	public GodotEngineLink link;
 
-	public Node3D MeshHolder;
+	private readonly List<Action> _runOnMainThread = new();
+
+	public void RunOnMainThread(Action action) {
+		if (IsMainThread) {
+			action?.Invoke();
+		}
+		else {
+			lock (_runOnMainThread) {
+				_runOnMainThread.Add(action);
+			}
+		}
+	}
 
 	public override void _Ready() {
-		if (MeshHolder is null) {
-			MeshHolder = new Node3D {
-				Name = "Mesh Holder"
-			};
-			AddChild(MeshHolder);
-		}
+		SetProcessInternal(true);
 		if (RLog.Instance == null) {
 			RLog.Instance = new GodotLogs();
 		}
@@ -71,6 +83,9 @@ public partial class EngineRunner : Node3D, IRTime
 		if (!StartInVR) {
 			args.Add("--no-vr");
 		}
+		if (StartDebugVisuals) {
+			args.Add("--debug-visuals");
+		}
 		var appPath = Environment.CurrentDirectory + "/";
 		RLog.Info("App Path: " + appPath);
 		engine = new Engine(link, args.ToArray(), outputCapture, appPath);
@@ -78,19 +93,34 @@ public partial class EngineRunner : Node3D, IRTime
 		engine.Init();
 	}
 
+	public string Typer;
+
+	public Vector2f MouseScrollDelta;
+	public Vector2f MouseScrollPos;
+	public Vector2f LastMouseScrollPos;
+
+	public override void _Notification(long what) {
+		if (what == Node.NotificationInternalProcess) {
+			MouseScrollDelta = MouseScrollPos - LastMouseScrollPos;
+			LastMouseScrollPos = MouseScrollPos;
+			engine?.Step();
+			TypeDelta = "";
+			MouseDelta = Vector2f.Zero;
+		}
+	}
+
 	public override void _Process(double delta) {
-		lock (_meshInstance3Ds) {
-			foreach (var item in _meshInstance3Ds) {
-				item.Visible = false;
+		lock (_runOnMainThread) {
+			foreach (var item in _runOnMainThread) {
+				item?.Invoke();
 			}
+			_runOnMainThread.Clear();
 		}
-		engine?.Step();
-		TypeDelta = "";
-		MouseDelta = Vector2f.Zero;
-		ScrollDelta = Vector2f.Zero;
-		if (!Input.IsKeyPressed(Godot.Key.Backspace)) {
-			BackSpaceTimer = 0;
+		//Dont Like this but it works
+		if (!link.InVR) {
+			Camera.SetPos(RRenderer.LocalCam);
 		}
+		//Dont Like this but it works
 	}
 
 	public override void _ExitTree() {
@@ -103,7 +133,6 @@ public partial class EngineRunner : Node3D, IRTime
 
 	public float Elapsedf => (float)GetProcessDeltaTime();
 
-	public Vector2f ScrollDelta { get; internal set; }
 	public Vector2f MouseDelta { get; internal set; }
 	public Vector2f MousePos { get; internal set; }
 
@@ -127,45 +156,39 @@ public partial class EngineRunner : Node3D, IRTime
 		}
 	}
 
-	readonly List<MeshInstance3D> _meshInstance3Ds = new();
-
-	internal void RemoveMeshInst(MeshInstance3D tempMeshDraw) {
-		lock (_meshInstance3Ds) {
-			_meshInstance3Ds.Remove(tempMeshDraw);
-		}
-	}
-
-	internal void AddMeshInst(MeshInstance3D tempMeshDraw) {
-		lock (_meshInstance3Ds) {
-			_meshInstance3Ds.Add(tempMeshDraw);
-			MeshHolder.AddChild(tempMeshDraw);
-		}
-	}
-
 	public string TypeDelta = "";
-
-	public uint BackSpaceTimer;
 
 	public override void _Input(InputEvent @event) {
 		if (@event is InputEventMouseMotion mouseMotion) {
 			MousePos = new Vector2f(mouseMotion.Position.x, mouseMotion.Position.y);
 			MouseDelta = new Vector2f(mouseMotion.Relative.x, mouseMotion.Relative.y);
 		}
+		if(@event is InputEventMouseButton button) {
+			if(button.ButtonIndex == MouseButton.WheelUp) {
+				MouseScrollPos += new Vector2f(0,1);
+			}
+			if (button.ButtonIndex == MouseButton.WheelDown) {
+				MouseScrollPos += new Vector2f(0, -1);
+			}
+			if (button.ButtonIndex == MouseButton.WheelRight) {
+				MouseScrollPos += new Vector2f(1, 0);
+			}
+			if (button.ButtonIndex == MouseButton.WheelLeft) {
+				MouseScrollPos += new Vector2f(-1, 0);
+			}
+		}
 		if (@event is InputEventKey key) {
 			var newString = System.Text.Encoding.UTF8.GetString(BitConverter.GetBytes(key.Unicode));
 			var clearFrom = newString.IndexOf('\0', 0);
 			if(key.Keycode == Godot.Key.Backspace) {
-				if (BackSpaceTimer is > 10 or 0) {
+				if (key.Pressed) {
 					TypeDelta += "\b";
 				}
-				BackSpaceTimer++;
 			}
 			else {
 				TypeDelta += newString.Remove(clearFrom);
 			}
 		}
-		var weely = Input.GetActionRawStrength("MouseWeelUp") - Input.GetActionRawStrength("MouseWeelDown");
-		var weelx = Input.GetActionRawStrength("MouseWeelRight") - Input.GetActionRawStrength("MouseWeelLeft");
-		ScrollDelta = new Vector2f(weelx, weely);
+
 	}
 }

@@ -6,12 +6,14 @@ using System.Reflection;
 
 namespace RhuEngine.WorldObjects.ECS
 {
-	public class NotLinkedRenderingComponentAttribute : Attribute {
+	public class NotLinkedRenderingComponentAttribute : Attribute
+	{
 
 	}
 
 	public abstract class LinkedWorldComponent : Component
 	{
+		protected virtual bool AddToUpdateList => true;
 		public IWorldLink WorldLink { get; set; }
 
 		public static Dictionary<Type, Type> loadedCasts = new();
@@ -41,40 +43,53 @@ namespace RhuEngine.WorldObjects.ECS
 				WorldLink = (IWorldLink)Activator.CreateInstance(linker);
 				WorldLink.LinkCompGen = this;
 				WorldLink.Init();
+				World_FoucusChanged();
 			});
 		}
 		protected override void OnLoaded() {
 			base.OnLoaded();
 			BuildRenderLink();
 			World.FoucusChanged += World_FoucusChanged;
+			Enabled.Changed += Enabled_Changed;
+		}
+
+		private void Enabled_Changed(IChangeable obj) {
+			World_FoucusChanged();
 		}
 
 		private void World_FoucusChanged() {
-			if(World.Focus == World.FocusLevel.Background) {
-				WorldLink?.Stopped();
-			}
-			else {
-				WorldLink?.Started();
-			}
-		}
-
-		protected override void AddListObject() {
-			World.RegisterWorldLinkObject(this);
 			if (World.Focus == World.FocusLevel.Background) {
 				WorldLink?.Stopped();
 			}
 			else {
-				WorldLink?.Started();
+				if (Entity.IsEnabled && Enabled.Value) {
+					WorldLink?.Started();
+				}
+				else {
+					WorldLink?.Stopped();
+				}
 			}
 		}
+
+		protected override void AddListObject() {
+			if (AddToUpdateList) {
+				World.RegisterWorldLinkObject(this);
+			}
+			World_FoucusChanged();
+		}
 		protected override void RemoveListObject() {
-			World.UnregisterWorldLinkObject(this);
+			if (AddToUpdateList) {
+				World.UnregisterWorldLinkObject(this);
+			}
 			WorldLink?.Stopped();
 		}
 
 		public override void Dispose() {
 			World.FoucusChanged -= World_FoucusChanged;
-			World.UnregisterWorldLinkObject(this);
+			if (AddToUpdateList) {
+				World.UnregisterWorldLinkObject(this);
+			}
+			WorldLink?.Remove();
 			base.Dispose();
 		}
 

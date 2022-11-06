@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Godot;
+
 using RhuEngine.Linker;
 
 using RNumerics;
@@ -20,19 +21,21 @@ namespace RhubarbVR.Bindings
 			var rot = node3D.Transform.basis.GetRotationQuaternion();
 			return Matrix.TRS(new Vector3f(pos.x, pos.y, pos.z), new Quaternionf(rot.x, rot.y, rot.z, rot.w), new Vector3f(scale.x, scale.y, scale.z));
 		}
-		public static void SetPos(this Node3D node3D,Matrix matrix) {
+		public static void SetPos(this Node3D node3D, Matrix matrix) {
 			matrix.Decompose(out var pos, out var rot, out var scale);
-			if (pos.IsAnyNan || rot.IsAnyNan || scale.IsAnyNan){
+			if (pos.IsAnyNan || rot.IsAnyNan || scale.IsAnyNan) {
 				node3D.Transform = new Transform3D();
 				return;
 			}
 			var trans = node3D.Transform;
-			trans.basis = new Basis(new Quaternion(rot.x, rot.y, rot.z, rot.w)).Scaled(new Vector3(scale.x, scale.y, scale.z));
-			trans.origin = new Vector3(pos.x,pos.y,pos.z);
+			trans.basis = new Basis(new Quaternion(rot.x, rot.y, rot.z, rot.w)) {
+				Scale = new Vector3(scale.x, scale.y, scale.z)
+			};
+			trans.origin = new Vector3(pos.x, pos.y, pos.z);
 			node3D.Transform = trans;
 		}
 	}
-	public class GodotRender : IRRenderer
+	public sealed class GodotRender : IRRenderer
 	{
 
 		public GodotRender(EngineRunner engineRunner) {
@@ -42,6 +45,21 @@ namespace RhubarbVR.Bindings
 		public float MinClip { get => EngineRunner.Camera.Near; set => EngineRunner.Camera.Near = value; }
 		public float FarClip { get => EngineRunner.Camera.Far; set => EngineRunner.Camera.Far = value; }
 		public EngineRunner EngineRunner { get; }
+		public float Fov { get => EngineRunner.Camera.Fov; set => EngineRunner.Camera.Fov = value; }
+
+		public bool PassthroughSupport => XRServer.PrimaryInterface?.IsPassthroughSupported() ?? false;
+
+		public bool PassthroughMode
+		{
+			get => XRServer.PrimaryInterface?.IsPassthroughEnabled() ?? false; set {
+				if (value) {
+					XRServer.PrimaryInterface?.StartPassthrough();
+				}
+				else {
+					XRServer.PrimaryInterface?.StopPassthrough();
+				}
+			}
+		}
 
 		public Matrix GetCameraRootMatrix() {
 			return EngineRunner.Rigin.GetPos();
@@ -56,6 +74,14 @@ namespace RhubarbVR.Bindings
 
 		public void SetEnableSky(bool e) {
 
+		}
+
+		public Matrix GetCameraLocalMatrix() {
+			return EngineRunner.Camera.GetPos();
+		}
+
+		public void SetCameraLocalMatrix(Matrix m) {
+			EngineRunner.Camera.SetPos(m);
 		}
 	}
 }

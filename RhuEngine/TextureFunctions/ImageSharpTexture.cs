@@ -28,7 +28,9 @@ namespace RhuEngine
 			Image = image;
 			Srgb = srgb;
 		}
-		public RTexture2D Texture2D { get; private set; }
+		public RImageTexture2D Texture2D { get; private set; }
+		public RImage RImage { get; private set; }
+
 		public unsafe RTexture2D CreateTexture() {
 			var colors = new Colorb[Height * Width];
 			var hanndel = GCHandle.Alloc(colors, GCHandleType.Pinned);
@@ -40,7 +42,10 @@ namespace RhuEngine
 				((Rgba32*)pin)[i] = color;
 			});
 			hanndel.Free();
-			Texture2D = RTexture2D.FromColors(colors, Width, Height, Srgb);
+			RImage = new RImage(null);
+			RImage.Create(Width, Height, true, RFormat.Rgba8);
+			RImage.SetColors(Width, Height, colors);
+			Texture2D = new RImageTexture2D(RImage);
 			return Texture2D;
 		}
 		public unsafe RTexture2D UpdateTexture() {
@@ -57,7 +62,8 @@ namespace RhuEngine
 				((Rgba32*)pin)[i] = color;
 			});
 			hanndel.Free();
-			Texture2D.SetColors(Width, Height, colors);
+			RImage.SetColors(Width, Height, colors);
+			Texture2D.UpdateImage(RImage);
 			return Texture2D;
 		}
 
@@ -69,6 +75,7 @@ namespace RhuEngine
 		public RTexture2D CreateTextureAndDisposes() {
 			var newtex = CreateTexture();
 			Dispose();
+			RImage.Dispose();
 			return newtex;
 		}
 		public void Dispose() {

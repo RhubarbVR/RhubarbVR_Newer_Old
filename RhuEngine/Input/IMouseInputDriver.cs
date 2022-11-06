@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-
+using RhuEngine.Components;
 using RhuEngine.Linker;
 
 using RNumerics;
@@ -24,5 +24,6 @@ namespace RhuEngine.Input
 
 		public void HideMouse();
 		public void UnHideMouse();
+		void SetCurrsor(RCursorShape currsor, RTexture2D rTexture2D);
 	}
 }

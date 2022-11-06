@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 using Godot;
 
+using RhubarbVR.Bindings.TextureBindings;
+
+using RhuEngine.Components;
 using RhuEngine.Input;
 using RhuEngine.Linker;
 
@@ -22,7 +25,7 @@ namespace RhubarbVR.Bindings.Input
 
 		public Vector2f MouseDelta => EngineRunner._.MouseDelta;
 
-		public Vector2f ScrollDelta => EngineRunner._.ScrollDelta;
+		public Vector2f ScrollDelta => EngineRunner._.MouseScrollDelta;
 
 		public bool GetIsDown(MouseKeys key) {
 			return key switch {
@@ -40,22 +43,9 @@ namespace RhubarbVR.Bindings.Input
 		public static bool CenterMous = false;
 
 		private void UpdateMouseMode() {
-			if (HideMous) {
-				if (CenterMous) {
-					Input.MouseMode = Input.MouseModeEnum.Captured;
-				}
-				else {
-					Input.MouseMode = Input.MouseModeEnum.Hidden;
-				}
-			}
-			else {
-				if (CenterMous) {
-					Input.MouseMode = Input.MouseModeEnum.Confined;
-				}
-				else {
-					Input.MouseMode = Input.MouseModeEnum.Visible;
-				}
-			}
+			Input.MouseMode = HideMous
+				? CenterMous ? Input.MouseModeEnum.Captured : Input.MouseModeEnum.Hidden
+				: CenterMous ? Input.MouseModeEnum.Confined : Input.MouseModeEnum.Visible;
 		}
 
 		public void HideMouse() {
@@ -76,6 +66,17 @@ namespace RhubarbVR.Bindings.Input
 		public void UnLockMouse() {
 			CenterMous = false;
 			UpdateMouseMode();
+		}
+
+		public void SetCurrsor(RCursorShape currsor, RTexture2D rTexture2D) {
+			if (rTexture2D is null) {
+				Input.SetDefaultCursorShape((Input.CursorShape)currsor);
+			}
+			else {
+				if (rTexture2D.Inst is GodotTexture2D godotTexture) {
+					Input.SetCustomMouseCursor(godotTexture.Texture, (Input.CursorShape)currsor);
+				}
+			}
 		}
 	}
 }

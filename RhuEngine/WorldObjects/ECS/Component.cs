@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+
 namespace RhuEngine.WorldObjects.ECS
 {
 	public interface IComponent : ISyncObject
@@ -22,6 +25,19 @@ namespace RhuEngine.WorldObjects.ECS
 		protected override void OnInitialize() {
 			base.OnInitialize();
 			Entity = (Entity)Parent.Parent;
+			var allowedOnWorldRoot = GetType().GetCustomAttribute<AllowedOnWorldRootAttribute>(true);
+			if(allowedOnWorldRoot is null && Entity.IsRoot) {
+				Destroy();
+				throw new Exception("Not Allowed on WorldRoot");
+			}
+			var locke = GetType().GetHighestAttributeInherit<SingleComponentLockAttribute>();
+			if(locke is not null) {
+				if(Entity.components.Where(x => x.GetType() == locke).Count() >= 2) {
+					Destroy();
+					throw new Exception("Single Component Locked");
+				}
+			}
+
 			if (Entity.IsEnabled) {
 				AddListObject();
 			}

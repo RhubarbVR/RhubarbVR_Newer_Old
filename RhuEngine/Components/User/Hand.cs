@@ -3,6 +3,7 @@ using RhuEngine.WorldObjects.ECS;
 
 using RhuEngine.Linker;
 using RNumerics;
+using RhuEngine.Input.XRInput;
 
 namespace RhuEngine.Components
 {
@@ -34,8 +35,11 @@ namespace RhuEngine.Components
 				return;
 			}
 			if (user.Target == World.GetLocalUser()) {
-				//Todo: Hand Poses
-				//Entity.LocalTrans = RInput.Hand(hand.Value).Wrist * RRenderer.CameraRoot.Inverse;
+				var pos = InputManager.XRInputSystem.GetHand(hand.Value)?[TrackerPos.Default];
+				if (pos is not null && pos.HasPos) {
+					Entity.position.Value = pos.Position;
+					Entity.rotation.Value = pos.Rotation;
+				}
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Vector3f>>($"HandPos{hand.Value}").Value = Entity.position.Value;
 				user.Target.FindOrCreateSyncStream<SyncValueStream<Quaternionf>>($"HandRot{hand.Value}").Value = Entity.rotation.Value;
 			}

@@ -5,6 +5,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using System.Collections.Generic;
 using RhuEngine.Physics;
+using System;
 
 namespace RhuEngine.Components
 {
@@ -25,39 +26,11 @@ namespace RhuEngine.Components
 
 		public readonly List<Grabbable> GrabbedObjects = new();
 
-		[OnChanged(nameof(PhysicsObjectChanged))]
-		public readonly SyncRef<PhysicsObject> OverlapingPhysicsObject;
-
-		[NoLoad]
-		[NoSave]
-		[NoSync]
-		private PhysicsObject _physicsObject;
-
-		protected override void OnLoaded() {
-			base.OnLoaded();
-			PhysicsObjectChanged();
-		}
-
-		private void PhysicsObjectChanged() {
-			if (_physicsObject == OverlapingPhysicsObject.Target) {
-				return;
-			}
-			if (_physicsObject is not null) {
-				_physicsObject.rigidBody.Overlap -= RigidBody_Overlap; 
-				_physicsObject.AddedData -= PhysicsObject_AddedData;
-			}
-			_physicsObject = OverlapingPhysicsObject.Target;
-			if (_physicsObject is null) {
-				return;
-			}
-			_physicsObject.AddedData += PhysicsObject_AddedData;
-			PhysicsObject_AddedData(_physicsObject.rigidBody);
-		}
-
 		private readonly List<RigidBodyCollider> _overLappingObjects = new();
 
 		private void RigidBody_Overlap(Vector3f PositionWorldOnA, Vector3f PositionWorldOnB, Vector3f NormalWorldOnB, double Distance, double Distance1, RigidBodyCollider hit) {
 			_overLappingObjects.Add(hit);
+
 		}
 
 		private void PhysicsObject_AddedData(RigidBodyCollider obj) {
@@ -77,7 +50,20 @@ namespace RhuEngine.Components
 				item.DestroyGrabbedObject();
 			}
 		}
-
+		public bool IsAnyLaserGrabbed
+		{
+			get {
+				if (GrabbedObjects.Count <= 0) {
+					return false;
+				}
+				foreach (var item in GrabbedObjects) {
+					if (item.LaserGrabbed) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}
 		public bool CanDestroyAnyGabbed
 		{
 			get {
@@ -107,10 +93,11 @@ namespace RhuEngine.Components
 		public void InitializeGrabHolder(Handed _source) {
 			user.Target = LocalUser;
 			source.Value = _source;
-			if(_source != Handed.Max) {
+			if (_source != Handed.Max) {
 				var shape = Entity.AttachComponent<SphereShape>();
-				shape.Radus.Value = 0.03f / 2;
-				OverlapingPhysicsObject.Target = shape;
+				shape.Radus.Value = 0.05f / 2;
+				shape.AddedData += PhysicsObject_AddedData;
+				PhysicsObject_AddedData(shape.rigidBody);
 			}
 			switch (_source) {
 				case Handed.Left:
@@ -127,7 +114,8 @@ namespace RhuEngine.Components
 			}
 		}
 
-		bool _gripping = false;
+		public bool gripping = false;
+		public bool grippingLastFrame = false;
 
 		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
@@ -139,59 +127,40 @@ namespace RhuEngine.Components
 			if (user.Target != LocalUser) {
 				return;
 			}
-			if(source.Value == Handed.Max) {
+			if (source.Value == Handed.Max) {
 				if (Engine.IsInVR) {
 					return;
 				}
 			}
 			var grabForce = InputManager.Grab.HandedValue(source.Value);
-			var isGrab = grabForce > 0.5;
-			if (isGrab && !_gripping) {
+			var isGrab = grabForce > 0.6;
+			grippingLastFrame = gripping;
+			if (isGrab && !gripping) {
 				foreach (var item in _overLappingObjects) {
 					if (item.CustomObject is PhysicsObject physicsObject) {
 						physicsObject.Entity.CallOnGrip(this, false, grabForce);
+						if (physicsObject.Entity == Entity) {
+							RLog.Info("Grabing self");
+						}
+						RLog.Info("Grip " + physicsObject.Entity.name.Value);
 					}
 				}
-				//StartGabbing
-				RUpdateManager.ExecuteOnStartOfFrame(() => {
-					switch (source.Value) {
-						case Handed.Left:
-							break;
-						case Handed.Right:
-							break;
-						case Handed.Max:
-							WorldManager.PrivateSpaceManager.DisableHeadLaser = true;
-							break;
-						default:
-							break;
-					}
-				});
-				_gripping = true;
+				gripping = true;
 			}
-			if (_gripping && !isGrab) {
+			if(isGrab && gripping) {
+				foreach (var item in GrabbedObjects) {
+					item.UpdateGrabbedObject();
+				}
+			}
+			if (gripping && !isGrab) {
 				//DoneGrabbing
-				RUpdateManager.ExecuteOnStartOfFrame(() => {
-					switch (source.Value) {
-						case Handed.Left:
-							WorldManager.PrivateSpaceManager.DisableLeftLaser = false;
-							break;
-						case Handed.Right:
-							WorldManager.PrivateSpaceManager.DisableRightLaser = false;
-							break;
-						case Handed.Max:
-							WorldManager.PrivateSpaceManager.DisableHeadLaser = false;
-							break;
-						default:
-							break;
-					}
-				});
 				for (var i = GrabbedObjects.Count - 1; i >= 0; i--) {
 					try {
 						GrabbedObjects[i]?.Drop();
 					}
 					catch { }
 				}
-				_gripping = false;
+				gripping = false;
 			}
 			_overLappingObjects.Clear();
 		}

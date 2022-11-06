@@ -4,6 +4,11 @@ using System.Linq;
 
 namespace RhuEngine.WorldObjects.ECS
 {
+	public class OverlayOnlyAttribute : Attribute
+	{
+
+	}
+
 	public class PrivateSpaceOnlyAttribute : Attribute
 	{
 

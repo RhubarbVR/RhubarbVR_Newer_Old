@@ -17,6 +17,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using DataModel.Enums;
 using Esprima;
+using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.Managers
 {
@@ -28,7 +29,7 @@ namespace RhuEngine.Managers
 		public SynchronizedCollection<World> worlds = new();
 
 		public World PrivateOverlay { get; private set; }
-
+		public World OverlayWorld { get; private set; }
 		public World LocalWorld { get; private set; }
 
 		private World _focusedWorld;
@@ -43,7 +44,7 @@ namespace RhuEngine.Managers
 		public PrivateSpaceManager PrivateSpaceManager { get; internal set; }
 
 		private readonly Stopwatch _stepStopwatch = new();
-		
+
 		public event Action<World> WorldChanged;
 
 		private void FocusedWorldChange() {
@@ -101,7 +102,7 @@ namespace RhuEngine.Managers
 						return worlds[i];
 					}
 				}
-				catch { 
+				catch {
 				}
 			}
 			return null;
@@ -130,7 +131,7 @@ namespace RhuEngine.Managers
 			return world;
 		}
 
-		public World CreateNewWorld(World.FocusLevel focusLevel,string sessionName,AccessLevel accessLevel,int maxUsers,bool isHiden,Guid? assosiatedGroup = null) {
+		public World CreateNewWorld(World.FocusLevel focusLevel, string sessionName, AccessLevel accessLevel, int maxUsers, bool isHiden, Guid? assosiatedGroup = null) {
 			var world = new World(this) {
 				Focus = World.FocusLevel.Background
 			};
@@ -163,9 +164,9 @@ namespace RhuEngine.Managers
 			ShowLoadingFeedback(world, focusLevel);
 			return world;
 		}
-		
+
 		public World LoadWorldFromBytes(World.FocusLevel focusLevel, byte[] data, bool localWorld = false) {
-			return LoadWorldFromDataNodeGroup(focusLevel,(DataNodeGroup)new DataReader(data).Data, localWorld);
+			return LoadWorldFromDataNodeGroup(focusLevel, (DataNodeGroup)new DataReader(data).Data, localWorld);
 		}
 		public World LoadWorldFromDataNodeGroup(World.FocusLevel focusLevel, DataNodeGroup data, bool localWorld = false) {
 			var world = new World(this) {
@@ -185,37 +186,40 @@ namespace RhuEngine.Managers
 			OnWorldUpdateTaskBar?.Invoke();
 			return world;
 		}
-		private WorldText _loadingText;
+		private TextLabel3D _loadingText;
 		public void Init(Engine engine) {
 			Engine = engine;
-			Engine.IntMsg = "Creating Personal Space";
+			Engine.IntMsg = "Creating Personal Space World";
 			PrivateOverlay = CreateNewWorld(World.FocusLevel.PrivateOverlay);
-			Engine.IntMsg = "Done Creating Personal Space";
+			Engine.IntMsg = "Creating Private Space Manager";
 			PrivateOverlay.RootEntity.AddChild("PrivateSpace").AttachComponent<PrivateSpaceManager>();
-			_loadingText = PrivateOverlay.RootEntity.AddChild("LoadingText").AttachComponent<WorldText>();
-			_loadingText.FitText.Value = true;
-			_loadingText.Width.Value = _loadingText.Height.Value = 0.35f;
-			_loadingText.StartingColor.Value = Colorf.White;
-			Engine.IntMsg = "Creating Local World";
+			Engine.IntMsg = "Creating Loading Text";
+			_loadingText = PrivateOverlay.RootEntity.AddChild("LoadingText").AttachComponent<TextLabel3D>();
+			//_loadingText.Size.Value = 0.35f; Todo fix size
+			Engine.IntMsg = "Creating Overlay World";
+			OverlayWorld = CreateNewWorld(World.FocusLevel.Overlay, true);
+			Engine.IntMsg = "Creating Overlay World Manager";
+			OverlayWorld.RootEntity.AddChild("OverlayWorldManager").AttachComponent<OverlayWorldManager>();
+			Engine.IntMsg = "Loading Local World";
 			var loaddedData = false;
 			if (LoadLocalWorld && File.Exists(Engine.BaseDir + "LocalWorldTest.RWorld")) {
 				try {
-					Engine.IntMsg = "Loading Local World From Flie";
+					Engine.IntMsg = "Loading Local World From File ";
 					LocalWorld = LoadWorldFromBytes(World.FocusLevel.Focused, File.ReadAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld"), true);
 					LocalWorld.SessionName.Value = "Local World";
 					LocalWorld.WorldName.Value = "Local World";
-					Engine.IntMsg = "Loaded Local World From Flie";
+					Engine.IntMsg = "Loaded Local World From File";
 					loaddedData = true;
 				}
 				catch {
 					loaddedData = false;
-					Engine.IntMsg = "Failed loading Local World From Flie";
+					Engine.IntMsg = "Failed loading Local World From Flie ";
 					RLog.Err("Failed loading Local World From Flie");
 				}
 			}
-
-			if(!loaddedData) {
+			if (!loaddedData) {
 				RLog.Info("Building Local World");
+				Engine.IntMsg = "Making Local World";
 				LocalWorld = CreateNewWorld(World.FocusLevel.Focused, true);
 				Engine.IntMsg = "Loading Local World Data";
 				LocalWorld.SessionName.Value = "Local World";
@@ -262,7 +266,12 @@ namespace RhuEngine.Managers
 		}
 
 		public void RenderStep() {
+			var hasRan = false;
 			for (var i = worlds.Count - 1; i >= 0; i--) {
+				if ((worlds[i].IsOverlayWorld || worlds[i].IsPersonalSpace) && !hasRan) {
+					hasRan = true;
+					UpdateCameraPos();
+				}
 				try {
 					worlds[i].RenderStep();
 				}
@@ -273,41 +282,66 @@ namespace RhuEngine.Managers
 			UpdateJoinMessage();
 		}
 
-		private Vector3f _oldPlayerPos = Vector3f.Zero;
 		private Vector3f _loadingPos = Vector3f.Zero;
+
 		private void UpdateJoinMessage() {
-			if(_loadingText is null) {
+			if (_loadingText is null) {
 				return;
 			}
-			if(PrivateOverlay.GetLocalUser() is null) {
+			if (PrivateOverlay.GetLocalUser() is null) {
 				return;
 			}
 			_loadingText.Entity.enabled.Value = _isRunning.Count != 0;
 			try {
 				if (_isRunning.Count != 0) {
 					var world = _isRunning.Peek();
-					var textpos = Matrix.T(Vector3f.Forward * 0.35f) * Matrix.T(0,-0.1f,0) * Engine.inputManager.HeadMatrix;
+					var textpos = Matrix.T(Vector3f.Forward * 0.35f) * Matrix.T(0, -0.1f, 0) * Engine.inputManager.ScreenHeadMatrix;
 					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 3.5f, 1);
 					var userPOS = PrivateOverlay.GetLocalUser().userRoot.Target?.Entity.GlobalTrans ?? Matrix.Identity;
 					if (world.IsLoading && !world.IsDisposed) {
 						_loadingText.Text.Value = $"{Engine.localisationManager.GetLocalString("Common.LoadingWorld")}\n {Engine.localisationManager.GetLocalString(world.LoadMsg)}";
-						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.HeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
+						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.ScreenHeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}
 					if (!world.HasError) {
 						_loadingText.Text.Value = $"{Engine.localisationManager.GetLocalString("Common.LoadedWorld")}";
-						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.HeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
+						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.ScreenHeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}
 					else {
 						var errorMsg = world.IsNetworked && world.IsJoiningSession
 							? Engine.localisationManager.GetLocalString("Common.FailedToJoinWorld")
 							: Engine.localisationManager.GetLocalString("Common.FailedToLoadWorld");
 						_loadingText.Text.Value = $"{errorMsg} {(Engine.netApiManager.Client.User?.UserName == null ? ", JIM" : "")}\n {Engine.localisationManager.GetLocalString(world.LoadMsg)}";
-						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180)* Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.HeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
+						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.ScreenHeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}
 				}
 			}
 			catch (Exception ex) {
 				RLog.Err("Failed to update joining msg text Error: " + ex.ToString());
+			}
+		}
+
+		private void UpdateCameraPos() {
+			if (FocusedWorld?.GetLocalUser()?.userRoot.Target is not null) {
+				if (FocusedWorld is null) {
+					return;
+				}
+				var focusUserRoot = FocusedWorld.GetLocalUser().userRoot.Target;
+				var Entity = PrivateOverlay.GetLocalUser()?.userRoot.Target?.Entity;
+				var EntityTwo = OverlayWorld.GetLocalUser()?.userRoot.Target?.Entity;
+				if (Engine.EngineLink.CanRender) {
+					RRenderer.CameraRoot = focusUserRoot.Entity.GlobalTrans;
+				}
+				CopyPosToWorld(Entity, focusUserRoot);
+				CopyPosToWorld(EntityTwo, focusUserRoot);
+			}
+		}
+
+		private void CopyPosToWorld(Entity Entity, UserRoot focusUserRoot) {
+			if (Entity is null) {
+				return;
+			}
+			if (focusUserRoot is not null) {
+				Entity.GlobalTrans = focusUserRoot.Entity.GlobalTrans;
 			}
 		}
 
@@ -318,6 +352,23 @@ namespace RhuEngine.Managers
 			worlds.Remove(world);
 			world.Dispose();
 			OnWorldUpdateTaskBar?.Invoke();
+		}
+
+		public void WorldCycling() {
+			RLog.Info("WorldCycling");
+			var currentIndex = worlds.IndexOf(FocusedWorld) + 1;
+			for (var i = currentIndex; i < worlds.Count; i++) {
+				if (worlds[i].Focus is World.FocusLevel.Background or World.FocusLevel.Focused) {
+					worlds[i].Focus = World.FocusLevel.Focused;
+					return;
+				}
+			}
+			for (var i = 0; i < worlds.Count; i++) {
+				if (worlds[i].Focus is World.FocusLevel.Background or World.FocusLevel.Focused) {
+					worlds[i].Focus = World.FocusLevel.Focused;
+					return;
+				}
+			}
 		}
 	}
 }

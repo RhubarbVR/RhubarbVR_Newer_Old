@@ -30,6 +30,9 @@ namespace RhuEngine.Components
 			if (World.IsPersonalSpace) {
 				return;
 			}
+			if (!Engine.MouseFree && !Engine.IsInVR) {
+				return;
+			}
 			if (user.Target is null || user.Target != World.GetLocalUser()) {
 				return;
 			}

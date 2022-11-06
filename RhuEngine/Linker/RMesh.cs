@@ -7,12 +7,40 @@ using RhuEngine.WorldObjects;
 using RNumerics;
 namespace RhuEngine.Linker
 {
+	public interface IRTempQuad : IDisposable
+	{
+		void Init(RTempQuad text);
+		public Matrix Pos { get; set; }
+		public bool Visible { get; set; }
+		public RMaterial Material { get; set; }
+	}
+
+	public sealed class RTempQuad : IDisposable
+	{
+
+		public static Type Instance { get; set; }
+
+		public IRTempQuad Inst { get; set; }
+
+		public RTempQuad() {
+			Inst = (IRTempQuad)Activator.CreateInstance(Instance);
+			Inst.Init(this);
+
+		}
+		public Matrix Pos { get => Inst.Pos; set => Inst.Pos = value; }
+		public bool Visible { get => Inst.Visible; set=>Inst.Visible = value; }
+		public RMaterial Material { get => Inst.Material; set => Inst.Material = value; }
+		public void Dispose() {
+			Inst.Dispose();
+		}
+	}
+
+
 	public interface IRMesh: IDisposable
 	{
 		public void LoadMeshData(IMesh mesh);
 		public void LoadMeshToRender();
 		public void Init(RMesh rMesh);
-		public void Draw(RMaterial loadingLogo, Matrix p, Colorf tint, int zDepth, RenderLayer layer, int submesh);
 	}
 
 	public class RMesh
@@ -22,8 +50,6 @@ namespace RhuEngine.Linker
 		public bool Dynamic { get; private set; }
 
 		public static Type Instance { get; set; }
-
-		public static RMesh Quad { get; set; }
 
 		public IMesh LoadedMesh { get; private set; }
 
@@ -48,8 +74,5 @@ namespace RhuEngine.Linker
 			RenderThread.ExecuteOnStartOfFrame(Inst.LoadMeshToRender);
 		}
 
-		public void Draw(RMaterial loadingLogo, Matrix p, Colorf? tint = null, int zDepth = 0, RenderLayer layer = RenderLayer.UI,int subMesh = -1) {
-			Inst.Draw(loadingLogo, p, tint ?? Colorf.White, zDepth, layer, subMesh);
-		}
 	}
 }

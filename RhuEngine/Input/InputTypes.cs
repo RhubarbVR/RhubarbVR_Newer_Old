@@ -26,7 +26,8 @@ namespace RhuEngine
 		Secondary,
 		Grab,
 		UnlockMouse,
-		ObserverOpen
+		ObserverOpen,
+		VRChange
 	}
 
 }

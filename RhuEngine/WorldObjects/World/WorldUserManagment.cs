@@ -146,8 +146,8 @@ namespace RhuEngine.WorldObjects
 						var userNodePos = debugcube.AttachComponent<UserBodyNodeTransform>();
 						userNodePos.Pos.SetLinkerTarget(lookAt.LookAtPoint);
 					}
-					var meshrender = debugcube.AttachComponent<WorldText>();
-					meshrender.StartingColor.Value = colorf;
+					var meshrender = debugcube.AttachComponent<TextLabel3D>();
+					meshrender.Modulate.Value = colorf;
 					meshrender.Text.Value = text.ToString();
 					meshrender.Entity.GlobalTrans = Matrix.TS(pos, scale) * matrix;
 					Task.Run(async () => {

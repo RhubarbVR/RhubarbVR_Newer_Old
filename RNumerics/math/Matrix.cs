@@ -7,7 +7,7 @@ using MessagePack.Formatters;
 
 namespace RNumerics
 {
-	
+
 
 	/// <summary>A Matrix in StereoKit is a 4x4 grid of numbers that is used 
 	/// to represent a transformation for any sort of position or vector! 
@@ -431,6 +431,11 @@ namespace RNumerics
 
 		public override int GetHashCode() {
 			return m.GetHashCode();
+		}
+
+		public static Matrix RS(Quaternionf rotation, Vector3f scale) {
+			return TRS(Vector3f.Zero, rotation, scale);
+
 		}
 	}
 }

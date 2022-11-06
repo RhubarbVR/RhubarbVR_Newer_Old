@@ -10,12 +10,25 @@ using RhuEngine.Settings;
 using RhuEngine.Linker;
 using RNumerics;
 using RhuEngine.Input;
+using RhuEngine.Input.XRInput;
 
 namespace RhuEngine.Managers
 {
 	public sealed partial class InputManager : IManager
 	{
 		private Engine _engine;
+
+		private event Action OnInputManagerLoaded;
+
+		public void OnLoaded(Action action) {
+			if (IsLoaded) {
+				action();
+			}
+			else {
+				OnInputManagerLoaded += action;
+			}
+		}
+
 
 		private readonly List<IInputDevice> _inputDevices = new();
 		private IInputSystem[] _inputSystems = Array.Empty<IInputSystem>();
@@ -39,31 +52,37 @@ namespace RhuEngine.Managers
 				disposable.Dispose();
 			}
 		}
-
+		public XRInputSystem XRInputSystem { get; private set; }
 		public KeyboardSystem KeyboardSystem { get; private set; }
 		public MouseSystem MouseSystem { get; private set; }
 		public MicSystem MicSystem { get; private set; }
 
-		public Matrix HeadMatrix { get; set; }
+		public Matrix ScreenHeadMatrix => screenInput.HeadPos;
 
 		public void Dispose() {
 		}
 
+		public bool IsLoaded { get; private set; } = false;
+
 		public void Init(Engine engine) {
 			_engine = engine;
+			XRInputSystem = new XRInputSystem(this);
 			KeyboardSystem = new KeyboardSystem(this);
 			MouseSystem = new MouseSystem(this);
-			screenInput = new ScreenInput(this);
 			MicSystem = new MicSystem(this);
 			_inputSystems = new IInputSystem[] {
+				XRInputSystem,
 				KeyboardSystem,
 				MouseSystem,
 				MicSystem,
 			};
+			screenInput = new ScreenInput(this);
 			LoadInputActions();
 			_engine.EngineLink.LoadInput(this);
 			SettingsUpdateInputActions();
 			_engine.SettingsUpdate += SettingsUpdateInputActions;
+			OnInputManagerLoaded?.Invoke();
+			IsLoaded = true;
 		}
 		public void RenderStep() {
 			foreach (var item in _inputSystems) {
@@ -80,6 +99,7 @@ namespace RhuEngine.Managers
 				? _engine.MainSettings.InputSettings.RightHanded ? Handed.Right : Handed.Left
 				: _engine.MainSettings.InputSettings.RightHanded ? Handed.Left : Handed.Right;
 		}
+
 		private float GetActionStringValue(string v) {
 			return Math.Min(GetActionStringValue(v, Handed.Left) + GetActionStringValue(v, Handed.Right) + GetActionStringValue(v, Handed.Max), 1f);
 		}
@@ -126,8 +146,8 @@ namespace RhuEngine.Managers
 				return 0f;
 			}
 			var thread = data[2];
-
 			if (handed == Handed.Max) {
+
 				if (device == "mouse") {
 					if (second == "scroll") {
 						if (thread is "x") {
@@ -172,6 +192,63 @@ namespace RhuEngine.Managers
 							_actions.Add(lookValue, scrollAction);
 							return scrollAction();
 						}
+					}
+				}
+			}
+			if (handed != Handed.Max) {
+
+				var dir = "";
+				if (data.Length > 3) {
+					dir = data[3];
+				}
+				if (device == "xr") {
+					Func<ITrackerDevice> target = null;
+					if (second == "main") {
+						target = () => XRInputSystem.GetHand(GetHand(true));
+					}
+					if (second == "secondary") {
+						target = () => XRInputSystem.GetHand(GetHand(false));
+					}
+					if (int.TryParse(second, out var selectedIndex)) {
+						target = () => XRInputSystem.Trackers.Count <= selectedIndex ? null : XRInputSystem.Trackers[selectedIndex];
+					}
+					if (second == "left" || handed == Handed.Left) {
+						target = () => XRInputSystem.GetHand(Handed.Left);
+					}
+					if (second == "right" || handed == Handed.Right) {
+						target = () => XRInputSystem.GetHand(Handed.Right);
+					}
+					if (target is not null) {
+						var inputAction = () => {
+							var targetDevice = target();
+							if (targetDevice is null) {
+								return 0f;
+							}
+							if (targetDevice.HasBoolInput(thread)) {
+								return targetDevice.BoolInput(thread) ? 1f : 0f;
+							}
+							if (targetDevice.HasDoubleInput(thread)) {
+								return (float)targetDevice.DoubleInput(thread);
+							}
+							if (targetDevice.HasVectorInput(thread)) {
+								var data = targetDevice.VectorInput(thread);
+								if (dir is "x") {
+									return data.x;
+								}
+								else if (dir is "x-" or "-x") {
+									return -data.x;
+								}
+								if (dir is "y") {
+									return data.y;
+								}
+								else if (dir is "y-" or "-y") {
+									return -data.y;
+								}
+							}
+							return 0f;
+						};
+						_actions.Add(lookValue, inputAction);
+						return inputAction();
 					}
 				}
 			}

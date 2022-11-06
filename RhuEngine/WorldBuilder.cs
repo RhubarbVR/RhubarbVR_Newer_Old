@@ -21,11 +21,7 @@ namespace RhuEngine
 			var coloider = floor.AttachComponent<CylinderShape>();
 			var (mesh, mit, render) = floor.AttachMeshWithMeshRender<CylinderMesh, UnlitMaterial>();
 			mit.Transparency.Value = Transparency.Blend;
-			var colorFollower = floor.AttachComponent<UIColorAssign>();
-			colorFollower.Alpha.Value = 0.75f;
-			colorFollower.Color.Value = UIColorAssign.ColorSelection.Primary;
-			colorFollower.ColorShif.Value = 0.1f;
-			colorFollower.TargetColor.Target = render.colorLinear;
+			mit.Tint.Value = new Colorf(10, 10, 10, 150);
 			mesh.TopRadius.Value = 4;
 			mesh.BaseRadius.Value = 3.5f;
 			mesh.Height.Value = 0.25f;
@@ -33,10 +29,59 @@ namespace RhuEngine
 			var spinningCubes = world.RootEntity.AddChild("SpinningCubes");
 			spinningCubes.position.Value = new Vector3f(0, 0.5f, 0);
 			AttachSpiningCubes(spinningCubes);
-#if DEBUG || UNITY
+#if DEBUG
+
 
 			var DebugStuff = floor.AddChild("DebugStuff");
 			DebugStuff.position.Value = new Vector3f(-1.5f, 0f, -1f);
+
+			var SubviewPortCame = DebugStuff.AddChild("Camera");
+			SubviewPortCame.position.Value = new Vector3f(4f, 2f, -2f);
+			var subViewPOrtdatae = SubviewPortCame.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var SubviewPorte = SubviewPortCame.AddChild("SubviewPort");
+			var viewporte = SubviewPorte.AttachComponent<Viewport>();
+			viewporte.OwnWorld3D.Value = false;
+			viewporte.Size.Value *= 2;
+			subViewPOrtdatae.Item2.MainTexture.Target = viewporte;
+			var cameras = SubviewPorte.AddChild("Camera").AttachComponent<Camera3D>();
+			cameras.Entity.rotation.Value = Quaternionf.Yawed180 * Quaternionf.Rolled180;
+
+
+
+			var SubviewPortCam = DebugStuff.AddChild("Camera");
+			SubviewPortCam.position.Value = new Vector3f(-1f, 1f, 1f);
+			var subViewPOrtdata = SubviewPortCam.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			var SubviewPort = SubviewPortCam.AddChild("SubviewPort");
+			var ee1 = SubviewPort.AddChild("test");
+			ee1.AttachComponent<UIElement>();
+			var ee2 = ee1.AddChild("test");
+			ee2.AttachComponent<UIElement>();
+			var ee3 = ee2.AddChild("test");
+			ee3.position.Value = new Vector3f(10, 10, 10);
+			ee3.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
+
+
+			SubviewPort.position.Value = new Vector3f(-1.5f, 0f, -1f);
+			var viewport = SubviewPort.AttachComponent<Viewport>();
+			viewport.OwnWorld3D.Value = true;
+			subViewPOrtdata.Item2.MainTexture.Target = viewport;
+
+			var camera = SubviewPort.AddChild("Camera");
+			var cam = camera.AttachComponent<Camera3D>();
+			camera.position.Value = new Vector3f(0, 0, -5);
+			camera.rotation.Value = Quaternionf.Yawed180;
+			var trauns = SubviewPort.AddChild("trauns");
+			trauns.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
+			var e1 = trauns.AddChild("test");
+			var e2 = e1.AddChild("test");
+			var e3 = e2.AddChild("test");
+			var e4 = e3.AddChild("test");
+			var testElement = e4.AddChild("test");
+			e4.position.Value = new Vector3f(1, 1, 1);
+			var e5 = e4.AddChild("test");
+			e5.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
+
+
 
 			var TempComps = DebugStuff.AddChild("RenderComps");
 			TempComps.position.Value = new Vector3f(0f, 3f, 4f);
@@ -54,13 +99,6 @@ namespace RhuEngine
 			unliotRender.RecevieShadows.Value = true;
 			unlitmit.AttachComponent<Grabbable>();
 			unlitmit.AttachComponent<SphereShape>();
-			var pbrmit = Mits.AddChild("PBR");
-			var (_, _, pbrRender) = pbrmit.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, PBRMaterial>();
-			pbrRender.CastShadows.Value = ShadowCast.On;
-			pbrRender.RecevieShadows.Value = true;
-			pbrmit.AttachComponent<Grabbable>();
-			pbrmit.AttachComponent<SphereShape>();
-			pbrmit.position.Value = new Vector3f(4f, 0f, 0f);
 
 			var lights = DebugStuff.AddChild("Lights");
 			lights.position.Value = new Vector3f(2f, 4f, -2f);
@@ -126,34 +164,19 @@ namespace RhuEngine
 			fontAtlis.AttachComponent<BoxShape>();
 			fontAtlis.AttachComponent<Grabbable>();
 			var data = fontAtlis.AttachMesh<TrivialBox3Mesh, UnlitMaterial>();
-			data.Item2.MainTexture.Target = fontAtlis.AttachComponent<FontAtlasTexture>();
 
 			var text = fontAtlis.AddChild("Text");
 			text.position.Value = new Vector3f(0, 1.5f, 0);
-			text.AttachComponent<WorldText>();
+			text.AttachComponent<TextLabel3D>();
 
 			var text2 = fontAtlis.AddChild("Text2");
 			text2.position.Value = new Vector3f(0, 2.5f, 0);
-			text2.AttachComponent<WorldText>().Text.Value = "This is another\nBit of Text";
-
-			var text3 = fontAtlis.AddChild("Text3");
-			text3.position.Value = new Vector3f(0, 3.5f, 0);
-			text3.AttachComponent<WorldText>().VerticalAlien.Value = EVerticalAlien.Center;
-			var text4 = fontAtlis.AddChild("Text4");
-			text4.position.Value = new Vector3f(0, 4.5f, 0);
-			text4.AttachComponent<WorldText>().VerticalAlien.Value = EVerticalAlien.Top;
-			var text5 = fontAtlis.AddChild("Text5");
-			text5.position.Value = new Vector3f(0, 5.5f, 0);
-			text5.AttachComponent<WorldText>().VerticalAlien.Value = EVerticalAlien.Bottom;
-			var text6 = fontAtlis.AddChild("Text6");
-			text6.position.Value = new Vector3f(0, 6.5f, 0);
-			text6.AttachComponent<WorldText>().HorizontalAlien.Value = EHorizontalAlien.Left;
-			var text7 = fontAtlis.AddChild("Text7");
-			text7.position.Value = new Vector3f(0, 7.5f, 0);
-			text7.AttachComponent<WorldText>().HorizontalAlien.Value = EHorizontalAlien.Right;
+			var textRender = text2.AttachComponent<TextLabel3D>();
+			textRender.Text.Value = "This is another\nBit of Text \nwith Billboard";
+			textRender.Billboard.Value = RBillboardOptions.Enabled;
 			var text8 = fontAtlis.AddChild("Text8");
 			text8.position.Value = new Vector3f(1, 0, 0);
-			text8.AttachComponent<WorldText>().Text.Value = "<color=red>Wa<colorblue>Trains<size=50>Trains";
+			text8.AttachComponent<TextLabel3D>().Text.Value = "<color=red>Wa<colorblue>Trains<size=50>Trains";
 			var textureStuff = testCubes.AddChild("Texture Stuff");
 			var dfg = textureStuff.AddChild("DFG-Noise");
 			dfg.position.Value = new Vector3f(2, 0, 0);

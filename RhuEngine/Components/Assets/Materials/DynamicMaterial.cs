@@ -9,19 +9,13 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Materials" })]
+	[AllowedOnWorldRoot]
 	public sealed class DynamicMaterial : AssetProvider<RMaterial>
 	{
 		[OnAssetLoaded(nameof(LoadMaterial))]
 		public readonly AssetRef<RShader> shader;
 
 		public readonly SyncAbstractObjList<PramInfo> Prams;
-
-		[OnChanged(nameof(UpdateRenderOrder))]
-		public readonly Sync<int> RenderOrderOffset;
-
-		public void UpdateRenderOrder() {
-			_material.RenderOrderOffset = RenderOrderOffset;
-		}
 
 		public void UpdatePram(string pram, object data) {
 			if (_material is not null) {
@@ -120,11 +114,6 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public Cull FaceCull
-		{
-			get => (Cull)GetParam("FACECULL_RHUBARB_CUSTOM").Item1.GetData();
-			set => TrySet("FACECULL_RHUBARB_CUSTOM", value);
-		}
 		public Transparency Transparency
 		{
 			get => (Transparency)GetParam("TRANSPARENCY_RHUBARB_CUSTOM").Item1.GetData();
@@ -141,232 +130,232 @@ namespace RhuEngine.Components
 			set => TrySet("WIREFRAME_RHUBARB_CUSTOM", value);
 		}
 		private void LoadMaterial() {
-			if (!Engine.EngineLink.CanRender) {
-				return;
-			}
-			Console.WriteLine("Load material");
-			if (shader.Asset is not null) {
-				_material = new RMaterial(shader.Asset);
-				foreach (var item in _material.GetAllParamInfo()) {
-					var (pram, index) = GetParam(item.name);
-					if (pram is not null) {
-						switch (item.type) {
-							case MaterialParam.Unknown:
-								throw new Exception("Not supported");
-							case MaterialParam.Float:
-								if (pram.GetType() != typeof(ValuePramInfo<float>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.Bool:
-								if (pram.GetType() != typeof(ValuePramInfo<bool>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.Vector2:
-								if (pram.GetType() != typeof(ValuePramInfo<Vector2f>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.Vector3:
-								if (pram.GetType() != typeof(ValuePramInfo<Vector3f>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.Vector4:
-								if (pram.GetType() != typeof(ValuePramInfo<Vector4f>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.Matrix:
-								if (pram.GetType() != typeof(ValuePramInfo<Matrix>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.Texture:
-								if (pram.GetType() != typeof(TexPramInfo)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.Int:
-								if (pram.GetType() != typeof(ValuePramInfo<int>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.Int2:
-								if (pram.GetType() != typeof(ValuePramInfo<Vector2i>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.Int3:
-								if (pram.GetType() != typeof(ValuePramInfo<Vector3i>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.Int4:
-								if (pram.GetType() != typeof(ValuePramInfo<Vector4i>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.UInt:
-								if (pram.GetType() != typeof(ValuePramInfo<uint>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.UInt2:
-								if (pram.GetType() != typeof(ValuePramInfo<Vector2u>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.UInt3:
-								if (pram.GetType() != typeof(ValuePramInfo<Vector3u>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.UInt4:
-								if (pram.GetType() != typeof(ValuePramInfo<Vector4u>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.Cull:
-								if (pram.GetType() != typeof(ValuePramInfo<Cull>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.Transparency:
-								if (pram.GetType() != typeof(ValuePramInfo<Transparency>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.TexAddress:
-								if (pram.GetType() != typeof(ValuePramInfo<TexAddress>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							case MaterialParam.TexSample:
-								if (pram.GetType() != typeof(ValuePramInfo<TexSample>)) {
-									Prams.DisposeAtIndex(index);
-									pram = null;
-								}
-								break;
-							default:
-								break;
-						}
-					}
-					if(pram is null) {
-						switch (item.type) {
-							case MaterialParam.Unknown:
-								throw new Exception("Not supported");
-							case MaterialParam.Float:
-								Prams.Add<ValuePramInfo<float>>().name.Value = item.name;
-								break;
-							case MaterialParam.Bool:
-								Prams.Add<ValuePramInfo<bool>>().name.Value = item.name;
-								break;
-							case MaterialParam.Vector2:
-								Prams.Add<ValuePramInfo<Vector2f>>().name.Value = item.name;
-								break;
-							case MaterialParam.Vector3:
-								Prams.Add<ValuePramInfo<Vector3f>>().name.Value = item.name;
-								break;
-							case MaterialParam.Vector4:
-								Prams.Add<ValuePramInfo<Vector4f>>().name.Value = item.name;
-								break;
-							case MaterialParam.Matrix:
-								Prams.Add<ValuePramInfo<Matrix>>().name.Value = item.name;
-								break;
-							case MaterialParam.Texture:
-								Prams.Add<TexPramInfo>().name.Value = item.name;
-								break;
-							case MaterialParam.Int:
-								Prams.Add<ValuePramInfo<int>>().name.Value = item.name;
-								break;
-							case MaterialParam.Int2:
-								Prams.Add<ValuePramInfo<Vector2i>>().name.Value = item.name;
-								break;
-							case MaterialParam.Int3:
-								Prams.Add<ValuePramInfo<Vector3i>>().name.Value = item.name;
-								break;
-							case MaterialParam.Int4:
-								Prams.Add<ValuePramInfo<Vector4i>>().name.Value = item.name;
-								break;
-							case MaterialParam.UInt:
-								Prams.Add<ValuePramInfo<uint>>().name.Value = item.name;
-								break;
-							case MaterialParam.UInt2:
-								Prams.Add<ValuePramInfo<Vector2u>>().name.Value = item.name;
-								break;
-							case MaterialParam.UInt3:
-								Prams.Add<ValuePramInfo<Vector3u>>().name.Value = item.name;
-								break;
-							case MaterialParam.UInt4:
-								Prams.Add<ValuePramInfo<Vector4u>>().name.Value = item.name;
-								break;
-							case MaterialParam.Cull:
-								Prams.Add<ValuePramInfo<Cull>>().name.Value = item.name;
-								break;
-							case MaterialParam.Transparency:
-								Prams.Add<ValuePramInfo<Transparency>>().name.Value = item.name;
-								break;
-							case MaterialParam.TexAddress:
-								Prams.Add<ValuePramInfo<TexAddress>>().name.Value = item.name;
-								break;
-							case MaterialParam.TexSample:
-								Prams.Add<ValuePramInfo<TexSample>>().name.Value = item.name;
-								break;
-							default:
-								break;
-						}
-						switch (item.type) {
-							case MaterialParam.Float:
-								break;
-							case MaterialParam.Vector4:
-								Prams.Add<ValuePramInfo<Vector4f>>().name.Value = item.name;
-								break;
-							case MaterialParam.Vector3:
-								Prams.Add<ValuePramInfo<Vector3f>>().name.Value = item.name;
-								break;
-							case MaterialParam.Vector2:
-								Prams.Add<ValuePramInfo<Vector2f>>().name.Value = item.name;
-								break;
-							case MaterialParam.Matrix:
-								Prams.Add<ValuePramInfo<Matrix>>().name.Value = item.name;
-								break;
-							case MaterialParam.Texture:
-								break;
-							default:
-								break;
-						}
-						RLog.Info($"Material pram loaded. Name: {item.name} Type: {item.type}");
-					}
-				}
-				foreach (var item in Prams) {
-					((PramInfo)item).MaterialLoaded();
-				}
-				Load(_material);
-				Console.WriteLine("Loaded material");
-			}
-			else {
-				Console.WriteLine($"Shader target null {shader.Value.HexString()}");
-			}
+			//if (!Engine.EngineLink.CanRender) {
+			//	return;
+			//}
+			//Console.WriteLine("Load material");
+			//if (shader.Asset is not null) {
+			//	_material = new RMaterial(shader.Asset);
+			//	foreach (var item in _material.GetAllParamInfo()) {
+			//		var (pram, index) = GetParam(item.name);
+			//		if (pram is not null) {
+			//			switch (item.type) {
+			//				case MaterialParam.Unknown:
+			//					throw new Exception("Not supported");
+			//				case MaterialParam.Float:
+			//					if (pram.GetType() != typeof(ValuePramInfo<float>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.Bool:
+			//					if (pram.GetType() != typeof(ValuePramInfo<bool>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.Vector2:
+			//					if (pram.GetType() != typeof(ValuePramInfo<Vector2f>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.Vector3:
+			//					if (pram.GetType() != typeof(ValuePramInfo<Vector3f>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.Vector4:
+			//					if (pram.GetType() != typeof(ValuePramInfo<Vector4f>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.Matrix:
+			//					if (pram.GetType() != typeof(ValuePramInfo<Matrix>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.Texture:
+			//					if (pram.GetType() != typeof(TexPramInfo)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.Int:
+			//					if (pram.GetType() != typeof(ValuePramInfo<int>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.Int2:
+			//					if (pram.GetType() != typeof(ValuePramInfo<Vector2i>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.Int3:
+			//					if (pram.GetType() != typeof(ValuePramInfo<Vector3i>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.Int4:
+			//					if (pram.GetType() != typeof(ValuePramInfo<Vector4i>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.UInt:
+			//					if (pram.GetType() != typeof(ValuePramInfo<uint>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.UInt2:
+			//					if (pram.GetType() != typeof(ValuePramInfo<Vector2u>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.UInt3:
+			//					if (pram.GetType() != typeof(ValuePramInfo<Vector3u>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.UInt4:
+			//					if (pram.GetType() != typeof(ValuePramInfo<Vector4u>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.Cull:
+			//					if (pram.GetType() != typeof(ValuePramInfo<Cull>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.Transparency:
+			//					if (pram.GetType() != typeof(ValuePramInfo<Transparency>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.TexAddress:
+			//					if (pram.GetType() != typeof(ValuePramInfo<TexAddress>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				case MaterialParam.TexSample:
+			//					if (pram.GetType() != typeof(ValuePramInfo<TexSample>)) {
+			//						Prams.DisposeAtIndex(index);
+			//						pram = null;
+			//					}
+			//					break;
+			//				default:
+			//					break;
+			//			}
+			//		}
+			//		if(pram is null) {
+			//			switch (item.type) {
+			//				case MaterialParam.Unknown:
+			//					throw new Exception("Not supported");
+			//				case MaterialParam.Float:
+			//					Prams.Add<ValuePramInfo<float>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Bool:
+			//					Prams.Add<ValuePramInfo<bool>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Vector2:
+			//					Prams.Add<ValuePramInfo<Vector2f>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Vector3:
+			//					Prams.Add<ValuePramInfo<Vector3f>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Vector4:
+			//					Prams.Add<ValuePramInfo<Vector4f>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Matrix:
+			//					Prams.Add<ValuePramInfo<Matrix>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Texture:
+			//					Prams.Add<TexPramInfo>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Int:
+			//					Prams.Add<ValuePramInfo<int>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Int2:
+			//					Prams.Add<ValuePramInfo<Vector2i>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Int3:
+			//					Prams.Add<ValuePramInfo<Vector3i>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Int4:
+			//					Prams.Add<ValuePramInfo<Vector4i>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.UInt:
+			//					Prams.Add<ValuePramInfo<uint>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.UInt2:
+			//					Prams.Add<ValuePramInfo<Vector2u>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.UInt3:
+			//					Prams.Add<ValuePramInfo<Vector3u>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.UInt4:
+			//					Prams.Add<ValuePramInfo<Vector4u>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Cull:
+			//					Prams.Add<ValuePramInfo<Cull>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Transparency:
+			//					Prams.Add<ValuePramInfo<Transparency>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.TexAddress:
+			//					Prams.Add<ValuePramInfo<TexAddress>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.TexSample:
+			//					Prams.Add<ValuePramInfo<TexSample>>().name.Value = item.name;
+			//					break;
+			//				default:
+			//					break;
+			//			}
+			//			switch (item.type) {
+			//				case MaterialParam.Float:
+			//					break;
+			//				case MaterialParam.Vector4:
+			//					Prams.Add<ValuePramInfo<Vector4f>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Vector3:
+			//					Prams.Add<ValuePramInfo<Vector3f>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Vector2:
+			//					Prams.Add<ValuePramInfo<Vector2f>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Matrix:
+			//					Prams.Add<ValuePramInfo<Matrix>>().name.Value = item.name;
+			//					break;
+			//				case MaterialParam.Texture:
+			//					break;
+			//				default:
+			//					break;
+			//			}
+			//			RLog.Info($"Material pram loaded. Name: {item.name} Type: {item.type}");
+			//		}
+			//	}
+			//	foreach (var item in Prams) {
+			//		((PramInfo)item).MaterialLoaded();
+			//	}
+			//	Load(_material);
+			//	Console.WriteLine("Loaded material");
+			//}
+			//else {
+			//	Console.WriteLine($"Shader target null {shader.Value.HexString()}");
+			//}
 		}
 
 		public override void Dispose() {

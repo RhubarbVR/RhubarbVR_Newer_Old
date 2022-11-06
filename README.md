@@ -3,12 +3,13 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
+[![MainBranch](https://github.com/RhubarbVR/RhubarbVR/actions/workflows/BuildAndRunTests.yml/badge.svg)](https://github.com/RhubarbVR/RhubarbVR/actions/workflows/BuildAndRunTests.yml)
 
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
   <a href="https://github.com/RhubarbVR/RhubarbVR">
-    <img src="Assets/RhubarbVR.png" alt="Rhubarb-Logo" width="80" height="80">
+    <img src="Docs/RhubarbVR.png" alt="Rhubarb-Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Rhubarb VR</h3>
@@ -44,6 +45,7 @@
     <li>
       <a href="#preview">Preview</a>
     </li>
+    <!--
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
@@ -51,6 +53,7 @@
         <li><a href="#compiling">Compiling</a></li>
       </ul>
     </li>
+    -->
     <li><a href="#usage">Usage</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -66,21 +69,21 @@ RhubarbVR is a networked VR game engine. What does this mean? Well, Rhubarb is a
 
 ### Libraries
 
-- [StereoKit](https://github.com/maluoi/StereoKit)
+- [Godot](https://github.com/godotengine/godot)
 - [LiteNetLib](https://github.com/RevenantX/LiteNetLib)
 - [MessagePack](https://github.com/neuecc/MessagePack-CSharp)
 - [ImageSharp](https://github.com/SixLabors/ImageSharp)
 
 ## Preview
 
-![](./docs/preview.png)
+![](./Docs/preview.png)
 
 <!-- GETTING STARTED -->
 
 ## Getting Started
 
 This is how to run the program and the standard problems you might encounter with trying to start or compile Rhubarb VR.
-
+<!-- 
 ### Playing Normally
 
 You can get a compiled version of RhubarbVR through this GitHub repository or obtain it from Steam.
@@ -122,7 +125,7 @@ But with either of these, you need to the net6 runtime installed.
    ```sh
    dotnet build "Platforms/Rhubarb_VR_DotNet" /p:Configuration=Release
    ```
-
+-->
 <!-- USAGE EXAMPLES -->
 
 ## Usage

@@ -21,7 +21,7 @@ namespace RhubarbVR.Bindings.Input
 			return Godot.Input.IsKeyPressed(ToGodotKey(key));
 		}
 
-		private static Godot.Key ToGodotKey(Key key) {
+		public static Godot.Key ToGodotKey(Key key) {
 			return key switch {
 				Key.Backspace => Godot.Key.Backspace,
 				Key.Tab => Godot.Key.Tab,

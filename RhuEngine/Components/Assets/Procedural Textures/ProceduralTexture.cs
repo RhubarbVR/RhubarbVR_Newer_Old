@@ -3,30 +3,18 @@ using RNumerics;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
+using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
-	public abstract class ProceduralTexture : AssetProvider<RTexture2D>
+	public abstract class ProceduralTexture : ImageTexture
 	{
-		[Default(TexSample.Anisotropic)]
-		[OnChanged(nameof(TextValueChanged))]
-		public readonly Sync<TexSample> sampleMode;
-
-		[Default(TexAddress.Wrap)]
-		[OnChanged(nameof(TextValueChanged))]
-		public readonly Sync<TexAddress> addressMode;
-
-		[Default(3)]
-		[OnChanged(nameof(TextValueChanged))]
-		public readonly Sync<int> anisoptropy;
+		protected RImageTexture2D RImageTexture2D;
 
 		protected void TextValueChanged() {
 			if (Value is null) {
 				return;
 			}
-			Value.Anisoptropy = anisoptropy;
-			Value.AddressMode = addressMode;
-			Value.SampleMode = sampleMode;
 		}
 
 		protected void UpdateTexture(Colorf[][] colors) {
@@ -36,12 +24,8 @@ namespace RhuEngine.Components
 					fullcolors[(y * colors[0].Length) + x] = colors[y][x].ToBytes();
 				}
 			}
-			if (Value is null) {
-				Load(RTexture2D.FromColors(fullcolors, colors[0].Length, colors.Length, true));
-				TextValueChanged();
-				return;
-			}
-			Value.SetColors(colors[0].Length, colors.Length, fullcolors);
+			_image.SetColors(colors[0].Length, colors.Length, fullcolors);
+			RImageTexture2D.UpdateImageAutoSet(_image);
 		}
 
 		protected void UpdateTexture(Colorb[][] colors) {
@@ -51,33 +35,21 @@ namespace RhuEngine.Components
 					fullcolors[(y * colors[0].Length) + x] = colors[y][x];
 				}
 			}
-			if (Value is null) {
-				Load(RTexture2D.FromColors(fullcolors, colors[0].Length, colors.Length, true));
-				TextValueChanged();
-				return;
-			}
-			Value.SetColors(colors[0].Length, colors.Length, fullcolors);
+			_image.SetColors(colors[0].Length, colors.Length, fullcolors);
+			RImageTexture2D.UpdateImageAutoSet(_image);
 		}
 		protected void UpdateTexture(Colorf[] colors, int width, int height) {
 			var fullColors = new Colorb[colors.Length];
 			for (var i = 0; i < colors.Length; i++) {
 				fullColors[i] = colors[i].ToBytes();
 			}
-			if (Value is null) {
-				Load(RTexture2D.FromColors(fullColors, width, height, true));
-				TextValueChanged();
-				return;
-			}
-			Value.SetColors(width, height, fullColors);
+			_image.SetColors(width, height, fullColors);
+			RImageTexture2D.UpdateImageAutoSet(_image);
 		}
 
-		protected void UpdateTexture(Colorb[] colors, int width,int height) {
-			if(Value is null) {
-				Load(RTexture2D.FromColors(colors, width, height,true));
-				TextValueChanged();
-				return;
-			}
-			Value.SetColors(width, height, colors);
+		protected void UpdateTexture(Colorb[] colors, int width, int height) {
+			_image.SetColors(width, height, colors);
+			RImageTexture2D.UpdateImageAutoSet(_image);
 		}
 
 		[OnChanged(nameof(ComputeTexture))]
@@ -90,28 +62,36 @@ namespace RhuEngine.Components
 
 		protected abstract void Generate();
 
-		protected override void OnLoaded() 
-		{
+		protected override void OnLoaded() {
+			if (!Engine.EngineLink.CanRender) {
+				return;
+			}
+			_image = new RImage(null);
+			_image.Create(Math.Max(Size.Value.x, 2), Math.Max(Size.Value.y, 2), true, RFormat.Rgba8);
+			RImageTexture2D = new RImageTexture2D(Image);
+			Load(RImageTexture2D);
 			ComputeTexture();
 		}
 
-		protected void ComputeTexture() 
-		{
-			if (!Engine.EngineLink.CanRender) 
-			{
+		private void UpdateTexture() {
+			try {
+				if (_image is null) {
+					return;
+				}
+				Generate();
+			}
+			catch (Exception e) {
+#if DEBUG
+				RLog.Err(e.ToString());
+#endif
+			}
+		}
+
+		protected void ComputeTexture() {
+			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-
-			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
-				try {
-					Generate();
-				}
-				catch (Exception e) {
-#if DEBUG
-					RLog.Err(e.ToString());
-#endif
-				}
-			});
+			RenderThread.ExecuteOnStartOfFrame(this, UpdateTexture);
 		}
 	}
 }

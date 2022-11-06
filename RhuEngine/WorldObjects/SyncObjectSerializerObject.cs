@@ -81,7 +81,7 @@ namespace RhuEngine.WorldObjects
 			else {
 				if (inputType.IsEnum) {
 					var unType = inputType.GetEnumUnderlyingType();
-					if(unType == typeof(int)) {
+					if (unType == typeof(int)) {
 						Value = new DataNode<int>((int)(object)value);
 					}
 					else if (unType == typeof(uint)) {
@@ -114,12 +114,14 @@ namespace RhuEngine.WorldObjects
 				}
 				else {
 					Value = new DataNode<T>(value);
-				}			}
+				}
+			}
 			obj.SetValue("Value", Value);
 			return obj;
 		}
 
-		struct SerializeFunction {
+		struct SerializeFunction
+		{
 			internal ISyncObject _syncObject;
 
 			internal DataNodeGroup _parrentData;

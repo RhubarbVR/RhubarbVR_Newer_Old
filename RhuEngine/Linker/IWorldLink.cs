@@ -9,9 +9,9 @@ namespace RhuEngine.Linker
 	{
 		public LinkedWorldComponent LinkCompGen { get; set; }
 		public void Started();
-		
+
 		public void Stopped();
-		
+
 		public void Render();
 
 		public void Remove();
@@ -20,7 +20,7 @@ namespace RhuEngine.Linker
 
 	}
 
-	public interface IWorldLink<T>:IWorldLink where T : LinkedWorldComponent,new()
+	public interface IWorldLink<T> : IWorldLink where T : LinkedWorldComponent, new()
 	{
 		T LinkedComp { get; set; }
 	}

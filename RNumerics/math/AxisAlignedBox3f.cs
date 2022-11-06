@@ -23,6 +23,10 @@ namespace RNumerics
 		[IgnoreMember]
 		public static readonly AxisAlignedBox3f CenterZero =
 			new(Vector3f.Zero, 0);
+		[IgnoreMember]
+		public static readonly AxisAlignedBox3f CenterOne =
+	new(Vector3f.One, 0);
+
 		public AxisAlignedBox3f() {
 
 		}

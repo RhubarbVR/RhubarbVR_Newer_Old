@@ -5,24 +5,24 @@ using RNumerics;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Observer/Observers" })]
 	public sealed class ObserverWorldObject : ObserverBase<IWorldObject>
 	{
-		protected override UIRect BuildMainUIRect() {
-			return Entity.AttachComponent<VerticalList>();
-		}
-		protected override void LoadObservedUI(UIBuilder ui) {
-			if(TargetElement is null) {
+		public readonly Linker<string> LableText;
+		protected override async Task LoadObservedUI(UIBuilder2D ui) {
+			if (TargetElement is null) {
 				return;
 			}
-			ui.PushRect(new Vector2f(0, 1),null, 0.01f);
-			ui.SetOffsetMinMax(new Vector2f(0, -ELMENTHIGHTSIZE));
-			ui.AddRectangle(0.2f,0.8f);
-			ui.AddText(TargetElement.GetType().GetFormattedName(), null, 2, 1, null, true);
-			ui.PopRect();
+			var table = ui.PushElement<TextLabel>();
+			LableText.Target = table.Text;
+			ui.Min = new Vector2f(0, 1);
+			ui.MinSize = new Vector2i(0, ELMENTHIGHTSIZE);
+			table.TextSize.Value = ELMENTHIGHTSIZE;
+			ui.Pop();
 			var data = TargetElement.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
 			foreach (var item in data) {
 				if (item.GetCustomAttribute<NoShowAttribute>() is not null) {
@@ -32,14 +32,25 @@ namespace RhuEngine.Components
 					continue;
 				}
 				var newObserver = item.FieldType.GetObserverFromType();
-				if(newObserver is null) {
+				if (newObserver is null) {
 					continue;
 				}
 				if (item.GetValue(TargetElement) is IWorldObject objec) {
-					var newOBserver = ui.CurretRectEntity.AddChild(objec.Name).AttachComponent<IObserver>(newObserver);
-					newOBserver.SetUIRectAndMat(ui.MainMat);
-					newOBserver.SetObserverd(objec);
+					var element = ui.Entity.AddChild(objec.Name);
+					var boxXo = element.AttachComponent<BoxContainer>();
+					boxXo.Vertical.Value = true;
+					boxXo.InputFilter.Value = RInputFilter.Pass;
+
+					var newOBserver = element.AttachComponent<IObserver>(newObserver);
+					await newOBserver.SetObserverd(objec);
 				}
+			}
+		}
+
+		protected override void LoadValueIn() {
+			if (LableText.Linked) {
+				LableText.LinkedValue = TargetElement.Name + " : " + TargetElement.GetType().GetFormattedName();
+
 			}
 		}
 	}

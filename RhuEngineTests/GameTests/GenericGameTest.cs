@@ -27,6 +27,7 @@ using RhuEngine.DataStructure;
 using System.Collections;
 using Assimp.Unmanaged;
 using System.Runtime.InteropServices;
+using static RBullet.BPhysicsSim;
 
 namespace RhuEngine.GameTests.Tests
 {
@@ -56,7 +57,6 @@ namespace RhuEngine.GameTests.Tests
 			Assert.IsNotNull(world);
 			world.RootEntity.AttachComponent<MainFont>();
 			world.RootEntity.AttachComponent<IconsTex>();
-			world.RootEntity.AttachComponent<SpriteProvder>();
 			world.RootEntity.AttachComponent<TrivialBox3Mesh>();
 			return world;
 		}
@@ -464,7 +464,6 @@ namespace RhuEngine.GameTests.Tests
 				var entity = rootEntity.AddChild($"TEst{i}");
 				entity.AttachComponent<MeshRender>();
 				entity.AttachComponent<Grabbable>();
-				entity.AttachComponent<UIRect>();
 				entity.AttachComponent<Spinner>();
 				entity.AttachComponent<RawECMAScript>();
 			}
@@ -619,7 +618,7 @@ namespace RhuEngine.GameTests.Tests
 								RunComponentTest(comp);
 							}
 							catch {
-								if (testes.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) {
+								if ((testes.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) && (testes.GetCustomAttribute<OverlayOnlyAttribute>(true) == null)) {
 									throw;
 								}
 							}
@@ -641,7 +640,7 @@ namespace RhuEngine.GameTests.Tests
 						RunComponentTest(comp);
 					}
 					catch {
-						if (item.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) {
+						if ((item.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) == null) && (item.GetCustomAttribute<OverlayOnlyAttribute>(true) == null)) {
 							throw;
 						}
 					}

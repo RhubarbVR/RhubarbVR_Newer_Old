@@ -26,10 +26,14 @@ namespace RhuEngine.Components
 				return;
 			}
 			if (isVR.Linked) {
-				isVR.LinkedValue = Engine.IsInVR;
+				if(isVR.LinkedValue != Engine.IsInVR) {
+					isVR.LinkedValue = Engine.IsInVR;
+				}
 			}
 			if (isNotVR.Linked) {
-				isNotVR.LinkedValue = !Engine.IsInVR;
+				if (isNotVR.LinkedValue != !Engine.IsInVR) {
+					isNotVR.LinkedValue = !Engine.IsInVR;
+				}
 			}
 		}
 	}

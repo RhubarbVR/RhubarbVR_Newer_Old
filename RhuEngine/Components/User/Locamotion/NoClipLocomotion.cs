@@ -26,6 +26,19 @@ namespace RhuEngine.Components
 		}
 
 		private void ProcessController(bool isMain) {
+			if (UserRoot.head.Target is null) {
+				return;
+			}
+			if (Engine.inputManager.GetHand(isMain) == Handed.Right) {
+				if (WorldManager.PrivateSpaceManager.Right.IsAnyLaserGrabbed) {
+					return;
+				}
+			}
+			else {
+				if (WorldManager.PrivateSpaceManager.Left.IsAnyLaserGrabbed) {
+					return;
+				}
+			}
 			var speed = AllowMultiplier ? MathUtil.Lerp(MovementSpeed, MaxSprintSpeed, MoveSpeed) : MovementSpeed;
 			var tempRight = InputManager.GetInputAction(InputTypes.Right).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
 			var tempLeft = InputManager.GetInputAction(InputTypes.Left).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
@@ -33,23 +46,28 @@ namespace RhuEngine.Components
 			var tempFlyDown = InputManager.GetInputAction(InputTypes.FlyDown).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
 			var tempForward = InputManager.GetInputAction(InputTypes.Forward).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
 			var tempBack = InputManager.GetInputAction(InputTypes.Back).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
-			var pos = new Vector3f(tempRight - tempLeft, tempFlyUp - tempFlyDown, -tempForward + tempBack) * speed;
+			var pos = new Vector3f(0, 0, -tempForward + tempBack) * speed;
 			var Rotspeed = AllowMultiplier ? MathUtil.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
 			var tempRotateRight = InputManager.GetInputAction(InputTypes.RotateLeft).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
 			var tempRotateLeft = InputManager.GetInputAction(InputTypes.RotateRight).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
-			var rot = Quaternionf.CreateFromEuler((tempRotateRight - tempRotateLeft) * RotationSpeed, 0, 0);
 			var AddToMatrix = Matrix.T(pos);
-			switch (Engine.inputManager.GetHand(isMain)) {
-				case Handed.Left:
-					ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot.Target?.leftController.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
-					break;
-				case Handed.Right:
-					ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot.Target?.rightController.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
-					break;
-				default:
-					break;
+			var handPos = InputManager.XRInputSystem.GetHand(Engine.inputManager.GetHand(isMain))[Input.XRInput.TrackerPos.Aim];
+			ProcessGlobalRotToUserRootMovement(AddToMatrix, Matrix.TR(handPos.Position, handPos.Rotation) * UserRootEnity.GlobalTrans);
+			var posHead = new Vector3f(tempRight - tempLeft, tempFlyUp - tempFlyDown, 0) * speed;
+			ProcessGlobalRotToUserRootMovement(Matrix.T(posHead), UserRoot.head.Target.GlobalTrans);
+			var otherHandNotUsable = !InputManager.XRInputSystem.GetHand(Engine.inputManager.GetHand(!isMain))[Input.XRInput.TrackerPos.Default].HasPos;
+			if (Engine.inputManager.GetHand(isMain) == Handed.Right) {
+				otherHandNotUsable |= WorldManager.PrivateSpaceManager.Left.IsAnyLaserGrabbed;
 			}
-			UserRootEnity.rotation.Value *= rot;
+			else {
+				otherHandNotUsable |= WorldManager.PrivateSpaceManager.Right.IsAnyLaserGrabbed;
+			}
+			if (isMain || otherHandNotUsable) {
+				var headPos = Matrix.T(UserRoot.head.Target.position.Value) * UserRootEnity.GlobalTrans;
+				var headLocal = headPos * UserRootEnity.GlobalTrans.Inverse;
+				var newHEadPos = Matrix.R(Quaternionf.CreateFromEuler((tempRotateRight - tempRotateLeft) * RotationSpeed, 0, 0)) * headPos;
+				SetUserRootGlobal(headLocal.Inverse * newHEadPos);
+			}
 		}
 
 		private void ProcessHeadBased() {
@@ -59,7 +77,9 @@ namespace RhuEngine.Components
 			var rot = Quaternionf.CreateFromEuler((RotateRight - RotateLeft) * RotationSpeed, 0, 0);
 			var AddToMatrix = Matrix.T(pos);
 			ProcessGlobalRotToUserRootMovement(AddToMatrix, LocalUser.userRoot?.Target.head.Target?.GlobalTrans ?? UserRootEnity.GlobalTrans);
-			UserRootEnity.rotation.Value *= rot;
+			if (!WorldManager.PrivateSpaceManager.Head.IsAnyLaserGrabbed) {
+				UserRootEnity.rotation.Value *= rot;
+			}
 		}
 
 		public override void ProcessMovement() {

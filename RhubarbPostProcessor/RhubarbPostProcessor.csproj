@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RhuEngine\RhuEngine.csproj" />
     <ProjectReference Include="..\RhuPostProcessor\RhuPostProcessor.csproj" />
   </ItemGroup>
 

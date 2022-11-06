@@ -110,6 +110,7 @@
     "Common.Logout": "Logout",
     "Common.Refresh": "refresh",
     "Common.Refreshing": "Refreshing..",
+    "Common.CustomStatus": "Custom Status",
 
     "Fact.Month1.Day16": "Jan 16th is Appreciate a Dragon Day",
     "Fact.Month2.Day13": "Feb 13th is World Radio Day",
@@ -241,6 +242,7 @@
     "API.LogOut": "LogOut",
 
     "Programs.Settings.Name": "Settings",
+    "Account.ChangePassword": "Change Password",
 
 
     "Programs.FileExplorer.Name": "File Explorer",
@@ -250,6 +252,13 @@
     "Actions.ChangeVR.Enable": "Enter VR",
     "Actions.ChangeVR.Disable": "Leave VR",
     "Programs.PublicSessions.Name": "Public Sessions",
+
+
+    "Status.Online": "Online",
+    "Status.Idle": "Idle",
+    "Status.DoNotDisturb": "DoNotDisturb",
+    "Status.Stream": "Stream",
+    "Status.Offline": "Offline",
 
     "Free.Of": "{0} free of {1}",
     "Messaging.CreateDm": "Create DM",

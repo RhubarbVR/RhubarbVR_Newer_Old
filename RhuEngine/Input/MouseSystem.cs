@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using RhuEngine.Components;
 using RhuEngine.Linker;
 using RhuEngine.Managers;
 
@@ -108,6 +109,10 @@ namespace RhuEngine.Input
 					_thisFrame.Add(key);
 				}
 			}
+		}
+
+		public void SetCurrsor(RCursorShape currsor,RTexture2D rTexture2D = null) {
+			_mouseInputDriver?.SetCurrsor(currsor, rTexture2D);
 		}
 	}
 }

@@ -4,10 +4,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using System;
 using RhuEngine.WorldObjects.ECS;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Drawing;
-using SixLabors.ImageSharp.Processing;
+
 
 namespace RhuEngine.Components
 {

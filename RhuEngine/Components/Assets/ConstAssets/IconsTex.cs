@@ -5,6 +5,7 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/ConstAssets" })]
+	[AllowedOnWorldRoot]
 	public sealed class IconsTex : AssetProvider<RTexture2D>
 	{
 		private void LoadTexture() {

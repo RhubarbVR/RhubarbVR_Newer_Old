@@ -246,11 +246,13 @@ namespace RhuEngine
 
 		public static Entity GetClosedEntity(this IWorldObject worldObject) {
 			try {
-				return (Entity)worldObject;
+				if(worldObject is Entity entity) {
+					return entity;
+				}
 			}
 			catch {
-				return worldObject?.Parent?.GetClosedEntity();
 			}
+			return worldObject?.Parent?.GetClosedEntity();
 		}
 
 		public static User GetClosedUser(this IWorldObject worldObject) {
@@ -290,6 +292,27 @@ namespace RhuEngine
 			return comp is null || comp == worldObject
 				? worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null"
 				: $"{comp.GetType().GetFormattedName()} attached to " + (worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null");
+		}
+
+		public static Type GetHighestAttributeInherit<T>(this Type type) where T:Attribute {
+			if (type.GetCustomAttribute<T>() is not null) {
+				return type;
+			}
+			if(type.GetCustomAttribute<T>(true) is null) {
+				return null;
+			}
+			return type.BaseType?.GetHighestAttributeInherit<T>();
+		}
+
+
+		public static bool IsNullable(this Type type) {
+			if (!type.IsValueType) {
+				return true; // ref-type
+			}
+			if (Nullable.GetUnderlyingType(type) != null) {
+				return true; // Nullable<T>
+			}
+			return false; // value-type
 		}
 	}
 }

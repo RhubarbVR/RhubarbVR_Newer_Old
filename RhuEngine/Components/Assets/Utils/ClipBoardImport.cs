@@ -12,6 +12,7 @@ using RhuEngine.Managers;
 namespace RhuEngine.Components
 {
 	[UpdatingComponent]
+	[AllowedOnWorldRoot]
 	[Category(new string[] { "Assets/Utils" })]
 	public sealed class ClipBoardImport :Component
 	{

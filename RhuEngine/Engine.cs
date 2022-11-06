@@ -150,6 +150,9 @@ namespace RhuEngine
 			var thedata = (MainSettingsObject)Activator.CreateInstance(theType);
 			MainSettings = lists.Count == 0 ? thedata : SettingsManager.LoadSettingsObject(thedata, lists.ToArray());
 			MainSettings.RenderSettings.RenderSettingsChange?.Invoke();
+			if (EngineLink.CanRender) {
+				RRenderer.Fov = thedata.Fov;
+			}
 		}
 
 		public bool HasKeyboard => KeyboardInteraction is not null;
@@ -161,6 +164,10 @@ namespace RhuEngine
 		}
 
 		public void KeyboardInteractionBind(IKeyboardInteraction uITextEditorInteraction) {
+			if (KeyboardInteraction == uITextEditorInteraction) {
+				KeyBoardUpdate();
+				return;
+			}
 			KeyboardInteraction?.KeyboardUnBind();
 			KeyboardInteraction = uITextEditorInteraction;
 			KeyBoardUpdate();
@@ -181,6 +188,9 @@ namespace RhuEngine
 		public event Action SettingsUpdate;
 
 		public void UpdateSettings() {
+			if (EngineLink.CanRender) {
+				RRenderer.Fov = MainSettings.Fov;
+			}
 			SettingsUpdate?.Invoke();
 		}
 
@@ -217,11 +227,11 @@ namespace RhuEngine
 
 		public NetApiManager netApiManager;
 
+		public WindowManager windowManager = new();
+
 		public WorldManager worldManager = new();
 
 		public AssetManager assetManager;
-
-		public UIManager uiManager = new();
 
 		public InputManager inputManager = new();
 
@@ -246,7 +256,8 @@ namespace RhuEngine
 		public Thread startingthread;
 
 		public RText StartingText;
-		public ITextMaterial StartingTextMit;
+		public RTempQuad StartingLogo;
+
 		public bool IsInVR => EngineLink.InVR;
 
 		public void Init(bool RunStartThread = true) {
@@ -256,24 +267,33 @@ namespace RhuEngine
 			IntMsg = $"Engine started Can Render {EngineLink.CanRender} Can Audio {EngineLink.CanAudio} Can input {EngineLink.CanInput}";
 			RLog.Info(IntMsg);
 			if (EngineLink.CanRender) {
+				if (RRenderer.PassthroughSupport) {
+					RLog.Info("Passthrough Supported");
+				}
+				else {
+					RLog.Info("Passthrough not Supported");
+				}
+			}
+			if (EngineLink.CanRender) {
 				StartingText = new RText(staticResources.MainFont) {
-					Text = "Starting"
+					Text = "Starting",
+					HorizontalAlignment = RHorizontalAlignment.Center,
+					VerticalAlignment = RVerticalAlignment.Center,
 				};
-				StartingTextMit = StaticMaterialManager.GetMaterial<ITextMaterial>();
-				StartingTextMit.Texture = StartingText.texture2D;
-				StartingText.UpdatedTexture += () => StartingTextMit.Texture = StartingText?.texture2D;
 				RRenderer.EnableSky = false;
+				StartingLogo = new RTempQuad();
 				LoadingLogo = StaticMaterialManager.GetMaterial<IUnlitMaterial>();
 				LoadingLogo.Transparency = Transparency.Blend;
 				LoadingLogo.DullSided = true;
 				LoadingLogo.Texture = staticResources.RhubarbLogoV2;
+				StartingLogo.Material = LoadingLogo.Material;
 			}
 			var startcode = () => {
 				IntMsg = "Building NetApiManager";
 				netApiManager = new NetApiManager((_userDataPathOverRide ?? BaseDir) + "/rhuCookie");
 				IntMsg = "Building AssetManager";
 				assetManager = new AssetManager(_cachePathOverRide);
-				_managers = new IManager[] { discordManager, localisationManager, inputManager, netApiManager, assetManager, worldManager, uiManager };
+				_managers = new IManager[] { discordManager, windowManager, localisationManager, inputManager, netApiManager, assetManager, worldManager };
 				foreach (var item in _managers) {
 					IntMsg = $"Starting {item.GetType().Name}";
 					try {
@@ -282,16 +302,22 @@ namespace RhuEngine
 					catch (Exception ex) {
 						RLog.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
 						IntMsg = $"Failed to start {item.GetType().GetFormattedName()} Error:{ex}";
-						throw ex;
+						//throw ex;
+						return;
 					}
 				}
+				IntMsg = $"{localisationManager?.GetLocalString("Common.Loaded")}\nEngine Started";
 				EngineStarting = false;
 				if (EngineLink.CanRender) {
-					StartingText?.Dispose();
-					StartingText = null;
-					LoadingLogo?.Dispose();
-					LoadingLogo = null;
-					RRenderer.EnableSky = true;
+					RenderThread.ExecuteOnStartOfFrame(() => {
+						StartingLogo?.Dispose();
+						StartingLogo = null;
+						StartingText?.Dispose();
+						StartingText = null;
+						LoadingLogo?.Dispose();
+						LoadingLogo = null;
+						RRenderer.EnableSky = true;
+					});
 				}
 				RLog.Info("Engine Started");
 				IntMsg = $"{localisationManager?.GetLocalString("Common.Loaded")}\nRunning First Step...";
@@ -308,6 +334,31 @@ namespace RhuEngine
 			}
 		}
 
+		private bool _mouseFree = true;
+
+		public bool MouseFree
+		{
+			get => _mouseFree;
+			set {
+				_mouseFree = value;
+				MouseFreeStateUpdate();
+			}
+		}
+
+		public void MouseFreeStateUpdate() {
+			if (inputManager?.MouseSystem is not null) {
+				if (IsInVR) {
+					inputManager.MouseSystem.MouseHidden = false;
+					inputManager.MouseSystem.MouseLocked = false;
+				}
+				else {
+					inputManager.MouseSystem.MouseHidden = _mouseFree;
+					inputManager.MouseSystem.MouseLocked = _mouseFree;
+				}
+			}
+		}
+
+
 		private Vector3f _oldPlayerPos = Vector3f.Zero;
 		private Vector3f _loadingPos = Vector3f.Zero;
 
@@ -316,11 +367,7 @@ namespace RhuEngine
 			if (EngineStarting) {
 				if (EngineLink.CanRender) {
 					try {
-						var headMat = inputManager.HeadMatrix;
-						if (!IsInVR) {
-							RRenderer.CameraRoot = Matrix.Identity;
-							headMat = Matrix.T(Vector3f.Forward / 10);
-						}
+						var headMat = RRenderer.GetMainViewMatrix;
 						var textpos = Matrix.T(Vector3f.Forward * 0.5f) * (EngineLink.CanInput ? headMat : Matrix.S(1));
 						var playerPos = RRenderer.CameraRoot.Translation;
 						_loadingPos += playerPos - _oldPlayerPos;
@@ -329,11 +376,9 @@ namespace RhuEngine
 						var rootMatrix = Matrix.TR(_loadingPos, Quaternionf.LookAt(EngineLink.CanInput ? headMat.Translation : Vector3f.Zero, _loadingPos));
 						if (StartingText is not null) {
 							StartingText.Text = $"{localisationManager?.GetLocalString("Common.Loading")}\n{IntMsg}";
-							if (StartingTextMit is not null) {
-								RMesh.Quad.Draw(StartingTextMit?.Material, Matrix.TS(0, -0.2f, 0, new Vector3f(StartingText?.AspectRatio ?? 1, 1, 1) / 7) * rootMatrix);
-							}
+							StartingText.Pos = Matrix.TS(0, -0.2f, 0, new Vector3f(-0.1f, 0.1f, 0.1f)) * rootMatrix;
 							if (LoadingLogo is not null) {
-								RMesh.Quad.Draw(LoadingLogo?.Material, Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix);
+								StartingLogo.Pos = Matrix.TS(0, 0.06f, 0, 0.25f) * rootMatrix;
 							}
 						}
 					}
@@ -357,13 +402,13 @@ namespace RhuEngine
 						item.RenderStep();
 					}
 					catch (Exception ex) {
-						RLog.Err($"Failed to step {item.GetType().GetFormattedName()} Error: {ex}");
+						RLog.Err($"Failed to render step {item.GetType().GetFormattedName()} Error: {ex}");
 						throw ex;
 					}
 				}
 			}
 			catch (Exception wa) {
-				RLog.Err("GameStep Error" + wa.ToString());
+				RLog.Err("Render Step Error" + wa.ToString());
 			}
 		}
 
@@ -401,6 +446,8 @@ namespace RhuEngine
 		public void Dispose() {
 			RLog.Info("Engine Disposed");
 			SaveSettings();
+			RLog.Info("CleanUpTemp");
+			TempFiles.CleanUpTempFiles();
 			foreach (var item in _managers) {
 				try {
 					item.Dispose();
@@ -412,6 +459,7 @@ namespace RhuEngine
 					}
 				}
 			}
+
 		}
 	}
 }

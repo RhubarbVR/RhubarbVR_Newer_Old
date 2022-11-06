@@ -22,6 +22,7 @@ namespace RhuEngine.WorldObjects
 		public PhysicsSim PhysicsSim { get; set; }
 
 		public bool IsLoading => (IsDeserializing || IsLoadingNet) & !HasError;
+		public bool IsOverlayWorld => worldManager.OverlayWorld == this;
 
 		public bool IsPersonalSpace { get; private set; }
 
@@ -290,7 +291,7 @@ namespace RhuEngine.WorldObjects
 
 		private readonly List<IGrouping<uint, Entity>> _sorrtedEntity = new();
 
-		private  bool _sortEntitys;
+		private bool _sortEntitys;
 
 		public void Step() {
 			_netManager?.PollEvents();
