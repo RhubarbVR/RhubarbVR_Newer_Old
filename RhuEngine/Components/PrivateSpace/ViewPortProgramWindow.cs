@@ -17,8 +17,12 @@ namespace RhuEngine.Components
 		[Default("ViewPort Program Window")]
 		[OnChanged(nameof(UpdateData))]
 		public readonly Sync<string> Title;
-
+		[OnChanged(nameof(ViewportUpdate))]
 		public readonly SyncRef<Viewport> Viewport;
+
+		public void ViewportUpdate() {
+			OnViewportUpdate?.Invoke();
+		}
 
 		[OnAssetLoaded(nameof(UpdateData))]
 		public readonly AssetRef<RTexture2D> IconTexture;
@@ -33,6 +37,7 @@ namespace RhuEngine.Components
 
 		public override event Action OnUpdatedData;
 		public override event Action OnUpdatePosAndScale;
+		public override event Action OnViewportUpdate;
 
 		public override RTexture2D Texture => Viewport.Target?.Value;
 

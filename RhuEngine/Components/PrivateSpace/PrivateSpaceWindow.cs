@@ -22,7 +22,18 @@ namespace RhuEngine.Components
 			Window.PrivateSpaceWindow = this;
 			LoadTaskBarItem();
 			LoadUI();
+			Window.OnViewportUpdate += Window_OnViewportUpdate;
+			Window_OnViewportUpdate();
+
 			window.OnClosedWindow += Window_OnClosedWindow;
+		}
+
+		private void Window_OnViewportUpdate() {
+			if(Window?.TargetViewport is null) {
+				return;
+			}
+			// Todo: Loaded window and connect with viewport connector
+			//Window.TargetViewport;
 		}
 
 		private void Window_OnClosedWindow() {

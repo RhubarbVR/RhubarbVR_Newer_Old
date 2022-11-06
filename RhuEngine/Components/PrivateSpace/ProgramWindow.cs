@@ -36,6 +36,7 @@ namespace RhuEngine.Components
 		public abstract bool CanClose { get; }
 
 		public event Action OnClosedWindow;
+		public abstract event Action OnViewportUpdate;
 
 		public void Close() {
 			if (!CanClose) {
