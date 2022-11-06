@@ -23,9 +23,23 @@ namespace RhubarbVR.Bindings.ComponentLinking
 	{
 		public T2 node;
 
-		public event Action VisibilityChanged { add => node.VisibilityChanged += value; remove => node.VisibilityChanged -= value; }
-		public event Action Hidden { add => node.Hidden += value; remove => node.Hidden -= value; }
-		public event Action ItemRectChanged { add => node.ItemRectChanged += value; remove => node.ItemRectChanged -= value; }
+		public event Action VisibilityChanged
+		{
+			add {
+				if (node is null) {
+					return;
+				}
+				node.VisibilityChanged += value;
+			}
+			remove {
+				if (node is null) {
+					return;
+				}
+				node.VisibilityChanged -= value;
+			}
+		}
+		public event Action Hidden { add { if (node is null) { return; } node.Hidden += value; } remove { if (node is null) { return; } node.Hidden -= value; } }
+		public event Action ItemRectChanged { add { if (node is null) { return; } node.ItemRectChanged += value; } remove { if (node is null) { return; } node.ItemRectChanged -= value; } }
 
 		public abstract string ObjectName { get; }
 
@@ -279,11 +293,17 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 
 		public override void Started() {
-			node?.SetVisible(true);
+			if(node is null) {
+				return;
+			}
+			node.Visible = true;
 		}
 
 		public override void Stopped() {
-			node?.SetVisible(false);
+			if (node is null) {
+				return;
+			}
+			node.Visible = false;
 		}
 
 		public bool UpdatePosThisFrame { get; private set; } = true;

@@ -73,24 +73,25 @@ namespace RhuEngine.Components
 			ComputeTexture();
 		}
 
+		private void UpdateTexture() {
+			try {
+				if (_image is null) {
+					return;
+				}
+				Generate();
+			}
+			catch (Exception e) {
+#if DEBUG
+				RLog.Err(e.ToString());
+#endif
+			}
+		}
+
 		protected void ComputeTexture() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-
-			RenderThread.ExecuteOnStartOfFrame(this, () => {
-				try {
-					if (_image is null) {
-						return;
-					}
-					Generate();
-				}
-				catch (Exception e) {
-#if DEBUG
-					RLog.Err(e.ToString());
-#endif
-				}
-			});
+			RenderThread.ExecuteOnStartOfFrame(this, UpdateTexture);
 		}
 	}
 }

@@ -26,6 +26,37 @@ namespace RhuEngine.Components
 			PrivateSpaceManager.UserInterfaceManager.privateSpaceTaskbarItems.Add(this);
 		}
 
+		private bool _overBackGorund;
+		private bool _overClose;
+
+		[Exposed]
+		public void InputOverBackGround() {
+			_overBackGorund = true;
+			InputUpdate();
+		}
+
+		[Exposed]
+		public void InputOverClose() {
+			_overClose = true;
+			InputUpdate();
+		}
+
+		private void InputUpdate() {
+			_closeButton.Entity.enabled.Value = (_privateSpaceWindow?.Window?.CanClose ?? false) && (_overBackGorund || _overClose);
+		}
+
+		[Exposed]
+		public void InputLeaveBackGround() {
+			_overBackGorund = false;
+			InputUpdate();
+		}
+
+		[Exposed]
+		public void InputLeaveClose() {
+			_overClose = false;
+			InputUpdate();
+		}
+
 		protected override void OnAttach() {
 			base.OnAttach();
 			var root = Entity.AttachComponent<UIElement>();
@@ -34,6 +65,11 @@ namespace RhuEngine.Components
 
 			var mainButton = Entity.AddChild("MainButton").AttachComponent<Button>();
 			mainButton.Flat.Value = true;
+
+			var inputEvents = mainButton.Entity.AttachComponent<UIInputEvents>();
+			inputEvents.InputEntered.Target = InputOverBackGround;
+			inputEvents.InputExited.Target = InputLeaveBackGround;
+
 
 			mainButton.IconAlignment.Value = RButtonAlignment.Center;
 			mainButton.ExpandIcon.Value = true;
@@ -49,6 +85,10 @@ namespace RhuEngine.Components
 			_isOpen.GrowVertical.Value = RGrowVertical.Top;
 
 			_closeButton = Entity.AddChild("CloseButton").AttachComponent<Button>();
+			var inputEventse = _closeButton.Entity.AttachComponent<UIInputEvents>();
+			inputEventse.InputEntered.Target = InputOverClose;
+			inputEventse.InputExited.Target = InputLeaveClose;
+
 			_closeButton.IconAlignment.Value = RButtonAlignment.Center;
 			_closeButton.ExpandIcon.Value = true;
 			_closeButton.Min.Value = new Vector2f(1, 0);
@@ -92,7 +132,7 @@ namespace RhuEngine.Components
 
 
 		private void Window_UpdateData() {
-			_closeButton.Entity.enabled.Value = _privateSpaceWindow?.Window?.CanClose ?? false;
+			InputUpdate();
 			_iconProvider.LoadAsset(_privateSpaceWindow?.Window?.Icon ?? Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
 		}
 

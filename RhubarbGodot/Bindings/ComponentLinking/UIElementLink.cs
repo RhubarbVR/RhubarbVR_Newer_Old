@@ -21,92 +21,106 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public event Action FocusEntered
 		{
 			add {
-				if (LinkedComp is IUIElementLinked val) {
-					val.FocusEntered += value;
+				if (node is null) {
+					return;
 				}
+				node.FocusEntered += value;
 			}
 			remove {
-				if (LinkedComp is IUIElementLinked val) {
-					val.FocusEntered -= value;
+				if (node is null) {
+					return;
 				}
+				node.FocusEntered -= value;
 			}
 		}
 		public event Action FocusExited
 		{
 			add {
-				if (LinkedComp is IUIElementLinked val) {
-					val.FocusExited += value;
+				if (node is null) {
+					return;
 				}
+				node.FocusExited += value;
 			}
 			remove {
-				if (LinkedComp is IUIElementLinked val) {
-					val.FocusExited -= value;
+				if (node is null) {
+					return;
 				}
+				node.FocusExited -= value;
 			}
 		}
 		public event Action Resized
 		{
 			add {
-				if (LinkedComp is IUIElementLinked val) {
-					val.Resized += value;
+				if (node is null) {
+					return;
 				}
+				node.Resized += value;
 			}
 			remove {
-				if (LinkedComp is IUIElementLinked val) {
-					val.Resized -= value;
+				if (node is null) {
+					return;
 				}
+				node.Resized -= value;
 			}
 		}
 		public event Action SizeFlagsChanged
 		{
 			add {
-				if (LinkedComp is IUIElementLinked val) {
-					val.SizeFlagsChanged += value;
+				if (node is null) {
+					return;
 				}
+				node.SizeFlagsChanged += value;
 			}
 			remove {
-				if (LinkedComp is IUIElementLinked val) {
-					val.SizeFlagsChanged -= value;
+				if (node is null) {
+					return;
 				}
+				node.SizeFlagsChanged -= value;
 			}
 		}
 		public event Action MinimumSizeChanged
 		{
 			add {
-				if (LinkedComp is IUIElementLinked val) {
-					val.MinimumSizeChanged += value;
+				if (node is null) {
+					return;
 				}
+				node.MinimumSizeChanged += value;
 			}
 			remove {
-				if (LinkedComp is IUIElementLinked val) {
-					val.MinimumSizeChanged -= value;
+				if (node is null) {
+					return;
 				}
+				node.MinimumSizeChanged -= value;
 			}
 		}
 		public event Action InputEntered
 		{
 			add {
-				if (LinkedComp is IUIElementLinked val) {
-					val.InputEntered += value;
+				if (node is null) {
+					return;
 				}
+				node.MouseEntered += value;
 			}
 			remove {
-				if (LinkedComp is IUIElementLinked val) {
-					val.InputEntered -= value;
+				if (node is null) {
+					return;
 				}
+				node.MouseEntered -= value;
 			}
 		}
 		public event Action InputExited
 		{
 			add {
-				if (LinkedComp is IUIElementLinked val) {
-					val.InputExited += value;
+				if (node is null) {
+					return;
 				}
+				node.MouseExited += value;
 			}
 			remove {
-				if (LinkedComp is IUIElementLinked val) {
-					val.InputExited -= value;
+				if (node is null) {
+					return;
 				}
+				node.MouseExited -= value;
 			}
 		}
 

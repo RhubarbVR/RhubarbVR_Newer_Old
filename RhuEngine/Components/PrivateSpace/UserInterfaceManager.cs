@@ -134,8 +134,6 @@ namespace RhuEngine.Components
 			taskBarVRElement.MaxOffset.Value = new Vector2i(0, 100);
 			taskBarVRElement.InputInterface.Target = _PrivateSpaceManager.VRViewPort;
 			
-
-
 			StartVRElement = VrElements.AddChild("StartVR").AttachMesh<CanvasMesh>(UImaterial);
 			StartVRElement.TopOffset.Value = false;
 			StartVRElement.FrontBindRadus.Value += 1f;

@@ -20,6 +20,9 @@ namespace RhuEngine.Components
 		protected T LoadedData;
 
 		private void Entity_CanvasItemUpdateEvent() {
+			if(LoadedData is not null) {
+				UnLoadCanvasItem(LoadedData);
+			}
 			if(Entity.CanvasItem is T data) {
 				LoadedData = data;
 				LoadCanvasItem(data);
@@ -32,7 +35,9 @@ namespace RhuEngine.Components
 		public override void Dispose() {
 			base.Dispose();
 			Entity.CanvasItemUpdateEvent -= Entity_CanvasItemUpdateEvent;
-			UnLoadCanvasItem(LoadedData);
+			if (LoadedData is not null) {
+				UnLoadCanvasItem(LoadedData);
+			}
 			LoadedData = null;
 		}
 	}
