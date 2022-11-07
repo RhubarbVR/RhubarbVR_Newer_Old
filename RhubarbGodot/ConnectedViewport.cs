@@ -26,8 +26,17 @@ public partial class ConnectedViewport : TextureRect
 		}
 	}
 
+	public override void _Ready() {
+		base._Ready();
+		IgnoreTextureSize = true;
+		StretchMode = StretchModeEnum.Keep;
+	}
+
 	public override void _Input(InputEvent @event) {
 		base._Input(@event);
+		if (Viewport.IsRemoved || Viewport.IsDestroying) {
+			return;
+		}
 		var xform = GetGlobalTransform();
 		var ev = @event.XformedBy(xform.AffineInverse());
 		targetViewport?.PushInput(ev);

@@ -13,14 +13,17 @@ namespace RNumerics
 		public int y;
 
 		public Vector2i() {
-			x
-				= 0;
+			x = 0;
 			y = 0;
 		}
 
 		public Vector2i(in int f) { x = y = f; }
 		public Vector2i(in int x, in int y) { this.x = x; this.y = y; }
 		public Vector2i(in int[] v2) { x = v2[0]; y = v2[1]; }
+
+		public Vector2i(float x, float y) : this((int)x, (int)y) {
+		}
+
 		[IgnoreMember]
 		public static readonly Vector2i Zero = new(0, 0);
 		[IgnoreMember]

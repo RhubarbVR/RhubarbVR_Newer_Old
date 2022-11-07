@@ -15,6 +15,7 @@ using RhuEngine.WorldObjects;
 using RhuEngine.Components.PrivateSpace;
 using System.Globalization;
 using System.Collections;
+using RhuEngine.Managers;
 
 namespace RhuEngine.Components
 {
@@ -34,6 +35,12 @@ namespace RhuEngine.Components
 		[NoLoad]
 		[NoSyncUpdate]
 		public UIElement UserInterface;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIElement Windows;
 
 		[NoSave]
 		[NoSync]
@@ -121,6 +128,8 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
+			Windows = RootUIEntity.AddChild("Windows").AttachComponent<UIElement>();
+
 			UImaterial = Entity.AttachComponent<UnlitMaterial>();
 			UImaterial.DullSided.Value = true;
 			UImaterial.Transparency.Value = Transparency.Blend;
@@ -320,9 +329,6 @@ namespace RhuEngine.Components
 			backGorund.Color.Value = new Colorf(50, 50, 50, 150);
 
 			var scrollCont = center.Entity.AddChild("Scroll").AttachComponent<ScrollContainer>();
-			scrollCont.MinOffset.Value = new Vector2f(0, -44);
-			scrollCont.MaxOffset.Value = new Vector2f(0, 44);
-
 			_taskbarElementHolder = scrollCont.Entity.AddChild("Box").AttachComponent<BoxContainer>();
 			_taskbarElementHolder.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
 			_taskbarElementHolder.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;

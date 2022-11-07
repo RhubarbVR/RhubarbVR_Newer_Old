@@ -32,15 +32,19 @@ namespace RhuEngine.Components
 			}
 			var window = programWindows[0].Target;
 			window.Entity.DestroyChildren();
-			if (Engine.netApiManager.Client.IsLogin) {
-				window.Entity.AddChild("Color").AttachComponent<ColorRect>().Color.Value = Colorf.Purple;
-			}
-			else if (Engine.netApiManager.Client.IsOnline) {
-				window.Entity.AddChild("Color").AttachComponent<ColorRect>().Color.Value = Colorf.Green;
-			}
-			else {
-				window.Entity.AddChild("Color").AttachComponent<ColorRect>().Color.Value = Colorf.Red;
-			}
+			var button = window.Entity.AddChild("Button").AttachComponent<Button>();
+			button.Text.Value = "Button";
+			button.Min.Value = new Vector2f(0.25f);
+			button.Max.Value = new Vector2f(0.75f);
+			//if (Engine.netApiManager.Client.IsLogin) {
+			//	window.Entity.AddChild("Color").AttachComponent<ColorRect>().Color.Value = Colorf.Purple;
+			//}
+			//else if (Engine.netApiManager.Client.IsOnline) {
+			//	window.Entity.AddChild("Color").AttachComponent<ColorRect>().Color.Value = Colorf.Green;
+			//}
+			//else {
+			//	window.Entity.AddChild("Color").AttachComponent<ColorRect>().Color.Value = Colorf.Red;
+			//}
 		}
 	}
 }

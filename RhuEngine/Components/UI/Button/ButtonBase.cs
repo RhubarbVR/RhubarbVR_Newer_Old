@@ -19,7 +19,8 @@ namespace RhuEngine.Components
 		None = 0,
 		Primary = 1,
 		Secondary = 2,
-		Tertiary = 4
+		Tertiary = 4,
+		All = Primary | Secondary | Tertiary
 	}
 
 	[Category("UI/Button")]
@@ -42,6 +43,7 @@ namespace RhuEngine.Components
 			base.OnAttach();
 			FocusMode.Value = RFocusMode.All;
 			CursorShape.Value = RCursorShape.PointingHand;
+			ButtonMask.Value = RButtonMask.Primary;
 		}
 	}
 }

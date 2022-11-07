@@ -65,13 +65,13 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		private void ButtonMask_Changed(IChangeable obj) {
 			var mask = MouseButton.None;
-			if((LinkedComp.ButtonMask.Value | RButtonMask.Primary) != RButtonMask.None) {
+			if((LinkedComp.ButtonMask.Value & RButtonMask.Primary) != RButtonMask.None) {
 				mask |= MouseButton.MaskLeft;
 			}
-			if ((LinkedComp.ButtonMask.Value | RButtonMask.Secondary) != RButtonMask.None) {
+			if ((LinkedComp.ButtonMask.Value & RButtonMask.Secondary) != RButtonMask.None) {
 				mask |= MouseButton.MaskRight;
 			}
-			if ((LinkedComp.ButtonMask.Value | RButtonMask.Tertiary) != RButtonMask.None) {
+			if ((LinkedComp.ButtonMask.Value & RButtonMask.Tertiary) != RButtonMask.None) {
 				mask |= MouseButton.MaskMiddle;
 			}
 			node.ButtonMask = mask;
