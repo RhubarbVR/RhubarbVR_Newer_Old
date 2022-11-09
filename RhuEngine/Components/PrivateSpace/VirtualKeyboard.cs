@@ -14,5 +14,6 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Local" })]
 	public sealed class VirtualKeyboard : Component
 	{
+
 	}
 }
