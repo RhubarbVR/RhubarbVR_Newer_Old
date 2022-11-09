@@ -15,6 +15,7 @@ using RhuEngine.WorldObjects;
 using RhuEngine.Components.PrivateSpace;
 using RhuEngine.Managers;
 using DiscordRPC;
+using RhuEngine.Input;
 
 namespace RhuEngine.Components
 {
@@ -128,6 +129,17 @@ namespace RhuEngine.Components
 			isOnScreen = true;
 		}
 
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Entity KeyboardEntity;
+
+		private void BuildKeyboard() {
+			KeyboardEntity = DashMover.AddChild("Keybord");
+			KeyboardEntity.AttachComponent<VirtualKeyboard>();
+		}
+
 		protected override void OnAttach() {
 			base.OnAttach();
 			Head = new GrabbableHolderCombiner(Handed.Max, WorldManager);
@@ -135,6 +147,7 @@ namespace RhuEngine.Components
 			Right = new GrabbableHolderCombiner(Handed.Right, WorldManager);
 			DashMover = World.RootEntity.AddChild("TaskBarMover");
 			DashMover.AttachComponent<UserInterfacePositioner>();
+			BuildKeyboard();
 			var screen = World.RootEntity.AddChild("RootScreen");
 			RootScreenElement = screen.AttachComponent<UIElement>();
 			var events = screen.AttachComponent<UIInputEvents>();
