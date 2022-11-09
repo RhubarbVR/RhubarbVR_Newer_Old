@@ -11,7 +11,7 @@ using RNumerics;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Executable" })]
+	[Category(new string[] { "Local" })]
 	public sealed class ViewPortProgramWindow : ProgramWindow
 	{
 		[Default("ViewPort Program Window")]

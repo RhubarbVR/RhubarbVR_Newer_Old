@@ -79,6 +79,7 @@ namespace RhubarbCloudClient
 			if (_hub is null) {
 				return;
 			}
+			StatusUpdate?.Invoke();
 			await _hub.InvokeAsync("SetStatus", status);
 		}
 
@@ -88,6 +89,8 @@ namespace RhubarbCloudClient
 		public async Task UpdateStatus() {
 			await UpdateUserStatus(Status);
 		}
+
+		public event Action StatusUpdate;
 
 		private async Task LoadInStatusInfo(PrivateUserStatus status) {
 			Console.WriteLine("User Status Loaded");

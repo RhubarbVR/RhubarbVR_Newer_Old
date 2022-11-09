@@ -144,7 +144,6 @@ namespace RhuEngine.Components
 			WindowVRElement.InputInterface.Target = PrivateSpaceManager.VRViewPort;
 
 
-
 			var root = PrivateSpaceManager.UserInterfaceManager.Windows;
 			RootElement = root.Entity.AddChild(Window.Name).AttachComponent<UIElement>();
 			RootElement.InputFilter.Value = RInputFilter.Pass;
@@ -200,13 +199,39 @@ namespace RhuEngine.Components
 			Label.HorizontalAlignment.Value = RHorizontalAlignment.Center;
 			Label.VerticalAlignment.Value = RVerticalAlignment.Center;
 
-
+			AddButton("PopOut", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Share), Popout);
 			Clapse = AddButton("Clapse", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Collapse), ClapseToggle).Item2;
 			AddButton("Minimize", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Minimize), MinimizeWindow);
 			CloseButton = AddButton("Close", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Close), CloseWindow).Item1;
 			OnMinimize?.Invoke();
 			UpdateVRPos();
 		}
+
+		[Exposed]
+		public void Popout() {
+			var newWin = Engine.windowManager.CreateNewWindow();
+			newWin.WaitOnLoadedIn((win) => {
+				win.SizeChanged += () => {
+					if (win.Size != Window.SizePixels) {
+						Window.SizePixels = win.Size;
+					}
+				};
+				void Resize() {
+					if (win.Size != Window.SizePixels) {
+						win.Size = Window.SizePixels;
+					}
+				}
+				Window.OnUpdatePosAndScale += Resize;
+				win.Viewport = Window.TargetViewport;
+				win.CloseRequested += () => {
+					Window.OnUpdatePosAndScale -= Resize;
+					win.Dispose();
+				};
+				win.Title = Window.WindowTitle;
+				win.Size = Window.TargetViewport.Size.Value;
+			});
+		}
+
 		[Exposed]
 		public void MoveWindowDown() {
 
