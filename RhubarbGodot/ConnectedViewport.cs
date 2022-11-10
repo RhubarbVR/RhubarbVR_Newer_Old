@@ -37,6 +37,10 @@ public partial class ConnectedViewport : TextureRect
 		if (Viewport.IsRemoved || Viewport.IsDestroying) {
 			return;
 		}
+		if (!IsVisibleInTree()) {
+			return;
+		}
+
 		var xform = GetGlobalTransform();
 		var ev = @event.XformedBy(xform.AffineInverse());
 		targetViewport?.PushInput(ev);

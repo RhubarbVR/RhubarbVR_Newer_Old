@@ -17,8 +17,12 @@ using static System.Collections.Specialized.BitVector32;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
+	[UpdateLevel(UpdateEnum.Normal)]
 	public sealed class PrivateSpaceWindow : Component
 	{
+		public ButtonBase MoveButon { get; set; }
+		public ButtonBase ResizeButon { get; set; }
+
 		public ProgramWindow Window { get; set; }
 
 		public PrivateSpaceTaskbarItem PrivateSpaceTaskbarItem { get; set; }
@@ -52,7 +56,7 @@ namespace RhuEngine.Components
 		}
 
 		private void UpdateVRPos() {
-			if(WindowVRElement is null) {
+			if (WindowVRElement is null) {
 				return;
 			}
 			var min = Window.Pos;
@@ -61,8 +65,23 @@ namespace RhuEngine.Components
 			if (Collapse) {
 				min += windSize * new Vector2f(0, 1);
 			}
-			WindowVRElement.MaxOffset.Value = new Vector2i(max.x, -min.y) + new Vector2i(5);
-			WindowVRElement.MinOffset.Value = new Vector2i(min.x, -max.y) - new Vector2i(5);
+			if (!(_moveWindow || _resizeWindow)) {
+				WindowVRElement.MaxOffset.Value = new Vector2i(max.x, -min.y) + new Vector2i(5);
+				WindowVRElement.MinOffset.Value = new Vector2i(min.x, -max.y) - new Vector2i(5);
+				if(WindowVRElement.Min.Value + WindowVRElement.Max.Value != new Vector2f(0, 2)) {
+					WindowVRElement.Min.Value = WindowVRElement.Max.Value = new Vector2f(0, 1);
+				}
+			}
+			else {
+				if (WindowVRElement.Min.Value + WindowVRElement.Max.Value == new Vector2f(0, 2)) {
+					WindowVRElement.Min.Value = Vector2f.Zero;
+					WindowVRElement.Max.Value = Vector2f.One;
+
+					WindowVRElement.MaxOffset.Value = Vector2i.Zero;
+					WindowVRElement.MinOffset.Value = new Vector2i(0,100);
+
+				}
+			}
 			WindowVRElement.Entity.enabled.Value = NotMinimized;
 		}
 
@@ -174,25 +193,21 @@ namespace RhuEngine.Components
 				buton.Pressed.Target = action;
 				return (buton, texture);
 			}
-			var buton = elements.Entity.AddChild("Resize").AttachComponent<Button>();
+			var buton = elements.Entity.AddChild("Resize").AttachComponent<ButtonBase>();
 			buton.CursorShape.Value = RCursorShape.Bdiagsize;
-
-			buton.IconAlignment.Value = RButtonAlignment.Center;
-			buton.ExpandIcon.Value = true;
+			ResizeButon = buton;
 			buton.MinSize.Value = new Vector2i(37, 0);
-			var texture = buton.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
-			buton.Icon.Target = texture;
-			texture.LoadAsset(Window.Icon);
 			buton.ButtonDown.Target = ResizeDown;
 			buton.ButtonUp.Target = ResizeUp;
 
-			var Movebuton = elements.Entity.AddChild("MoveWindow").AttachComponent<ButtonBase>();
-			Movebuton.CursorShape.Value = RCursorShape.Move;
-			Movebuton.MinSize.Value = new Vector2i(37, 0);
-			Movebuton.ButtonDown.Target = MoveWindowDown;
-			Movebuton.ButtonUp.Target = MoveWindowUp;
-			Movebuton.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
-			Label = Movebuton.Entity.AddChild("Label").AttachComponent<TextLabel>();
+			MoveButon = elements.Entity.AddChild("MoveWindow").AttachComponent<ButtonBase>();
+			MoveButon.CursorShape.Value = RCursorShape.Move;
+			MoveButon.MinSize.Value = new Vector2i(37, 0);
+			MoveButon.ButtonMask.Value = RButtonMask.Primary | RButtonMask.Secondary;
+			MoveButon.ButtonDown.Target = MoveWindowDown;
+			MoveButon.ButtonUp.Target = MoveWindowUp;
+			MoveButon.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+			Label = MoveButon.Entity.AddChild("Label").AttachComponent<TextLabel>();
 			Label.InputFilter.Value = RInputFilter.Pass;
 			Label.TextSize.Value = 15;
 			Label.Text.Value = Window.WindowTitle;
@@ -232,20 +247,38 @@ namespace RhuEngine.Components
 			});
 		}
 
+		private bool _moveWindow;
+		private Vector2f _offsetPos;
+
+		private bool _resizeWindow;
+		private Vector2f _offsetResize;
+		private Vector2f _offsetResizeLastWindow;
+		private Vector2f _offsetResizeLastWindowPos;
+
 		[Exposed]
 		public void MoveWindowDown() {
-
+			_moveWindow = true;
+			_offsetPos = MoveButon.MainPos - Window.Pos;
+			UpdateVRPos();
 		}
 		[Exposed]
 		public void ResizeDown() {
+			_resizeWindow = true;
+			_offsetResize = ResizeButon.MainPos;
+			_offsetResizeLastWindow = (Vector2f)Window.SizePixels;
+			_offsetResizeLastWindowPos = Window.Pos;
+			UpdateVRPos();
 		}
 
 		[Exposed]
 		public void MoveWindowUp() {
-
+			_moveWindow = false;
+			UpdateVRPos();
 		}
 		[Exposed]
 		public void ResizeUp() {
+			_resizeWindow = false;
+			UpdateVRPos();
 		}
 
 		[Exposed]
@@ -284,6 +317,23 @@ namespace RhuEngine.Components
 
 		private void LoadUI() {
 
+		}
+
+		protected override void AlwaysStep() {
+			base.AlwaysStep();
+			if (_moveWindow) {
+				Window.Pos = MoveButon.MainPos - _offsetPos;
+			}
+
+			if (_resizeWindow) {
+				var change = (_offsetResize - ResizeButon.MainPos) * new Vector2f(1, -1);
+				var newSIze = change + _offsetResizeLastWindow;
+				var sizeDef = MathUtil.Abs(Window.SizePixels - new Vector2i(newSIze.x, newSIze.y));
+				if (sizeDef.x + sizeDef.y > 5) {
+					Window.SizePixels = new Vector2i(newSIze.x, newSIze.y);
+					Window.Pos = _offsetResizeLastWindowPos - new Vector2f(change.x, 0);
+				}
+			}
 		}
 
 	}

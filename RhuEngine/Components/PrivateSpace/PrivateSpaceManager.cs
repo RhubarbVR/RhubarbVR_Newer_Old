@@ -1,21 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
+﻿using RhuEngine.Components.PrivateSpace;
+using RhuEngine.Linker;
+using RhuEngine.Managers;
+using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using SharedModels;
-
 using RNumerics;
-using RhuEngine.Linker;
-using RhuEngine.Physics;
-using RhuEngine.WorldObjects;
-using RhuEngine.Components.PrivateSpace;
-using RhuEngine.Managers;
-using DiscordRPC;
-using RhuEngine.Input;
 
 namespace RhuEngine.Components
 {
@@ -137,7 +126,9 @@ namespace RhuEngine.Components
 
 		private void BuildKeyboard() {
 			KeyboardEntity = DashMover.AddChild("Keybord");
+			KeyboardEntity.AttachComponent<Grabbable>();
 			KeyboardEntity.AttachComponent<VirtualKeyboard>();
+			KeyboardEntity.enabled.Value = false;
 		}
 
 		protected override void OnAttach() {
@@ -441,7 +432,11 @@ namespace RhuEngine.Components
 		}
 
 		public void KeyBoardUpdate(Matrix openLocation) {
-
+			var wasAlreadyOpen = KeyboardEntity.enabled.Value;
+			KeyboardEntity.enabled.Value = Engine.HasKeyboard && Engine.IsInVR;
+			if (!wasAlreadyOpen) {
+				KeyboardEntity.LocalTrans = Matrix.TR(new Vector3f(0,-0.5,-0.5),Quaternionf.CreateFromEuler(0,-10,0));
+			}
 		}
 	}
 }

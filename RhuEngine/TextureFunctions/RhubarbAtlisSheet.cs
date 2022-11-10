@@ -66,6 +66,7 @@ namespace RhuEngine
 					}
 				}
 			}
+			_lastGridSize = GridSize;
 			UpdateSizes();
 		}
 

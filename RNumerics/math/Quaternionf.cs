@@ -672,7 +672,7 @@ namespace RNumerics
 
 		public static Quaternionf CreateFromEuler(in float yaw, in float pitch, in float roll) {
 
-			return CreateFromYawPitchRoll((float)(Math.PI / 180) * yaw, (float)(Math.PI / 180) * pitch, (float)(Math.PI / 180) * roll);
+			return CreateFromYawPitchRoll(MathUtil.DEG_2_RADF * yaw, MathUtil.DEG_2_RADF * pitch, MathUtil.DEG_2_RADF * roll);
 		}
 		public Vector3f GetEuler() {
 			var sqw = w * w;

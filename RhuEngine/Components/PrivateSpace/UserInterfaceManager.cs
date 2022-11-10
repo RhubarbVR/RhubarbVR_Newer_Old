@@ -324,6 +324,9 @@ namespace RhuEngine.Components
 
 
 			void ChangeStatus(DataModel.Enums.UserStatus userStatus) {
+				if(Engine.netApiManager.Client.Status is null) {
+					return;
+				}
 				Engine.netApiManager.Client.Status.Status = userStatus;
 				UpdateStatus(userStatus);
 			}

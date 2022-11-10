@@ -176,7 +176,8 @@ namespace RhuEngine.Components
 		public readonly Sync<Vector2i> Size;
 		public readonly Sync<Vector2i> Size2DOverride;
 		public readonly Sync<bool> Size2DOverrideStretch;
-
+		[Default(true)]
+		public readonly Sync<bool> TakeKeyboardFocus;
 		public readonly Sync<bool> UseTAA;
 		public readonly Sync<bool> UseDebanding;
 
