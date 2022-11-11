@@ -176,7 +176,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Secret_Changed(IChangeable obj) {
-			node.SecretCharacter = LinkedComp.SecretCharacter.Value;
+			node.Secret = LinkedComp.Secret.Value;
 		}
 
 		private void Editable_Changed(IChangeable obj) {

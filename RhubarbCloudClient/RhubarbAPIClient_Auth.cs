@@ -72,6 +72,7 @@ namespace RhubarbCloudClient
 
 		private Task Hub_Closed(Exception arg) {
 			Console.WriteLine($"SignelR Closed {arg?.Message??"null"}");
+			CheckForInternetConnectionLoop().ConfigureAwait(false);
 			return Task.CompletedTask;
 		}
 
