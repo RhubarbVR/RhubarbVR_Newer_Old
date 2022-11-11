@@ -17,15 +17,21 @@ namespace RhuEngine.Components
 			Entity_CanvasItemUpdateEvent();
 		}
 
-		protected T LoadedData;
+		protected T LoadedData = null;
 
 		private void Entity_CanvasItemUpdateEvent() {
-			if(LoadedData is not null) {
-				UnLoadCanvasItem(LoadedData);
-			}
-			if(Entity.CanvasItem is T data) {
-				LoadedData = data;
-				LoadCanvasItem(data);
+			lock (this) {
+				if(LoadedData == Entity.CanvasItem) {
+					return;
+				}
+				if (LoadedData is not null) {
+					UnLoadCanvasItem(LoadedData);
+					LoadedData = null;
+				}
+				if (Entity.CanvasItem is T data) {
+					LoadCanvasItem(data);
+					LoadedData = data;
+				}
 			}
 		}
 

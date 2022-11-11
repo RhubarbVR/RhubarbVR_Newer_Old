@@ -112,6 +112,38 @@ namespace RhuEngine.Components
 				password.Secret.Value = true;
 				password.MinSize.Value = new Vector2i(350, 0);
 
+				var forgotPassword = boxRoot.AddChild("ForgotPassword").AttachComponent<LinkButton>();
+				forgotPassword.HorizontalFilling.Value = RFilling.ShrinkCenter | RFilling.Expand;
+				forgotPassword.MinSize.Value = new Vector2i(350, 0);
+				var forgotPasswordLocal = forgotPassword.Entity.AttachComponent<StandardLocale>();
+				forgotPasswordLocal.TargetValue.Target = forgotPassword.Text;
+				forgotPasswordLocal.Key.Value = "Programs.Login.Forgot password";
+
+
+				var rbuttonLogin = boxRoot.AddChild("Login").AttachComponent<Button>();
+				rbuttonLogin.Pressed.Target = GoOnline;
+				rbuttonLogin.HorizontalFilling.Value = RFilling.ShrinkCenter | RFilling.Expand;
+				rbuttonLogin.MinSize.Value = new Vector2i(100, 0);
+				rbuttonLogin.Alignment.Value = RButtonAlignment.Center;
+				var loginLoc = rbuttonLogin.Entity.AttachComponent<StandardLocale>();
+				loginLoc.TargetValue.Target = rbuttonLogin.Text;
+				loginLoc.Key.Value = "Programs.Login.LoginButton";
+
+				var RegBox = boxRoot.AddChild("Regester").AttachComponent<BoxContainer>();
+				RegBox.HorizontalFilling.Value = RFilling.ShrinkCenter | RFilling.Expand;
+				RegBox.Alignment.Value = RBoxContainerAlignment.Center;
+				var labal = RegBox.Entity.AddChild("Text").AttachComponent<TextLabel>();
+				labal.TextSize.Value = 17;
+				labal.VerticalAlignment.Value = RVerticalAlignment.Top;
+				var labalLoc = rbuttonLogin.Entity.AttachComponent<StandardLocale>();
+				labalLoc.TargetValue.Target = labal.Text;
+				labalLoc.Key.Value = "Programs.Login.RegisterText";
+
+				var button = RegBox.Entity.AddChild("RegButton").AttachComponent<LinkButton>();
+				var buttonLoc = rbuttonLogin.Entity.AttachComponent<StandardLocale>();
+				buttonLoc.TargetValue.Target = button.Text;
+				buttonLoc.Key.Value = "Programs.Login.RegisterButton";
+
 			}
 			else {
 				var loadingImg = boxRoot.AddChild("Img").AttachComponent<TextureRect>();
@@ -146,6 +178,7 @@ namespace RhuEngine.Components
 				var oflinee = rbutton.Entity.AttachComponent<StandardLocale>();
 				oflinee.TargetValue.Target = rbutton.Text;
 				oflinee.Key.Value = "Programs.Offline.GoOnline";
+
 			}
 		}
 		[Exposed]
