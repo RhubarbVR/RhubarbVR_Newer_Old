@@ -20,8 +20,8 @@ namespace RhuEngine.Components
 		protected T LoadedData = null;
 
 		private void Entity_CanvasItemUpdateEvent() {
-			lock (this) {
-				if(LoadedData == Entity.CanvasItem) {
+			RenderThread.ExecuteOnStartOfFrame(() => {
+				if (LoadedData == Entity.CanvasItem) {
 					return;
 				}
 				if (LoadedData is not null) {
@@ -32,7 +32,7 @@ namespace RhuEngine.Components
 					LoadCanvasItem(data);
 					LoadedData = data;
 				}
-			}
+			});
 		}
 
 		protected abstract void LoadCanvasItem(T data);

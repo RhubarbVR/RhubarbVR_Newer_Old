@@ -246,7 +246,7 @@ namespace RhuEngine.Components
 			var head = LocalUser.userRoot.Target?.head.Target;
 			if (head != null) {
 				if (!Engine.IsInVR) {
-					if (isOnScreen || Engine.MouseFree) {
+					if (isOnScreen) {
 						UpdateHeadLazer(head);
 					}
 				}
