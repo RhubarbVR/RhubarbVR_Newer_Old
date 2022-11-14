@@ -82,7 +82,7 @@ namespace RhuEngine.Components
 					}
 				}
 				var layerValue = LayerValues[layer];
-				if (PressedEpoch || _justClick) {
+				if (PressedEpoch || _justClick || (Button.Target?.ToggleMode.Value??false)) {
 					Engine.inputManager.KeyboardSystem.virtualKeyboard.PressingKeys.Add(layerValue.TypedKey.Value);
 					_lastPressClick = DateTimeOffset.UtcNow;
 					_justClick = false;
@@ -242,20 +242,18 @@ namespace RhuEngine.Components
 
 		private void BuildQWERTY_US() {
 			AddCommlexButton(new Vector2f(0, 90), 22.5f, "TAB", "\t", Key.Tab);
-			AddCommlexButton(new Vector2f(0, 135), 45f, "CAPS", null, Key.CapsLock, true, 1);
+			AddCommlexButton(new Vector2f(0, 135), 45f, "CAPS", null, Key.Capslock, true, 1);
 			AddCommlexButton(new Vector2f(0, 180), 67.5f, "SHIFT", null, Key.Shift, true, 1);
 			AddCommlexButton(new Vector2f(0, 225), 21f, "CTRL", null, Key.Ctrl, true);
-			AddCommlexButton(new Vector2f(65, 225), 0, "CMD", null, Key.LCmd, true);
 			AddCommlexButton(new Vector2f(110, 225), 21f, "ALT", null, Key.Alt, true);
 
 			AddCommlexButton(new Vector2f(175, 225), 215, " ", " ", Key.Space, false);
 			AddCommlexButton(new Vector2f(433, 225), 21f, "ALT", null, Key.Alt, true);
-			AddCommlexButton(new Vector2f(500, 225), 27f, "CMD", null, Key.RCmd, true);
 			AddCommlexButton(new Vector2f(575, 225), 27f, "CTRL", null, Key.Ctrl, true);
 
 			AddCommlexButton(new Vector2f(540, 180), 63f, "SHIFT", null, Key.Shift, true, 1);
-			AddCommlexButton(new Vector2f(560, 135), 45f, "ENTER", "\n", Key.Return, false);
-			AddKeyboardButtonWith(new Vector2f(580, 90), 22.5f, "\\", "|", Key.SlashBack);
+			AddCommlexButton(new Vector2f(560, 135), 45f, "ENTER", "\n", Key.Enter, false);
+			AddKeyboardButtonWith(new Vector2f(580, 90), 22.5f, "\\", "|", Key.Backslash);
 			AddCommlexButton(new Vector2f(560, 45), 45f, "🠔", "\b", Key.Backspace);
 
 			AddCommlexButton(new Vector2f(650, 225), 0, "🠔", null, Key.Left);
@@ -265,27 +263,56 @@ namespace RhuEngine.Components
 
 			//TODO add numPad
 			AddButtons(new (string, string, Key)?[] {
-				("Print",null,Key.Printscreen),
+				("Prt",null,Key.Print),
+			    ("Scr",null,Key.Scrolllock),
+				("Pau",null,Key.Pause),
 			}, new Vector2f(650, 0));
 			AddButtons(new (string, string, Key)?[] {
 				("Ins",null,Key.Insert),
 				("Hom",null,Key.Home),
-				("Pg🠉",null,Key.PageUp),
+				("Pg🠉",null,Key.Pageup),
 			}, new Vector2f(650, 45));
 			AddButtons(new (string, string, Key)?[] {
-				("Del",null,Key.Del),
+				("Del",null,Key.Delete),
 				("End",null,Key.End),
-				("Pg🠋",null,Key.PageDown),
+				("Pg🠋",null,Key.Pagedown),
 			}, new Vector2f(650, 90));
 
 
+			AddButtons(new (string, string, Key)?[] {
+				("Num",null,Key.Numlock),
+				("/","/",Key.KpDivide),
+				("*","*",Key.KpMultiply),
+				("-","-",Key.KpSubtract),
+			}, new Vector2f(785, 45));
+			AddButtons(new (string, string, Key)?[] {
+				("7","7",Key.Kp7),
+				("8","8",Key.Kp8),
+				("9","9",Key.Kp9),
+			}, new Vector2f(785, 90));
+			AddButtons(new (string, string, Key)?[] {
+				("4","4",Key.Kp4),
+				("5","5",Key.Kp5),
+				("6","6",Key.Kp6),
+			}, new Vector2f(785, 135));
+			AddButtons(new (string, string, Key)?[] {
+				("1","1",Key.Kp1),
+				("2","2",Key.Kp2),
+				("3","3",Key.Kp3),
+			}, new Vector2f(785, 180));
 
 
+			AddCommlexButton(new Vector2f(785, 225), 45, "0", "0", Key.Kp0);
+			AddCommlexButton(new Vector2f(873, 225), 0, ".", ".", Key.KpPeriod);
 
+			var kpEnter = AddCommlexButton(new Vector2f(918, 202.5), 0, "Ent", "\n", Key.KpEnter);
+			kpEnter.MinSize.Value += new Vector2i(0, 45);
 
+			var kpAdd = AddCommlexButton(new Vector2f(918, 112.5), 0, "+", "+", Key.KpAdd);
+			kpAdd.MinSize.Value += new Vector2i(0, 45);
 
 			AddButtons(new (string, string, Key)?[] {
-				("ESC",null,Key.Esc),
+				("ESC",null,Key.Escape),
 				null,
 				("F1",null,Key.F1),
 				("F2",null,Key.F2),
@@ -309,19 +336,19 @@ namespace RhuEngine.Components
 			}, new Vector2f(474, 0));
 
 			AddButtons(new (string, string, Key)?[] {
-				("`","~",Key.Backtick),
-				("1","!",Key.N1),
-				("2","@",Key.N2),
-				("3","#",Key.N3),
-				("4","$",Key.N4),
-				("5","%",Key.N5),
-				("6","^",Key.N6),
-				("7","&",Key.N7),
-				("8","*",Key.N8),
-				("9","(",Key.N9),
-				("0",")",Key.N0),
-				("-","_",Key.Subtract),
-				("=","+",Key.Equals),
+				("`","~",Key.Quoteleft),
+				("1","!",Key.Key1),
+				("2","@",Key.Key2),
+				("3","#",Key.Key3),
+				("4","$",Key.Key4),
+				("5","%",Key.Key5),
+				("6","^",Key.Key6),
+				("7","&",Key.Key7),
+				("8","*",Key.Key8),
+				("9","(",Key.Key9),
+				("0",")",Key.Key0),
+				("-","_",Key.Minus),
+				("=","+",Key.Equal),
 			}, new Vector2f(0, 45));
 			AddButtons(new (string, string, Key)?[] {
 				("q","Q",Key.Q),
@@ -334,8 +361,8 @@ namespace RhuEngine.Components
 				("i","I",Key.I),
 				("o","O",Key.O),
 				("p","P",Key.P),
-				("[","{",Key.BracketOpen),
-				("]","}",Key.BracketClose),
+				("[","{",Key.Bracketleft),
+				("]","}",Key.Braceright),
 			}, new Vector2f(65, 90));
 			AddButtons(new (string, string, Key)?[] {
 				("a","A",Key.A),
@@ -360,7 +387,7 @@ namespace RhuEngine.Components
 				("m","M",Key.M),
 				(",","<",Key.Comma),
 				(".",">",Key.Period),
-				("/","?",Key.SlashFwd),
+				("/","?",Key.Slash),
 			}, new Vector2f(110, 180));
 		}
 	}

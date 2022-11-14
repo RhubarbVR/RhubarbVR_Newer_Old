@@ -140,222 +140,1060 @@ namespace RhuEngine.Linker
 
 	/// <summary>A collection of system key codes, representing keyboard
 	/// characters and mouse buttons. Based on VK codes.</summary>
-	public enum Key
+	public enum Key:long
 	{
-		None = 0x00,
-		/// <summary>Left mouse button.</summary>
-		MouseLeft = 0x01,
-		/// <summary>Right mouse button.</summary>
-		MouseRight = 0x02,
-		/// <summary>Center mouse button.</summary>
-		MouseCenter = 0x04,
-		/// <summary>Mouse forward button.</summary>
-		MouseForward = 0x05,
-		/// <summary>Mouse back button.</summary>
-		MouseBack = 0x06,
-		/// <summary>Backspace</summary>
-		Backspace = 0x08,
-		/// <summary>Tab</summary>
-		Tab = 0x09,
-		/// <summary>Return, or Enter.</summary>
-		Return = 0x0D,
-		/// <summary>Left or right Shift.</summary>
-		Shift = 0x10,
-		/// <summary>Left or right Control key.</summary>
-		Ctrl = 0x11,
-		/// <summary>Left or right Alt key.</summary>
-		Alt = 0x12,
-		/// <summary>
-		/// PauseBreak
-		/// </summary>
-		Pause = 0x13,
-		/// <summary>This behaves a little differently! This tells the toggle
-		/// state of caps lock, rather than the key state itself.</summary>
-		CapsLock = 0x14,
-		/// <summary>Escape</summary>
-		Esc = 0x1B,
-		/// <summary>Space</summary>
-		Space = 0x20,
-		/// <summary>End</summary>
-		End = 0x23,
-		/// <summary>Home</summary>
-		Home = 0x24,
-		/// <summary>Left arrow key.</summary>
-		Left = 0x25,
-		/// <summary>Right arrow key.</summary>
-		Right = 0x27,
-		/// <summary>Up arrow key.</summary>
-		Up = 0x26,
-		/// <summary>Down arrow key.</summary>
-		Down = 0x28,
-		/// <summary>Page up</summary>
-		PageUp = 0x21,
-		/// <summary>Page down</summary>
-		PageDown = 0x22,
-		/// <summary>Printscreen</summary>
-		Printscreen = 0x2A,
-		/// <summary>Any Insert key.</summary>
-		Insert = 0x2D,
-		/// <summary>Any Delete key.</summary>
-		Del = 0x2E,
-		/// <summary>Keyboard top row 0, with shift is ')'.</summary>
-		N0 = 0x30,
-		/// <summary>Keyboard top row 1, with shift is '!'.</summary>
-		N1 = 0x31,
-		/// <summary>Keyboard top row 2, with shift is '@'.</summary>
-		N2 = 0x32,
-		/// <summary>Keyboard top row 3, with shift is '#'.</summary>
-		N3 = 0x33,
-		/// <summary>Keyboard top row 4, with shift is '$'.</summary>
-		N4 = 0x34,
-		/// <summary>Keyboard top row 5, with shift is '%'.</summary>
-		N5 = 0x35,
-		/// <summary>Keyboard top row 6, with shift is '^'.</summary>
-		N6 = 0x36,
-		/// <summary>Keyboard top row 7, with shift is '&amp;'.</summary>
-		N7 = 0x37,
-		/// <summary>Keyboard top row 8, with shift is '*'.</summary>
-		N8 = 0x38,
-		/// <summary>Keyboard top row 9, with shift is '('.</summary>
-		N9 = 0x39,
-		/// <summary>a/A</summary>
-		A = 0x41,
-		/// <summary>b/B</summary>
-		B = 0x42,
-		/// <summary>c/C</summary>
-		C = 0x43,
-		/// <summary>d/D</summary>
-		D = 0x44,
-		/// <summary>e/E</summary>
-		E = 0x45,
-		/// <summary>f/F</summary>
-		F = 0x46,
-		/// <summary>g/G</summary>
-		G = 0x47,
-		/// <summary>h/H</summary>
-		H = 0x48,
-		/// <summary>i/I</summary>
-		I = 0x49,
-		/// <summary>j/J</summary>
-		J = 0x4A,
-		/// <summary>k/K</summary>
-		K = 0x4B,
-		/// <summary>l/L</summary>
-		L = 0x4C,
-		/// <summary>m/M</summary>
-		M = 0x4D,
-		/// <summary>n/N</summary>
-		N = 0x4E,
-		/// <summary>o/O</summary>
-		O = 0x4F,
-		/// <summary>p/P</summary>
-		P = 0x50,
-		/// <summary>q/Q</summary>
-		Q = 0x51,
-		/// <summary>r/R</summary>
-		R = 0x52,
-		/// <summary>s/S</summary>
-		S = 0x53,
-		/// <summary>t/T</summary>
-		T = 0x54,
-		/// <summary>u/U</summary>
-		U = 0x55,
-		/// <summary>v/V</summary>
-		V = 0x56,
-		/// <summary>w/W</summary>
-		W = 0x57,
-		/// <summary>x/X</summary>
-		X = 0x58,
-		/// <summary>y/Y</summary>
-		Y = 0x59,
-		/// <summary>z/Z</summary>
-		Z = 0x5A,
-		App = 0x5B,
-		/// <summary>0 on the numpad, when numlock is on.</summary>
-		Num0 = 0x60,
-		/// <summary>1 on the numpad, when numlock is on.</summary>
-		Num1 = 0x61,
-		/// <summary>2 on the numpad, when numlock is on.</summary>
-		Num2 = 0x62,
-		/// <summary>3 on the numpad, when numlock is on.</summary>
-		Num3 = 0x63,
-		/// <summary>4 on the numpad, when numlock is on.</summary>
-		Num4 = 0x64,
-		/// <summary>5 on the numpad, when numlock is on.</summary>
-		Num5 = 0x65,
-		/// <summary>6 on the numpad, when numlock is on.</summary>
-		Num6 = 0x66,
-		/// <summary>7 on the numpad, when numlock is on.</summary>
-		Num7 = 0x67,
-		/// <summary>8 on the numpad, when numlock is on.</summary>
-		Num8 = 0x68,
-		/// <summary>9 on the numpad, when numlock is on.</summary>
-		Num9 = 0x69,
-		/// <summary>Function key F1.</summary>
-		F1 = 0x70,
-		/// <summary>Function key F2.</summary>
-		F2 = 0x71,
-		/// <summary>Function key F3.</summary>
-		F3 = 0x72,
-		/// <summary>Function key F4.</summary>
-		F4 = 0x73,
-		/// <summary>Function key F5.</summary>
-		F5 = 0x74,
-		/// <summary>Function key F6.</summary>
-		F6 = 0x75,
-		/// <summary>Function key F7.</summary>
-		F7 = 0x76,
-		/// <summary>Function key F8.</summary>
-		F8 = 0x77,
-		/// <summary>Function key F9.</summary>
-		F9 = 0x78,
-		/// <summary>Function key F10.</summary>
-		F10 = 0x79,
-		/// <summary>Function key F11.</summary>
-		F11 = 0x7A,
-		/// <summary>Function key F12.</summary>
-		F12 = 0x7B,
-		/// <summary>
-		/// ScrollLock
-		/// </summary>
-		ScrollLock = 0x91,
-		/// <summary>,/&lt;</summary>
-		Comma = 0xBC,
-		/// <summary>./&gt;</summary>
-		Period = 0xBE,
-		/// <summary>/</summary>
-		SlashFwd = 0xBF,
-		/// <summary>\</summary>
-		SlashBack = 0xDC,
-		/// <summary>;/:</summary>
-		Semicolon = 0xBA,
-		/// <summary>'/"</summary>
-		Apostrophe = 0xDE,
-		/// <summary>[/{</summary>
-		BracketOpen = 0xDB,
-		/// <summary>]/}</summary>
-		BracketClose = 0xDD,
-		/// <summary>-/_</summary>
-		Minus = 0xBD,
-		/// <summary>=/+</summary>
-		Equals = 0xBB,
-		/// <summary>`/~</summary>
-		Backtick = 0xc0,
-		/// <summary>The Windows/Mac Command button on the left side of the keyboard.</summary>
-		LCmd = 0x5B,
-		/// <summary>The Windows/Mac Command button on the right side of the keyboard.</summary>
-		RCmd = 0x5C,
-		/// <summary>Numpad '*', NOT the same as number row '*'.</summary>
-		Multiply = 0x6A,
-		/// <summary>Numpad '+', NOT the same as number row '+'.</summary>
-		Add = 0x6B,
-		/// <summary>Numpad '-', NOT the same as number row '-'.</summary>
-		Subtract = 0x6D,
-		/// <summary>Numpad '.', NOT the same as character '.'.</summary>
-		Decimal = 0x6E,
-		/// <summary>Numpad '/', NOT the same as character '/'.</summary>
-		Divide = 0x6F,
-		/// <summary>Maximum value for key codes.</summary>
-		MAX = 0xFF,
+		//
+		// Summary:
+		//     Enum value which doesn't correspond to any key. This is used to initialize Godot.Key
+		//     properties with a generic state.
+		None = 0L,
+		//
+		// Summary:
+		//     Keycodes with this bit applied are non-printable.
+		Special = 0x400000L,
+		//
+		// Summary:
+		//     Escape key.
+		Escape = 4194305L,
+		//
+		// Summary:
+		//     Tab key.
+		Tab = 4194306L,
+		//
+		// Summary:
+		//     Shift + Tab key.
+		Backtab = 4194307L,
+		//
+		// Summary:
+		//     Backspace key.
+		Backspace = 4194308L,
+		//
+		// Summary:
+		//     Return key (on the main keyboard).
+		Enter = 4194309L,
+		//
+		// Summary:
+		//     Enter key on the numeric keypad.
+		KpEnter = 4194310L,
+		//
+		// Summary:
+		//     Insert key.
+		Insert = 4194311L,
+		//
+		// Summary:
+		//     Delete key.
+		Delete = 4194312L,
+		//
+		// Summary:
+		//     Pause key.
+		Pause = 4194313L,
+		//
+		// Summary:
+		//     Print Screen key.
+		Print = 4194314L,
+		//
+		// Summary:
+		//     System Request key.
+		Sysreq = 4194315L,
+		//
+		// Summary:
+		//     Clear key.
+		Clear = 4194316L,
+		//
+		// Summary:
+		//     Home key.
+		Home = 4194317L,
+		//
+		// Summary:
+		//     End key.
+		End = 4194318L,
+		//
+		// Summary:
+		//     Left arrow key.
+		Left = 4194319L,
+		//
+		// Summary:
+		//     Up arrow key.
+		Up = 4194320L,
+		//
+		// Summary:
+		//     Right arrow key.
+		Right = 4194321L,
+		//
+		// Summary:
+		//     Down arrow key.
+		Down = 4194322L,
+		//
+		// Summary:
+		//     Page Up key.
+		Pageup = 4194323L,
+		//
+		// Summary:
+		//     Page Down key.
+		Pagedown = 4194324L,
+		//
+		// Summary:
+		//     Shift key.
+		Shift = 4194325L,
+		//
+		// Summary:
+		//     Control key.
+		Ctrl = 4194326L,
+		//
+		// Summary:
+		//     Meta key.
+		Meta = 4194327L,
+		//
+		// Summary:
+		//     Alt key.
+		Alt = 4194328L,
+		//
+		// Summary:
+		//     Caps Lock key.
+		Capslock = 4194329L,
+		//
+		// Summary:
+		//     Num Lock key.
+		Numlock = 4194330L,
+		//
+		// Summary:
+		//     Scroll Lock key.
+		Scrolllock = 4194331L,
+		//
+		// Summary:
+		//     F1 key.
+		F1 = 4194332L,
+		//
+		// Summary:
+		//     F2 key.
+		F2 = 4194333L,
+		//
+		// Summary:
+		//     F3 key.
+		F3 = 4194334L,
+		//
+		// Summary:
+		//     F4 key.
+		F4 = 4194335L,
+		//
+		// Summary:
+		//     F5 key.
+		F5 = 4194336L,
+		//
+		// Summary:
+		//     F6 key.
+		F6 = 4194337L,
+		//
+		// Summary:
+		//     F7 key.
+		F7 = 4194338L,
+		//
+		// Summary:
+		//     F8 key.
+		F8 = 4194339L,
+		//
+		// Summary:
+		//     F9 key.
+		F9 = 4194340L,
+		//
+		// Summary:
+		//     F10 key.
+		F10 = 4194341L,
+		//
+		// Summary:
+		//     F11 key.
+		F11 = 4194342L,
+		//
+		// Summary:
+		//     F12 key.
+		F12 = 4194343L,
+		//
+		// Summary:
+		//     F13 key.
+		F13 = 4194344L,
+		//
+		// Summary:
+		//     F14 key.
+		F14 = 4194345L,
+		//
+		// Summary:
+		//     F15 key.
+		F15 = 4194346L,
+		//
+		// Summary:
+		//     F16 key.
+		F16 = 4194347L,
+		//
+		// Summary:
+		//     F17 key.
+		F17 = 4194348L,
+		//
+		// Summary:
+		//     F18 key.
+		F18 = 4194349L,
+		//
+		// Summary:
+		//     F19 key.
+		F19 = 4194350L,
+		//
+		// Summary:
+		//     F20 key.
+		F20 = 4194351L,
+		//
+		// Summary:
+		//     F21 key.
+		F21 = 4194352L,
+		//
+		// Summary:
+		//     F22 key.
+		F22 = 4194353L,
+		//
+		// Summary:
+		//     F23 key.
+		F23 = 4194354L,
+		//
+		// Summary:
+		//     F24 key.
+		F24 = 4194355L,
+		//
+		// Summary:
+		//     F25 key. Only supported on macOS and Linux due to a Windows limitation.
+		F25 = 4194356L,
+		//
+		// Summary:
+		//     F26 key. Only supported on macOS and Linux due to a Windows limitation.
+		F26 = 4194357L,
+		//
+		// Summary:
+		//     F27 key. Only supported on macOS and Linux due to a Windows limitation.
+		F27 = 4194358L,
+		//
+		// Summary:
+		//     F28 key. Only supported on macOS and Linux due to a Windows limitation.
+		F28 = 4194359L,
+		//
+		// Summary:
+		//     F29 key. Only supported on macOS and Linux due to a Windows limitation.
+		F29 = 4194360L,
+		//
+		// Summary:
+		//     F30 key. Only supported on macOS and Linux due to a Windows limitation.
+		F30 = 4194361L,
+		//
+		// Summary:
+		//     F31 key. Only supported on macOS and Linux due to a Windows limitation.
+		F31 = 4194362L,
+		//
+		// Summary:
+		//     F32 key. Only supported on macOS and Linux due to a Windows limitation.
+		F32 = 4194363L,
+		//
+		// Summary:
+		//     F33 key. Only supported on macOS and Linux due to a Windows limitation.
+		F33 = 4194364L,
+		//
+		// Summary:
+		//     F34 key. Only supported on macOS and Linux due to a Windows limitation.
+		F34 = 4194365L,
+		//
+		// Summary:
+		//     F35 key. Only supported on macOS and Linux due to a Windows limitation.
+		F35 = 4194366L,
+		//
+		// Summary:
+		//     Multiply (*) key on the numeric keypad.
+		KpMultiply = 4194433L,
+		//
+		// Summary:
+		//     Divide (/) key on the numeric keypad.
+		KpDivide = 4194434L,
+		//
+		// Summary:
+		//     Subtract (-) key on the numeric keypad.
+		KpSubtract = 4194435L,
+		//
+		// Summary:
+		//     Period (.) key on the numeric keypad.
+		KpPeriod = 4194436L,
+		//
+		// Summary:
+		//     Add (+) key on the numeric keypad.
+		KpAdd = 4194437L,
+		//
+		// Summary:
+		//     Number 0 on the numeric keypad.
+		Kp0 = 4194438L,
+		//
+		// Summary:
+		//     Number 1 on the numeric keypad.
+		Kp1 = 4194439L,
+		//
+		// Summary:
+		//     Number 2 on the numeric keypad.
+		Kp2 = 4194440L,
+		//
+		// Summary:
+		//     Number 3 on the numeric keypad.
+		Kp3 = 4194441L,
+		//
+		// Summary:
+		//     Number 4 on the numeric keypad.
+		Kp4 = 4194442L,
+		//
+		// Summary:
+		//     Number 5 on the numeric keypad.
+		Kp5 = 4194443L,
+		//
+		// Summary:
+		//     Number 6 on the numeric keypad.
+		Kp6 = 4194444L,
+		//
+		// Summary:
+		//     Number 7 on the numeric keypad.
+		Kp7 = 4194445L,
+		//
+		// Summary:
+		//     Number 8 on the numeric keypad.
+		Kp8 = 4194446L,
+		//
+		// Summary:
+		//     Number 9 on the numeric keypad.
+		Kp9 = 4194447L,
+		//
+		// Summary:
+		//     Left Super key (Windows key).
+		SuperL = 4194368L,
+		//
+		// Summary:
+		//     Right Super key (Windows key).
+		SuperR = 4194369L,
+		//
+		// Summary:
+		//     Context menu key.
+		Menu = 4194370L,
+		//
+		// Summary:
+		//     Left Hyper key.
+		HyperL = 4194371L,
+		//
+		// Summary:
+		//     Right Hyper key.
+		HyperR = 4194372L,
+		//
+		// Summary:
+		//     Help key.
+		Help = 4194373L,
+		//
+		// Summary:
+		//     Left Direction key.
+		DirectionL = 4194374L,
+		//
+		// Summary:
+		//     Right Direction key.
+		DirectionR = 4194375L,
+		//
+		// Summary:
+		//     Media back key. Not to be confused with the Back button on an Android device.
+		Back = 4194376L,
+		//
+		// Summary:
+		//     Media forward key.
+		Forward = 4194377L,
+		//
+		// Summary:
+		//     Media stop key.
+		Stop = 4194378L,
+		//
+		// Summary:
+		//     Media refresh key.
+		Refresh = 4194379L,
+		//
+		// Summary:
+		//     Volume down key.
+		Volumedown = 4194380L,
+		//
+		// Summary:
+		//     Mute volume key.
+		Volumemute = 4194381L,
+		//
+		// Summary:
+		//     Volume up key.
+		Volumeup = 4194382L,
+		//
+		// Summary:
+		//     Bass Boost key.
+		Bassboost = 4194383L,
+		//
+		// Summary:
+		//     Bass up key.
+		Bassup = 4194384L,
+		//
+		// Summary:
+		//     Bass down key.
+		Bassdown = 4194385L,
+		//
+		// Summary:
+		//     Treble up key.
+		Trebleup = 4194386L,
+		//
+		// Summary:
+		//     Treble down key.
+		Trebledown = 4194387L,
+		//
+		// Summary:
+		//     Media play key.
+		Mediaplay = 4194388L,
+		//
+		// Summary:
+		//     Media stop key.
+		Mediastop = 4194389L,
+		//
+		// Summary:
+		//     Previous song key.
+		Mediaprevious = 4194390L,
+		//
+		// Summary:
+		//     Next song key.
+		Medianext = 4194391L,
+		//
+		// Summary:
+		//     Media record key.
+		Mediarecord = 4194392L,
+		//
+		// Summary:
+		//     Home page key.
+		Homepage = 4194393L,
+		//
+		// Summary:
+		//     Favorites key.
+		Favorites = 4194394L,
+		//
+		// Summary:
+		//     Search key.
+		Search = 4194395L,
+		//
+		// Summary:
+		//     Standby key.
+		Standby = 4194396L,
+		//
+		// Summary:
+		//     Open URL / Launch Browser key.
+		Openurl = 4194397L,
+		//
+		// Summary:
+		//     Launch Mail key.
+		Launchmail = 4194398L,
+		//
+		// Summary:
+		//     Launch Media key.
+		Launchmedia = 4194399L,
+		//
+		// Summary:
+		//     Launch Shortcut 0 key.
+		Launch0 = 4194400L,
+		//
+		// Summary:
+		//     Launch Shortcut 1 key.
+		Launch1 = 4194401L,
+		//
+		// Summary:
+		//     Launch Shortcut 2 key.
+		Launch2 = 4194402L,
+		//
+		// Summary:
+		//     Launch Shortcut 3 key.
+		Launch3 = 4194403L,
+		//
+		// Summary:
+		//     Launch Shortcut 4 key.
+		Launch4 = 4194404L,
+		//
+		// Summary:
+		//     Launch Shortcut 5 key.
+		Launch5 = 4194405L,
+		//
+		// Summary:
+		//     Launch Shortcut 6 key.
+		Launch6 = 4194406L,
+		//
+		// Summary:
+		//     Launch Shortcut 7 key.
+		Launch7 = 4194407L,
+		//
+		// Summary:
+		//     Launch Shortcut 8 key.
+		Launch8 = 4194408L,
+		//
+		// Summary:
+		//     Launch Shortcut 9 key.
+		Launch9 = 4194409L,
+		//
+		// Summary:
+		//     Launch Shortcut A key.
+		Launcha = 4194410L,
+		//
+		// Summary:
+		//     Launch Shortcut B key.
+		Launchb = 4194411L,
+		//
+		// Summary:
+		//     Launch Shortcut C key.
+		Launchc = 4194412L,
+		//
+		// Summary:
+		//     Launch Shortcut D key.
+		Launchd = 4194413L,
+		//
+		// Summary:
+		//     Launch Shortcut E key.
+		Launche = 4194414L,
+		//
+		// Summary:
+		//     Launch Shortcut F key.
+		Launchf = 4194415L,
+		//
+		// Summary:
+		//     Unknown key.
+		Unknown = 0xFFFFFFL,
+		//
+		// Summary:
+		//     Space key.
+		Space = 0x20L,
+		//
+		// Summary:
+		//     ! key.
+		Exclam = 33L,
+		//
+		// Summary:
+		//     " key.
+		Quotedbl = 34L,
+		//
+		// Summary:
+		//     # key.
+		Numbersign = 35L,
+		//
+		// Summary:
+		//     $ key.
+		Dollar = 36L,
+		//
+		// Summary:
+		//     % key.
+		Percent = 37L,
+		//
+		// Summary:
+		//     & key.
+		Ampersand = 38L,
+		//
+		// Summary:
+		//     ' key.
+		Apostrophe = 39L,
+		//
+		// Summary:
+		//     ( key.
+		Parenleft = 40L,
+		//
+		// Summary:
+		//     ) key.
+		Parenright = 41L,
+		//
+		// Summary:
+		//     * key.
+		Asterisk = 42L,
+		//
+		// Summary:
+		//     + key.
+		Plus = 43L,
+		//
+		// Summary:
+		//     , key.
+		Comma = 44L,
+		//
+		// Summary:
+		//     - key.
+		Minus = 45L,
+		//
+		// Summary:
+		//     . key.
+		Period = 46L,
+		//
+		// Summary:
+		//     / key.
+		Slash = 47L,
+		//
+		// Summary:
+		//     Number 0 key.
+		Key0 = 48L,
+		//
+		// Summary:
+		//     Number 1 key.
+		Key1 = 49L,
+		//
+		// Summary:
+		//     Number 2 key.
+		Key2 = 50L,
+		//
+		// Summary:
+		//     Number 3 key.
+		Key3 = 51L,
+		//
+		// Summary:
+		//     Number 4 key.
+		Key4 = 52L,
+		//
+		// Summary:
+		//     Number 5 key.
+		Key5 = 53L,
+		//
+		// Summary:
+		//     Number 6 key.
+		Key6 = 54L,
+		//
+		// Summary:
+		//     Number 7 key.
+		Key7 = 55L,
+		//
+		// Summary:
+		//     Number 8 key.
+		Key8 = 56L,
+		//
+		// Summary:
+		//     Number 9 key.
+		Key9 = 57L,
+		//
+		// Summary:
+		//     : key.
+		Colon = 58L,
+		//
+		// Summary:
+		//     ; key.
+		Semicolon = 59L,
+		//
+		// Summary:
+		//     < key.
+		Less = 60L,
+		//
+		// Summary:
+		//     = key.
+		Equal = 61L,
+		//
+		// Summary:
+		//     > key.
+		Greater = 62L,
+		//
+		// Summary:
+		//     ? key.
+		Question = 0x3FL,
+		//
+		// Summary:
+		//     @ key.
+		At = 0x40L,
+		//
+		// Summary:
+		//     A key.
+		A = 65L,
+		//
+		// Summary:
+		//     B key.
+		B = 66L,
+		//
+		// Summary:
+		//     C key.
+		C = 67L,
+		//
+		// Summary:
+		//     D key.
+		D = 68L,
+		//
+		// Summary:
+		//     E key.
+		E = 69L,
+		//
+		// Summary:
+		//     F key.
+		F = 70L,
+		//
+		// Summary:
+		//     G key.
+		G = 71L,
+		//
+		// Summary:
+		//     H key.
+		H = 72L,
+		//
+		// Summary:
+		//     I key.
+		I = 73L,
+		//
+		// Summary:
+		//     J key.
+		J = 74L,
+		//
+		// Summary:
+		//     K key.
+		K = 75L,
+		//
+		// Summary:
+		//     L key.
+		L = 76L,
+		//
+		// Summary:
+		//     M key.
+		M = 77L,
+		//
+		// Summary:
+		//     N key.
+		N = 78L,
+		//
+		// Summary:
+		//     O key.
+		O = 79L,
+		//
+		// Summary:
+		//     P key.
+		P = 80L,
+		//
+		// Summary:
+		//     Q key.
+		Q = 81L,
+		//
+		// Summary:
+		//     R key.
+		R = 82L,
+		//
+		// Summary:
+		//     S key.
+		S = 83L,
+		//
+		// Summary:
+		//     T key.
+		T = 84L,
+		//
+		// Summary:
+		//     U key.
+		U = 85L,
+		//
+		// Summary:
+		//     V key.
+		V = 86L,
+		//
+		// Summary:
+		//     W key.
+		W = 87L,
+		//
+		// Summary:
+		//     X key.
+		X = 88L,
+		//
+		// Summary:
+		//     Y key.
+		Y = 89L,
+		//
+		// Summary:
+		//     Z key.
+		Z = 90L,
+		//
+		// Summary:
+		//     [ key.
+		Bracketleft = 91L,
+		//
+		// Summary:
+		//     \ key.
+		Backslash = 92L,
+		//
+		// Summary:
+		//     ] key.
+		Bracketright = 93L,
+		//
+		// Summary:
+		//     ^ key.
+		Asciicircum = 94L,
+		//
+		// Summary:
+		//     _ key.
+		Underscore = 95L,
+		//
+		// Summary:
+		//     ` key.
+		Quoteleft = 96L,
+		//
+		// Summary:
+		//     { key.
+		Braceleft = 123L,
+		//
+		// Summary:
+		//     | key.
+		Bar = 124L,
+		//
+		// Summary:
+		//     } key.
+		Braceright = 125L,
+		//
+		// Summary:
+		//     ~ key.
+		Asciitilde = 126L,
+		//
+		// Summary:
+		//     Non-breakable space key.
+		Nobreakspace = 160L,
+		//
+		// Summary:
+		//     ¡ key.
+		Exclamdown = 161L,
+		//
+		// Summary:
+		//     ¢ key.
+		Cent = 162L,
+		//
+		// Summary:
+		//     £ key.
+		Sterling = 163L,
+		//
+		// Summary:
+		//     ¤ key.
+		Currency = 164L,
+		//
+		// Summary:
+		//     ¥ key.
+		Yen = 165L,
+		//
+		// Summary:
+		//     ¦ key.
+		Brokenbar = 166L,
+		//
+		// Summary:
+		//     § key.
+		Section = 167L,
+		//
+		// Summary:
+		//     ¨ key.
+		Diaeresis = 168L,
+		//
+		// Summary:
+		//     © key.
+		Copyright = 169L,
+		//
+		// Summary:
+		//     ª key.
+		Ordfeminine = 170L,
+		//
+		// Summary:
+		//     « key.
+		Guillemotleft = 171L,
+		//
+		// Summary:
+		//     ¬ key.
+		Notsign = 172L,
+		//
+		// Summary:
+		//     Soft hyphen key.
+		Hyphen = 173L,
+		//
+		// Summary:
+		//     ® key.
+		Registered = 174L,
+		//
+		// Summary:
+		//     ¯ key.
+		Macron = 175L,
+		//
+		// Summary:
+		//     ° key.
+		Degree = 176L,
+		//
+		// Summary:
+		//     ± key.
+		Plusminus = 177L,
+		//
+		// Summary:
+		//     ² key.
+		Twosuperior = 178L,
+		//
+		// Summary:
+		//     ³ key.
+		Threesuperior = 179L,
+		//
+		// Summary:
+		//     ´ key.
+		Acute = 180L,
+		//
+		// Summary:
+		//     µ key.
+		Mu = 181L,
+		//
+		// Summary:
+		//     ¶ key.
+		Paragraph = 182L,
+		//
+		// Summary:
+		//     · key.
+		Periodcentered = 183L,
+		//
+		// Summary:
+		//     ¸ key.
+		Cedilla = 184L,
+		//
+		// Summary:
+		//     ¹ key.
+		Onesuperior = 185L,
+		//
+		// Summary:
+		//     º key.
+		Masculine = 186L,
+		//
+		// Summary:
+		//     » key.
+		Guillemotright = 187L,
+		//
+		// Summary:
+		//     ¼ key.
+		Onequarter = 188L,
+		//
+		// Summary:
+		//     ½ key.
+		Onehalf = 189L,
+		//
+		// Summary:
+		//     ¾ key.
+		Threequarters = 190L,
+		//
+		// Summary:
+		//     ¿ key.
+		Questiondown = 191L,
+		//
+		// Summary:
+		//     À key.
+		Agrave = 192L,
+		//
+		// Summary:
+		//     Á key.
+		Aacute = 193L,
+		//
+		// Summary:
+		//     Â key.
+		Acircumflex = 194L,
+		//
+		// Summary:
+		//     Ã key.
+		Atilde = 195L,
+		//
+		// Summary:
+		//     Ä key.
+		Adiaeresis = 196L,
+		//
+		// Summary:
+		//     Å key.
+		Aring = 197L,
+		//
+		// Summary:
+		//     Æ key.
+		Ae = 198L,
+		//
+		// Summary:
+		//     Ç key.
+		Ccedilla = 199L,
+		//
+		// Summary:
+		//     È key.
+		Egrave = 200L,
+		//
+		// Summary:
+		//     É key.
+		Eacute = 201L,
+		//
+		// Summary:
+		//     Ê key.
+		Ecircumflex = 202L,
+		//
+		// Summary:
+		//     Ë key.
+		Ediaeresis = 203L,
+		//
+		// Summary:
+		//     Ì key.
+		Igrave = 204L,
+		//
+		// Summary:
+		//     Í key.
+		Iacute = 205L,
+		//
+		// Summary:
+		//     Î key.
+		Icircumflex = 206L,
+		//
+		// Summary:
+		//     Ï key.
+		Idiaeresis = 207L,
+		//
+		// Summary:
+		//     Ð key.
+		Eth = 208L,
+		//
+		// Summary:
+		//     Ñ key.
+		Ntilde = 209L,
+		//
+		// Summary:
+		//     Ò key.
+		Ograve = 210L,
+		//
+		// Summary:
+		//     Ó key.
+		Oacute = 211L,
+		//
+		// Summary:
+		//     Ô key.
+		Ocircumflex = 212L,
+		//
+		// Summary:
+		//     Õ key.
+		Otilde = 213L,
+		//
+		// Summary:
+		//     Ö key.
+		Odiaeresis = 214L,
+		//
+		// Summary:
+		//     × key.
+		Multiply = 215L,
+		//
+		// Summary:
+		//     Ø key.
+		Ooblique = 216L,
+		//
+		// Summary:
+		//     Ù key.
+		Ugrave = 217L,
+		//
+		// Summary:
+		//     Ú key.
+		Uacute = 218L,
+		//
+		// Summary:
+		//     Û key.
+		Ucircumflex = 219L,
+		//
+		// Summary:
+		//     Ü key.
+		Udiaeresis = 220L,
+		//
+		// Summary:
+		//     Ý key.
+		Yacute = 221L,
+		//
+		// Summary:
+		//     Þ key.
+		Thorn = 222L,
+		//
+		// Summary:
+		//     ß key.
+		Ssharp = 223L,
+		//
+		// Summary:
+		//     ÷ key.
+		Division = 247L,
+		//
+		// Summary:
+		//     ÿ key.
+		Ydiaeresis = 0xFFL
 	}
 }
