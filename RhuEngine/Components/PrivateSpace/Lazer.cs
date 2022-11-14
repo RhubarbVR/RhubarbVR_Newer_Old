@@ -57,12 +57,13 @@ namespace RhuEngine.Components
 			sprite.texture.Target = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
 			sprite.HFrames.Value = 26;
 			sprite.VFrames.Value = 7;
-			sprite.PixelSize.Value = 0.00010f;
+			sprite.PixelSize.Value = 0.00005f;
 			sprite.NoDepthTest.Value = true;
 			sprite.RenderPriority.Value += 101;
 			sprite.Billboard.Value = RBillboardOptions.Enabled;
 			sprite.FixedSize.Value = true;
 			var data = render.AttachMeshWithMeshRender<CurvedTubeMesh, UnlitMaterial>();
+			data.Item1.Radius.Value /= 2;
 			data.Item1.StartHandle.Value /= 35;
 			data.Item1.EndHandle.Value /= 35;
 			data.Item2.Transparency.Value = Transparency.Blend;

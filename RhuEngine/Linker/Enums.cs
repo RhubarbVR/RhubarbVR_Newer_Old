@@ -266,6 +266,7 @@ namespace RhuEngine.Linker
 		Y = 0x59,
 		/// <summary>z/Z</summary>
 		Z = 0x5A,
+		App = 0x5B,
 		/// <summary>0 on the numpad, when numlock is on.</summary>
 		Num0 = 0x60,
 		/// <summary>1 on the numpad, when numlock is on.</summary>
