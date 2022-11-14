@@ -165,6 +165,10 @@ namespace RhuEngine.Linker
 		Ctrl = 0x11,
 		/// <summary>Left or right Alt key.</summary>
 		Alt = 0x12,
+		/// <summary>
+		/// PauseBreak
+		/// </summary>
+		Pause = 0x13,
 		/// <summary>This behaves a little differently! This tells the toggle
 		/// state of caps lock, rather than the key state itself.</summary>
 		CapsLock = 0x14,
@@ -311,6 +315,10 @@ namespace RhuEngine.Linker
 		F11 = 0x7A,
 		/// <summary>Function key F12.</summary>
 		F12 = 0x7B,
+		/// <summary>
+		/// ScrollLock
+		/// </summary>
+		ScrollLock = 0x91,
 		/// <summary>,/&lt;</summary>
 		Comma = 0xBC,
 		/// <summary>./&gt;</summary>

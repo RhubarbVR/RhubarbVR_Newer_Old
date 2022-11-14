@@ -117,6 +117,8 @@ namespace RhubarbVR.Bindings.Input
 				Key.Subtract => Godot.Key.KpSubtract,
 				Key.Decimal => Godot.Key.KpPeriod,
 				Key.Divide => Godot.Key.KpDivide,
+				Key.ScrollLock => Godot.Key.Scrolllock,
+				Key.Pause => Godot.Key.Pause,
 				_ => Godot.Key.None,
 			};
 		}

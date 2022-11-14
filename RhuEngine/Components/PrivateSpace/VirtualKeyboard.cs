@@ -229,7 +229,7 @@ namespace RhuEngine.Components
 
 		protected override void Step() {
 			base.Step();
-			if(!(World.IsOverlayWorld || World.IsPersonalSpace) || World.IsNetworked){
+			if (!(World.IsOverlayWorld || World.IsPersonalSpace) || World.IsNetworked) {
 				return;
 			}
 			foreach (KeyboardButton item in KeyboardButtons) {
@@ -264,6 +264,24 @@ namespace RhuEngine.Components
 			AddCommlexButton(new Vector2f(695, 180), 0, "🠉", null, Key.Up);
 
 			//TODO add numPad
+			AddButtons(new (string, string, Key)?[] {
+				("Print",null,Key.Printscreen),
+			}, new Vector2f(650, 0));
+			AddButtons(new (string, string, Key)?[] {
+				("Ins",null,Key.Insert),
+				("Hom",null,Key.Home),
+				("Pg🠉",null,Key.PageUp),
+			}, new Vector2f(650, 45));
+			AddButtons(new (string, string, Key)?[] {
+				("Del",null,Key.Del),
+				("End",null,Key.End),
+				("Pg🠋",null,Key.PageDown),
+			}, new Vector2f(650, 90));
+
+
+
+
+
 
 
 			AddButtons(new (string, string, Key)?[] {
