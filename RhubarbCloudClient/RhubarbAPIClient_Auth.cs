@@ -85,6 +85,7 @@ namespace RhubarbCloudClient
 		}
 
 		public string ClientCompatibility = "WEB";
+		public string ClientVersion = "1.0";
 		public PrivateUserStatus Status { get; private set; }
 
 		public async Task UpdateStatus() {
@@ -96,8 +97,8 @@ namespace RhubarbCloudClient
 		private async Task LoadInStatusInfo(PrivateUserStatus status) {
 			Console.WriteLine("User Status Loaded");
 			Status = status;
-			status.ClientVersion = Environment.Version.ToString();
-			status.Device = Environment.OSVersion.ToString();
+			status.ClientVersion = ClientVersion + "_NET" + Environment.Version.ToString() ;
+			status.Device = Environment.OSVersion.Platform.ToString();
 			status.ClientCompatibility = ClientCompatibility;
 			await UpdateUserStatus(status);
 		}

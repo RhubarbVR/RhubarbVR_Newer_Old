@@ -12,7 +12,6 @@ namespace RhubarbCloudClient.Model
 		public UserStatus Status { get; set; }
 		public string CustomStatusMsg { get; set; }
 		public string ClientVersion { get; set; }
-		public string Device { get; set; }
 
 	}
 }

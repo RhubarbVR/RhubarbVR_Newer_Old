@@ -214,6 +214,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			Engine.netApiManager.Client.Status.CustomStatusMsg = _ststusLineEdit.Text.Value;
+			Task.Run(Engine.netApiManager.Client.UpdateStatus);
 		}
 
 		private void Client_OnLogout() {
@@ -347,6 +348,7 @@ namespace RhuEngine.Components
 					return;
 				}
 				Engine.netApiManager.Client.Status.Status = userStatus;
+				Task.Run(Engine.netApiManager.Client.UpdateStatus);
 				UpdateStatus(userStatus);
 			}
 			_onlineButton = AddStatusButton("Status.Online", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.OnlineStatus), () => ChangeStatus(DataModel.Enums.UserStatus.Online));

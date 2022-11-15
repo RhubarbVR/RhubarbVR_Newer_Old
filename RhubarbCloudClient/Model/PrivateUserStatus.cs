@@ -11,7 +11,8 @@ namespace RhubarbCloudClient.Model
 		public PrivateUserStatus() {
 
 		}
+		public string Device { get; set; }
 		public string ClientCompatibility { get; set; }
-		public AccessLevel UserStatusAccess { get; set; }
+		public AccessLevel UserStatusAccess { get; set; } = AccessLevel.Public;
 	}
 }

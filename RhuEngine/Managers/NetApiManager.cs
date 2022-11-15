@@ -8,13 +8,15 @@ using System.Net.Http;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using RNumerics;
 using Newtonsoft.Json;
 
 using RhubarbCloudClient;
@@ -42,7 +44,7 @@ namespace RhuEngine.Managers
 			Client = new RhubarbAPIClient(new Uri("https://api.rhubarbvr.net/"), path) {
 				UserConnectionBind = UserConnection,
 				SessionErrorBind = SessionError,
-				SessionIDBind = SessionIDupdate
+				SessionIDBind = SessionIDupdate,
 			};
 #endif
 		}
@@ -85,7 +87,21 @@ namespace RhuEngine.Managers
 		}
 		public void Init(Engine engine) {
 			WorldManager = engine.worldManager;
+			UpdateHash();
+			Client.ClientVersion = engine.version.ToString();
 			Task.Run(Client.Check);
+		}
+
+
+		public void UpdateHash() {
+			using (var mD5CryptoServiceProvider = new MD5CryptoServiceProvider()) {
+				var concatenatedStream = new ConcatenatedStream();
+				concatenatedStream.Enqueue(new MemoryStream(BitConverter.GetBytes(10)));
+				//AddExtraToHash concatenatedStream.Enqueue(DataFormClassesInDLLS)
+				var inArray = mD5CryptoServiceProvider.ComputeHash(concatenatedStream);
+				Client.ClientCompatibility = Convert.ToBase64String(inArray);
+				RLog.Info("Client Compatibility: " + Client.ClientCompatibility);
+			}
 		}
 
 		public void Step() {

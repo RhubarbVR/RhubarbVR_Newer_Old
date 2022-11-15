@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using DataModel.Enums;
+
 using RhuSettings;
 
 namespace RhuEngine.Settings
@@ -28,7 +30,5 @@ namespace RhuEngine.Settings
 		public string ThreeLetterLanguageName = null;
 		[SettingsField()]
 		public string MainMic = null;
-		[SettingsField("KeyboardLayout")]
-		public int KeyboardLayoutID = -1;
 	}
 }
