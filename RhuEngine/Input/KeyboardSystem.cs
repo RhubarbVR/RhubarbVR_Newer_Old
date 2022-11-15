@@ -17,9 +17,13 @@ namespace RhuEngine.Input
 			return PressingKeys.Contains(key);
 		}
 
-		public void Update() {
+		private void UpdateData() {
 			TypeDelta = null;
 			PressingKeys.Clear();
+		}
+
+		public void Update() {
+			RUpdateManager.ExecuteOnStartOfFrame(UpdateData);
 		}
 	}
 

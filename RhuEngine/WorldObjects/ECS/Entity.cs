@@ -441,6 +441,7 @@ namespace RhuEngine.WorldObjects.ECS
 				ParentDepthUpdate();
 				ParentEnabledChange(InternalParent.IsEnabled);
 				TransValueChange();
+				ViewportUpdate();
 				OnParentChanged?.Invoke();
 			}
 			catch {

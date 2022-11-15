@@ -36,7 +36,7 @@ namespace RhuEngine.Components
 			if (user.Target is null || user.Target != World.GetLocalUser()) {
 				return;
 			}
-			if (Engine.HasKeyboard) {
+			if (Engine.HasKeyboard && !Engine.IsInVR) {
 				return;
 			}
 			var locModule = CurrentLocomotionModule;

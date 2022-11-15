@@ -57,6 +57,17 @@ namespace RhuEngine.Components
 			InputUpdate();
 		}
 
+		private void UpdatePanel() {
+			if (_privateSpaceWindow?.Minimized??false) {
+				_isOpen.MinOffset.Value = new Vector2f(-25, -10);
+				_isOpen.MaxOffset.Value = new Vector2f(25, -5);
+			}
+			else {
+				_isOpen.MinOffset.Value = new Vector2f(-15, -10);
+				_isOpen.MaxOffset.Value = new Vector2f(15, -5);
+			}
+		}
+
 		protected override void OnAttach() {
 			base.OnAttach();
 			var root = Entity.AttachComponent<UIElement>();
@@ -65,6 +76,7 @@ namespace RhuEngine.Components
 
 			var mainButton = Entity.AddChild("MainButton").AttachComponent<Button>();
 			mainButton.Flat.Value = true;
+			mainButton.Pressed.Target = MainButtonClick;
 
 			var inputEvents = mainButton.Entity.AttachComponent<UIInputEvents>();
 			inputEvents.InputEntered.Target = InputOverBackGround;
@@ -108,6 +120,29 @@ namespace RhuEngine.Components
 			tex.MinOffset.Value = new Vector2f(-3);
 			tex.MaxOffset.Value = new Vector2f(3);
 		}
+
+		private DateTimeOffset _lastClick;
+		private DateTimeOffset _lastLastClick;
+		[Exposed]
+		public void MainButtonClick() {
+			if (_privateSpaceWindow is null) {
+				return;
+			}
+			var newTime = DateTimeOffset.UtcNow;
+			if ((newTime - _lastLastClick).TotalSeconds <= 0.5f) {
+				_privateSpaceWindow.NotMinimized = !_privateSpaceWindow.NotMinimized;
+			}
+			else if ((newTime - _lastClick).TotalSeconds <= 0.5f) {
+				_privateSpaceWindow.Window?.CenterWindowIntoView();
+			}
+			else if(!_privateSpaceWindow.NotMinimized) {
+				_privateSpaceWindow.NotMinimized = !_privateSpaceWindow.NotMinimized;
+			}
+			_lastLastClick = _lastClick;
+			_lastClick = DateTimeOffset.UtcNow;
+		}
+
+
 		[Exposed]
 		public void OnClose() {
 			_privateSpaceWindow?.Window.Close();
@@ -115,6 +150,7 @@ namespace RhuEngine.Components
 
 		public override void Dispose() {
 			base.Dispose();
+			OpennedPorgram(null);
 			PrivateSpaceManager?.UserInterfaceManager.privateSpaceTaskbarItems.Remove(this);
 		}
 
@@ -123,11 +159,16 @@ namespace RhuEngine.Components
 		public void OpennedPorgram(PrivateSpaceWindow privateSpaceWindow) {
 			if (_privateSpaceWindow is not null) {
 				_privateSpaceWindow.Window.OnUpdatedData -= Window_UpdateData;
+				_privateSpaceWindow.OnMinimize -= UpdatePanel;
 			}
-			privateSpaceWindow.Window.OnUpdatedData += Window_UpdateData;
 			_privateSpaceWindow = privateSpaceWindow;
+			if (_privateSpaceWindow?.Window is not null) {
+				_privateSpaceWindow.Window.OnUpdatedData += Window_UpdateData;
+				_privateSpaceWindow.OnMinimize += UpdatePanel;
+			}
 			_isOpen.Entity.enabled.Value = privateSpaceWindow is not null;
 			Window_UpdateData();
+			UpdatePanel();
 		}
 
 

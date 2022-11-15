@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -157,7 +158,36 @@ namespace RhubarbVR.Bindings
 			manager.LoadInputDriver<GodotMouse>();
 		}
 
+		private void CopyNeededFiles(string from) {
+			foreach (var item in Directory.GetDirectories(from)) {
+				try {
+					Directory.Move(item, Path.Combine(System.Environment.CurrentDirectory, Path.GetFileName(item)));
+				}
+				catch { }
+			}
+			foreach (var item in Directory.GetFiles(from)) {
+				try {
+					File.Copy(item, Path.Combine(System.Environment.CurrentDirectory, Path.GetFileName(item)), true);
+				}
+				catch { }
+			}
+			
+		}
+
 		public void LoadStatics() {
+			try {
+				new RBullet.BulletPhsyicsLink().RegisterPhysics();
+			}
+			catch {
+				var godotEngineMain = Path.Combine(System.Environment.CurrentDirectory, ".godot", "mono", "temp", "bin", "Debug");
+				if (Directory.Exists(godotEngineMain)) {
+					CopyNeededFiles(godotEngineMain);
+					new RBullet.BulletPhsyicsLink().RegisterPhysics();
+				}
+				else {
+					RLog.Err("Failed to find runtime folder");
+				}
+			}
 			RTime.Instance = EngineRunner;
 			RFont.Instance = typeof(GodotFont);
 			RText.Instance = typeof(GodotTextRender);
@@ -174,7 +204,6 @@ namespace RhubarbVR.Bindings
 			image.Create(2, 2, false, RFormat.Rgb8);
 			RTexture2D.White = new RImageTexture2D(image);
 			RTempQuad.Instance = typeof(GodotTempMeshRender);
-			new RBullet.BulletPhsyicsLink().RegisterPhysics();
 			Engine.windowManager.windowManagerLink = new GodotWindowManager();
 			if (EngineRunner._.GetViewport() is Window window) {
 				Engine.windowManager.LoadWindow(new GodotWindow(window));

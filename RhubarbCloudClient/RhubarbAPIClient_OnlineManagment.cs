@@ -81,7 +81,7 @@ namespace RhubarbCloudClient
 			}
 		}
 
-		private async Task CheckForInternetConnectionLoop() {
+		public async Task CheckForInternetConnectionLoop() {
 			Ping = await CheckForInternetConnection();
 			IsOnline = Ping != -1;
 		}

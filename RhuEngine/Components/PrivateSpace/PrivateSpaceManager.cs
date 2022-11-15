@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
+﻿using RhuEngine.Components.PrivateSpace;
+using RhuEngine.Linker;
+using RhuEngine.Managers;
+using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
-using SharedModels;
-
 using RNumerics;
-using RhuEngine.Linker;
-using RhuEngine.Physics;
-using RhuEngine.WorldObjects;
-using RhuEngine.Components.PrivateSpace;
-using RhuEngine.Managers;
-using DiscordRPC;
 
 namespace RhuEngine.Components
 {
@@ -115,6 +105,32 @@ namespace RhuEngine.Components
 			Rightlazer.Side.Value = Handed.Right;
 		}
 
+		public bool isOnScreen = true;
+
+		[Exposed]
+		public void ScreenInputExited() {
+			isOnScreen = false;
+		}
+
+
+		[Exposed]
+		public void ScreenInputEntered() {
+			isOnScreen = true;
+		}
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Entity KeyboardEntity;
+
+		private void BuildKeyboard() {
+			KeyboardEntity = DashMover.AddChild("Keybord");
+			KeyboardEntity.AttachComponent<Grabbable>();
+			KeyboardEntity.AttachComponent<VirtualKeyboard>();
+			KeyboardEntity.enabled.Value = false;
+		}
+
 		protected override void OnAttach() {
 			base.OnAttach();
 			Head = new GrabbableHolderCombiner(Handed.Max, WorldManager);
@@ -122,12 +138,18 @@ namespace RhuEngine.Components
 			Right = new GrabbableHolderCombiner(Handed.Right, WorldManager);
 			DashMover = World.RootEntity.AddChild("TaskBarMover");
 			DashMover.AttachComponent<UserInterfacePositioner>();
+			BuildKeyboard();
 			var screen = World.RootEntity.AddChild("RootScreen");
 			RootScreenElement = screen.AttachComponent<UIElement>();
+			var events = screen.AttachComponent<UIInputEvents>();
+			events.InputEntered.Target = ScreenInputEntered;
+			events.InputExited.Target = ScreenInputExited;
 			IconTexRender = screen.AddChild("Center Icon").AttachComponent<TextureRect>();
+			IconTexRender.InputFilter.Value = RInputFilter.Pass;
 			InputManager.screenInput.MouseStateUpdate += (newState) => IconTexRender.Entity.enabled.Value = !newState;
 			IconTexRender.Entity.orderOffset.Value = -100;
 			UserInterface = screen.AddChild("UserInterface").AttachComponent<UIElement>();
+			UserInterface.InputFilter.Value = RInputFilter.Pass;
 			UserInterface.Enabled.Value = false;
 			UserInterfaceManager = DashMover.AttachComponent<UserInterfaceManager>();
 			var size = new Vector2f(0.075f);
@@ -224,7 +246,9 @@ namespace RhuEngine.Components
 			var head = LocalUser.userRoot.Target?.head.Target;
 			if (head != null) {
 				if (!Engine.IsInVR) {
-					UpdateHeadLazer(head);
+					if (isOnScreen) {
+						UpdateHeadLazer(head);
+					}
 				}
 				if (Engine.IsInVR) {
 					if (Leftlazer is not null) {
@@ -361,6 +385,7 @@ namespace RhuEngine.Components
 				hitFocus = true;
 			}
 			lazer.CurrsorIcon = GetIcon(currsor);
+			Engine.inputManager.MouseSystem.SetCurrsor(currsor);
 			lazer.HitFocus = hitFocus;
 			lazer.HitOverlay = hitOverlay;
 			lazer.HitPrivate = hitPrivate;
@@ -398,7 +423,6 @@ namespace RhuEngine.Components
 				hitFocus = true;
 			}
 			CursorIcon = GetIcon(currsor);
-			InputManager.MouseSystem.SetCurrsor(currsor, null);
 			RootScreenElement.CursorShape.Value = currsor;
 			UserInterface.CursorShape.Value = currsor;
 			HeadLaserHitPoint = hitPoint;
@@ -408,7 +432,11 @@ namespace RhuEngine.Components
 		}
 
 		public void KeyBoardUpdate(Matrix openLocation) {
-
+			var wasAlreadyOpen = KeyboardEntity.enabled.Value;
+			KeyboardEntity.enabled.Value = Engine.HasKeyboard && Engine.IsInVR;
+			if (!wasAlreadyOpen) {
+				KeyboardEntity.LocalTrans = Matrix.TR(new Vector3f(0,-0.5,-0.5),Quaternionf.CreateFromEuler(0,-10,0));
+			}
 		}
 	}
 }

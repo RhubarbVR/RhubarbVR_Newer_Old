@@ -85,10 +85,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			RenderThread.ExecuteOnStartOfFrame(this, UpdateParrent);
 		}
 
+
 		public virtual void UpdateParrent() {
-			if (node.GetParent() is not null) {
-				node.GetParent().RemoveChild(node);
-			}
+			node.GetParent()?.RemoveChild(node);
 			var addToViewPort = false;
 			if (LinkedComp.Entity.InternalParent?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
 				if (canvasItem.CanvasItem != node) {

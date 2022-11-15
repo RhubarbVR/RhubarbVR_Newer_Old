@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RNumerics;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -27,6 +28,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			node.ButtonUp += Node_ButtonUp;
 			node.Pressed += Node_Pressed;
 			node.Toggled += Node_Toggled;
+			node.GuiInput += Node_GuiInput;
+			LinkedComp.GetPosFunc = GetPos;
+
 			Disabled_Changed(null);
 			ToggleMode_Changed(null);
 			ButtonPressed_Changed(null);
@@ -34,6 +38,47 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			ButtonMask_Changed(null);
 			KeepPressedOutside_Changed(null);
 		}
+		public Handed GetSideFromMouseID(int id) {
+			return (Handed)(id >> 16);
+		}
+
+		public Vector2f LeftPos;
+		public Vector2f RightPos;
+		public Vector2f MaxPos;
+
+		private Vector2f GetPos(Handed handed) {
+			return handed switch {
+				Handed.Left => LeftPos,
+				Handed.Right => RightPos,
+				Handed.Max => MaxPos,
+				_ => Vector2f.Zero,
+			};
+		}
+
+		private void Node_GuiInput(InputEvent @event) {
+			if (@event is InputEventMouse mouse) {
+				var newPos = new Vector2f(mouse.GlobalPosition.x, mouse.GlobalPosition.y);
+				switch (GetSideFromMouseID(mouse.Device)) {
+					case Handed.Left:
+						LeftPos = newPos;
+						break;
+					case Handed.Right:
+						RightPos = newPos;
+						break;
+					case Handed.Max:
+						MaxPos = newPos;
+						break;
+					default:
+						break;
+				}
+				if ((mouse.ButtonMask & node.ButtonMask) == MouseButton.None) {
+					return;
+				}
+				LinkedComp.LastHanded = GetSideFromMouseID(mouse.Device);
+			}
+
+		}
+
 
 		private void SendState() {
 			LinkedComp.ButtonPressed.Value = node.ButtonPressed;
@@ -41,22 +86,23 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		private void Node_ButtonDown() {
 			SendState();
-			LinkedComp.ButtonDown.Target?.Invoke();
+			RUpdateManager.ExecuteOnEndOfFrame(LinkedComp.ButtonDown.Invoke);
 		}
 
 		private void Node_ButtonUp() {
 			SendState();
-			LinkedComp.ButtonUp.Target?.Invoke();
+			RUpdateManager.ExecuteOnEndOfFrame(LinkedComp.ButtonUp.Invoke);
 		}
 
 		private void Node_Pressed() {
 			SendState();
-			LinkedComp.Pressed.Target?.Invoke();
+			RUpdateManager.ExecuteOnEndOfFrame(LinkedComp.Pressed.Invoke);
 		}
 
 		private void Node_Toggled(bool buttonPressed) {
 			SendState();
-			LinkedComp.Toggled.Target?.Invoke(buttonPressed);
+			RUpdateManager.ExecuteOnEndOfFrame(() => LinkedComp.Toggled.Target?.Invoke(buttonPressed));
+			;
 		}
 
 		private void KeepPressedOutside_Changed(IChangeable obj) {
@@ -65,13 +111,13 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		private void ButtonMask_Changed(IChangeable obj) {
 			var mask = MouseButton.None;
-			if((LinkedComp.ButtonMask.Value | RButtonMask.Primary) != RButtonMask.None) {
+			if ((LinkedComp.ButtonMask.Value & RButtonMask.Primary) != RButtonMask.None) {
 				mask |= MouseButton.MaskLeft;
 			}
-			if ((LinkedComp.ButtonMask.Value | RButtonMask.Secondary) != RButtonMask.None) {
+			if ((LinkedComp.ButtonMask.Value & RButtonMask.Secondary) != RButtonMask.None) {
 				mask |= MouseButton.MaskRight;
 			}
-			if ((LinkedComp.ButtonMask.Value | RButtonMask.Tertiary) != RButtonMask.None) {
+			if ((LinkedComp.ButtonMask.Value & RButtonMask.Tertiary) != RButtonMask.None) {
 				mask |= MouseButton.MaskMiddle;
 			}
 			node.ButtonMask = mask;

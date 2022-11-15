@@ -72,6 +72,7 @@ namespace RhubarbCloudClient
 
 		private Task Hub_Closed(Exception arg) {
 			Console.WriteLine($"SignelR Closed {arg?.Message??"null"}");
+			CheckForInternetConnectionLoop().ConfigureAwait(false);
 			return Task.CompletedTask;
 		}
 
@@ -79,21 +80,25 @@ namespace RhubarbCloudClient
 			if (_hub is null) {
 				return;
 			}
+			StatusUpdate?.Invoke();
 			await _hub.InvokeAsync("SetStatus", status);
 		}
 
 		public string ClientCompatibility = "WEB";
+		public string ClientVersion = "1.0";
 		public PrivateUserStatus Status { get; private set; }
 
 		public async Task UpdateStatus() {
 			await UpdateUserStatus(Status);
 		}
 
+		public event Action StatusUpdate;
+
 		private async Task LoadInStatusInfo(PrivateUserStatus status) {
 			Console.WriteLine("User Status Loaded");
 			Status = status;
-			status.ClientVersion = Environment.Version.ToString();
-			status.Device = Environment.OSVersion.ToString();
+			status.ClientVersion = ClientVersion + "_NET" + Environment.Version.ToString() ;
+			status.Device = Environment.OSVersion.Platform.ToString();
 			status.ClientCompatibility = ClientCompatibility;
 			await UpdateUserStatus(status);
 		}

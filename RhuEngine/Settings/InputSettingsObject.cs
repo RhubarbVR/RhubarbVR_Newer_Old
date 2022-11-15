@@ -76,7 +76,7 @@ namespace RhuEngine.Settings
 		public InputAction ObjectPush = new(new[] { new[] { "Mouse.Scroll.y" }, new[] { "XR.Main.Primary.y" } });
 
 		[SettingsField("OpenDash")]
-		public InputAction OpenDash = new(new[] { new[] { "Key.Esc" }, new[] { "Key.Ctrl", "Key.Space" } });
+		public InputAction OpenDash = new(new[] { new[] { "Key.Escape" }, new[] { "Key.Ctrl", "Key.Space" } });
 
 		[SettingsField("ChangeWorld")]
 		public InputAction ChangeWorld = new(new[] { new[] { "Key.Ctrl", "Key.Tab" } });

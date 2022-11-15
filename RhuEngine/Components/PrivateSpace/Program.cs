@@ -33,6 +33,7 @@ namespace RhuEngine.Components
 				window.AddRawTexture(ProgramIcon);
 			}
 			programWindows.Add().Target = window;
+			window.CenterWindowIntoView();
 			return window;
 		}
 

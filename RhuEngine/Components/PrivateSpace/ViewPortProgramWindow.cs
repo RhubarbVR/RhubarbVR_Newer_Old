@@ -11,7 +11,7 @@ using RNumerics;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Executable" })]
+	[Category(new string[] { "Local" })]
 	public sealed class ViewPortProgramWindow : ProgramWindow
 	{
 		[Default("ViewPort Program Window")]
@@ -65,9 +65,9 @@ namespace RhuEngine.Components
 
 		protected override void OnAttach() {
 			base.OnAttach();
-			Size.Value = new Vector2i(512);
 			var viewPort = Viewport.Target = Entity.AttachComponent<Viewport>();
 			ViewPortSizeLink.Target = viewPort.Size;
+			Size.Value = new Vector2i(512);
 		}
 
 		public void AddRawTexture(RTexture2D rTexture2D) {

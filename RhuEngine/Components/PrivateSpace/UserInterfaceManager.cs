@@ -15,6 +15,8 @@ using RhuEngine.WorldObjects;
 using RhuEngine.Components.PrivateSpace;
 using System.Globalization;
 using System.Collections;
+using RhuEngine.Managers;
+using DataModel.Enums;
 
 namespace RhuEngine.Components
 {
@@ -34,6 +36,12 @@ namespace RhuEngine.Components
 		[NoLoad]
 		[NoSyncUpdate]
 		public UIElement UserInterface;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIElement Windows;
 
 		[NoSave]
 		[NoSync]
@@ -121,6 +129,13 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
+			Engine.netApiManager.Client.OnLogout += Client_OnLogout;
+			Engine.netApiManager.Client.OnLogin += Client_OnLogin;
+			Engine.netApiManager.Client.HasGoneOfline += Client_OnLogout;
+			Engine.netApiManager.Client.StatusUpdate += Client_StatusUpdate;
+
+			Windows = RootUIEntity.AddChild("Windows").AttachComponent<UIElement>();
+			Windows.InputFilter.Value = RInputFilter.Pass;
 			UImaterial = Entity.AttachComponent<UnlitMaterial>();
 			UImaterial.DullSided.Value = true;
 			UImaterial.Transparency.Value = Transparency.Blend;
@@ -133,7 +148,7 @@ namespace RhuEngine.Components
 			taskBarVRElement.Max.Value = new Vector2f(1, 0);
 			taskBarVRElement.MaxOffset.Value = new Vector2i(0, 100);
 			taskBarVRElement.InputInterface.Target = _PrivateSpaceManager.VRViewPort;
-			
+
 			StartVRElement = VrElements.AddChild("StartVR").AttachMesh<CanvasMesh>(UImaterial);
 			StartVRElement.TopOffset.Value = false;
 			StartVRElement.FrontBindRadus.Value += 1f;
@@ -172,7 +187,111 @@ namespace RhuEngine.Components
 			Start = RootUIEntity.AddChild("Start").AttachComponent<UIElement>();
 			BuildStartMenu(Start);
 			ToggleStart(false);
+			Client_StatusUpdate();
+			if (Engine.netApiManager.Client.IsLogin) {
+				Client_OnLogin(Engine.netApiManager.Client.User);
+			}
+			else {
+				Client_OnLogout();
+			}
 		}
+
+		private void Client_StatusUpdate() {
+			UpdateStatus(Engine?.netApiManager?.Client?.Status?.Status ?? UserStatus.Offline);
+			_ststusLineEdit.Text.Value = Engine?.netApiManager?.Client?.Status?.CustomStatusMsg;
+		}
+
+		private void Client_OnLogin(RhubarbCloudClient.Model.PrivateUser obj) {
+			Client_StatusUpdate();
+			_profileSideButton.Entity.enabled.Value = true;
+			_usernameLabel.Text.Value = obj.UserName;
+			//Todo: Load users icon
+		}
+
+		[Exposed]
+		public void ChangeStatusText() {
+			if (Engine?.netApiManager?.Client?.Status is null) {
+				return;
+			}
+			Engine.netApiManager.Client.Status.CustomStatusMsg = _ststusLineEdit.Text.Value;
+			Task.Run(Engine.netApiManager.Client.UpdateStatus);
+		}
+
+		private void Client_OnLogout() {
+			_profileElement.Entity.enabled.Value = false;
+			_profileSideButton.ButtonPressed.Value = false;
+			_profileSideButton.Entity.enabled.Value = false;
+		}
+		Button _onlineButton;
+		Button _idleButton;
+		Button _doNotDisturbButton;
+		Button _streamButton;
+		Button _offlineButton;
+		LineEdit _ststusLineEdit;
+		private void UpdateStatus(UserStatus rhubarbIcons) {
+			if (_onlineButton is null ||
+			_idleButton is null ||
+			_doNotDisturbButton is null ||
+			_streamButton is null ||
+			_offlineButton is null) {
+				return;
+			}
+			switch (rhubarbIcons) {
+				case UserStatus.Online:
+					_onlineButton.ButtonPressed.Value = true;
+					_idleButton.ButtonPressed.Value = false;
+					_doNotDisturbButton.ButtonPressed.Value = false;
+					_streamButton.ButtonPressed.Value = false;
+					_offlineButton.ButtonPressed.Value = false;
+					break;
+				case UserStatus.Idle:
+					_onlineButton.ButtonPressed.Value = false;
+					_idleButton.ButtonPressed.Value = true;
+					_doNotDisturbButton.ButtonPressed.Value = false;
+					_streamButton.ButtonPressed.Value = false;
+					_offlineButton.ButtonPressed.Value = false;
+					break;
+				case UserStatus.DoNotDisturb:
+					_onlineButton.ButtonPressed.Value = false;
+					_idleButton.ButtonPressed.Value = false;
+					_doNotDisturbButton.ButtonPressed.Value = true;
+					_streamButton.ButtonPressed.Value = false;
+					_offlineButton.ButtonPressed.Value = false;
+					break;
+				case UserStatus.Streaming:
+					_onlineButton.ButtonPressed.Value = false;
+					_idleButton.ButtonPressed.Value = false;
+					_doNotDisturbButton.ButtonPressed.Value = false;
+					_streamButton.ButtonPressed.Value = true;
+					_offlineButton.ButtonPressed.Value = false;
+					break;
+				case UserStatus.Invisible:
+					_onlineButton.ButtonPressed.Value = false;
+					_idleButton.ButtonPressed.Value = false;
+					_doNotDisturbButton.ButtonPressed.Value = false;
+					_streamButton.ButtonPressed.Value = false;
+					_offlineButton.ButtonPressed.Value = true;
+					break;
+				case UserStatus.Offline:
+					_onlineButton.ButtonPressed.Value = false;
+					_idleButton.ButtonPressed.Value = false;
+					_doNotDisturbButton.ButtonPressed.Value = false;
+					_streamButton.ButtonPressed.Value = false;
+					_offlineButton.ButtonPressed.Value = true;
+					break;
+				default:
+					break;
+			}
+
+		}
+
+		[Exposed]
+		public void Logout() {
+			Task.Run(Engine.netApiManager.Client.LogOut);
+		}
+
+
+		private Button _usernameLabel;
 
 		private void BuildStartMenu(UIElement start) {
 			start.Min.Value = new Vector2f(0, 1);
@@ -196,8 +315,8 @@ namespace RhuEngine.Components
 			var profileBox = _profileElement.Entity.AddChild("Data").AttachComponent<BoxContainer>();
 			profileBox.Vertical.Value = true;
 			profileBox.Alignment.Value = RBoxContainerAlignment.Center;
-			var UsernameLabel = profileBox.Entity.AddChild("UserName").AttachComponent<Button>();
-			UsernameLabel.Text.Value = "Username";
+			_usernameLabel = profileBox.Entity.AddChild("UserName").AttachComponent<Button>();
+			_usernameLabel.Text.Value = "Username";
 
 			var StatusButtons = profileBox.Entity.AddChild("StatusButtons").AttachComponent<BoxContainer>();
 			StatusButtons.Alignment.Value = RBoxContainerAlignment.Center;
@@ -221,23 +340,35 @@ namespace RhuEngine.Components
 				}
 				return statusButton;
 			}
-			AddStatusButton("Status.Online", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.OnlineStatus), null);
-			AddStatusButton("Status.Idle", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.IdleStatus), null);
-			AddStatusButton("Status.DoNotDisturb", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.DoNotDistrubeStatus), null);
-			AddStatusButton("Status.Stream", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.StreamingStatus), null);
-			AddStatusButton("Status.Offline", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.OfflineStatus), null).ButtonPressed.Value = true;
 
-			var ststusLineEdit = profileBox.Entity.AddChild("StatusField").AttachComponent<LineEdit>();
-			var ststusLineEditlocale = ststusLineEdit.Entity.AttachComponent<StandardLocale>();
-			ststusLineEditlocale.TargetValue.Target = ststusLineEdit.PlaceholderText;
+
+
+			void ChangeStatus(DataModel.Enums.UserStatus userStatus) {
+				if (Engine.netApiManager.Client.Status is null) {
+					return;
+				}
+				Engine.netApiManager.Client.Status.Status = userStatus;
+				Task.Run(Engine.netApiManager.Client.UpdateStatus);
+				UpdateStatus(userStatus);
+			}
+			_onlineButton = AddStatusButton("Status.Online", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.OnlineStatus), () => ChangeStatus(DataModel.Enums.UserStatus.Online));
+			_idleButton = AddStatusButton("Status.Idle", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.IdleStatus), () => ChangeStatus(DataModel.Enums.UserStatus.Idle));
+			_doNotDisturbButton = AddStatusButton("Status.DoNotDisturb", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.DoNotDistrubeStatus), () => ChangeStatus(DataModel.Enums.UserStatus.DoNotDisturb));
+			_streamButton = AddStatusButton("Status.Stream", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.StreamingStatus), () => ChangeStatus(DataModel.Enums.UserStatus.Streaming));
+			_offlineButton = AddStatusButton("Status.Offline", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.OfflineStatus), () => ChangeStatus(DataModel.Enums.UserStatus.Offline));
+
+			_ststusLineEdit = profileBox.Entity.AddChild("StatusField").AttachComponent<LineEdit>();
+			var ststusLineEditlocale = _ststusLineEdit.Entity.AttachComponent<StandardLocale>();
+			ststusLineEditlocale.TargetValue.Target = _ststusLineEdit.PlaceholderText;
 			ststusLineEditlocale.Key.Value = "Common.CustomStatus";
-			ststusLineEdit.HorizontalFilling.Value = RFilling.ShrinkCenter;
-			ststusLineEdit.MinSize.Value = new Vector2i(230, 35);
-
+			_ststusLineEdit.HorizontalFilling.Value = RFilling.ShrinkCenter;
+			_ststusLineEdit.MinSize.Value = new Vector2i(230, 35);
+			_ststusLineEdit.TextSubmitted.Target = ChangeStatusText;
 
 			var logoutButton = profileBox.Entity.AddChild("logoutButton").AttachComponent<Button>();
 			var locale = logoutButton.Entity.AttachComponent<StandardLocale>();
 			locale.TargetValue.Target = logoutButton.Text;
+			logoutButton.Pressed.Target = Logout;
 			locale.Key.Value = "Common.Logout";
 			logoutButton.HorizontalFilling.Value = RFilling.ShrinkCenter;
 			logoutButton.MinSize.Value = new Vector2i(230, 35);
@@ -320,9 +451,6 @@ namespace RhuEngine.Components
 			backGorund.Color.Value = new Colorf(50, 50, 50, 150);
 
 			var scrollCont = center.Entity.AddChild("Scroll").AttachComponent<ScrollContainer>();
-			scrollCont.MinOffset.Value = new Vector2f(0, -44);
-			scrollCont.MaxOffset.Value = new Vector2f(0, 44);
-
 			_taskbarElementHolder = scrollCont.Entity.AddChild("Box").AttachComponent<BoxContainer>();
 			_taskbarElementHolder.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
 			_taskbarElementHolder.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;

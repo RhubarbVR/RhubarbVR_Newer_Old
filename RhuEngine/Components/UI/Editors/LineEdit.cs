@@ -65,7 +65,7 @@ namespace RhuEngine.Components
 		protected override void Step() {
 			base.Step();
 			if(Engine.KeyboardInteraction == this) {
-				if (Engine.inputManager.KeyboardSystem.IsKeyJustDown(Key.Return) && !Engine.inputManager.KeyboardSystem.IsKeyDown(Key.Shift)) {
+				if (Engine.inputManager.KeyboardSystem.IsKeyJustDown(Key.Enter) && !Engine.inputManager.KeyboardSystem.IsKeyDown(Key.Shift)) {
 					KeyboardUnBind();
 				}
 			}

@@ -54,7 +54,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public const float TIME_FOR_DOUBLE_CLICK = 0.25f;
 
 		public override void Render() {
-			if (LinkedComp.Engine.KeyboardInteraction is UIElement element && element.Entity.Viewport == LinkedComp) {
+			if (LinkedComp.Engine.KeyboardInteraction is Component element && element.Entity.Viewport == LinkedComp && ((!element.Entity.Viewport.IsConnected && !element.Engine.IsInVR) || element.Engine.IsInVR)) {
 				foreach (var item in KeyboardSystem._keys) {
 					var time = LinkedComp.InputManager.KeyboardSystem.GetStateChangeTime(item);
 					if (time is 0 or > 0.5f) {
@@ -301,7 +301,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			if (_isInputUpdate) {
 				node.RenderTargetUpdateMode = SubViewport.UpdateMode.Once;
 			}
-			var deviceid = (current * ((int)side + 1)) + 10;
+			var deviceid = (current << 8) | 255 | ((int)side << 16);
 			if (!InputActions.TryGetValue(deviceid, out var inputAction)) {
 				inputAction = new InputAction();
 				InputActions.Add(deviceid, inputAction);
@@ -321,7 +321,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 						node.MoveChild(canvasItem.CanvasItem, -1);
 					}
 					else {
-						canvasItem.CanvasItem?.GetParent()?.RemoveChild(node);
+						canvasItem.CanvasItem?.GetParent()?.RemoveChild(canvasItem.CanvasItem);
 						node.AddChild(canvasItem.CanvasItem);
 						canvasItem.CanvasItem.Owner = node;
 						node.MoveChild(canvasItem.CanvasItem, -1);

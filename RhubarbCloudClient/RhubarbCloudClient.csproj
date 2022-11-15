@@ -9,7 +9,6 @@
 		<Content Remove="Locales\de.json" />
 		<Content Remove="Locales\en-us.json" />
 		<Content Remove="Locales\en.json" />
-		<Content Remove="Locales\KeyQwerty.json" />
 		<Content Remove="Locales\nl.json" />
 	</ItemGroup>
 
@@ -21,9 +20,6 @@
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</EmbeddedResource>
 		<EmbeddedResource Include="Locales\en.json">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<EmbeddedResource Include="Locales\KeyQwerty.json">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</EmbeddedResource>
 		<EmbeddedResource Include="Locales\nl.json">

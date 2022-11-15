@@ -81,6 +81,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Node_TextChanged(string newText) {
+			LinkedComp.Text.Value = newText;
 			LinkedComp.TextChange?.Target?.Invoke(newText);
 		}
 
@@ -176,7 +177,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Secret_Changed(IChangeable obj) {
-			node.SecretCharacter = LinkedComp.SecretCharacter.Value;
+			node.Secret = LinkedComp.Secret.Value;
 		}
 
 		private void Editable_Changed(IChangeable obj) {
@@ -197,7 +198,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Text_Changed(IChangeable obj) {
-			node.Text = LinkedComp.Text.Value;
+			if(node.Text != LinkedComp.Text.Value) {
+				node.Text = LinkedComp.Text.Value;
+			}
 		}
 	}
 

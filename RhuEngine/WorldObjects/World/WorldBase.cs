@@ -278,7 +278,8 @@ namespace RhuEngine.WorldObjects
 			try {
 				if (Engine.EngineLink.CanRender) {
 					lock (_worldLinkComponents) {
-						foreach (var item in _worldLinkComponents) {
+						//Todo Dont relay like this
+						foreach (var item in _worldLinkComponents.ToArray()) {
 							item.RunRender();
 						}
 					}

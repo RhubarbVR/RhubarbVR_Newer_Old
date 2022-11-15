@@ -176,7 +176,8 @@ namespace RhuEngine.Components
 		public readonly Sync<Vector2i> Size;
 		public readonly Sync<Vector2i> Size2DOverride;
 		public readonly Sync<bool> Size2DOverrideStretch;
-
+		[Default(true)]
+		public readonly Sync<bool> TakeKeyboardFocus;
 		public readonly Sync<bool> UseTAA;
 		public readonly Sync<bool> UseDebanding;
 
@@ -276,6 +277,11 @@ namespace RhuEngine.Components
 		}
 
 		public Action<Vector2f, Vector2f, float, Handed, int, bool, bool, bool, bool> SendInputEvent;
+
+		public ViewportConnector ViewportConnector { get; internal set; }
+
+		public bool IsConnected => ViewportConnector is not null;
+
 
 		public void SendInput(Vector2f pos, Vector2f Tilt, float PressForce, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
 			SendInputEvent?.Invoke(pos, Tilt, PressForce, side, current, isLazer, IsClickedPrime, IsClickedSecod, IsClickedTur);

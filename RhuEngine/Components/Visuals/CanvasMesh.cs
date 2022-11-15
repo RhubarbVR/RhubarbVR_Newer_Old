@@ -72,10 +72,12 @@ namespace RhuEngine.Components
 
 		public RigidBodyCollider PhysicsCollider;
 
+		public Handed LastHand { get; private set; }
+
 		public override void ComputeMesh() {
 			PhysicsCollider?.Remove();
 			PhysicsCollider = null;
-			var min = Min.Value + ((Vector2f)MinOffset.Value/ (Vector2f)Resolution.Value);
+			var min = Min.Value + ((Vector2f)MinOffset.Value / (Vector2f)Resolution.Value);
 			var max = Max.Value + ((Vector2f)MaxOffset.Value / (Vector2f)Resolution.Value);
 			var rectSize = max - min;
 			var rectMin = min;
@@ -111,7 +113,7 @@ namespace RhuEngine.Components
 
 			foreach (var item in hitDatas) {
 				var pos = item.HitPointOnCanvas;
-				
+
 				var isPrime = item.PressForce >= PrimaryNeededForce.Value;
 				var isSec = item.GripForces >= GripNeededForce.Value;
 				var isMed = InputManager.GetInputAction(InputTypes.Secondary).HandedValue(item.Side) >= SecodaryNeededForce.Value;
@@ -218,35 +220,28 @@ namespace RhuEngine.Components
 
 		private void AddHitData(HitData hitData) {
 			var localPoint = RenderLocation.GetLocal(Matrix.T(hitData.Hitpointworld));
-			var isJustBloxMesh = !(TopOffset.Value || FrontBind.Value);
-			if (isJustBloxMesh) {
-				var pos = localPoint.Translation.Xy;
-				pos /= Scale.Value.Xy / 10;
-				hitData.HitPointOnCanvas = pos;
+
+			if (LoadedSimpleMesh is null) {
+				return;
 			}
-			else {
-				if (LoadedSimpleMesh is null) {
-					return;
-				}
-				var e = RenderLocation.GetLocal(Matrix.T(hitData.Hitpointworld));
-				var hitPoint = e.Translation;
-				World.DrawDebugSphere(RenderLocation, (Vector3f)hitPoint, new Vector3d(0.01), Colorf.Red, 0.5f);
-				var mesh = LoadedSimpleMesh;
-				var hittry = mesh.InsideTry(hitPoint);
-				if (hittry < 0 || hittry >= mesh.MaxTriangleID) {
-					return;
-				}
-				var tryangle = mesh.GetTriangle(hittry);
-				var p1 = mesh.GetVertexAll(tryangle.a);
-				var p2 = mesh.GetVertexAll(tryangle.b);
-				var p3 = mesh.GetVertexAll(tryangle.c);
-				World.DrawDebugSphere(RenderLocation, (Vector3f)p1.v, new Vector3d(0.01), Colorf.Red, 0.5f);
-				World.DrawDebugSphere(RenderLocation, (Vector3f)p2.v, new Vector3d(0.01), Colorf.Blue, 0.5f);
-				World.DrawDebugSphere(RenderLocation, (Vector3f)p3.v, new Vector3d(0.01), Colorf.Green, 0.5f);
-				var uvpos = Vector2f.GetUVPosOnTry(p1.v, p1.uv[0], p2.v, p2.uv[0], p3.v, p3.uv[0], hitPoint);
-				World.DrawDebugText(RenderLocation, (Vector3f)hitPoint + new Vector3f(0, 0.1f, 0.1f), new Vector3f(0.1f), Colorf.BlueMetal, uvpos, 0.1f);
-				hitData.HitPointOnCanvas = uvpos;
+			var e = RenderLocation.GetLocal(Matrix.T(hitData.Hitpointworld));
+			var hitPoint = e.Translation;
+			World.DrawDebugSphere(RenderLocation, (Vector3f)hitPoint, new Vector3d(0.01), Colorf.Red, 0.5f);
+			var mesh = LoadedSimpleMesh;
+			var hittry = mesh.InsideTry(hitPoint);
+			if (hittry < 0 || hittry >= mesh.MaxTriangleID) {
+				return;
 			}
+			var tryangle = mesh.GetTriangle(hittry);
+			var p1 = mesh.GetVertexAll(tryangle.a);
+			var p2 = mesh.GetVertexAll(tryangle.b);
+			var p3 = mesh.GetVertexAll(tryangle.c);
+			World.DrawDebugSphere(RenderLocation, (Vector3f)p1.v, new Vector3d(0.01), Colorf.Red, 0.5f);
+			World.DrawDebugSphere(RenderLocation, (Vector3f)p2.v, new Vector3d(0.01), Colorf.Blue, 0.5f);
+			World.DrawDebugSphere(RenderLocation, (Vector3f)p3.v, new Vector3d(0.01), Colorf.Green, 0.5f);
+			var uvpos = Vector2f.GetUVPosOnTry(p1.v, p1.uv[0], p2.v, p2.uv[0], p3.v, p3.uv[0], hitPoint);
+			World.DrawDebugText(RenderLocation, (Vector3f)hitPoint + new Vector3f(0, 0.1f, 0.1f), new Vector3f(0.1f), Colorf.BlueMetal, uvpos, 0.1f);
+			hitData.HitPointOnCanvas = uvpos;
 			hitDatas.Add(hitData);
 		}
 

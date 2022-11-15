@@ -81,8 +81,12 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			MidGrapheme_Changed(null);
 			TextDir_Changed(null);
 			Language_Changed(null);
+			node.TextChanged += Node_TextChanged;
 		}
 
+		private void Node_TextChanged() {
+			LinkedComp.Text.Value = node.Text;
+		}
 
 		private void Language_Changed(IChangeable obj) {
 			node.Language = LinkedComp.Language.Value;
@@ -210,7 +214,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Text_Changed(IChangeable obj) {
-			node.Text = LinkedComp.Text.Value;
+			if (node.Text != LinkedComp.Text.Value) {
+				node.Text = LinkedComp.Text.Value;
+			}
 		}
 	}
 

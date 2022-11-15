@@ -182,11 +182,13 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			}
 		}
 		protected void Node_FocusExited() {
-			LinkedComp.Engine.KeyboardInteractionUnBind(LinkedComp);
+			if (LinkedComp.Entity.Viewport?.TakeKeyboardFocus?.Value??true) {
+				LinkedComp.Engine.KeyboardInteractionUnBind(LinkedComp);
+			}
 		}
 
 		protected void Node_FocusEntered() {
-			if (FreeKeyboard) {
+			if (FreeKeyboard & (LinkedComp.Entity.Viewport?.TakeKeyboardFocus?.Value ?? true)) {
 				LinkedComp.Engine.KeyboardInteractionBind(LinkedComp);
 			}
 		}
