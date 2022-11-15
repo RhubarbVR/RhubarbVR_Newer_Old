@@ -18,9 +18,13 @@ public partial class ConnectedViewport : TextureRect
 		set {
 			_viewport = value;
 			RenderThread.ExecuteOnEndOfFrame(() => {
-				if (_viewport.WorldLink is ViewportLink viewport) {
-					targetViewport = viewport.node;
-					Texture = viewport.node?.GetTexture();
+				try {
+					if (_viewport.WorldLink is ViewportLink viewport) {
+						targetViewport = viewport.node;
+						Texture = viewport.node?.GetTexture();
+					}
+				}
+				catch { 
 				}
 			});
 		}

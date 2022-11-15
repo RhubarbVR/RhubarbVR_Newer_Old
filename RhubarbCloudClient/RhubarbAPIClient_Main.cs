@@ -42,7 +42,7 @@ namespace RhubarbCloudClient
 
 		public RhubarbAPIClient(HttpClient httpClient) {
 			HttpClient = httpClient;
-			HttpClient.Timeout = TimeSpan.FromMilliseconds(1000);
+			HttpClient.Timeout = TimeSpan.FromMilliseconds(10000);
 			UpdateCheckForInternetConnection();
 		}
 		public RhubarbAPIClient(Uri baseAdress, string fileName = null) {
@@ -62,7 +62,7 @@ namespace RhubarbCloudClient
 					BaseAddress = baseAdress
 				};
 			}
-			HttpClient.Timeout = TimeSpan.FromMilliseconds(1000);
+			HttpClient.Timeout = TimeSpan.FromMilliseconds(10000);
 			UpdateCheckForInternetConnection();
 		}
 

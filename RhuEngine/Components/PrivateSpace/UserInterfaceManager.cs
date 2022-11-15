@@ -198,11 +198,22 @@ namespace RhuEngine.Components
 
 		private void Client_StatusUpdate() {
 			UpdateStatus(Engine?.netApiManager?.Client?.Status?.Status ?? UserStatus.Offline);
+			_ststusLineEdit.Text.Value = Engine?.netApiManager?.Client?.Status?.CustomStatusMsg;
 		}
 
 		private void Client_OnLogin(RhubarbCloudClient.Model.PrivateUser obj) {
+			Client_StatusUpdate();
 			_profileSideButton.Entity.enabled.Value = true;
+			_usernameLabel.Text.Value = obj.UserName;
 			//Todo: Load users icon
+		}
+
+		[Exposed]
+		public void ChangeStatusText() {
+			if (Engine?.netApiManager?.Client?.Status is null) {
+				return;
+			}
+			Engine.netApiManager.Client.Status.CustomStatusMsg = _ststusLineEdit.Text.Value;
 		}
 
 		private void Client_OnLogout() {
@@ -215,7 +226,7 @@ namespace RhuEngine.Components
 		Button _doNotDisturbButton;
 		Button _streamButton;
 		Button _offlineButton;
-
+		LineEdit _ststusLineEdit;
 		private void UpdateStatus(UserStatus rhubarbIcons) {
 			if (_onlineButton is null ||
 			_idleButton is null ||
@@ -273,6 +284,14 @@ namespace RhuEngine.Components
 
 		}
 
+		[Exposed]
+		public void Logout() {
+			Task.Run(Engine.netApiManager.Client.LogOut);
+		}
+
+
+		private Button _usernameLabel;
+
 		private void BuildStartMenu(UIElement start) {
 			start.Min.Value = new Vector2f(0, 1);
 			start.Max.Value = new Vector2f(0, 1);
@@ -295,8 +314,8 @@ namespace RhuEngine.Components
 			var profileBox = _profileElement.Entity.AddChild("Data").AttachComponent<BoxContainer>();
 			profileBox.Vertical.Value = true;
 			profileBox.Alignment.Value = RBoxContainerAlignment.Center;
-			var UsernameLabel = profileBox.Entity.AddChild("UserName").AttachComponent<Button>();
-			UsernameLabel.Text.Value = "Username";
+			_usernameLabel = profileBox.Entity.AddChild("UserName").AttachComponent<Button>();
+			_usernameLabel.Text.Value = "Username";
 
 			var StatusButtons = profileBox.Entity.AddChild("StatusButtons").AttachComponent<BoxContainer>();
 			StatusButtons.Alignment.Value = RBoxContainerAlignment.Center;
@@ -324,7 +343,7 @@ namespace RhuEngine.Components
 
 
 			void ChangeStatus(DataModel.Enums.UserStatus userStatus) {
-				if(Engine.netApiManager.Client.Status is null) {
+				if (Engine.netApiManager.Client.Status is null) {
 					return;
 				}
 				Engine.netApiManager.Client.Status.Status = userStatus;
@@ -336,17 +355,18 @@ namespace RhuEngine.Components
 			_streamButton = AddStatusButton("Status.Stream", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.StreamingStatus), () => ChangeStatus(DataModel.Enums.UserStatus.Streaming));
 			_offlineButton = AddStatusButton("Status.Offline", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.OfflineStatus), () => ChangeStatus(DataModel.Enums.UserStatus.Offline));
 
-			var ststusLineEdit = profileBox.Entity.AddChild("StatusField").AttachComponent<LineEdit>();
-			var ststusLineEditlocale = ststusLineEdit.Entity.AttachComponent<StandardLocale>();
-			ststusLineEditlocale.TargetValue.Target = ststusLineEdit.PlaceholderText;
+			_ststusLineEdit = profileBox.Entity.AddChild("StatusField").AttachComponent<LineEdit>();
+			var ststusLineEditlocale = _ststusLineEdit.Entity.AttachComponent<StandardLocale>();
+			ststusLineEditlocale.TargetValue.Target = _ststusLineEdit.PlaceholderText;
 			ststusLineEditlocale.Key.Value = "Common.CustomStatus";
-			ststusLineEdit.HorizontalFilling.Value = RFilling.ShrinkCenter;
-			ststusLineEdit.MinSize.Value = new Vector2i(230, 35);
-
+			_ststusLineEdit.HorizontalFilling.Value = RFilling.ShrinkCenter;
+			_ststusLineEdit.MinSize.Value = new Vector2i(230, 35);
+			_ststusLineEdit.TextSubmitted.Target = ChangeStatusText;
 
 			var logoutButton = profileBox.Entity.AddChild("logoutButton").AttachComponent<Button>();
 			var locale = logoutButton.Entity.AttachComponent<StandardLocale>();
 			locale.TargetValue.Target = logoutButton.Text;
+			logoutButton.Pressed.Target = Logout;
 			locale.Key.Value = "Common.Logout";
 			logoutButton.HorizontalFilling.Value = RFilling.ShrinkCenter;
 			logoutButton.MinSize.Value = new Vector2i(230, 35);

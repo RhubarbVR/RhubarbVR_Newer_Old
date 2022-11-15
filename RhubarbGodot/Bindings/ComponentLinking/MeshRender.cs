@@ -209,6 +209,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Mesh_LoadChange(RhuEngine.Linker.RMesh obj) {
+			if(node is null) {
+				return;
+			}
 			if (obj is null) {
 				node.Mesh = null;
 				return;
