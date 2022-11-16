@@ -9,7 +9,7 @@ using System.Linq;
 namespace RhuEngine
 {
 
-	file static class CustomMimeTypes
+	 static class CustomMimeTypes
 	{
 		private const string DEFAULT_FALLBACK_MIME_TYPE = "application/octet-stream";
 		private static string _fallbackMimeType;
