@@ -133,10 +133,15 @@ namespace RhuEngine.Managers
 			if (handed == Handed.Max) {
 				if (device == "key") {
 					if (!Enum.TryParse<Key>(second, true, out var keydata)) {
+						if(Enum.TryParse<MouseKeys>(second,true,out var mouseCe)) {
+							var mouseKeyAction = () => MouseSystem.IsMouseKeyDown(mouseCe) ? 1f : 0f;
+							_actions.Add(lookValue, mouseKeyAction);
+							return mouseKeyAction();
+						}
 						_actions.Add(lookValue, ReturnZero);
 						return 0f;
 					}
-					var keyAction = () => (KeyboardSystem.IsKeyDown(keydata) || MouseSystem.IsMouseKeyDown((MouseKeys)keydata)) ? 1f : 0f;
+					var keyAction = () => KeyboardSystem.IsKeyDown(keydata) ? 1f : 0f;
 					_actions.Add(lookValue, keyAction);
 					return keyAction();
 				}

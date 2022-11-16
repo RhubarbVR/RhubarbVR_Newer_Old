@@ -24,7 +24,7 @@ namespace RhuEngine.Components
 
 		public override string ProgramNameLocName => "Programs.Login.Name";
 
-		public override void StartProgram(object[] args = null, Stream file = null, string mimetype = null, string ex = null) {
+		public override void StartProgram(Stream file = null, string mimetype = null, string ex = null, params object[] args) {
 			AddWindow(null, null, false, false);
 			RebuildUI();
 			Engine.netApiManager.Client.OnLogin += Client_OnLogin;
@@ -282,14 +282,14 @@ namespace RhuEngine.Components
 				eLoganRegBox.Alignment.Value = RBoxContainerAlignment.Center;
 				var buttonTerms = eLoganRegBox.Entity.AddChild("RegButton").AttachComponent<LinkButton>();
 				buttonTerms.Text.Value = "Terms of service";
+				buttonTerms.Entity.AttachComponent<UILinkOpen>().TargetUri.Value = new Uri("https://rhubarbvr.net/terms");
 				var laband = eLoganRegBox.Entity.AddChild("Text").AttachComponent<TextLabel>();
 				laband.TextSize.Value = 17;
 				laband.VerticalAlignment.Value = RVerticalAlignment.Top;
 				laband.Text.Value = "and";
 				var buttonPrivacy = eLoganRegBox.Entity.AddChild("RegButton").AttachComponent<LinkButton>();
 				buttonPrivacy.Text.Value = "Privacy Policy";
-
-
+				buttonPrivacy.Entity.AttachComponent<UILinkOpen>().TargetUri.Value = new Uri("https://rhubarbvr.net/privacy");
 
 				_regBox = boxRoot.AddChild("Regester").AttachComponent<BoxContainer>();
 				_regBox.HorizontalFilling.Value = RFilling.ShrinkCenter | RFilling.Expand;

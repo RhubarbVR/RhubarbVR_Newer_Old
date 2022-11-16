@@ -416,7 +416,7 @@ namespace RhuEngine.Components
 			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
 				hitPrivate = true;
 			}
-			else if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
+			else if (RunLaserCastInWorld(WorldManager.OverlayWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
 				hitOverlay = true;
 			}
 			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {

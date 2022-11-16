@@ -41,7 +41,7 @@ namespace RhuEngine.Components
 
 		public abstract string ProgramName { get; }
 
-		public abstract void StartProgram(object[] args = null, Stream file = null, string mimetype = null, string ex = null);
+		public abstract void StartProgram(Stream file = null, string mimetype = null, string ex = null, params object[] args);
 
 		public virtual void CloseProgram() {
 			Entity.Destroy();

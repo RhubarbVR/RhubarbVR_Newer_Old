@@ -78,6 +78,9 @@ namespace RhuEngine.WorldObjects
 			if (inputType == typeof(Type)) {
 				Value = new DataNode<string>(((Type)(object)value)?.FullName);
 			}
+			else if (inputType == typeof(Uri)) {
+				Value = new DataNode<string>(((Uri)(object)value)?.ToString());
+			}
 			else {
 				if (inputType.IsEnum) {
 					var unType = inputType.GetEnumUnderlyingType();

@@ -253,6 +253,10 @@
     "Actions.ChangeVR.Disable": "Leave VR",
     "Programs.PublicSessions.Name": "Public Sessions",
 
+    "Program.OpenLink.Name": "Open System Webbrowser",
+    "Program.OpenLink.Text": "This link will take you to {0}. Open in browser?",
+    "Program.OpenLink.Yes": "Yes",
+    "Program.OpenLink.No": "No",
 
     "Status.Online": "Online",
     "Status.Idle": "Idle",

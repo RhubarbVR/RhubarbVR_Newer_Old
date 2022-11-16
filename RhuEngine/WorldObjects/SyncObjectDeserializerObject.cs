@@ -76,10 +76,10 @@ namespace RhuEngine.WorldObjects
 			onLoaded.Add(@object.RunOnLoad);
 		}
 
-		public bool ValueDeserialize<T>(DataNodeGroup data, IWorldObject @object,out T value) {
+		public bool ValueDeserialize<T>(DataNodeGroup data, IWorldObject @object, out T value) {
 			if (data == null) {
 				RLog.Warn($"Node did not exist when loading Sync value {@object.GetType().FullName}");
-				value = default(T);
+				value = default;
 				return false;
 			}
 			BindPointer(data, @object);
@@ -90,6 +90,12 @@ namespace RhuEngine.WorldObjects
 				value = ((DataNode<string>)data.GetValue("Value")).Value is null
 					? (T)(object)null
 					: (T)(object)Type.GetType(((DataNode<string>)data.GetValue("Value")).Value, false, false);
+				return true;
+			}
+			else if (typeof(T) == typeof(Uri)) {
+				value = ((DataNode<string>)data.GetValue("Value")).Value is null
+					? (T)(object)null
+					: (T)(object)new Uri(((DataNode<string>)data.GetValue("Value")).Value);
 				return true;
 			}
 			else {
@@ -204,7 +210,7 @@ namespace RhuEngine.WorldObjects
 				RLog.Warn("Node did not exist when loading Node: " + @object.GetType().FullName);
 				return;
 			}
-			BindPointer(data,@object);
+			BindPointer(data, @object);
 			var fields = @object.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
 			foreach (var field in fields) {
 				if ((field.GetCustomAttribute<NoLoadAttribute>(true) is null) && typeof(IWorldObject).IsAssignableFrom(field.FieldType) && ((field.GetCustomAttributes(typeof(NoSaveAttribute), true).Length <= 0) || (!hasNewRefIDs && (field.GetCustomAttributes(typeof(NoSyncAttribute), true).Length <= 0)))) {

@@ -96,7 +96,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		private void Node_Pressed() {
 			SendState();
-			RUpdateManager.ExecuteOnEndOfFrame(LinkedComp.Pressed.Invoke);
+			RUpdateManager.ExecuteOnEndOfFrame(() => {
+				LinkedComp.Pressed.Invoke();
+				LinkedComp.SendPressedAction();
+			});
 		}
 
 		private void Node_Toggled(bool buttonPressed) {

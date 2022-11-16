@@ -68,7 +68,7 @@ namespace RhuEngine.Components
 			if (!(_moveWindow || _resizeWindow)) {
 				WindowVRElement.MaxOffset.Value = new Vector2i(max.x, -min.y) + new Vector2i(5);
 				WindowVRElement.MinOffset.Value = new Vector2i(min.x, -max.y) - new Vector2i(5);
-				if(WindowVRElement.Min.Value + WindowVRElement.Max.Value != new Vector2f(0, 2)) {
+				if (WindowVRElement.Min.Value + WindowVRElement.Max.Value != new Vector2f(0, 2)) {
 					WindowVRElement.Min.Value = WindowVRElement.Max.Value = new Vector2f(0, 1);
 				}
 			}
@@ -78,7 +78,7 @@ namespace RhuEngine.Components
 					WindowVRElement.Max.Value = Vector2f.One;
 
 					WindowVRElement.MaxOffset.Value = Vector2i.Zero;
-					WindowVRElement.MinOffset.Value = new Vector2i(0,100);
+					WindowVRElement.MinOffset.Value = new Vector2i(0, 100);
 
 				}
 			}
@@ -165,6 +165,7 @@ namespace RhuEngine.Components
 
 			var root = PrivateSpaceManager.UserInterfaceManager.Windows;
 			RootElement = root.Entity.AddChild(Window.Name).AttachComponent<UIElement>();
+			RootElement.ClipContents.Value = true;
 			RootElement.InputFilter.Value = RInputFilter.Pass;
 			var top = RootElement.Entity.AddChild("Top").AttachComponent<UIElement>();
 			TopElement = top;
@@ -237,6 +238,7 @@ namespace RhuEngine.Components
 						win.Size = Window.SizePixels;
 					}
 				}
+				win.MinSize = Window.MinSize;
 				Window.OnUpdatePosAndScale += Resize;
 				win.Viewport = Window.TargetViewport;
 				win.CloseRequested += () => {
@@ -332,8 +334,9 @@ namespace RhuEngine.Components
 				var newSIze = change + _offsetResizeLastWindow;
 				var sizeDef = MathUtil.Abs(Window.SizePixels - new Vector2i(newSIze.x, newSIze.y));
 				if (sizeDef.x + sizeDef.y > 5) {
-					Window.SizePixels = new Vector2i(newSIze.x, newSIze.y);
-					Window.Pos = _offsetResizeLastWindowPos - new Vector2f(change.x, 0);
+					var startSize = new Vector2i(newSIze.x, newSIze.y);
+					Window.SizePixels = startSize;
+					Window.Pos = _offsetResizeLastWindowPos - new Vector2f(change.x, 0) - ((Vector2f)(Window.SizePixels - startSize) * new Vector2f(1, 0));
 				}
 			}
 		}

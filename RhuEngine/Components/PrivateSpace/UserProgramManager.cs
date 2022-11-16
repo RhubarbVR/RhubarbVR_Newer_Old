@@ -79,47 +79,47 @@ namespace RhuEngine.Components
 			return null;
 		}
 
-		public T OpenOnePrivateOpenProgram<T>(object[] args = null, Stream file = null, string mimetype = null, string ex = null) where T : Program, new() {
+		public T OpenOnePrivateOpenProgram<T>(Stream file = null, string mimetype = null, string ex = null, params object[] args) where T : Program, new() {
 			foreach (var item in Programs) {
 				if (item is T data) {
 					return data;
 				}
 			}
-			return PrivateOpenProgram<T>(args, file, mimetype, ex);
+			return PrivateOpenProgram<T>(file, mimetype, ex, args);
 		}
 
 		public Program OpenProgram(Type programType, object[] args = null, Stream file = null, string mimetype = null, string ex = null) {
 			return programType is null
 				? null
 				: programType.GetCustomAttribute<PrivateSpaceOnlyAttribute>() is not null
-				? OpenProgram(programType, WorldManager.PrivateOverlay, args, file, mimetype, ex)
+				? OpenProgram(programType, WorldManager.PrivateOverlay, file, mimetype, ex, args)
 				: programType.GetCustomAttribute<OverlayOnlyAttribute>() is not null
-				? OpenProgram(programType, WorldManager.OverlayWorld, args, file, mimetype, ex)
-				: OpenProgram(programType, WorldManager.FocusedWorld, args,file,mimetype,ex);
+				? OpenProgram(programType, WorldManager.OverlayWorld, file, mimetype, ex, args)
+				: OpenProgram(programType, WorldManager.FocusedWorld, file, mimetype, ex, args);
 		}
 
-		public Program OpenProgram(Type programType,World world, object[] args = null, Stream file = null, string mimetype = null, string ex = null) {
+		public Program OpenProgram(Type programType,World world, Stream file = null, string mimetype = null, string ex = null, params object[] args) {
 			var program = world.RootEntity.AddChild(programType.Name).AttachComponent<Program>(programType);
-			program.StartProgram(args, file, mimetype, ex);
+			program.StartProgram(file, mimetype, ex, args);
 			return program;
 		}
 
-		public T OpenProgram<T>(World world, object[] args = null, Stream file = null, string mimetype = null, string ex = null) where T : Program, new() {
+		public T OpenProgram<T>(World world, Stream file = null, string mimetype = null, string ex = null, params object[] args) where T : Program, new() {
 			var program = world.RootEntity.AddChild(typeof(T).Name).AttachComponent<T>();
-			program.StartProgram(args, file, mimetype, ex);
+			program.StartProgram(file, mimetype, ex, args);
 			return program;
 		}
 
-		public T PrivateOpenProgram<T>(object[] args = null, Stream file = null, string mimetype = null, string ex = null) where T : Program, new() {
-			return OpenProgram<T>(WorldManager.PrivateOverlay, args, file, mimetype, ex);
+		public T PrivateOpenProgram<T>(Stream file = null, string mimetype = null, string ex = null, params object[] args) where T : Program, new() {
+			return OpenProgram<T>(WorldManager.PrivateOverlay, file, mimetype, ex, args);
 		}
 
-		public T OverlayOpenProgram<T>(object[] args = null, Stream file = null, string mimetype = null, string ex = null) where T : Program, new() {
-			return OpenProgram<T>(WorldManager.OverlayWorld, args, file, mimetype, ex);
+		public T OverlayOpenProgram<T>(Stream file = null, string mimetype = null, string ex = null, params object[] args) where T : Program, new() {
+			return OpenProgram<T>(WorldManager.OverlayWorld, file, mimetype, ex, args);
 		}
 
-		public T FocusedOpenProgram<T>(object[] args = null, Stream file = null, string mimetype = null, string ex = null) where T : Program, new() {
-			return OpenProgram<T>(WorldManager.FocusedWorld, args, file, mimetype, ex);
+		public T FocusedOpenProgram<T>(Stream file = null, string mimetype = null, string ex = null, params object[] args) where T : Program, new() {
+			return OpenProgram<T>(WorldManager.FocusedWorld, file, mimetype, ex, args);
 		}
 
 		internal void LoadProgramWindow(ProgramWindow program) {

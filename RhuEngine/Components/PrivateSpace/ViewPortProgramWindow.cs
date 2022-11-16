@@ -30,6 +30,8 @@ namespace RhuEngine.Components
 		public readonly Linker<Vector2i> ViewPortSizeLink;
 		[OnChanged(nameof(SizePosUpdate))]
 		public readonly Sync<Vector2i> Size;
+		public readonly Sync<Vector2i> WindowMinSize;
+
 		[OnChanged(nameof(SizePosUpdate))]
 		public readonly Sync<Vector2f> WindowPos;
 		[OnChanged(nameof(UpdateData))]
@@ -52,11 +54,18 @@ namespace RhuEngine.Components
 
 		public override Viewport TargetViewport => Viewport.Target;
 
+		public override Vector2i MinSize => WindowMinSize.Value;
+
 		public void UpdateData() {
 			OnUpdatedData?.Invoke();
 		}
 
 		public void SizePosUpdate() {
+			var clampSize = MathUtil.Max(MinSize, Size.Value);
+			if(clampSize != Size.Value) {
+				Size.Value = clampSize;
+				return;
+			}
 			OnUpdatePosAndScale?.Invoke();
 			if (ViewPortSizeLink.Linked) {
 				ViewPortSizeLink.LinkedValue = Size.Value;
@@ -68,6 +77,7 @@ namespace RhuEngine.Components
 			var viewPort = Viewport.Target = Entity.AttachComponent<Viewport>();
 			ViewPortSizeLink.Target = viewPort.Size;
 			Size.Value = new Vector2i(512);
+			WindowMinSize.Value = new Vector2i(235,150);
 		}
 
 		public void AddRawTexture(RTexture2D rTexture2D) {

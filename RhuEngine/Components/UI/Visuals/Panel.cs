@@ -8,8 +8,8 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Container/Visuals")]
-	public class Panel : UIVisuals
+	public sealed class Panel : UIVisuals
 	{
-		
+
 	}
 }

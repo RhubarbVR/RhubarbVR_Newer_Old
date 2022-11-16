@@ -30,6 +30,7 @@ namespace RhuEngine.WorldObjects
 			typeof(byte[]),
 			typeof(Enum),
 			typeof(Type),
+			typeof(Uri),
 			typeof(NetPointer),
 			typeof(DateTime),
 			typeof(Playback),

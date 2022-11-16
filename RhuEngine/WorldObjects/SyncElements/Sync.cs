@@ -47,6 +47,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public object Object { get => _value; set => _value = (T)value; }
+
 		private void BroadcastValue() {
 			if (IsLinkedTo || NoSync) {
 				return;
@@ -55,6 +56,9 @@ namespace RhuEngine.WorldObjects
 			IDataNode Value;
 			if (inputType == typeof(Type)) {
 				Value = new DataNode<string>(((Type)(object)_value)?.FullName);
+			}
+			else if (inputType == typeof(Uri)) {
+				Value = new DataNode<string>(((Uri)(object)_value)?.ToString());
 			}
 			else {
 				if (inputType.IsEnum) {
@@ -100,7 +104,56 @@ namespace RhuEngine.WorldObjects
 			if (IsLinkedTo || NoSync) {
 				return;
 			}
-			var newValue = typeof(T).IsEnum ? (T)(object)((DataNode<int>)data).Value : ((DataNode<T>)data).Value;
+			var inputType = typeof(T);
+			T newValue;
+			if (inputType == typeof(Type)) {
+				newValue = ((DataNode<string>)data).Value is null
+					? (T)(object)null
+					: (T)(object)Type.GetType(((DataNode<string>)data).Value, false, false);
+			}
+			else if (inputType == typeof(Uri)) {
+				newValue = ((DataNode<string>)data).Value is null
+					? (T)(object)null
+					: (T)(object)new Uri(((DataNode<string>)data).Value);
+			}
+			else {
+				if (inputType.IsEnum) {
+					var unType = inputType.GetEnumUnderlyingType();
+					if (unType == typeof(int)) {
+						newValue = (T)(object)((DataNode<int>)data).Value;
+					}
+					else if (unType == typeof(uint)) {
+						newValue = (T)(object)((DataNode<uint>)data).Value;
+					}
+					else if (unType == typeof(bool)) {
+						newValue = (T)(object)((DataNode<bool>)data).Value;
+					}
+					else if (unType == typeof(byte)) {
+						newValue = (T)(object)((DataNode<byte>)data).Value;
+					}
+					else if (unType == typeof(sbyte)) {
+						newValue = (T)(object)((DataNode<sbyte>)data).Value;
+					}
+					else if (unType == typeof(short)) {
+						newValue = (T)(object)((DataNode<short>)data).Value;
+					}
+					else if (unType == typeof(ushort)) {
+						newValue = (T)(object)((DataNode<ushort>)data).Value;
+					}
+					else if (unType == typeof(long)) {
+						newValue = (T)(object)((DataNode<long>)data).Value;
+					}
+					else if (unType == typeof(ulong)) {
+						newValue = (T)(object)((DataNode<ulong>)data).Value;
+					}
+					else {
+						throw new NotSupportedException();
+					}
+				}
+				else {
+					newValue = (DataNode<T>)data;
+				}
+			}
 			lock (_locker) {
 				var lastVal = _value;
 				_value = newValue;
@@ -139,7 +192,7 @@ namespace RhuEngine.WorldObjects
 		protected override void InitializeMembers(bool networkedObject, bool deserializeFunc, NetPointerUpdateDelegate func) {
 		}
 
-		public void Lerp(T targetpos,double time = 5f,bool removeOnDone = true) {
+		public void Lerp(T targetpos, double time = 5f, bool removeOnDone = true) {
 			var lerp = this.GetClosedEntityOrRoot().AttachComponent<Lerp<T>>();
 			lerp.StartLerp(this, targetpos, time, removeOnDone);
 		}
@@ -161,7 +214,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public override void Deserialize(IDataNode data, SyncObjectDeserializerObject syncObjectSerializerObject) {
-			if(syncObjectSerializerObject.ValueDeserialize<T>((DataNodeGroup)data, this,out var tempvalue)) {
+			if (syncObjectSerializerObject.ValueDeserialize<T>((DataNodeGroup)data, this, out var tempvalue)) {
 				_value = tempvalue;
 			}
 			OnLoad(syncObjectSerializerObject);

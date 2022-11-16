@@ -26,6 +26,7 @@ namespace RhuEngine.Components
 		public abstract Vector2f Pos { get; set; }
 
 		public abstract Vector2i SizePixels { get; set; }
+		public abstract Vector2i MinSize { get; }
 
 		[NoSave]
 		[NoSync]

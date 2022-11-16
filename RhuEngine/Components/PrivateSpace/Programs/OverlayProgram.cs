@@ -28,7 +28,7 @@ namespace RhuEngine.Components
 
 		public override string ProgramNameLocName => "Overlay";
 
-		public override void StartProgram(object[] args = null, Stream file = null, string mimetype = null, string ex = null) {
+		public override void StartProgram(Stream file = null, string mimetype = null, string ex = null, params object[] args) {
 			if (Engine.windowManager.MainWindow is null) {
 				return;
 			}
@@ -36,6 +36,7 @@ namespace RhuEngine.Components
 		}
 
 		private void MainWindow_FilesDropped(string[] obj) {
+			obj = obj.SelectMany(DirToFiles).ToArray();
 			if (obj.Length == 0) {
 				return;
 			}
@@ -44,6 +45,17 @@ namespace RhuEngine.Components
 			}
 			else {
 				OpenFiles(obj);
+			}
+		}
+
+		private IEnumerable<string> DirToFiles(string obj) {
+			if (Directory.Exists(obj)) {
+				foreach (var item in Directory.GetFiles(obj)) {
+					yield return item;
+				}
+			}
+			else {
+				yield return obj;
 			}
 		}
 
@@ -82,12 +94,22 @@ namespace RhuEngine.Components
 			}
 			MimeTypeManagment.TryGetMimeType(filePath, out var mimeType);
 			var ex = Path.GetExtension(filePath);
-			OpenDialogue<Open_WithDialogue>().LoadImport(filePath,mimeType,ex);
+			OpenDialogue<Open_WithDialogue>().LoadImport(filePath, null, mimeType, ex);
 		}
 
-		public T OpenDialogue<T>(RhubarbAtlasSheet.RhubarbIcons rhubarbIcons = RhubarbAtlasSheet.RhubarbIcons.File) where T:OverlayDialogue,new() {
-			var name = typeof(T).Name.Replace("Dialogue", "").Replace("_"," ");
+		public void OpenURI(Uri uri) {
+			OpenNoFile("nofile/uri", null, null, uri);
+		}
+
+		public void OpenNoFile(string mimeType, Stream stream, string ex, params object[] args) {
+			OpenDialogue<Open_WithDialogue>().LoadImport(null, stream, mimeType, ex, args);
+		}
+
+		public T OpenDialogue<T>(RhubarbAtlasSheet.RhubarbIcons rhubarbIcons = RhubarbAtlasSheet.RhubarbIcons.File) where T : OverlayDialogue, new() {
+			var name = typeof(T).Name.Replace("Dialogue", "").Replace("_", " ");
 			var newWindow = AddWindow(name, Engine.staticResources.IconSheet.GetElement(rhubarbIcons), false, true);
+			newWindow.SizePixels = new Vector2i(320,350);
+			newWindow.CenterWindowIntoView();
 			var dialog = newWindow.Entity.AttachComponent<T>();
 			newWindow.OnClosedWindow += dialog.Close;
 			dialog.programWindow = newWindow;
@@ -105,6 +127,9 @@ namespace RhuEngine.Components
 				if (clipBoardText != null) {
 					if (File.Exists(clipBoardText)) {
 						OpenFile(clipBoardText);
+					}
+					else if (Directory.Exists(clipBoardText)) {
+						OpenFiles(new string[] { clipBoardText }.SelectMany(DirToFiles).ToArray());
 					}
 					else if (!Engine.HasKeyboard) {
 						var text = Path.GetTempFileName() + ".txt";

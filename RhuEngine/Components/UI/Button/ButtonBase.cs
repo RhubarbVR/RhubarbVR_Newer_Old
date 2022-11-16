@@ -48,6 +48,12 @@ namespace RhuEngine.Components
 
 		public Func<Handed, Vector2f> GetPosFunc;
 
+		public event Action PressedAction;
+
+		public void SendPressedAction() {
+			PressedAction?.Invoke();
+		}
+
 		protected override void OnAttach() {
 			base.OnAttach();
 			FocusMode.Value = RFocusMode.All;

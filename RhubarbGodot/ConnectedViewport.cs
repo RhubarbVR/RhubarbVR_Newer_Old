@@ -24,7 +24,7 @@ public partial class ConnectedViewport : TextureRect
 						Texture = viewport.node?.GetTexture();
 					}
 				}
-				catch { 
+				catch {
 				}
 			});
 		}
@@ -34,6 +34,17 @@ public partial class ConnectedViewport : TextureRect
 		base._Ready();
 		IgnoreTextureSize = true;
 		StretchMode = StretchModeEnum.Keep;
+		MouseEntered += ConnectedViewport_MouseEntered;
+		MouseExited += ConnectedViewport_MouseExited;
+	}
+	bool _hover = false;
+
+	private void ConnectedViewport_MouseExited() {
+		_hover = false;
+	}
+
+	private void ConnectedViewport_MouseEntered() {
+		_hover = true;
 	}
 
 	public override void _Input(InputEvent @event) {
@@ -44,7 +55,9 @@ public partial class ConnectedViewport : TextureRect
 		if (!IsVisibleInTree()) {
 			return;
 		}
-
+		if (!_hover) {
+			return;
+		}
 		var xform = GetGlobalTransform();
 		var ev = @event.XformedBy(xform.AffineInverse());
 		targetViewport?.PushInput(ev);

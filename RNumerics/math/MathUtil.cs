@@ -186,6 +186,11 @@ namespace RNumerics
 			// shift back
 			return theta + c;
 		}
+
+		public static Vector2i Max(in Vector2i item, in Vector2i max) {
+			return new Vector2i(Math.Max(item.x, max.x), Math.Max(item.y, max.y));
+		}
+
 		public static Vector2f Max(in Vector2f item, in Vector2f max) {
 			return new Vector2f(Math.Max(item.x, max.x), Math.Max(item.y, max.y));
 		}
@@ -715,5 +720,7 @@ namespace RNumerics
 		public static double FastCos(in double v) {
 			return FastSin(v + 1.5707963);
 		}
+
+
 	}
 }
