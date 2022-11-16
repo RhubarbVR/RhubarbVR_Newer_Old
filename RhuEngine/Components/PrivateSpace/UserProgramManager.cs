@@ -13,12 +13,17 @@ using RhuEngine.Linker;
 using RhuEngine.Physics;
 using RhuEngine.WorldObjects;
 using System.IO;
+using System.Reflection;
 
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
 	public sealed class UserProgramManager : Component
 	{
+
+		public OverlayProgram OverlayProgram { get; private set; }
+
+
 		protected override void OnLoaded() {
 			base.OnLoaded();
 			Engine.worldManager.PrivateSpaceManager._ProgramManager = this;
@@ -31,6 +36,7 @@ namespace RhuEngine.Components
 			Engine.netApiManager.Client.HasGoneOfline += Client_HasGoneOfline;
 			Engine.netApiManager.Client.HasGoneOnline += Client_HasGoneOnline;
 
+			OverlayProgram = OpenOnePrivateOpenProgram<OverlayProgram>();
 			if (!Engine.netApiManager.Client.IsOnline) {
 				Client_HasGoneOfline();
 				return;
@@ -82,6 +88,21 @@ namespace RhuEngine.Components
 			return PrivateOpenProgram<T>(args, file, mimetype, ex);
 		}
 
+		public Program OpenProgram(Type programType, object[] args = null, Stream file = null, string mimetype = null, string ex = null) {
+			return programType is null
+				? null
+				: programType.GetCustomAttribute<PrivateSpaceOnlyAttribute>() is not null
+				? OpenProgram(programType, WorldManager.PrivateOverlay, args, file, mimetype, ex)
+				: programType.GetCustomAttribute<OverlayOnlyAttribute>() is not null
+				? OpenProgram(programType, WorldManager.OverlayWorld, args, file, mimetype, ex)
+				: OpenProgram(programType, WorldManager.FocusedWorld, args,file,mimetype,ex);
+		}
+
+		public Program OpenProgram(Type programType,World world, object[] args = null, Stream file = null, string mimetype = null, string ex = null) {
+			var program = world.RootEntity.AddChild(programType.Name).AttachComponent<Program>(programType);
+			program.StartProgram(args, file, mimetype, ex);
+			return program;
+		}
 
 		public T OpenProgram<T>(World world, object[] args = null, Stream file = null, string mimetype = null, string ex = null) where T : Program, new() {
 			var program = world.RootEntity.AddChild(typeof(T).Name).AttachComponent<T>();

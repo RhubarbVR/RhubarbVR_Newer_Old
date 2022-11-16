@@ -115,9 +115,6 @@ namespace RhuEngine.Managers
 			world.Initialize(!localWorld, false, false, focusLevel == World.FocusLevel.PrivateOverlay);
 			world.RootEntity.name.Value = "Root";
 			world.RootEntity.AttachComponent<SimpleSpawn>();
-			if (focusLevel != World.FocusLevel.PrivateOverlay) {
-				world.RootEntity.AttachComponent<ClipBoardImport>();
-			}
 			world.SessionName.Value = sessionName;
 			if ((focusLevel != World.FocusLevel.PrivateOverlay) && !localWorld) {
 				Task.Run(async () => await world.StartNetworking(true));
@@ -138,7 +135,6 @@ namespace RhuEngine.Managers
 			world.Initialize(true, false, false, false);
 			world.RootEntity.name.Value = "Root";
 			world.RootEntity.AttachComponent<SimpleSpawn>();
-			world.RootEntity.AttachComponent<ClipBoardImport>();
 			world.SessionName.Value = sessionName;
 			world.AssociatedGroup.Value = assosiatedGroup?.ToString();
 			world.AccessLevel.Value = accessLevel;
