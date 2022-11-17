@@ -40,7 +40,7 @@
 		<PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
 		<PackageReference Include="BEPUik" Version="1.5.1" />
 		<PackageReference Include="DiscordRichPresence" Version="1.1.1.14" />
-		<PackageReference Include="Jint" Version="3.0.0-beta-2041" />
+		<PackageReference Include="Jint" Version="3.0.0-beta-2043" />
 		<PackageReference Include="LibVLCSharp" Version="3.6.6" />
 		<PackageReference Include="LiteNetLib" Version="0.9.5.2" />
 		<PackageReference Include="MessagePack" Version="2.4.35" />

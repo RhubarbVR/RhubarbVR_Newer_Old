@@ -14,7 +14,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NullContext;
 
 using RhuEngine.Components;
-
+using RhuEngine.Datatypes;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
@@ -185,6 +185,133 @@ namespace RhuEngine.GameTests.Tests
 			script.Invoke("RunCode");
 			Assert.AreEqual(typeof(CapsuleMesh), value.Value.Value);
 			((IDisposable)tester).Dispose();
+		}
+
+		[TestMethod()]
+		public void TestFloatAdd() {
+			var script = AttachTestScript();
+			var random = new Random();
+			var test1 = random.NextSingle();
+			var test2 = random.NextSingle();
+			var value = script.Entity.AttachComponent<ValueField<float>>();
+			value.Value.Value = test1;
+			var value2 = script.Entity.AttachComponent<ValueField<float>>();
+			value2.Value.Value = test2;
+			script.Targets.Add().Target = value;
+			script.Targets.Add().Target = value2;
+			script.ScriptCode.Value = @"
+				function RunCode()	{
+					script.GetTarget(0).Value.Value = script.GetTarget(0).Value.Value + script.GetTarget(1).Value.Value;
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(test1 + test2, value.Value.Value);
+			((IDisposable)tester).Dispose();
+		}
+
+		[TestMethod()]
+		public void TestVectorsReadX() {
+			var script = AttachTestScript();
+			var random = new Random();
+			var test2 = new Vector2f(random.NextSingle(), random.NextSingle());
+			var value = script.Entity.AttachComponent<ValueField<float>>();
+			var value2 = script.Entity.AttachComponent<ValueField<Vector2f>>();
+			value2.Value.Value = test2;
+			script.Targets.Add().Target = value;
+			script.Targets.Add().Target = value2;
+			script.ScriptCode.Value = @"
+				function RunCode()	{
+					script.GetTarget(0).Value.Value = script.GetTarget(1).Value.Value.X;
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(value.Value.Value, value2.Value.Value.x);
+			((IDisposable)tester).Dispose();
+		}
+
+		[TestMethod()]
+		public void TestVectorsSetX() {
+			var script = AttachTestScript();
+			var random = new Random();
+			var test2 = new Vector2f(random.NextSingle(), random.NextSingle());
+			var value = script.Entity.AttachComponent<ValueField<float>>();
+			var value2 = script.Entity.AttachComponent<ValueField<Vector2f>>();
+			value2.Value.Value = test2;
+			script.Targets.Add().Target = value;
+			script.Targets.Add().Target = value2;
+			script.ScriptCode.Value = @"
+				function RunCode()	{
+					var value = script.GetTarget(1).Value.Value;
+					value.X = script.GetTarget(0).Value.Value;
+					script.GetTarget(1).Value.Value = value;
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(value.Value.Value, value2.Value.Value.x);
+			((IDisposable)tester).Dispose();
+		}
+
+		[TestMethod()]
+		public void TestRefIDWriteTwo() {
+			unchecked {
+				var script = AttachTestScript();
+				var random = new Random();
+				var test2 = (ulong)random.NextInt64();
+
+				var value = script.Entity.AttachComponent<ValueField<NetPointer>>();
+				var value2 = script.Entity.AttachComponent<ValueField<ulong>>();
+				value2.Value.Value = test2;
+				script.Targets.Add().Target = value;
+				script.Targets.Add().Target = value2;
+				script.ScriptCode.Value = @"
+				function RunCode()	{
+					var value = script.GetTarget(0).Value.Value;
+					value.id = script.GetTarget(1).Value.Value;
+					script.GetTarget(0).Value.Value = value;
+				}
+			";
+				if (!script.ScriptLoaded) {
+					throw new Exception("Script not loaded");
+				}
+				script.Invoke("RunCode");
+				Assert.AreNotEqual(value.Value.Value.id, value2.Value.Value);
+				((IDisposable)tester).Dispose();
+			}
+		}
+
+		[TestMethod()]
+		public void TestRefIDWriteOne() {
+			unchecked {
+				var script = AttachTestScript();
+				var random = new Random();
+				var test2 = (ulong)random.NextInt64();
+
+				var value = script.Entity.AttachComponent<ValueField<NetPointer>>();
+				var value2 = script.Entity.AttachComponent<ValueField<ulong>>();
+				value2.Value.Value = test2;
+				script.Targets.Add().Target = value;
+				script.Targets.Add().Target = value2;
+				script.ScriptCode.Value = @"
+				function RunCode()	{
+					script.GetTarget(0).Value.Value.id = script.GetTarget(1).Value.Value;
+				}
+			";
+				if (!script.ScriptLoaded) {
+					throw new Exception("Script not loaded");
+				}
+				script.Invoke("RunCode");
+				Assert.AreNotEqual(value.Value.Value.id, value2.Value.Value);
+				((IDisposable)tester).Dispose();
+			}
 		}
 
 		[TestMethod()]

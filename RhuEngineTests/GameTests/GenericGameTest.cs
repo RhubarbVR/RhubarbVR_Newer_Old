@@ -490,7 +490,7 @@ namespace RhuEngine.GameTests.Tests
 		[TestMethod()]
 		public void TestMultiOperatorsComponentNetPointer() {
 			var testEntity = AttachEntity();
-			var inttest = testEntity.AttachComponent<Components.MultiOperators<NetPointer, NetPointer>>();
+			var inttest = testEntity.AttachComponent<Components.MultiOperators<NetPointer>>();
 			var output = testEntity.AttachComponent<Components.ValueField<NetPointer>>();
 			inttest.Output.Target = output.Value;
 			var random = new Random();
@@ -514,46 +514,46 @@ namespace RhuEngine.GameTests.Tests
 			((IDisposable)tester).Dispose();
 		}
 
-		//[TestMethod()]
-		//public void TestMultiOperatorsComponentVector() {
-		//	var testEntity = AttachEntity();
-		//	var inttest = testEntity.AttachComponent<Components.MultiOperators<Vector3f, Vector3f>>();
-		//	var output = testEntity.AttachComponent<Components.ValueField<Vector3f>>();
-		//	inttest.Output.Target = output.Value;
-		//	var random = new Random();
-		//	var inputs = testEntity.AttachComponent<Components.ValueList<Vector3f>>();
-		//	var one = inputs.Value.Add();
-		//	var valueone = one.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
-		//	inttest.Inputs.Add().Target = one;
+		[TestMethod()]
+		public void TestMultiOperatorsComponentVector() {
+			var testEntity = AttachEntity();
+			var inttest = testEntity.AttachComponent<Components.MultiOperators<Vector3f>>();
+			var output = testEntity.AttachComponent<Components.ValueField<Vector3f>>();
+			inttest.Output.Target = output.Value;
+			var random = new Random();
+			var inputs = testEntity.AttachComponent<Components.ValueList<Vector3f>>();
+			var one = inputs.Value.Add();
+			var valueone = one.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
+			inttest.Inputs.Add().Target = one;
 
-		//	var two = inputs.Value.Add();
-		//	var valuetwo = two.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
-		//	inttest.Inputs.Add().Target = two;
+			var two = inputs.Value.Add();
+			var valuetwo = two.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
+			inttest.Inputs.Add().Target = two;
 
-		//	var three = inputs.Value.Add();
-		//	var valueThree = three.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
-		//	inttest.Inputs.Add().Target = three;
+			var three = inputs.Value.Add();
+			var valueThree = three.Value = new Vector3f(random.NextDouble(), random.NextDouble(), random.NextDouble());
+			inttest.Inputs.Add().Target = three;
 
-		//	inttest.Operators.Value = Components.MultiOperators.Addition;
-		//	Assert.AreEqual(output.Value, valueone + valuetwo + valueThree);
+			inttest.Operators.Value = Components.MultiOperators.Addition;
+			Assert.AreEqual(output.Value, valueone + valuetwo + valueThree);
 
-		//	inttest.Operators.Value = Components.MultiOperators.Subtraction;
-		//	Assert.AreEqual(output.Value, valueone - valuetwo - valueThree);
+			inttest.Operators.Value = Components.MultiOperators.Subtraction;
+			Assert.AreEqual(output.Value, valueone - valuetwo - valueThree);
 
-		//	inttest.Operators.Value = Components.MultiOperators.Multiplication;
-		//	Assert.AreEqual(output.Value, valueone * valuetwo * valueThree);
+			inttest.Operators.Value = Components.MultiOperators.Multiplication;
+			Assert.AreEqual(output.Value, valueone * valuetwo * valueThree);
 
-		//	inttest.Operators.Value = Components.MultiOperators.Division;
-		//	Assert.AreEqual(output.Value, valueone / valuetwo / valueThree);
+			inttest.Operators.Value = Components.MultiOperators.Division;
+			Assert.AreEqual(output.Value, valueone / valuetwo / valueThree);
 
-		//	tester.RunForSteps();
-		//	((IDisposable)tester).Dispose();
-		//}
+			tester.RunForSteps();
+			((IDisposable)tester).Dispose();
+		}
 
 		[TestMethod()]
 		public void TestMultiOperatorsComponentInt() {
 			var testEntity = AttachEntity();
-			var inttest = testEntity.AttachComponent<Components.MultiOperators<int, int>>();
+			var inttest = testEntity.AttachComponent<Components.MultiOperators<int>>();
 			var output = testEntity.AttachComponent<Components.ValueField<int>>();
 			inttest.Output.Target = output.Value;
 			var random = new Random();

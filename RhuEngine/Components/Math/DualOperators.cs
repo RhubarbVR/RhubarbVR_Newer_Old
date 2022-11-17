@@ -1,28 +1,30 @@
 ﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
+using RNumerics;
+
 namespace RhuEngine.Components
 {
 	[Category("Math")]
-	public sealed class DualOperators<In,Out> : AbDualOperation<Out,In> where In : struct where Out : struct
+	public sealed class DualOperators<In> : AbDualOperation<bool, In> where In : struct
 	{
 		[OnChanged(nameof(ComputeOutput))]
 		public readonly Sync<DualOperators> Operators;
 
-		protected override Out Compute(In a, In b) {
+		protected override bool Compute(In a, In b) {
 			switch (Operators.Value) {
 				case DualOperators.Equal:
-					return ((dynamic)a) == ((dynamic)b);
+					return ((RDynamic<In>)a) == ((RDynamic<In>)b);
 				case DualOperators.NotEqual:
-					return ((dynamic)a) != ((dynamic)b);
+					return ((RDynamic<In>)a) != ((RDynamic<In>)b);
 				case DualOperators.LessThan:
-					return ((dynamic)a) < ((dynamic)b);
+					return ((RDynamic<In>)a) < ((RDynamic<In>)b);
 				case DualOperators.GreaterThan:
-					return ((dynamic)a) > ((dynamic)b);
+					return ((RDynamic<In>)a) > ((RDynamic<In>)b);
 				case DualOperators.LessThanOrEqual:
-					return ((dynamic)a) <= ((dynamic)b);
+					return ((RDynamic<In>)a) <= ((RDynamic<In>)b);
 				case DualOperators.GreaterThanOrEqual:
-					return ((dynamic)a) >= ((dynamic)b);
+					return ((RDynamic<In>)a) >= ((RDynamic<In>)b);
 				default:
 					break;
 			}

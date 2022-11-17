@@ -43,19 +43,14 @@ namespace RhuEngine.Components
 				try {
 					var pos = playback.Position / playback.ClipLength;
 					if (pos != 1f) {
-						try {
-							driver.LinkedValue = MathUtil.DynamicLerp(from.Value, to.Value, pos);
+						if (typeof(T) == typeof(Quaternionf)) {
+							driver.LinkedValue = Quaternionf.Slerp((dynamic)from.Value, (dynamic)to.Value, (float)pos);
 						}
-						catch {
-							if (typeof(T) == typeof(Quaternionf)) {
-								driver.LinkedValue = Quaternionf.Slerp((dynamic)from.Value, (dynamic)to.Value, (float)pos);
-							}
-							else if (typeof(T) == typeof(Quaterniond)) {
-								driver.LinkedValue = Quaterniond.Slerp((dynamic)from.Value, (dynamic)to.Value, pos);
-							}
-							else {
-								throw;
-							}
+						else if (typeof(T) == typeof(Quaterniond)) {
+							driver.LinkedValue = Quaterniond.Slerp((dynamic)from.Value, (dynamic)to.Value, pos);
+						}
+						else {
+							driver.LinkedValue = MathUtil.DynamicLerp(from.Value, to.Value, pos);
 						}
 					}
 					else if (removeOnDone) {

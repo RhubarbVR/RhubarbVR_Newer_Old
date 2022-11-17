@@ -253,10 +253,13 @@
     "Actions.ChangeVR.Disable": "Leave VR",
     "Programs.PublicSessions.Name": "Public Sessions",
 
-    "Program.OpenLink.Name": "Open System Webbrowser",
-    "Program.OpenLink.Text": "This link will take you to {0}. Open in browser?",
-    "Program.OpenLink.Yes": "Yes",
-    "Program.OpenLink.No": "No",
+    "Program.OpenBrowser.Name": "Open System Webbrowser",
+    "Program.OpenBrowser.Text": "This link will take you to \n {0}.\n Open in browser?",
+    "Program.OpenBrowser.Yes": "Yes",
+    "Program.OpenBrowser.No": "No",
+
+    "OpenWith.Header": "Open With",
+    "OpenWith.NoneFound": "No program found to open this file type.",
 
     "Status.Online": "Online",
     "Status.Idle": "Idle",

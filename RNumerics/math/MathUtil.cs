@@ -47,7 +47,7 @@ namespace RNumerics
 
 		//ToDo: NoMoreDynmaic
 		public static T Clamp<T>(in T f, in T low, in T high) {
-			return ((dynamic)f < low) ? low : ((dynamic)f > high) ? high : f;
+			return ((RDynamic<T>)f < low) ? low : ((RDynamic<T>)f > high) ? high : f;
 		}
 		public static float Clamp(in float f, in float low, in float high) {
 			return (f < low) ? low : (f > high) ? high : f;
@@ -382,13 +382,23 @@ namespace RNumerics
 			var m = Math.Max(dot0, Math.Max(dot1, dot2));
 			return (m == dot0) ? 0 : (m == dot1) ? 1 : 2;
 		}
-		//ToDo: no more dynamic
+
 		public static T DynamicLerp<T>(T a, T b, double t) {
 			try {
-				return ((dynamic)a * (1.0 - t)) + ((dynamic)t * b);
+				try {
+					return ((dynamic)a * (1.0 - t)) + ((dynamic)t * b);
+				}
+				catch {
+					return ((dynamic)a * (float)(1.0 - t)) + ((float)t * (dynamic)b);
+				}
 			}
 			catch {
-				return ((dynamic)a * (float)(1.0 - t)) + ((float)t * (dynamic)b);
+				try {
+					return (RDynamic<T>)(T)((dynamic)a * (1.0 - t)) + (RDynamic<T>)(T)(t * (dynamic)b);
+				}
+				catch {
+					return (RDynamic<T>)(T)((dynamic)a * (float)(1.0 - t)) + (RDynamic<T>)(T)((float)t * (dynamic)b);
+				}
 			}
 		}
 

@@ -14,6 +14,20 @@ namespace RNumerics
 		public float x;
 		[Key(1)]
 		public float y;
+
+		[Exposed, IgnoreMember]
+		public float X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public float Y
+		{
+			get => y;
+			set => y = value;
+		}
+
 		public Vector2f() {
 			x = 0f;
 			y = 0f;

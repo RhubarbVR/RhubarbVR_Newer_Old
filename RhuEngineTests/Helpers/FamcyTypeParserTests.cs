@@ -67,7 +67,7 @@ namespace RNumerics.Tests
 		}
 		[TestMethod()]
 		public void GenaricTypeTestFive() {
-			var type = FamcyTypeParser.PraseType("MultiOperators<Vector3f,Vector3f>");
+			var type = FamcyTypeParser.PraseType("SingleOperators<Vector3f,Vector3f>");
 			Assert.IsNotNull(type);
 		}
 	}

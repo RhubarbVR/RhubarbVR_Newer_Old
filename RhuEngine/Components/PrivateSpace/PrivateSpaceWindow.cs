@@ -228,12 +228,14 @@ namespace RhuEngine.Components
 			var newWin = Engine.windowManager.CreateNewWindow();
 			newWin.WaitOnLoadedIn((win) => {
 				void SizeChange() {
+					win.MinSize = Window.MinSize;
 					if (win.Size != Window.SizePixels) {
 						Window.SizePixels = win.Size;
 					}
 				}
 				win.SizeChanged += SizeChange;
 				void Resize() {
+					win.MinSize = Window.MinSize;
 					if (win.Size != Window.SizePixels) {
 						win.Size = Window.SizePixels;
 					}
@@ -248,6 +250,7 @@ namespace RhuEngine.Components
 				};
 				win.Title = Window.WindowTitle;
 				win.Size = Window.TargetViewport.Size.Value;
+				Window.OnClosedWindow += () => win?.Dispose();
 			});
 		}
 

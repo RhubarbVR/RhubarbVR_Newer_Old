@@ -1,6 +1,8 @@
 ﻿using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
+using RNumerics;
+
 namespace RhuEngine.Components
 {
 	[Category("Math")]
@@ -12,7 +14,7 @@ namespace RhuEngine.Components
 		protected override Out Compute(In a) {
 			switch (Operators.Value) {
 				case SingleOperators.Cast:
-					return (dynamic)a;
+					return RDynamic<In>.CastTo<Out>(a);
 				case SingleOperators.LogicalNegation:
 					return !(dynamic)a;
 				case SingleOperators.BitwiseComplement:

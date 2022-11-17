@@ -446,7 +446,7 @@ namespace RNumerics
 
 
 		public void Expand(in float f) {
-			Extent += f;
+			//Extent += f;
 		}
 
 		public void Translate(in Vector2f v) {

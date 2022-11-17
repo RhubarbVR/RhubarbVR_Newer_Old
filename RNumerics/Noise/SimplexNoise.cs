@@ -337,8 +337,15 @@ namespace RNumerics.Noise
 			return Generate((time * speed) + seed) * magnitude;
 		}
 
-		public static T Generate<T>(in float time, in T speed, in T magnitude, in T seed) {
-			return Generate(((dynamic)speed * time) + seed) * magnitude;
+		public static T Generate<T>(in double time, in T speed, in T magnitude, in T seed) {
+			try {
+				var first = (dynamic)speed * time;
+				return Generate(first + seed) * magnitude;
+			}
+			catch {
+				var first = (dynamic)speed * (float)time;
+				return Generate(first + seed) * magnitude;
+			}
 		}
 
 		private static byte[] _perm;

@@ -10,11 +10,22 @@ using RhuEngine.WorldObjects.ECS;
 using System.Text;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using RhuEngine.Components;
 
 namespace RhuEngine
 {
 	public static class Helper
 	{
+		public static (string ProgramName, RTexture2D icon) GetProgramInfo(this Type type) {
+			try {
+				var program = (Program)Activator.CreateInstance(type);
+				return (program.ProgramName, program.ProgramIcon);
+			}
+			catch {
+				return (null, null);
+			}
+		}
+
 		public static int RuneLength(this string value) {
 			return value.EnumerateRunes().Count();
 		}

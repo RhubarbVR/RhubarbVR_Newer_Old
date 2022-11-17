@@ -15,7 +15,8 @@ namespace RhuEngine.Components.PrivateSpace.Programs.OverlayDialogues
 			var foundProgam = false;
 			foreach (var data in ProgramOpenWithAttribute.GetAllPrograms(mimeType, Assembly.GetExecutingAssembly())) {
 				foundProgam = true;
-				RLog.Info($"Found program to open mimeType:{mimeType} Program {data.Name}");
+				var programInfo = data.GetProgramInfo();
+				RLog.Info($"Found program to open mimeType:{mimeType} Program {programInfo.ProgramName}");
 			}
 			if (!foundProgam) {
 				RLog.Info($"Found no program to open mimeType:{mimeType}");

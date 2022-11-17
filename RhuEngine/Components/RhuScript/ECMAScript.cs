@@ -11,9 +11,11 @@ using Jint.Native;
 using System.Reflection;
 using Jint.Native.Object;
 using System.Threading;
+using MessagePack;
 
 namespace RhuEngine.Components
 {
+
 	public abstract class ProceduralECMAScript : ECMAScript
 	{
 	}
@@ -116,16 +118,16 @@ namespace RhuEngine.Components
 			return Targets.GetValue(index).Target;
 		}
 
-
 		protected abstract string Script { get; }
+
 
 		protected void InitECMA() {
 			_ecma = new Jint.Engine(options => {
 				options.LimitMemory(1_000_000); // alocate 1 MB
 				options.TimeoutInterval(TimeSpan.FromSeconds(1));
-				options.MaxStatements(1580);
+				options.MaxStatements(3050);
 				options.SetTypeResolver(new TypeResolver {
-					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExposedAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType())) && !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
+					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExposedAttribute)) || Attribute.IsDefined(member, typeof(KeyAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType())) && !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
 				});
 				options.Strict = true;
 			});

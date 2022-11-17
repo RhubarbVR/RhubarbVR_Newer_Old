@@ -19,5 +19,11 @@ namespace RhuEngine.Components.PrivateSpace.Programs.OverlayDialogues
 
 		public abstract void Opened();
 		public abstract void Close();
+
+		public void CloseWindow() {
+			programWindow?.Close();
+			programWindow = null;
+			Entity.Destroy();
+		}
 	}
 }

@@ -37,7 +37,6 @@ namespace RhuEngine.Components
 		[Default(RAutowrapMode.Off)]
 		public readonly Sync<RAutowrapMode> AutowrapMode;
 		public readonly Sync<bool> ClipText;
-		[Default(ROverrunBehavior.TrimEllipsis)]
 		public readonly Sync<ROverrunBehavior> OverrunBehavior;
 		public readonly Sync<bool> Uppercase;
 		public readonly Sync<int> LinesSkipped;

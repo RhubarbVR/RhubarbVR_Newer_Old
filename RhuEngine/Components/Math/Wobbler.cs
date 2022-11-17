@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 		protected override void Step() {
 			if (driver.Linked) {
 				try {
-					var time = (float)World.WorldTime;
+					var time = World.WorldTime;
 					var noiseValue = SimplexNoise.Generate(time, speed.Value, magnitude.Value, seed.Value);
 					driver.LinkedValue = (dynamic)offset.Value + noiseValue;
 				}
