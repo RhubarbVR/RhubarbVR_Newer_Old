@@ -49,7 +49,7 @@ namespace RhuEngine.Components
 			RootElement.Min.Value = Vector2f.Zero;
 			RootElement.Max.Value = Vector2f.Zero;
 			var min = Window.Pos;
-			var max = Window.Pos + (Vector2f)Window.SizePixels + new Vector2f(0, 35);
+			var max = Window.Pos + (Vector2f)Window.SizePixels + new Vector2f(0, 35) + new Vector2f(10);
 			RootElement.MaxOffset.Value = new Vector2f(min.x, max.y);
 			RootElement.MinOffset.Value = new Vector2f(max.x, min.y);
 			UpdateVRPos();
@@ -175,6 +175,8 @@ namespace RhuEngine.Components
 			top.Entity.AddChild("Back").AttachComponent<Panel>();
 			var viewportConnector = top.Entity.AddChild("UI").AttachComponent<ViewportConnector>();
 			viewportConnector.Target.Target = Window.TargetViewport;
+			viewportConnector.MinOffset.Value = new Vector2f(-5, 5);
+			viewportConnector.MaxOffset.Value = new Vector2f(5, 5);
 
 			var bottom = RootElement.Entity.AddChild("Bottom").AttachComponent<UIElement>();
 			bottom.Min.Value = new Vector2f(0, 1);

@@ -35,6 +35,38 @@ namespace RhuEngine.Components
 		protected override string Script => ScriptCode;
 	}
 
+	internal static class MathEx
+	{
+		private interface IObjectAdder
+		{
+			public object Add(object obj, object b);
+		}
+		private sealed class ObjectAdder<T> : IObjectAdder
+		{
+			public RDynamic<T> valueOne;
+			public RDynamic<T> valueTwo;
+
+			public object Add(object obj, object b) {
+				T value = (RDynamic<T>)(T)obj + (RDynamic<T>)(T)b;
+				return value;
+			}
+		}
+
+		public static object MathAdd(this object a, object b) {
+			try {
+				if (a.GetType() == b.GetType()) {
+					var value = ((IObjectAdder)Activator.CreateInstance(typeof(ObjectAdder<>).MakeGenericType(a.GetType()))).Add(a, b);
+					return value;
+				}
+				return (dynamic)a + (dynamic)b;
+			}
+			catch {
+				return null;
+			}
+		}
+	}
+
+
 	public abstract class ECMAScript : Component
 	{
 		public class ECMAScriptFunction : SyncObject
@@ -129,6 +161,7 @@ namespace RhuEngine.Components
 				options.SetTypeResolver(new TypeResolver {
 					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExposedAttribute)) || Attribute.IsDefined(member, typeof(KeyAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType())) && !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
 				});
+				options.AddExtensionMethods(typeof(MathEx));
 				options.Strict = true;
 			});
 			_ecma.ResetCallStack();

@@ -188,6 +188,32 @@ namespace RhuEngine.GameTests.Tests
 		}
 
 		[TestMethod()]
+		public void TestStringAdd() {
+			var script = AttachTestScript();
+			var random = new Random();
+			var test1 = random.NextSingle();
+			var test2 = random.NextSingle();
+			var value = script.Entity.AttachComponent<ValueField<string>>();
+			value.Value.Value = test1.ToString();
+			var value2 = script.Entity.AttachComponent<ValueField<string>>();
+			value2.Value.Value = test2.ToString();
+			script.Targets.Add().Target = value;
+			script.Targets.Add().Target = value2;
+			script.ScriptCode.Value = @"
+				function RunCode()	{
+					script.GetTarget(0).Value.Value = script.GetTarget(0).Value.Value.MathAdd(script.GetTarget(1).Value.Value);
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(test1.ToString() + test2.ToString(), value.Value.Value);
+			((IDisposable)tester).Dispose();
+		}
+
+
+		[TestMethod()]
 		public void TestFloatAdd() {
 			var script = AttachTestScript();
 			var random = new Random();
@@ -201,7 +227,7 @@ namespace RhuEngine.GameTests.Tests
 			script.Targets.Add().Target = value2;
 			script.ScriptCode.Value = @"
 				function RunCode()	{
-					script.GetTarget(0).Value.Value = script.GetTarget(0).Value.Value + script.GetTarget(1).Value.Value;
+					script.GetTarget(0).Value.Value = script.GetTarget(0).Value.Value.MathAdd(script.GetTarget(1).Value.Value);
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -234,6 +260,33 @@ namespace RhuEngine.GameTests.Tests
 			Assert.AreEqual(value.Value.Value, value2.Value.Value.x);
 			((IDisposable)tester).Dispose();
 		}
+
+		[TestMethod()]
+		public void TestVectorsAdd() {
+			var script = AttachTestScript();
+			var random = new Random();
+			var test2 = new Vector2f(random.NextSingle(), random.NextSingle());
+			var test1 = new Vector2f(random.NextSingle(), random.NextSingle());
+			var value = script.Entity.AttachComponent<ValueField<Vector2f>>();
+			var value2 = script.Entity.AttachComponent<ValueField<Vector2f>>();
+			value2.Value.Value = test2;
+			value.Value.Value = test1;
+			script.Targets.Add().Target = value;
+			script.Targets.Add().Target = value2;
+			script.ScriptCode.Value = @"
+				function RunCode()	{
+					var value = script.GetTarget(1).Value.Value.MathAdd(script.GetTarget(0).Value.Value);
+					script.GetTarget(1).Value.Value = value;
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(value2.Value.Value, test2 + test1);
+			((IDisposable)tester).Dispose();
+		}
+
 
 		[TestMethod()]
 		public void TestVectorsSetX() {
