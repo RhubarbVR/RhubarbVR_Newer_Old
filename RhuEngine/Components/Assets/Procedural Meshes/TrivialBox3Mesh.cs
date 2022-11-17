@@ -50,7 +50,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			var box = new TrivialBox3Generator {
-				Box = new Box3f { Extent = Extent.Value, Center = Center.Value, AxisX = AxisX.Value, AxisY = AxisY.Value, AxisZ = AxisZ.Value },
+				Box = new Box3f { extent = Extent.Value, center = Center.Value, axisX = AxisX.Value, axisY = AxisY.Value, axisZ = AxisZ.Value },
 				NoSharedVertices = NoSharedVertices.Value,
 				WantUVs = WantUVs,
 				WantNormals = WantNormals,

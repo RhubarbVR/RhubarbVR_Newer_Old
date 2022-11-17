@@ -53,16 +53,16 @@ namespace RNumerics
 			}
 
 			// Test if line intersects triangle.  If so, the squared distance is zero.
-			var edge0 = _triangle.V1 - _triangle.V0;
-			var edge1 = _triangle.V2 - _triangle.V0;
+			var edge0 = _triangle.v1 - _triangle.v0;
+			var edge1 = _triangle.v2 - _triangle.v0;
 			var normal = edge0.UnitCross(edge1);
-			var NdD = normal.Dot(_line.Direction);
+			var NdD = normal.Dot(_line.direction);
 			if (Math.Abs(NdD) > MathUtil.ZERO_TOLERANCE) {
 				// The line and triangle are not parallel, so the line intersects
 				// the plane of the triangle.
-				var diff = _line.Origin - _triangle.V0;
+				var diff = _line.origin - _triangle.v0;
 				Vector3d U = Vector3d.Zero, V = Vector3d.Zero;
-				Vector3d.GenerateComplementBasis(ref U, ref V, _line.Direction);
+				Vector3d.GenerateComplementBasis(ref U, ref V, _line.direction);
 				var UdE0 = U.Dot(edge0);
 				var UdE1 = U.Dot(edge1);
 				var UdDiff = U.Dot(diff);
@@ -78,17 +78,17 @@ namespace RNumerics
 
 				if (b0 >= 0 && b1 >= 0 && b2 >= 0) {
 					// Line parameter for the point of intersection.
-					var DdE0 = _line.Direction.Dot(edge0);
-					var DdE1 = _line.Direction.Dot(edge1);
-					var DdDiff = _line.Direction.Dot(diff);
+					var DdE0 = _line.direction.Dot(edge0);
+					var DdE1 = _line.direction.Dot(edge1);
+					var DdDiff = _line.direction.Dot(diff);
 					LineParam = (b1 * DdE0) + (b2 * DdE1) - DdDiff;
 
 					// Barycentric coordinates for the point of intersection.
 					TriangleBaryCoords = new Vector3d(b0, b1, b2);
 
 					// The intersection point is inside or on the triangle.
-					LineClosest = _line.Origin + (LineParam * _line.Direction);
-					TriangleClosest = _triangle.V0 + (b1 * edge0) + (b2 * edge1);
+					LineClosest = _line.origin + (LineParam * _line.direction);
+					TriangleClosest = _triangle.v0 + (b1 * edge0) + (b2 * edge1);
 					DistanceSquared = 0;
 					return 0;
 				}
@@ -109,7 +109,7 @@ namespace RNumerics
 					TriangleClosest = queryLS.SegmentClosest;
 					sqrDist = sqrDistTmp;
 					LineParam = queryLS.LineParameter;
-					var ratio = queryLS.SegmentParameter / segment.Extent;
+					var ratio = queryLS.SegmentParameter / segment.extent;
 					TriangleBaryCoords = Vector3d.Zero;
 					TriangleBaryCoords[i0] = 0.5 * (1 - ratio);
 					TriangleBaryCoords[i1] = 1 - TriangleBaryCoords[i0];

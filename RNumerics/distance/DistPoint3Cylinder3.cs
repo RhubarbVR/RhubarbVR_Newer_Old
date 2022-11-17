@@ -69,12 +69,12 @@ namespace RNumerics
 			// Convert the point to the cylinder coordinate system.  In this system,
 			// the point believes (0,0,0) is the cylinder axis origin and (0,0,1) is
 			// the cylinder axis direction.
-			var basis0 = _cylinder.Axis.Direction;
+			var basis0 = _cylinder.Axis.direction;
 			Vector3d basis1 = Vector3d.Zero, basis2 = Vector3d.Zero;
 			Vector3d.ComputeOrthogonalComplement(1, basis0, ref basis1, ref basis2);
 			var height = Cylinder.Height / 2.0;
 
-			var delta = _point - _cylinder.Axis.Origin;
+			var delta = _point - _cylinder.Axis.origin;
 			var P = new Vector3d(basis1.Dot(delta), basis2.Dot(delta), basis0.Dot(delta));
 
 			var sqrRadius = _cylinder.Radius * _cylinder.Radius;
@@ -118,7 +118,7 @@ namespace RNumerics
 
 			// Convert the closest point from the cylinder coordinate system to the
 			// original coordinate system.
-			CylinderClosest = _cylinder.Axis.Origin +
+			CylinderClosest = _cylinder.Axis.origin +
 				(result_closest.x * basis1) +
 				(result_closest.y * basis2) +
 				(result_closest.z * basis0);
@@ -134,11 +134,11 @@ namespace RNumerics
 			// Convert the point to the cylinder coordinate system.  In this system,
 			// the point believes (0,0,0) is the cylinder axis origin and (0,0,1) is
 			// the cylinder axis direction.
-			var basis0 = _cylinder.Axis.Direction;
+			var basis0 = _cylinder.Axis.direction;
 			Vector3d basis1 = Vector3d.Zero, basis2 = Vector3d.Zero;
 			Vector3d.ComputeOrthogonalComplement(1, basis0, ref basis1, ref basis2);
 
-			var delta = _point - _cylinder.Axis.Origin;
+			var delta = _point - _cylinder.Axis.origin;
 			var P = new Vector3d(basis1.Dot(delta), basis2.Dot(delta), basis0.Dot(delta));
 
 			var sqrDistance = (P[0] * P[0]) + (P[1] * P[1]);
@@ -152,7 +152,7 @@ namespace RNumerics
 
 			// Convert the closest point from the cylinder coordinate system to the
 			// original coordinate system.
-			CylinderClosest = _cylinder.Axis.Origin +
+			CylinderClosest = _cylinder.Axis.origin +
 				(result_closest.x * basis1) +
 				(result_closest.y * basis2) +
 				(result_closest.z * basis0);

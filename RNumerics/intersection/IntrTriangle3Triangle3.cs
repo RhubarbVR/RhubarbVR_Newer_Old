@@ -68,7 +68,7 @@ namespace RNumerics
 			int i, iM, iP;
 
 			// Get the plane of triangle0.
-			var plane0 = new Plane3d(_triangle0.V0, _triangle0.V1, _triangle0.V2);
+			var plane0 = new Plane3d(_triangle0.v0, _triangle0.v1, _triangle0.v2);
 
 			// Compute the signed distances of triangle1 vertices to plane0.  Use
 			// an epsilon-thick plane test.
@@ -146,15 +146,15 @@ namespace RNumerics
 		public bool Test() {
 			// Get edge vectors for triangle0.
 			Vector3dTuple3 E0;
-			E0.V0 = _triangle0.V1 - _triangle0.V0;
-			E0.V1 = _triangle0.V2 - _triangle0.V1;
-			E0.V2 = _triangle0.V0 - _triangle0.V2;
+			E0.V0 = _triangle0.v1 - _triangle0.v0;
+			E0.V1 = _triangle0.v2 - _triangle0.v1;
+			E0.V2 = _triangle0.v0 - _triangle0.v2;
 
 			// Get normal vector of triangle0.
 			var N0 = E0[0].UnitCross(E0[1]);
 
 			// Project triangle1 onto normal line of triangle0, test for separation.
-			var N0dT0V0 = N0.Dot(_triangle0.V0);
+			var N0dT0V0 = N0.Dot(_triangle0.v0);
 			ProjectOntoAxis(ref _triangle1, ref N0, out var min1, out var max1);
 			if (N0dT0V0 < min1 || N0dT0V0 > max1) {
 				return false;
@@ -162,9 +162,9 @@ namespace RNumerics
 
 			// Get edge vectors for triangle1.
 			Vector3dTuple3 E1;
-			E1.V0 = _triangle1.V1 - _triangle1.V0;
-			E1.V1 = _triangle1.V2 - _triangle1.V1;
-			E1.V2 = _triangle1.V0 - _triangle1.V2;
+			E1.V0 = _triangle1.v1 - _triangle1.v0;
+			E1.V1 = _triangle1.v2 - _triangle1.v1;
+			E1.V2 = _triangle1.v0 - _triangle1.v2;
 
 			// Get normal vector of triangle1.
 			var N1 = E1[0].UnitCross(E1[1]);
@@ -179,7 +179,7 @@ namespace RNumerics
 
 				// Project triangle0 onto normal line of triangle1, test for
 				// separation.
-				var N1dT1V0 = N1.Dot(_triangle1.V0);
+				var N1dT1V0 = N1.Dot(_triangle1.v0);
 				ProjectOntoAxis(ref _triangle0, ref N1, out min0, out max0);
 				if (N1dT1V0 < min0 || N1dT1V0 > max0) {
 					return false;
@@ -237,15 +237,15 @@ namespace RNumerics
 		public static bool Intersects(ref Triangle3d triangle0, ref Triangle3d triangle1) {
 			// Get edge vectors for triangle0.
 			Vector3dTuple3 E0;
-			E0.V0 = triangle0.V1 - triangle0.V0;
-			E0.V1 = triangle0.V2 - triangle0.V1;
-			E0.V2 = triangle0.V0 - triangle0.V2;
+			E0.V0 = triangle0.v1 - triangle0.v0;
+			E0.V1 = triangle0.v2 - triangle0.v1;
+			E0.V2 = triangle0.v0 - triangle0.v2;
 
 			// Get normal vector of triangle0.
 			var N0 = E0.V0.UnitCross(E0.V1);
 
 			// Project triangle1 onto normal line of triangle0, test for separation.
-			var N0dT0V0 = N0.Dot(triangle0.V0);
+			var N0dT0V0 = N0.Dot(triangle0.v0);
 			ProjectOntoAxis(ref triangle1, ref N0, out var min1, out var max1);
 			if (N0dT0V0 < min1 || N0dT0V0 > max1) {
 				return false;
@@ -253,9 +253,9 @@ namespace RNumerics
 
 			// Get edge vectors for triangle1.
 			Vector3dTuple3 E1;
-			E1.V0 = triangle1.V1 - triangle1.V0;
-			E1.V1 = triangle1.V2 - triangle1.V1;
-			E1.V2 = triangle1.V0 - triangle1.V2;
+			E1.V0 = triangle1.v1 - triangle1.v0;
+			E1.V1 = triangle1.v2 - triangle1.v1;
+			E1.V2 = triangle1.v0 - triangle1.v2;
 
 			// Get normal vector of triangle1.
 			var N1 = E1.V0.UnitCross(E1.V1);
@@ -270,7 +270,7 @@ namespace RNumerics
 
 				// Project triangle0 onto normal line of triangle1, test for
 				// separation.
-				var N1dT1V0 = N1.Dot(triangle1.V0);
+				var N1dT1V0 = N1.Dot(triangle1.v0);
 				ProjectOntoAxis(ref triangle0, ref N1, out min0, out max0);
 				if (N1dT1V0 < min0 || N1dT1V0 > max0) {
 					return false;
@@ -327,9 +327,9 @@ namespace RNumerics
 
 
 		static public void ProjectOntoAxis(ref Triangle3d triangle, ref Vector3d axis, out double fmin, out double fmax) {
-			var dot0 = axis.Dot(triangle.V0);
-			var dot1 = axis.Dot(triangle.V1);
-			var dot2 = axis.Dot(triangle.V2);
+			var dot0 = axis.Dot(triangle.v0);
+			var dot1 = axis.Dot(triangle.v1);
+			var dot2 = axis.Dot(triangle.v2);
 
 			fmin = dot0;
 			fmax = fmin;
@@ -390,7 +390,7 @@ namespace RNumerics
 			// in the plane may be written as Q = V0 + x0*U0 + x1*U1.  The coordinates
 			// are computed as x0 = Dot(U0,Q-V0) and x1 = Dot(U1,Q-V0).
 			Vector3d U0 = Vector3d.Zero, U1 = Vector3d.Zero;
-			Vector3d.GenerateComplementBasis(ref U0, ref U1, plane.Normal);
+			Vector3d.GenerateComplementBasis(ref U0, ref U1, plane.normal);
 
 			// Compute the planar coordinates for the points P, V1, and V2.  To
 			// simplify matters, the origin is subtracted from the points, in which
@@ -433,13 +433,13 @@ namespace RNumerics
 			// Project the triangle and segment onto the coordinate plane most
 			// aligned with the plane normal.
 			var maxNormal = 0;
-			var fmax = Math.Abs(plane.Normal.x);
-			var absMax = Math.Abs(plane.Normal.y);
+			var fmax = Math.Abs(plane.normal.x);
+			var absMax = Math.Abs(plane.normal.y);
 			if (absMax > fmax) {
 				maxNormal = 1;
 				fmax = absMax;
 			}
-			absMax = Math.Abs(plane.Normal.z);
+			absMax = Math.Abs(plane.normal.z);
 			if (absMax > fmax) {
 				maxNormal = 2;
 			}
@@ -504,29 +504,29 @@ namespace RNumerics
 
 			// Unproject the segment of intersection.
 			if (maxNormal == 0) {
-				var invNX = ((double)1) / plane.Normal.x;
+				var invNX = ((double)1) / plane.normal.x;
 				for (i = 0; i < Quantity; ++i) {
 					var y = intr[i].x;
 					var z = intr[i].y;
-					var x = invNX * (plane.Constant - (plane.Normal.y * y) - (plane.Normal.z * z));
+					var x = invNX * (plane.constant - (plane.normal.y * y) - (plane.normal.z * z));
 					Points[i] = new Vector3d(x, y, z);
 				}
 			}
 			else if (maxNormal == 1) {
-				var invNY = ((double)1) / plane.Normal.y;
+				var invNY = ((double)1) / plane.normal.y;
 				for (i = 0; i < Quantity; ++i) {
 					var x = intr[i].x;
 					var z = intr[i].y;
-					var y = invNY * (plane.Constant - (plane.Normal.x * x) - (plane.Normal.z * z));
+					var y = invNY * (plane.constant - (plane.normal.x * x) - (plane.normal.z * z));
 					Points[i] = new Vector3d(x, y, z);
 				}
 			}
 			else {
-				var invNZ = ((double)1) / plane.Normal.z;
+				var invNZ = ((double)1) / plane.normal.z;
 				for (i = 0; i < Quantity; ++i) {
 					var x = intr[i].x;
 					var y = intr[i].y;
-					var z = invNZ * (plane.Constant - (plane.Normal.x * x) - (plane.Normal.y * y));
+					var z = invNZ * (plane.constant - (plane.normal.x * x) - (plane.normal.y * y));
 					Points[i] = new Vector3d(x, y, z);
 				}
 			}
@@ -541,13 +541,13 @@ namespace RNumerics
 			// Project triangles onto coordinate plane most aligned with plane
 			// normal.
 			var maxNormal = 0;
-			var fmax = Math.Abs(plane.Normal.x);
-			var absMax = Math.Abs(plane.Normal.y);
+			var fmax = Math.Abs(plane.normal.x);
+			var absMax = Math.Abs(plane.normal.y);
 			if (absMax > fmax) {
 				maxNormal = 1;
 				fmax = absMax;
 			}
-			absMax = Math.Abs(plane.Normal.z);
+			absMax = Math.Abs(plane.normal.z);
 			if (absMax > fmax) {
 				maxNormal = 2;
 			}
@@ -607,29 +607,29 @@ namespace RNumerics
 			// Map 2D intersections back to the 3D triangle space.
 			Quantity = intr.Quantity;
 			if (maxNormal == 0) {
-				var invNX = ((double)1) / plane.Normal.x;
+				var invNX = ((double)1) / plane.normal.x;
 				for (i = 0; i < Quantity; i++) {
 					var y = intr.Points[i].x;
 					var z = intr.Points[i].y;
-					var x = invNX * (plane.Constant - (plane.Normal.y * y) - (plane.Normal.z * z));
+					var x = invNX * (plane.constant - (plane.normal.y * y) - (plane.normal.z * z));
 					PolygonPoints[i] = new Vector3d(x, y, z);
 				}
 			}
 			else if (maxNormal == 1) {
-				var invNY = ((double)1) / plane.Normal.y;
+				var invNY = ((double)1) / plane.normal.y;
 				for (i = 0; i < Quantity; i++) {
 					var x = intr.Points[i].x;
 					var z = intr.Points[i].y;
-					var y = invNY * (plane.Constant - (plane.Normal.x * x) - (plane.Normal.z * z));
+					var y = invNY * (plane.constant - (plane.normal.x * x) - (plane.normal.z * z));
 					PolygonPoints[i] = new Vector3d(x, y, z);
 				}
 			}
 			else {
-				var invNZ = ((double)1) / plane.Normal.z;
+				var invNZ = ((double)1) / plane.normal.z;
 				for (i = 0; i < Quantity; i++) {
 					var x = intr.Points[i].x;
 					var y = intr.Points[i].y;
-					var z = invNZ * (plane.Constant - (plane.Normal.x * x) - (plane.Normal.y * y));
+					var z = invNZ * (plane.constant - (plane.normal.x * x) - (plane.normal.y * y));
 					PolygonPoints[i] = new Vector3d(x, y, z);
 				}
 			}

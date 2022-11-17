@@ -12,6 +12,18 @@ namespace RNumerics
 		[Key(1)]
 		public int y;
 
+		[Exposed, IgnoreMember]
+		public int X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public int Y
+		{
+			get => y;
+			set => y = value;
+		}
 		public Vector2i() {
 			x = 0;
 			y = 0;
@@ -24,13 +36,13 @@ namespace RNumerics
 		public Vector2i(float x, float y) : this((int)x, (int)y) {
 		}
 
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		public static readonly Vector2i Zero = new(0, 0);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2i One = new(1, 1);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2i AxisX = new(1, 0);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2i AxisY = new(0, 1);
 
 		[IgnoreMember]
@@ -140,13 +152,13 @@ namespace RNumerics
 		public Vector2l(long f) { x = y = f; }
 		public Vector2l(long x, long y) { this.x = x; this.y = y; }
 		public Vector2l(long[] v2) { x = v2[0]; y = v2[1]; }
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2l Zero = new(0, 0);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2l One = new(1, 1);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2l AxisX = new(1, 0);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2l AxisY = new(0, 1);
 
 		[IgnoreMember]

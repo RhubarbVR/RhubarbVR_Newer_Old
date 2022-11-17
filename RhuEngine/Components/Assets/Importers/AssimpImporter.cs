@@ -125,7 +125,7 @@ namespace RhuEngine.Components
 
 			public void CalculateOptimumBounds(Entity entity) {
 				var localPoint = root.GlobalPointToLocal(entity.GlobalTrans.Translation);
-				BoundingBox = BoundsUtil.Combined(BoundingBox, new AxisAlignedBox3f { Max = localPoint, Min = localPoint });
+				BoundingBox = BoundsUtil.Combined(BoundingBox, new AxisAlignedBox3f { max = localPoint, min = localPoint });
 			}
 		}
 

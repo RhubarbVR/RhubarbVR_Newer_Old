@@ -13,6 +13,22 @@ namespace RNumerics
 		Quaternionf _rotation;
 		[Key(1)]
 		Vector3f _origin;
+
+		[Exposed, IgnoreMember]
+		public Quaternionf Rotation
+		{
+			get => _rotation;
+			set => _rotation = value;
+		}
+		[Exposed, IgnoreMember]
+		public Vector3f Origin
+		{
+			get => _origin;
+			set => _origin = value;
+		}
+		
+
+
 		[IgnoreMember]
 		static readonly public Frame3f Identity = new(Vector3f.Zero, Quaternionf.Identity);
 
@@ -66,19 +82,7 @@ namespace RNumerics
 		}
 
 
-		[IgnoreMember]
-		public Quaternionf Rotation
-		{
-			get => _rotation;
-			set => _rotation = value;
-		}
-
-		[IgnoreMember]
-		public Vector3f Origin
-		{
-			get => _origin;
-			set => _origin = value;
-		}
+		
 
 		[IgnoreMember]
 		public Vector3f X => _rotation.AxisX;
@@ -293,19 +297,19 @@ namespace RNumerics
 
 		///<summary> Map ray *into* local coordinates of Frame </summary>
 		public Ray3f ToFrame(Ray3f r) {
-			return new Ray3f(ToFrameP(r.Origin), ToFrameV(ref r.Direction));
+			return new Ray3f(ToFrameP(r.origin), ToFrameV(ref r.direction));
 		}
 		///<summary> Map ray *into* local coordinates of Frame </summary>
 		public Ray3f ToFrame(ref Ray3f r) {
-			return new Ray3f(ToFrameP(r.Origin), ToFrameV(ref r.Direction));
+			return new Ray3f(ToFrameP(r.origin), ToFrameV(ref r.direction));
 		}
 		/// <summary> Map ray *from* local frame coordinates into "world" coordinates </summary>
 		public Ray3f FromFrame(Ray3f r) {
-			return new Ray3f(FromFrameP(r.Origin), FromFrameV(ref r.Direction));
+			return new Ray3f(FromFrameP(r.origin), FromFrameV(ref r.direction));
 		}
 		/// <summary> Map ray *from* local frame coordinates into "world" coordinates </summary>
 		public Ray3f FromFrame(ref Ray3f r) {
-			return new Ray3f(FromFrameP(r.Origin), FromFrameV(ref r.Direction));
+			return new Ray3f(FromFrameP(r.origin), FromFrameV(ref r.direction));
 		}
 
 
@@ -329,34 +333,34 @@ namespace RNumerics
 
 		///<summary> Map box *into* local coordinates of Frame </summary>
 		public Box3f ToFrame(ref Box3f box) {
-			box.Center = ToFrameP(box.Center);
-			box.AxisX = ToFrameV(ref box.AxisX);
-			box.AxisY = ToFrameV(ref box.AxisY);
-			box.AxisZ = ToFrameV(ref box.AxisZ);
+			box.center = ToFrameP(box.center);
+			box.axisX = ToFrameV(ref box.axisX);
+			box.axisY = ToFrameV(ref box.axisY);
+			box.axisZ = ToFrameV(ref box.axisZ);
 			return box;
 		}
 		/// <summary> Map box *from* local frame coordinates into "world" coordinates </summary>
 		public Box3f FromFrame(ref Box3f box) {
-			box.Center = FromFrameP(box.Center);
-			box.AxisX = FromFrameV(ref box.AxisX);
-			box.AxisY = FromFrameV(ref box.AxisY);
-			box.AxisZ = FromFrameV(ref box.AxisZ);
+			box.center = FromFrameP(box.center);
+			box.axisX = FromFrameV(ref box.axisX);
+			box.axisY = FromFrameV(ref box.axisY);
+			box.axisZ = FromFrameV(ref box.axisZ);
 			return box;
 		}
 		///<summary> Map box *into* local coordinates of Frame </summary>
 		public Box3d ToFrame(ref Box3d box) {
-			box.Center = ToFrameP(box.Center);
-			box.AxisX = ToFrameV(ref box.AxisX);
-			box.AxisY = ToFrameV(ref box.AxisY);
-			box.AxisZ = ToFrameV(ref box.AxisZ);
+			box.center = ToFrameP(box.center);
+			box.axisX = ToFrameV(ref box.axisX);
+			box.axisY = ToFrameV(ref box.axisY);
+			box.axisZ = ToFrameV(ref box.axisZ);
 			return box;
 		}
 		/// <summary> Map box *from* local frame coordinates into "world" coordinates </summary>
 		public Box3d FromFrame(ref Box3d box) {
-			box.Center = FromFrameP(box.Center);
-			box.AxisX = FromFrameV(ref box.AxisX);
-			box.AxisY = FromFrameV(ref box.AxisY);
-			box.AxisZ = FromFrameV(ref box.AxisZ);
+			box.center = FromFrameP(box.center);
+			box.axisX = FromFrameV(ref box.axisX);
+			box.axisY = FromFrameV(ref box.axisY);
+			box.axisZ = FromFrameV(ref box.axisZ);
 			return box;
 		}
 

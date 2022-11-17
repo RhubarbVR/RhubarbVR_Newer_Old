@@ -14,11 +14,25 @@ namespace RNumerics
 		[Key(1)]
 		public double y;
 
+		[Exposed, IgnoreMember]
+		public double X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public double Y
+		{
+			get => y;
+			set => y = value;
+		}
+
+
 		public Vector2d() {
 			x = 0;
 			y = 0;
 		}
-
+			
 		public override int GetHashCode() {
 			unchecked // Overflow is fine, just wrap
 			{
@@ -40,17 +54,17 @@ namespace RNumerics
 		public Vector2d(in float[] v2) { x = v2[0]; y = v2[1]; }
 		public Vector2d(in Vector2d copy) { x = copy.x; y = copy.y; }
 		public Vector2d(in Vector2f copy) { x = copy.x; y = copy.y; }
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2d Zero = new(0.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2d One = new(1.0f, 1.0f);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2d AxisX = new(1.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2d AxisY = new(0.0f, 1.0f);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2d MaxValue = new(double.MaxValue, double.MaxValue);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2d MinValue = new(double.MinValue, double.MinValue);
 
 		public static Vector2d FromAngleRad(in double angle) {

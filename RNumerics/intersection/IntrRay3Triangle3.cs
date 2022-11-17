@@ -50,9 +50,9 @@ namespace RNumerics
 			}
 
 			// Compute the offset origin, edges, and normal.
-			var diff = _ray.Origin - _triangle.V0;
-			var edge1 = _triangle.V1 - _triangle.V0;
-			var edge2 = _triangle.V2 - _triangle.V0;
+			var diff = _ray.origin - _triangle.v0;
+			var edge1 = _triangle.v1 - _triangle.v0;
+			var edge2 = _triangle.v2 - _triangle.v0;
 			var normal = edge1.Cross(edge2);
 
 			// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
@@ -60,7 +60,7 @@ namespace RNumerics
 			//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
 			//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
 			//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-			var DdN = _ray.Direction.Dot(normal);
+			var DdN = _ray.direction.Dot(normal);
 			double sign;
 			if (DdN > MathUtil.ZERO_TOLERANCE) {
 				sign = 1;
@@ -76,9 +76,9 @@ namespace RNumerics
 				return false;
 			}
 
-			var DdQxE2 = sign * _ray.Direction.Dot(diff.Cross(edge2));
+			var DdQxE2 = sign * _ray.direction.Dot(diff.Cross(edge2));
 			if (DdQxE2 >= 0) {
-				var DdE1xQ = sign * _ray.Direction.Dot(edge1.Cross(diff));
+				var DdE1xQ = sign * _ray.direction.Dot(edge1.Cross(diff));
 				if (DdE1xQ >= 0) {
 					if (DdQxE2 + DdE1xQ <= DdN) {
 						// Line intersects triangle, check if ray does.
@@ -114,7 +114,7 @@ namespace RNumerics
 		/// </summary>
 		public static bool Intersects(ref Ray3d ray, ref Vector3d V0, ref Vector3d V1, ref Vector3d V2, out double rayT) {
 			// Compute the offset origin, edges, and normal.
-			var diff = ray.Origin - V0;
+			var diff = ray.origin - V0;
 			var edge1 = V1 - V0;
 			var edge2 = V2 - V0;
 			var normal = edge1.Cross(edge2);
@@ -126,7 +126,7 @@ namespace RNumerics
 			//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
 			//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
 			//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-			var DdN = ray.Direction.Dot(normal);
+			var DdN = ray.direction.Dot(normal);
 			double sign;
 			if (DdN > MathUtil.ZERO_TOLERANCE) {
 				sign = 1;
@@ -142,10 +142,10 @@ namespace RNumerics
 			}
 
 			var cross = diff.Cross(edge2);
-			var DdQxE2 = sign * ray.Direction.Dot(cross);
+			var DdQxE2 = sign * ray.direction.Dot(cross);
 			if (DdQxE2 >= 0) {
 				cross = edge1.Cross(diff);
-				var DdE1xQ = sign * ray.Direction.Dot(cross);
+				var DdE1xQ = sign * ray.direction.Dot(cross);
 				if (DdE1xQ >= 0) {
 					if (DdQxE2 + DdE1xQ <= DdN) {
 						// Line intersects triangle, check if ray does.

@@ -16,6 +16,24 @@ namespace RNumerics
 		[Key(2)]
 		public bool z;
 
+		[Exposed, IgnoreMember]
+		public bool X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public bool Y
+		{
+			get => y;
+			set => y = value;
+		}
+		[Exposed, IgnoreMember]
+		public bool Z
+		{
+			get => z;
+			set => z = value;
+		}
 		public Vector3b() {
 			x = false;
 			y = false;
@@ -26,9 +44,9 @@ namespace RNumerics
 		public Vector3b(in bool x, in bool y, in bool z) { this.x = x; this.y = y; this.z = z; }
 		public Vector3b(in bool[] v3) { x = v3[0]; y = v3[1]; z = v3[2]; }
 
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3b True = new(true, true, true);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3b False = new(false, false, false);
 		[IgnoreMember]
 		public bool this[in int key]

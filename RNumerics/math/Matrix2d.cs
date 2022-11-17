@@ -16,11 +16,37 @@ namespace RNumerics
 		[Key(3)]
 		public double m11;
 
-		[IgnoreMember]
+
+		[Exposed, IgnoreMember]
+		public double M00
+		{
+			get => m00;
+			set => m00 = value;
+		}
+		[Exposed, IgnoreMember]
+		public double M01
+		{
+			get => m01;
+			set => m01 = value;
+		}
+		[Exposed, IgnoreMember]
+		public double M10
+		{
+			get => m10;
+			set => m10 = value;
+		}
+		[Exposed, IgnoreMember]
+		public double M11
+		{
+			get => m11;
+			set => m11 = value;
+		}
+
+		[Exposed,IgnoreMember]
 		public static readonly Matrix2d Identity = new(true);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		public static readonly Matrix2d Zero = new(false);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		public static readonly Matrix2d One = new(1, 1, 1, 1);
 		public Matrix2d() {
 		}

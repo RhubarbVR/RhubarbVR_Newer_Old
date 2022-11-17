@@ -13,6 +13,18 @@ namespace RNumerics
 		[Key(1)]
 		public double b;
 
+		[Exposed, IgnoreMember]
+		public double A
+		{
+			get => a;
+			set => a = value;
+		}
+		[Exposed, IgnoreMember]
+		public double B
+		{
+			get => b;
+			set => b = value;
+		}
 		public Interval1d(in double f) { a = b = f; }
 		public Interval1d(in double x, in double y) { a = x; b = y; }
 		public Interval1d(in double[] v2) { a = v2[0]; b = v2[1]; }
@@ -21,11 +33,11 @@ namespace RNumerics
 		public Interval1d(in float[] v2) { a = v2[0]; b = v2[1]; }
 		public Interval1d(in Interval1d copy) { a = copy.a; b = copy.b; }
 
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Interval1d Zero = new(0.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Interval1d Empty = new(double.MaxValue, -double.MaxValue);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Interval1d Infinite = new(-double.MaxValue, double.MaxValue);
 
 

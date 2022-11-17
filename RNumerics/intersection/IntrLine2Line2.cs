@@ -57,19 +57,19 @@ namespace RNumerics
 
 			// [RMS] if either line direction is not a normalized vector, 
 			//   results are garbage, so fail query
-			if (_line1.Direction.IsNormalized == false || _line2.Direction.IsNormalized == false) {
+			if (_line1.direction.IsNormalized == false || _line2.direction.IsNormalized == false) {
 				Type = IntersectionType.Empty;
 				Result = IntersectionResult.InvalidQuery;
 				return false;
 			}
 
 			var s = Vector2d.Zero;
-			Type = Classify(_line1.Origin, _line1.Direction,
-							_line2.Origin, _line2.Direction, _dotThresh, ref s);
+			Type = Classify(_line1.origin, _line1.direction,
+							_line2.origin, _line2.direction, _dotThresh, ref s);
 
 			if (Type == IntersectionType.Point) {
 				Quantity = 1;
-				Point = _line1.Origin + (s.x * _line1.Direction);
+				Point = _line1.origin + (s.x * _line1.direction);
 				Segment1Parameter = s.x;
 				Segment2Parameter = s.y;
 			}

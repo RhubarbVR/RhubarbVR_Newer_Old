@@ -15,7 +15,7 @@ namespace RNumerics
 		public static List<Vector2d> BoundedRegularTiling2(in AxisAlignedBox2d element, in AxisAlignedBox2d bounds,
 														   in double spacing)
 		{
-            var oshift = -element.Min;
+            var oshift = -element.min;
             var w = element.Width;
             var h = element.Height;
 
@@ -40,7 +40,7 @@ namespace RNumerics
 				for (var xi = 0; xi < nx; ++xi)
 				{
                     var dx = (xi * w) + (xi * spacing);
-					translations.Add(new Vector2d(dx, dy) + oshift + bounds.Min);
+					translations.Add(new Vector2d(dx, dy) + oshift + bounds.min);
 				}
 			}
 
@@ -59,7 +59,7 @@ namespace RNumerics
 		public static List<Vector2d> BoundedCircleTiling2(in AxisAlignedBox2d element, in AxisAlignedBox2d bounds,
 															 in double spacing)
 		{
-			var oshift = -element.Min;
+			var oshift = -element.min;
 			var w = element.Width;
 			var h = element.Height;
 			if (MathUtil.EpsilonEqual(w, h, MathUtil.EPSILONF) == false)
@@ -129,7 +129,7 @@ namespace RNumerics
 				for (var xi = 0; xi < nx; ++xi)
 				{
                     var dx = shiftx + (xi * stepx) + (xi * spacingx);
-					translations.Add(new Vector2d(dx, dy) + oshift + bounds.Min);
+					translations.Add(new Vector2d(dx, dy) + oshift + bounds.min);
 				}
 			}
 

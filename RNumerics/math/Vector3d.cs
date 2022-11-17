@@ -16,6 +16,24 @@ namespace RNumerics
 		[Key(2)]
 		public double z;
 
+		[Exposed, IgnoreMember]
+		public double X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public double Y
+		{
+			get => y;
+			set => y = value;
+		}
+		[Exposed, IgnoreMember]
+		public double Z
+		{
+			get => z;
+			set => z = value;
+		}
 		public Vector3d() {
 			x = 0;
 			y = 0;
@@ -32,19 +50,19 @@ namespace RNumerics
 		public Vector3d(in double[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; }
 		public Vector3d(in Vector3d copy) { x = copy.x; y = copy.y; z = copy.z; }
 		public Vector3d(in Vector3f copy) { x = copy.x; y = copy.y; z = copy.z; }
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3d Zero = new(0.0f, 0.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3d One = new(1.0f, 1.0f, 1.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3d AxisX = new(1.0f, 0.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3d AxisY = new(0.0f, 1.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3d AxisZ = new(0.0f, 0.0f, 1.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3d MaxValue = new(double.MaxValue, double.MaxValue, double.MaxValue);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3d MinValue = new(double.MinValue, double.MinValue, double.MinValue);
 		[IgnoreMember]
 		public double this[in int key]

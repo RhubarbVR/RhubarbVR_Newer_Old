@@ -16,6 +16,26 @@ namespace RNumerics
 		public float y;
 		[Key(2)]
 		public float z;
+
+		[Exposed, IgnoreMember]
+		public float X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public float Y
+		{
+			get => y;
+			set => y = value;
+		}
+		[Exposed, IgnoreMember]
+		public float Z
+		{
+			get => z;
+			set => z = value;
+		}
+
 		[IgnoreMember]
 		public float Magnitude => (float)Math.Sqrt((x * x) + (y * y) + (z * z));
 
@@ -41,44 +61,44 @@ namespace RNumerics
 		}
 
 		public Vector3f(in Vector3d copy) { x = (float)copy.x; y = (float)copy.y; z = (float)copy.z; }
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		public static readonly Vector3f Zero = new(0.0f, 0.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3f One = new(1.0f, 1.0f, 1.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3f OneNormalized = new Vector3f(1.0f, 1.0f, 1.0f).Normalized;
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3f Invalid = new(float.MaxValue, float.MaxValue, float.MaxValue);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3f AxisX = new(1.0f, 0.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3f AxisY = new(0.0f, 1.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3f AxisZ = new(0.0f, 0.0f, 1.0f);
 
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3f AxisXY = new(1.0f, 1.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3f AxisYZ = new(0.0f, 1.0f, 1.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3f AxisZX = new(1.0f, 0.0f, 1.0f);
 
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3f MaxValue = new(float.MaxValue, float.MaxValue, float.MaxValue);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3f MinValue = new(float.MinValue, float.MinValue, float.MinValue);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		/// <summary>A vector representing the up axis. In StereoKit, this is
 		/// the same as `new Vec3(0,1,0)`.</summary>
 		public static readonly Vector3f Up = new (0, 1, 0);
 
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		/// <summary>StereoKit uses a right-handed coordinate system, which
 		/// means that forward is looking down the -Z axis! This value is the
 		/// same as `new Vec3(0,0,-1)`. This is NOT the same as UnitZ!
 		/// </summary>
 		public static readonly Vector3f Forward = new (0, 0, -1);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		/// <summary>When looking forward, this is the direction to the 
 		/// right! In StereoKit, this is the same as `new Vec3(1,0,0)`
 		/// </summary>

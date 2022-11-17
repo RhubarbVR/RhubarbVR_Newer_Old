@@ -89,8 +89,8 @@ namespace RNumerics
 				var seg = c.GetSegment(i);
 
 				// raycast to line bounding-sphere first (is this going ot be faster??)
-				var bHitBoundSphere = RayIntersection.SphereSigned(ray.Origin, ray.Direction,
-					seg.Center, seg.Extent + segRadius, out var fSphereHitT);
+				var bHitBoundSphere = RayIntersection.SphereSigned(ray.origin, ray.direction,
+					seg.center, seg.extent + segRadius, out var fSphereHitT);
 				if (bHitBoundSphere == false) {
 					continue;
 				}

@@ -431,8 +431,8 @@ namespace RNumerics
 		void SetBounds(in AxisAlignedBox2f bounds) {
 			_bounds = bounds;
 
-			_fXShift = (bounds.Min.x < 0) ? bounds.Min.x : -bounds.Min.x;
-			_fYShift = (bounds.Min.y < 0) ? bounds.Min.y : -bounds.Min.y;
+			_fXShift = (bounds.min.x < 0) ? bounds.min.x : -bounds.min.x;
+			_fYShift = (bounds.min.y < 0) ? bounds.min.y : -bounds.min.y;
 
 			_fScale = (bounds.Width > bounds.Height) ? bounds.Width : bounds.Height;
 

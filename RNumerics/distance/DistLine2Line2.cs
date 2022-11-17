@@ -57,16 +57,16 @@ namespace RNumerics
 				return DistanceSquared;
 			}
 
-			var diff = _line1.Origin - _line2.Origin;
-			var a01 = -_line1.Direction.Dot(_line2.Direction);
-			var b0 = diff.Dot(_line1.Direction);
+			var diff = _line1.origin - _line2.origin;
+			var a01 = -_line1.direction.Dot(_line2.direction);
+			var b0 = diff.Dot(_line1.direction);
 			var c = diff.LengthSquared;
 			var det = Math.Abs(1.0 - (a01 * a01));
 			double b1, s0, s1, sqrDist;
 
 			if (det >= MathUtil.ZERO_TOLERANCE) {
 				// Lines are not parallel.
-				b1 = -diff.Dot(_line2.Direction);
+				b1 = -diff.Dot(_line2.direction);
 				var invDet = ((double)1) / det;
 				s0 = ((a01 * b1) - b0) * invDet;
 				s1 = ((a01 * b0) - b1) * invDet;
@@ -85,9 +85,9 @@ namespace RNumerics
 			}
 
 			Line1Parameter = s0;
-			Line1Closest = _line1.Origin + (s0 * _line1.Direction);
+			Line1Closest = _line1.origin + (s0 * _line1.direction);
 			Line2Parameter = s1;
-			Line2Closest = _line2.Origin + (s1 * _line2.Direction);
+			Line2Closest = _line2.origin + (s1 * _line2.direction);
 
 			DistanceSquared = sqrDist;
 			return sqrDist;

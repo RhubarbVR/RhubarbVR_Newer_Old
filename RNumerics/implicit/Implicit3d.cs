@@ -92,17 +92,17 @@ namespace RNumerics
 			set {
 				_box = value;
 				_local_aabb = new AxisAlignedBox3d(
-					-Box.Extent.x, -Box.Extent.y, -Box.Extent.z,
-					Box.Extent.x, Box.Extent.y, Box.Extent.z);
+					-Box.extent.x, -Box.extent.y, -Box.extent.z,
+					Box.extent.x, Box.extent.y, Box.extent.z);
 				_bounds_aabb = _box.ToAABB();
 			}
 		}
 
 
 		public double Value(in Vector3d pt) {
-			var dx = (pt - Box.Center).Dot(Box.AxisX);
-			var dy = (pt - Box.Center).Dot(Box.AxisY);
-			var dz = (pt - Box.Center).Dot(Box.AxisZ);
+			var dx = (pt - Box.center).Dot(Box.axisX);
+			var dy = (pt - Box.center).Dot(Box.axisY);
+			var dz = (pt - Box.center).Dot(Box.axisZ);
 			return _local_aabb.SignedDistance(new Vector3d(dx, dy, dz));
 		}
 

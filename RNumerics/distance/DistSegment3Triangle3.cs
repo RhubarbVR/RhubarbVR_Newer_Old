@@ -52,13 +52,13 @@ namespace RNumerics
 				return DistanceSquared;
 			}
 
-			var line = new Line3d(_segment.Center, _segment.Direction);
+			var line = new Line3d(_segment.center, _segment.direction);
 			var queryLT = new DistLine3Triangle3(line, _triangle);
 			var sqrDist = queryLT.GetSquared();
 			SegmentParam = queryLT.LineParam;
 
-			if (SegmentParam >= -_segment.Extent) {
-				if (SegmentParam <= _segment.Extent) {
+			if (SegmentParam >= -_segment.extent) {
+				if (SegmentParam <= _segment.extent) {
 					SegmentClosest = queryLT.LineClosest;
 					TriangleClosest = queryLT.TriangleClosest;
 					TriangleBaryCoords = queryLT.TriangleBaryCoords;
@@ -68,7 +68,7 @@ namespace RNumerics
 					var queryPT = new DistPoint3Triangle3(SegmentClosest, _triangle);
 					sqrDist = queryPT.GetSquared();
 					TriangleClosest = queryPT.TriangleClosest;
-					SegmentParam = _segment.Extent;
+					SegmentParam = _segment.extent;
 					TriangleBaryCoords = queryPT.TriangleBaryCoords;
 				}
 			}
@@ -77,7 +77,7 @@ namespace RNumerics
 				var queryPT = new DistPoint3Triangle3(SegmentClosest, _triangle);
 				sqrDist = queryPT.GetSquared();
 				TriangleClosest = queryPT.TriangleClosest;
-				SegmentParam = -_segment.Extent;
+				SegmentParam = -_segment.extent;
 				TriangleBaryCoords = queryPT.TriangleBaryCoords;
 			}
 

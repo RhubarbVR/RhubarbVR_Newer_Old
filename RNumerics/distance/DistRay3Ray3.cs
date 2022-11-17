@@ -60,16 +60,16 @@ namespace RNumerics
 				return DistanceSquared;
 			}
 
-			var diff = _ray1.Origin - _ray2.Origin;
-			var a01 = -_ray1.Direction.Dot(_ray2.Direction);
-			var b0 = diff.Dot(_ray1.Direction);
+			var diff = _ray1.origin - _ray2.origin;
+			var a01 = -_ray1.direction.Dot(_ray2.direction);
+			var b0 = diff.Dot(_ray1.direction);
 			var c = diff.LengthSquared;
 			var det = Math.Abs(1.0 - (a01 * a01));
 			double b1, s0, s1, sqrDist;
 
 			if (det >= MathUtil.ZERO_TOLERANCE) {
 				// Rays are not parallel.
-				b1 = -diff.Dot(_ray2.Direction);
+				b1 = -diff.Dot(_ray2.direction);
 				s0 = (a01 * b1) - b0;
 				s1 = (a01 * b0) - b1;
 
@@ -143,7 +143,7 @@ namespace RNumerics
 				else {
 					// Same direction vectors.
 					if (b0 >= 0) {
-						b1 = -diff.Dot(_ray2.Direction);
+						b1 = -diff.Dot(_ray2.direction);
 						s0 = 0;
 						s1 = -b1;
 						sqrDist = (b1 * s1) + c;
@@ -156,8 +156,8 @@ namespace RNumerics
 				}
 			}
 
-			Ray1Closest = _ray1.Origin + (s0 * _ray1.Direction);
-			Ray2Closest = _ray2.Origin + (s1 * _ray2.Direction);
+			Ray1Closest = _ray1.origin + (s0 * _ray1.direction);
+			Ray2Closest = _ray2.origin + (s1 * _ray2.direction);
 			Ray1Parameter = s0;
 			Ray2Parameter = s1;
 

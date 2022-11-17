@@ -50,7 +50,7 @@ namespace RNumerics
 			}
 
 			// Work in the box's coordinate system.
-			var diff = _point - _box.Center;
+			var diff = _point - _box.center;
 
 			// Compute squared distance and closest point on box.
 			var sqrDistance = (double)0;
@@ -59,19 +59,19 @@ namespace RNumerics
 			int i;
 			for (i = 0; i < 2; ++i) {
 				closest[i] = diff.Dot(_box.Axis(i));
-				if (closest[i] < -_box.Extent[i]) {
-					delta = closest[i] + _box.Extent[i];
+				if (closest[i] < -_box.extent[i]) {
+					delta = closest[i] + _box.extent[i];
 					sqrDistance += delta * delta;
-					closest[i] = -_box.Extent[i];
+					closest[i] = -_box.extent[i];
 				}
-				else if (closest[i] > _box.Extent[i]) {
-					delta = closest[i] - _box.Extent[i];
+				else if (closest[i] > _box.extent[i]) {
+					delta = closest[i] - _box.extent[i];
 					sqrDistance += delta * delta;
-					closest[i] = _box.Extent[i];
+					closest[i] = _box.extent[i];
 				}
 			}
 
-			BoxClosest = _box.Center;
+			BoxClosest = _box.center;
 			for (i = 0; i < 2; ++i) {
 				BoxClosest += closest[i] * _box.Axis(i);
 			}

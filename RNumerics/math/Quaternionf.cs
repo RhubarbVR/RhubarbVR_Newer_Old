@@ -21,6 +21,31 @@ namespace RNumerics
 		public float z;
 		[Key(0)]
 		public float w;
+
+		[Exposed, IgnoreMember]
+		public float X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public float Y
+		{
+			get => y;
+			set => y = value;
+		}
+		[Exposed, IgnoreMember]
+		public float Z
+		{
+			get => z;
+			set => z = value;
+		}
+		[Exposed, IgnoreMember]
+		public float W
+		{
+			get => w;
+			set => w = value;
+		}
 		public Quaternionf() {
 			x = 0f;
 			y = 0f;
@@ -66,21 +91,21 @@ namespace RNumerics
 			w = 1;
 			SetFromRotationMatrix(mat);
 		}
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Quaternionf Zero = new(0.0f, 0.0f, 0.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Quaternionf Identity = new(0.0f, 0.0f, 0.0f, 1.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Quaternionf Pitched = CreateFromEuler(0,90,0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Quaternionf Pitched180 = CreateFromEuler(0, 180, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Quaternionf Yawed = CreateFromEuler(90, 0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Quaternionf Yawed180 = CreateFromEuler(180, 0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Quaternionf Rolled = CreateFromEuler(0, 0, 90);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Quaternionf Rolled180 = CreateFromEuler(0, 0, 180);
 		[IgnoreMember]
 		public float this[in int key]

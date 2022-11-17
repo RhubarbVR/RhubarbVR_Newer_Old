@@ -18,6 +18,30 @@ namespace RNumerics
 		[Key(3)]
 		public double w;
 
+		[Exposed, IgnoreMember]
+		public double X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public double Y
+		{
+			get => y;
+			set => y = value;
+		}
+		[Exposed, IgnoreMember]
+		public double Z
+		{
+			get => z;
+			set => z = value;
+		}
+		[Exposed, IgnoreMember]
+		public double W
+		{
+			get => w;
+			set => w = value;
+		}
 		public Vector4d() {
 			x = 0;
 			y = 0;
@@ -29,9 +53,9 @@ namespace RNumerics
 		public Vector4d(in double x, in double y, in double z, in double w) { this.x = x; this.y = y; this.z = z; this.w = w; }
 		public Vector4d(in double[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
 		public Vector4d(in Vector4d copy) { x = copy.x; y = copy.y; z = copy.z; w = copy.w; }
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4d Zero = new(0.0f, 0.0f, 0.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4d One = new(1.0f, 1.0f, 1.0f, 1.0f);
 
 		[IgnoreMember]

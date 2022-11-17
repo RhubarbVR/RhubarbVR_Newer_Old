@@ -64,7 +64,7 @@ namespace RNumerics
 					Triangle1Closest = queryST.TriangleClosest;
 					sqrDist = sqrDistTmp;
 
-					ratio = queryST.SegmentParam / edge.Extent;
+					ratio = queryST.SegmentParam / edge.extent;
 					Triangle0BaryCoords = Vector3d.Zero;
 					Triangle0BaryCoords[i0] = 0.5 * (1 - ratio);
 					Triangle0BaryCoords[i1] = 1 - Triangle0BaryCoords[i0];
@@ -89,7 +89,7 @@ namespace RNumerics
 					Triangle1Closest = queryST.TriangleClosest;
 					sqrDist = sqrDistTmp;
 
-					ratio = queryST.SegmentParam / edge.Extent;
+					ratio = queryST.SegmentParam / edge.extent;
 					Triangle1BaryCoords = Vector3d.Zero;
 					Triangle1BaryCoords[i0] = 0.5 * (1 - ratio);
 					Triangle1BaryCoords[i1] = 1 - Triangle1BaryCoords[i0];

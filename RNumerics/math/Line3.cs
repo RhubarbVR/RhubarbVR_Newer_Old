@@ -9,46 +9,59 @@ namespace RNumerics
 	public struct Line3d
 	{
 		[Key(0)]
-		public Vector3d Origin;
+		public Vector3d origin;
 		[Key(1)]
-		public Vector3d Direction;
+		public Vector3d direction;
+
+		[Exposed, IgnoreMember]
+		public Vector3d Origin
+		{
+			get => origin;
+			set => origin = value;
+		}
+		[Exposed, IgnoreMember]
+		public Vector3d Direction
+		{
+			get => direction;
+			set => direction = value;
+		}
 		public Line3d() {
-			Origin = Vector3d.Zero;
-			Direction = Vector3d.Zero;
+			origin = Vector3d.Zero;
+			direction = Vector3d.Zero;
 		}
 		public Line3d(in Vector3d origin, in Vector3d direction)
 		{
-			Origin = origin;
-			Direction = direction;
+			this.origin = origin;
+			this.direction = direction;
 		}
 
 		// parameter is distance along Line
 		public Vector3d PointAt(in double d)
 		{
-			return Origin + (d * Direction);
+			return origin + (d * direction);
 		}
 
 		public double Project(in Vector3d p)
 		{
-			return (p - Origin).Dot(Direction);
+			return (p - origin).Dot(direction);
 		}
 
 		public double DistanceSquared(in Vector3d p)
 		{
-			var t = (p - Origin).Dot(Direction);
-			var proj = Origin + (t * Direction);
+			var t = (p - origin).Dot(direction);
+			var proj = origin + (t * direction);
 			return (proj - p).LengthSquared;
 		}
 
 		public Vector3d ClosestPoint(in Vector3d p)
 		{
-			var t = (p - Origin).Dot(Direction);
-			return Origin + (t * Direction);
+			var t = (p - origin).Dot(direction);
+			return origin + (t * direction);
 		}
 
 		// conversion operators
 		public static implicit operator Line3d(in Line3f v) => new (v.Origin, v.Direction);
-		public static explicit operator Line3f(in Line3d v) => new ((Vector3f)v.Origin, (Vector3f)v.Direction);
+		public static explicit operator Line3f(in Line3d v) => new ((Vector3f)v.origin, (Vector3f)v.direction);
 
 
 	}

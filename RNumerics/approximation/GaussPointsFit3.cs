@@ -21,17 +21,17 @@ namespace RNumerics
 			// Compute the mean of the points.
 			var numPoints = 0;
 			foreach (var v in points) {
-				Box.Center += v;
+				Box.center += v;
 				numPoints++;
 			}
 			var invNumPoints = 1.0 / numPoints;
-			Box.Center *= invNumPoints;
+			Box.center *= invNumPoints;
 
 			// Compute the covariance matrix of the points.
 			double sumXX = (double)0, sumXY = (double)0, sumXZ = (double)0;
 			double sumYY = (double)0, sumYZ = (double)0, sumZZ = (double)0;
 			foreach (var p in points) {
-				var diff = p - Box.Center;
+				var diff = p - Box.center;
 				sumXX += diff[0] * diff[0];
 				sumXY += diff[0] * diff[1];
 				sumXZ += diff[0] * diff[2];
@@ -57,12 +57,12 @@ namespace RNumerics
 			foreach (var v in points) {
 				weights_itr.MoveNext();
 				var w = weights_itr.Current;
-				Box.Center += w * v;
+				Box.center += w * v;
 				weightSum += w;
 				numPoints++;
 			}
 			var invWeightDivide = 1.0 / weightSum;
-			Box.Center *= invWeightDivide;
+			Box.center *= invWeightDivide;
 
 			// Compute the covariance matrix of the points.
 			double sumXX = (double)0, sumXY = (double)0, sumXZ = (double)0;
@@ -72,7 +72,7 @@ namespace RNumerics
 				weights_itr.MoveNext();
 				var w = weights_itr.Current;
 				w *= w;
-				var diff = p - Box.Center;
+				var diff = p - Box.center;
 				sumXX += w * diff[0] * diff[0];
 				sumXY += w * diff[0] * diff[1];
 				sumXZ += w * diff[0] * diff[2];
@@ -105,11 +105,11 @@ namespace RNumerics
 			var iters = solver.Solve(matrix, SymmetricEigenSolver.SortType.Increasing);
 			ResultValid = iters is > 0 and < SymmetricEigenSolver.NO_CONVERGENCE;
 			if (ResultValid) {
-				Box.Extent = new Vector3d(solver.GetEigenvalues());
+				Box.extent = new Vector3d(solver.GetEigenvalues());
 				var evectors = solver.GetEigenvectors();
-				Box.AxisX = new Vector3d(evectors[0], evectors[1], evectors[2]);
-				Box.AxisY = new Vector3d(evectors[3], evectors[4], evectors[5]);
-				Box.AxisZ = new Vector3d(evectors[6], evectors[7], evectors[8]);
+				Box.axisX = new Vector3d(evectors[0], evectors[1], evectors[2]);
+				Box.axisY = new Vector3d(evectors[3], evectors[4], evectors[5]);
+				Box.axisZ = new Vector3d(evectors[6], evectors[7], evectors[8]);
 			}
 		}
 

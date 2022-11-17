@@ -18,6 +18,31 @@ namespace RNumerics
 		[Key(3)]
 		public bool w;
 
+		[Exposed, IgnoreMember]
+		public bool X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public bool Y
+		{
+			get => y;
+			set => y = value;
+		}
+		[Exposed, IgnoreMember]
+		public bool Z
+		{
+			get => z;
+			set => z = value;
+		}
+		[Exposed, IgnoreMember]
+		public bool W
+		{
+			get => w;
+			set => w = value;
+		}
+
 		public Vector4b() {
 			x = false;
 			y = false;
@@ -29,9 +54,9 @@ namespace RNumerics
 		public Vector4b(in bool x, in bool y, in bool z, in bool w) { this.x = x; this.y = y; this.z = z; this.w = w; }
 		public Vector4b(in bool[] v4) { x = v4[0]; y = v4[1]; z = v4[2]; w = v4[3]; }
 
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4b True = new(true, true, true, true);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4b False = new(false, false, false, false);
 
 		[IgnoreMember]

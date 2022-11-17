@@ -25,7 +25,7 @@ namespace RNumerics
 				for (var i = 0; i < 8; ++i)
 				{
 					vertices[i] = Box.Corner(i);
-					normals[i] = (Vector3f)(vertices[i] - Box.Center[i]).Normalized;
+					normals[i] = (Vector3f)(vertices[i] - Box.center[i]).Normalized;
 					uv[i] = square_uv[i % 4];      // what to do for UVs in this case ?!?
 				}
 				var ti = 0;
@@ -148,7 +148,7 @@ namespace RNumerics
 				var intvertices = new Vector3i[boxvertices.Length];
 				for (var k = 0; k < boxvertices.Length; ++k)
 				{
-					var v = boxvertices[k] - Box.Center;
+					var v = boxvertices[k] - Box.center;
 					intvertices[k] = new Vector3i(
 						v.x < 0 ? 0 : N - 1,
 						v.y < 0 ? 0 : N - 1,

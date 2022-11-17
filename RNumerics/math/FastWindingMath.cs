@@ -87,7 +87,7 @@ namespace RNumerics
 
 			// second-order LHS - integrated second-order area matrix (formula 26)
 			var centroid = new Vector3d(
-				(t.V0.x + t.V1.x + t.V2.x) / 3.0, (t.V0.y + t.V1.y + t.V2.y) / 3.0, (t.V0.z + t.V1.z + t.V2.z) / 3.0);
+				(t.v0.x + t.v1.x + t.v2.x) / 3.0, (t.v0.y + t.v1.y + t.v2.y) / 3.0, (t.v0.z + t.v1.z + t.v2.z) / 3.0);
 			var dcp = centroid - p;
 			var o2_lhs = new Matrix3d( dcp,  xn);
 			var order2 = xA * o2_lhs.InnerProduct( hessian);

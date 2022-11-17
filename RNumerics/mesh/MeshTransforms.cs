@@ -270,8 +270,8 @@ namespace RNumerics
 			for (var vid = 0; vid < NV; ++vid) {
 				if (mesh.IsVertex(vid)) {
 					var newPN = TransformF(mesh.GetVertex(vid), mesh.GetVertexNormal(vid));
-					mesh.SetVertex(vid, newPN.V0);
-					mesh.SetVertexNormal(vid, (Vector3f)newPN.V1);
+					mesh.SetVertex(vid, newPN.v0);
+					mesh.SetVertexNormal(vid, (Vector3f)newPN.v1);
 				}
 			}
 		}

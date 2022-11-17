@@ -19,17 +19,29 @@ namespace RNumerics
 		[Key(1)]
 		public int b;
 
+		[Exposed, IgnoreMember]
+		public int A
+		{
+			get => a;
+			set => a = value;
+		}
+		[Exposed, IgnoreMember]
+		public int B
+		{
+			get => b;
+			set => b = value;
+		}
 		public Interval1i(in int f) { a = b = f; }
 		public Interval1i(in int x, in int y) { a = x; b = y; }
 		public Interval1i(in int[] v2) { a = v2[0]; b = v2[1]; }
 		public Interval1i(in Interval1i copy) { a = copy.a; b = copy.b; }
 
 
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Interval1i Zero = new (0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Interval1i Empty = new (int.MaxValue, -int.MaxValue);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Interval1i Infinite = new (-int.MaxValue, int.MaxValue);
 
 		/// <summary> construct interval [0, N-1] </summary>
