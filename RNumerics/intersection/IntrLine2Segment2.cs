@@ -93,14 +93,14 @@ namespace RNumerics
 
 			// [RMS] if either segment direction is not a normalized vector, 
 			//   results are garbage, so fail query
-			if (_line.Direction.IsNormalized == false || _segment.Direction.IsNormalized == false) {
+			if (_line.direction.IsNormalized == false || _segment.Direction.IsNormalized == false) {
 				Type = IntersectionType.Empty;
 				Result = IntersectionResult.InvalidQuery;
 				return false;
 			}
 
 			var s = Vector2d.Zero;
-			Type = IntrLine2Line2.Classify(_line.Origin, _line.Direction,
+			Type = IntrLine2Line2.Classify(_line.origin, _line.direction,
 										   _segment.Center, _segment.Direction,
 										   _dotThresh, ref s);
 
@@ -109,7 +109,7 @@ namespace RNumerics
 				// Test whether the line-line intersection is on the segment.
 				if (Math.Abs(s[1]) <= _segment.Extent + _intervalThresh) {
 					Quantity = 1;
-					Point = _line.Origin + (s[0] * _line.Direction);
+					Point = _line.origin + (s[0] * _line.direction);
 					Parameter = s[0];
 				}
 				else {

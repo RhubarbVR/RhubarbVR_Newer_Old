@@ -64,10 +64,10 @@ namespace RNumerics
 				return DistanceSquared;
 			}
 
-			var diff = _ray.Origin - _segment.Center;
-			var a01 = -_ray.Direction.Dot(_segment.Direction);
-			var b0 = diff.Dot(_ray.Direction);
-			var b1 = -diff.Dot(_segment.Direction);
+			var diff = _ray.origin - _segment.center;
+			var a01 = -_ray.direction.Dot(_segment.direction);
+			var b0 = diff.Dot(_ray.direction);
+			var b1 = -diff.Dot(_segment.direction);
 			var c = diff.LengthSquared;
 			var det = Math.Abs(1 - (a01 * a01));
 			double s0, s1, sqrDist, extDet;
@@ -76,7 +76,7 @@ namespace RNumerics
 				// The Ray and Segment are not parallel.
 				s0 = (a01 * b1) - b0;
 				s1 = (a01 * b0) - b1;
-				extDet = _segment.Extent * det;
+				extDet = _segment.extent * det;
 
 				if (s0 >= 0) {
 					if (s1 >= -extDet) {
@@ -91,7 +91,7 @@ namespace RNumerics
 						}
 						else  // region 1
 						{
-							s1 = _segment.Extent;
+							s1 = _segment.extent;
 							s0 = -((a01 * s1) + b0);
 							if (s0 > 0) {
 								sqrDist = (-s0 * s0) + (s1 * (s1 + (2 * b1))) + c;
@@ -104,7 +104,7 @@ namespace RNumerics
 					}
 					else  // region 5
 					{
-						s1 = -_segment.Extent;
+						s1 = -_segment.extent;
 						s0 = -((a01 * s1) + b0);
 						if (s0 > 0) {
 							sqrDist = (-s0 * s0) + (s1 * (s1 + (2 * b1))) + c;
@@ -118,19 +118,19 @@ namespace RNumerics
 				else {
 					if (s1 <= -extDet)  // region 4
 					{
-						s0 = -((-a01 * _segment.Extent) + b0);
+						s0 = -((-a01 * _segment.extent) + b0);
 						if (s0 > 0) {
-							s1 = -_segment.Extent;
+							s1 = -_segment.extent;
 							sqrDist = (-s0 * s0) + (s1 * (s1 + (2 * b1))) + c;
 						}
 						else {
 							s0 = 0;
 							s1 = -b1;
-							if (s1 < -_segment.Extent) {
-								s1 = -_segment.Extent;
+							if (s1 < -_segment.extent) {
+								s1 = -_segment.extent;
 							}
-							else if (s1 > _segment.Extent) {
-								s1 = _segment.Extent;
+							else if (s1 > _segment.extent) {
+								s1 = _segment.extent;
 							}
 							sqrDist = (s1 * (s1 + (2 * b1))) + c;
 						}
@@ -139,29 +139,29 @@ namespace RNumerics
 					{
 						s0 = 0;
 						s1 = -b1;
-						if (s1 < -_segment.Extent) {
-							s1 = -_segment.Extent;
+						if (s1 < -_segment.extent) {
+							s1 = -_segment.extent;
 						}
-						else if (s1 > _segment.Extent) {
-							s1 = _segment.Extent;
+						else if (s1 > _segment.extent) {
+							s1 = _segment.extent;
 						}
 						sqrDist = (s1 * (s1 + (2 * b1))) + c;
 					}
 					else  // region 2
 					{
-						s0 = -((a01 * _segment.Extent) + b0);
+						s0 = -((a01 * _segment.extent) + b0);
 						if (s0 > 0) {
-							s1 = _segment.Extent;
+							s1 = _segment.extent;
 							sqrDist = (-s0 * s0) + (s1 * (s1 + (2 * b1))) + c;
 						}
 						else {
 							s0 = 0;
 							s1 = -b1;
-							if (s1 < -_segment.Extent) {
-								s1 = -_segment.Extent;
+							if (s1 < -_segment.extent) {
+								s1 = -_segment.extent;
 							}
-							else if (s1 > _segment.Extent) {
-								s1 = _segment.Extent;
+							else if (s1 > _segment.extent) {
+								s1 = _segment.extent;
 							}
 							sqrDist = (s1 * (s1 + (2 * b1))) + c;
 						}
@@ -172,11 +172,11 @@ namespace RNumerics
 				// Ray and Segment are parallel.
 				if (a01 > 0) {
 					// Opposite direction vectors.
-					s1 = -_segment.Extent;
+					s1 = -_segment.extent;
 				}
 				else {
 					// Same direction vectors.
-					s1 = _segment.Extent;
+					s1 = _segment.extent;
 				}
 
 				s0 = -((a01 * s1) + b0);
@@ -189,8 +189,8 @@ namespace RNumerics
 				}
 			}
 
-			RayClosest = _ray.Origin + (s0 * _ray.Direction);
-			SegmentClosest = _segment.Center + (s1 * _segment.Direction);
+			RayClosest = _ray.origin + (s0 * _ray.direction);
+			SegmentClosest = _segment.center + (s1 * _segment.direction);
 			RayParameter = s0;
 			SegmentParameter = s1;
 
@@ -212,10 +212,10 @@ namespace RNumerics
 		/// </summary>
 		public static double SquaredDistance(in Ray3d ray, in Segment3d segment,
 			out double rayT, out double segT) {
-			var diff = ray.Origin - segment.Center;
-			var a01 = -ray.Direction.Dot(segment.Direction);
-			var b0 = diff.Dot(ray.Direction);
-			var b1 = -diff.Dot(segment.Direction);
+			var diff = ray.origin - segment.center;
+			var a01 = -ray.direction.Dot(segment.direction);
+			var b0 = diff.Dot(ray.direction);
+			var b1 = -diff.Dot(segment.direction);
 			var c = diff.LengthSquared;
 			var det = Math.Abs(1 - (a01 * a01));
 			double s0, s1, sqrDist, extDet;
@@ -224,7 +224,7 @@ namespace RNumerics
 				// The Ray and Segment are not parallel.
 				s0 = (a01 * b1) - b0;
 				s1 = (a01 * b0) - b1;
-				extDet = segment.Extent * det;
+				extDet = segment.extent * det;
 
 				if (s0 >= 0) {
 					if (s1 >= -extDet) {
@@ -239,7 +239,7 @@ namespace RNumerics
 						}
 						else  // region 1
 						{
-							s1 = segment.Extent;
+							s1 = segment.extent;
 							s0 = -((a01 * s1) + b0);
 							if (s0 > 0) {
 								sqrDist = (-s0 * s0) + (s1 * (s1 + (2 * b1))) + c;
@@ -252,7 +252,7 @@ namespace RNumerics
 					}
 					else  // region 5
 					{
-						s1 = -segment.Extent;
+						s1 = -segment.extent;
 						s0 = -((a01 * s1) + b0);
 						if (s0 > 0) {
 							sqrDist = (-s0 * s0) + (s1 * (s1 + (2 * b1))) + c;
@@ -266,19 +266,19 @@ namespace RNumerics
 				else {
 					if (s1 <= -extDet)  // region 4
 					{
-						s0 = -((-a01 * segment.Extent) + b0);
+						s0 = -((-a01 * segment.extent) + b0);
 						if (s0 > 0) {
-							s1 = -segment.Extent;
+							s1 = -segment.extent;
 							sqrDist = (-s0 * s0) + (s1 * (s1 + (2 * b1))) + c;
 						}
 						else {
 							s0 = 0;
 							s1 = -b1;
-							if (s1 < -segment.Extent) {
-								s1 = -segment.Extent;
+							if (s1 < -segment.extent) {
+								s1 = -segment.extent;
 							}
-							else if (s1 > segment.Extent) {
-								s1 = segment.Extent;
+							else if (s1 > segment.extent) {
+								s1 = segment.extent;
 							}
 							sqrDist = (s1 * (s1 + (2 * b1))) + c;
 						}
@@ -287,29 +287,29 @@ namespace RNumerics
 					{
 						s0 = 0;
 						s1 = -b1;
-						if (s1 < -segment.Extent) {
-							s1 = -segment.Extent;
+						if (s1 < -segment.extent) {
+							s1 = -segment.extent;
 						}
-						else if (s1 > segment.Extent) {
-							s1 = segment.Extent;
+						else if (s1 > segment.extent) {
+							s1 = segment.extent;
 						}
 						sqrDist = (s1 * (s1 + (2 * b1))) + c;
 					}
 					else  // region 2
 					{
-						s0 = -((a01 * segment.Extent) + b0);
+						s0 = -((a01 * segment.extent) + b0);
 						if (s0 > 0) {
-							s1 = segment.Extent;
+							s1 = segment.extent;
 							sqrDist = (-s0 * s0) + (s1 * (s1 + (2 * b1))) + c;
 						}
 						else {
 							s0 = 0;
 							s1 = -b1;
-							if (s1 < -segment.Extent) {
-								s1 = -segment.Extent;
+							if (s1 < -segment.extent) {
+								s1 = -segment.extent;
 							}
-							else if (s1 > segment.Extent) {
-								s1 = segment.Extent;
+							else if (s1 > segment.extent) {
+								s1 = segment.extent;
 							}
 							sqrDist = (s1 * (s1 + (2 * b1))) + c;
 						}
@@ -320,11 +320,11 @@ namespace RNumerics
 				// Ray and Segment are parallel.
 				if (a01 > 0) {
 					// Opposite direction vectors.
-					s1 = -segment.Extent;
+					s1 = -segment.extent;
 				}
 				else {
 					// Same direction vectors.
-					s1 = segment.Extent;
+					s1 = segment.extent;
 				}
 
 				s0 = -((a01 * s1) + b0);

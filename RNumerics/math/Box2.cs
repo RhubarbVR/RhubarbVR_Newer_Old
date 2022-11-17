@@ -13,58 +13,83 @@ namespace RNumerics
 		// A/ point X = C+y[0]*U[0]+y[1]*U[1] is inside or on the box whenever
 		// |y[i]| <= e[i] for all i.
 		[Key(0)]
-		public Vector2d Center;
+		public Vector2d center;
 		[Key(1)]
-		public Vector2d AxisX;
+		public Vector2d axisX;
 		[Key(2)]
-		public Vector2d AxisY;
+		public Vector2d axisY;
 		[Key(3)]
-		public Vector2d Extent;
+		public Vector2d extent;
+
+		[Exposed, IgnoreMember]
+		public Vector2d Center
+		{
+			get => center;
+			set => center = value;
+		}
+		[Exposed, IgnoreMember]
+		public Vector2d AxisX
+		{
+			get => axisX;
+			set => axisX = value;
+		}
+		[Exposed, IgnoreMember]
+		public Vector2d AxisY
+		{
+			get => axisY;
+			set => axisY = value;
+		}
+		[Exposed, IgnoreMember]
+		public Vector2d Extent
+		{
+			get => extent;
+			set => extent = value;
+		}
 
 		public Box2d() {
-			Center = Vector2d.Zero;
-			AxisX = Vector2d.Zero;
-			AxisY = Vector2d.Zero;
-			Extent = Vector2d.Zero;
+			center = Vector2d.Zero;
+			axisX = Vector2d.Zero;
+			axisY = Vector2d.Zero;
+			extent = Vector2d.Zero;
 		}
 
 		public Box2d(in Vector2d center) {
-			Center = center;
-			AxisX = Vector2d.AxisX;
-			AxisY = Vector2d.AxisY;
-			Extent = Vector2d.Zero;
+			this.center = center;
+			axisX = Vector2d.AxisX;
+			axisY = Vector2d.AxisY;
+			extent = Vector2d.Zero;
 		}
 		public Box2d(in Vector2d center, in Vector2d x, in Vector2d y, in Vector2d extent) {
-			Center = center;
-			AxisX = x;
-			AxisY = y;
-			Extent = extent;
+			this.center = center;
+			axisX = x;
+			axisY = y;
+			this.extent = extent;
 		}
 		public Box2d(in Vector2d center, in Vector2d extent) {
-			Center = center;
-			Extent = extent;
-			AxisX = Vector2d.AxisX;
-			AxisY = Vector2d.AxisY;
+			this.center = center;
+			this.extent = extent;
+			axisX = Vector2d.AxisX;
+			axisY = Vector2d.AxisY;
 		}
 		public Box2d(in AxisAlignedBox2d aaBox) {
-			Extent = 0.5 * aaBox.Diagonal;
-			Center = aaBox.Min + Extent;
-			AxisX = Vector2d.AxisX;
-			AxisY = Vector2d.AxisY;
+			extent = 0.5 * aaBox.Diagonal;
+			center = aaBox.min + extent;
+			axisX = Vector2d.AxisX;
+			axisY = Vector2d.AxisY;
 		}
 		public Box2d(in Segment2d seg) {
-			Center = seg.Center;
-			AxisX = seg.Direction;
-			AxisY = seg.Direction.Perp;
-			Extent = new Vector2d(seg.Extent, 0);
+			center = seg.Center;
+			axisX = seg.Direction;
+			axisY = seg.Direction.Perp;
+			extent = new Vector2d(seg.Extent, 0);
 		}
 
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		public static readonly Box2d Empty = new(Vector2d.Zero);
 
 
 		public Vector2d Axis(in int i) {
-			return (i == 0) ? AxisX : AxisY;
+			return (i == 0) ? axisX : axisY;
 		}
 
 
@@ -74,45 +99,45 @@ namespace RNumerics
 			return v;
 		}
 		public void ComputeVertices(in Vector2d[] vertex) {
-			var extAxis0 = Extent.x * AxisX;
-			var extAxis1 = Extent.y * AxisY;
-			vertex[0] = Center - extAxis0 - extAxis1;
-			vertex[1] = Center + extAxis0 - extAxis1;
-			vertex[2] = Center + extAxis0 + extAxis1;
-			vertex[3] = Center - extAxis0 + extAxis1;
+			var extAxis0 = extent.x * axisX;
+			var extAxis1 = extent.y * axisY;
+			vertex[0] = center - extAxis0 - extAxis1;
+			vertex[1] = center + extAxis0 - extAxis1;
+			vertex[2] = center + extAxis0 + extAxis1;
+			vertex[3] = center - extAxis0 + extAxis1;
 		}
 		public void ComputeVertices(ref Vector2dTuple4 vertex) {
-			var extAxis0 = Extent.x * AxisX;
-			var extAxis1 = Extent.y * AxisY;
-			vertex[0] = Center - extAxis0 - extAxis1;
-			vertex[1] = Center + extAxis0 - extAxis1;
-			vertex[2] = Center + extAxis0 + extAxis1;
-			vertex[3] = Center - extAxis0 + extAxis1;
+			var extAxis0 = extent.x * axisX;
+			var extAxis1 = extent.y * axisY;
+			vertex[0] = center - extAxis0 - extAxis1;
+			vertex[1] = center + extAxis0 - extAxis1;
+			vertex[2] = center + extAxis0 + extAxis1;
+			vertex[3] = center - extAxis0 + extAxis1;
 		}
 
 
 		// RNumerics extensions
 		[IgnoreMember]
-		public double MaxExtent => Math.Max(Extent.x, Extent.y);
+		public double MaxExtent => Math.Max(extent.x, extent.y);
 		[IgnoreMember]
-		public double MinExtent => Math.Min(Extent.x, Extent.y);
+		public double MinExtent => Math.Min(extent.x, extent.y);
 		[IgnoreMember]
 		public Vector2d Diagonal
 		{
 			get {
-				return (Extent.x * AxisX) + (Extent.y * AxisY) -
-			  ((-Extent.x * AxisX) - (Extent.y * AxisY));
+				return (extent.x * axisX) + (extent.y * axisY) -
+			  ((-extent.x * axisX) - (extent.y * axisY));
 			}
 		}
 		[IgnoreMember]
-		public double Area => 2 * Extent.x * 2 * Extent.y;
+		public double Area => 2 * extent.x * 2 * extent.y;
 
 		public void Contain(in Vector2d v) {
-			var lv = v - Center;
+			var lv = v - center;
 			for (var k = 0; k < 2; ++k) {
 				var t = lv.Dot(Axis(k));
-				if (Math.Abs(t) > Extent[k]) {
-					double min = -Extent[k], max = Extent[k];
+				if (Math.Abs(t) > extent[k]) {
+					double min = -extent[k], max = extent[k];
 					if (t < min) {
 						min = t;
 					}
@@ -120,8 +145,8 @@ namespace RNumerics
 						max = t;
 					}
 
-					Extent[k] = (max - min) * 0.5;
-					Center += (max + min) * 0.5 * Axis(k);
+					extent[k] = (max - min) * 0.5;
+					center += (max + min) * 0.5 * Axis(k);
 				}
 			}
 		}
@@ -136,22 +161,22 @@ namespace RNumerics
 		}
 
 		public bool Contains(in Vector2d v) {
-			var lv = v - Center;
-			return (Math.Abs(lv.Dot(AxisX)) <= Extent.x) &&
-				(Math.Abs(lv.Dot(AxisY)) <= Extent.y);
+			var lv = v - center;
+			return (Math.Abs(lv.Dot(axisX)) <= extent.x) &&
+				(Math.Abs(lv.Dot(axisY)) <= extent.y);
 		}
 
 		public void Expand(in double f) {
-			Extent += f;
+			extent += f;
 		}
 
 		public void Translate(in Vector2d v) {
-			Center += v;
+			center += v;
 		}
 
 		public void RotateAxes(in Matrix2d m) {
-			AxisX = m * AxisX;
-			AxisY = m * AxisY;
+			axisX = m * axisX;
+			axisY = m * axisY;
 		}
 
 
@@ -164,19 +189,19 @@ namespace RNumerics
 		/// </summary>
 		public double DistanceSquared(Vector2d v) {
 			// Work in the box's coordinate system.
-			v -= Center;
+			v -= center;
 
 			// Compute squared distance and closest point on box.
 			double sqrDistance = 0;
 			double delta, c, extent;
 			for (var i = 0; i < 2; ++i) {
 				if (i == 0) {
-					c = v.Dot(AxisX);
-					extent = Extent.x;
+					c = v.Dot(axisX);
+					extent = this.extent.x;
 				}
 				else {
-					c = v.Dot(AxisY);
-					extent = Extent.y;
+					c = v.Dot(axisY);
+					extent = this.extent.y;
 				}
 				if (c < -extent) {
 					delta = c + extent;
@@ -196,15 +221,15 @@ namespace RNumerics
 
 		public Vector2d ClosestPoint(in Vector2d v) {
 			// Work in the box's coordinate system.
-			var diff = v - Center;
+			var diff = v - center;
 
 			// Compute squared distance and closest point on box.
 			double sqrDistance = 0;
 			double delta;
 			var closest = new Vector2d();
 			for (var i = 0; i < 2; ++i) {
-				closest[i] = diff.Dot((i == 0) ? AxisX : AxisY);
-				var extent = (i == 0) ? Extent.x : Extent.y;
+				closest[i] = diff.Dot((i == 0) ? axisX : axisY);
+				var extent = (i == 0) ? this.extent.x : this.extent.y;
 				if (closest[i] < -extent) {
 					delta = closest[i] + extent;
 					sqrDistance += delta * delta;
@@ -217,7 +242,7 @@ namespace RNumerics
 				}
 			}
 
-			return Center + (closest.x * AxisX) + (closest.y * AxisY);
+			return center + (closest.x * axisX) + (closest.y * axisY);
 		}
 
 
@@ -230,21 +255,21 @@ namespace RNumerics
 				// The first guess at the box center.  This value will be updated later
 				// after the input box vertices are projected onto axes determined by an
 				// average of box axes.
-				Center = 0.5 * (box0.Center + box1.Center)
+				center = 0.5 * (box0.center + box1.center)
 			};
 
 			// The merged box axes are the averages of the input box axes.  The
 			// axes of the second box are negated, if necessary, so they form acute
 			// angles with the axes of the first box.
-			if (box0.AxisX.Dot(box1.AxisX) >= 0) {
-				box.AxisX = 0.5 * (box0.AxisX + box1.AxisX);
-				box.AxisX.Normalize();
+			if (box0.axisX.Dot(box1.axisX) >= 0) {
+				box.axisX = 0.5 * (box0.axisX + box1.axisX);
+				box.axisX.Normalize();
 			}
 			else {
-				box.AxisX = 0.5 * (box0.AxisX - box1.AxisX);
-				box.AxisX.Normalize();
+				box.axisX = 0.5 * (box0.axisX - box1.axisX);
+				box.axisX.Normalize();
 			}
-			box.AxisY = -box.AxisX.Perp;
+			box.axisY = -box.axisX.Perp;
 
 			// Project the input box vertices onto the merged-box axes.  Each axis
 			// D[i] containing the current center C has a minimum projected value
@@ -266,7 +291,7 @@ namespace RNumerics
 
 			box0.ComputeVertices(ref vertex);
 			for (i = 0; i < 4; ++i) {
-				diff = vertex[i] - box.Center;
+				diff = vertex[i] - box.center;
 				for (j = 0; j < 2; ++j) {
 					dot = diff.Dot(box.Axis(j));
 					if (dot > pmax[j]) {
@@ -280,7 +305,7 @@ namespace RNumerics
 
 			box1.ComputeVertices(ref vertex);
 			for (i = 0; i < 4; ++i) {
-				diff = vertex[i] - box.Center;
+				diff = vertex[i] - box.center;
 				for (j = 0; j < 2; ++j) {
 					dot = diff.Dot(box.Axis(j));
 					if (dot > pmax[j]) {
@@ -295,10 +320,10 @@ namespace RNumerics
 			// [min,max] is the axis-aligned box in the coordinate system of the
 			// merged box axes.  Update the current box center to be the center of
 			// the new box.  Compute the extents based on the new center.
-			box.Extent[0] = 0.5 * (pmax[0] - pmin[0]);
-			box.Extent[1] = 0.5 * (pmax[1] - pmin[1]);
-			box.Center += box.AxisX * (0.5 * (pmax[0] + pmin[0]));
-			box.Center += box.AxisY * (0.5 * (pmax[1] + pmin[1]));
+			box.extent[0] = 0.5 * (pmax[0] - pmin[0]);
+			box.extent[1] = 0.5 * (pmax[1] - pmin[1]);
+			box.center += box.axisX * (0.5 * (pmax[0] + pmin[0]));
+			box.center += box.axisY * (0.5 * (pmax[1] + pmin[1]));
 
 			return box;
 		}
@@ -312,8 +337,8 @@ namespace RNumerics
 
 
 
-		public static implicit operator Box2d(in Box2f v) => new(v.Center, v.AxisX, v.AxisY, v.Extent);
-		public static explicit operator Box2f(in Box2d v) => new((Vector2f)v.Center, (Vector2f)v.AxisX, (Vector2f)v.AxisY, (Vector2f)v.Extent);
+		public static implicit operator Box2d(in Box2f v) => new(v.center, v.axisX, v.axisY, v.extent);
+		public static explicit operator Box2f(in Box2d v) => new((Vector2f)v.center, (Vector2f)v.axisX, (Vector2f)v.axisY, (Vector2f)v.extent);
 
 
 	}
@@ -337,45 +362,69 @@ namespace RNumerics
 		// A/ point X = C+y[0]*U[0]+y[1]*U[1] is inside or on the box whenever
 		// |y[i]| <= e[i] for all i.
 		[Key(0)]
-		public Vector2f Center;
+		public Vector2f center;
 		[Key(1)]
-		public Vector2f AxisX;
+		public Vector2f axisX;
 		[Key(2)]
-		public Vector2f AxisY;
+		public Vector2f axisY;
 		[Key(3)]
-		public Vector2f Extent;
+		public Vector2f extent;
 
+		[Exposed, IgnoreMember]
+		public Vector2f Center
+		{
+			get => center;
+			set => center = value;
+		}
+		[Exposed, IgnoreMember]
+		public Vector2f AxisX
+		{
+			get => axisX;
+			set => axisX = value;
+		}
+		[Exposed, IgnoreMember]
+		public Vector2f AxisY
+		{
+			get => axisY;
+			set => axisY = value;
+		}
+		[Exposed, IgnoreMember]
+		public Vector2f Extent
+		{
+			get => extent;
+			set => extent = value;
+		}
 		public Box2f(in Vector2f center) {
-			Center = center;
-			AxisX = Vector2f.AxisX;
-			AxisY = Vector2f.AxisY;
-			Extent = Vector2f.Zero;
+			this.center = center;
+			axisX = Vector2f.AxisX;
+			axisY = Vector2f.AxisY;
+			extent = Vector2f.Zero;
 		}
 		public Box2f(in Vector2f center, in Vector2f x, in Vector2f y, in Vector2f extent) {
-			Center = center;
-			AxisX = x;
-			AxisY = y;
-			Extent = extent;
+			this.center = center;
+			axisX = x;
+			axisY = y;
+			this.extent = extent;
 		}
 		public Box2f(in Vector2f center, in Vector2f extent) {
-			Center = center;
-			Extent = extent;
-			AxisX = Vector2f.AxisX;
-			AxisY = Vector2f.AxisY;
+			this.center = center;
+			this.extent = extent;
+			axisX = Vector2f.AxisX;
+			axisY = Vector2f.AxisY;
 		}
 		public Box2f(in AxisAlignedBox2f aaBox) {
-			Extent = 0.5f * aaBox.Diagonal;
-			Center = aaBox.Min + Extent;
-			AxisX = Vector2f.AxisX;
-			AxisY = Vector2f.AxisY;
+			extent = 0.5f * aaBox.Diagonal;
+			center = aaBox.min + extent;
+			axisX = Vector2f.AxisX;
+			axisY = Vector2f.AxisY;
 		}
 
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		public static readonly Box2f Empty = new(Vector2f.Zero);
 
 
 		public Vector2f Axis(in int i) {
-			return (i == 0) ? AxisX : AxisY;
+			return (i == 0) ? axisX : axisY;
 		}
 
 
@@ -385,37 +434,37 @@ namespace RNumerics
 			return v;
 		}
 		public void ComputeVertices(in Vector2f[] vertex) {
-			var extAxis0 = Extent.x * AxisX;
-			var extAxis1 = Extent.y * AxisY;
-			vertex[0] = Center - extAxis0 - extAxis1;
-			vertex[1] = Center + extAxis0 - extAxis1;
-			vertex[2] = Center + extAxis0 + extAxis1;
-			vertex[3] = Center - extAxis0 + extAxis1;
+			var extAxis0 = extent.x * axisX;
+			var extAxis1 = extent.y * axisY;
+			vertex[0] = center - extAxis0 - extAxis1;
+			vertex[1] = center + extAxis0 - extAxis1;
+			vertex[2] = center + extAxis0 + extAxis1;
+			vertex[3] = center - extAxis0 + extAxis1;
 		}
 
 
 		// RNumerics extensions
 		[IgnoreMember]
-		public double MaxExtent => Math.Max(Extent.x, Extent.y);
+		public double MaxExtent => Math.Max(extent.x, extent.y);
 		[IgnoreMember]
-		public double MinExtent => Math.Min(Extent.x, Extent.y);
+		public double MinExtent => Math.Min(extent.x, extent.y);
 		[IgnoreMember]
 		public Vector2f Diagonal
 		{
 			get {
-				return (Extent.x * AxisX) + (Extent.y * AxisY) -
-			  ((-Extent.x * AxisX) - (Extent.y * AxisY));
+				return (extent.x * axisX) + (extent.y * axisY) -
+			  ((-extent.x * axisX) - (extent.y * axisY));
 			}
 		}
 		[IgnoreMember]
-		public double Area => 2 * Extent.x * 2 * Extent.y;
+		public double Area => 2 * extent.x * 2 * extent.y;
 
 		public void Contain(in Vector2f v) {
-			var lv = v - Center;
+			var lv = v - center;
 			for (var k = 0; k < 2; ++k) {
 				double t = lv.Dot(Axis(k));
-				if (Math.Abs(t) > Extent[k]) {
-					double min = -Extent[k], max = Extent[k];
+				if (Math.Abs(t) > extent[k]) {
+					double min = -extent[k], max = extent[k];
 					if (t < min) {
 						min = t;
 					}
@@ -423,8 +472,8 @@ namespace RNumerics
 						max = t;
 					}
 
-					Extent[k] = (float)(max - min) * 0.5f;
-					Center += (float)(max + min) * 0.5f * Axis(k);
+					extent[k] = (float)(max - min) * 0.5f;
+					center += (float)(max + min) * 0.5f * Axis(k);
 				}
 			}
 		}
@@ -439,18 +488,18 @@ namespace RNumerics
 		}
 
 		public bool Contains(in Vector2f v) {
-			var lv = v - Center;
-			return (Math.Abs(lv.Dot(AxisX)) <= Extent.x) &&
-				(Math.Abs(lv.Dot(AxisY)) <= Extent.y);
+			var lv = v - center;
+			return (Math.Abs(lv.Dot(axisX)) <= extent.x) &&
+				(Math.Abs(lv.Dot(axisY)) <= extent.y);
 		}
 
 
 		public void Expand(in float f) {
-			//Extent += f;
+			extent += f;
 		}
 
 		public void Translate(in Vector2f v) {
-			Center += v;
+			center += v;
 		}
 
 	}

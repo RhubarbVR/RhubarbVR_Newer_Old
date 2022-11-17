@@ -44,21 +44,21 @@ namespace RNumerics
 
 		public static explicit operator Vector2f(in Vector2i v) => new(v.x, v.y);
 
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2f Zero = new(0.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2f Inf = new(float.PositiveInfinity, float.PositiveInfinity);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2f NInf = new(float.NegativeInfinity, float.NegativeInfinity);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2f One = new(1.0f, 1.0f);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2f AxisX = new(1.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2f AxisY = new(0.0f, 1.0f);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2f MaxValue = new(float.MaxValue, float.MaxValue);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2f MinValue = new(float.MinValue, float.MinValue);
 		public bool IsInBox(in Vector2f min, in Vector2f check) {
 			return check.y >= min.y && check.y <= y && check.x >= min.x && check.x <= x;

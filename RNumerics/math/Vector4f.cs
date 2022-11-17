@@ -17,6 +17,32 @@ namespace RNumerics
 		public float z;
 		[Key(3)]
 		public float w;
+
+		[Exposed, IgnoreMember]
+		public float X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public float Y
+		{
+			get => y;
+			set => y = value;
+		}
+		[Exposed, IgnoreMember]
+		public float Z
+		{
+			get => z;
+			set => z = value;
+		}
+		[Exposed, IgnoreMember]
+		public float W
+		{
+			get => w;
+			set => w = value;
+		}
+
 		public Vector4f() {
 			x = 0f;
 			y = 0f;
@@ -32,9 +58,9 @@ namespace RNumerics
 		public Vector4f(in float x, in float y, in float z, in float w) { this.x = x; this.y = y; this.z = z; this.w = w; }
 		public Vector4f(in float[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
 		public Vector4f(in Vector4f copy) { x = copy.x; y = copy.y; z = copy.z; w = copy.w; }
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		public static readonly Vector4f Zero = new(0.0f, 0.0f, 0.0f, 0.0f);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		public static readonly Vector4f One = new(1.0f, 1.0f, 1.0f, 1.0f);
 
 		[IgnoreMember]

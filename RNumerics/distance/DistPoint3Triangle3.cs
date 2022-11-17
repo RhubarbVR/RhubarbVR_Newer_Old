@@ -56,9 +56,9 @@ namespace RNumerics
 
 
 		public static double DistanceSqr(ref Vector3d point, ref Triangle3d triangle, out Vector3d closestPoint, out Vector3d baryCoords) {
-			var diff = triangle.V0 - point;
-			var edge0 = triangle.V1 - triangle.V0;
-			var edge1 = triangle.V2 - triangle.V0;
+			var diff = triangle.v0 - point;
+			var edge0 = triangle.v1 - triangle.v0;
+			var edge1 = triangle.v2 - triangle.v0;
 			var a00 = edge0.LengthSquared;
 			var a01 = edge0.Dot( edge1);
 			var a11 = edge1.LengthSquared;
@@ -241,7 +241,7 @@ namespace RNumerics
 					}
 				}
 			}
-			closestPoint = triangle.V0 + (s * edge0) + (t * edge1);
+			closestPoint = triangle.v0 + (s * edge0) + (t * edge1);
 			baryCoords = new Vector3d(1 - s - t, s, t);
 
 			// Account for numerical round-off error.

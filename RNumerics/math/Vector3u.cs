@@ -22,6 +22,24 @@ namespace RNumerics
 		[Key(2)]
 		public uint z;
 
+		[Exposed, IgnoreMember]
+		public uint X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public uint Y
+		{
+			get => y;
+			set => y = value;
+		}
+		[Exposed, IgnoreMember]
+		public uint Z
+		{
+			get => z;
+			set => z = value;
+		}
 		public Vector3u() {
 			x = 0;
 			y = 0;
@@ -34,15 +52,15 @@ namespace RNumerics
 		public Vector3u(in uint f) { x = y = z = f; }
 		public Vector3u(in uint x, in uint y, in uint z) { this.x = x; this.y = y; this.z = z; }
 		public Vector3u(in uint[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; }
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3u Zero = new(0, 0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3u One = new(1, 1, 1);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3u AxisX = new(1, 0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3u AxisY = new(0, 1, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector3u AxisZ = new(0, 0, 1);
 
 		[IgnoreMember]

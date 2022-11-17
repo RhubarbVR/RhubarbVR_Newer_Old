@@ -12,6 +12,18 @@ namespace RNumerics
 		[Key(1)]
 		public uint y;
 
+		[Exposed, IgnoreMember]
+		public uint X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public uint Y
+		{
+			get => y;
+			set => y = value;
+		}
 		public Vector2u() {
 			x = 0;
 			y = 0;
@@ -20,13 +32,13 @@ namespace RNumerics
 		public Vector2u(in uint f) { x = y = f; }
 		public Vector2u(in uint x, in uint y) { this.x = x; this.y = y; }
 		public Vector2u(in uint[] v2) { x = v2[0]; y = v2[1]; }
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector2u Zero = new(0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector2u One = new(1, 1);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector2u AxisX = new(1, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector2u AxisY = new(0, 1);
 		[IgnoreMember]
 		public uint this[in uint key]

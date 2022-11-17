@@ -24,6 +24,30 @@ namespace RNumerics
 		[Key(3)]
 		public int w;
 
+		[Exposed, IgnoreMember]
+		public int X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public int Y
+		{
+			get => y;
+			set => y = value;
+		}
+		[Exposed, IgnoreMember]
+		public int Z
+		{
+			get => z;
+			set => z = value;
+		}
+		[Exposed, IgnoreMember]
+		public int W
+		{
+			get => w;
+			set => w = value;
+		}
 		public Vector4i() {
 			x = 0;
 			y = 0;
@@ -35,17 +59,17 @@ namespace RNumerics
 		public Vector4i(in int x, in int y, in int z, in int w) { this.x = x; this.y = y; this.z = z; this.w = w; }
 		public Vector4i(in int[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
 
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4i Zero = new(0, 0, 0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4i One = new(1, 1, 1, 1);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4i AxisX = new(1, 0, 0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4i AxisY = new(0, 1, 0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4i AxisZ = new(0, 0, 1, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4i AxisW = new(0, 0, 0, 1);
 
 		[IgnoreMember]

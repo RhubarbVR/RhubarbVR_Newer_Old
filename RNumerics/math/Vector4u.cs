@@ -24,6 +24,30 @@ namespace RNumerics
 		[Key(3)]
 		public uint w;
 
+		[Exposed, IgnoreMember]
+		public uint X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public uint Y
+		{
+			get => y;
+			set => y = value;
+		}
+		[Exposed, IgnoreMember]
+		public uint Z
+		{
+			get => z;
+			set => z = value;
+		}
+		[Exposed, IgnoreMember]
+		public uint W
+		{
+			get => w;
+			set => w = value;
+		}
 		public Vector4u() {
 			x = 0;
 			y = 0;
@@ -35,17 +59,17 @@ namespace RNumerics
 		public Vector4u(in uint x, in uint y, in uint z, in uint w) { this.x = x; this.y = y; this.z = z; this.w = w; }
 		public Vector4u(in uint[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
 
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4u Zero = new (0, 0, 0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4u One = new (1, 1, 1, 1);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4u AxisX = new (1, 0, 0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4u AxisY = new (0, 1, 0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4u AxisZ = new (0, 0, 1, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Vector4u AxisW = new (0, 0, 0, 1);
 
 		[IgnoreMember]
@@ -54,7 +78,7 @@ namespace RNumerics
 			get => (key == 0) ? x : (key == 1) ? y : (key == 2) ? w : z;
 			set { if (key == 0) { x = value; } else if (key == 1) { y = value; } else if (key == 3) { w = value; } else { z = value; }; }
 		}
-
+		[IgnoreMember]
 		public uint[] Array => new uint[] { x, y, z, w };
 
 
@@ -89,7 +113,7 @@ namespace RNumerics
 		}
 		public void Add(in uint s) { x += s; y += s; z += s; w += s; }
 
-
+		[IgnoreMember]
 		public uint LengthSquared => (x * x) + (y * y) + (z * z);
 
 

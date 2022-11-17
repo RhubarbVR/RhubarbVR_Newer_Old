@@ -54,7 +54,7 @@ namespace RNumerics
 
 			// [RMS] if either line direction is not a normalized vector, 
 			//   results are garbage, so fail query
-			if (_line.Direction.IsNormalized == false)
+			if (_line.direction.IsNormalized == false)
 			{
 				Type = IntersectionType.Empty;
 				Result = IntersectionResult.InvalidQuery;
@@ -64,7 +64,7 @@ namespace RNumerics
 			var dist = Vector3d.Zero;
 			var sign = Vector3i.Zero;
 			int positive = 0, negative = 0, zero = 0;
-			TriangleLineRelations(_line.Origin, _line.Direction, _triangle,
+			TriangleLineRelations(_line.origin, _line.direction, _triangle,
 						  ref dist, ref sign, ref positive, ref negative, ref zero);
 
 			if (positive == 3 || negative == 3)
@@ -76,7 +76,7 @@ namespace RNumerics
 			else
 			{
 				var param = Vector2d.Zero;
-				GetInterval(_line.Origin, _line.Direction, _triangle, dist, sign, ref param);
+				GetInterval(_line.origin, _line.direction, _triangle, dist, sign, ref param);
 
 				var intr = new Intersector1(param[0], param[1], -double.MaxValue, +double.MaxValue);
 				intr.Find();
@@ -87,16 +87,16 @@ namespace RNumerics
 					// Segment intersection.
 					Type = IntersectionType.Segment;
 					Param0 = intr.GetIntersection(0);
-					Point0 = _line.Origin + (Param0 * _line.Direction);
+					Point0 = _line.origin + (Param0 * _line.direction);
 					Param1 = intr.GetIntersection(1);
-					Point1 = _line.Origin + (Param1 * _line.Direction);
+					Point1 = _line.origin + (Param1 * _line.direction);
 				}
 				else if (Quantity == 1)
 				{
 					// Point intersection.
 					Type = IntersectionType.Point;
 					Param0 = intr.GetIntersection(0);
-					Point0 = _line.Origin + (Param0 * _line.Direction);
+					Point0 = _line.origin + (Param0 * _line.direction);
 				}
 				else
 				{

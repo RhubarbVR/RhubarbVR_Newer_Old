@@ -14,6 +14,25 @@ namespace RNumerics
 		[Key(2)]
 		public int c;
 
+		[Exposed, IgnoreMember]
+		public int A
+		{
+			get => a;
+			set => a = value;
+		}
+		[Exposed, IgnoreMember]
+		public int B
+		{
+			get => b;
+			set => b = value;
+		}
+		[Exposed, IgnoreMember]
+		public int C
+		{
+			get => c;
+			set => c = value;
+		}
+
 		public Index3i() {
 			a = 0;
 			b = 0;
@@ -32,13 +51,13 @@ namespace RNumerics
 			else { b = jj; c = kk; }
 		}
 
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Index3i Zero = new(0, 0, 0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Index3i One = new(1, 1, 1);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Index3i Max = new(int.MaxValue, int.MaxValue, int.MaxValue);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Index3i Min = new(int.MinValue, int.MinValue, int.MinValue);
 
 

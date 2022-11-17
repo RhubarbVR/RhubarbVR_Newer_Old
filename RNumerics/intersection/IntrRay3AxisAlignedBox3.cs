@@ -50,7 +50,7 @@ namespace RNumerics
 
 			// [RMS] if either line direction is not a normalized vector, 
 			//   results are garbage, so fail query
-			if (_ray.Direction.IsNormalized == false) {
+			if (_ray.direction.IsNormalized == false) {
 				Type = IntersectionType.Empty;
 				Result = IntersectionResult.InvalidQuery;
 				return false;
@@ -58,7 +58,7 @@ namespace RNumerics
 
 			RayParam0 = 0.0;
 			RayParam1 = double.MaxValue;
-			IntrLine3AxisAlignedBox3.DoClipping(ref RayParam0, ref RayParam1, ref _ray.Origin, ref _ray.Direction, ref _box,
+			IntrLine3AxisAlignedBox3.DoClipping(ref RayParam0, ref RayParam1, ref _ray.origin, ref _ray.direction, ref _box,
 					  true, ref Quantity, ref Point0, ref Point1, ref Type);
 
 			Result = (Type != IntersectionType.Empty) ?
@@ -84,10 +84,10 @@ namespace RNumerics
 			var ADdU = Vector3d.Zero;
 			double RHS;
 
-			var diff = ray.Origin - box.Center;
+			var diff = ray.origin - box.Center;
 			var extent = box.Extents + expandExtents;
 
-			WdU.x = ray.Direction.x; // ray.Direction.Dot(Vector3d.AxisX);
+			WdU.x = ray.direction.x; // ray.Direction.Dot(Vector3d.AxisX);
 			AWdU.x = Math.Abs(WdU.x);
 			DdU.x = diff.x; // diff.Dot(Vector3d.AxisX);
 			ADdU.x = Math.Abs(DdU.x);
@@ -95,7 +95,7 @@ namespace RNumerics
 				return false;
 			}
 
-			WdU.y = ray.Direction.y; // ray.Direction.Dot(Vector3d.AxisY);
+			WdU.y = ray.direction.y; // ray.Direction.Dot(Vector3d.AxisY);
 			AWdU.y = Math.Abs(WdU.y);
 			DdU.y = diff.y; // diff.Dot(Vector3d.AxisY);
 			ADdU.y = Math.Abs(DdU.y);
@@ -103,7 +103,7 @@ namespace RNumerics
 				return false;
 			}
 
-			WdU.z = ray.Direction.z; // ray.Direction.Dot(Vector3d.AxisZ);
+			WdU.z = ray.direction.z; // ray.Direction.Dot(Vector3d.AxisZ);
 			AWdU.z = Math.Abs(WdU.z);
 			DdU.z = diff.z; // diff.Dot(Vector3d.AxisZ);
 			ADdU.z = Math.Abs(DdU.z);
@@ -111,7 +111,7 @@ namespace RNumerics
 				return false;
 			}
 
-			var WxD = ray.Direction.Cross(diff);
+			var WxD = ray.direction.Cross(diff);
 			var AWxDdU = Vector3d.Zero;
 
 			AWxDdU.x = Math.Abs(WxD.x); // Math.Abs(WxD.Dot(Vector3d.AxisX));
@@ -143,7 +143,7 @@ namespace RNumerics
 			var Point0 = Vector3d.Zero;
 			var Point1 = Vector3d.Zero;
 			var Type = IntersectionType.Empty;
-			IntrLine3AxisAlignedBox3.DoClipping(ref RayParam0, ref RayParam1, ref ray.Origin, ref ray.Direction, ref box,
+			IntrLine3AxisAlignedBox3.DoClipping(ref RayParam0, ref RayParam1, ref ray.origin, ref ray.direction, ref box,
 					  true, ref Quantity, ref Point0, ref Point1, ref Type);
 
 			if (Type != IntersectionType.Empty) {

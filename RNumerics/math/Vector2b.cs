@@ -14,6 +14,19 @@ namespace RNumerics
 		[Key(1)]
 		public bool y;
 
+		[Exposed, IgnoreMember]
+		public bool X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public bool Y
+		{
+			get => y;
+			set => y = value;
+		}
+
 		public Vector2b() {
 			x = false;
 			y = false;
@@ -23,9 +36,9 @@ namespace RNumerics
 		public Vector2b(in bool x, in bool y) { this.x = x; this.y = y; }
 		public Vector2b(in bool[] v2) { x = v2[0]; y = v2[1]; }
 
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2b True = new (true, true);
-		[IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Vector2b False = new (false, false);
 
 		public bool this[in int key]

@@ -18,21 +18,21 @@ namespace RNumerics
 
 
 		public static AxisAlignedBox3d Bounds(in Triangle3d tri) {
-			return Bounds(tri.V0, tri.V1, tri.V2);
+			return Bounds(tri.v0, tri.v1, tri.v2);
 		}
 
 		public static AxisAlignedBox3d Bounds(in Vector3d v0, in Vector3d v1, in Vector3d v2) {
 			AxisAlignedBox3d box;
-			MathUtil.MinMax(v0.x, v1.x, v2.x, out box.Min.x, out box.Max.x);
-			MathUtil.MinMax(v0.y, v1.y, v2.y, out box.Min.y, out box.Max.y);
-			MathUtil.MinMax(v0.z, v1.z, v2.z, out box.Min.z, out box.Max.z);
+			MathUtil.MinMax(v0.x, v1.x, v2.x, out box.min.x, out box.max.x);
+			MathUtil.MinMax(v0.y, v1.y, v2.y, out box.min.y, out box.max.y);
+			MathUtil.MinMax(v0.z, v1.z, v2.z, out box.min.z, out box.max.z);
 			return box;
 		}
 
 		public static AxisAlignedBox2d Bounds(in Vector2d v0, in Vector2d v1, in Vector2d v2) {
 			AxisAlignedBox2d box;
-			MathUtil.MinMax(v0.x, v1.x, v2.x, out box.Min.x, out box.Max.x);
-			MathUtil.MinMax(v0.y, v1.y, v2.y, out box.Min.y, out box.Max.y);
+			MathUtil.MinMax(v0.x, v1.x, v2.x, out box.min.x, out box.max.x);
+			MathUtil.MinMax(v0.y, v1.y, v2.y, out box.min.y, out box.max.y);
 			return box;
 		}
 
@@ -119,8 +119,8 @@ namespace RNumerics
 
 		public static AxisAlignedBox3f Combined(in AxisAlignedBox3f a, in AxisAlignedBox3f b) {
 			return new AxisAlignedBox3f {
-				Max = new Vector3f(Math.Max(a.Max.x, b.Max.x), Math.Max(a.Max.y, b.Max.y), Math.Max(a.Max.z, b.Max.z)),
-				Min = new Vector3f(Math.Min(a.Min.x, b.Min.x), Math.Min(a.Min.y, b.Min.y), Math.Min(a.Min.z, b.Min.z)),
+				max = new Vector3f(Math.Max(a.max.x, b.max.x), Math.Max(a.max.y, b.max.y), Math.Max(a.max.z, b.max.z)),
+				min = new Vector3f(Math.Min(a.min.x, b.min.x), Math.Min(a.min.y, b.min.y), Math.Min(a.min.z, b.min.z)),
 			};
 		}
 

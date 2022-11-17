@@ -50,7 +50,7 @@ namespace RNumerics
 
 			// [RMS] if either line direction is not a normalized vector, 
 			//   results are garbage, so fail query
-			if (_line.Direction.IsNormalized == false) {
+			if (_line.direction.IsNormalized == false) {
 				Type = IntersectionType.Empty;
 				Result = IntersectionResult.InvalidQuery;
 				return false;
@@ -58,7 +58,7 @@ namespace RNumerics
 
 			LineParam0 = -double.MaxValue;
 			LineParam1 = double.MaxValue;
-			DoClipping(ref LineParam0, ref LineParam1, ref _line.Origin, ref _line.Direction, ref _box,
+			DoClipping(ref LineParam0, ref LineParam1, ref _line.origin, ref _line.direction, ref _box,
 					  true, ref Quantity, ref Point0, ref Point1, ref Type);
 
 			Result = (Type != IntersectionType.Empty) ?
@@ -74,20 +74,20 @@ namespace RNumerics
 			var AWxDdU = Vector3d.Zero;
 			double RHS;
 
-			var diff = _line.Origin - _box.Center;
-			var WxD = _line.Direction.Cross(diff);
+			var diff = _line.origin - _box.Center;
+			var WxD = _line.direction.Cross(diff);
 
 			var extent = _box.Extents;
 
-			AWdU[1] = Math.Abs(_line.Direction.Dot(Vector3d.AxisY));
-			AWdU[2] = Math.Abs(_line.Direction.Dot(Vector3d.AxisZ));
+			AWdU[1] = Math.Abs(_line.direction.Dot(Vector3d.AxisY));
+			AWdU[2] = Math.Abs(_line.direction.Dot(Vector3d.AxisZ));
 			AWxDdU[0] = Math.Abs(WxD.Dot(Vector3d.AxisX));
 			RHS = (extent.y * AWdU[2]) + (extent.z * AWdU[1]);
 			if (AWxDdU[0] > RHS) {
 				return false;
 			}
 
-			AWdU[0] = Math.Abs(_line.Direction.Dot(Vector3d.AxisX));
+			AWdU[0] = Math.Abs(_line.direction.Dot(Vector3d.AxisX));
 			AWxDdU[1] = Math.Abs(WxD.Dot(Vector3d.AxisY));
 			RHS = (extent.x * AWdU[2]) + (extent.z * AWdU[0]);
 			if (AWxDdU[1] > RHS) {

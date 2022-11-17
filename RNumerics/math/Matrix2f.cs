@@ -16,13 +16,38 @@ namespace RNumerics
 		[Key(3)]
 		public float m11;
 
+		[Exposed, IgnoreMember]
+		public float M00
+		{
+			get => m00;
+			set => m00 = value;
+		}
+		[Exposed, IgnoreMember]
+		public float M01
+		{
+			get => m01;
+			set => m01 = value;
+		}
+		[Exposed, IgnoreMember]
+		public float M10
+		{
+			get => m10;
+			set => m10 = value;
+		}
+		[Exposed, IgnoreMember]
+		public float M11
+		{
+			get => m11;
+			set => m11 = value;
+		}
+
 		public Matrix2f() {
 		}
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		public static readonly Matrix2f Identity = new (true);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		public static readonly Matrix2f Zero = new (false);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		public static readonly Matrix2f One = new (1, 1, 1, 1);
 
 

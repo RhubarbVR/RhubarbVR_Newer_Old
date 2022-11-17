@@ -10,27 +10,40 @@ namespace RNumerics
 	public struct Vector3dTuple2
 	{
 		[Key(0)]
-		public Vector3d V0;
+		public Vector3d v0;
 		[Key(1)]
-		public Vector3d V1;
+		public Vector3d v1;
+
+		[Exposed, IgnoreMember]
+		public Vector3d V0
+		{
+			get => v0;
+			set => v0 = value;
+		}
+		[Exposed, IgnoreMember]
+		public Vector3d V1
+		{
+			get => v1;
+			set => v1 = value;
+		}
 
 		public Vector3dTuple2() {
-			V0 = new Vector3d(0, 0, 0);
-			V1 = new Vector3d(0, 0, 0);
+			v0 = new Vector3d(0, 0, 0);
+			v1 = new Vector3d(0, 0, 0);
 		}
 
 		public Vector3dTuple2(in Vector3d v0, in Vector3d v1) {
-			V0 = v0;
-			V1 = v1;
+			this.v0 = v0;
+			this.v1 = v1;
 		}
 
 		public Vector3d this[in int key]
 		{
-			get => (key == 0) ? V0 : V1;
+			get => (key == 0) ? v0 : v1;
 			set {
-				if (key == 0) { V0 = value; }
+				if (key == 0) { v0 = value; }
 				else {
-					V1 = value;
+					v1 = value;
 				}
 			}
 		}

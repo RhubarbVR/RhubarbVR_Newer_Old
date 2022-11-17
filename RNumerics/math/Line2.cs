@@ -11,16 +11,30 @@ namespace RNumerics
 	public struct Line2d
 	{
 		[Key(0)]
-		public Vector2d Origin;
+		public Vector2d origin;
 		[Key(1)]
-		public Vector2d Direction;
+		public Vector2d direction;
 		public Line2d() {
-			Origin = Vector2d.Zero;
-			Direction = Vector2d.Zero;
+			origin = Vector2d.Zero;
+			direction = Vector2d.Zero;
 		}
+
+		[Exposed, IgnoreMember]
+		public Vector2d Origin
+		{
+			get => origin;
+			set => origin = value;
+		}
+		[Exposed, IgnoreMember]
+		public Vector2d Direction
+		{
+			get => direction;
+			set => direction = value;
+		}
+
 		public Line2d(in Vector2d origin, in Vector2d direction) {
-			Origin = origin;
-			Direction = direction;
+			this.origin = origin;
+			this.direction = direction;
 		}
 
 
@@ -30,16 +44,16 @@ namespace RNumerics
 
 		// parameter is distance along Line
 		public Vector2d PointAt(in double d) {
-			return Origin + (d * Direction);
+			return origin + (d * direction);
 		}
 
 		public double Project(in Vector2d p) {
-			return (p - Origin).Dot(Direction);
+			return (p - origin).Dot(direction);
 		}
 
 		public double DistanceSquared(in Vector2d p) {
-			var t = (p - Origin).Dot(Direction);
-			var proj = Origin + (t * Direction);
+			var t = (p - origin).Dot(direction);
+			var proj = origin + (t * direction);
 			return (proj - p).LengthSquared;
 		}
 
@@ -52,10 +66,10 @@ namespace RNumerics
 		///    0, on the line
 		/// </summary>
 		public int WhichSide(in Vector2d test, in double tol = 0) {
-			var x0 = test.x - Origin.x;
-			var y0 = test.y - Origin.y;
-			var x1 = Direction.x;
-			var y1 = Direction.y;
+			var x0 = test.x - origin.x;
+			var y0 = test.y - origin.y;
+			var x1 = direction.x;
+			var y1 = direction.y;
 			var det = (x0 * y1) - (x1 * y0);
 			return det > tol ? +1 : (det < -tol ? -1 : 0);
 		}
@@ -69,13 +83,13 @@ namespace RNumerics
 		/// <returns></returns>
 		public Vector2d IntersectionPoint(in Line2d other, in double dotThresh = MathUtil.ZERO_TOLERANCE) {
 			// see IntrLine2Line2 for explanation of algorithm
-			var diff = other.Origin - Origin;
-			var D0DotPerpD1 = Direction.DotPerp(other.Direction);
+			var diff = other.origin - origin;
+			var D0DotPerpD1 = direction.DotPerp(other.direction);
 			if (Math.Abs(D0DotPerpD1) > dotThresh) {                    // Lines intersect in a single point.
 				var invD0DotPerpD1 = ((double)1) / D0DotPerpD1;
-				var diffDotPerpD1 = diff.DotPerp(other.Direction);
+				var diffDotPerpD1 = diff.DotPerp(other.direction);
 				var s = diffDotPerpD1 * invD0DotPerpD1;
-				return Origin + (s * Direction);
+				return origin + (s * direction);
 			}
 			// Lines are parallel.
 			return Vector2d.MaxValue;
@@ -87,7 +101,7 @@ namespace RNumerics
 
 		// conversion operators
 		public static implicit operator Line2d(in Line2f v) => new(v.Origin, v.Direction);
-		public static explicit operator Line2f(in Line2d v) => new((Vector2f)v.Origin, (Vector2f)v.Direction);
+		public static explicit operator Line2f(in Line2d v) => new((Vector2f)v.origin, (Vector2f)v.direction);
 
 
 	}

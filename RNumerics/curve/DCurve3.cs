@@ -237,10 +237,10 @@ namespace RNumerics
 				var a = vi;
 				var b = (vi + 1) % _vertices.Count;
 				var seg = new Segment3d(_vertices[a], _vertices[b]);
-				var t = (p - seg.Center).Dot(seg.Direction);
-				var d = t >= seg.Extent
+				var t = (p - seg.center).Dot(seg.direction);
+				var d = t >= seg.extent
 					? seg.P1.DistanceSquared(p)
-					: t <= -seg.Extent ? seg.P0.DistanceSquared(p) : (seg.PointAt(t) - p).LengthSquared;
+					: t <= -seg.extent ? seg.P0.DistanceSquared(p) : (seg.PointAt(t) - p).LengthSquared;
 
 				if (d < dist) {
 					dist = d;

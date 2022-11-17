@@ -13,24 +13,43 @@ namespace RNumerics
 		// Center-direction-extent representation.
 		// Extent is half length of segment
 		[Key(0)]
-		public Vector3d Center;
+		public Vector3d center;
 		[Key(1)]
-		public Vector3d Direction;
+		public Vector3d direction;
 		[Key(2)]
-		public double Extent;
+		public double extent;
+
+		[Exposed, IgnoreMember]
+		public Vector3d Center
+		{
+			get => center;
+			set => center = value;
+		}
+		[Exposed, IgnoreMember]
+		public Vector3d Direction
+		{
+			get => direction;
+			set => direction = value;
+		}
+		[Exposed, IgnoreMember]
+		public double Extent
+		{
+			get => extent;
+			set => extent = value;
+		}
 
 		public Segment3d(in Vector3d p0, in Vector3d p1)
 		{
 			//update_from_endpoints(p0, p1);
-			Center = 0.5 * (p0 + p1);
-			Direction = p1 - p0;
-			Extent = 0.5 * Direction.Normalize();
+			center = 0.5 * (p0 + p1);
+			direction = p1 - p0;
+			extent = 0.5 * direction.Normalize();
 		}
 		public Segment3d(in Vector3d center, in Vector3d direction, in double extent)
 		{
-			Center = center;
-			Direction = direction;
-			Extent = extent;
+			this.center = center;
+			this.direction = direction;
+			this.extent = extent;
 		}
 
 		public void SetEndpoints(in Vector3d p0, in Vector3d p1)
@@ -41,83 +60,83 @@ namespace RNumerics
 		[IgnoreMember]
 		public Vector3d P0
 		{
-			get => Center - (Extent * Direction);
+			get => center - (extent * direction);
 			set => Update_from_endpoints(value, P1);
 		}
 		[IgnoreMember]
 		public Vector3d P1
 		{
-			get => Center + (Extent * Direction);
+			get => center + (extent * direction);
 			set => Update_from_endpoints(P0, value);
 		}
 		[IgnoreMember]
-		public double Length => 2 * Extent;
+		public double Length => 2 * extent;
 
 		// parameter is signed distance from center in direction
 		public Vector3d PointAt(in double d)
 		{
-			return Center + (d * Direction);
+			return center + (d * direction);
 		}
 
 		// t ranges from [0,1] over [P0,P1]
 		public Vector3d PointBetween(in double t) {
-			return Center + (((2 * t) - 1) * Extent * Direction);
+			return center + (((2 * t) - 1) * extent * direction);
 		}
 
 		public double DistanceSquared(in Vector3d p)
 		{
-			var t = (p - Center).Dot(Direction);
-			if (t >= Extent) {
+			var t = (p - center).Dot(direction);
+			if (t >= extent) {
 				return P1.DistanceSquared(p);
 			}
-			else if (t <= -Extent) {
+			else if (t <= -extent) {
 				return P0.DistanceSquared(p);
 			}
 
-			var proj = Center + (t * Direction);
+			var proj = center + (t * direction);
 			return (proj - p).LengthSquared;
 		}
 		public double DistanceSquared(in Vector3d p, out double t)
 		{
-			t = (p - Center).Dot(Direction);
-			if (t >= Extent)
+			t = (p - center).Dot(direction);
+			if (t >= extent)
 			{
-				t = Extent;
+				t = extent;
 				return P1.DistanceSquared(p);
 			}
-			else if (t <= -Extent)
+			else if (t <= -extent)
 			{
-				t = -Extent;
+				t = -extent;
 				return P0.DistanceSquared(p);
 			}
-			var proj = Center + (t * Direction);
+			var proj = center + (t * direction);
 			return (proj - p).LengthSquared;
 		}
 
 
 		public Vector3d NearestPoint(in Vector3d p)
 		{
-			var t = (p - Center).Dot(Direction);
-			return t >= Extent ? P1 : t <= -Extent ? P0 : Center + (t * Direction);
+			var t = (p - center).Dot(direction);
+			return t >= extent ? P1 : t <= -extent ? P0 : center + (t * direction);
 		}
 
 		public double Project(in Vector3d p)
 		{
-			return (p - Center).Dot(Direction);
+			return (p - center).Dot(direction);
 		}
 
 
 		void Update_from_endpoints(in Vector3d p0, in Vector3d p1)
 		{
-			Center = 0.5 * (p0 + p1);
-			Direction = p1 - p0;
-			Extent = 0.5 * Direction.Normalize();
+			center = 0.5 * (p0 + p1);
+			direction = p1 - p0;
+			extent = 0.5 * direction.Normalize();
 		}
 
 
 		// conversion operators
 		public static implicit operator Segment3d(in Segment3f v) => new (v.Center, v.Direction, v.Extent);
-		public static explicit operator Segment3f(in Segment3d v) => new ((Vector3f)v.Center, (Vector3f)v.Direction, (float)v.Extent);
+		public static explicit operator Segment3f(in Segment3d v) => new ((Vector3f)v.center, (Vector3f)v.direction, (float)v.extent);
 
 
 		// IParametricCurve3d interface
@@ -131,22 +150,22 @@ namespace RNumerics
 		// t in range[0,1] spans arc
 		public Vector3d SampleT(in double t)
 		{
-			return Center + (((2 * t) - 1) * Extent * Direction);
+			return center + (((2 * t) - 1) * extent * direction);
 		}
 
 		public Vector3d TangentT(in double t)
 		{
-			return Direction;
+			return direction;
 		}
 
 		[IgnoreMember]
 		public bool HasArcLength => true;
 		[IgnoreMember]
-		public double ArcLength => 2 * Extent;
+		public double ArcLength => 2 * extent;
 
 		public Vector3d SampleArcLength(in double a)
 		{
-			return P0 + (a * Direction);
+			return P0 + (a * direction);
 		}
 
 		public void Reverse()
@@ -156,7 +175,7 @@ namespace RNumerics
 
 		public IParametricCurve3d Clone()
 		{
-			return new Segment3d(Center, Direction, Extent);
+			return new Segment3d(center, direction, extent);
 		}
 
 

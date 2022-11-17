@@ -57,9 +57,9 @@ namespace RNumerics
 				return DistanceSquared;
 			}
 
-			var diff = _line.Origin - _segment.Center;
-			var a01 = -_line.Direction.Dot(_segment.Direction);
-			var b0 = diff.Dot(_line.Direction);
+			var diff = _line.origin - _segment.Center;
+			var a01 = -_line.direction.Dot(_segment.Direction);
+			var b0 = diff.Dot(_line.direction);
 			var c = diff.LengthSquared;
 			var det = Math.Abs(1 - (a01 * a01));
 			double b1, s0, s1, sqrDist, extDet;
@@ -104,7 +104,7 @@ namespace RNumerics
 			}
 
 			LineParameter = s0;
-			LineClosest = _line.Origin + (s0 * _line.Direction);
+			LineClosest = _line.origin + (s0 * _line.direction);
 			SegmentParameter = s1;
 			SegmentClosest = _segment.Center + (s1 * _segment.Direction);
 

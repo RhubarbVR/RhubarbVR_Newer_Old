@@ -31,6 +31,13 @@ namespace RNumerics
 		[Key(0)]
 		public Matrix4x4 m;
 
+		[Exposed, IgnoreMember]
+		public Matrix4x4 M
+		{
+			get => m;
+			set => m = value;
+		}
+	
 		public Matrix() {
 			m = new Matrix4x4();
 		}

@@ -400,11 +400,11 @@ namespace RNumerics
 				var hullIndices = hull.HullIndices;
 
 				if (hullDim == 0) {
-					_mMinBox.Center = points[0];
-					_mMinBox.AxisX = Vector2d.AxisX;
-					_mMinBox.AxisY = Vector2d.AxisY;
-					_mMinBox.Extent[0] = (double)0;
-					_mMinBox.Extent[1] = (double)0;
+					_mMinBox.center = points[0];
+					_mMinBox.axisX = Vector2d.AxisX;
+					_mMinBox.axisY = Vector2d.AxisY;
+					_mMinBox.extent[0] = (double)0;
+					_mMinBox.extent[1] = (double)0;
 					return;
 				}
 
@@ -512,13 +512,13 @@ namespace RNumerics
 
 			// The dimensions of the axis-aligned box.  The extents store width and
 			// height for now.
-			_mMinBox.Center.x = ((double)0.5) * (xmin + xmax);
-			_mMinBox.Center.y = ((double)0.5) * (ymin + ymax);
-			_mMinBox.AxisX = Vector2d.AxisX;
-			_mMinBox.AxisY = Vector2d.AxisY;
-			_mMinBox.Extent[0] = ((double)0.5) * (xmax - xmin);
-			_mMinBox.Extent[1] = ((double)0.5) * (ymax - ymin);
-			var minAreaDiv4 = _mMinBox.Extent[0] * _mMinBox.Extent[1];
+			_mMinBox.center.x = ((double)0.5) * (xmin + xmax);
+			_mMinBox.center.y = ((double)0.5) * (ymin + ymax);
+			_mMinBox.axisX = Vector2d.AxisX;
+			_mMinBox.axisY = Vector2d.AxisY;
+			_mMinBox.extent[0] = ((double)0.5) * (xmax - xmin);
+			_mMinBox.extent[1] = ((double)0.5) * (ymax - ymin);
+			var minAreaDiv4 = _mMinBox.extent[0] * _mMinBox.extent[1];
 
 			// The rotating calipers algorithm.
 			var U = Vector2d.AxisX;
@@ -653,12 +653,12 @@ namespace RNumerics
 			var areaDiv4 = extent0 * extent1;
 			if (areaDiv4 < minAreaDiv4) {
 				minAreaDiv4 = areaDiv4;
-				_mMinBox.AxisX = U;
-				_mMinBox.AxisY = V;
-				_mMinBox.Extent[0] = extent0;
-				_mMinBox.Extent[1] = extent1;
+				_mMinBox.axisX = U;
+				_mMinBox.axisY = V;
+				_mMinBox.extent[0] = extent0;
+				_mMinBox.extent[1] = extent1;
 				var LBDiff = LPoint - BPoint;
-				_mMinBox.Center = LPoint + (U * extent0) + (V * (extent1 - V.Dot(LBDiff)));
+				_mMinBox.center = LPoint + (U * extent0) + (V * (extent1 - V.Dot(LBDiff)));
 			}
 		}
 

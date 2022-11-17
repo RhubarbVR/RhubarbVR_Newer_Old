@@ -59,15 +59,15 @@ namespace RNumerics
 
 			// [RMS] if either line direction is not a normalized vector, 
 			//   results are garbage, so fail query
-			if (_segment.Direction.IsNormalized == false) {
+			if (_segment.direction.IsNormalized == false) {
 				Type = IntersectionType.Empty;
 				Result = IntersectionResult.InvalidQuery;
 				return false;
 			}
 
-			SegmentParam0 = -_segment.Extent;
-			SegmentParam1 = _segment.Extent;
-			DoClipping(ref SegmentParam0, ref SegmentParam1, _segment.Center, _segment.Direction, _box,
+			SegmentParam0 = -_segment.extent;
+			SegmentParam1 = _segment.extent;
+			DoClipping(ref SegmentParam0, ref SegmentParam1, _segment.center, _segment.direction, _box,
 					  _solid, ref Quantity, ref Point0, ref Point1, ref Type);
 
 			Result = (Type != IntersectionType.Empty) ?
@@ -84,45 +84,45 @@ namespace RNumerics
 			var AWxDdU = Vector3d.Zero;
 			double RHS;
 
-			var diff = _segment.Center - _box.Center;
+			var diff = _segment.center - _box.center;
 
-			AWdU[0] = Math.Abs(_segment.Direction.Dot(_box.AxisX));
-			ADdU[0] = Math.Abs(diff.Dot(_box.AxisX));
-			RHS = _box.Extent.x + (_segment.Extent * AWdU[0]);
+			AWdU[0] = Math.Abs(_segment.direction.Dot(_box.axisX));
+			ADdU[0] = Math.Abs(diff.Dot(_box.axisX));
+			RHS = _box.extent.x + (_segment.extent * AWdU[0]);
 			if (ADdU[0] > RHS) {
 				return false;
 			}
 
-			AWdU[1] = Math.Abs(_segment.Direction.Dot(_box.AxisY));
-			ADdU[1] = Math.Abs(diff.Dot(_box.AxisY));
-			RHS = _box.Extent.y + (_segment.Extent * AWdU[1]);
+			AWdU[1] = Math.Abs(_segment.direction.Dot(_box.axisY));
+			ADdU[1] = Math.Abs(diff.Dot(_box.axisY));
+			RHS = _box.extent.y + (_segment.extent * AWdU[1]);
 			if (ADdU[1] > RHS) {
 				return false;
 			}
 
-			AWdU[2] = Math.Abs(_segment.Direction.Dot(_box.AxisZ));
-			ADdU[2] = Math.Abs(diff.Dot(_box.AxisZ));
-			RHS = _box.Extent.z + (_segment.Extent * AWdU[2]);
+			AWdU[2] = Math.Abs(_segment.direction.Dot(_box.axisZ));
+			ADdU[2] = Math.Abs(diff.Dot(_box.axisZ));
+			RHS = _box.extent.z + (_segment.extent * AWdU[2]);
 			if (ADdU[2] > RHS) {
 				return false;
 			}
 
-			var WxD = _segment.Direction.Cross(diff);
+			var WxD = _segment.direction.Cross(diff);
 
-			AWxDdU[0] = Math.Abs(WxD.Dot(_box.AxisX));
-			RHS = (_box.Extent.y * AWdU[2]) + (_box.Extent.z * AWdU[1]);
+			AWxDdU[0] = Math.Abs(WxD.Dot(_box.axisX));
+			RHS = (_box.extent.y * AWdU[2]) + (_box.extent.z * AWdU[1]);
 			if (AWxDdU[0] > RHS) {
 				return false;
 			}
 
-			AWxDdU[1] = Math.Abs(WxD.Dot(_box.AxisY));
-			RHS = (_box.Extent.x * AWdU[2]) + (_box.Extent.z * AWdU[0]);
+			AWxDdU[1] = Math.Abs(WxD.Dot(_box.axisY));
+			RHS = (_box.extent.x * AWdU[2]) + (_box.extent.z * AWdU[0]);
 			if (AWxDdU[1] > RHS) {
 				return false;
 			}
 
-			AWxDdU[2] = Math.Abs(WxD.Dot(_box.AxisZ));
-			RHS = (_box.Extent.x * AWdU[1]) + (_box.Extent.y * AWdU[0]);
+			AWxDdU[2] = Math.Abs(WxD.Dot(_box.axisZ));
+			RHS = (_box.extent.x * AWdU[1]) + (_box.extent.y * AWdU[0]);
 			return AWxDdU[2] <= RHS;
 		}
 
@@ -135,26 +135,26 @@ namespace RNumerics
 						 ref Vector3d point0, ref Vector3d point1,
 						 ref IntersectionType intrType) {
 			// Convert linear component to box coordinates.
-			var diff = origin - box.Center;
+			var diff = origin - box.center;
 			var BOrigin = new Vector3d(
-				diff.Dot(box.AxisX),
-				diff.Dot(box.AxisY),
-				diff.Dot(box.AxisZ)
+				diff.Dot(box.axisX),
+				diff.Dot(box.axisY),
+				diff.Dot(box.axisZ)
 			);
 			var BDirection = new Vector3d(
-				direction.Dot(box.AxisX),
-				direction.Dot(box.AxisY),
-				direction.Dot(box.AxisZ)
+				direction.Dot(box.axisX),
+				direction.Dot(box.axisY),
+				direction.Dot(box.axisZ)
 			);
 
 			double saveT0 = t0, saveT1 = t1;
 			var notAllClipped =
-				Clip(+BDirection.x, -BOrigin.x - box.Extent.x, ref t0, ref t1) &&
-				Clip(-BDirection.x, +BOrigin.x - box.Extent.x, ref t0, ref t1) &&
-				Clip(+BDirection.y, -BOrigin.y - box.Extent.y, ref t0, ref t1) &&
-				Clip(-BDirection.y, +BOrigin.y - box.Extent.y, ref t0, ref t1) &&
-				Clip(+BDirection.z, -BOrigin.z - box.Extent.z, ref t0, ref t1) &&
-				Clip(-BDirection.z, +BOrigin.z - box.Extent.z, ref t0, ref t1);
+				Clip(+BDirection.x, -BOrigin.x - box.extent.x, ref t0, ref t1) &&
+				Clip(-BDirection.x, +BOrigin.x - box.extent.x, ref t0, ref t1) &&
+				Clip(+BDirection.y, -BOrigin.y - box.extent.y, ref t0, ref t1) &&
+				Clip(-BDirection.y, +BOrigin.y - box.extent.y, ref t0, ref t1) &&
+				Clip(+BDirection.z, -BOrigin.z - box.extent.z, ref t0, ref t1) &&
+				Clip(-BDirection.z, +BOrigin.z - box.extent.z, ref t0, ref t1);
 
 			if (notAllClipped && (solid || t0 != saveT0 || t1 != saveT1)) {
 				if (t1 > t0) {

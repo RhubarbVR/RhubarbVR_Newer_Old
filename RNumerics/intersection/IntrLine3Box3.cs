@@ -53,7 +53,7 @@ namespace RNumerics
 
 			// [RMS] if either line direction is not a normalized vector, 
 			//   results are garbage, so fail query
-			if (_line.Direction.IsNormalized == false)
+			if (_line.direction.IsNormalized == false)
 			{
 				Type = IntersectionType.Empty;
 				Result = IntersectionResult.InvalidQuery;
@@ -62,7 +62,7 @@ namespace RNumerics
 
 			LineParam0 = -double.MaxValue;
 			LineParam1 = double.MaxValue;
-			DoClipping(ref LineParam0, ref LineParam1, _line.Origin, _line.Direction, _box,
+			DoClipping(ref LineParam0, ref LineParam1, _line.origin, _line.direction, _box,
 					  true, ref Quantity, ref Point0, ref Point1, ref Type);
 
 			Result = (Type != IntersectionType.Empty) ?
@@ -79,28 +79,28 @@ namespace RNumerics
 			var AWxDdU = Vector3d.Zero;
 			double RHS;
 
-			var diff = _line.Origin - _box.Center;
-			var WxD = _line.Direction.Cross(diff);
+			var diff = _line.origin - _box.center;
+			var WxD = _line.direction.Cross(diff);
 
-			AWdU[1] = Math.Abs(_line.Direction.Dot(_box.AxisY));
-			AWdU[2] = Math.Abs(_line.Direction.Dot(_box.AxisZ));
-			AWxDdU[0] = Math.Abs(WxD.Dot(_box.AxisX));
-			RHS = (_box.Extent.y * AWdU[2]) + (_box.Extent.z * AWdU[1]);
+			AWdU[1] = Math.Abs(_line.direction.Dot(_box.axisY));
+			AWdU[2] = Math.Abs(_line.direction.Dot(_box.axisZ));
+			AWxDdU[0] = Math.Abs(WxD.Dot(_box.axisX));
+			RHS = (_box.extent.y * AWdU[2]) + (_box.extent.z * AWdU[1]);
 			if (AWxDdU[0] > RHS)
 			{
 				return false;
 			}
 
-			AWdU[0] = Math.Abs(_line.Direction.Dot(_box.AxisX));
-			AWxDdU[1] = Math.Abs(WxD.Dot(_box.AxisY));
-			RHS = (_box.Extent.x * AWdU[2]) + (_box.Extent.z * AWdU[0]);
+			AWdU[0] = Math.Abs(_line.direction.Dot(_box.axisX));
+			AWxDdU[1] = Math.Abs(WxD.Dot(_box.axisY));
+			RHS = (_box.extent.x * AWdU[2]) + (_box.extent.z * AWdU[0]);
 			if (AWxDdU[1] > RHS)
 			{
 				return false;
 			}
 
-			AWxDdU[2] = Math.Abs(WxD.Dot(_box.AxisZ));
-			RHS = (_box.Extent.x * AWdU[1]) + (_box.Extent.y * AWdU[0]);
+			AWxDdU[2] = Math.Abs(WxD.Dot(_box.axisZ));
+			RHS = (_box.extent.x * AWdU[1]) + (_box.extent.y * AWdU[0]);
 			return AWxDdU[2] <= RHS;
 		}
 
@@ -114,26 +114,26 @@ namespace RNumerics
 						 ref IntersectionType intrType)
 		{
 			// Convert linear component to box coordinates.
-			var diff = origin - box.Center;
+			var diff = origin - box.center;
 			var BOrigin = new Vector3d(
-				diff.Dot(box.AxisX),
-				diff.Dot(box.AxisY),
-				diff.Dot(box.AxisZ)
+				diff.Dot(box.axisX),
+				diff.Dot(box.axisY),
+				diff.Dot(box.axisZ)
 			);
 			var BDirection = new Vector3d(
-				direction.Dot(box.AxisX),
-				direction.Dot(box.AxisY),
-				direction.Dot(box.AxisZ)
+				direction.Dot(box.axisX),
+				direction.Dot(box.axisY),
+				direction.Dot(box.axisZ)
 			);
 
 			double saveT0 = t0, saveT1 = t1;
 			var notAllClipped =
-				Clip(+BDirection.x, -BOrigin.x - box.Extent.x, ref t0, ref t1) &&
-				Clip(-BDirection.x, +BOrigin.x - box.Extent.x, ref t0, ref t1) &&
-				Clip(+BDirection.y, -BOrigin.y - box.Extent.y, ref t0, ref t1) &&
-				Clip(-BDirection.y, +BOrigin.y - box.Extent.y, ref t0, ref t1) &&
-				Clip(+BDirection.z, -BOrigin.z - box.Extent.z, ref t0, ref t1) &&
-				Clip(-BDirection.z, +BOrigin.z - box.Extent.z, ref t0, ref t1);
+				Clip(+BDirection.x, -BOrigin.x - box.extent.x, ref t0, ref t1) &&
+				Clip(-BDirection.x, +BOrigin.x - box.extent.x, ref t0, ref t1) &&
+				Clip(+BDirection.y, -BOrigin.y - box.extent.y, ref t0, ref t1) &&
+				Clip(-BDirection.y, +BOrigin.y - box.extent.y, ref t0, ref t1) &&
+				Clip(+BDirection.z, -BOrigin.z - box.extent.z, ref t0, ref t1) &&
+				Clip(-BDirection.z, +BOrigin.z - box.extent.z, ref t0, ref t1);
 
 			if (notAllClipped && (solid || t0 != saveT0 || t1 != saveT1))
 			{

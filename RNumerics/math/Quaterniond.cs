@@ -21,6 +21,30 @@ namespace RNumerics
 		[Key(3)]
 		public double w;
 
+		[Exposed, IgnoreMember]
+		public double X
+		{
+			get => x;
+			set => x = value;
+		}
+		[Exposed, IgnoreMember]
+		public double Y
+		{
+			get => y;
+			set => y = value;
+		}
+		[Exposed, IgnoreMember]
+		public double Z
+		{
+			get => z;
+			set => z = value;
+		}
+		[Exposed, IgnoreMember]
+		public double W
+		{
+			get => w;
+			set => w = value;
+		}
 		public Quaterniond() {
 			x = 0;
 			y = 0;
@@ -52,9 +76,9 @@ namespace RNumerics
 			w = 1;
 			SetFromRotationMatrix(mat);
 		}
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Quaterniond Zero = new(0.0, 0.0, 0.0, 0.0);
-		[IgnoreMember]
+		[Exposed,IgnoreMember]
 		static public readonly Quaterniond Identity = new(0.0, 0.0, 0.0, 1.0);
 
 		public double this[in int key]

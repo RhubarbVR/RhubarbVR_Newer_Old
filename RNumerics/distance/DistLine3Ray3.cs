@@ -60,15 +60,15 @@ namespace RNumerics
 				return DistanceSquared;
 			}
 
-			var kDiff = _line.Origin - _ray.Origin;
-			var a01 = -_line.Direction.Dot(_ray.Direction);
-			var b0 = kDiff.Dot(_line.Direction);
+			var kDiff = _line.origin - _ray.origin;
+			var a01 = -_line.direction.Dot(_ray.direction);
+			var b0 = kDiff.Dot(_line.direction);
 			var c = kDiff.LengthSquared;
 			var det = Math.Abs(1.0 - (a01 * a01));
 			double b1, s0, s1, sqrDist;
 
 			if (det >= MathUtil.ZERO_TOLERANCE) {
-				b1 = -kDiff.Dot(_ray.Direction);
+				b1 = -kDiff.Dot(_ray.direction);
 				s1 = (a01 * b0) - b1;
 
 				if (s1 >= (double)0) {
@@ -94,8 +94,8 @@ namespace RNumerics
 				sqrDist = (b0 * s0) + c;
 			}
 
-			LineClosest = _line.Origin + (s0 * _line.Direction);
-			RayClosest = _ray.Origin + (s1 * _ray.Direction);
+			LineClosest = _line.origin + (s0 * _line.direction);
+			RayClosest = _ray.origin + (s1 * _ray.direction);
 			LineParameter = s0;
 			RayParameter = s1;
 

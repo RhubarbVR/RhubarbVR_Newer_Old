@@ -27,19 +27,19 @@ namespace RNumerics
 		public override MeshGenerator Generate() {
 			base.Generate();
 			for (var i = 0; i < vertices.Count; ++i) {
-				var v = vertices[i] - Box.Center;
+				var v = vertices[i] - Box.center;
 				if (NormalizeType == NormalizationTypes.CubeMapping) {
-					var x = v.Dot(Box.AxisX) / Box.Extent.x;
-					var y = v.Dot(Box.AxisY) / Box.Extent.y;
-					var z = v.Dot(Box.AxisZ) / Box.Extent.z;
+					var x = v.Dot(Box.axisX) / Box.extent.x;
+					var y = v.Dot(Box.axisY) / Box.extent.y;
+					var z = v.Dot(Box.axisZ) / Box.extent.z;
 					double x2 = x * x, y2 = y * y, z2 = z * z;
 					var sx = x * Math.Sqrt(1.0 - (y2 * 0.5) - (z2 * 0.5) + (y2 * z2 / 3.0));
 					var sy = y * Math.Sqrt(1.0 - (x2 * 0.5) - (z2 * 0.5) + (x2 * z2 / 3.0));
 					var sz = z * Math.Sqrt(1.0 - (x2 * 0.5) - (y2 * 0.5) + (x2 * y2 / 3.0));
-					v = (sx * Box.AxisX) + (sy * Box.AxisY) + (sz * Box.AxisZ);
+					v = (sx * Box.axisX) + (sy * Box.axisY) + (sz * Box.axisZ);
 				}
 				v.Normalize();
-				vertices[i] = Box.Center + (Radius * 2 * v);
+				vertices[i] = Box.center + (Radius * 2 * v);
 				normals[i] = (Vector3f)v;
 			}
 

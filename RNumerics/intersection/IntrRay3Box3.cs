@@ -50,7 +50,7 @@ namespace RNumerics
 
 			// [RMS] if either line direction is not a normalized vector, 
 			//   results are garbage, so fail query
-			if (_ray.Direction.IsNormalized == false) {
+			if (_ray.direction.IsNormalized == false) {
 				Type = IntersectionType.Empty;
 				Result = IntersectionResult.InvalidQuery;
 				return false;
@@ -58,7 +58,7 @@ namespace RNumerics
 
 			RayParam0 = 0.0;
 			RayParam1 = double.MaxValue;
-			IntrLine3Box3.DoClipping(ref RayParam0, ref RayParam1, _ray.Origin, _ray.Direction, _box,
+			IntrLine3Box3.DoClipping(ref RayParam0, ref RayParam1, _ray.origin, _ray.direction, _box,
 					  true, ref Quantity, ref Point0, ref Point1, ref Type);
 
 			Result = (Type != IntersectionType.Empty) ?
@@ -87,48 +87,48 @@ namespace RNumerics
 			var AWxDdU = Vector3d.Zero;
 			double RHS;
 
-			var diff = ray.Origin - box.Center;
-			var extent = box.Extent + expandExtents;
+			var diff = ray.origin - box.center;
+			var extent = box.extent + expandExtents;
 
-			WdU[0] = ray.Direction.Dot(box.AxisX);
+			WdU[0] = ray.direction.Dot(box.axisX);
 			AWdU[0] = Math.Abs(WdU[0]);
-			DdU[0] = diff.Dot(box.AxisX);
+			DdU[0] = diff.Dot(box.axisX);
 			ADdU[0] = Math.Abs(DdU[0]);
 			if (ADdU[0] > extent.x && DdU[0] * WdU[0] >= (double)0) {
 				return false;
 			}
 
-			WdU[1] = ray.Direction.Dot(box.AxisY);
+			WdU[1] = ray.direction.Dot(box.axisY);
 			AWdU[1] = Math.Abs(WdU[1]);
-			DdU[1] = diff.Dot(box.AxisY);
+			DdU[1] = diff.Dot(box.axisY);
 			ADdU[1] = Math.Abs(DdU[1]);
 			if (ADdU[1] > extent.y && DdU[1] * WdU[1] >= (double)0) {
 				return false;
 			}
 
-			WdU[2] = ray.Direction.Dot(box.AxisZ);
+			WdU[2] = ray.direction.Dot(box.axisZ);
 			AWdU[2] = Math.Abs(WdU[2]);
-			DdU[2] = diff.Dot(box.AxisZ);
+			DdU[2] = diff.Dot(box.axisZ);
 			ADdU[2] = Math.Abs(DdU[2]);
 			if (ADdU[2] > extent.z && DdU[2] * WdU[2] >= (double)0) {
 				return false;
 			}
 
-			var WxD = ray.Direction.Cross(diff);
+			var WxD = ray.direction.Cross(diff);
 
-			AWxDdU[0] = Math.Abs(WxD.Dot(box.AxisX));
+			AWxDdU[0] = Math.Abs(WxD.Dot(box.axisX));
 			RHS = (extent.y * AWdU[2]) + (extent.z * AWdU[1]);
 			if (AWxDdU[0] > RHS) {
 				return false;
 			}
 
-			AWxDdU[1] = Math.Abs(WxD.Dot(box.AxisY));
+			AWxDdU[1] = Math.Abs(WxD.Dot(box.axisY));
 			RHS = (extent.x * AWdU[2]) + (extent.z * AWdU[0]);
 			if (AWxDdU[1] > RHS) {
 				return false;
 			}
 
-			AWxDdU[2] = Math.Abs(WxD.Dot(box.AxisZ));
+			AWxDdU[2] = Math.Abs(WxD.Dot(box.axisZ));
 			RHS = (extent.x * AWdU[1]) + (extent.y * AWdU[0]);
 			return AWxDdU[2] <= RHS;
 		}
