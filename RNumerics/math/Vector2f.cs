@@ -21,6 +21,7 @@ namespace RNumerics
 			get => x;
 			set => x = value;
 		}
+
 		[Exposed, IgnoreMember]
 		public float Y
 		{

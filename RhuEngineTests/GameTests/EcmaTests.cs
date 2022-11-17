@@ -262,6 +262,70 @@ namespace RhuEngine.GameTests.Tests
 		}
 
 		[TestMethod()]
+		public void TestVectorsCreate() {
+			var script = AttachTestScript();
+			var random = new Random();
+			var test1 = new Vector2f(random.NextSingle(), random.NextSingle());
+			var value = script.Entity.AttachComponent<ValueField<Vector2f>>();
+			value.Value.Value = test1;
+			script.Targets.Add().Target = value;
+			script.ScriptCode.Value = @"
+				function RunCode()	{
+					script.GetTarget(0).Value.Value = new_Vector2f();
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(Vector2f.Zero, value.Value.Value);
+			((IDisposable)tester).Dispose();
+		}
+
+		[TestMethod()]
+		public void TestVectorsCreatePram() {
+			var script = AttachTestScript();
+			var random = new Random();
+			var test1 = new Vector2f(random.NextSingle(), random.NextSingle());
+			var value = script.Entity.AttachComponent<ValueField<Vector2f>>();
+			value.Value.Value = test1;
+			script.Targets.Add().Target = value;
+			script.ScriptCode.Value = @"
+				function RunCode()	{
+					script.GetTarget(0).Value.Value = new_Vector2f(1);
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(Vector2f.One, value.Value.Value);
+			((IDisposable)tester).Dispose();
+		}
+
+		[TestMethod()]
+		public void TestVectorsCreatePramTwo() {
+			var script = AttachTestScript();
+			var random = new Random();
+			var test1 = new Vector2f(random.NextSingle(), random.NextSingle());
+			var value = script.Entity.AttachComponent<ValueField<Vector2f>>();
+			value.Value.Value = test1;
+			script.Targets.Add().Target = value;
+			script.ScriptCode.Value = @"
+				function RunCode()	{
+					script.GetTarget(0).Value.Value = new_Vector2f(1,2);
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(new Vector2f(1, 2), value.Value.Value);
+			((IDisposable)tester).Dispose();
+		}
+
+
+		[TestMethod()]
 		public void TestVectorsAdd() {
 			var script = AttachTestScript();
 			var random = new Random();

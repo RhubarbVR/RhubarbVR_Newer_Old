@@ -12,6 +12,7 @@ using System.Reflection;
 using Jint.Native.Object;
 using System.Threading;
 using MessagePack;
+using System.Linq;
 
 namespace RhuEngine.Components
 {
@@ -152,6 +153,41 @@ namespace RhuEngine.Components
 
 		protected abstract string Script { get; }
 
+		private object GetBestConstructor(IEnumerable<ConstructorInfo> constructors, params object[] objects) {
+			foreach (var item in constructors) {
+				var prams = item.GetParameters();
+				var sendPrams = new object[prams.Length];
+				var isSupported = true;
+				for (var i = 0; i < objects.Length; i++) {
+					var supported = false;
+					if (prams.Length <= i) {
+						if (objects[i] is null) {
+							supported = true;
+						}
+						isSupported &= supported;
+						continue;
+					}
+					if (objects[i]?.GetType() == prams[i].ParameterType) {
+						sendPrams[i] = objects[i];
+						supported = true;
+					}
+					if (objects[i] is null && !prams[i].ParameterType.IsValueType) {
+						sendPrams[i] = objects[i];
+						supported = true;
+					}
+					if (objects[i]?.GetType().MakeByRefType() == prams[i].ParameterType) {
+						sendPrams[i] = objects[i];
+						supported = true;
+					}
+					isSupported &= supported;
+				}
+				if (isSupported) {
+					return item.Invoke(sendPrams);
+				}
+			}
+			return null;
+		}
+
 
 		protected void InitECMA() {
 			_ecma = new Jint.Engine(options => {
@@ -165,6 +201,23 @@ namespace RhuEngine.Components
 				options.Strict = true;
 			});
 			_ecma.ResetCallStack();
+			foreach (var item in Assembly.GetAssembly(typeof(Vector2f)).GetTypes().Where(x => x.GetCustomAttribute<MessagePackObjectAttribute>() is not null)) {
+				var name = item.Name;
+				var functionName = $"new_{name}";
+#if DEBUG
+				RLog.Info($"Loaded Type ecma {name}");
+#endif
+				var cons = item.GetConstructors();
+				_ecma.SetValue(functionName, (object val, object val2, object val3, object val4, object val5) => GetBestConstructor(cons, val, val2, val3, val4, val5));
+				foreach (var field in item.GetFields()) {
+					if (field.IsStatic && field.GetCustomAttribute<ExposedAttribute>() is not null) {
+						_ecma.SetValue($"{name}{field.Name}", field.GetValue(null));
+#if DEBUG
+						RLog.Info($"Loaded Static ecma {name}{item.Name}");
+#endif
+					}
+				}
+			}
 			_ecma.SetValue("script", this);
 			_ecma.SetValue("entity", Entity);
 			_ecma.SetValue("world", World);
