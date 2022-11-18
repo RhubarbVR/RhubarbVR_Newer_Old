@@ -13,6 +13,7 @@ using Jint.Native.Object;
 using System.Threading;
 using MessagePack;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace RhuEngine.Components
 {
@@ -35,38 +36,6 @@ namespace RhuEngine.Components
 
 		protected override string Script => ScriptCode;
 	}
-
-	internal static class MathEx
-	{
-		private interface IObjectAdder
-		{
-			public object Add(object obj, object b);
-		}
-		private sealed class ObjectAdder<T> : IObjectAdder
-		{
-			public RDynamic<T> valueOne;
-			public RDynamic<T> valueTwo;
-
-			public object Add(object obj, object b) {
-				T value = (RDynamic<T>)(T)obj + (RDynamic<T>)(T)b;
-				return value;
-			}
-		}
-
-		public static object MathAdd(this object a, object b) {
-			try {
-				if (a.GetType() == b.GetType()) {
-					var value = ((IObjectAdder)Activator.CreateInstance(typeof(ObjectAdder<>).MakeGenericType(a.GetType()))).Add(a, b);
-					return value;
-				}
-				return (dynamic)a + (dynamic)b;
-			}
-			catch {
-				return null;
-			}
-		}
-	}
-
 
 	public abstract class ECMAScript : Component
 	{
@@ -192,7 +161,7 @@ namespace RhuEngine.Components
 		protected void InitECMA() {
 			_ecma = new Jint.Engine(options => {
 				options.LimitMemory(1_000_000); // alocate 1 MB
-				options.TimeoutInterval(TimeSpan.FromSeconds(1));
+				options.TimeoutInterval(TimeSpan.FromSeconds(5));
 				options.MaxStatements(3050);
 				options.SetTypeResolver(new TypeResolver {
 					MemberFilter = member => (Attribute.IsDefined(member, typeof(ExposedAttribute)) || Attribute.IsDefined(member, typeof(KeyAttribute)) || typeof(ISyncObject).IsAssignableFrom(member.MemberInnerType())) && !Attribute.IsDefined(member, typeof(UnExsposedAttribute)),
@@ -213,7 +182,7 @@ namespace RhuEngine.Components
 					if (field.IsStatic && field.GetCustomAttribute<ExposedAttribute>() is not null) {
 						_ecma.SetValue($"{name}{field.Name}", field.GetValue(null));
 #if DEBUG
-						RLog.Info($"Loaded Static ecma {name}{item.Name}");
+						RLog.Info($"Loaded Static ecma {name}{field.Name}");
 #endif
 					}
 				}
@@ -228,7 +197,6 @@ namespace RhuEngine.Components
 			_ecma.SetValue("toString", new Func<object, string>((object a) => (a.GetType() == typeof(Type)) ? ((Type)a).GetFormattedName() : a?.ToString()));
 			try {
 				_ecma.Execute(Script);
-
 			}
 			catch (Exception ex) {
 				_ecma = null;
@@ -241,4 +209,380 @@ namespace RhuEngine.Components
 			InitECMA();
 		}
 	}
+
+	internal static class MathEx
+	{
+		private interface IObjectAdder
+		{
+			public object UnaryPlus(object obj);
+
+			public object UnaryNegation(object obj);
+
+			public object Increment(object obj);
+
+			public object Decrement(object obj);
+
+			public object LogicalNot(object obj);
+			public object OnesComplement(object obj);
+			public object Addition(object obj, object b);
+			public object Subtraction(object obj, object b);
+			public object Multiply(object obj, object b);
+			public object Division(object obj, object b);
+			public object BitwiseAnd(object obj, object b);
+			public object BitwiseOr(object obj, object b);
+			public object ExclusiveOr(object obj, object b);
+			public bool Equality(object obj, object b);
+			public bool Inequality(object obj, object b);
+			public bool LessThan(object obj, object b);
+			public bool GreaterThan(object obj, object b);
+			public bool LessThanOrEqual(object obj, object b);
+			public bool GreaterThanOrEqual(object obj, object b);
+
+			public object LeftShift(object obj, object b);
+			public object RightShift(object obj, object b);
+			public object Modulus(object obj, object b);
+		}
+		private sealed class ObjectAdder<T> : IObjectAdder
+		{
+			public RDynamic<T> valueOne;
+			public RDynamic<T> valueTwo;
+
+			public object Addition(object obj, object b) {
+				T value = (RDynamic<T>)(T)obj + (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public object BitwiseAnd(object obj, object b) {
+				T value = (RDynamic<T>)(T)obj & (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public object BitwiseOr(object obj, object b) {
+				T value = (RDynamic<T>)(T)obj | (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public object Decrement(object obj) {
+				var value = (RDynamic<T>)(T)obj;
+				value--;
+				var re = (T)value;
+				return re;
+			}
+
+			public object Division(object obj, object b) {
+				T value = (RDynamic<T>)(T)obj / (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public bool Equality(object obj, object b) {
+				var value = (RDynamic<T>)(T)obj == (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public object ExclusiveOr(object obj, object b) {
+				T value = (RDynamic<T>)(T)obj ^ (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public bool GreaterThan(object obj, object b) {
+				var value = (RDynamic<T>)(T)obj > (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public bool GreaterThanOrEqual(object obj, object b) {
+				var value = (RDynamic<T>)(T)obj >= (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public object Increment(object obj) {
+				var value = (RDynamic<T>)(T)obj;
+				value++;
+				var re = (T)value;
+				return re;
+			}
+
+			public bool Inequality(object obj, object b) {
+				var value = (RDynamic<T>)(T)obj != (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public object LeftShift(object obj, object b) {
+				T value = (RDynamic<T>)(T)obj << (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public bool LessThan(object obj, object b) {
+				var value = (RDynamic<T>)(T)obj < (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public bool LessThanOrEqual(object obj, object b) {
+				var value = (RDynamic<T>)(T)obj <= (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public object LogicalNot(object obj) {
+				T value = !(RDynamic<T>)(T)obj;
+				return value;
+			}
+
+			public object Modulus(object obj, object b) {
+				T value = (RDynamic<T>)(T)obj % (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public object Multiply(object obj, object b) {
+				T value = (RDynamic<T>)(T)obj * (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public object OnesComplement(object obj) {
+				T value = ~(RDynamic<T>)(T)obj;
+				return value;
+			}
+
+			public object RightShift(object obj, object b) {
+				T value = (RDynamic<T>)(T)obj >> (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public object Subtraction(object obj, object b) {
+				T value = (RDynamic<T>)(T)obj - (RDynamic<T>)(T)b;
+				return value;
+			}
+
+			public object UnaryNegation(object obj) {
+				T value = -(RDynamic<T>)(T)obj;
+				return value;
+			}
+
+			public object UnaryPlus(object obj) {
+				T value = +(RDynamic<T>)(T)obj;
+				return value;
+			}
+		}
+
+		public static object OP_UnaryPlus(this object obj) {
+			var value = GetManager(obj.GetType()).UnaryPlus(obj);
+			return value;
+		}
+		public static object OP_UnaryNegation(this object obj) {
+			var value = GetManager(obj.GetType()).UnaryNegation(obj);
+			return value;
+		}
+		public static object OP_Increment(this object obj) {
+			var value = GetManager(obj.GetType()).Increment(obj);
+			return value;
+		}
+		public static object OP_Decrement(this object obj) {
+			var value = GetManager(obj.GetType()).Decrement(obj);
+			return value;
+		}
+		public static object OP_LogicalNot(this object obj) {
+			var value = GetManager(obj.GetType()).LogicalNot(obj);
+			return value;
+		}
+		public static object OP_OnesComplement(this object obj) {
+			var value = GetManager(obj.GetType()).OnesComplement(obj);
+			return value;
+		}
+		public static object OP_Addition(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).Addition(obj, b);
+					return value;
+				}
+				return (dynamic)obj + (dynamic)b;
+			}
+			catch {
+				return null;
+			}
+		}
+		public static object OP_Subtraction(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).Subtraction(obj, b);
+					return value;
+				}
+				return (dynamic)obj - (dynamic)b;
+			}
+			catch {
+				return null;
+			}
+		}
+		public static object OP_Multiply(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).Multiply(obj, b);
+					return value;
+				}
+				return (dynamic)obj * (dynamic)b;
+			}
+			catch {
+				return null;
+			}
+		}
+		public static object OP_Division(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).Division(obj, b);
+					return value;
+				}
+				return (dynamic)obj / (dynamic)b;
+			}
+			catch {
+				return null;
+			}
+		}
+		public static object OP_BitwiseAnd(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).BitwiseAnd(obj, b);
+					return value;
+				}
+				return (dynamic)obj & (dynamic)b;
+			}
+			catch {
+				return null;
+			}
+		}
+		public static object OP_BitwiseOr(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).BitwiseOr(obj, b);
+					return value;
+				}
+				return (dynamic)obj | (dynamic)b;
+			}
+			catch {
+				return null;
+			}
+		}
+		public static object OP_ExclusiveOr(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).ExclusiveOr(obj, b);
+					return value;
+				}
+				return (dynamic)obj ^ (dynamic)b;
+			}
+			catch {
+				return null;
+			}
+		}
+		public static bool OP_Equality(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).Equality(obj, b);
+					return value;
+				}
+				return (dynamic)obj == (dynamic)b;
+			}
+			catch {
+				return false;
+			}
+		}
+		public static bool OP_Inequality(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).Inequality(obj, b);
+					return value;
+				}
+				return (dynamic)obj != (dynamic)b;
+			}
+			catch {
+				return false;
+			}
+		}
+		public static bool OP_LessThan(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).LessThan(obj, b);
+					return value;
+				}
+				return (dynamic)obj < (dynamic)b;
+			}
+			catch {
+				return false;
+			}
+		}
+		public static bool OP_GreaterThan(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).GreaterThan(obj, b);
+					return value;
+				}
+				return (dynamic)obj > (dynamic)b;
+			}
+			catch {
+				return false;
+			}
+		}
+		public static bool OP_LessThanOrEqual(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).LessThanOrEqual(obj, b);
+					return value;
+				}
+				return (dynamic)obj <= (dynamic)b;
+			}
+			catch {
+				return false;
+			}
+		}
+		public static bool OP_GreaterThanOrEqual(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).GreaterThanOrEqual(obj, b);
+					return value;
+				}
+				return (dynamic)obj >= (dynamic)b;
+			}
+			catch {
+				return false;
+			}
+		}
+		public static object OP_LeftShift(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).LeftShift(obj, b);
+					return value;
+				}
+				return (dynamic)obj << (dynamic)b;
+			}
+			catch {
+				return false;
+			}
+		}
+		public static object OP_RightShift(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).RightShift(obj, b);
+					return value;
+				}
+				return (dynamic)obj >> (dynamic)b;
+			}
+			catch {
+				return false;
+			}
+		}
+		public static object OP_Modulus(this object obj, object b) {
+			try {
+				if (obj.GetType() == b.GetType()) {
+					var value = GetManager(obj.GetType()).Modulus(obj, b);
+					return value;
+				}
+				return (dynamic)obj % (dynamic)b;
+			}
+			catch {
+				return false;
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static IObjectAdder GetManager(Type type) {
+			return (IObjectAdder)Activator.CreateInstance(typeof(ObjectAdder<>).MakeGenericType(type));
+		}
+	}
+
 }

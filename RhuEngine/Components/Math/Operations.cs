@@ -33,6 +33,10 @@ namespace RhuEngine.Components
 		Cast,
 		LogicalNegation,
 		BitwiseComplement,
+		UnaryPlus,
+		UnaryNegation,
+		Increment,
+		Decrement,
 	}
 
 

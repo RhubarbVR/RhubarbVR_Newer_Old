@@ -16,9 +16,21 @@ namespace RhuEngine.Components
 				case SingleOperators.Cast:
 					return RDynamic<In>.CastTo<Out>(a);
 				case SingleOperators.LogicalNegation:
-					return !(dynamic)a;
+					return (!(RDynamic<In>)a).CastTo<Out>();
 				case SingleOperators.BitwiseComplement:
-					return ~(dynamic)a;
+					return (~(RDynamic<In>)a).CastTo<Out>();
+				case SingleOperators.UnaryPlus:
+					return (+(RDynamic<In>)a).CastTo<Out>();
+				case SingleOperators.UnaryNegation:
+					return (-(RDynamic<In>)a).CastTo<Out>();
+				case SingleOperators.Increment:
+					var data = (RDynamic<In>)a;
+					data++;
+					return data.CastTo<Out>();
+				case SingleOperators.Decrement:
+					var deata = (RDynamic<In>)a;
+					deata--;
+					return deata.CastTo<Out>();
 				default:
 					break;
 			}

@@ -10,7 +10,7 @@ namespace RNumerics
 
 	public interface IRDynamic { }
 
-	public unsafe struct RDynamic<T>: IRDynamic
+	public unsafe struct RDynamic<T> : IRDynamic
 	{
 		public static T DefaultValue = default;
 
@@ -19,6 +19,30 @@ namespace RNumerics
 		public RDynamic(T data) {
 			_data = data;
 		}
+
+		private delegate T FixedUnaryData(ref T a);
+
+		private static Func<T, T> GetMethodUnaryAction(string target, Func<T, T> LastTry) {
+			foreach (var item in typeof(T).GetMethods()) {
+				if (!item.IsStatic) {
+					continue;
+				}
+				if (item.Name == target) {
+					var prams = item.GetParameters();
+					if (prams.Length == 2) {
+						if (prams[0].ParameterType == prams[1].ParameterType && prams[0].ParameterType == typeof(T).MakeByRefType()) {
+							return (T a) => ((FixedUnaryData)item.CreateDelegate(typeof(FixedUnaryData)))(ref a);
+						}
+						if (prams[0].ParameterType == prams[1].ParameterType && prams[0].ParameterType == typeof(T)) {
+							return (Func<T, T>)item.CreateDelegate(typeof(Func<T, T>));
+						}
+					}
+				}
+			}
+			return LastTry;
+		}
+
+
 
 		private delegate T FixedData(ref T a, ref T b);
 
@@ -63,6 +87,53 @@ namespace RNumerics
 			}
 			return LastTry;
 		}
+
+
+
+		private static Func<T, T> _op_UnaryPlus;
+		public static RDynamic<T> operator +(in RDynamic<T> v0) {
+			_op_UnaryPlus ??= GetMethodUnaryAction("op_UnaryPlus", (T a) => +(dynamic)a);
+			return _op_UnaryPlus(v0);
+		}
+
+		private static Func<T, T> _op_UnaryNegation;
+		public static RDynamic<T> operator -(in RDynamic<T> v0) {
+			_op_UnaryNegation ??= GetMethodUnaryAction("op_UnaryNegation", (T a) => -(dynamic)a);
+			return _op_UnaryNegation(v0);
+		}
+
+		private static Func<T, T> _op_Increment;
+		public static RDynamic<T> operator ++(in RDynamic<T> v0) {
+			_op_Increment ??= GetMethodUnaryAction("op_Increment", (T a) => {
+				var data = (dynamic)a;
+				++data;
+				return (T)data;
+			});
+			return _op_Increment(v0);
+		}
+
+		private static Func<T, T> _op_Decrement;
+		public static RDynamic<T> operator --(in RDynamic<T> v0) {
+			_op_Decrement ??= GetMethodUnaryAction("op_Decrement", (T a) => {
+				var data = (dynamic)a;
+				--data;
+				return (T)data;
+			});
+			return _op_Decrement(v0);
+		}
+
+		private static Func<T, T> _op_LogicalNot;
+		public static RDynamic<T> operator !(in RDynamic<T> v0) {
+			_op_LogicalNot ??= GetMethodUnaryAction("op_LogicalNot", (T a) => !(dynamic)a);
+			return _op_LogicalNot(v0);
+		}
+
+		private static Func<T, T> _op_OnesComplement;
+		public static RDynamic<T> operator ~(in RDynamic<T> v0) {
+			_op_OnesComplement ??= GetMethodUnaryAction("op_OnesComplement", (T a) => ~(dynamic)a);
+			return _op_OnesComplement(v0);
+		}
+
 
 
 		private static Func<T, T, T> _op_Addition;

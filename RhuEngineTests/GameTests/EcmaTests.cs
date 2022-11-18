@@ -201,7 +201,7 @@ namespace RhuEngine.GameTests.Tests
 			script.Targets.Add().Target = value2;
 			script.ScriptCode.Value = @"
 				function RunCode()	{
-					script.GetTarget(0).Value.Value = script.GetTarget(0).Value.Value.MathAdd(script.GetTarget(1).Value.Value);
+					script.GetTarget(0).Value.Value = script.GetTarget(0).Value.Value.OP_Addition(script.GetTarget(1).Value.Value);
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -227,7 +227,7 @@ namespace RhuEngine.GameTests.Tests
 			script.Targets.Add().Target = value2;
 			script.ScriptCode.Value = @"
 				function RunCode()	{
-					script.GetTarget(0).Value.Value = script.GetTarget(0).Value.Value.MathAdd(script.GetTarget(1).Value.Value);
+					script.GetTarget(0).Value.Value = script.GetTarget(0).Value.Value.OP_Addition(script.GetTarget(1).Value.Value);
 				}
 			";
 			if (!script.ScriptLoaded) {
@@ -260,6 +260,28 @@ namespace RhuEngine.GameTests.Tests
 			Assert.AreEqual(value.Value.Value, value2.Value.Value.x);
 			((IDisposable)tester).Dispose();
 		}
+
+		[TestMethod()]
+		public void TestVectorsStatic() {
+			var script = AttachTestScript();
+			var random = new Random();
+			var test1 = new Vector2f(random.NextSingle(), random.NextSingle());
+			var value = script.Entity.AttachComponent<ValueField<Vector2f>>();
+			value.Value.Value = test1;
+			script.Targets.Add().Target = value;
+			script.ScriptCode.Value = @"
+				function RunCode()	{
+					script.GetTarget(0).Value.Value = Vector2fOne;
+				}
+			";
+			if (!script.ScriptLoaded) {
+				throw new Exception("Script not loaded");
+			}
+			script.Invoke("RunCode");
+			Assert.AreEqual(Vector2f.One, value.Value.Value);
+			((IDisposable)tester).Dispose();
+		}
+
 
 		[TestMethod()]
 		public void TestVectorsCreate() {
@@ -339,7 +361,7 @@ namespace RhuEngine.GameTests.Tests
 			script.Targets.Add().Target = value2;
 			script.ScriptCode.Value = @"
 				function RunCode()	{
-					var value = script.GetTarget(1).Value.Value.MathAdd(script.GetTarget(0).Value.Value);
+					var value = script.GetTarget(1).Value.Value.OP_Addition(script.GetTarget(0).Value.Value);
 					script.GetTarget(1).Value.Value = value;
 				}
 			";
