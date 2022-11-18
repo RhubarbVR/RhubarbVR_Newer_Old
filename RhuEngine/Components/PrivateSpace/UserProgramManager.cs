@@ -82,6 +82,10 @@ namespace RhuEngine.Components
 		public T OpenOnePrivateOpenProgram<T>(Stream file = null, string mimetype = null, string ex = null, params object[] args) where T : Program, new() {
 			foreach (var item in Programs) {
 				if (item is T data) {
+					if(data.programWindows.Count >= 1) {
+						data[0].Maximize();
+						data[0].CenterWindowIntoView();
+					}
 					return data;
 				}
 			}

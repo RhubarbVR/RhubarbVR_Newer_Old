@@ -404,14 +404,23 @@ namespace RhuEngine.Components
 
 			_profileSideButton = AddSideButton("Profile", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.User), () => _profileElement.Entity.enabled.Value = !_profileElement.Entity.enabled.Value);
 			if (Engine.EngineLink.LiveVRChange) {
-				AddSideButton("VRSwitch", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.VRHeadset), () => Engine.EngineLink.ChangeVR(!Engine.IsInVR));
+				AddSideButton("VRSwitch", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.VRHeadset), () => { Engine.EngineLink.ChangeVR(!Engine.IsInVR); ToggleStart(false); });
 			}
 			else {
 				sideBar.Entity.AddChild("VRSwitch").AttachComponent<UIElement>().MinSize.Value = new Vector2i(0, 84);
 			}
-			AddSideButton("Files", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Folder), () => { });
-			AddSideButton("Settings", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Settings), () => { });
-			AddSideButton("Exit", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Shutdown), () => Engine.Close());
+			AddSideButton("Files", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Folder), () => {
+				ProgramManager.PrivateOpenProgram<FileExplorerProgram>();
+				ToggleStart(false);
+			});
+			AddSideButton("Settings", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Settings), () => {
+				ProgramManager.OpenOnePrivateOpenProgram<SettingsProgram>();
+				ToggleStart(false);
+			});
+			AddSideButton("Exit", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Shutdown), () => {
+				Engine.Close();
+				ToggleStart(false);
+			});
 		}
 
 

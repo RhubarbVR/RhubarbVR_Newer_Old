@@ -64,5 +64,12 @@ namespace RhuEngine.Components
 			OnClosedWindow?.Invoke();
 			ProgramManager.UnLoadProgramWindow(this);
 		}
+
+		public void Maximize() {
+			if(PrivateSpaceWindow is null) {
+				return;
+			}
+			PrivateSpaceWindow.Minimized = false;
+		}
 	}
 }

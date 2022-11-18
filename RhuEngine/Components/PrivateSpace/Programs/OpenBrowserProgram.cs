@@ -23,7 +23,6 @@ namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
 	[ProgramOpenWith("text/uri-list", "text/x-uuencode", "text/plain", "nofile/uri")]
-	[UpdateLevel(UpdateEnum.Normal)]
 	public sealed class OpenBrowserProgram : PrivateSpaceProgram
 	{
 		public override RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.Link;

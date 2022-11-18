@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
@@ -44,6 +45,38 @@ namespace RhubarbCloudClient
 			}
 		}
 
+		public async Task<ServerResponse<CreateRecordResponses>> UploadRecordGroup(Guid group,Stream data, string ContentType, bool publicData = true, ProgressTracker progress = null) {
+			var size = data.Length;
+			var req = await CreateRecordGroup(group,size, publicData, ContentType);
+			if (!req.Error) {
+				var stream = new ProgressableStreamContent(data, progress);
+				var httpResponse = await HttpClient.PutAsync(new Uri(req.Data.TempUploadURL), stream);
+				if (!httpResponse.IsSuccessStatusCode) {
+					req.Error = true;
+					req.MSG = await httpResponse.Content.ReadAsStringAsync();
+					stream.ProgressTracker?.ChangeState(ProgressState.Failed);
+					return req;
+				}
+				else {
+					stream.ProgressTracker?.ChangeState(ProgressState.Done);
+					return req;
+				}
+			}
+			else {
+				return req;
+			}
+		}
+
+		public async Task<ServerResponse<CreateRecordResponses>> CreateRecordGroup(Guid group,long sizeInBytes, bool publicData, string ContentType) {
+			var create = await SendPostServerResponses<CreateRecordResponses, RCreateRecord>(API_PATH + RECPATH + "CreateRecordGroup/" + group.ToString(), new RCreateRecord {
+				ContentType = ContentType,
+				Public = publicData,
+				SizeInBytes = sizeInBytes,
+			});
+			await UpdateGroupRecords(group);
+			return create;
+		}
+
 		public async Task<ServerResponse<CreateRecordResponses>> CreateRecord(long sizeInBytes, bool publicData, string ContentType) {
 			var create = await SendPostServerResponses<CreateRecordResponses, RCreateRecord>(API_PATH + RECPATH + "CreateRecord", new RCreateRecord {
 				ContentType = ContentType,
@@ -54,9 +87,12 @@ namespace RhubarbCloudClient
 			return create;
 		}
 
+		public readonly Dictionary<Guid,List<RecordResponses>> GroupRecordResponses = new();
+
 		public readonly List<RecordResponses> RecordResponses = new();
 
 		public event Action RecordResponsesUpdate;
+		public event Action<Guid> RecordResponsesUpdateGroup;
 
 		public async Task LoadStartDataGroups() {
 			await UpdateRecords();
@@ -67,6 +103,10 @@ namespace RhubarbCloudClient
 			return await SendGetServerResponses<RecordResponses[]>(API_PATH + RECPATH + "GetRecords");
 		}
 
+		public async Task<ServerResponse<RecordResponses[]>> GetRecordsGroup(Guid group) {
+			return await SendGetServerResponses<RecordResponses[]>(API_PATH + RECPATH + "GetRecordsGroup/" + group.ToString());
+		}
+
 		public async Task UpdateRecords() {
 			var data = await GetRecords();
 			if (data.Error) {
@@ -75,6 +115,22 @@ namespace RhubarbCloudClient
 			RecordResponses.Clear();
 			RecordResponses.AddRange(data.Data);
 			RecordResponsesUpdate?.Invoke();
+		}
+
+		public async Task UpdateGroupRecords(Guid group) {
+			var data = await GetRecordsGroup(group);
+			if (data.Error) {
+				return;
+			}
+			if(GroupRecordResponses.TryGetValue(group,out var ldata)) {
+				ldata.Clear();
+				ldata.AddRange(data.Data);
+				RecordResponsesUpdateGroup?.Invoke(group);
+			}
+			else {
+				GroupRecordResponses.Add(group, data.Data.ToList());
+				RecordResponsesUpdateGroup?.Invoke(group);
+			}
 		}
 
 		public async Task<ServerResponse<RecordAccessResponses>> GetRecordAccesses(Guid target) {
