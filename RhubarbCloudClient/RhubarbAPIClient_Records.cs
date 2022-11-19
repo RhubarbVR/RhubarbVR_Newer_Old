@@ -28,6 +28,13 @@ namespace RhubarbCloudClient
 			var req = await CreateRecord(size, publicData, publicDataStaticURL, ContentType);
 			if (!req.Error) {
 				var stream = new ProgressableStreamContent(data, progress);
+				stream.Headers.Add("Content-Type", ContentType);
+				stream.Headers.Add("x-upload-content-length", size.ToString());
+				if (publicDataStaticURL) {
+					stream.Headers.Add("X-Goog-Acl", "public-read");
+					stream.Headers.Add("Cache-Control", "public, max-age=31540000");
+
+				}
 				var httpResponse = await HttpClient.PutAsync(new Uri(req.Data.TempUploadURL), stream);
 				if (!httpResponse.IsSuccessStatusCode) {
 					req.Error = true;
@@ -50,6 +57,13 @@ namespace RhubarbCloudClient
 			var req = await CreateRecordGroup(group,size, publicData, publicDataStaticURL, ContentType);
 			if (!req.Error) {
 				var stream = new ProgressableStreamContent(data, progress);
+				stream.Headers.Add("Content-Type", ContentType);
+				stream.Headers.Add("x-upload-content-length", size.ToString());
+				if (publicDataStaticURL) {
+					stream.Headers.Add("X-Goog-Acl", "public-read");
+					stream.Headers.Add("Cache-Control", "public, max-age=31540000");
+
+				}
 				var httpResponse = await HttpClient.PutAsync(new Uri(req.Data.TempUploadURL), stream);
 				if (!httpResponse.IsSuccessStatusCode) {
 					req.Error = true;
