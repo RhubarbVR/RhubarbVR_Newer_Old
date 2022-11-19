@@ -105,6 +105,9 @@ namespace RhuEngine.WorldObjects
 						Pings.Add(item, (int)e.RoundtripTime);
 					}
 				}
+				if (!Guid.TryParse(ThumNail.Value, out var thumNail)) {
+					thumNail = Guid.Empty;
+				}
 				////TODO: add support for changeing on connection info 
 				var userConnection = new UserConnectionInfo {
 					ConnectionType = ConnectionType.HolePunch,
@@ -122,7 +125,7 @@ namespace RhuEngine.WorldObjects
 						SessionAccessLevel = AccessLevel.Value,
 						MaxUsers = MaxUserCount.Value,
 						IsHidden = IsHidden.Value,
-						ThumNail = ThumNail.Value,
+						ThumNail = thumNail,
 						WorldID = WorldID.Value,
 						IsAssociatedToGroup = Guid.TryParse(AssociatedGroup.Value, out var gorupID),
 						AssociatedGroup = gorupID,
@@ -144,11 +147,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-#if DEBUG
-		private string KEY => $"MyNameISJeffryFromMilksnake{worldManager.Engine.version.Major}{worldManager.Engine.version.Minor}";
-#else
-		private string KEY => $"MyNameISJeffryFromRhubarbVR{worldManager.Engine.version.Major}{worldManager.Engine.version.Minor}";
-#endif
+		private string KEY => $"Rhubarb_{worldManager.Engine.netApiManager.Client.ClientCompatibility}";
 
 		public ConcurrentDictionary<string, bool> NatIntroductionSuccessIsGood = new();
 		public ConcurrentDictionary<string, NetPeer> NatConnection = new();
@@ -337,7 +336,7 @@ namespace RhuEngine.WorldObjects
 				var data = reader.GetRemainingBytes();
 				if (peer.Tag is Peer) {
 					var tag = peer.Tag as Peer;
-					if(deliveryMethod == DeliveryMethod.Unreliable) {
+					if (deliveryMethod == DeliveryMethod.Unreliable) {
 						if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
 							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
 						}

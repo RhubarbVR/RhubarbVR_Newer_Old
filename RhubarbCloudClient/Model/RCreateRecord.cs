@@ -10,6 +10,8 @@ namespace RhubarbCloudClient.Model
 
         public bool Public { get; set; }
 
-        public string ContentType { get; set; }
+		public bool PublicStaticURL { get; set; }
+
+		public string ContentType { get; set; }
     }
 }

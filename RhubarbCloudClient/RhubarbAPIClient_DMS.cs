@@ -38,10 +38,10 @@ namespace RhubarbCloudClient
 			public async Task<Uri> DMAsset() {
 				if(IsUserDm) {
 					var user = await Client.GetUser(DM.Users.Where((x) => x != Client.User.Id).FirstOrDefault());
-					return await Client.GetRecordDownloadURL(Guid.Parse(user.UserData.ProfileIcon));
+					return await Client.GetRecordDownloadURL(user.UserData.ProfileIcon);
 				}
 				else {
-					return await Client.GetRecordDownloadURL(Guid.Parse(DM.Thumbnail));
+					return await Client.GetRecordDownloadURL(DM.Thumbnail);
 				}
 			}
 

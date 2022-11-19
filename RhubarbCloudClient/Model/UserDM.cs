@@ -32,7 +32,7 @@ namespace RhubarbCloudClient.Model
 		public Guid LastMsgId { get; set; }
 
 		public string DMName { get; set; }
-		public string Thumbnail { get; set; }
+		public Guid Thumbnail { get; set; }
 		public bool IsGorupDM { get; set; }
 		public Guid[] Users { get; set; }
 		public MSG[] Msgs { get; set; }

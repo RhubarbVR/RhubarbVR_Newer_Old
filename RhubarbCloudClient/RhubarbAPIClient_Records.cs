@@ -23,9 +23,9 @@ namespace RhubarbCloudClient
 	{
 		public const string RECPATH = "records/";
 
-		public async Task<ServerResponse<CreateRecordResponses>> UploadRecord(Stream data, string ContentType, bool publicData = true, ProgressTracker progress = null) {
+		public async Task<ServerResponse<CreateRecordResponses>> UploadRecord(Stream data, string ContentType, bool publicDataStaticURL = true, bool publicData = true, ProgressTracker progress = null) {
 			var size = data.Length;
-			var req = await CreateRecord(size, publicData, ContentType);
+			var req = await CreateRecord(size, publicData, publicDataStaticURL, ContentType);
 			if (!req.Error) {
 				var stream = new ProgressableStreamContent(data, progress);
 				var httpResponse = await HttpClient.PutAsync(new Uri(req.Data.TempUploadURL), stream);
@@ -45,9 +45,9 @@ namespace RhubarbCloudClient
 			}
 		}
 
-		public async Task<ServerResponse<CreateRecordResponses>> UploadRecordGroup(Guid group,Stream data, string ContentType, bool publicData = true, ProgressTracker progress = null) {
+		public async Task<ServerResponse<CreateRecordResponses>> UploadRecordGroup(Guid group,Stream data, string ContentType, bool publicDataStaticURL = true, bool publicData = true, ProgressTracker progress = null) {
 			var size = data.Length;
-			var req = await CreateRecordGroup(group,size, publicData, ContentType);
+			var req = await CreateRecordGroup(group,size, publicData, publicDataStaticURL, ContentType);
 			if (!req.Error) {
 				var stream = new ProgressableStreamContent(data, progress);
 				var httpResponse = await HttpClient.PutAsync(new Uri(req.Data.TempUploadURL), stream);
@@ -67,20 +67,22 @@ namespace RhubarbCloudClient
 			}
 		}
 
-		public async Task<ServerResponse<CreateRecordResponses>> CreateRecordGroup(Guid group,long sizeInBytes, bool publicData, string ContentType) {
+		public async Task<ServerResponse<CreateRecordResponses>> CreateRecordGroup(Guid group,long sizeInBytes, bool publicData, bool publicDataStaticURL, string ContentType) {
 			var create = await SendPostServerResponses<CreateRecordResponses, RCreateRecord>(API_PATH + RECPATH + "CreateRecordGroup/" + group.ToString(), new RCreateRecord {
 				ContentType = ContentType,
 				Public = publicData,
+				PublicStaticURL= publicDataStaticURL,
 				SizeInBytes = sizeInBytes,
 			});
 			await UpdateGroupRecords(group);
 			return create;
 		}
 
-		public async Task<ServerResponse<CreateRecordResponses>> CreateRecord(long sizeInBytes, bool publicData, string ContentType) {
+		public async Task<ServerResponse<CreateRecordResponses>> CreateRecord(long sizeInBytes, bool publicData, bool publicDataStaticURL, string ContentType) {
 			var create = await SendPostServerResponses<CreateRecordResponses, RCreateRecord>(API_PATH + RECPATH + "CreateRecord", new RCreateRecord {
 				ContentType = ContentType,
 				Public = publicData,
+				PublicStaticURL = publicDataStaticURL,
 				SizeInBytes = sizeInBytes,
 			});
 			await UpdateRecords();

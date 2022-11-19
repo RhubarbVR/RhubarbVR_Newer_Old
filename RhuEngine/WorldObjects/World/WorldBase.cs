@@ -172,7 +172,7 @@ namespace RhuEngine.WorldObjects
 		public readonly Sync<string> SessionName;
 
 		[NoSave]
-		[Default("https://rhubarbvr.net/images/RhubarbVR2.png")]
+		[Default("")]
 		[OnChanged(nameof(SessionInfoChanged))]
 		public readonly Sync<string> ThumNail;
 

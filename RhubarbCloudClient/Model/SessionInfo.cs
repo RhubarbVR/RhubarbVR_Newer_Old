@@ -16,7 +16,7 @@ namespace RhubarbCloudClient.Model
 		public int UsersInSession { get; set; }
 
 		public bool IsHidden { get; set; }
-		public string ThumNail { get; set; }
+		public Guid ThumNail { get; set; }
 		public bool IsAssociatedToGroup { get; set; }
 		public Guid AssociatedGroup { get; set; }
 		public Guid AssociatedWorld { get; set; }
