@@ -5,6 +5,8 @@ using System.Text;
 
 using DataModel.Enums;
 
+using Newtonsoft.Json;
+
 namespace RhubarbCloudClient.Model
 {
 	public sealed class SessionInfo
@@ -17,6 +19,9 @@ namespace RhubarbCloudClient.Model
 
 		public bool IsHidden { get; set; }
 		public Guid ThumNail { get; set; }
+
+		[JsonIgnore]
+		public string ThumNailURL => StaticData.GetPublicData(ThumNail);
 		public bool IsAssociatedToGroup { get; set; }
 		public Guid AssociatedGroup { get; set; }
 		public Guid AssociatedWorld { get; set; }

@@ -153,6 +153,10 @@ namespace RhubarbCloudClient
 			return await SendGetServerResponses<RecordAccessResponses>(API_PATH + RECPATH + target.ToString() + "/GetRecord");
 		}
 
+		public async Task<ServerResponse<SyncFile[]>> GetRecordFiles(Guid target) {
+			return await SendGetServerResponses<SyncFile[]>(API_PATH + RECPATH + "GetRecordFiles/" + target.ToString());
+		}
+
 		public async Task<Uri> GetRecordDownloadURL(Guid target) {
 			var req = await GetRecordAccesses(target);
 			return req.Error ? null : new Uri(req.Data.TempURL);
