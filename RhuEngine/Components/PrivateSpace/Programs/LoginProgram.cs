@@ -79,6 +79,10 @@ namespace RhuEngine.Components
 		[Exposed]
 		public void LoginReg() {
 			if (_login) {
+				if (string.IsNullOrEmpty(_email.Text.Value) || string.IsNullOrEmpty(_password.Text.Value)) {
+					Error("Programs.Login.nullError");
+					return;
+				}
 				Task.Run(async () => {
 					var res = await Engine.netApiManager.Client.Login(_email.Text.Value, _password.Text.Value, _twoFA.Text.Value);
 					Error(res.MSG);
@@ -89,6 +93,10 @@ namespace RhuEngine.Components
 					Error("Programs.Login.MatchPassword");
 					return;
 				}
+				if (string.IsNullOrEmpty(_email.Text.Value) || string.IsNullOrEmpty(_password.Text.Value) || string.IsNullOrEmpty(_username.Text.Value)) {
+					Error("Programs.Login.nullError");
+					return;
+				}
 				Task.Run(async () => {
 					var res = await Engine.netApiManager.Client.RegisterAccount(_username.Text.Value, _password.Text.Value, _email.Text.Value);
 					if (res.Data == "Programs.Login.Code") {
@@ -96,12 +104,7 @@ namespace RhuEngine.Components
 						Error("");
 						return;
 					}
-					if (res.IsDataGood) {
-						Error(res.Data);
-					}
-					else {
-						Error(res.Data);
-					}
+					Error(res.Data);
 				});
 			}
 		}
@@ -131,6 +134,7 @@ namespace RhuEngine.Components
 		[Exposed]
 		public void ToggleLoginScreen() {
 			_login = !_login;
+			Error("");
 			if (_login) {
 				_loadingImg.Entity.enabled.Value = true;
 				_loginLoc.Key.Value = "Programs.Login.LoginButton";

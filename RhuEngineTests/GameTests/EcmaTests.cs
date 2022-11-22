@@ -459,7 +459,6 @@ namespace RhuEngine.GameTests.Tests
 			script.ScriptCode.Value = @"
 				function RunCode()	{
 					script.Entity.AttachComponent(getType(""ValueField<World>""));
-					var e = new Vector3f(1,1,1);
 				}
 			";
 			if (!script.ScriptLoaded) {
