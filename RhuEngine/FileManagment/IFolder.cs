@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace RhuEngine
 {
@@ -14,6 +15,8 @@ namespace RhuEngine
 		public IFile[] Files { get; }
 		public IFolder[] Folders { get; }
 		public IDrive Drive { get; }
+
+		public Task Refresh();
 
 	}
 }

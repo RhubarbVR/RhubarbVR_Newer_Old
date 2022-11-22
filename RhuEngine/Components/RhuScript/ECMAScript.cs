@@ -244,9 +244,6 @@ namespace RhuEngine.Components
 		}
 		private sealed class ObjectAdder<T> : IObjectAdder
 		{
-			public RDynamic<T> valueOne;
-			public RDynamic<T> valueTwo;
-
 			public object Addition(object obj, object b) {
 				T value = (RDynamic<T>)(T)obj + (RDynamic<T>)(T)b;
 				return value;

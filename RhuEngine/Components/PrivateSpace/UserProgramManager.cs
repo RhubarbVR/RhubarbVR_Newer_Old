@@ -35,18 +35,19 @@ namespace RhuEngine.Components
 			Engine.netApiManager.Client.OnLogout += Client_OnLogout;
 			Engine.netApiManager.Client.HasGoneOfline += Client_HasGoneOfline;
 			Engine.netApiManager.Client.HasGoneOnline += Client_HasGoneOnline;
-
-			OverlayProgram = OpenOnePrivateOpenProgram<OverlayProgram>();
-			if (!Engine.netApiManager.Client.IsOnline) {
-				Client_HasGoneOfline();
-				return;
-			}
-			if (Engine.netApiManager.Client.IsLogin) {
-				Client_HasGoneOnline();
-			}
-			else {
-				Client_HasGoneOfline();
-			}
+			RenderThread.ExecuteOnStartOfFrame(() => {
+				OverlayProgram = OpenOnePrivateOpenProgram<OverlayProgram>();
+				if (!Engine.netApiManager.Client.IsOnline) {
+					Client_HasGoneOfline();
+					return;
+				}
+				if (Engine.netApiManager.Client.IsLogin) {
+					Client_HasGoneOnline();
+				}
+				else {
+					Client_HasGoneOfline();
+				}
+			});
 		}
 
 		private void Client_HasGoneOnline() {
@@ -82,7 +83,7 @@ namespace RhuEngine.Components
 		public T OpenOnePrivateOpenProgram<T>(Stream file = null, string mimetype = null, string ex = null, params object[] args) where T : Program, new() {
 			foreach (var item in Programs) {
 				if (item is T data) {
-					if(data.programWindows.Count >= 1) {
+					if (data.programWindows.Count >= 1) {
 						data[0].Maximize();
 						data[0].CenterWindowIntoView();
 					}
@@ -102,7 +103,7 @@ namespace RhuEngine.Components
 				: OpenProgram(programType, WorldManager.FocusedWorld, file, mimetype, ex, args);
 		}
 
-		public Program OpenProgram(Type programType,World world, Stream file = null, string mimetype = null, string ex = null, params object[] args) {
+		public Program OpenProgram(Type programType, World world, Stream file = null, string mimetype = null, string ex = null, params object[] args) {
 			var program = world.RootEntity.AddChild(programType.Name).AttachComponent<Program>(programType);
 			program.StartProgram(file, mimetype, ex, args);
 			return program;

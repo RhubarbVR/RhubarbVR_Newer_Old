@@ -53,5 +53,9 @@ namespace RhuEngine
 			var data = await _netApiManager.Client.GetFolder(_target);
 			syncFolder = data.Data;
 		}
+
+		public override Task Refresh() {
+			return UpdateInfoAsync();
+		}
 	}
 }

@@ -244,7 +244,18 @@
     "Programs.Settings.Name": "Settings",
     "Account.ChangePassword": "Change Password",
 
+    "Programs.FileExplorer.Size": "Size",
+    "Programs.FileExplorer.Type": "Type",
+    "Programs.FileExplorer.FileName": "Name",
 
+    "Programs.FileExplorer.SpecialFolder.Desktop": "Desktop",
+    "Programs.FileExplorer.SpecialFolder.MyPictures": "Pictures",
+    "Programs.FileExplorer.SpecialFolder.MyDocuments": "Documents",
+    "Programs.FileExplorer.SpecialFolder.MyVideos": "Videos",
+    "Programs.FileExplorer.SpecialFolder.MyMusic": "Music",
+
+
+    "Programs.FileExplorer.ThisPC": "This PC",
     "Programs.FileExplorer.Name": "File Explorer",
     "Programs.FileExplorer.Path": "Path",
     "Programs.CreateNewWorld.Name": "Create New World",

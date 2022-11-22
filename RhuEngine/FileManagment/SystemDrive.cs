@@ -8,7 +8,8 @@ namespace RhuEngine
 {
 	public sealed class SystemDrive : IDrive
 	{
-		public SystemDrive(DriveInfo driveInfo) {
+		public SystemDrive(Engine engine, DriveInfo driveInfo) {
+			Engine = engine;
 			_driveInfo = driveInfo;
 		}
 
@@ -23,5 +24,15 @@ namespace RhuEngine
 		public long TotalBytes => _driveInfo.TotalSize;
 
 		public IFolder Root => new SystemFolder(Path, this, null);
+
+		public Engine Engine { get; }
+
+		public SystemFile GetFile(string path) {
+			return new SystemFile(path, this);
+		}
+
+		public SystemFolder GetFolder(string path) {
+			return new SystemFolder(path, this);
+		}
 	}
 }

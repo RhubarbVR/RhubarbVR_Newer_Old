@@ -304,7 +304,6 @@ namespace RhuEngine
 					catch (Exception ex) {
 						RLog.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
 						IntMsg = $"Failed to start {item.GetType().GetFormattedName()} Error:{ex}";
-						//throw ex;
 						return;
 					}
 				}
@@ -365,7 +364,6 @@ namespace RhuEngine
 		private Vector3f _loadingPos = Vector3f.Zero;
 
 		public void Step() {
-			RenderThread.RunOnStartOfFrame();
 			if (EngineStarting) {
 				if (EngineLink.CanRender) {
 					try {
@@ -389,9 +387,9 @@ namespace RhuEngine
 						throw ex;
 					}
 				}
-				RenderThread.RunOnEndOfFrame();
 				return;
 			}
+			RenderThread.RunOnStartOfFrame();
 			GameStep();
 			RenderStep();
 			RenderThread.RunOnEndOfFrame();

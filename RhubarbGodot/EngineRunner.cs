@@ -90,7 +90,7 @@ public partial class EngineRunner : Node3D, IRTime
 		RLog.Info("App Path: " + appPath);
 		engine = new Engine(link, args.ToArray(), outputCapture, appPath);
 		engine.OnCloseEngine += () => GetTree().Quit();
-		engine.Init(false);
+		engine.Init();
 	}
 
 	public string Typer;

@@ -54,7 +54,7 @@ namespace RhuEngine
 		/// <param name="fileName">The name of the file.</param>
 		/// <param name="mimeType">The MIME-type for the given file name.</param>
 		/// <returns><c>true</c> if a MIME-type was found, <c>false</c> otherwise.</returns>
-		public static bool TryGetMimeType(string? fileName, [NotNullWhen(true)] out string? mimeType) {
+		public static bool TryGetMimeType(string fileName, [NotNullWhen(true)] out string mimeType) {
 			if (fileName is null) {
 				mimeType = null;
 				return false;
@@ -109,7 +109,7 @@ namespace RhuEngine
 		/// <param name="fileName">The name of the file.</param>
 		/// <param name="mimeType">The MIME-type for the given file name.</param>
 		/// <returns><c>true</c> if a MIME-type was found, <c>false</c> otherwise.</returns>
-		public static bool TryGetMimeType(string? fileName, [NotNullWhen(true)] out string? mimeType) {
+		public static bool TryGetMimeType(string fileName, [NotNullWhen(true)] out string mimeType) {
 			return CustomMimeTypes.TryGetMimeType(fileName, out mimeType) || MimeTypes.TryGetMimeType(fileName, out mimeType);
 		}
 

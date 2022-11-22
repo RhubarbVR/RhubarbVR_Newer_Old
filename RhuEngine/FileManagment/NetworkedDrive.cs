@@ -17,12 +17,13 @@ namespace RhuEngine
 			_target = target;
 			_netApiManager = netApiManager;
 			_isGroup = isGroup;
+			Engine = netApiManager.WorldManager.Engine;
 			UpdateInfo();
 		}
 		private readonly NetApiManager _netApiManager;
 
-		private readonly Guid _target;
-		private readonly bool _isGroup;
+		public readonly Guid _target;
+		public readonly bool _isGroup;
 
 		public string Path => Name;
 
@@ -41,6 +42,8 @@ namespace RhuEngine
 
 		public IFolder Root => new NetworkedFolder(_target, _netApiManager, null, this);
 
+		public Engine Engine { get; }
+
 		public SyncFolder syncFolder;
 
 		private void UpdateInfo() {
@@ -55,6 +58,40 @@ namespace RhuEngine
 				UsedBytes = _netApiManager.Client.User.UsedBytes;
 				TotalBytes = _netApiManager.Client.User.TotalBytes;
 			}
+		}
+
+		public bool TryGetDataFromPath(string path, out IFolder folder, out IFile file) {
+			var data = path.Split('/', '\\');
+			var parrentFolder = Root;
+			for (var i = 1; i < data.Length; i++) {
+				var currentPathPoint = data[i];
+				var foundParrent = false;
+				foreach (var item in parrentFolder.Folders) {
+					if (item.Name == currentPathPoint) {
+						parrentFolder = item;
+						foundParrent = true;
+						if (data.Length == i + 1) {
+							folder = item;
+							file = null;
+							return true;
+						}
+						break;
+					}
+				}
+				if (foundParrent) {
+					continue;
+				}
+				foreach (var item in parrentFolder.Files) {
+					if (item.Name == currentPathPoint) {
+						folder = null;
+						file = item;
+						return true;
+					}
+				}
+			}
+			folder = null;
+			file = null;
+			return false;
 		}
 	}
 }

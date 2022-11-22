@@ -26,7 +26,7 @@ namespace RhuEngine.Managers
 			lock (Drives) {
 				Drives.Clear();
 				foreach (var drive in DriveInfo.GetDrives()) {
-					Drives.Add(new SystemDrive(drive));
+					Drives.Add(new SystemDrive(_engine, drive));
 				}
 			}
 		}
@@ -37,6 +37,51 @@ namespace RhuEngine.Managers
 		public void ReloadAllDrives() {
 			ReloadSystemDrives();
 			ReloadNetDrives();
+		}
+
+		public async Task ReloadAllDrivesAsync() {
+			ReloadSystemDrives();
+			await AsyncReloadNetDrives();
+		}
+
+		public bool TryGetDataFromPath(string path, out IFolder folder, out IFile file) {
+			if (Directory.Exists(path)) {
+				folder = path.EndsWith("\\") || path.EndsWith("/") ? GetSystemFolder(path) : (IFolder)GetSystemFolder(path + "\\");
+				file = null;
+				return true;
+			}
+			if (File.Exists(path)) {
+				folder = null;
+				file = GetSystemFile(path);
+				return true;
+			}
+			foreach (var item in NetDrives) {
+				if ((item.Path.ToLower() == path.ToLower()) || (item._target.ToString() == path)) {
+					return item.TryGetDataFromPath(path, out folder, out file);
+				}
+			}
+			folder = null;
+			file = null;
+			return false;
+		}
+		private SystemDrive GetSystemDrive(string pathRoot) {
+			ReloadSystemDrives();
+			foreach (var item in Drives) {
+				if (item.Path == pathRoot) {
+					return item;
+				}
+			}
+			return null;
+		}
+
+		private SystemFile GetSystemFile(string path) {
+			var drive = GetSystemDrive(Path.GetPathRoot(path));
+			return drive.GetFile(path);
+		}
+		private SystemFolder GetSystemFolder(string path) {
+			var drive = GetSystemDrive(Path.GetPathRoot(path));
+			RLog.Info(path);
+			return drive.GetFolder(path);
 		}
 
 		public async Task AsyncReloadNetDrives() {

@@ -176,9 +176,13 @@ namespace RhuEngine.WorldObjects
 					World.RegisterWorldObject(this);
 				}
 				InitializeMembers(networkedObject, deserialize, netPointer);
-				OnInitialize();
-				if (!deserialize) {
-					OnLoaded();
+				try {
+					OnInitialize();
+					if (!deserialize) {
+						OnLoaded();
+					}
+				}catch(Exception ex) {
+					throw new Exception("Failed to load", ex);
 				}
 				if (typeof(IGlobalStepable).IsAssignableFrom(GetType())) {
 					world.RegisterGlobalStepable((IGlobalStepable)this);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace RhuEngine
 {
@@ -22,5 +23,6 @@ namespace RhuEngine
 
 		public abstract IFolder[] Folders { get; }
 
+		public abstract Task Refresh();
 	}
 }

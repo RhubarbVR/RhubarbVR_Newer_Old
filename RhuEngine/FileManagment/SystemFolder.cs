@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace RhuEngine
 {
@@ -12,6 +13,17 @@ namespace RhuEngine
 			_path = path;
 			Drive = drive;
 			Parrent = parrent;
+		}
+
+		public SystemFolder(string path, IDrive drive) {
+			_path = path;
+			Drive = drive;
+			var parrent = Directory.GetParent(path);
+			if(parrent.FullName == System.IO.Path.GetPathRoot(parrent.FullName)) {
+				Parrent = null;
+				return;
+			}
+			Parrent = new SystemFolder(parrent.FullName, drive);
 		}
 		private readonly string _path;
 		public override string Name
@@ -41,5 +53,8 @@ namespace RhuEngine
 
 		public override IFolder[] Folders => Directory.GetFiles(_path).Select(x => new SystemFolder(x, Drive, this)).ToArray();
 
+		public override Task Refresh() {
+			return Task.CompletedTask;
+		}
 	}
 }

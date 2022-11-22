@@ -4,6 +4,7 @@ using System.Text;
 
 namespace RhuEngine
 {
+
 	public interface IFile
 	{
 		public string Name { get; set; }

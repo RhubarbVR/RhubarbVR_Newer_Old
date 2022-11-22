@@ -13,6 +13,17 @@ namespace RhuEngine
 			Drive = drive;
 			Parrent = parrent;
 		}
+		public SystemFile(string path, IDrive drive) {
+			_path = path;
+			Drive = drive;
+			var parrent = Directory.GetParent(path);
+			if (parrent.FullName == System.IO.Path.GetPathRoot(parrent.FullName)) {
+				Parrent = null;
+				return;
+			}
+			Parrent = new SystemFolder(parrent.FullName, drive);
+		}
+
 		private readonly string _path;
 		public override string Name { get => System.IO.Path.GetDirectoryName(_path); set => File.Move(_path, System.IO.Path.Combine(Directory.GetParent(_path).FullName, value)); }
 
@@ -27,7 +38,7 @@ namespace RhuEngine
 		public override long SizeInBytes => new FileInfo(Path).Length;
 
 		public override void Open() {
-			throw new NotImplementedException();
+			Drive?.Engine?.worldManager?.PrivateSpaceManager?.ProgramManager?.OverlayProgram?.OpenFile(_path);
 		}
 	}
 }

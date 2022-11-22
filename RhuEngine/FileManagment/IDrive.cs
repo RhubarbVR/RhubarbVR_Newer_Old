@@ -6,6 +6,7 @@ namespace RhuEngine
 {
 	public interface IDrive
 	{
+		public Engine Engine { get; }
 		public string Path { get; }
 		public string Name { get; set; }
 		public long UsedBytes { get; }
