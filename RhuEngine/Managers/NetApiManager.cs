@@ -34,7 +34,7 @@ namespace RhuEngine.Managers
 		public RhubarbAPIClient Client { get; private set; }
 
 		public NetApiManager(string path) {
-#if DEBUG
+#if false && DEBUG
 			Client = new RhubarbAPIClient(RhubarbAPIClient.BaseUri, path) {
 				UserConnectionBind = UserConnection,
 				SessionErrorBind = SessionError,
