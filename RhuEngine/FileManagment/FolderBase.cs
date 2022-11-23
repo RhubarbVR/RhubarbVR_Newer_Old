@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
+using RhuEngine.Linker;
+
 namespace RhuEngine
 {
 	public abstract class FolderBase : IFolder
@@ -22,6 +24,8 @@ namespace RhuEngine
 		public abstract IFile[] Files { get; }
 
 		public abstract IFolder[] Folders { get; }
+
+		public RTexture2D Texture => Drive.Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Folder);
 
 		public abstract Task Refresh();
 	}

@@ -28,7 +28,7 @@ namespace RhuEngine
 		private readonly string _path;
 		public override string Name
 		{
-			get => Parrent is null ? (Drive?.Name) : System.IO.Path.GetDirectoryName(_path);
+			get => Parrent is null ? (Drive?.Name) : System.IO.Path.GetFileName(_path);
 			set {
 				if (Parrent is null) {
 					if (Drive is null) {
@@ -51,7 +51,7 @@ namespace RhuEngine
 
 		public override IFile[] Files => Directory.GetFiles(_path).Select(x => new SystemFile(x, Drive, this)).ToArray();
 
-		public override IFolder[] Folders => Directory.GetFiles(_path).Select(x => new SystemFolder(x, Drive, this)).ToArray();
+		public override IFolder[] Folders => Directory.GetDirectories(_path).Select(x => new SystemFolder(x, Drive, this)).ToArray();
 
 		public override Task Refresh() {
 			return Task.CompletedTask;

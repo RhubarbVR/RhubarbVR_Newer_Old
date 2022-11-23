@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using RhubarbCloudClient.Model;
 
+using RhuEngine.Linker;
 using RhuEngine.Managers;
 
 namespace RhuEngine
@@ -42,7 +43,8 @@ namespace RhuEngine
 
 		public override IDrive Drive { get; }
 
-		public override long SizeInBytes => throw new NotImplementedException();
+		public override long SizeInBytes => 0;
+		public override RTexture2D Texture => Drive.Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.File);
 
 		private void UpdateInfo() {
 			Task.Run(UpdateInfoAsync);

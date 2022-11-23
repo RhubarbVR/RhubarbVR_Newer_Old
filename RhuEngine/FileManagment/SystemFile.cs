@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+using RhuEngine.Linker;
+
 namespace RhuEngine
 {
 	public sealed class SystemFile : FileBase
@@ -25,7 +27,7 @@ namespace RhuEngine
 		}
 
 		private readonly string _path;
-		public override string Name { get => System.IO.Path.GetDirectoryName(_path); set => File.Move(_path, System.IO.Path.Combine(Directory.GetParent(_path).FullName, value)); }
+		public override string Name { get => System.IO.Path.GetFileName(_path); set => File.Move(_path, System.IO.Path.Combine(Directory.GetParent(_path).FullName, value)); }
 
 		public override IFolder Parrent { get; }
 
@@ -36,7 +38,7 @@ namespace RhuEngine
 		public override IDrive Drive { get; }
 
 		public override long SizeInBytes => new FileInfo(Path).Length;
-
+		public override RTexture2D Texture => Drive.Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.File);
 		public override void Open() {
 			Drive?.Engine?.worldManager?.PrivateSpaceManager?.ProgramManager?.OverlayProgram?.OpenFile(_path);
 		}

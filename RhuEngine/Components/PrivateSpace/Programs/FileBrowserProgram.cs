@@ -65,6 +65,7 @@ namespace RhuEngine.Components
 			if (_backList.Count > 25) {
 				_backList.RemoveAt(0);
 			}
+			_forwaredList.Clear();
 			UpdateFolder(folder);
 			UpdateRedoUndoButtons();
 		}
@@ -146,6 +147,10 @@ namespace RhuEngine.Components
 			_elements.Entity.DestroyChildren();
 			if (CurrentFolder is null) {
 				//Build this pc
+				var scrollRoot = _elements.Entity.AddChild("ScrollRoot").AttachComponent<ScrollContainer>();
+				scrollRoot.ClipContents.Value = true;
+				var gridData = scrollRoot.Entity.AddChild("list").AttachComponent<GridContainer>();
+
 
 
 				return;
@@ -153,20 +158,76 @@ namespace RhuEngine.Components
 			var allFolders = CurrentFolder.Folders;
 			var allFiles = CurrentFolder.Files;
 			if (_isGridLayout) {
-				var currentIndex = 0;
-				foreach (var item in allFolders) {
+				var scrollRoot = _elements.Entity.AddChild("ScrollRoot").AttachComponent<ScrollContainer>();
+				scrollRoot.ClipContents.Value = true;
+				var gridData = scrollRoot.Entity.AddChild("list").AttachComponent<GridContainer>();
+				gridData.Columns.Value = 3;
 
-					currentIndex++;
+				foreach (var item in allFolders) {
+					var buttonBase = gridData.Entity.AddChild(item.Name).AttachComponent<Button>();
+					buttonBase.MinSize.Value = new Vector2i(125);
+					buttonBase.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+					var boxButtonCon = buttonBase.Entity.AddChild().AttachComponent<BoxContainer>();
+					boxButtonCon.Vertical.Value = true;
+					boxButtonCon.Alignment.Value = RBoxContainerAlignment.Center;
+					var Icon = boxButtonCon.Entity.AddChild().AttachComponent<TextureRect>();
+					Icon.MinSize.Value = new Vector2i(65);
+					var asset = Icon.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+					Icon.Texture.Target = asset;
+					Icon.IgnoreTextureSize.Value = true;
+					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
+					asset.LoadAsset(item.Texture);
+					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<TextLabel>();
+					itemData.Text.Value = item.Name;
+					itemData.HorizontalAlignment.Value = RHorizontalAlignment.Center;
+					itemData.AutowrapMode.Value = RAutowrapMode.Arbitrary;
+					itemData.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
+					itemData.TextSize.Value = 20;
+					itemData.MinSize.Value = new Vector2i(155, 20);
+					itemData.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
+
+					var del = buttonBase.Entity.AttachComponent<DelegateCall>();
+					buttonBase.Pressed.Target = del.CallDelegate;
+					del.action = () => UpdateFolderAddBack(item);
+					boxButtonCon.InputFilter.Value = RInputFilter.Pass;
+					itemData.InputFilter.Value = RInputFilter.Pass;
+					Icon.InputFilter.Value = RInputFilter.Pass;
 				}
 				foreach (var item in allFiles) {
+					var buttonBase = gridData.Entity.AddChild(item.Name).AttachComponent<Button>();
+					buttonBase.MinSize.Value = new Vector2i(125);
+					buttonBase.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+					var boxButtonCon = buttonBase.Entity.AddChild().AttachComponent<BoxContainer>();
+					boxButtonCon.Vertical.Value = true;
+					boxButtonCon.Alignment.Value = RBoxContainerAlignment.Center;
+					var Icon = boxButtonCon.Entity.AddChild().AttachComponent<TextureRect>();
+					Icon.MinSize.Value = new Vector2i(65);
+					var asset = Icon.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+					Icon.Texture.Target = asset;
+					Icon.IgnoreTextureSize.Value = true;
+					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
+					asset.LoadAsset(item.Texture);
+					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<TextLabel>();
+					itemData.Text.Value = item.Name;
+					itemData.HorizontalAlignment.Value = RHorizontalAlignment.Center;
+					itemData.AutowrapMode.Value = RAutowrapMode.Arbitrary;
+					itemData.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
+					itemData.TextSize.Value = 20;
+					itemData.MinSize.Value = new Vector2i(155, 20);
+					itemData.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
 
-					currentIndex++;
+					var del = buttonBase.Entity.AttachComponent<DelegateCall>();
+					buttonBase.Pressed.Target = del.CallDelegate;
+					del.action = () => item.Open();
+					boxButtonCon.InputFilter.Value = RInputFilter.Pass;
+					itemData.InputFilter.Value = RInputFilter.Pass;
+					Icon.InputFilter.Value = RInputFilter.Pass;
+
 				}
 			}
 			else {
 				var scrollRoot = _elements.Entity.AddChild("ScrollRoot").AttachComponent<ScrollContainer>();
 				scrollRoot.ClipContents.Value = true;
-				scrollRoot.VerticalScrollBar.Value = RScrollBarVisibility.Disable;
 				var box = scrollRoot.Entity.AddChild("list").AttachComponent<BoxContainer>();
 				box.Vertical.Value = true;
 				var boxCon = box.Entity.AddChild("top").AttachComponent<BoxContainer>();
@@ -196,14 +257,59 @@ namespace RhuEngine.Components
 				sizetext.TargetValue.Target = sizeLabel.Text;
 				sizetext.Key.Value = "Programs.FileExplorer.Size";
 
-				var bottom = box.Entity.AddChild("bottom").AttachComponent<BoxContainer>();
-				bottom.Vertical.Value = true;
+				var bottomBOx = box.Entity.AddChild("bottom").AttachComponent<BoxContainer>();
+				bottomBOx.Vertical.Value = true;
 				foreach (var item in allFolders) {
+					var buttonBase = bottomBOx.Entity.AddChild(item.Name).AttachComponent<Button>();
+					buttonBase.MinSize.Value = new Vector2i(0, 45);
+					var boxButtonCon = buttonBase.Entity.AddChild().AttachComponent<BoxContainer>();
+					var Icon = boxButtonCon.Entity.AddChild().AttachComponent<TextureRect>();
+					Icon.MinSize.Value = new Vector2i(45);
+					var asset = Icon.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+					Icon.Texture.Target = asset;
+					Icon.IgnoreTextureSize.Value = true;
+					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
+					asset.LoadAsset(item.Texture);
+					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<TextLabel>();
+					itemData.Text.Value = item.Name;
+					itemData.HorizontalAlignment.Value = RHorizontalAlignment.Left;
+					itemData.AutowrapMode.Value = RAutowrapMode.Arbitrary;
+					itemData.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
+					itemData.TextSize.Value = 20;
+					itemData.MinSize.Value = new Vector2i(255, 0);
+					var del = buttonBase.Entity.AttachComponent<DelegateCall>();
+					buttonBase.Pressed.Target = del.CallDelegate;
+					del.action = () => UpdateFolderAddBack(item);
+					boxButtonCon.InputFilter.Value = RInputFilter.Pass;
+					itemData.InputFilter.Value = RInputFilter.Pass;
+					Icon.InputFilter.Value = RInputFilter.Pass;
 
 				}
 
 				foreach (var item in allFiles) {
-
+					var buttonBase = bottomBOx.Entity.AddChild(item.Name).AttachComponent<Button>();
+					buttonBase.MinSize.Value = new Vector2i(0, 45);
+					var boxButtonCon = buttonBase.Entity.AddChild().AttachComponent<BoxContainer>();
+					var Icon = boxButtonCon.Entity.AddChild().AttachComponent<TextureRect>();
+					Icon.MinSize.Value = new Vector2i(45);
+					var asset = Icon.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+					Icon.Texture.Target = asset;
+					Icon.IgnoreTextureSize.Value = true;
+					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
+					asset.LoadAsset(item.Texture);
+					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<TextLabel>();
+					itemData.Text.Value = item.Name;
+					itemData.HorizontalAlignment.Value = RHorizontalAlignment.Left;
+					itemData.AutowrapMode.Value = RAutowrapMode.Arbitrary;
+					itemData.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
+					itemData.TextSize.Value = 20;
+					itemData.MinSize.Value = new Vector2i(255, 0);
+					var del = buttonBase.Entity.AttachComponent<DelegateCall>();
+					buttonBase.Pressed.Target = del.CallDelegate;
+					del.action = () => item.Open();
+					boxButtonCon.InputFilter.Value = RInputFilter.Pass;
+					itemData.InputFilter.Value = RInputFilter.Pass;
+					Icon.InputFilter.Value = RInputFilter.Pass;
 				}
 
 			}
@@ -233,7 +339,7 @@ namespace RhuEngine.Components
 			var thisPcLoc = Engine.localisationManager.GetLocalString("Programs.FileExplorer.ThisPC");
 			AddSideButton(thisPcLoc, () => NavToPath(thisPcLoc));
 
-			foreach (var item in Engine.fileManager.Drives) {
+			foreach (var item in Engine.fileManager.GetDrives()) {
 				AddSideButton(item.Name, () => UpdateFolderAddBack(item.Root));
 			}
 
@@ -283,10 +389,12 @@ namespace RhuEngine.Components
 				await CurrentFolder.Refresh();
 			}
 			await Engine.fileManager.ReloadAllDrivesAsync();
-			BuildSideBarDataList();
-			UpdateCenterUI();
-			UpdateRedoUndoButtons();
-			PathDataUpdate();
+			RenderThread.ExecuteOnEndOfFrame(this, () => {
+				BuildSideBarDataList();
+				UpdateCenterUI();
+				UpdateRedoUndoButtons();
+				PathDataUpdate();
+			});
 		}
 
 		[Exposed]

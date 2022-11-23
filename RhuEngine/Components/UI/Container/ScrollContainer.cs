@@ -28,6 +28,10 @@ namespace RhuEngine.Components
 		public readonly Sync<int> HorizontalScroll;
 		public readonly Sync<int> VerticalScroll;
 
+		protected override void OnAttach() {
+			base.OnAttach();
+			ClipContents.Value = true;
+		}
 
 	}
 }

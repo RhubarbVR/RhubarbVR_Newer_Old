@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using RhuEngine.Linker;
+
 namespace RhuEngine
 {
 
@@ -14,6 +16,7 @@ namespace RhuEngine
 		public DateTimeOffset LastEdit { get; }
 		public long SizeInBytes { get; }
 		public IDrive Drive { get; }
+		public RTexture2D Texture { get; }
 		public void Open();
 	}
 }

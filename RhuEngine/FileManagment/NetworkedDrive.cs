@@ -13,6 +13,14 @@ namespace RhuEngine
 {
 	public sealed class NetworkedDrive : IDrive
 	{
+		public NetworkedDrive(SyncFolder target, NetApiManager netApiManager, bool isGroup) {
+			_target = target.Id;
+			_netApiManager = netApiManager;
+			_isGroup = isGroup;
+			Engine = netApiManager.WorldManager.Engine;
+			syncFolder = target;
+			UpdateInfo();
+		}
 		public NetworkedDrive(Guid target, NetApiManager netApiManager, bool isGroup) {
 			_target = target;
 			_netApiManager = netApiManager;
@@ -50,7 +58,8 @@ namespace RhuEngine
 			Task.Run(UpdateInfoAsync);
 		}
 		private async Task UpdateInfoAsync() {
-			await _netApiManager.Client.GetFolder(_target);
+			var data = await _netApiManager.Client.GetFolder(_target);
+			syncFolder = data.Data;
 			if (_isGroup) {
 				//Todo Group Info
 			}

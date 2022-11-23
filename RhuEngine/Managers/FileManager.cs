@@ -15,6 +15,11 @@ namespace RhuEngine.Managers
 		public readonly List<NetworkedDrive> NetDrives = new();
 
 		public IEnumerable<IDrive> GetDrives() {
+			lock (NetDrives) {
+				foreach (var item in NetDrives) {
+					yield return item;
+				}
+			}
 			lock (Drives) {
 				foreach (var item in Drives) {
 					yield return item;
@@ -85,6 +90,9 @@ namespace RhuEngine.Managers
 		}
 
 		public async Task AsyncReloadNetDrives() {
+			if (!_engine.netApiManager.Client.IsLogin) {
+				return;
+			}
 			var data = await _engine.netApiManager.Client.GetRootFolders();
 			if (data.Error) {
 				return;
@@ -92,7 +100,7 @@ namespace RhuEngine.Managers
 			lock (NetDrives) {
 				NetDrives.Clear();
 				foreach (var drive in data.Data) {
-					NetDrives.Add(new NetworkedDrive(drive.Id, _engine.netApiManager, drive.Id != _engine.netApiManager.Client.User.Id));
+					NetDrives.Add(new NetworkedDrive(drive, _engine.netApiManager, drive.Id != _engine.netApiManager.Client.User.Id));
 				}
 			}
 		}
@@ -105,9 +113,10 @@ namespace RhuEngine.Managers
 
 		public void Init(Engine engine) {
 			_engine = engine;
+			_engine.netApiManager.Client.OnLogin += (x) => ReloadAllDrives();
+			_engine.netApiManager.Client.OnLogout += ReloadAllDrives;
 			ReloadSystemDrives();
 			ReloadNetDrives();
-
 		}
 
 		public void RenderStep() {
