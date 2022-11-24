@@ -21,9 +21,13 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(EntityChanged))]
 		public readonly SyncRef<Entity> TargetEntity;
 
+		[Default(true)]
+		public readonly Sync<bool> PausePhysicsOnGrab;
+
 		protected override void OnAttach() {
 			base.OnAttach();
 			TargetEntity.Target = Entity;
+			PhysicsObject.Target = Entity.GetFirstComponent<PhysicsObject>();
 		}
 
 		private void EntityChanged() {
@@ -63,7 +67,27 @@ namespace RhuEngine.Components
 
 		protected override void OnLoaded() {
 			base.OnLoaded();
+			Entity.OnGrabbed += Entity_OnGrabbed;
+			Entity.OnDroped += Entity_OnDroped;
 			PhysicsObjectChanged();
+		}
+
+		private void Entity_OnDroped() {
+			if (_physicsObject is null) {
+				return;
+			}
+			if (PausePhysicsOnGrab.Value) {
+				_physicsObject.rigidBody.Activate = true;
+			}
+		}
+
+		private void Entity_OnGrabbed(Grabbable obj) {
+			if(_physicsObject is null) {
+				return;
+			}
+			if (PausePhysicsOnGrab.Value) {
+				_physicsObject.rigidBody.Activate = false;
+			}
 		}
 
 		private void PhysicsObjectChanged() {
@@ -89,7 +113,7 @@ namespace RhuEngine.Components
 			}
 			obj.NoneStaticBody = true;
 			obj.Mass = Mass;
-			obj.Active = true;
+			obj.Enabled = true;
 		}
 
 		protected override void Step() {
@@ -98,8 +122,20 @@ namespace RhuEngine.Components
 			if (colider is null) {
 				return;
 			}
+			if (!colider.Activate) {
+				return;
+			}
 			var entity = TargetEntity.Target;
 			if (entity is null) {
+				return;
+			}
+			if (!entity.position.IsLinkedTo) {
+				return;
+			}
+			if (!entity.rotation.IsLinkedTo) {
+				return;
+			}
+			if (!entity.scale.IsLinkedTo) {
 				return;
 			}
 			entity.SetGlobalMatrixPysics(colider.Matrix);

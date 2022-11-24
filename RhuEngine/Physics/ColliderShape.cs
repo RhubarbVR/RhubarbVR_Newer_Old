@@ -38,14 +38,14 @@ namespace RhuEngine.Physics
 		public RigidBodyCollider GetCollider(PhysicsSim physicsSim,object selfobject = null,bool startActive = true) {
 			var col =  Manager?.GetCollider(this, physicsSim);
 			col.CustomObject = selfobject;
-			col.Active = startActive;
+			col.Enabled = startActive;
 			return col;
 		}
 		public RigidBodyCollider GetCollider(PhysicsSim physicsSim,Matrix startingpos, object selfobject = null, bool startActive = true) {
 			var col = Manager?.GetCollider(this, physicsSim);
 			col.CustomObject = selfobject;
 			col.Matrix = startingpos;
-			col.Active = startActive;
+			col.Enabled = startActive;
 			return col;
 		}
 	}

@@ -8,10 +8,12 @@ namespace RhuEngine.Physics
 {
 	public interface ILinkedRigidBodyCollider
 	{
+		public bool ActivateGet(object obj);
 
-		public bool ActiveGet(object obj);
+		public void ActivateSet(object obj, bool val);
+		public bool EnabledGet(object obj);
 
-		public void ActiveSet(object obj,bool val);
+		public void EnabledSet(object obj,bool val);
 
 		public float MassGet(object obj);
 		public void MassSet(object obj,float val);
@@ -44,10 +46,16 @@ namespace RhuEngine.Physics
 		public object obj;
 		public object CustomObject { get; set; }
 
-		public bool Active
+		public bool Enabled
 		{
-			get => Manager.ActiveGet(obj);
-			set => Manager.ActiveSet(obj,value);
+			get => Manager.EnabledGet(obj);
+			set => Manager.EnabledSet(obj,value);
+		}
+
+		public bool Activate
+		{
+			get => Manager.ActivateGet(obj);
+			set => Manager.ActivateSet(obj, value);
 		}
 
 		public float Mass

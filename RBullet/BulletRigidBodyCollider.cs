@@ -7,6 +7,7 @@ using RhuEngine.Physics;
 
 using RNumerics;
 
+using static BulletSharp.Dbvt;
 
 namespace RBullet
 {
@@ -17,12 +18,13 @@ namespace RBullet
 		public Matrix Matrix;
 
 		public bool Enabled = true;
-		public bool NoneStaticBody = true;
+		public bool NoneStaticBody = false;
 
 		public ECollisionFilterGroups Group = ECollisionFilterGroups.AllFilter;
 		public ECollisionFilterGroups Mask = ECollisionFilterGroups.AllFilter;
 
 		public RigidBodyCollider Collider { get; set; }
+		public bool Active { get; set; } = true;
 
 		public BRigidBodyCollider(RigidBodyCollider collider) {
 			Collider = collider;
@@ -89,10 +91,10 @@ namespace RBullet
 				if (Enabled) {
 					_added = true;
 					if (NoneStaticBody) {
-						((BPhysicsSim)Collider.PhysicsSim.obj)._physicsWorld.AddRigidBody(newCol, (int)Group, (int)Group);
+						((BPhysicsSim)Collider.PhysicsSim.obj)._physicsWorld.AddRigidBody(newCol, (int)Group, (int)Mask);
 					}
 					else {
-						((BPhysicsSim)Collider.PhysicsSim.obj)._physicsWorld.AddCollisionObject(newCol, (int)Group, (int)Group);
+						((BPhysicsSim)Collider.PhysicsSim.obj)._physicsWorld.AddCollisionObject(newCol, (int)Group, (int)Mask);
 					}
 				}
 			}
@@ -109,6 +111,13 @@ namespace RBullet
 				if (Matrix != _matrix) {
 					_matrix = Matrix; 
 					collisionObject.WorldTransform = CastMet(Matrix);
+					if (Active) {
+						collisionObject.ForceActivationState(ActivationState.ActiveTag);
+						collisionObject.Activate(true);
+					}
+					else {
+						collisionObject.ForceActivationState(ActivationState.DisableSimulation);
+					}
 				}
 			}
 		}
@@ -143,11 +152,11 @@ namespace RBullet
 	}
 	public class BulletRigidBodyCollider : ILinkedRigidBodyCollider
 	{
-		public bool ActiveGet(object obj) {
+		public bool EnabledGet(object obj) {
 			return ((BRigidBodyCollider)obj).Enabled;
 		}
 
-		public void ActiveSet(object obj, bool val) {
+		public void EnabledSet(object obj, bool val) {
 			((BRigidBodyCollider)obj).Enabled = val;
 			((BRigidBodyCollider)obj).ReloadCollission();
 		}
@@ -177,6 +186,13 @@ namespace RBullet
 
 		public void MassSet(object obj, float val) {
 			((BRigidBodyCollider)obj).Mass = val;
+			if (((BRigidBodyCollider)obj).collisionObject != null) {
+				var collider = ((BRigidBodyCollider)obj).Collider;
+				((BPhysicsSim)collider.PhysicsSim.obj)._physicsWorld.RemoveCollisionObject(((BRigidBodyCollider)obj).collisionObject);
+				((BPhysicsSim)collider.PhysicsSim.obj)._physicsWorld.RemoveRigidBody(((BRigidBodyCollider)obj).collisionObject);
+				((BRigidBodyCollider)obj).collisionObject?.Dispose();
+				((BRigidBodyCollider)obj).collisionObject = null;
+			}
 			((BRigidBodyCollider)obj).ReloadCollission();
 		}
 
@@ -208,6 +224,24 @@ namespace RBullet
 
 		public void RemoveOverlapCallback(object obj, RigidBodyCollider.OverlapCallback overlapCallback) {
 			((BRigidBodyCollider)obj).RemoveOverlapCallBack(overlapCallback);
+		}
+
+		public bool ActivateGet(object obj) {
+			return ((BRigidBodyCollider)obj).Active;
+		}
+
+		public void ActivateSet(object obj, bool val) {
+			((BRigidBodyCollider)obj).Active = val;
+			if(((BRigidBodyCollider)obj).collisionObject is null) {
+				return;
+			}
+			if (((BRigidBodyCollider)obj).Active) {
+				((BRigidBodyCollider)obj).collisionObject.ForceActivationState(ActivationState.ActiveTag);
+				((BRigidBodyCollider)obj).collisionObject.Activate(true);
+			}
+			else {
+				((BRigidBodyCollider)obj).collisionObject.ForceActivationState(ActivationState.DisableSimulation);
+			}
 		}
 	}
 }

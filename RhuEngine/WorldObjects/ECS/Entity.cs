@@ -528,7 +528,14 @@ namespace RhuEngine.WorldObjects.ECS
 
 		private bool _dirtyGlobal;
 		private bool _dirtyLocal;
-
+		public event Action<Grabbable> OnGrabbed;
+		public event Action OnDroped;
+		public void CallOnGrabbed(Grabbable grabbable) {
+			OnGrabbed?.Invoke(grabbable);
+		}
+		public void CallOnDroped() {
+			OnDroped?.Invoke();
+		}
 		private void TransValueChange() {
 			if (IsRoot) {
 				return;

@@ -9,6 +9,7 @@ using RhuEngine.Input.XRInput;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Interaction" })]
+	[SingleComponentLock]
 	public sealed class Grabbable : Component
 	{
 		public readonly SyncRef<Entity> lastParent;
@@ -57,6 +58,7 @@ namespace RhuEngine.Components
 			}
 			catch { }
 			grabbableHolder.Target = null;
+			Entity.CallOnDroped();
 		}
 
 		protected override void OnLoaded() {
@@ -127,6 +129,7 @@ namespace RhuEngine.Components
 				aimPosMatrix = Matrix.Identity;
 			}
 			StartingPos = LocalToUser * aimPosMatrix.Inverse;
+			Entity.CallOnGrabbed(this);
 		}
 		[Exposed]
 		public void RemoteGrab(Handed hand) {

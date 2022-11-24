@@ -52,7 +52,7 @@ namespace RhuEngine.Components
 			rigidBody.Mask = Mask.Value;
 			rigidBody.Group = Group.Value;
 			rigidBody.Matrix = Entity.GlobalTrans;
-			rigidBody.Active = Entity.enabled;
+			rigidBody.Enabled = Entity.enabled;
 			AddedData?.Invoke(rigidBody);
 		}
 
@@ -64,7 +64,7 @@ namespace RhuEngine.Components
 		}
 
 		private void Enabled_Changed(IChangeable obj) {
-			rigidBody.Active = Entity.enabled;
+			rigidBody.Enabled = Entity.enabled;
 		}
 
 		public override void Dispose() {

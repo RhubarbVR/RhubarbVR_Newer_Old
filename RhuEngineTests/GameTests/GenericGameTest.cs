@@ -28,6 +28,7 @@ using System.Collections;
 using Assimp.Unmanaged;
 using System.Runtime.InteropServices;
 using static RBullet.BPhysicsSim;
+using static BulletSharp.Dbvt;
 
 namespace RhuEngine.GameTests.Tests
 {
@@ -365,20 +366,34 @@ namespace RhuEngine.GameTests.Tests
 		}
 
 
-		//Todo: fix problem with RigidBody
-		//[TestMethod]
-		//public void RiggedBodyTest() {
-		//	var testWorld = StartNewTestWorld();
-		//	var box = new RBoxShape(0.5f);
-		//	var startPos = Matrix.TS(Vector3f.One, 1);
-		//	var collider = box.GetCollider(testWorld.PhysicsSim, startPos);
-		//	collider.NoneStaticBody = true;
-		//	collider.Mass = 100f;
-		//	collider.Active = true;
-		//	tester.RunForSteps(2);
-		//	Assert.AreNotEqual(startPos, collider.Matrix);
-		//	tester.Dispose();
-		//}
+		[TestMethod]
+		public void RiggedBodyTest() {
+			var testWorld = StartNewTestWorld();
+			tester.RunForSteps(20);
+			var box = new RBoxShape(0.5f);
+			var startPos = Matrix.TS(Vector3f.One, 1);
+			var collider = box.GetCollider(testWorld.PhysicsSim, startPos);
+			collider.NoneStaticBody = true;
+			collider.Mass = 100f;
+			collider.Enabled = true;
+			tester.RunForSteps(20);
+			Assert.AreNotEqual(startPos, collider.Matrix);
+			tester.Dispose();
+		}
+
+
+		[TestMethod]
+		public void RiggedBodEntityyTest() {
+			var testEntity = AttachEntity();
+			testEntity.position.Value = Vector3f.One * 10;
+			var a = testEntity.AddChild("A");
+			var boxShape = a.AttachComponent<BoxShape>();
+			var startTrans = a.GlobalTrans;
+			a.AttachComponent<RigidBody>();
+			tester.RunForSteps(20);
+			Assert.AreNotEqual(startTrans, a.GlobalTrans);
+			tester.Dispose();
+		}
 
 
 		[TestMethod]

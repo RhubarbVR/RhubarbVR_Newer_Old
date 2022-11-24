@@ -101,7 +101,7 @@ namespace RhuEngine.Components
 			PhysicsCollider.CustomObject = this;
 			PhysicsCollider.Group = ECollisionFilterGroups.UI;
 			PhysicsCollider.Mask = ECollisionFilterGroups.UI;
-			PhysicsCollider.Active = Entity.IsEnabled;
+			PhysicsCollider.Enabled = Entity.IsEnabled;
 		}
 
 		protected override void RenderStep() {
@@ -150,7 +150,7 @@ namespace RhuEngine.Components
 
 		private void Entity_EnabledChanged() {
 			if (PhysicsCollider is not null) {
-				PhysicsCollider.Active = Entity.IsEnabled;
+				PhysicsCollider.Enabled = Entity.IsEnabled;
 			}
 		}
 

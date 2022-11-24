@@ -35,6 +35,12 @@ namespace RhuEngine
 			var DebugStuff = floor.AddChild("DebugStuff");
 			DebugStuff.position.Value = new Vector3f(-1.5f, 0f, -1f);
 
+			var things = DebugStuff.AddChild("Thing");
+			things.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			things.position.Value = Vector3f.Up * 5;
+			things.AttachComponent<BoxShape>();
+			things.AttachComponent<Grabbable>();
+			things.AttachComponent<RigidBody>();
 			var SubviewPortCame = DebugStuff.AddChild("Camera");
 			SubviewPortCame.position.Value = new Vector3f(4f, 2f, -2f);
 			var subViewPOrtdatae = SubviewPortCame.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
