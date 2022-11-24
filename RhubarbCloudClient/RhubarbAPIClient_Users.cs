@@ -28,7 +28,7 @@ namespace RhubarbCloudClient
 		public class ManagedUser
 		{
 			private readonly RhubarbAPIClient _client;
-			public Guid UserID => UserData?.Id??Guid.Empty;
+			public Guid UserID => UserData?.Id ?? Guid.Empty;
 
 			public UserRelation Relation { get; private set; }
 
@@ -80,7 +80,7 @@ namespace RhubarbCloudClient
 
 			public void BindStatusUpdate(Action<PublicUserStatus> action) {
 				UserStatusChanged += action;
-				if(UserStatus is not null) {
+				if (UserStatus is not null) {
 					action(UserStatus);
 				}
 			}
@@ -116,7 +116,7 @@ namespace RhubarbCloudClient
 
 
 		public async Task<ManagedUser> GetUser(Guid userID) {
-			if(userID == Guid.Empty) {
+			if (userID == Guid.Empty) {
 				return null;
 			}
 			if (_loadedUsers.TryGetValue(userID, out var val)) {
@@ -128,14 +128,16 @@ namespace RhubarbCloudClient
 				await newData.UpdateUserStatus();
 				await newData.UpdateUserData();
 				await newData.UpdateUserRelation();
-				await _hub.InvokeAsync("UserUpdateListen", userID);
+				if (userID != (User?.Id ?? Guid.Empty)) {
+					await _hub.InvokeAsync("UserUpdateListen", userID);
+				}
 				return newData;
 			}
 		}
 
 		private async Task UserDataUpdate(Guid userID, bool statusUpdate) {
 			var targetUser = await GetUser(userID);
-			if(targetUser is null) {
+			if (targetUser is null) {
 				Console.WriteLine("Target user was null");
 				return;
 			}

@@ -26,12 +26,30 @@ using static System.Net.Mime.MediaTypeNames;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
+	[UpdateLevel(UpdateEnum.Normal)]
 	public sealed class FileExplorerProgram : PrivateSpaceProgram
 	{
 		public override RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.Folder;
 
 		public override string ProgramNameLocName => "Programs.FileExplorer.Name";
 
+		protected override void Step() {
+			base.Step();
+			if (_gridContainer is null) {
+				return;
+			}
+			if (MainProgramWindow is null) {
+				return;
+			}
+			var sizeNoSideBar = MainProgramWindow.SizePixels.x - 170;
+			var amount = (int)Math.Floor(sizeNoSideBar / _gridSize);
+			if (_gridContainer.Columns.Value != amount) {
+				_gridContainer.Columns.Value = amount;
+			}
+		}
+
+		private GridContainer _gridContainer;
+		private float _gridSize;
 		private UIElement _elements;
 		private LineEdit _lineEdit;
 		private Button _forwaredButton;
@@ -42,13 +60,11 @@ namespace RhuEngine.Components
 		private BoxContainer _sideBarVisual;
 		private IFolder CurrentFolder { get; set; }
 
-		private bool _isGridLayout = false;
+		private bool _isGridLayout = true;
 
 		private void UpdateFolder(IFolder folder) {
 			CurrentFolder = folder;
-			CurrentFolder?.Refresh();
-			PathDataUpdate();
-			UpdateCenterUI();
+			Refresh();
 		}
 
 		private void PathDataUpdate() {
@@ -150,7 +166,63 @@ namespace RhuEngine.Components
 				var scrollRoot = _elements.Entity.AddChild("ScrollRoot").AttachComponent<ScrollContainer>();
 				scrollRoot.ClipContents.Value = true;
 				var gridData = scrollRoot.Entity.AddChild("list").AttachComponent<GridContainer>();
+				_gridContainer = gridData;
+				_gridSize = 300;
 
+				foreach (var item in Engine.fileManager.GetDrives()) {
+					var buttonBase = gridData.Entity.AddChild(item.Name).AttachComponent<Button>();
+					buttonBase.MinSize.Value = new Vector2i(300,125);
+					buttonBase.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+					var boxButtonCon = buttonBase.Entity.AddChild().AttachComponent<BoxContainer>();
+					boxButtonCon.Alignment.Value = RBoxContainerAlignment.Center;
+					var Icon = boxButtonCon.Entity.AddChild().AttachComponent<TextureRect>();
+					Icon.MinSize.Value = new Vector2i(65);
+					var asset = Icon.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+					Icon.Texture.Target = asset;
+					Icon.IgnoreTextureSize.Value = true;
+					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
+					asset.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Archive));
+
+					var boxButtonCon2 = boxButtonCon.Entity.AddChild().AttachComponent<BoxContainer>();
+					boxButtonCon2.Alignment.Value = RBoxContainerAlignment.Center;
+					boxButtonCon2.Vertical.Value = true;
+					var itemData = boxButtonCon2.Entity.AddChild("Name").AttachComponent<LineEdit>();
+					itemData.Text.Value = item.Name;
+					itemData.MinSize.Value = new Vector2i(190, 20);
+					itemData.GrowVertical.Value = RGrowVertical.Both;
+					itemData.VerticalFilling.Value = RFilling.ShrinkCenter;
+
+					var ProgressitemData = boxButtonCon2.Entity.AddChild("Progress").AttachComponent<ProgressBar>();
+					ProgressitemData.Value.Value = item.UsedBytes;
+					ProgressitemData.MaxValue.Value = item.TotalBytes;
+					ProgressitemData.MinSize.Value = itemData.MinSize.Value;
+					ProgressitemData.GrowVertical.Value = RGrowVertical.Both;
+					ProgressitemData.VerticalFilling.Value = RFilling.ShrinkCenter;
+
+					var Text = boxButtonCon2.Entity.AddChild("ProgressText").AttachComponent<TextLabel>();
+					Text.VerticalAlignment.Value = RVerticalAlignment.Top;
+					Text.MinSize.Value = itemData.MinSize.Value;
+					Text.GrowVertical.Value = RGrowVertical.Both;
+					Text.VerticalFilling.Value = RFilling.ShrinkCenter;
+					Text.TextSize.Value = 15;
+					Text.Text.Value = Engine.localisationManager.GetLocalString("Programs.FileExplorer.FreeOf", FileSizeFormatter.FormatSize(item.TotalBytes - item.UsedBytes), FileSizeFormatter.FormatSize(item.TotalBytes));
+					
+
+					var Namedel = buttonBase.Entity.AttachComponent<DelegateCall>();
+					itemData.TextSubmitted.Target = Namedel.CallDelegate;
+					Namedel.action = () => {
+						if (item.Name != itemData.Text.Value) {
+							item.Name = itemData.Text.Value;
+						}
+					};
+
+
+					var del = buttonBase.Entity.AttachComponent<DelegateCall>();
+					buttonBase.Pressed.Target = del.CallDelegate;
+					del.action = () => UpdateFolderAddBack(item.Root);
+					boxButtonCon.InputFilter.Value = RInputFilter.Pass;
+					Icon.InputFilter.Value = RInputFilter.Pass;
+				}
 
 
 				return;
@@ -161,6 +233,8 @@ namespace RhuEngine.Components
 				var scrollRoot = _elements.Entity.AddChild("ScrollRoot").AttachComponent<ScrollContainer>();
 				scrollRoot.ClipContents.Value = true;
 				var gridData = scrollRoot.Entity.AddChild("list").AttachComponent<GridContainer>();
+				_gridContainer = gridData;
+				_gridSize = 125;
 				gridData.Columns.Value = 3;
 
 				foreach (var item in allFolders) {
@@ -177,20 +251,25 @@ namespace RhuEngine.Components
 					Icon.IgnoreTextureSize.Value = true;
 					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
 					asset.LoadAsset(item.Texture);
-					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<TextLabel>();
+					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<LineEdit>();
 					itemData.Text.Value = item.Name;
-					itemData.HorizontalAlignment.Value = RHorizontalAlignment.Center;
-					itemData.AutowrapMode.Value = RAutowrapMode.Arbitrary;
-					itemData.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
-					itemData.TextSize.Value = 20;
-					itemData.MinSize.Value = new Vector2i(155, 20);
-					itemData.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
+					itemData.MinSize.Value = new Vector2i(100, 20);
+					itemData.GrowVertical.Value = RGrowVertical.Both;
+					itemData.VerticalFilling.Value = RFilling.ShrinkCenter;
+
+					var Namedel = buttonBase.Entity.AttachComponent<DelegateCall>();
+					itemData.TextSubmitted.Target = Namedel.CallDelegate;
+					Namedel.action = () => {
+						if (item.Name != itemData.Text.Value) {
+							item.Name = itemData.Text.Value;
+						}
+					};
+
 
 					var del = buttonBase.Entity.AttachComponent<DelegateCall>();
 					buttonBase.Pressed.Target = del.CallDelegate;
 					del.action = () => UpdateFolderAddBack(item);
 					boxButtonCon.InputFilter.Value = RInputFilter.Pass;
-					itemData.InputFilter.Value = RInputFilter.Pass;
 					Icon.InputFilter.Value = RInputFilter.Pass;
 				}
 				foreach (var item in allFiles) {
@@ -207,15 +286,19 @@ namespace RhuEngine.Components
 					Icon.IgnoreTextureSize.Value = true;
 					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
 					asset.LoadAsset(item.Texture);
-					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<TextLabel>();
+					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<LineEdit>();
 					itemData.Text.Value = item.Name;
-					itemData.HorizontalAlignment.Value = RHorizontalAlignment.Center;
-					itemData.AutowrapMode.Value = RAutowrapMode.Arbitrary;
-					itemData.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
-					itemData.TextSize.Value = 20;
-					itemData.MinSize.Value = new Vector2i(155, 20);
-					itemData.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
+					itemData.MinSize.Value = new Vector2i(100, 20);
+					itemData.GrowVertical.Value = RGrowVertical.Both;
+					itemData.VerticalFilling.Value = RFilling.ShrinkCenter;
 
+					var Namedel = buttonBase.Entity.AttachComponent<DelegateCall>();
+					itemData.TextSubmitted.Target = Namedel.CallDelegate;
+					Namedel.action = () => {
+						if (item.Name != itemData.Text.Value) {
+							item.Name = itemData.Text.Value;
+						}
+					};
 					var del = buttonBase.Entity.AttachComponent<DelegateCall>();
 					buttonBase.Pressed.Target = del.CallDelegate;
 					del.action = () => item.Open();
@@ -226,6 +309,7 @@ namespace RhuEngine.Components
 				}
 			}
 			else {
+				_gridContainer = null;
 				var scrollRoot = _elements.Entity.AddChild("ScrollRoot").AttachComponent<ScrollContainer>();
 				scrollRoot.ClipContents.Value = true;
 				var box = scrollRoot.Entity.AddChild("list").AttachComponent<BoxContainer>();
@@ -270,13 +354,19 @@ namespace RhuEngine.Components
 					Icon.IgnoreTextureSize.Value = true;
 					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
 					asset.LoadAsset(item.Texture);
-					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<TextLabel>();
+					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<LineEdit>();
 					itemData.Text.Value = item.Name;
-					itemData.HorizontalAlignment.Value = RHorizontalAlignment.Left;
-					itemData.AutowrapMode.Value = RAutowrapMode.Arbitrary;
-					itemData.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
-					itemData.TextSize.Value = 20;
 					itemData.MinSize.Value = new Vector2i(255, 0);
+
+
+					var Namedel = buttonBase.Entity.AttachComponent<DelegateCall>();
+					itemData.TextSubmitted.Target = Namedel.CallDelegate;
+					Namedel.action = () => {
+						if (item.Name != itemData.Text.Value) {
+							item.Name = itemData.Text.Value;
+						}
+					};
+
 					var del = buttonBase.Entity.AttachComponent<DelegateCall>();
 					buttonBase.Pressed.Target = del.CallDelegate;
 					del.action = () => UpdateFolderAddBack(item);
@@ -297,13 +387,18 @@ namespace RhuEngine.Components
 					Icon.IgnoreTextureSize.Value = true;
 					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
 					asset.LoadAsset(item.Texture);
-					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<TextLabel>();
+					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<LineEdit>();
 					itemData.Text.Value = item.Name;
-					itemData.HorizontalAlignment.Value = RHorizontalAlignment.Left;
-					itemData.AutowrapMode.Value = RAutowrapMode.Arbitrary;
-					itemData.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
-					itemData.TextSize.Value = 20;
 					itemData.MinSize.Value = new Vector2i(255, 0);
+
+
+					var Namedel = buttonBase.Entity.AttachComponent<DelegateCall>();
+					itemData.TextSubmitted.Target = Namedel.CallDelegate;
+					Namedel.action = () => {
+						if (item.Name != itemData.Text.Value) {
+							item.Name = itemData.Text.Value;
+						}
+					};
 					var del = buttonBase.Entity.AttachComponent<DelegateCall>();
 					buttonBase.Pressed.Target = del.CallDelegate;
 					del.action = () => item.Open();
@@ -404,6 +499,7 @@ namespace RhuEngine.Components
 		}
 
 		private void NavToPath(string path) {
+			RLog.Info("Nav To Path Path:" + path);
 			if (path.ToLower() == Engine.localisationManager.GetLocalString("Programs.FileExplorer.ThisPC").ToLower()) {
 				UpdateFolderAddBack(null);
 			}

@@ -248,6 +248,9 @@
     "Programs.FileExplorer.Type": "Type",
     "Programs.FileExplorer.FileName": "Name",
 
+    "Programs.FileExplorer.FreeOf": "{0} Free Of {1}",
+
+
     "Programs.FileExplorer.SpecialFolder.Desktop": "Desktop",
     "Programs.FileExplorer.SpecialFolder.MyPictures": "Pictures",
     "Programs.FileExplorer.SpecialFolder.MyDocuments": "Documents",

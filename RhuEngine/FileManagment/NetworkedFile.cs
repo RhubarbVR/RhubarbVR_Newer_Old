@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using RhubarbCloudClient;
 using RhubarbCloudClient.Model;
 
 using RhuEngine.Linker;
@@ -14,44 +15,26 @@ namespace RhuEngine
 {
 	public sealed class NetworkedFile : FileBase
 	{
-		public NetworkedFile(Guid target, NetApiManager netApiManager, NetworkedFolder parrent, IDrive networkedDrive) {
-			_target = target;
-			_netApiManager = netApiManager;
-			Drive = networkedDrive;
-			Parrent = parrent;
-			UpdateInfo();
+		private readonly RhubarbAPIClient.FileCache _item;
+		private readonly NetworkedDrive _networkedDrive;
+
+		public NetworkedFile(RhubarbAPIClient.FileCache item, NetworkedDrive networkedDrive) {
+			_item = item;
+			_networkedDrive = networkedDrive;
 		}
-		private readonly NetApiManager _netApiManager;
+		public override string Name { get => _item.Name; set => _item.Name = value; }
 
-		private readonly Guid _target;
+		public override IFolder Parrent => _item.ParrentFolder is null ? null : (IFolder)new NetworkedFolder(_item.ParrentFolder, _networkedDrive);
 
-		public SyncFile syncFile;
+		public override DateTimeOffset CreationDate => _item.CreationDate;
 
-		public override string Name
-		{
-			get => syncFile.Name; set => Task.Run(async () => {
-				await _netApiManager.Client.SetFolderName(_target, value);
-				await UpdateInfoAsync();
-			});
-		}
-
-		public override IFolder Parrent { get; }
-
-		public override DateTimeOffset CreationDate => syncFile.CreationDate;
-
-		public override DateTimeOffset LastEdit => syncFile.UpdateDate;
-
-		public override IDrive Drive { get; }
+		public override DateTimeOffset LastEdit => _item.UpdateData;
 
 		public override long SizeInBytes => 0;
-		public override RTexture2D Texture => Drive.Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.File);
 
-		private void UpdateInfo() {
-			Task.Run(UpdateInfoAsync);
-		}
-		private async Task UpdateInfoAsync() {
-			syncFile = (await _netApiManager.Client.GetFile(_target)).Data;
-		}
+		public override IDrive Drive => _networkedDrive;
+
+		public override RTexture2D Texture => _networkedDrive.Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.File);
 
 		public override void Open() {
 

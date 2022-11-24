@@ -17,6 +17,10 @@ namespace RhuEngine.Components
 
 		public ProgramWindow this[int c] => programWindows[c].Target;
 
+
+		public ProgramWindow MainProgramWindow => programWindows.Count >= 1 ? this[0] : null;
+
+
 		public ViewPortProgramWindow AddWindow(string name = null, RTexture2D icon = null,bool closeProgramOnWindowClose = true,bool canClose = true) {
 			var window = Entity.AddChild(name ?? ProgramName).AttachComponent<ViewPortProgramWindow>();
 			window.WindowCanClose.Value = canClose;

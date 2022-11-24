@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,12 +13,20 @@ namespace RhuEngine.Managers
 	public sealed class FileManager : IManager
 	{
 		public readonly List<SystemDrive> Drives = new();
-		public readonly List<NetworkedDrive> NetDrives = new();
+		public readonly Dictionary<Guid, NetworkedDrive> NetDrives = new();
 
 		public IEnumerable<IDrive> GetDrives() {
-			lock (NetDrives) {
-				foreach (var item in NetDrives) {
-					yield return item;
+			lock (_engine.netApiManager.Client.RootFolders) {
+				foreach (var item in _engine.netApiManager.Client.RootFolders) {
+					if (NetDrives.TryGetValue(item.ID, out var drive)) {
+						yield return drive;
+					}
+					else {
+						var newDrive = new NetworkedDrive(item, _engine);
+						NetDrives.Add(item.ID, newDrive);
+						yield return newDrive;
+					}
+
 				}
 			}
 			lock (Drives) {
@@ -35,18 +44,14 @@ namespace RhuEngine.Managers
 				}
 			}
 		}
-		public void ReloadNetDrives() {
-			Task.Run(AsyncReloadNetDrives);
-		}
 
 		public void ReloadAllDrives() {
 			ReloadSystemDrives();
-			ReloadNetDrives();
+			Task.Run(_engine.netApiManager.Client.GetRootFolders);
 		}
-
 		public async Task ReloadAllDrivesAsync() {
 			ReloadSystemDrives();
-			await AsyncReloadNetDrives();
+			await _engine.netApiManager.Client.GetRootFolders();
 		}
 
 		public bool TryGetDataFromPath(string path, out IFolder folder, out IFile file) {
@@ -59,11 +64,6 @@ namespace RhuEngine.Managers
 				folder = null;
 				file = GetSystemFile(path);
 				return true;
-			}
-			foreach (var item in NetDrives) {
-				if ((item.Path.ToLower() == path.ToLower()) || (item._target.ToString() == path)) {
-					return item.TryGetDataFromPath(path, out folder, out file);
-				}
 			}
 			folder = null;
 			file = null;
@@ -89,22 +89,6 @@ namespace RhuEngine.Managers
 			return drive.GetFolder(path);
 		}
 
-		public async Task AsyncReloadNetDrives() {
-			if (!_engine.netApiManager.Client.IsLogin) {
-				return;
-			}
-			var data = await _engine.netApiManager.Client.GetRootFolders();
-			if (data.Error) {
-				return;
-			}
-			lock (NetDrives) {
-				NetDrives.Clear();
-				foreach (var drive in data.Data) {
-					NetDrives.Add(new NetworkedDrive(drive, _engine.netApiManager, drive.Id != _engine.netApiManager.Client.User.Id));
-				}
-			}
-		}
-
 		public void Dispose() {
 
 		}
@@ -115,8 +99,7 @@ namespace RhuEngine.Managers
 			_engine = engine;
 			_engine.netApiManager.Client.OnLogin += (x) => ReloadAllDrives();
 			_engine.netApiManager.Client.OnLogout += ReloadAllDrives;
-			ReloadSystemDrives();
-			ReloadNetDrives();
+			ReloadAllDrives();
 		}
 
 		public void RenderStep() {

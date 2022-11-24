@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using RhubarbCloudClient;
 using RhubarbCloudClient.Model;
 
 using RhuEngine.Managers;
@@ -13,49 +14,30 @@ namespace RhuEngine
 {
 	public sealed class NetworkedFolder : FolderBase
 	{
-		public NetworkedFolder(Guid target, NetApiManager netApiManager, NetworkedFolder parrent, IDrive networkedDrive) {
-			_target = target;
-			_netApiManager = netApiManager;
-			Drive = networkedDrive;
-			Parrent = parrent;
-			UpdateInfo();
-		}
-		private readonly NetApiManager _netApiManager;
+		private readonly RhubarbAPIClient.FolderCache _item;
+		private readonly NetworkedDrive _networkedDrive;
 
-		private readonly Guid _target;
-
-		public SyncFolder syncFolder;
-
-		public override string Name
-		{
-			get => syncFolder.Name; set => Task.Run(async () => {
-				await _netApiManager.Client.SetFolderName(_target, value);
-				await UpdateInfoAsync();
-			});
+		public NetworkedFolder(RhubarbAPIClient.FolderCache item, NetworkedDrive networkedDrive) {
+			_item = item;
+			_networkedDrive = networkedDrive;
 		}
 
-		public override IFolder Parrent { get; }
+		public override string Name { get => _item.Name; set => _item.Name = value; }
 
-		public override DateTimeOffset CreationDate => syncFolder.CreationDate;
+		public override IFolder Parrent => _item.ParrentFolder is null ? null : (IFolder)new NetworkedFolder(_item.ParrentFolder, _networkedDrive);
 
-		public override DateTimeOffset LastEdit => syncFolder.UpdateDate;
+		public override DateTimeOffset CreationDate => _item.CreationDate;
 
-		public override IDrive Drive { get; }
+		public override DateTimeOffset LastEdit => _item.UpdateData;
 
-		public override IFile[] Files => syncFolder.Files.Select(x => new NetworkedFile(x.Id, _netApiManager, this, Drive)).ToArray();
+		public override IDrive Drive => _networkedDrive;
 
-		public override IFolder[] Folders => syncFolder.Folders.Select(x => new NetworkedFolder(x.Id, _netApiManager, this, Drive)).ToArray();
+		public override IFile[] Files => _item.Files().Select(x => new NetworkedFile(x, _networkedDrive)).ToArray();
 
-		private void UpdateInfo() {
-			Task.Run(UpdateInfoAsync);
-		}
-		private async Task UpdateInfoAsync() {
-			var data = await _netApiManager.Client.GetFolder(_target);
-			syncFolder = data.Data;
-		}
+		public override IFolder[] Folders => _item.Folders().Select(x => new NetworkedFolder(x, _networkedDrive)).ToArray();
 
 		public override Task Refresh() {
-			return UpdateInfoAsync();
+			return _item.Refresh();
 		}
 	}
 }
