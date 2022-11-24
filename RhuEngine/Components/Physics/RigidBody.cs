@@ -34,15 +34,9 @@ namespace RhuEngine.Components
 			if(TargetEntity.Target is null) {
 				return;
 			}
-			if (Scale.Target is null) {
-				Scale.Target = TargetEntity.Target.scale;
-			}
-			if (Rotation.Target is null) {
-				Rotation.Target = TargetEntity.Target.rotation;
-			}
-			if (Position.Target is null) {
-				Position.Target = TargetEntity.Target.position;
-			}
+			Scale.Target ??= TargetEntity.Target.scale;
+			Rotation.Target ??= TargetEntity.Target.rotation;
+			Position.Target ??= TargetEntity.Target.position;
 		}
 
 		[Default(10f)]
