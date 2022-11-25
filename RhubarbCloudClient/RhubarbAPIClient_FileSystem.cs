@@ -297,12 +297,13 @@ namespace RhubarbCloudClient
 			return await SendPostServerResponses<SyncFolder, NameData>(API_PATH + FILEPATH + "CreateFolder/" + parrentFolder.ToString(), new NameData { Name = name });
 		}
 
-		public async Task<ServerResponse<SyncFile>> ReqCreateFile(Guid parrentFolder, string nameOfFile, Guid thumnail, Guid mainRecordId, IEnumerable<Guid> allOtherRecords) {
+		public async Task<ServerResponse<SyncFile>> ReqCreateFile(Guid parrentFolder, string nameOfFile, string type, Guid thumnail, Guid mainRecordId, IEnumerable<Guid> allOtherRecords) {
 			return await SendPostServerResponses<SyncFile, CreateFile>(API_PATH + FILEPATH + "CreateFile/" + parrentFolder.ToString(), new CreateFile {
 				Name = nameOfFile,
 				AllOtherRecords = allOtherRecords.ToArray(),
 				Thumbnail = thumnail,
-				MainRecordId = mainRecordId
+				MainRecordId = mainRecordId,
+				Type = type,
 			});
 		}
 
