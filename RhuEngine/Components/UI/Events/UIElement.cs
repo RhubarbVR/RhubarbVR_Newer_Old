@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 		protected T LoadedData = null;
 
 		private void Entity_CanvasItemUpdateEvent() {
-			RenderThread.ExecuteOnStartOfFrame(() => {
+			RenderThread.ExecuteOnEndOfFrame(() => {
 				if (LoadedData == Entity.CanvasItem) {
 					return;
 				}

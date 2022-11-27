@@ -58,6 +58,22 @@ namespace RhuEngine.Components
 				return false;
 			}
 		}
+
+		public IWorldObject HolderReferenWithGrabed
+		{
+			get {
+				foreach (var item in WorldManager.worlds) {
+					if (GetGrabbableHolderFromWorld(item)?.HolderReferen is not null) {
+						return GetGrabbableHolderFromWorld(item)?.HolderReferen;
+					}
+					else if (GetGrabbableHolderFromWorld(item).GrabbedObjects.Count == 1) {
+						return GetGrabbableHolderFromWorld(item).GrabbedObjects[0];
+					}
+				}
+				return null;
+			}
+		}
+
 		public IWorldObject HolderReferen
 		{
 			get {
@@ -70,9 +86,14 @@ namespace RhuEngine.Components
 			}
 		}
 
+		public void UpdateHolderReferen() {
+			WorldManager.PrivateSpaceManager.UpdateHolderReferen();
+		}
+
 
 		public bool Gripping => PrivateGrabbableHolder.gripping;
 		public bool GrippingLastFrame => PrivateGrabbableHolder.grippingLastFrame;
+
 
 	}
 }

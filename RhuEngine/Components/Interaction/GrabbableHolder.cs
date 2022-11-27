@@ -16,6 +16,7 @@ namespace RhuEngine.Components
 	{
 		public readonly SyncRef<Entity> holder;
 
+		[OnChanged(nameof(UpdateReferencer))]
 		public readonly SyncRef<IWorldObject> Referencer;
 
 		public readonly SyncRef<Entity> RefrencerEntity;
@@ -27,6 +28,13 @@ namespace RhuEngine.Components
 		public readonly List<Grabbable> GrabbedObjects = new();
 
 		private readonly List<RigidBodyCollider> _overLappingObjects = new();
+
+		internal void UpdateReferencer() {
+			try {
+				PrivateSpaceManager.GetGrabbableHolder(source.Value).UpdateHolderReferen();
+			}
+			catch { }
+		}
 
 		private void RigidBody_Overlap(Vector3f PositionWorldOnA, Vector3f PositionWorldOnB, Vector3f NormalWorldOnB, double Distance, double Distance1, RigidBodyCollider hit) {
 			_overLappingObjects.Add(hit);
@@ -81,12 +89,9 @@ namespace RhuEngine.Components
 		public IWorldObject HolderReferen
 		{
 			get {
-				if ((World.HeadGrabbableHolder.Referencer.Target != this) && World.HeadGrabbableHolder.Referencer.Target is not null) {
-					if (World.HeadGrabbableHolder.Referencer.Target is not null) {
-						return World.HeadGrabbableHolder.Referencer.Target;
-					}
-				}
-				return Referencer.Target;
+				return World.HeadGrabbableHolder != this && World.HeadGrabbableHolder.Referencer.Target is not null
+					? World.HeadGrabbableHolder.Referencer.Target
+					: Referencer.Target;
 			}
 		}
 
@@ -132,6 +137,19 @@ namespace RhuEngine.Components
 					return;
 				}
 			}
+			if (source.Value == Handed.Left && World.LeftGrabbableHolder != this) {
+				return;
+			}
+			else if (source.Value == Handed.Right && World.RightGrabbableHolder != this) {
+				return;
+			}
+			else if (source.Value == Handed.Max && World.HeadGrabbableHolder != this) {
+				return;
+			}
+			else if (source.Value > Handed.Max) {
+				return;
+			}
+
 			var grabForce = InputManager.Grab.HandedValue(source.Value);
 			var isGrab = grabForce > 0.6;
 			grippingLastFrame = gripping;
@@ -146,13 +164,20 @@ namespace RhuEngine.Components
 					}
 				}
 				gripping = true;
+				UpdateReferencer();
+				if (World.IsPersonalSpace) {
+					PrivateSpaceManager.HolderGrip();
+				}
 			}
-			if(isGrab && gripping) {
+			if (isGrab && gripping) {
 				foreach (var item in GrabbedObjects) {
 					item.UpdateGrabbedObject();
 				}
 			}
 			if (gripping && !isGrab) {
+				if (World.IsPersonalSpace) {
+					PrivateSpaceManager.HolderDrop();
+				}
 				//DoneGrabbing
 				for (var i = GrabbedObjects.Count - 1; i >= 0; i--) {
 					try {
@@ -161,6 +186,7 @@ namespace RhuEngine.Components
 					catch { }
 				}
 				gripping = false;
+				UpdateReferencer();
 			}
 			_overLappingObjects.Clear();
 		}

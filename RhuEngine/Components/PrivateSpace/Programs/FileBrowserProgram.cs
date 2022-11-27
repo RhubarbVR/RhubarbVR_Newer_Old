@@ -7,11 +7,16 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
+using Assimp;
+
+using NYoutubeDL.Options;
+
 using RhubarbCloudClient;
 
 using RhuEngine.Commads;
 using RhuEngine.Components.PrivateSpace;
 using RhuEngine.Components.PrivateSpace.Programs.OverlayDialogues;
+using RhuEngine.Components.UI;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
@@ -22,6 +27,7 @@ using TextCopy;
 
 using static System.Collections.Specialized.BitVector32;
 using static System.Net.Mime.MediaTypeNames;
+using static Assimp.Metadata;
 
 namespace RhuEngine.Components
 {
@@ -51,6 +57,7 @@ namespace RhuEngine.Components
 		private GridContainer _gridContainer;
 		private float _gridSize;
 		private UIElement _elements;
+		private Entity _drop;
 		private LineEdit _lineEdit;
 		private Button _forwaredButton;
 		private Button _backButton;
@@ -155,14 +162,109 @@ namespace RhuEngine.Components
 			mainArea.Entity.AddChild().AttachComponent<Panel>();
 			mainArea.Entity.AddChild().AttachComponent<Panel>();
 
+
 			_elements = mainArea.Entity.AddChild("Elements").AttachComponent<UIElement>();
+			_drop = mainArea.Entity.AddChild("Drop");
+			var element = _drop.AttachComponent<UIElement>();
+			element.Max.Value = element.Min.Value = new Vector2f(0.5f);
+			element.MinOffset.Value = new Vector2f(50, -50);
+			element.MaxOffset.Value = new Vector2f(-50, 50);
+
+			_drop.AttachComponent<ReferenceAccepter<Entity>>().Dropped.Target = SaveEntity;
 
 			Refresh();
 		}
+
+		[Exposed]
+		public void SaveEntity(Entity entity) {
+			if (CurrentFolder is null) {
+				return;
+			}
+			if (CurrentFolder is NetworkedFolder networked) {
+				BuildSaveDialogue(entity, networked);
+			}
+			else if (CurrentFolder is SystemFolder system) {
+				BuildExportDialogue(entity, system);
+			}
+		}
+
+		private (Entity, LineEdit, ViewPortProgramWindow) BuildMainDialoguePart(string text, IFolder folder, Entity entity) {
+			var name = Engine.localisationManager.GetLocalString(text + "Title");
+			var window = AddWindow(name, null, false);
+			window.SizePixels = new Vector2i(320, 350);
+			window.CenterWindowIntoView();
+			var center = window.Entity.AddChild("Scroll").AttachComponent<ScrollContainer>().Entity.AddChild("Center");
+			var root = center.AttachComponent<BoxContainer>();
+			root.Vertical.Value = true;
+			root.Alignment.Value = RBoxContainerAlignment.Center;
+			root.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
+			root.VerticalFilling.Value = RFilling.Expand | RFilling.Fill;
+			var label = center.AddChild("Title").AttachComponent<TextLabel>();
+			label.Text.Value = name;
+			label.TextSize.Value = 20;
+			var pathlabel = center.AddChild("Title").AttachComponent<TextLabel>();
+			pathlabel.Text.Value = Engine.localisationManager.GetLocalString(text + "Path", entity.name.Value, folder.Path);
+			pathlabel.TextSize.Value = 15;
+			var namelabel = center.AddChild("Title").AttachComponent<TextLabel>();
+			namelabel.Text.Value = Engine.localisationManager.GetLocalString("Common.Name");
+			namelabel.TextSize.Value = 13;
+			namelabel.MinSize.Value = new Vector2i(300, 0);
+			namelabel.HorizontalAlignment.Value = RHorizontalAlignment.Left;
+			namelabel.HorizontalFilling.Value = RFilling.ShrinkCenter;
+			var nameChange = center.AddChild("nameChange").AttachComponent<LineEdit>();
+			nameChange.Text.Value = entity.name.Value;
+			nameChange.PlaceholderText.Value = Engine.localisationManager.GetLocalString("Common.Name");
+			nameChange.HorizontalFilling.Value = RFilling.ShrinkCenter;
+			nameChange.MinSize.Value = new Vector2i(300, 20);
+			return (center, nameChange, window);
+		}
+
+		private void BuildSaveDialogue(Entity taget, NetworkedFolder networked) {
+			var data = BuildMainDialoguePart("Programs.FileExplorer.SaveDialogue.", networked, taget);
+			var buttons = data.Item1.AddChild("ButtonHolder").AttachComponent<BoxContainer>();
+			buttons.Alignment.Value = RBoxContainerAlignment.Center;
+			var cancle = buttons.Entity.AddChild("Cancle").AttachComponent<Button>();
+			cancle.Text.Value = Engine.localisationManager.GetLocalString("Common.Cancel");
+			var cancledel = cancle.Entity.AttachComponent<DelegateCall>();
+			cancle.Pressed.Target = cancledel.CallDelegate;
+			cancledel.action = () => data.Item3.Close();
+
+			var ok = buttons.Entity.AddChild("ok").AttachComponent<Button>();
+			ok.Text.Value = Engine.localisationManager.GetLocalString("Programs.FileExplorer.SaveDialogue.Save");
+			var okdel = cancle.Entity.AttachComponent<DelegateCall>();
+			ok.Pressed.Target = okdel.CallDelegate;
+			okdel.action = () => {
+
+			};
+		}
+
+		private void BuildExportDialogue(Entity taget, SystemFolder systemFolder) {
+			var data = BuildMainDialoguePart("Programs.FileExplorer.ExportDialogue.", systemFolder, taget);
+			var exportAssets = data.Item1.AddChild("AssetsExport").AttachComponent<CheckBox>();
+			exportAssets.Text.Value = Engine.localisationManager.GetLocalString("Programs.FileExplorer.ExportDialogue.EmbedAssets");
+			exportAssets.ButtonPressed.Value = true;
+			var buttons = data.Item1.AddChild("ButtonHolder").AttachComponent<BoxContainer>();
+			buttons.Alignment.Value = RBoxContainerAlignment.Center;
+			var cancle = buttons.Entity.AddChild("Cancle").AttachComponent<Button>();
+			cancle.Text.Value = Engine.localisationManager.GetLocalString("Common.Cancel");
+			var cancledel = cancle.Entity.AttachComponent<DelegateCall>();
+			cancle.Pressed.Target = cancledel.CallDelegate;
+			cancledel.action = () => data.Item3.Close();
+
+			var ok = buttons.Entity.AddChild("ok").AttachComponent<Button>();
+			ok.Text.Value = Engine.localisationManager.GetLocalString("Programs.FileExplorer.ExportDialogue.Export");
+			var okdel = cancle.Entity.AttachComponent<DelegateCall>();
+			ok.Pressed.Target = okdel.CallDelegate;
+			okdel.action = () => {
+
+			};
+		}
+
 		private void UpdateCenterUI() {
 			_elements.Entity.DestroyChildren();
 			if (CurrentFolder is null) {
 				//Build this pc
+				_drop.enabled.Value = false;
 				var scrollRoot = _elements.Entity.AddChild("ScrollRoot").AttachComponent<ScrollContainer>();
 				scrollRoot.ClipContents.Value = true;
 				var gridData = scrollRoot.Entity.AddChild("list").AttachComponent<GridContainer>();
@@ -171,7 +273,7 @@ namespace RhuEngine.Components
 
 				foreach (var item in Engine.fileManager.GetDrives()) {
 					var buttonBase = gridData.Entity.AddChild(item.Name).AttachComponent<Button>();
-					buttonBase.MinSize.Value = new Vector2i(300,125);
+					buttonBase.MinSize.Value = new Vector2i(300, 125);
 					buttonBase.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
 					var boxButtonCon = buttonBase.Entity.AddChild().AttachComponent<BoxContainer>();
 					boxButtonCon.Alignment.Value = RBoxContainerAlignment.Center;
@@ -206,7 +308,7 @@ namespace RhuEngine.Components
 					Text.VerticalFilling.Value = RFilling.ShrinkCenter;
 					Text.TextSize.Value = 15;
 					Text.Text.Value = Engine.localisationManager.GetLocalString("Programs.FileExplorer.FreeOf", FileSizeFormatter.FormatSize(item.TotalBytes - item.UsedBytes), FileSizeFormatter.FormatSize(item.TotalBytes));
-					
+
 
 					var Namedel = buttonBase.Entity.AttachComponent<DelegateCall>();
 					itemData.TextSubmitted.Target = Namedel.CallDelegate;
@@ -227,6 +329,7 @@ namespace RhuEngine.Components
 
 				return;
 			}
+			_drop.enabled.Value = true;
 			var allFolders = CurrentFolder.Folders;
 			var allFiles = CurrentFolder.Files;
 			if (_isGridLayout) {

@@ -45,7 +45,7 @@ namespace RhuEngine
 			}
 			return newstring.ToNormalString();
 		}
-		public static string AutoBrakeLine(this string value,int amount = 155) {
+		public static string AutoBrakeLine(this string value, int amount = 155) {
 			var newSTreing = "";
 			var currentAmount = 0;
 			foreach (var item in value) {
@@ -142,7 +142,7 @@ namespace RhuEngine
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool IsAssignableTo(this Type type,Type type1) {
+		public static bool IsAssignableTo(this Type type, Type type1) {
 			return type1.IsAssignableFrom(type);
 		}
 
@@ -235,7 +235,7 @@ namespace RhuEngine
 		public static float DistSquared(this Vector3f start, Vector3f end) {
 			return System.Numerics.Vector3.DistanceSquared(start, end);
 		}
-		
+
 		public static IWorldObject GetClosedSyncObject(this IWorldObject worldObject, bool allowSyncVals = false) {
 			allowSyncVals = allowSyncVals || typeof(SyncStream).IsAssignableFrom(worldObject.GetType());
 			try {
@@ -256,41 +256,39 @@ namespace RhuEngine
 
 
 		public static Entity GetClosedEntity(this IWorldObject worldObject) {
-			try {
-				if(worldObject is Entity entity) {
-					return entity;
-				}
-			}
-			catch {
-			}
-			return worldObject?.Parent?.GetClosedEntity();
+			return worldObject is Entity entity ? entity : (worldObject?.Parent?.GetClosedEntity());
 		}
 
 		public static User GetClosedUser(this IWorldObject worldObject) {
-			try {
-				return (User)worldObject;
-			}
-			catch {
-				return worldObject?.Parent?.GetClosedUser();
-			}
+			return worldObject is User user ? user : (worldObject?.Parent?.GetClosedUser());
+
 		}
 
 		public static Component GetClosedComponent(this IWorldObject worldObject) {
-			try {
-				return (Component)worldObject;
-			}
-			catch {
-				return worldObject?.Parent?.GetClosedComponent();
-			}
+			return worldObject is Component Component ? Component : (worldObject?.Parent?.GetClosedComponent());
+
+		}
+
+		public static T Get<T>(this IWorldObject worldObject) where T : class, IWorldObject {
+			return worldObject is T Component ? Component : null;
 		}
 
 		public static T GetClosedGeneric<T>(this IWorldObject worldObject) where T : class, IWorldObject {
-			try {
-				return (T)worldObject;
+			return worldObject is T Component ? Component : (worldObject?.Parent?.GetClosedGeneric<T>());
+		}
+
+		public static T GetClosedGenericWithComps<T>(this IWorldObject worldObject) where T : class, IWorldObject {
+			if (worldObject is T Component) {
+				return Component;
 			}
-			catch {
-				return worldObject?.Parent?.GetClosedGeneric<T>();
+			if (worldObject is Entity entity) {
+				foreach (var item in entity.components) {
+					if (item is T component) {
+						return component;
+					}
+				}
 			}
+			return worldObject?.Parent?.GetClosedGenericWithComps<T>();
 		}
 
 		public static string GetNameString(this IWorldObject worldObject) {
@@ -305,11 +303,11 @@ namespace RhuEngine
 				: $"{comp.GetType().GetFormattedName()} attached to " + (worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null");
 		}
 
-		public static Type GetHighestAttributeInherit<T>(this Type type) where T:Attribute {
+		public static Type GetHighestAttributeInherit<T>(this Type type) where T : Attribute {
 			if (type.GetCustomAttribute<T>() is not null) {
 				return type;
 			}
-			if(type.GetCustomAttribute<T>(true) is null) {
+			if (type.GetCustomAttribute<T>(true) is null) {
 				return null;
 			}
 			return type.BaseType?.GetHighestAttributeInherit<T>();

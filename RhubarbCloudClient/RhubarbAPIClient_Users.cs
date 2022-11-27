@@ -135,6 +135,10 @@ namespace RhubarbCloudClient
 			}
 		}
 
+		public async Task ChangeProfile(Guid Target) {
+			await SendPost<GuidData>(API_PATH + PRIVATEPATH + "ChangeProfile", new GuidData { Target = Target });
+		}
+
 		private async Task UserDataUpdate(Guid userID, bool statusUpdate) {
 			var targetUser = await GetUser(userID);
 			if (targetUser is null) {

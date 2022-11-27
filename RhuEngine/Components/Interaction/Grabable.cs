@@ -31,7 +31,7 @@ namespace RhuEngine.Components
 		public bool LaserGrabbed;
 		public Matrix StartingPos;
 
-		public bool Grabbed => (grabbableHolder.Target is not null) && (grabbingUser.Target is not null);
+		public bool Grabbed => grabbableHolder.Target is not null && grabbingUser.Target is not null;
 
 
 		protected override void OnAttach() {
@@ -123,12 +123,15 @@ namespace RhuEngine.Components
 			}
 			catch { }
 			var LocalToUser = LocalUser.userRoot.Target.Entity.GlobalToLocal(Entity.GlobalTrans);
-			var aimPos = InputManager.XRInputSystem.GetHand(obj.source.Value)?[Input.XRInput.TrackerPos.Aim];
+			var aimPos = InputManager.XRInputSystem.GetHand(obj.source.Value)?[TrackerPos.Aim];
 			var aimPosMatrix = Matrix.TR(aimPos?.Position ?? Vector3f.Zero, aimPos?.Rotation ?? Quaternionf.Identity);
 			if (aimPos is null) {
 				aimPosMatrix = Matrix.Identity;
 			}
 			StartingPos = LocalToUser * aimPosMatrix.Inverse;
+			if (Laser) {
+				grabbableHolder.Target?.UpdateReferencer();
+			}
 			Entity.CallOnGrabbed(this);
 		}
 		[Exposed]
@@ -152,7 +155,7 @@ namespace RhuEngine.Components
 			}
 			var pushBackAndForth = InputManager.ObjectPush.HandedValue(GabbedSide) - InputManager.ObjectPull.HandedValue(GabbedSide);
 			var rotate = InputManager.RotateRight.HandedValue(GabbedSide) - InputManager.RotateLeft.HandedValue(GabbedSide);
-			var aimPos = InputManager.XRInputSystem.GetHand(grabbableHolder.Target.source.Value)?[Input.XRInput.TrackerPos.Aim];
+			var aimPos = InputManager.XRInputSystem.GetHand(grabbableHolder.Target.source.Value)?[TrackerPos.Aim];
 			var aimPosMatrix = Matrix.TR(aimPos?.Position ?? Vector3f.Zero, aimPos?.Rotation ?? Quaternionf.Identity) * LocalUser.userRoot.Target.Entity.GlobalTrans;
 			if (aimPos is null) {
 				aimPosMatrix = LocalUser.userRoot.Target.head.Target.GlobalTrans;

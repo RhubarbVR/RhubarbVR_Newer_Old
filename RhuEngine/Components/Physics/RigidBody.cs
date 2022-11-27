@@ -5,6 +5,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
 using System;
+using RhuEngine.Components;
 
 namespace RhuEngine.Components
 {

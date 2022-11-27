@@ -1,4 +1,6 @@
-﻿using RhuEngine.Components.PrivateSpace;
+﻿using System;
+
+using RhuEngine.Components.PrivateSpace;
 using RhuEngine.Linker;
 using RhuEngine.Managers;
 using RhuEngine.WorldObjects;
@@ -93,6 +95,33 @@ namespace RhuEngine.Components
 		public GrabbableHolderCombiner Head;
 		public GrabbableHolderCombiner Left;
 		public GrabbableHolderCombiner Right;
+
+		public IWorldObject GetHolderRefGrabbable
+		{
+			get {
+				return Head.HolderReferenWithGrabed is not null
+					? Head.HolderReferenWithGrabed
+					: Right.HolderReferenWithGrabed is not null ? Right.HolderReferenWithGrabed : Left.HolderReferenWithGrabed is not null ? Left.HolderReferenWithGrabed : null;
+			}
+		}
+
+		public IWorldObject GetHolderRef
+		{
+			get {
+				return Head.HolderReferen is not null
+					? Head.HolderReferen
+					: Right.HolderReferen is not null ? Right.HolderReferen : Left.HolderReferen is not null ? Left.HolderReferen : null;
+			}
+		}
+
+		public GrabbableHolderCombiner GetGrabbableHolder(Handed handed) {
+			return handed switch {
+				Handed.Left => Left,
+				Handed.Right => Right,
+				Handed.Max => Head,
+				_ => throw new NotSupportedException(),
+			};
+		}
 
 
 		public void BuildLazers() {
@@ -399,6 +428,18 @@ namespace RhuEngine.Components
 
 		public bool HeadLazerHitAny => HeadLazerHitFocus | HeadLazerHitOverlay | HeadLazerHitFocus;
 
+		public event Action OnDrop;
+
+		public event Action OnGrip;
+
+		internal void HolderDrop() {
+			OnDrop?.Invoke();
+		}
+		internal void HolderGrip() {
+			OnGrip?.Invoke();
+		}
+
+
 		public void UpdateHeadLazer(Entity head) {
 			var PressForce = Engine.inputManager.GetInputAction(InputTypes.Primary).HandedValue(Handed.Max);
 			var GripForce = Engine.inputManager.GetInputAction(InputTypes.Grab).HandedValue(Handed.Max);
@@ -435,8 +476,13 @@ namespace RhuEngine.Components
 			var wasAlreadyOpen = KeyboardEntity.enabled.Value;
 			KeyboardEntity.enabled.Value = Engine.HasKeyboard && Engine.IsInVR;
 			if (!wasAlreadyOpen) {
-				KeyboardEntity.LocalTrans = Matrix.TR(new Vector3f(0,-0.5,-0.5),Quaternionf.CreateFromEuler(0,-10,0));
+				KeyboardEntity.LocalTrans = Matrix.TR(new Vector3f(0, -0.5, -0.5), Quaternionf.CreateFromEuler(0, -10, 0));
 			}
+		}
+
+		public event Action OnUpdateHolderReferen;
+		internal void UpdateHolderReferen() {
+			OnUpdateHolderReferen?.Invoke();
 		}
 	}
 }

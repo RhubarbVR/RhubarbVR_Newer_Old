@@ -29,6 +29,7 @@ using Assimp.Unmanaged;
 using System.Runtime.InteropServices;
 using static RBullet.BPhysicsSim;
 using static BulletSharp.Dbvt;
+using RhuEngine.Components.Interaction;
 
 namespace RhuEngine.GameTests.Tests
 {

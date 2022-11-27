@@ -63,6 +63,7 @@
     "Common.ExportFile": "Export File",
     "Common.CopyLink": "Copy Link",
     "Common.PressToBegin": "Press To Begin",
+    "Common.Name": "Name",
 
     "Common.Continue": "Continue",
     "Common.Next": "Next",
@@ -249,7 +250,14 @@
     "Programs.FileExplorer.FileName": "Name",
 
     "Programs.FileExplorer.FreeOf": "{0} Free Of {1}",
+    "Programs.FileExplorer.SaveDialogue.Title": "Save Item",
+    "Programs.FileExplorer.ExportDialogue.Title": "Export Item",
+    "Programs.FileExplorer.SaveDialogue.Path": "Save {0} to Path: {1}",
+    "Programs.FileExplorer.ExportDialogue.Path": "Export {0} to Path: {1}",
+    "Programs.FileExplorer.ExportDialogue.EmbedAssets": "Embed Assets",
 
+    "Programs.FileExplorer.SaveDialogue.Save": "Save",
+    "Programs.FileExplorer.ExportDialogue.Export": "Export",
 
     "Programs.FileExplorer.SpecialFolder.Desktop": "Desktop",
     "Programs.FileExplorer.SpecialFolder.MyPictures": "Pictures",

@@ -214,6 +214,7 @@ namespace RhuEngine.Components
 			Label.InputFilter.Value = RInputFilter.Pass;
 			Label.TextSize.Value = 15;
 			Label.Text.Value = Window.WindowTitle;
+			Label.ClipText.Value = true;
 			Label.HorizontalAlignment.Value = RHorizontalAlignment.Center;
 			Label.VerticalAlignment.Value = RVerticalAlignment.Center;
 
