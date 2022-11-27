@@ -66,7 +66,7 @@ namespace RhuEngine.Components
 					if (GetGrabbableHolderFromWorld(item)?.HolderReferen is not null) {
 						return GetGrabbableHolderFromWorld(item)?.HolderReferen;
 					}
-					else if (GetGrabbableHolderFromWorld(item).GrabbedObjects.Count == 1) {
+					else if ((GetGrabbableHolderFromWorld(item)?.GrabbedObjects?.Count ?? 0) == 1) {
 						return GetGrabbableHolderFromWorld(item).GrabbedObjects[0];
 					}
 				}
