@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using MessagePack;
 namespace RhuEngine.AssetSystem.RequestStructs
 {
@@ -10,8 +11,6 @@ namespace RhuEngine.AssetSystem.RequestStructs
 		[Key(0)]
 		public string URL { get; set; }
 		[Key(1)]
-		public long ChunkAmount;
-		[Key(2)]
-		public uint ChunkSizeBytes;
+		public byte[] Bytes { get; set; }
 	}
 }

@@ -6,7 +6,6 @@ using System.Threading;
 
 using RhuEngine.Managers;
 using RhuEngine.WorldObjects.ECS;
-using RhuEngine.AssetSystem;
 using RhuEngine.Linker;
 using RhuEngine.Physics;
 using RNumerics;
@@ -26,14 +25,12 @@ namespace RhuEngine.WorldObjects
 
 		public bool IsPersonalSpace { get; private set; }
 
-		public readonly AssetSession assetSession;
 		public readonly WorldManager worldManager;
 		public Engine Engine => worldManager.Engine;
 
 		public World(WorldManager worldManager) {
 			PhysicsSim = new PhysicsSim();
 			this.worldManager = worldManager;
-			assetSession = new AssetSession(worldManager.Engine.assetManager, this);
 		}
 
 		public string LoadMsg = "Starting to LoadWorld";
@@ -345,7 +342,6 @@ namespace RhuEngine.WorldObjects
 				foreach (var item in _disposables) {
 					item.Dispose();
 				}
-				assetSession.Dispose();
 				try {
 					worldManager.RemoveWorld(this);
 				}

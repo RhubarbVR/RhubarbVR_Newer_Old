@@ -6,9 +6,9 @@ using MessagePack;
 
 namespace RhuEngine.AssetSystem.RequestStructs
 {
-	[Union(0, typeof(AssetChunk))]
+	[Union(0, typeof(RequestAsset))]
 	[Union(1, typeof(AssetResponse))]
-	[Union(2, typeof(RequestAsset))]
+	[Union(2, typeof(PremoteAsset))]
 	public interface IAssetRequest
 	{
 		public string URL { get; }

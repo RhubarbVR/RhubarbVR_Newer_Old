@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System;
 using System.Collections.Generic;
-using RhuEngine.AssetSystem;
 using RNumerics;
 using System.Linq;
 
@@ -60,6 +59,8 @@ namespace RhuEngine.Components
 		}
 
 		AssimpContext _assimpContext;
+		private static bool _srgbTextures;
+
 		public class StringArrayEqualityComparer : IEqualityComparer<string[]>
 		{
 			public bool Equals(string[] x, string[] y) {
@@ -99,7 +100,7 @@ namespace RhuEngine.Components
 			public Dictionary<string, Entity> Nodes = new();
 			public Dictionary<string[], Armature> Armatures = new(new StringArrayEqualityComparer());
 			public AxisAlignedBox3f BoundingBox = AxisAlignedBox3f.CenterZero;
-			public List<(Entity,Node)> LoadMeshNodes = new();
+			public List<(Entity, Node)> LoadMeshNodes = new();
 
 			public AssimpHolder(Scene scene, Entity _root, Entity _assetEntity) {
 				this.scene = scene;
@@ -107,7 +108,7 @@ namespace RhuEngine.Components
 				assetEntity = _assetEntity;
 			}
 
-			public void CalculateOptimumBounds(ComplexMesh amesh,Entity entity) {
+			public void CalculateOptimumBounds(ComplexMesh amesh, Entity entity) {
 				var local = root.GlobalToLocal(entity.GlobalTrans);
 				var mesh = BoundsUtil.Bounds(amesh.Vertices, (x) => x);
 				mesh.Translate(local.Translation);
@@ -286,10 +287,11 @@ namespace RhuEngine.Components
 			foreach (var item in scene.scene.Textures) {
 				RLog.Info($"Loaded Texture {item.Filename}");
 				if (item.HasCompressedData) {
-					var newuri = entity.World.LoadLocalAsset(item.CompressedData, item.Filename + item.CompressedFormatHint);
+					var newtexture = new ImageSharpTexture(new MemoryStream(item.CompressedData), _srgbTextures).CreateTextureAndDisposes();
+					var textureURI = entity.World.CreateLocalAsset(newtexture);
 					var tex = entity.AttachComponent<StaticTexture>();
 					scene.textures.Add(tex);
-					tex.url.Value = newuri.ToString();
+					tex.url.Value = textureURI.ToString();
 				}
 				else if (item.HasNonCompressedData) {
 					RLog.Err("not supported");
@@ -339,8 +341,8 @@ namespace RhuEngine.Components
 			}
 		}
 
-		private static void AddMeshRender(Entity entity, Node node, AssimpHolder scene,ComplexMesh amesh, IEnumerable<int> mits) {
-			var newuri = entity.World.LoadLocalAsset(CustomAssetManager.SaveAsset(amesh,amesh.MeshName), amesh.MeshName);
+		private static void AddMeshRender(Entity entity, Node node, AssimpHolder scene, ComplexMesh amesh, IEnumerable<int> mits) {
+			var newuri = entity.World.CreateLocalAsset(amesh);
 			var rmesh = scene.assetEntity.AttachComponent<StaticMesh>();
 			rmesh.url.Value = newuri.ToString();
 			if (amesh.HasBones || amesh.HasMeshAttachments) {

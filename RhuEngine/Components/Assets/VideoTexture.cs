@@ -171,25 +171,15 @@ namespace RhuEngine.Components
 				StopLoad = true;
 				Load(null);
 				var uri = new Uri(url);
-				if ((useCache || uri.Scheme.ToLower() == "local") && !VideoImporter.IsVideoStreaming(uri)) {
+				if (!VideoImporter.IsVideoStreaming(uri)) {
 					RLog.Info("Loading static video");
-					var lastTask = CurrentTask;
-					CurrentTask = World.assetSession.AssetLoadingTask((data) => {
-						lastTask?.Stop();
-						if (data != null) {
-							var media = new Media(_libVLC, Engine.assetManager.GetAssetFile(uri));
-							while (media.State == VLCState.Buffering) {
-								Thread.Sleep(10);
-							}
-							VlcVideoSourceProvider_RelaodTex();
-							_mediaPlayer?.Play(media);
-							PlayBackUpdate();
-						}
-						else {
-							RLog.Err("Failed to load assets");
-						}
-					}, uri, true);
-
+					var media = new Media(_libVLC, Engine.assetManager.GetCachedPath(uri));
+					while (media.State == VLCState.Buffering) {
+						Thread.Sleep(10);
+					}
+					VlcVideoSourceProvider_RelaodTex();
+					_mediaPlayer?.Play(media);
+					PlayBackUpdate();
 				}
 				else {
 					RLog.Info("Loading stream video");
@@ -237,8 +227,8 @@ namespace RhuEngine.Components
 							var currentRating = 0L;
 							currentRating += RateVideoCodec(videoCodec);
 							currentRating += RateAudioCodec(audioCodec);
-							currentRating += (item?.Width??int.MinValue)/1000;
-							if(currentRating >= lastRateing | formatDownloadInfo is null) {
+							currentRating += (item?.Width ?? int.MinValue) / 1000;
+							if (currentRating >= lastRateing | formatDownloadInfo is null) {
 								formatDownloadInfo = item;
 								lastRateing = currentRating;
 							}
@@ -301,6 +291,10 @@ namespace RhuEngine.Components
 			_waveProvider = data;
 			_audioLoaded = data != null;
 			_audioaction?.Invoke(data);
+		}
+
+		public override void LoadAsset(byte[] data) {
+			StartLoadAsset();
 		}
 	}
 }

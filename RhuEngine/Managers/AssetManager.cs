@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using RhuEngine.AssetSystem;
-using RhuEngine.AssetSystem.AssetProtocals;
 using System.IO;
 using System.Threading.Tasks;
 using RhuEngine.Linker;
 using RNumerics;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace RhuEngine.Managers
 {
@@ -19,69 +18,12 @@ namespace RhuEngine.Managers
 
 		public string CacheDir = "";
 
-		public SynchronizedCollection<AssetSession> assetSessions = new();
-
-		public IAssetProtocol[] protocols;
-
-		public SynchronizedCollection<AssetTask> tasks = new();
-
-		public byte[] GetAsset(Uri asset, bool useCache, Action<float> ProgressUpdate = null) {
-			byte[] assetData = null;
-			var lowerScema = asset.Scheme.ToLower();
-			if (useCache) {
-				assetData = GetCacheAsset(asset);
-			}
-			if (assetData is null) {
-				foreach (var item in protocols) {
-					if (item.Schemes.Contains(lowerScema) && assetData is null) {
-						assetData = item.ProccessAsset(asset, ProgressUpdate).Result;
-					}
-				}
-			}
-			if (assetData is not null && useCache) {
-				CacheAsset(asset, assetData);
-			}
-			return assetData;
-		}
-
-		public byte[] GetCacheAsset(Uri asset) {
-			return IsCache(asset) ? File.ReadAllBytes(GetAssetFile(asset)) : null;
-		}
-
-		public string GetAssetFile(Uri asset) {
-			return $"{GetAssetDir(asset)}{asset.AbsolutePath.Replace('/', '_').Replace('/', '_').Replace('%', 'P')}.RAsset";
-		}
-
-		public string GetAssetDir(Uri asset) {
-			return asset.Scheme.ToLower() == "local" ? $"{CacheDir}/local/" : $"{CacheDir}/{asset.Host}{asset.Port}/";
-		}
-
-		public bool IsCache(Uri asset) {
-			return File.Exists(GetAssetFile(asset));
-		}
-
-		public void CacheAsset(Uri asset, byte[] data) {
-			if (IsCache(asset)) {
-				return;
-			}
-			try {
-				Directory.CreateDirectory(GetAssetDir(asset));
-			}
-			catch (Exception e) {
-				RLog.Err("Error creating Asset Cache Dir Error:" + e.ToString());
-			}
-			try {
-				File.WriteAllBytes(GetAssetFile(asset), data);
-			}
-			catch (Exception e) {
-				RLog.Err("Error creating Asset Cache File Error:" + e.ToString());
-			}
-		}
+		public string LocalPath => Path.Combine(CacheDir, "local");
 
 		public void Dispose() {
 			try {
-				if (Directory.Exists($"{CacheDir}/local/")) {
-					Directory.Delete($"{CacheDir}/local/", true);
+				if (Directory.Exists(LocalPath)) {
+					Directory.Delete(LocalPath, true);
 				}
 			}
 			catch (Exception e) {
@@ -90,7 +32,7 @@ namespace RhuEngine.Managers
 		}
 
 		public void Init(Engine engine) {
-			protocols = new IAssetProtocol[] { new HttpHttpsProtocol(this), new FtpFtpsProtocol(this) };
+
 		}
 
 		public void Step() {
@@ -98,5 +40,37 @@ namespace RhuEngine.Managers
 		public void RenderStep() {
 		}
 
+		public void SaveNew(string sessionID, ushort localUserID, Guid newID, byte[] bytes) {
+			if (!Directory.Exists(LocalPath)) {
+				Directory.CreateDirectory(LocalPath);
+			}
+			File.WriteAllBytes(Path.Combine(LocalPath, $"{sessionID}-{localUserID}-{newID}"), bytes);
+		}
+		public string GetCachedPath(Uri uri) {
+			if(uri.Scheme is "local" or "rdb") {
+				return Path.Combine(CacheDir, uri.Scheme, uri.Host);
+			}
+			var fileName = uri.ToString();
+			foreach (var c in Path.GetInvalidFileNameChars()) {
+				fileName = fileName.Replace(c, '-');
+			}
+			var startPath = Path.Combine(CacheDir, "local", "web");
+			if (!Directory.Exists(startPath)) {
+				Directory.CreateDirectory(startPath);
+			}
+			return Path.Combine(startPath, fileName);
+
+		}
+		public byte[] GetCached(Uri uri) {
+			var path = GetCachedPath(uri);
+			return File.Exists(path) ? File.ReadAllBytes(path) : null;
+		}
+
+		public void PremoteAsset(Uri dataUrl, Uri uri) {
+			var data = GetCached(dataUrl);
+			if (data is not null) {
+				File.WriteAllBytes(GetCachedPath(uri), data);
+			}
+		}
 	}
 }

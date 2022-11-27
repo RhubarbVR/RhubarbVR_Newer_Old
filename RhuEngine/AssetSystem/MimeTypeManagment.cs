@@ -5,11 +5,14 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Linq;
+using Assimp;
+using RhuEngine.WorldObjects.ECS;
+using RhuEngine.WorldObjects;
 
 namespace RhuEngine
 {
 
-	 static class CustomMimeTypes
+	static class CustomMimeTypes
 	{
 		private const string DEFAULT_FALLBACK_MIME_TYPE = "application/octet-stream";
 		private static string _fallbackMimeType;
@@ -29,7 +32,11 @@ namespace RhuEngine
 
 			_typeMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 			{
-			//	{ "123", "application/vnd.lotus-1-2-3" },
+				{"RFile","application/rhubarbvr" },
+				{"RMesh","application/rhubarbvr_mesh" },
+				{"REntity","application/rhubarbvr_entity" },
+				{"RWorld","application/rhubarbvr_world" },
+				{"RAvatar","application/rhubarbvr_avatar" },
 			};
 		}
 
@@ -120,7 +127,7 @@ namespace RhuEngine
 		/// <param name="fileName">The name of the file.</param>
 		/// <returns>The MIME-type for the given file name.</returns>
 		public static string GetMimeType(string fileName) {
-			return TryGetMimeType(fileName,out var mimeType) ? mimeType : MimeTypes.FallbackMimeType;
+			return TryGetMimeType(fileName, out var mimeType) ? mimeType : MimeTypes.FallbackMimeType;
 		}
 	}
 }

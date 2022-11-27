@@ -107,16 +107,16 @@ namespace RhuEngine.Components
 			else {
 				if (rawdata == null) {
 					if (File.Exists(data)) {
-						var newuri = World.LoadLocalAsset(File.ReadAllBytes(data), data);
-						Import(newuri.ToString(), true,null);
+						var newuri = World.CreateLocalAsset(File.ReadAllBytes(data));
+						Import(newuri.ToString(), true, null);
 					}
 					else {
 						RLog.Err("Video Load Uknown" + data);
 					}
 				}
 				else {
-					var newuri = World.LoadLocalAsset(rawdata, data);
-					Import(newuri.ToString(), true,null);
+					var newuri = World.CreateLocalAsset(rawdata);
+					Import(newuri.ToString(), true, null);
 				}
 			}
 		}

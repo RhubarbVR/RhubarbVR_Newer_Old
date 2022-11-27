@@ -8,7 +8,6 @@ using RhuEngine.WorldObjects.ECS;
 
 using RhuEngine.Linker;
 using SharedModels.GameSpecific;
-using RhuEngine.AssetSystem;
 using RNumerics;
 
 namespace RhuEngine.Components
@@ -22,7 +21,7 @@ namespace RhuEngine.Components
 					return;
 				}
 				Load(null);
-				Load(new RMesh(CustomAssetManager.GetCustomAsset<ComplexMesh>(data), false));
+				
 			}
 			catch(Exception err) {
 				RLog.Err($"Failed to load Static Mesh Error {err}");

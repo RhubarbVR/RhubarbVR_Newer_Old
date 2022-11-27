@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+
 using LiteNetLib;
 
 using RhubarbCloudClient.Model;
@@ -41,18 +42,18 @@ namespace RhuEngine.WorldObjects
 			peers.Clear();
 			//first peer is loading in key
 			RLog.Info("Loading First Relay Peer");
-			var firstpeer = new Peer(NetPeer,StartingPeerID, 1);
+			var firstpeer = new Peer(NetPeer, StartingPeerID, 1);
 			peers.Add(firstpeer);
 			World.ProcessUserConnection(firstpeer);
-			
+
 		}
 	}
 
 	public sealed class Peer
 	{
 		public User User { get; set; }
-		public Guid UserID { get;private set; }
-		public ushort ID { get;private set; }
+		public Guid UserID { get; private set; }
+		public ushort ID { get; private set; }
 		public NetPeer NetPeer { get; private set; }
 
 		public bool IsRelay => ID != 0;
@@ -66,11 +67,11 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void Send(byte[] data, DeliveryMethod reliableOrdered) {
-			if( ID == 0) {
-				NetPeer.Send(data, 0,reliableOrdered);
+			if (ID == 0) {
+				NetPeer.Send(data, 0, reliableOrdered);
 			}
 			else {
-				NetPeer.Send(Serializer.Save(new DataPacked(data,ID)),0, reliableOrdered);
+				NetPeer.Send(Serializer.Save(new DataPacked(data, ID)), 0, reliableOrdered);
 			}
 		}
 
@@ -80,10 +81,10 @@ namespace RhuEngine.WorldObjects
 
 		public void SendAsset(byte[] data, DeliveryMethod reliableOrdered) {
 			if (ID == 0) {
-				NetPeer.Send(data,3, reliableOrdered);
+				NetPeer.Send(data, 2, reliableOrdered);
 			}
 			else {
-				NetPeer.Send(Serializer.Save(new DataPacked(data, ID)),3, reliableOrdered);
+				NetPeer.Send(Serializer.Save(new DataPacked(data, ID)), 2, reliableOrdered);
 			}
 		}
 	}

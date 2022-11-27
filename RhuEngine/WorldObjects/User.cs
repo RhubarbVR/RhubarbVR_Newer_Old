@@ -29,12 +29,12 @@ namespace RhuEngine.WorldObjects
 			return userRoot.Target is null
 				? Matrix.Identity
 				: bodyNode switch {
-				BodyNode.UserRoot => userRoot.Target.Entity.GlobalTrans,
-				BodyNode.Head => userRoot.Target.head.Target?.GlobalTrans ?? Matrix.Identity,
-				BodyNode.LeftController => userRoot.Target.leftController.Target?.GlobalTrans ?? Matrix.Identity,
-				BodyNode.RightController => userRoot.Target.rightController.Target?.GlobalTrans ?? Matrix.Identity,
-				_ => Matrix.Identity,
-			};
+					BodyNode.UserRoot => userRoot.Target.Entity.GlobalTrans,
+					BodyNode.Head => userRoot.Target.head.Target?.GlobalTrans ?? Matrix.Identity,
+					BodyNode.LeftController => userRoot.Target.leftController.Target?.GlobalTrans ?? Matrix.Identity,
+					BodyNode.RightController => userRoot.Target.rightController.Target?.GlobalTrans ?? Matrix.Identity,
+					_ => Matrix.Identity,
+				};
 		}
 
 
@@ -93,6 +93,8 @@ namespace RhuEngine.WorldObjects
 		public bool IsConnected => (CurrentPeer?.NetPeer?.ConnectionState ?? LiteNetLib.ConnectionState.Disconnected) == LiteNetLib.ConnectionState.Connected;
 
 		public bool IsLocalUser => World.GetLocalUser() == this;
+
+		public ushort ID => World.GetUserID(this);
 
 		protected override void OnLoaded() {
 			base.OnLoaded();

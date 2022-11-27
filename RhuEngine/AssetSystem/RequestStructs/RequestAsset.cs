@@ -7,7 +7,7 @@ using MessagePack;
 namespace RhuEngine.AssetSystem.RequestStructs
 {
 	[MessagePackObject]
-	public class RequestAsset:IAssetRequest
+	public class RequestAsset : IAssetRequest
 	{
 
 		[Key(0)]

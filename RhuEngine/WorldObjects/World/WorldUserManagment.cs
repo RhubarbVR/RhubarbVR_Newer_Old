@@ -18,7 +18,7 @@ namespace RhuEngine.WorldObjects
 		[NoSyncUpdate]
 		[NoSave]
 		public readonly SyncObjList<User> Users;
-		
+
 		public User GetUserFromID(Guid id) {
 			//Todo: make forLoop
 			foreach (var item in Users.Cast<User>()) {
@@ -28,7 +28,7 @@ namespace RhuEngine.WorldObjects
 			}
 			return null;
 		}
-		
+
 		private void LoadUserIn(Peer peer) {
 			if (peer.User is not null) {
 				RLog.Info("Peer already has peer");
@@ -38,7 +38,7 @@ namespace RhuEngine.WorldObjects
 				if (user == null) {
 					RLog.Info($"User built from peer {Users.Count + 1}");
 					var userid = (ushort)(Users.Count + 1);
-					var pos = 176u; 
+					var pos = 176u;
 					user = Users.AddWithCustomRefIds(false, false, () => {
 						lock (_buildRefIDLock) {
 							var netPointer = NetPointer.BuildID(pos, userid);
@@ -70,6 +70,11 @@ namespace RhuEngine.WorldObjects
 		public User GetMasterUser() {
 			return IsNetworked ? Users[MasterUser] : Users[0];
 		}
+
+		public ushort GetUserID(User user) {
+			return (ushort)Users.IndexOf(user);
+		}
+
 		[Exposed]
 		public User GetHostUser() {
 			return Users[0];
@@ -86,7 +91,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public void DrawDebugMesh(IMesh mesha,Matrix matrix,Colorf colorf, float drawTime = 1) {
+		public void DrawDebugMesh(IMesh mesha, Matrix matrix, Colorf colorf, float drawTime = 1) {
 			if (DebugVisuals) {
 				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					var mesh = RootEntity.GetFirstComponentOrAttach<RawMeshAsset>();
@@ -111,10 +116,10 @@ namespace RhuEngine.WorldObjects
 		}
 
 
-		public void DrawDebugCube(Matrix matrix, Vector3f pos, Vector3d scale, Colorf colorf,float drawTime = 1) {
+		public void DrawDebugCube(Matrix matrix, Vector3f pos, Vector3d scale, Colorf colorf, float drawTime = 1) {
 			DrawDebugCube(matrix, pos, (Vector3f)scale, colorf, drawTime);
 		}
-		public void DrawDebugCube(Matrix matrix,Vector3f pos,Vector3f scale,Colorf colorf, float drawTime = 1) {
+		public void DrawDebugCube(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf, float drawTime = 1) {
 			if (DebugVisuals) {
 				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					var mesh = RootEntity.GetFirstComponentOrAttach<TrivialBox3Mesh>();
@@ -137,7 +142,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public void DrawDebugText(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf,object text, float drawTime = 1,bool lookAtLocal = true) {
+		public void DrawDebugText(Matrix matrix, Vector3f pos, Vector3f scale, Colorf colorf, object text, float drawTime = 1, bool lookAtLocal = true) {
 			if (DebugVisuals) {
 				RUpdateManager.ExecuteOnStartOfFrame(() => {
 					var debugcube = RootEntity.AddChild("DebugText");
@@ -186,5 +191,6 @@ namespace RhuEngine.WorldObjects
 				});
 			}
 		}
+
 	}
 }

@@ -6,164 +6,107 @@ using System.Threading;
 
 using RhuEngine.Managers;
 using RhuEngine.WorldObjects.ECS;
-using RhuEngine.AssetSystem;
-using RhuEngine.AssetSystem.RequestStructs;
 using LiteNetLib;
 using System.Threading.Tasks;
 using SharedModels;
 using System.Collections.Generic;
 using SharedModels.GameSpecific;
 using RhuEngine.Linker;
+using RNumerics;
+using RhuEngine.AssetSystem;
+using RhuEngine.AssetSystem.RequestStructs;
+using RhuEngine.DataStructure;
+using System.IO;
+using RhubarbCloudClient.Model;
 
 namespace RhuEngine.WorldObjects
 {
 	public sealed partial class World
 	{
 		public const DeliveryMethod ASSET_DELIVERY_METHOD = DeliveryMethod.ReliableUnordered;
-
-		public Dictionary<string, LocalAssetLoadTask> loadTasks = new();
-
-		public class LocalAssetLoadTask
-		{
-			public bool ReadyToStart { get; private set; } = false;
-			private readonly World _world;
-			public bool IsLoading { get; private set; } = true;
-
-			public byte[] Data { get; private set; }
-
-			public LocalAssetLoadTask(World world,string url) {
-				_world = world;
-				Url = url;
-				try {
-					_world.loadTasks.Add(url, this);
-					ReadyToStart = true;
-				}
-				catch {
-					ReadyToStart = false;
-				}
-			}
-
-			public byte[] WaitForByteArray() {
-				while (IsLoading) {
-					Thread.Sleep(10);
-				}
-				return Data;
-			}
-
-			public byte[] Load(Uri uri) {
-				var path = uri.AbsolutePath;
-				var userID = path.Substring(0, path.IndexOf('/'));
-				var user = _world.GetUserFromID(Guid.Parse(userID));
-				if (user == null) {
-					RLog.Err($"User was null when loadeding LocalAsset UserID: {userID} Path {path}");
-					return null;
-				}
-				if (user.CurrentPeer == null) {
-					RLog.Err("User Peer was null when loadeding LocalAsset");
-					return null;
-				}
-				user.CurrentPeer.Send(Serializer.Save<IAssetRequest>(new RequestAsset { URL = path }), ASSET_DELIVERY_METHOD);
-				while (true) {
-					Thread.Sleep(10);
-				}
-
-				//IsLoading = false;
-			}
-
-			public string Url { get; private set; }
+		public Uri CreateLocalAsset(byte[] data) {
+			var newID = Guid.NewGuid();
+			Engine.assetManager.SaveNew(SessionID.Value, LocalUserID, newID, data);
+			return new Uri($"local://{SessionID.Value}-{LocalUserID}-{newID}");
+		}
+		public Uri CreateLocalAsset(RTexture2D newtexture) {
+			var newID = Guid.NewGuid();
+			Engine.assetManager.SaveNew(SessionID.Value, LocalUserID, newID, newtexture.Image.SaveWebp(false, 1f));
+			return new Uri($"local://{SessionID.Value}-{LocalUserID}-{newID}");
 		}
 
-		public List<LocalAssetSendTask> sendTasks = new();
+		public Uri CreateLocalAsset(ComplexMesh amesh) {
+			var newID = Guid.NewGuid();
+			Engine.assetManager.SaveNew(SessionID.Value, LocalUserID, newID, RhubarbFileManager.SaveFile(Engine.netApiManager.Client.User.Id, amesh));
+			return new Uri($"local://{SessionID.Value}-{LocalUserID}-{newID}");
+		}
+		public readonly HashSet<Uri> WaitingOnAssets = new();
+		public void RequestAsset(Uri target) {
+			WaitingOnAssets.Add(target);
+			_netManager.SendToAll(Serializer.Save(new RequestAsset { URL = target.ToString() }), 2, ASSET_DELIVERY_METHOD);
+		}
 
-		public class LocalAssetSendTask
-		{
-			private readonly World _world;
-
-			public Task Task { get; private set; }
-
-			public LocalAssetSendTask(World world,string url,Peer requester) {
-				_world = world;
-				Url = url;
-				Requester = requester;
-				world.sendTasks.Add(this);
-				Task = Task.Run(SendLoop);
+		public async Task PremoteAssetAsync(Uri target, Guid? arreay) {
+			if (!Engine.netApiManager.Client.IsLogin) {
+				return;
 			}
+			var data = Engine.assetManager.GetCached(target);
+			if (data is null) {
+				return;
+			}
+			//TodoAddtyperec
+			var returndata = await (arreay is null
+				? Engine.netApiManager.Client.UploadRecord(new MemoryStream(data), "")
+				: Engine.netApiManager.Client.UploadRecordGroup(arreay ?? Guid.Empty, new MemoryStream(data), ""));
+			if (returndata.Error) {
+				RLog.Err($"Failed to premote {target} Error:{returndata.Error}");
+				return;
+			}
+			var createdrec = returndata.Data;
+			var newUrl = new Uri($"rdb://{createdrec.RecordID}");
+			Engine.assetManager.PremoteAsset(target, newUrl);
+			_netManager.SendToAll(Serializer.Save(new PremoteAsset { URL = target.ToString(), NewURL = newUrl.ToString() }), 2, ASSET_DELIVERY_METHOD);
+			OnPremoteLocalAssets?.Invoke(target, newUrl);
+		}
 
-			public uint maxChunkSizeBytes = 1024 * 15;
+		public void PremoteAsset(Uri target, Guid? arreay = null) {
+			Task.Run(async () => await PremoteAssetAsync(target, arreay));
+		}
 
-			public void SendLoop() {
-				var asset = _world.assetSession.GetAsset(new Uri($"local:///{Url}"), true);
-				double devis = 0;
-				for (var i = maxChunkSizeBytes; i >= 0; i--) {
-					devis = ((double)asset.LongLength) / i;
-					if((devis % 1) == 0) {
-						break;
+		private void AssetResponses(IAssetRequest assetRequest, Peer tag, DeliveryMethod deliveryMethod) {
+			var dataUrl = new Uri(assetRequest.URL);
+			var firstData = dataUrl.Host;
+			if (assetRequest is RequestAsset reqwest) {
+				if (dataUrl.Scheme == "local") {
+					if (!firstData.StartsWith($"{SessionID.Value}-{LocalUserID}")) {
+						return;
 					}
 				}
-				var chunksize = (uint)devis;
-				var chunkAmount = asset.LongLength/chunksize;
-				RLog.Info($"Sending asset with chunkSize:{chunksize} ChunkAmount:{chunkAmount} assetSize{asset.LongLength}");
-				if (asset != null) {
-					Requester.Send(Serializer.Save<IAssetRequest>(new AssetResponse { URL = Url,ChunkAmount = chunkAmount,ChunkSizeBytes = chunksize}), ASSET_DELIVERY_METHOD);
-					var chunkBuffer = new byte[chunksize];
-					var remainingChunks = chunkAmount;
-					while (remainingChunks == 0) {
-						Array.Copy(asset,(remainingChunks - 1)*chunksize, chunkBuffer,0, chunkBuffer.Length);
-						Requester.SendAsset(Serializer.Save<IAssetRequest>(new AssetChunk { URL = Url,ChunkID = remainingChunks, data =  chunkBuffer}), ASSET_DELIVERY_METHOD);
-						remainingChunks--;
-						Thread.Sleep(10);
-					}
-					RLog.Info("Sent all Chunks");
+				var data = Engine.assetManager.GetCached(dataUrl);
+				if (data is null) {
+					return;
 				}
+				tag.SendAsset(Serializer.Save(new AssetResponse { URL = assetRequest.URL, Bytes = null }), ASSET_DELIVERY_METHOD);
+				return;
 			}
-
-			public string Url { get; }
-			public Peer Requester { get; private set; }
-		}
-
-		private void AssetResponses(IAssetRequest assetRequest,Peer peer, DeliveryMethod deliveryMethod) {
-			if (assetRequest is RequestAsset request) {
-				RLog.Info("User Wants LocalAsset" + request.URL);
-				new LocalAssetSendTask(this, request.URL, peer);
+			if (!firstData.StartsWith($"{SessionID.Value}-{tag.User.ID}")) {
+				return;
 			}
-			else if (assetRequest is AssetChunk assetChunk) {
-
-			}
-			else if (assetRequest is AssetResponse response) {
-				RLog.Info($"Asset Resived with chunkSize:{response.ChunkSizeBytes} ChunkAmount:{response.ChunkAmount} assetSize{response.ChunkAmount * response.ChunkSizeBytes}");
-			}
-		}
-
-		
-
-		public byte[] RequestAssets(Uri uri) {
-			var loadTask = new LocalAssetLoadTask(this, uri.AbsolutePath);
-			if (loadTask.ReadyToStart) {
-				return loadTask.Load(uri);
-			}
-			else {
-				if (loadTasks.TryGetValue(uri.AbsolutePath, out loadTask)) {
-					return loadTask.WaitForByteArray();
+			if (assetRequest is AssetResponse assetData) {
+				if (!WaitingOnAssets.Contains(dataUrl)) {
+					return;
 				}
-				else {
-					RLog.Err("Asset Load Task Not found");
-					return null;
-				}
+				WaitingOnAssets.Remove(dataUrl);
+				OnLoadedLocalAssets?.Invoke(dataUrl, assetData.Bytes);
+			}
+			else if (assetRequest is PremoteAsset premote) {
+				Engine.assetManager.PremoteAsset(dataUrl, new Uri(premote.NewURL));
+				OnPremoteLocalAssets?.Invoke(dataUrl, new Uri(premote.NewURL));
 			}
 		}
 
-		public Uri LoadLocalAsset(byte[] data,string fileExs) {
-			RLog.Info("Loadeding localAsset " + fileExs);
-			var addedEnd = "";
-			var indexofpoint = fileExs.IndexOf('.');
-			if (indexofpoint > -1) {
-				addedEnd = fileExs.Substring(indexofpoint);
-			}
-			var user = GetLocalUser();
-			var id = Guid.NewGuid().ToString();
-			var uri = new Uri($"local:///{user.userID.Value}/{id}{addedEnd}");
-			Engine.assetManager.CacheAsset(uri, data);
-			return uri;
-		}
+		public event Action<Uri, byte[]> OnLoadedLocalAssets;
+		public event Action<Uri, Uri> OnPremoteLocalAssets;
+
 	}
 }

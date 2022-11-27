@@ -4,12 +4,15 @@ using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 using RhuEngine.Linker;
 using System.Threading.Tasks;
+using static Assimp.Metadata;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Importers" })]
 	public sealed class TextureImporter : Importer
 	{
+		private bool _srgbTextures;
+
 		public static bool IsValidImport(string path) {
 			path = path.ToLower();
 			return
@@ -42,16 +45,18 @@ namespace RhuEngine.Components
 			else {
 				if (rawdata == null) {
 					if (File.Exists(data)) {
-						var newuri = World.LoadLocalAsset(File.ReadAllBytes(data), data);
-						ImportAsync(newuri.ToString(), true, null);
+						var newtexture = new ImageSharpTexture(data, _srgbTextures).CreateTextureAndDisposes();
+						var textureURI = Entity.World.CreateLocalAsset(newtexture);
+						ImportAsync(textureURI.ToString(), true, null);
 					}
 					else {
 						RLog.Err("Texture Load Uknown" + data);
 					}
 				}
 				else {
-					var newuri = World.LoadLocalAsset(rawdata, data);
-					ImportAsync(newuri.ToString(), true, null);
+					var newtexture = new ImageSharpTexture(new MemoryStream(rawdata), _srgbTextures).CreateTextureAndDisposes();
+					var textureURI = Entity.World.CreateLocalAsset(newtexture);
+					ImportAsync(textureURI.ToString(), true, null);
 				}
 			}
 		}
