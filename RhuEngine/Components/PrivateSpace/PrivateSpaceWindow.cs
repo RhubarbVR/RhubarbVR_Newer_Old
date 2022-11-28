@@ -174,6 +174,7 @@ namespace RhuEngine.Components
 			top.GrowVertical.Value = RGrowVertical.Both;
 			top.Entity.AddChild("Back").AttachComponent<Panel>();
 			var viewportConnector = top.Entity.AddChild("UI").AttachComponent<ViewportConnector>();
+			viewportConnector.Target.AllowCrossWorld();
 			viewportConnector.Target.Target = Window.TargetViewport;
 			viewportConnector.MinOffset.Value = new Vector2f(-5, 5);
 			viewportConnector.MaxOffset.Value = new Vector2f(5, 5);

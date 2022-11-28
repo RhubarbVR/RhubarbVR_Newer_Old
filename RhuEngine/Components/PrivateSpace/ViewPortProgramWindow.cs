@@ -62,7 +62,7 @@ namespace RhuEngine.Components
 
 		public void SizePosUpdate() {
 			var clampSize = MathUtil.Max(MinSize, Size.Value);
-			if(clampSize != Size.Value) {
+			if (clampSize != Size.Value) {
 				Size.Value = clampSize;
 				return;
 			}
@@ -77,10 +77,13 @@ namespace RhuEngine.Components
 			var viewPort = Viewport.Target = Entity.AttachComponent<Viewport>();
 			ViewPortSizeLink.Target = viewPort.Size;
 			Size.Value = new Vector2i(512);
-			WindowMinSize.Value = new Vector2i(235,150);
+			WindowMinSize.Value = new Vector2i(235, 150);
 		}
 
 		public void AddRawTexture(RTexture2D rTexture2D) {
+			if (!(World.IsOverlayWorld || World.IsPersonalSpace)) {
+				return;
+			}
 			var texture = Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 			texture.LoadAsset(rTexture2D);
 			IconTexture.Target = texture;

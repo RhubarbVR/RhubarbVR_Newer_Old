@@ -54,11 +54,15 @@ namespace RhuEngine.Managers
 			foreach (var c in Path.GetInvalidFileNameChars()) {
 				fileName = fileName.Replace(c, '-');
 			}
-			var startPath = Path.Combine(CacheDir, "local", "web");
+			var startPath = Path.Combine(CacheDir, "web");
 			if (!Directory.Exists(startPath)) {
 				Directory.CreateDirectory(startPath);
 			}
-			return Path.Combine(startPath, fileName);
+			var other = Path.Combine(startPath, uri.Scheme);
+			if (!Directory.Exists(other)) {
+				Directory.CreateDirectory(other);
+			}
+			return Path.Combine(other, fileName);
 
 		}
 		public byte[] GetCached(Uri uri) {

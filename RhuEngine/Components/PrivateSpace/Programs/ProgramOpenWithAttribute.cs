@@ -42,7 +42,7 @@ namespace RhuEngine.Components
 				}
 				else {
 					var types = item.GetCustomAttribute<ProgramOpenWithAttribute>(true).mimeTypes;
-					if(types.Contains(targetMime) || targetMime.Contains("*")) {
+					if(types.Contains(targetMime) || types.Contains("*")) {
 						yield return item;
 					}
 				}

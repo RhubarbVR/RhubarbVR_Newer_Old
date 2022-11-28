@@ -15,7 +15,6 @@ namespace RhuEngine.Components.PrivateSpace.Programs.OverlayDialogues
 	public sealed class Open_WithDialogue : OverlayDialogue
 	{
 		public void LoadImport(string file, Stream stream, string mimeType, string ex, object[] args = null) {
-			var foundProgam = false;
 			var scrollArray = programWindow.Entity.AddChild().AttachComponent<ScrollContainer>();
 			var items = scrollArray.Entity.AddChild("List").AttachComponent<BoxContainer>();
 			items.Vertical.Value = true;
@@ -29,9 +28,10 @@ namespace RhuEngine.Components.PrivateSpace.Programs.OverlayDialogues
 			elemntheaderlocliztion.TargetValue.Target = elemntheader.Text;
 			elemntheaderlocliztion.Key.Value = "OpenWith.Header";
 			elemntheader.TextSize.Value = 30;
+			var amountOfPrograms = 0;
+			Action lastAction = null;
 			foreach (var data in ProgramOpenWithAttribute.GetAllPrograms(mimeType, Assembly.GetExecutingAssembly())) {
-				foundProgam = true;
-				
+				amountOfPrograms++;
 				var programInfo = data.GetProgramInfo();
 				var elemnt = items.Entity.AddChild(data.Name).AttachComponent<Button>();
 				elemnt.MinSize.Value = new Vector2i(0, 40);
@@ -42,14 +42,17 @@ namespace RhuEngine.Components.PrivateSpace.Programs.OverlayDialogues
 				var texture = elemnt.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 				var caller = elemnt.Entity.AttachComponent<DelegateCall>();
 				elemnt.Pressed.Target = caller.CallDelegate;
-				caller.action = () => {
-					ProgramManager.OpenProgram(data, args, stream, mimeType, ex);
+				caller.action = lastAction = () => {
+					ProgramManager.OpenProgram(data, args ?? new string[] { file }, stream, mimeType, ex);
 					CloseWindow();
 				};
 				elemnt.Icon.Target = texture;
 				texture.LoadAsset(programInfo.icon);
 			}
-			if (!foundProgam) {
+			if(amountOfPrograms == 1) { //Auto open when one program
+				lastAction?.Invoke();
+			}
+			if (amountOfPrograms == 0) {
 				var elemnt = items.Entity.AddChild().AttachComponent<TextLabel>();
 				elemnt.MinSize.Value = new Vector2i(0, 40);
 				elemnt.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;

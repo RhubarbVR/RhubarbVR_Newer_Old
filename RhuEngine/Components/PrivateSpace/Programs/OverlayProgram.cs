@@ -33,6 +33,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			Engine.windowManager.MainWindow.FilesDropped += MainWindow_FilesDropped;
+			RenderThread.ExecuteOnStartOfFrame(() => OpenDialogue<PreAlphaDialogue>().BuildUI());
 		}
 
 		private void MainWindow_FilesDropped(string[] obj) {

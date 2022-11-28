@@ -34,7 +34,7 @@ namespace RhuEngine.WorldObjects
 						Unbind();
 						_targetPointer = value;
 						var targetValue = World.GetWorldObject(value);
-						if(targetValue == null) {
+						if (targetValue == null) {
 							_target = null;
 						}
 						else {
@@ -81,11 +81,11 @@ namespace RhuEngine.WorldObjects
 		private T _target;
 		internal void SetTargetNoChange(T value) {
 			lock (_syncRefLock) {
-					Unbind();
-					_targetPointer = value == null ? default : value.Pointer;
-					_target = value;
-					BroadcastValue();
-					Bind();
+				Unbind();
+				_targetPointer = value == null ? default : value.Pointer;
+				_target = value;
+				BroadcastValue();
+				Bind();
 			}
 		}
 		internal void SetTargetNoNetworkOrChange(T value) {
@@ -97,13 +97,25 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public IWorldObject TargetIWorldObject { get => Target; set { if (value is T data) { Target = data; } else { Target = null; } } }
+		public IWorldObject TargetIWorldObject { get => Target; set => Target = value is T data ? data : null; }
+
+		private bool _allowCrossWorld = false;
+
+		/// <summary>
+		/// This is not to be used enlesss you know the value will never be serialized and networked
+		/// </summary>
+		internal void AllowCrossWorld() {
+			_allowCrossWorld = true;
+		}
 
 		[Exposed]
 		public virtual T Target
 		{
-			get => _target == null || (_target?.IsRemoved ?? false) || _target?.World != World ? null : _target;
+			get => _target?.IsRemoved ?? true ? null : _target;
 			set {
+				if (value?.World != World && value is not null && (!(_allowCrossWorld && World.IsPersonalSpace))) {
+					throw new NotSupportedException("World not the same");
+				}
 				lock (_syncRefLock) {
 					Unbind();
 					_targetPointer = value == null ? default : value.Pointer;

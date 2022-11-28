@@ -90,14 +90,14 @@ namespace RelayHolePuncher
 			};
 
 			_relay = new NetManager(clientListener) {
-				IPv6Enabled = IPv6Mode.SeparateSocket
+				IPv6Enabled = IPv6Mode.SeparateSocket//Todo change to dule mode
 			};
 			_relay.Start(port);
 			_relay.MaxConnectAttempts = 15;
 			_relay.ChannelsCount = 3;
 			_relay.DisconnectTimeout = 1000000;
 			_relay.ReuseAddress = true;
-			_relay.UpdateTime = 120;
+			_relay.UpdateTime = 120;//Todo change update speed
 			Console.WriteLine($"Started Relay Server on port {port}");
 		}
 
@@ -131,9 +131,7 @@ namespace RelayHolePuncher
 					else if (Serializer.TryToRead<StreamDataPacked>(data, out var streampacked)) {
 						foreach (var item in userconections) {
 							try {
-								if (item.otherConnection is not null) {
-									item.otherConnection.Peer.Send(Serializer.Save(new DataPacked(data, item.otherConnection.index)), 1, deliveryMethod);
-								}
+								item.otherConnection?.Peer.Send(Serializer.Save(new DataPacked(data, item.otherConnection.index)), 1, deliveryMethod);
 							}
 							catch (Exception e) {
 								Console.WriteLine("Failed to send to user" + e.ToString());

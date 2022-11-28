@@ -19,9 +19,21 @@ namespace RhuEngine.Components
 
 
 		public ProgramWindow MainProgramWindow => programWindows.Count >= 1 ? this[0] : null;
+		public ViewPortProgramWindow AddWindowWithIcon(RhubarbAtlasSheet.RhubarbIcons icon, string name = null, bool closeProgramOnWindowClose = true, bool canClose = true) {
+			var window = AddWindow(name, null, closeProgramOnWindowClose, canClose);
+			var nicon = window.Entity.AttachComponent<SingleIconTex>();
+			nicon.Icon.Value = icon;
+			window.IconTexture.Target = nicon;
+			return window;
+		}
+		public ViewPortProgramWindow AddWindowWithTexture(IAssetProvider<RTexture2D> icon, string name = null, bool closeProgramOnWindowClose = true, bool canClose = true) {
+			var window = AddWindow(name, null, closeProgramOnWindowClose, canClose);
+			window.IconTexture.Target = icon;
+			return window;
+		}
 
 
-		public ViewPortProgramWindow AddWindow(string name = null, RTexture2D icon = null,bool closeProgramOnWindowClose = true,bool canClose = true) {
+		public ViewPortProgramWindow AddWindow(string name = null, RTexture2D icon = null, bool closeProgramOnWindowClose = true, bool canClose = true) {
 			var window = Entity.AddChild(name ?? ProgramName).AttachComponent<ViewPortProgramWindow>();
 			window.WindowCanClose.Value = canClose;
 			if (canClose) {

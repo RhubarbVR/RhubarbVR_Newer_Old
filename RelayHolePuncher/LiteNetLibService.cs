@@ -25,6 +25,7 @@ namespace RelayHolePuncher
 		}
 
 		public void StartUpdateLoop() {
+			//Todo make loop run smoother
 			var thread = new Thread(() => { while (true) { punchServer.Update(); } });
 			var thread2 = new Thread(() => { while (true) { relayServer.Update(); } });
 			thread.Start();

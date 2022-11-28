@@ -12,5 +12,7 @@ namespace RhuEngine.AssetSystem.RequestStructs
 		public string URL { get; set; }
 		[Key(1)]
 		public byte[] Bytes { get; set; }
+		[Key(2)]
+		public string MimeType { get; set; }
 	}
 }

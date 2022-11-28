@@ -52,6 +52,9 @@ public partial class ConnectedViewport : TextureRect
 
 	public override void _Input(InputEvent @event) {
 		base._Input(@event);
+		if(Viewport is null) {
+			return;
+		}
 		if (Viewport.IsRemoved || Viewport.IsDestroying) {
 			return;
 		}

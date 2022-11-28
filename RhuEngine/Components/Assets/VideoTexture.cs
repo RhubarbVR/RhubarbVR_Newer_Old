@@ -171,7 +171,7 @@ namespace RhuEngine.Components
 				StopLoad = true;
 				Load(null);
 				var uri = new Uri(url);
-				if (!VideoImporter.IsVideoStreaming(uri)) {
+				if (!ImportStatics.IsVideoStreaming(uri)) {
 					RLog.Info("Loading static video");
 					var media = new Media(_libVLC, Engine.assetManager.GetCachedPath(uri));
 					while (media.State == VLCState.Buffering) {
@@ -185,7 +185,7 @@ namespace RhuEngine.Components
 					RLog.Info("Loading stream video");
 					StopLoad = false;
 					Media media;
-					if (VideoImporter.IsVideoStreaming(uri)) {
+					if (ImportStatics.IsVideoStreaming(uri)) {
 						RLog.Info($"Loadeding youtubeDL");
 						if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
 							RLog.Info($"YoutubeDL Loading Windows");

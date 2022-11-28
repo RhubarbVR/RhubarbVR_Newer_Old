@@ -13,20 +13,6 @@ namespace RhuEngine.Components
 	{
 		private bool _srgbTextures;
 
-		public static bool IsValidImport(string path) {
-			path = path.ToLower();
-			return
-				path.EndsWith(".png") ||
-				path.EndsWith(".jpeg") ||
-				path.EndsWith(".jpg") ||
-				path.EndsWith(".bmp") ||
-				path.EndsWith(".pdm") ||
-				path.EndsWith(".gif") ||
-				path.EndsWith(".tiff") ||
-				path.EndsWith(".tga") ||
-				path.EndsWith(".webp");
-		}
-
 		public void ImportAsync(string data, bool wasUri, byte[] rawdata) {
 			RLog.Info($"Loaded Texture Data {data} Uri{wasUri}");
 			if (wasUri) {
