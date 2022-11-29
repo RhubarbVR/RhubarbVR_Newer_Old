@@ -32,7 +32,7 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 			var locke = GetType().GetHighestAttributeInherit<SingleComponentLockAttribute>();
 			if(locke is not null) {
-				if(Entity.components.Where(x => x.GetType() == locke).Count() >= 2) {
+				if(Entity.components.Where(x => x.GetType().IsAssignableFrom(locke)).Count() >= 2) {
 					Destroy();
 					throw new Exception("Single Component Locked");
 				}
