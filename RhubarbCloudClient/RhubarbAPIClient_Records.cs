@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,12 +30,11 @@ namespace RhubarbCloudClient
 			var req = await CreateRecord(size, publicData, publicDataStaticURL, ContentType);
 			if (!req.Error) {
 				var stream = new ProgressableStreamContent(data, progress);
-				stream.Headers.Add("Content-Type", ContentType);
+				stream.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(ContentType);
 				stream.Headers.Add("x-upload-content-length", size.ToString());
 				if (publicDataStaticURL) {
 					stream.Headers.Add("X-Goog-Acl", "public-read");
-					stream.Headers.Add("Cache-Control", "public, max-age=31540000");
-
+					stream.Headers.Add("X-Cache-Control", "public, max-age=31540000");
 				}
 				var httpResponse = await HttpClient.PutAsync(new Uri(req.Data.TempUploadURL), stream);
 				if (!httpResponse.IsSuccessStatusCode) {
@@ -48,6 +49,7 @@ namespace RhubarbCloudClient
 				}
 			}
 			else {
+				progress?.ChangeState(ProgressState.Failed);
 				return req;
 			}
 		}
@@ -57,12 +59,11 @@ namespace RhubarbCloudClient
 			var req = await CreateRecordGroup(group,size, publicData, publicDataStaticURL, ContentType);
 			if (!req.Error) {
 				var stream = new ProgressableStreamContent(data, progress);
-				stream.Headers.Add("Content-Type", ContentType);
+				stream.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(ContentType);
 				stream.Headers.Add("x-upload-content-length", size.ToString());
 				if (publicDataStaticURL) {
 					stream.Headers.Add("X-Goog-Acl", "public-read");
-					stream.Headers.Add("Cache-Control", "public, max-age=31540000");
-
+					stream.Headers.Add("X-Cache-Control", "public, max-age=31540000");
 				}
 				var httpResponse = await HttpClient.PutAsync(new Uri(req.Data.TempUploadURL), stream);
 				if (!httpResponse.IsSuccessStatusCode) {

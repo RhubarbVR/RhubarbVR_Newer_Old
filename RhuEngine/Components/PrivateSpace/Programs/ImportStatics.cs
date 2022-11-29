@@ -25,13 +25,14 @@ namespace RhuEngine.Components
 	{
 		public enum FileTypes
 		{
-			Unknown = Image | Mesh | Video | Audio | Text,
+			Unknown = Image | Mesh | Video | Audio | Text | Font,
 			None = 0,
 			Image = 1,
 			Mesh = 2,
 			Video = 4,
 			Audio = 8,
 			Text = 16,
+			Font = 32,
 		}
 
 		public static FileTypes GetFileTypes(string fileName, string mimeType) {
@@ -54,6 +55,9 @@ namespace RhuEngine.Components
 			if (IsTextureImport(fileName, mimeType)) {
 				fileTypes |= FileTypes.Image;
 			}
+			if(IsFontImport(fileName, mimeType)) {
+				fileTypes |= FileTypes.Font;
+			}
 			return fileTypes == FileTypes.None ? FileTypes.Unknown : fileTypes;
 		}
 
@@ -67,7 +71,9 @@ namespace RhuEngine.Components
 		public static bool IsAudioImport(string fileName, string mimeType) {
 			return ChechMimeType(mimeType, "audio");
 		}
-
+		public static bool IsFontImport(string fileName, string mimeType) {
+			return ChechMimeType(mimeType, "font");
+		}
 
 		public static bool IsVideoImport(string fileName, string mimeType) {
 			return ChechMimeType(mimeType, "video") || ChechMimeType(mimeType, "audio") || IsValidVideoImport(fileName);

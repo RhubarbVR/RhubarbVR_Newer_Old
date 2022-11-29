@@ -25,7 +25,7 @@ namespace RhuEngine
 			mesh.TopRadius.Value = 4;
 			mesh.BaseRadius.Value = 3.5f;
 			mesh.Height.Value = 0.25f;
-			coloider.boxHalfExtent.Value = new Vector3d(8, 0.25f, 8) / 2;
+			coloider.boxHalfExtent.Value = new Vector3d(8, 0.5f, 8) / 2;
 			var spinningCubes = world.RootEntity.AddChild("SpinningCubes");
 			spinningCubes.position.Value = new Vector3f(0, 0.5f, 0);
 			AttachSpiningCubes(spinningCubes);
@@ -41,6 +41,14 @@ namespace RhuEngine
 			things.AttachComponent<BoxShape>();
 			things.AttachComponent<Grabbable>();
 			things.AttachComponent<RigidBody>();
+
+			var things2 = DebugStuff.AddChild("Thing");
+			things2.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			things2.position.Value = Vector3f.Up * 6;
+			things2.AttachComponent<BoxShape>();
+			things2.AttachComponent<Grabbable>();
+			things2.AttachComponent<RigidBody>();
+
 			var SubviewPortCame = DebugStuff.AddChild("Camera");
 			SubviewPortCame.position.Value = new Vector3f(4f, 2f, -2f);
 			var subViewPOrtdatae = SubviewPortCame.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();

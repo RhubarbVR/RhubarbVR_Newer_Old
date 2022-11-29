@@ -17,6 +17,8 @@ using System.Globalization;
 using System.Collections;
 using RhuEngine.Managers;
 using DataModel.Enums;
+using RhuEngine.Components.UI;
+using System.IO;
 
 namespace RhuEngine.Components
 {
@@ -125,6 +127,20 @@ namespace RhuEngine.Components
 
 		public Entity RootUIEntity => UserInterface.Entity;
 
+		private bool _offlineStart = false;
+		private void LoadTaskBarAndStart() {
+			if (Engine.netApiManager.Client.IsLogin) {
+				_offlineStart = false;
+			}
+			else if (!_offlineStart) {
+
+
+
+
+				_offlineStart = true;
+			}
+		}
+
 		internal void LoadInterface() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
@@ -205,7 +221,19 @@ namespace RhuEngine.Components
 			Client_StatusUpdate();
 			_profileSideButton.Entity.enabled.Value = true;
 			_usernameLabel.Text.Value = obj.UserName;
-			//Todo: Load users icon
+			LoadTaskBarAndStart();
+			UpdateProfilePic();
+		}
+
+		private void UpdateProfilePic() {
+			if ((Engine.netApiManager.Client.User?.ProfileIcon ?? Guid.Empty) == Guid.Empty) {
+				_profileSideButton.Icon.Target = _profileSideButton.Entity.GetFirstComponent<RawAssetProvider<RTexture2D>>();
+			}
+			else {
+				var data = _profileSideButton.Entity.GetFirstComponentOrAttach<StaticTexture>();
+				data.url.Value = Engine.netApiManager.Client.User.ProfileURL;
+				_profileSideButton.Icon.Target = data;
+			}
 		}
 
 		[Exposed]
@@ -221,6 +249,7 @@ namespace RhuEngine.Components
 			_profileElement.Entity.enabled.Value = false;
 			_profileSideButton.ButtonPressed.Value = false;
 			_profileSideButton.Entity.enabled.Value = false;
+			LoadTaskBarAndStart();
 		}
 		Button _onlineButton;
 		Button _idleButton;
@@ -288,6 +317,41 @@ namespace RhuEngine.Components
 		[Exposed]
 		public void Logout() {
 			Task.Run(Engine.netApiManager.Client.LogOut);
+		}
+
+		[Exposed]
+		public void ChangeProfile(IAssetProvider<RTexture2D> assetProvider) {
+			if (assetProvider is null) {
+				return;
+			}
+			if (!assetProvider.Loaded) {
+				return;
+			}
+			if (assetProvider.Value is null) {
+				return;
+			}
+			if (!Engine.netApiManager.Client.IsLogin) {
+				return;
+			}
+			RLog.Info("Changing profile pic");
+			var img = assetProvider.Value.Image;
+			Task.Run(async () => {
+				var data = new MemoryStream(img.SaveWebp(false, 1));
+				RLog.Info("Uploading profile pic");
+				var uploadedData = await Engine.netApiManager.Client.UploadRecord(data, "image/webp", true, true);
+				if (uploadedData.Error) {
+					RLog.Err("Failed to upload profile Error:" + uploadedData.MSG);
+					return;
+				}
+				RLog.Info($"Changing profile pic to {uploadedData.Data.RecordID}");
+				var change = await Engine.netApiManager.Client.ChangeProfile(uploadedData.Data.RecordID);
+				if (change.Error) {
+					RLog.Err("Failed to chage profile Error:" + change.Error);
+					return;
+				}
+				Engine.netApiManager.Client.User.ProfileIcon = uploadedData.Data.RecordID;
+				UpdateProfilePic();
+			});
 		}
 
 
@@ -391,7 +455,7 @@ namespace RhuEngine.Components
 				sideBarButton.MinSize.Value = new Vector2i(0, 84);
 				sideBarButton.IconAlignment.Value = RButtonAlignment.Center;
 				sideBarButton.ExpandIcon.Value = true;
-				var textureRef = sideBar.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+				var textureRef = sideBarButton.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 				var actionProvider = sideBar.Entity.AttachComponent<DelegateCall>();
 				actionProvider.action = clickAction;
 				sideBarButton.Icon.Target = textureRef;
@@ -403,6 +467,9 @@ namespace RhuEngine.Components
 			}
 
 			_profileSideButton = AddSideButton("Profile", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.User), () => _profileElement.Entity.enabled.Value = !_profileElement.Entity.enabled.Value);
+			var acsepter = _profileSideButton.Entity.AttachComponent<ReferenceAccepter<IAssetProvider<RTexture2D>>>();
+			acsepter.Dropped.Target = ChangeProfile;
+
 			if (Engine.EngineLink.LiveVRChange) {
 				AddSideButton("VRSwitch", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.VRHeadset), () => { Engine.EngineLink.ChangeVR(!Engine.IsInVR); ToggleStart(false); });
 			}

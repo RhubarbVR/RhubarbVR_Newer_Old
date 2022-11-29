@@ -84,6 +84,12 @@ namespace RhuEngine.Components
 			grid.Columns.Value = 2;
 			var root = grid.Entity;
 			var gettype = ImportStatics.GetFileTypes(path, mimetype);
+			if ((gettype & ImportStatics.FileTypes.Text) != ImportStatics.FileTypes.None) {
+				var button = AddSelectionButton(root, "Text", OpenText);
+				if (gettype == ImportStatics.FileTypes.Text) {
+					button.Item2?.Invoke();
+				}
+			}
 			if ((gettype & ImportStatics.FileTypes.Image) != ImportStatics.FileTypes.None) {
 				var button = AddSelectionButton(root, "Texture", OpenTexture);
 				if (gettype == ImportStatics.FileTypes.Image) {
@@ -108,9 +114,9 @@ namespace RhuEngine.Components
 					button.Item2?.Invoke();
 				}
 			}
-			if ((gettype & ImportStatics.FileTypes.Text) != ImportStatics.FileTypes.None) {
-				var button = AddSelectionButton(root, "Text", OpenText);
-				if (gettype == ImportStatics.FileTypes.Text) {
+			if ((gettype & ImportStatics.FileTypes.Font) != ImportStatics.FileTypes.None) {
+				var button = AddSelectionButton(root, "Font", OpenFont);
+				if (gettype == ImportStatics.FileTypes.Font) {
 					button.Item2?.Invoke();
 				}
 			}
@@ -158,6 +164,15 @@ namespace RhuEngine.Components
 			}
 			scroll.Target.Entity.DestroyChildren();
 			BuildAttachEntity<AssimpImporter>();
+		}
+		[Exposed]
+		public void OpenFont() {
+			if (!_hasImportData) { return; }
+			if (scroll.Target is null) {
+				return;
+			}
+			scroll.Target.Entity.DestroyChildren();
+			//Todo Load font importer
 		}
 
 		[Exposed]
