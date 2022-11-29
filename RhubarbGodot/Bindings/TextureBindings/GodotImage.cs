@@ -140,7 +140,7 @@ namespace RhubarbVR.Bindings.TextureBindings
 		}
 
 		public IRImage GetRect(Vector2i rectPos, Vector2i rectSiz) {
-			return new GodotImage(Image.GetRect(new Rect2i(rectPos.x, rectPos.y, rectSiz.x, rectSiz.y)));
+			return new GodotImage(Image.GetRegion(new Rect2i(rectPos.x, rectPos.y, rectSiz.x, rectSiz.y)));
 		}
 
 		public (Vector2i pos, Vector2i size) GetUsedRect() {

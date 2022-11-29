@@ -25,7 +25,7 @@ namespace RhubarbVR.Bindings.FontBindings
 			RFont = rFont;
 			FontFile ??= new FontFile();
 		}
-		public byte[] Data { get => FontFile.Data; set => throw new NotImplementedException(); }
+		public byte[] Data { get => FontFile.Data; set => FontFile.Data = value; }
 		public bool GenerateMipmaps { get => FontFile.GenerateMipmaps; set => FontFile.GenerateMipmaps = value; }
 		public RFontAntialiasing Antialiasing { get => (RFontAntialiasing)FontFile.Antialiasing ; set => FontFile.Antialiasing  = (FontAntialiasing)value; }
 		public string FontName { get => FontFile.FontName ; set => FontFile.FontName  = value; }

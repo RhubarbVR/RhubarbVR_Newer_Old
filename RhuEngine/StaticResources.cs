@@ -132,6 +132,7 @@ namespace RhuEngine
 			MainFont.AddFallBack(LoadFontFromStream(GetStaticResource("Fonts.NotoSansSymbols-Regular.ttf")));
 			MainFont.AddFallBack(LoadFontFromStream(GetStaticResource("Fonts.NotoSansSymbols2-Regular.ttf")));
 			MainFont.AddFallBack(LoadFontFromStream(GetStaticResource("Fonts.NotoSansEgyptianHieroglyphs-Regular.ttf")));
+			MainFont.MultichannelSignedDistanceField = true;
 			return MainFont;
 		}
 	}
