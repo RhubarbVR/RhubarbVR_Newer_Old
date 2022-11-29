@@ -343,12 +343,7 @@ namespace RhuEngine.Components
 					RLog.Err("Failed to upload profile Error:" + uploadedData.MSG);
 					return;
 				}
-				RLog.Info($"Changing profile pic to {uploadedData.Data.RecordID}");
-				var change = await Engine.netApiManager.Client.ChangeProfile(uploadedData.Data.RecordID);
-				if (change.Error) {
-					RLog.Err("Failed to chage profile Error:" + change.Error);
-					return;
-				}
+				await Engine.netApiManager.Client.ChangeProfile(uploadedData.Data.RecordID);
 				Engine.netApiManager.Client.User.ProfileIcon = uploadedData.Data.RecordID;
 				UpdateProfilePic();
 			});
