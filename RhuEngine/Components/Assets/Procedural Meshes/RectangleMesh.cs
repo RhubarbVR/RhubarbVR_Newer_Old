@@ -41,24 +41,23 @@ namespace RhuEngine.Components
 		}
 
 		public override void ComputeMesh() {
-			try {
-				if (!Engine.EngineLink.CanRender) {
-					return;
-				}
-				var mesh = new TrivialRectGenerator {
-					Width = Dimensions.Value.x,
-					Height = Dimensions.Value.y,
-					UVMode = UVMode,
-					Normal = Normal,
-					IndicesMap = IndicesMap,
-					WantUVs = WantUVs.Value,
-					WantNormals = WantNormals,
-				};
-				mesh.Generate();
-				GenMesh(mesh.MakeSimpleMesh());
-			}catch(Exception e) {
-				RLog.Err("Error Loading rec mesh " + e);
+			if (!Engine.EngineLink.CanRender) {
+				return;
 			}
+			if(IndicesMap.Value.a == 0 && IndicesMap.Value.b == 0) {
+				return;
+			}
+			var mesh = new TrivialRectGenerator {
+				Width = Dimensions.Value.x,
+				Height = Dimensions.Value.y,
+				UVMode = UVMode,
+				Normal = Normal,
+				IndicesMap = IndicesMap,
+				WantUVs = WantUVs.Value,
+				WantNormals = WantNormals,
+			};
+			mesh.Generate();
+			GenMesh(mesh.MakeSimpleMesh());
 		}
 	}
 }

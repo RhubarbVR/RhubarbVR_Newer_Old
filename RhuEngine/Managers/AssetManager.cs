@@ -40,6 +40,15 @@ namespace RhuEngine.Managers
 		public void RenderStep() {
 		}
 
+		public async Task SaveNew(string sessionID, ushort localUserID, Guid newID, Stream data) {
+			if (!Directory.Exists(LocalPath)) {
+				Directory.CreateDirectory(LocalPath);
+			}
+			var createFile = File.Create(Path.Combine(LocalPath, $"{sessionID}-{localUserID}-{newID}"));
+			await data.CopyToAsync(createFile);
+			createFile.Close();
+		}
+
 		public void SaveNew(string sessionID, ushort localUserID, Guid newID, byte[] bytes) {
 			if (!Directory.Exists(LocalPath)) {
 				Directory.CreateDirectory(LocalPath);

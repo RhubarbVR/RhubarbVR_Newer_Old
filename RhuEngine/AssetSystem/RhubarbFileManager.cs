@@ -27,6 +27,15 @@ namespace RhuEngine.AssetSystem
 			};
 		}
 
+		public static RhubarbFile ReadFile(byte[] data) {
+			return Serializer.Read<RhubarbFile>(data);
+		}
+
+		public static (T, RhubarbFile) ReadFile<T>(byte[] data) {
+			var file = Serializer.Read<RhubarbFile>(data);
+			return (Serializer.Read<T>(file.Data), file);
+		}
+
 		public static byte[] SaveFile(RhubarbFile rhubarbFile) {
 			return Serializer.Save(rhubarbFile);
 		}

@@ -89,6 +89,7 @@ namespace RhuEngine.Components
 					}
 				}
 				else {
+					RLog.Info("loaded static Asset from cache");
 					LoadAsset(data);
 					_staticAssetLoaded = true;
 				}

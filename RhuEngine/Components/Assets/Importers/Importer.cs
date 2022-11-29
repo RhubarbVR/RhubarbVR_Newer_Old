@@ -1,12 +1,65 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 
+using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
+
+using RNumerics;
 
 namespace RhuEngine.Components
 {
 	public abstract class Importer : Component
 	{
-		public abstract void Import(string path_url, bool isUrl, byte[] rawData);
+		public readonly SyncRef<ImportProgram> ImporterProgram;
+
+		public readonly SyncRef<Button> ImportButton;
+		public virtual void BuildUI(Entity rootBox) {
+			var importButton = ImportButton.Target = rootBox.AddChild("Button").AttachComponent<Button>();
+			importButton.Text.Value = "Import";
+			importButton.Alignment.Value = RButtonAlignment.Center;
+			importButton.Pressed.Target = Import;
+		}
+
+		private bool _hasData = false;
+		protected (string url_path, bool isUrl, Stream rawData) _importData;
+
+		public virtual void LoadImportData(string url_path, bool isUrl, Stream rawData,ImportProgram importProgram) {
+			ImporterProgram.Target = importProgram;
+			_hasData = true;
+			_importData = (url_path, isUrl, rawData);
+		}
+
+		public abstract Task ImportAsset();
+
+
+		[Exposed]
+		public virtual void Import() {
+			if(!_hasData ) {
+				return;
+			}
+			if (ImportButton.Target is null) {
+				return;
+			}
+			if (ImportButton.Target.Disabled.Value) {
+				return;
+			}
+			Task.Run(async () => {
+				if (ImportButton.Target is not null) {
+					ImportButton.Target.Disabled.Value = true;
+				}
+				try {
+					await ImportAsset();
+				}
+				catch(Exception e) {
+					RLog.Err("Failed to import asset Error:" + e.ToString());
+				}
+				if (ImportButton.Target is not null) {
+					ImportButton.Target.Disabled.Value = false;
+				}
+				ImporterProgram.Target?.CloseProgram();
+			});
+		}
 	}
 }

@@ -13,8 +13,11 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Assets/Importers" })]
 	public sealed class VideoImporter : Importer
 	{
+		public override Task ImportAsset() {
+			return Task.Run(() => ImportAsync(_importData.url_path, _importData.isUrl, _importData.rawData));
+		}
 
-		public void ImportAsync(string data, bool wasUri, byte[] rawdata) {
+		public async Task ImportAsync(string data, bool wasUri, Stream rawdata) {
 			if (wasUri) {
 				RLog.Info("Building video");
 				Entity.AttachComponent<Grabbable>();
@@ -34,21 +37,17 @@ namespace RhuEngine.Components
 				if (rawdata == null) {
 					if (File.Exists(data)) {
 						var newuri = World.CreateLocalAsset(File.ReadAllBytes(data), MimeTypeManagment.GetMimeType(data));
-						Import(newuri.ToString(), true, null);
+						await ImportAsync(newuri.ToString(), true, null);
 					}
 					else {
 						RLog.Err("Video Load Uknown" + data);
 					}
 				}
 				else {
-					var newuri = World.CreateLocalAsset(rawdata, MimeTypeManagment.GetMimeType(data));
-					Import(newuri.ToString(), true, null);
+					var newuri = await World.CreateLocalAsset(rawdata, MimeTypeManagment.GetMimeType(data));
+					await ImportAsync(newuri.ToString(), true, null);
 				}
 			}
-		}
-
-		public override void Import(string data, bool wasUri, byte[] rawdata) {
-			Task.Run(() => ImportAsync(data, wasUri, rawdata));
 		}
 	}
 }

@@ -9,6 +9,7 @@ using RhuEngine.WorldObjects.ECS;
 using RhuEngine.Linker;
 using SharedModels.GameSpecific;
 using RNumerics;
+using RhuEngine.AssetSystem;
 
 namespace RhuEngine.Components
 {
@@ -20,11 +21,11 @@ namespace RhuEngine.Components
 				if (!Engine.EngineLink.CanRender) {
 					return;
 				}
-				Load(null);
-				
+				Load(new RMesh((IMesh)RhubarbFileManager.ReadFile<ComplexMesh>(data).Item1, false));
 			}
-			catch(Exception err) {
+			catch (Exception err) {
 				RLog.Err($"Failed to load Static Mesh Error {err}");
+				Load(null);
 			}
 		}
 	}

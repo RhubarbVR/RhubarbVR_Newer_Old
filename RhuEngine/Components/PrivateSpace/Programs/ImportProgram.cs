@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,16 +44,27 @@ namespace RhuEngine.Components
 			return (button, action);
 		}
 
+		private bool _hasImportData = false;
+
+		private (string url_path, bool isUrl, Stream rawData) _importData;
+
 		public readonly SyncRef<BoxContainer> scroll;
 
 		public override void StartProgram(Stream file = null, string mimetype = null, string ex = null, params object[] args) {
-			var window = AddWindowWithIcon(IconFind);
-			window.SizePixels = new Vector2i(320, 350);
-			window.CenterWindowIntoView();
+			_hasImportData = true;
 			var path = ex;
 			if (args is not null && args.Length == 1 && args[0] is string @string) {
 				path = @string;
 			}
+			var isUri = Uri.TryCreate(path, UriKind.RelativeOrAbsolute, out var uri);
+			if (isUri && uri.Scheme == "file") {
+				isUri = false;
+			}
+			_importData = (path, isUri, file);
+			var window = AddWindowWithIcon(IconFind);
+			window.SizePixels = new Vector2i(320, 350);
+			window.CenterWindowIntoView();
+
 			var scroll = this.scroll.Target = window.Entity.AddChild("Scroll").AttachComponent<ScrollContainer>().Entity.AddChild("Back").AttachComponent<BoxContainer>();
 			scroll.Vertical.Value = true;
 			scroll.Alignment.Value = RBoxContainerAlignment.Center;
@@ -104,9 +116,25 @@ namespace RhuEngine.Components
 			}
 		}
 
+		private T BuildAttachEntity<T>() where T : Importer, new() {
+			var parent = LocalUser.userRoot.Target?.Entity.InternalParent ?? World.RootEntity;
+			var newEntity = parent.AddChild(typeof(T).Name);
+			var import = newEntity.AttachComponent<T>();
+			if (LocalUser is not null) {
+				newEntity.GlobalTrans = Matrix.TR(Vector3f.Forward * 0.35f, Quaternionf.Pitched) * LocalUser.userRoot.Target?.head.Target?.GlobalTrans ?? Matrix.Identity;
+			}
+			import.LoadImportData(_importData.url_path, _importData.isUrl, _importData.rawData, this);
+			var box = scroll.Target.Entity.AddChild().AttachComponent<BoxContainer>();
+			box.Alignment.Value = RBoxContainerAlignment.Center;
+			box.Vertical.Value = true;
+			import.BuildUI(box.Entity);
+			return import;
+		}
+
 		[Exposed]
 		public void OpenText() {
-			if(scroll.Target is null) {
+			if (!_hasImportData) { return; }
+			if (scroll.Target is null) {
 				return;
 			}
 			scroll.Target.Entity.DestroyChildren();
@@ -114,24 +142,27 @@ namespace RhuEngine.Components
 		}
 		[Exposed]
 		public void OpenVideo() {
+			if (!_hasImportData) { return; }
 			if (scroll.Target is null) {
 				return;
 			}
 			scroll.Target.Entity.DestroyChildren();
-			//Todo Load video importer
+			BuildAttachEntity<VideoImporter>();
 		}
 
 		[Exposed]
 		public void OpenMesh() {
+			if (!_hasImportData) { return; }
 			if (scroll.Target is null) {
 				return;
 			}
 			scroll.Target.Entity.DestroyChildren();
-			//Todo Load mesh importer
+			BuildAttachEntity<AssimpImporter>();
 		}
 
 		[Exposed]
 		public void OpenAudio() {
+			if (!_hasImportData) { return; }
 			if (scroll.Target is null) {
 				return;
 			}
@@ -141,11 +172,12 @@ namespace RhuEngine.Components
 
 		[Exposed]
 		public void OpenTexture() {
+			if (!_hasImportData) { return; }
 			if (scroll.Target is null) {
 				return;
 			}
 			scroll.Target.Entity.DestroyChildren();
-			//Todo Load Texture importer
+			BuildAttachEntity<TextureImporter>();
 		}
 
 	}

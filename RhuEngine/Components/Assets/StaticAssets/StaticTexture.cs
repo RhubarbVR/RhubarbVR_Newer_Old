@@ -31,14 +31,23 @@ namespace RhuEngine.Components
 				if (!Engine.EngineLink.CanRender) {
 					return;
 				}
-				Load(null);
+				if(data is null) {
+					Load(null);
+					return;
+				}
+				if (data.Length == 0) {
+					Load(null);
+					return;
+				}
 				Image?.Dispose();
 				Image = new RImage(null);
 				Image.LoadWebp(data);
 				_rImageTexture2D.SetImage(Image);
+				Load(_rImageTexture2D);
 			}
-			catch(Exception err) {
+			catch (Exception err) {
 				RLog.Err($"Failed to load Static Texture Error {err}");
+				Load(null);
 			}
 		}
 	}

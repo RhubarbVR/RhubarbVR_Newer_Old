@@ -18,15 +18,25 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(TextScale))]
 		[Default(1f)]
 		public readonly Sync<float> scaleMultiplier;
+		[OnChanged(nameof(TextScale))]
+		[Default(0.001f)]
+		public readonly Sync<float> depth;
 
+		[OnChanged(nameof(TextScale))]
 		public readonly Linker<Vector2f> scale;
+		[OnChanged(nameof(TextScale))]
+		public readonly Linker<Vector3d> boxScale;
 
 		private void TextScale() {
-			if(texture.Asset is null) {
+			if (texture.Asset is null) {
 				return;
 			}
+			var mainSize = new Vector2f(texture.Asset.Width, texture.Asset.Height) / texture.Asset.Height * scaleMultiplier;
 			if (scale.Linked) {
-				scale.LinkedValue = new Vector2f(texture.Asset.Width, texture.Asset.Height) / texture.Asset.Height * scaleMultiplier;
+				scale.LinkedValue = mainSize;
+			}
+			if (boxScale.Linked) {
+				boxScale.LinkedValue = new Vector3f(mainSize.x, depth.Value, mainSize.y) / 2;
 			}
 		}
 

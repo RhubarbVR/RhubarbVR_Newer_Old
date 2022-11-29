@@ -25,6 +25,14 @@ namespace RhuEngine.WorldObjects
 	{
 		public const DeliveryMethod ASSET_DELIVERY_METHOD = DeliveryMethod.ReliableUnordered;
 
+		public async Task<Uri> CreateLocalAsset(Stream data, string mimeType) {
+			var newID = Guid.NewGuid();
+			await Engine.assetManager.SaveNew(SessionID.Value, LocalUserID, newID, data);
+			var uri = new Uri($"local://{SessionID.Value}-{LocalUserID}-{newID}");
+			AssetMimeType.Add(uri, mimeType);
+			return uri;
+		}
+
 		public Uri CreateLocalAsset(byte[] data, string mimeType) {
 			var newID = Guid.NewGuid();
 			Engine.assetManager.SaveNew(SessionID.Value, LocalUserID, newID, data);
@@ -42,7 +50,7 @@ namespace RhuEngine.WorldObjects
 
 		public Uri CreateLocalAsset(ComplexMesh amesh) {
 			var newID = Guid.NewGuid();
-			Engine.assetManager.SaveNew(SessionID.Value, LocalUserID, newID, RhubarbFileManager.SaveFile(Engine.netApiManager.Client.User.Id, amesh));
+			Engine.assetManager.SaveNew(SessionID.Value, LocalUserID, newID, RhubarbFileManager.SaveFile(Engine.netApiManager.Client.User?.Id??Guid.Empty, amesh));
 			var uri = new Uri($"local://{SessionID.Value}-{LocalUserID}-{newID}");
 			AssetMimeType.Add(uri, "application/rhubarbvr_mesh");
 			return uri;

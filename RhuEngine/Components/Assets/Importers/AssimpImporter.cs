@@ -16,7 +16,19 @@ namespace RhuEngine.Components
 	public sealed class AssimpImporter : Importer
 	{
 		AssimpContext _assimpContext;
-		private static bool _srgbTextures;
+
+		public readonly SyncRef<IValueSource<bool>> srgbTextures;
+
+		private bool SrgbTextures => srgbTextures.Target?.Value ?? false;
+
+		public override void BuildUI(Entity rootBox) {
+			var checkBOx = rootBox.AddChild("CheckBox").AttachComponent<CheckBox>();
+			checkBOx.Text.Value = "SRGB";
+			srgbTextures.Target = checkBOx.ButtonPressed;
+			checkBOx.ButtonPressed.Value = true;
+			base.BuildUI(rootBox);
+		}
+
 
 		public class StringArrayEqualityComparer : IEqualityComparer<string[]>
 		{
@@ -87,21 +99,21 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public async Task ImportAsync(string path_url, bool isUrl, byte[] rawData) {
+		public override async Task ImportAsset() {
 			try {
 				Entity.rotation.Value *= Quaternionf.Pitched.Inverse;
 				_assimpContext ??= new AssimpContext {
 					Scale = .001f,
 				};
 				Scene scene;
-				if (isUrl) {
+				if (_importData.isUrl) {
 					using var client = new HttpClient();
-					using var response = await client.GetAsync(path_url);
+					using var response = await client.GetAsync(_importData.url_path);
 					using var streamToReadFrom = await response.Content.ReadAsStreamAsync();
 					scene = _assimpContext.ImportFileFromStream(streamToReadFrom);
 				}
 				else {
-					scene = rawData is null ? _assimpContext.ImportFile(path_url) : _assimpContext.ImportFileFromStream(new MemoryStream(rawData));
+					scene = _importData.rawData is null ? _assimpContext.ImportFile(_importData.url_path) : _assimpContext.ImportFileFromStream(_importData.rawData);
 				}
 				if (scene is null) {
 					RLog.Err("failed to Load Model Scene not loaded");
@@ -236,7 +248,7 @@ namespace RhuEngine.Components
 				lightcomp.Color.Value = new RNumerics.Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, 1);
 			}
 		}
-		private static void LoadTextures(Entity entity, AssimpHolder scene) {
+		private void LoadTextures(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasTextures) {
 				RLog.Info($"No Textures");
 				return;
@@ -244,7 +256,7 @@ namespace RhuEngine.Components
 			foreach (var item in scene.scene.Textures) {
 				RLog.Info($"Loaded Texture {item.Filename}");
 				if (item.HasCompressedData) {
-					var newtexture = new ImageSharpTexture(new MemoryStream(item.CompressedData), _srgbTextures).CreateTextureAndDisposes();
+					var newtexture = new ImageSharpTexture(new MemoryStream(item.CompressedData), SrgbTextures).CreateTextureAndDisposes();
 					var textureURI = entity.World.CreateLocalAsset(newtexture);
 					var tex = entity.AttachComponent<StaticTexture>();
 					scene.textures.Add(tex);
@@ -299,9 +311,10 @@ namespace RhuEngine.Components
 		}
 
 		private static void AddMeshRender(Entity entity, Node node, AssimpHolder scene, ComplexMesh amesh, IEnumerable<int> mits) {
-			var newuri = entity.World.CreateLocalAsset(amesh);
 			var rmesh = scene.assetEntity.AttachComponent<StaticMesh>();
-			rmesh.url.Value = newuri.ToString();
+			if (amesh is not null) {
+				rmesh.url.Value = entity.World.CreateLocalAsset(amesh).ToString();
+			}
 			if (amesh.HasBones || amesh.HasMeshAttachments) {
 				var boneNames = amesh.Bones.Select((x) => x.Name).ToArray();
 				Armature armiturer;
@@ -344,8 +357,6 @@ namespace RhuEngine.Components
 			RLog.Info($"Added MeshNode {node.Name}");
 		}
 
-		public override void Import(string path_url, bool isUrl, byte[] rawData) {
-			Task.Run(async () => await ImportAsync(path_url, isUrl, rawData));
-		}
+
 	}
 }

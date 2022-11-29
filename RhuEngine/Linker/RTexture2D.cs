@@ -10,7 +10,7 @@ using RNumerics;
 namespace RhuEngine.Linker
 {
 
-	public interface IRTexture2D: IRTexture, IDisposable
+	public interface IRTexture2D : IRTexture, IDisposable
 	{
 		long Height { get; }
 		long Width { get; }
@@ -31,14 +31,22 @@ namespace RhuEngine.Linker
 
 		public IRTexture2D Texture2D => (IRTexture2D)Inst;
 
-		public RTexture2D(IRTexture2D tex):base(tex) {
+		public RTexture2D(IRTexture2D tex) : base(tex) {
 			if (typeof(RTexture2D) == GetType()) {
 				Inst = tex ?? (IRTexture2D)Activator.CreateInstance(Instance);
 				((IRTexture2D)Inst).Init(this);
 			}
 		}
 
-		public virtual RImage Image => _targetImage ??= new RImage(Texture2D.GetImage());
+		public virtual RImage Image
+		{
+			get {
+				if (_targetImage?.Inst is null) {
+					_targetImage = new RImage(Texture2D.GetImage());
+				}
+				return _targetImage;
+			}
+		}
 
 		public long Height => Texture2D.Height;
 		public long Width => Texture2D.Width;

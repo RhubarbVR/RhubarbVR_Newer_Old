@@ -11,27 +11,43 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Assets/Importers" })]
 	public sealed class TextureImporter : Importer
 	{
-		private bool _srgbTextures;
+		public readonly SyncRef<IValueSource<bool>> srgbTextures;
 
-		public void ImportAsync(string data, bool wasUri, byte[] rawdata) {
+		private bool SrgbTextures => srgbTextures.Target?.Value ?? false;
+
+		public override void BuildUI(Entity rootBox) {
+			var checkBOx = rootBox.AddChild("CheckBox").AttachComponent<CheckBox>();
+			checkBOx.Text.Value = "SRGB";
+			srgbTextures.Target = checkBOx.ButtonPressed;
+			checkBOx.ButtonPressed.Value = true;
+			base.BuildUI(rootBox);
+		}
+
+		public override Task ImportAsset() {
+			return Task.Run(() => ImportAsync(_importData.url_path, _importData.isUrl, _importData.rawData));
+		}
+
+		public void ImportAsync(string data, bool wasUri, Stream rawdata) {
 			RLog.Info($"Loaded Texture Data {data} Uri{wasUri}");
 			if (wasUri) {
-				Entity.AttachComponent<BoxShape>();
+				var box = Entity.AttachComponent<BoxShape>();
 				Entity.AttachComponent<Grabbable>();
 				var (pmesh, mit, prender) = Entity.AttachMeshWithMeshRender<RectangleMesh, UnlitMaterial>();
 				var scaler = Entity.AttachComponent<TextureScaler>();
 				scaler.scale.SetLinkerTarget(pmesh.Dimensions);
 				scaler.scaleMultiplier.Value = 0.1f;
+				scaler.boxScale.SetLinkerTarget(box.boxHalfExtent);
 				var textur = Entity.AttachComponent<StaticTexture>();
 				scaler.texture.Target = textur;
 				textur.url.Value = data;
 				mit.MainTexture.Target = textur;
+				mit.DullSided.Value = true;
 				Destroy();
 			}
 			else {
 				if (rawdata == null) {
 					if (File.Exists(data)) {
-						var newtexture = new ImageSharpTexture(data, _srgbTextures).CreateTextureAndDisposes();
+						var newtexture = new ImageSharpTexture(data, SrgbTextures).CreateTextureAndDisposes();
 						var textureURI = Entity.World.CreateLocalAsset(newtexture);
 						ImportAsync(textureURI.ToString(), true, null);
 					}
@@ -40,15 +56,12 @@ namespace RhuEngine.Components
 					}
 				}
 				else {
-					var newtexture = new ImageSharpTexture(new MemoryStream(rawdata), _srgbTextures).CreateTextureAndDisposes();
+					var newtexture = new ImageSharpTexture(rawdata, SrgbTextures).CreateTextureAndDisposes();
 					var textureURI = Entity.World.CreateLocalAsset(newtexture);
 					ImportAsync(textureURI.ToString(), true, null);
 				}
 			}
 		}
 
-		public override void Import(string data, bool wasUri, byte[] rawdata) {
-			Task.Run(() => ImportAsync(data, wasUri, rawdata));
-		}
 	}
 }
