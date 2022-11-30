@@ -571,7 +571,7 @@ namespace RhuEngine.Components
 			}
 			try {
 				var Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-				AddSideButton(Engine.localisationManager.GetLocalString("Programs.FileExplorer.SpecialFolder.Desktop"), () =>  NavToPath(Path.GetFullPath(Desktop)));
+				AddSideButton(Engine.localisationManager.GetLocalString("Programs.FileExplorer.SpecialFolder.Desktop"), () => NavToPath(Path.GetFullPath(Desktop)));
 			}
 			catch {
 
@@ -657,12 +657,10 @@ namespace RhuEngine.Components
 				await CurrentFolder.Refresh();
 			}
 			await Engine.fileManager.ReloadAllDrivesAsync();
-			RenderThread.ExecuteOnEndOfFrame(this, () => {
-				BuildSideBarDataList();
-				UpdateCenterUI();
-				UpdateRedoUndoButtons();
-				PathDataUpdate();
-			});
+			BuildSideBarDataList();
+			UpdateCenterUI();
+			UpdateRedoUndoButtons();
+			PathDataUpdate();
 		}
 
 		[Exposed]

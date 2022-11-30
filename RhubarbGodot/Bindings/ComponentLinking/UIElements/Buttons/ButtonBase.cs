@@ -56,6 +56,12 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Node_GuiInput(InputEvent @event) {
+			if(LinkedComp is null) {
+				return;
+			}
+			if(node is null) {
+				return;
+			}
 			if (@event is InputEventMouse mouse) {
 				var newPos = new Vector2f(mouse.GlobalPosition.x, mouse.GlobalPosition.y);
 				switch (GetSideFromMouseID(mouse.Device)) {

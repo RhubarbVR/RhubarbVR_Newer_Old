@@ -55,6 +55,7 @@ namespace RhuEngine.Components
 				catch(Exception e) {
 					RLog.Err("Failed to import asset Error:" + e.ToString());
 				}
+				_importData.rawData?.Dispose();
 				if (ImportButton.Target is not null) {
 					ImportButton.Target.Disabled.Value = false;
 				}

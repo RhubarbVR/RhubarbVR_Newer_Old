@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,6 +18,9 @@ namespace RhuEngine
 		public IFile[] Files { get; }
 		public IFolder[] Folders { get; }
 		public IDrive Drive { get; }
+
+		//public Task SaveFile(string type, Stream fileData);
+
 		public RTexture2D Texture { get; }
 
 		public Task Refresh();

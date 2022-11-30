@@ -258,12 +258,18 @@ namespace RhuEngine.WorldObjects
 				RLog.Err($"Failed to update global stepables for session {WorldDebugName}. Error: {e}");
 			}
 			try {
-				var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
-											 group ent by ent.Depth;
-				var sorted = from groupe in sortedUpdatingEntities
-							 orderby groupe.Key ascending
-							 select groupe;
-				foreach (var item in sorted) {
+				if (_sortEntitys) {
+					lock (_updatingEntities) {
+						var sortedUpdatingEntities = from ent in _updatingEntities.AsParallel()
+													 group ent by ent.Depth;
+						_sorrtedEntity.Clear();
+						_sorrtedEntity.AddRange(from groupe in sortedUpdatingEntities
+												orderby groupe.Key ascending
+												select groupe);
+						_sortEntitys = false;
+					}
+				}
+				foreach (var item in _sorrtedEntity) {
 					foreach (var ent in item) {
 						ent.RenderStep();
 					}
@@ -274,11 +280,8 @@ namespace RhuEngine.WorldObjects
 			}
 			try {
 				if (Engine.EngineLink.CanRender) {
-					lock (_worldLinkComponents) {
-						//Todo Dont relay like this
-						foreach (var item in _worldLinkComponents.ToArray()) {
-							item.RunRender();
-						}
+					for (var i = 0; i < _worldLinkComponents.Count; i++) {
+						_worldLinkComponents[i].RunRender();
 					}
 				}
 			}

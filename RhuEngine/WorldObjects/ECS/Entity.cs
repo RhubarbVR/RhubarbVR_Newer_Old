@@ -51,14 +51,16 @@ namespace RhuEngine.WorldObjects.ECS
 		{
 			get {
 				var box = AxisAlignedBox3f.Zero;
-				foreach (var item in components) {
+				for (var i = 0; i < components.Count; i++) {
+					var item = components[i];
 					if (item is IWorldBoundingBox boundingBox) {
 						var scale = boundingBox.Bounds;
 						scale.Scale(GlobalTrans.Scale);
 						box = BoundsUtil.Combined(box, scale);
 					}
 				}
-				foreach (var item in children.Cast<Entity>()) {
+				for (var i = 0; i < children.Count; i++) {
+					var item = children[i];
 					var element = item.Bounds;
 					element.Translate(item.GlobalTrans.Translation);
 					element.Rotate(item.GlobalTrans.Rotation);
@@ -110,8 +112,8 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 		public void ParentDepthUpdate() {
 			Depth = CompDepth;
-			foreach (var child in children.Cast<Entity>()) {
-				child.ParentDepthUpdate();
+			for (var i = 0; i < children.Count; i++) {
+				children[i].ParentDepthUpdate();
 			}
 		}
 
@@ -128,8 +130,8 @@ namespace RhuEngine.WorldObjects.ECS
 			_cachedGlobalMatrix = matrix;
 			_cachedLocalMatrix = newLocal;
 			GlobalTransformChange?.Invoke(this, false);
-			foreach (var item in children.Cast<Entity>()) {
-				item.GlobalTransMark(false);
+			for (var i = 0; i < children.Count; i++) {
+				children[i].GlobalTransMark(false);
 			}
 		}
 
@@ -142,9 +144,10 @@ namespace RhuEngine.WorldObjects.ECS
 
 		[Exposed]
 		public Entity GetChildByName(string v) {
-			foreach (var child in children.Cast<Entity>()) {
-				if (((Entity)child).name.Value == v) {
-					return (Entity)child;
+			for (var i = 0; i < children.Count; i++) {
+				var child = children[i];
+				if (child.name.Value == v) {
+					return child;
 				}
 			}
 			return null;
@@ -169,7 +172,8 @@ namespace RhuEngine.WorldObjects.ECS
 			//Takes 2 frames for linker to load
 			RenderThread.ExecuteOnStartOfFrame(() => RenderThread.ExecuteOnEndOfFrame(() => CanvasItemUpdateEvent?.Invoke()));
 			if (oldCanvasItem != CanvasItem) {
-				foreach (var item in children.Cast<Entity>()) {
+				for (var i = 0; i < children.Count; i++) {
+					var item = children[i];
 					item.UpdateCanvasItem();
 				}
 			}
@@ -182,7 +186,8 @@ namespace RhuEngine.WorldObjects.ECS
 			//Takes 2 frames for linker to load
 			RenderThread.ExecuteOnStartOfFrame(() => RenderThread.ExecuteOnEndOfFrame(() => ViewportUpdateEvent?.Invoke()));
 			if (oldViewPort != Viewport) {
-				foreach (var item in children.Cast<Entity>()) {
+				for (var i = 0; i < children.Count; i++) {
+					var item = children[i];
 					item.ViewportUpdate();
 				}
 			}
@@ -225,7 +230,8 @@ namespace RhuEngine.WorldObjects.ECS
 
 		[Exposed]
 		public T GetFirstComponentOrAttach<T>() where T : Component, new() {
-			foreach (var item in components) {
+			for (var i = 0; i < components.Count; i++) {
+				var item = components[i];
 				if (typeof(T).IsAssignableFrom(item.GetType())) {
 					return (T)item;
 				}
@@ -234,7 +240,8 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 		[Exposed]
 		public T GetFirstComponent<T>() where T : Component {
-			foreach (var item in components) {
+			for (var i = 0; i < components.Count; i++) {
+				var item = components[i];
 				if (typeof(T).IsAssignableFrom(item.GetType())) {
 					return (T)item;
 				}
@@ -243,7 +250,8 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 		[Exposed]
 		public IEnumerable<T> GetAllComponents<T>() where T : Component {
-			foreach (var item in components) {
+			for (var i = 0; i < components.Count; i++) {
+				var item = components[i];
 				if (typeof(T).IsAssignableFrom(item.GetType())) {
 					yield return (T)item;
 				}
@@ -325,9 +333,10 @@ namespace RhuEngine.WorldObjects.ECS
 				if (components.Count == 0) {
 					return false;
 				}
-				foreach (var item in components) {
-					foreach (var aitem in item.GetType().GetCustomAttributes(true)) {
-						if (typeof(UpdatingComponentAttribute).IsAssignableFrom(aitem.GetType())) {
+				for (var i = 0; i < components.Count; i++) {
+					var item = components[i].GetType().GetCustomAttributes(true);
+					for (var i2 = 0; i2 < item.Length; i2++) {
+						if (typeof(UpdatingComponentAttribute).IsAssignableFrom(item[i2].GetType())) {
 							return true;
 						}
 					}
@@ -340,8 +349,8 @@ namespace RhuEngine.WorldObjects.ECS
 			if (IsRemoved || IsDestroying) {
 				return;
 			}
-			foreach (var item in components) {
-				((Component)item).ListObjectUpdate(IsEnabled);
+			for (var i = 0; i < components.Count; i++) {
+				((Component)components[i]).ListObjectUpdate(IsEnabled);
 			}
 			if (IsEnabled && _hasUpdatingComponentSave) {
 				try {
@@ -368,8 +377,8 @@ namespace RhuEngine.WorldObjects.ECS
 		public void ParentEnabledChange(bool _parentEnabled) {
 			if (_parentEnabled != parentEnabled) {
 				parentEnabled = _parentEnabled;
-				foreach (var entity in children.Cast<Entity>()) {
-					((Entity)entity).ParentEnabledChange(_parentEnabled);
+				for (var i = 0; i < children.Count; i++) {
+					children[i].ParentEnabledChange(_parentEnabled);
 				}
 			}
 			EnabledChanged?.Invoke();
@@ -379,8 +388,8 @@ namespace RhuEngine.WorldObjects.ECS
 			if (!enabled.Value && (World.RootEntity == this)) {
 				enabled.Value = true;
 			};
-			foreach (var entity in children.Cast<Entity>()) {
-				((Entity)entity).ParentEnabledChange(enabled.Value);
+			for (var i = 0; i < children.Count; i++) {
+				children[i].ParentEnabledChange(enabled.Value);
 			}
 			EnabledChanged?.Invoke();
 			UpdateEnableList();
@@ -395,10 +404,7 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		private bool IsParrent(Entity check) {
-			if (check.Depth > Depth) {
-				return false;
-			}
-			return (check == this) || (InternalParent?.IsParrent(check) ?? false);
+			return check.Depth <= Depth && ((check == this) || (InternalParent?.IsParrent(check) ?? false));
 		}
 
 		private void ParentChanged() {
@@ -495,8 +501,8 @@ namespace RhuEngine.WorldObjects.ECS
 				_dirtyGlobal = false;
 				_dirtyLocal = false;
 				GlobalTransformChange?.Invoke(this, true);
-				foreach (var item in children.Cast<Entity>()) {
-					item.GlobalTransMark();
+				for (var i = 0; i < children.Count; i++) {
+					children[i].GlobalTransMark();
 				}
 			}
 		}
@@ -520,8 +526,8 @@ namespace RhuEngine.WorldObjects.ECS
 				_dirtyGlobal = false;
 				_dirtyLocal = false;
 				GlobalTransformChange?.Invoke(this, true);
-				foreach (var item in children.Cast<Entity>()) {
-					item.GlobalTransMark();
+				for (var i = 0; i < children.Count; i++) {
+					children[i].GlobalTransMark();
 				}
 			}
 		}
@@ -549,8 +555,8 @@ namespace RhuEngine.WorldObjects.ECS
 				return;
 			}
 			if (!_dirtyGlobal) {
-				foreach (var child in children.Cast<Entity>()) {
-					child.GlobalTransMark(physics);
+				for (var i = 0; i < children.Count; i++) {
+					children[i].GlobalTransMark(physics);
 				}
 				GlobalTransformChange?.Invoke(this, physics);
 				_dirtyGlobal = true;
@@ -564,15 +570,15 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		public void RenderStep() {
-			foreach (var item in components) {
-				var comp = (Component)item;
+			for (var i = 0; i < components.Count; i++) {
+				var comp = (Component)components[i];
 				comp.RunRenderStep(comp.Enabled.Value && IsEnabled);
 			}
 		}
 
 		public void Step() {
-			foreach (var item in components) {
-				var comp = (Component)item;
+			for (var i = 0; i < components.Count; i++) {
+				var comp = (Component)components[i];
 				comp.RunStep(comp.Enabled.Value && IsEnabled);
 			}
 		}
