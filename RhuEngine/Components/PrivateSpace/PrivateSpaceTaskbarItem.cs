@@ -58,7 +58,7 @@ namespace RhuEngine.Components
 		}
 
 		private void UpdatePanel() {
-			if (_privateSpaceWindow?.Minimized??false) {
+			if (_privateSpaceWindow?.Minimized ?? false) {
 				_isOpen.MinOffset.Value = new Vector2f(-25, -10);
 				_isOpen.MaxOffset.Value = new Vector2f(25, -5);
 			}
@@ -97,6 +97,7 @@ namespace RhuEngine.Components
 			_isOpen.GrowVertical.Value = RGrowVertical.Top;
 
 			_closeButton = Entity.AddChild("CloseButton").AttachComponent<Button>();
+			_closeButton.Entity.enabled.Value = false;
 			var inputEventse = _closeButton.Entity.AttachComponent<UIInputEvents>();
 			inputEventse.InputEntered.Target = InputOverClose;
 			inputEventse.InputExited.Target = InputLeaveClose;
@@ -123,9 +124,13 @@ namespace RhuEngine.Components
 
 		private DateTimeOffset _lastClick;
 		private DateTimeOffset _lastLastClick;
+
+		private Action _fallBackAction;
+
 		[Exposed]
 		public void MainButtonClick() {
 			if (_privateSpaceWindow is null) {
+				_fallBackAction?.Invoke();
 				return;
 			}
 			var newTime = DateTimeOffset.UtcNow;
@@ -135,7 +140,7 @@ namespace RhuEngine.Components
 			else if ((newTime - _lastClick).TotalSeconds <= 0.5f) {
 				_privateSpaceWindow.Window?.CenterWindowIntoView();
 			}
-			else if(!_privateSpaceWindow.NotMinimized) {
+			else if (!_privateSpaceWindow.NotMinimized) {
 				_privateSpaceWindow.NotMinimized = !_privateSpaceWindow.NotMinimized;
 			}
 			_lastLastClick = _lastClick;
@@ -154,6 +159,7 @@ namespace RhuEngine.Components
 			PrivateSpaceManager?.UserInterfaceManager.privateSpaceTaskbarItems.Remove(this);
 		}
 
+		private static event Action ProgramsUpdate;
 
 		private PrivateSpaceWindow _privateSpaceWindow;
 		public void OpennedPorgram(PrivateSpaceWindow privateSpaceWindow) {
@@ -169,16 +175,52 @@ namespace RhuEngine.Components
 			_isOpen.Entity.enabled.Value = privateSpaceWindow is not null;
 			Window_UpdateData();
 			UpdatePanel();
+			ProgramsUpdate?.Invoke();
 		}
 
+		private Type _innnerType;
+
+		public void SetUpProgramOpen(Type type,int localtion) {
+			Entity.orderOffset.Value = localtion + 1;
+			_innnerType = type;
+			ProgramsUpdate += UpdateHide;
+			var programInfo = type.GetProgramInfo();
+			_iconProvider.LoadAsset(programInfo.icon ?? Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
+			_fallBackAction = () => PrivateSpaceManager.ProgramManager.OpenProgram(type);
+			UpdateHide();
+		}
+
+		private void UpdateHide() {
+			var foundProgram = false;
+			foreach (var item in PrivateSpaceManager.UserInterfaceManager.privateSpaceTaskbarItems) {
+				if (item._privateSpaceWindow?.Window?.Program is null) {
+					continue;
+				}
+				if (item._privateSpaceWindow.Window.Program.GetType() == _innnerType) {
+					item.Entity.orderOffset.Value = Entity.orderOffset.Value;
+					Entity.enabled.Value = false;
+					foundProgram = true;
+					break;
+				}
+			}
+			Entity.enabled.Value = !foundProgram;
+		}
 
 		private void Window_UpdateData() {
 			InputUpdate();
 			_iconProvider.LoadAsset(_privateSpaceWindow?.Window?.Icon ?? Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
+			ProgramsUpdate?.Invoke();
 		}
 
 		public void WindowClosed() {
+			ProgramsUpdate?.Invoke();
 			Entity.Destroy();
+		}
+
+		public void SetUpItemOpen(IFile file, int count) {
+			Entity.orderOffset.Value = count + 1;
+			_iconProvider.LoadAsset(file.Texture ?? Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
+			_fallBackAction = () => file.Open();
 		}
 	}
 }

@@ -22,7 +22,7 @@ using TextCopy;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	[ProgramOpenWith("text/uri-list", "text/x-uuencode", "text/plain", "nofile/uri")]
+	[ProgramOpenWith("nofile/uri")]
 	public sealed class OpenBrowserProgram : PrivateSpaceProgram
 	{
 		public override RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.Link;
@@ -30,6 +30,12 @@ namespace RhuEngine.Components
 		public override string ProgramNameLocName => "Program.OpenBrowser.Name";
 
 		public Uri targetURI;
+
+		public static HashSet<string> allowedScheme = new() {
+			"http",
+			"https",
+			"rtmp",
+		};
 
 		public override void StartProgram(Stream file = null, string mimetype = null, string ex = null, params object[] args) {
 			if ((args?.Length ?? 0) >= 1) {
@@ -44,8 +50,7 @@ namespace RhuEngine.Components
 				using var reader = new StreamReader(file, true);
 				Uri.TryCreate(reader.ReadToEnd(), UriKind.RelativeOrAbsolute, out targetURI);
 			}
-
-			if (targetURI is null) {
+			if (targetURI is null || !allowedScheme.Contains(targetURI.Scheme)) {
 				CloseProgram();
 			}
 			else {
@@ -106,7 +111,6 @@ namespace RhuEngine.Components
 		[Exposed]
 		public void OpenWebbrowserCall() {
 			Process.Start(new ProcessStartInfo {
-				//Todo Could be abused
 				FileName = targetURI?.ToString(),
 				UseShellExecute = true
 			});

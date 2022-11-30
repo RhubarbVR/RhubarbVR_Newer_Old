@@ -18,6 +18,7 @@ namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
 	[UpdateLevel(UpdateEnum.Normal)]
+	[ProgramHide]
 	public sealed class LoginProgram : PrivateSpaceProgram
 	{
 		public override RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.Login;

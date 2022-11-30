@@ -144,6 +144,8 @@ namespace RhubarbCloudClient
 			public Guid Thumbnail { get; private set; }
 			public Guid MainRecordId { get; private set; }
 
+			public string Type { get; private set; }
+
 			public string Name
 			{
 				get => _name;
@@ -174,7 +176,7 @@ namespace RhubarbCloudClient
 				ParrentFolderID = returnData.ParrentFolderId;
 				Thumbnail = returnData.Thumbnail;
 				MainRecordId = returnData.MainRecordId;
-
+				Type = returnData.Type;
 			}
 
 			public async Task Refresh() {

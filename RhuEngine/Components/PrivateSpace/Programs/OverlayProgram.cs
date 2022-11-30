@@ -22,6 +22,7 @@ namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
 	[UpdateLevel(UpdateEnum.Normal)]
+	[ProgramHide]
 	public sealed class OverlayProgram : PrivateSpaceProgram
 	{
 		public override RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.MissingFile;

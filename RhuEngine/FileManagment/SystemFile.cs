@@ -37,8 +37,11 @@ namespace RhuEngine
 
 		public override IDrive Drive { get; }
 
-		public override long SizeInBytes => new FileInfo(Path).Length;
+		public override long SizeInBytes => new FileInfo(_path).Length;
 		public override RTexture2D Texture => Drive.Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.File);
+
+		public override string Type => MimeTypeManagment.GetMimeType(_path);
+
 		public override void Open() {
 			Drive?.Engine?.worldManager?.PrivateSpaceManager?.ProgramManager?.OverlayProgram?.OpenFile(_path);
 		}

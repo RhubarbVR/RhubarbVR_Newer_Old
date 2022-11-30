@@ -19,6 +19,7 @@ using RhuEngine.Managers;
 using DataModel.Enums;
 using RhuEngine.Components.UI;
 using System.IO;
+using System.Reflection;
 
 namespace RhuEngine.Components
 {
@@ -93,6 +94,8 @@ namespace RhuEngine.Components
 #endif
 				if (!UserInterface.Enabled.Value) {
 					ToggleStart(false);
+					_allProgramsButton.Entity.enabled.Value = true;
+					_startscroll.Entity.enabled.Value = true;
 					_profileElement.Entity.enabled.Value = false;
 					_profileSideButton.ButtonPressed.Value = false;
 				}
@@ -128,18 +131,132 @@ namespace RhuEngine.Components
 		public Entity RootUIEntity => UserInterface.Entity;
 
 		private bool _offlineStart = false;
+
+		private static readonly Type[] _startTypes = new[] {
+			typeof(SessionsFinderProgram),
+			typeof(CreateWorldProgram),
+			typeof(FileExplorerProgram),
+			typeof(SettingsProgram),
+		};
+		private static readonly Type[] _taskBarTypes = new[] {
+			typeof(SessionsFinderProgram),
+			typeof(CreateWorldProgram),
+		};
+
 		private void LoadTaskBarAndStart() {
 			if (Engine.netApiManager.Client.IsLogin) {
+				ClearStart();
+				ClearTaskBar();
+
+
+
 				_offlineStart = false;
 			}
 			else if (!_offlineStart) {
-
-
-
-
+				ClearStart();
+				ClearTaskBar();
+				foreach (var item in _startTypes) {
+					AddStartProgram(item);
+				}
+				foreach (var item in _taskBarTypes) {
+					AddTaskBarItemProgram(item);
+				}
 				_offlineStart = true;
 			}
 		}
+
+		private readonly List<PrivateSpaceTaskbarItem> _taskBarItems = new();
+
+		private void ClearTaskBar() {
+			lock (_taskBarItems) {
+				foreach (var privateSpaceTaskbarItem in _taskBarItems) {
+					privateSpaceTaskbarItem.Entity.Destroy();
+				}
+				foreach (var item in privateSpaceTaskbarItems) {
+					item.Entity.orderOffset.Value = 0;
+				}
+				_taskBarItems.Clear();
+			}
+		}
+		private void ClearStart() {
+			_startListBox.Entity.DestroyChildren();
+		}
+
+		private void AddStartFolder(IFolder folder) {
+
+		}
+		private void AddStartItem(IFile file) {
+
+		}
+
+
+		private void BuildAllPrograms() {
+			var e = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).Where(x => !x.IsAbstract).Where(x => x.IsAssignableTo(typeof(Program))).Where(x => x.GetCustomAttribute<ProgramHideAttribute>(true) is null);
+			foreach (var type in e) {
+				var info = type.GetProgramInfo();
+				var button = _startListBoxAllPrograms.Entity.AddChild(type.Name).AttachComponent<Button>();
+				button.MinSize.Value = new Vector2i(230, 50);
+				button.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+				button.Alignment.Value = RButtonAlignment.Left;
+				button.IconAlignment.Value = RButtonAlignment.Left;
+				button.ExpandIcon.Value = true;
+				button.Text.Value = info.ProgramName;
+				var asset = button.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+				button.Icon.Target = asset;
+				asset.LoadAsset(info.icon);
+				var delCaller = button.Entity.AttachComponent<DelegateCall>();
+				delCaller.action = () => {
+					ProgramManager.OpenProgram(type);
+					ToggleStart(false);
+				};
+				button.Pressed.Target = delCaller.CallDelegate;
+			}
+		}
+
+		private void AddStartProgram(Type type) {
+			if (type is null) {
+				return;
+			}
+			var info = type.GetProgramInfo();
+			var button = _startListBox.Entity.AddChild(type.Name).AttachComponent<Button>();
+			button.MinSize.Value = new Vector2i(230, 50);
+			button.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+			button.Alignment.Value = RButtonAlignment.Left;
+			button.IconAlignment.Value = RButtonAlignment.Left;
+			button.ExpandIcon.Value = true;
+			button.Text.Value = info.ProgramName;
+			var asset = button.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+			button.Icon.Target = asset;
+			asset.LoadAsset(info.icon);
+			var delCaller = button.Entity.AttachComponent<DelegateCall>();
+			delCaller.action = () => {
+				ProgramManager.OpenProgram(type);
+				ToggleStart(false);
+			};
+			button.Pressed.Target = delCaller.CallDelegate;
+		}
+
+		private void AddTaskBarItem(IFile file) {
+			if (file is null) {
+				return;
+			}
+			lock (_taskBarItems) {
+				var newItem = PrivateSpaceManager.UserInterfaceManager._taskbarElementHolder?.Entity?.AddChild(file.Name)?.AttachComponent<PrivateSpaceTaskbarItem>();
+				newItem.SetUpItemOpen(file, _taskBarItems.Count);
+				_taskBarItems.Add(newItem);
+			}
+		}
+		private void AddTaskBarItemProgram(Type type) {
+			if (type is null) {
+				return;
+			}
+			lock (_taskBarItems) {
+				var newItem = PrivateSpaceManager.UserInterfaceManager._taskbarElementHolder?.Entity?.AddChild(type.Name)?.AttachComponent<PrivateSpaceTaskbarItem>();
+				newItem.SetUpProgramOpen(type, _taskBarItems.Count);
+				_taskBarItems.Add(newItem);
+			}
+		}
+
 
 		internal void LoadInterface() {
 			if (!Engine.EngineLink.CanRender) {
@@ -367,6 +484,43 @@ namespace RhuEngine.Components
 			main.MinOffset.Value = new Vector2f(97, 8);
 			main.MaxOffset.Value = new Vector2f(343, 443);
 
+
+			_startscroll = main.Entity.AddChild("Scroll").AttachComponent<ScrollContainer>();
+			_startscroll.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
+			_startscroll.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+
+			_startListBox = _startscroll.Entity.AddChild("Start").AttachComponent<BoxContainer>();
+			_startListBox.Vertical.Value = true;
+			_startListBox.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
+			_startListBox.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+
+			_startListBoxAllPrograms = _startscroll.Entity.AddChild("StartAll").AttachComponent<BoxContainer>();
+			_startListBoxAllPrograms.Vertical.Value = true;
+			_startListBoxAllPrograms.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
+			_startListBoxAllPrograms.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+			_startListBoxAllPrograms.Entity.enabled.Value = false;
+			BuildAllPrograms();
+
+			_allProgramsButton = main.Entity.AddChild("AllProgramsButton").AttachComponent<Button>();
+			_allProgramsButton.MinSize.Value = new Vector2i(230, 35);
+			_allProgramsButton.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+			_allProgramsButton.ToggleMode.Value = true;
+			_allProgramsButton.Alignment.Value = RButtonAlignment.Center;
+			var Locale = _allProgramsButton.Entity.AttachComponent<StandardLocale>();
+			Locale.TargetValue.Target = _allProgramsButton.Text;
+			Locale.Key.Value = "Start.AllPrograms";
+			_allProgramsButton.ExpandIcon.Value = true;
+			var AllProgramsButtonactionProvider = _allProgramsButton.Entity.AttachComponent<DelegateCall>();
+			AllProgramsButtonactionProvider.action = () => {
+				_startListBoxAllPrograms.Entity.enabled.Value = _startListBox.Entity.enabled.Value;
+				_startListBox.Entity.enabled.Value = !_startListBoxAllPrograms.Entity.enabled.Value;
+				Locale.Key.Value = _startListBoxAllPrograms.Entity.enabled.Value ? "Common.Back" : "Start.AllPrograms";
+			};
+			_allProgramsButton.Pressed.Target = AllProgramsButtonactionProvider.CallDelegate;
+
+
+
+
 			_profileElement = main.Entity.AddChild("Profile").AttachComponent<UIElement>();
 			_profileElement.Entity.enabled.Value = false;
 			_profileElement.MinSize.Value = new Vector2i(0, 443);
@@ -461,7 +615,11 @@ namespace RhuEngine.Components
 				return sideBarButton;
 			}
 
-			_profileSideButton = AddSideButton("Profile", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.User), () => _profileElement.Entity.enabled.Value = !_profileElement.Entity.enabled.Value);
+			_profileSideButton = AddSideButton("Profile", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.User), () => {
+				_profileElement.Entity.enabled.Value = !_profileElement.Entity.enabled.Value;
+				_allProgramsButton.Entity.enabled.Value = !_profileElement.Entity.enabled.Value;
+				_startscroll.Entity.enabled.Value = !_profileElement.Entity.enabled.Value;
+			});
 			var acsepter = _profileSideButton.Entity.AttachComponent<ReferenceAccepter<IAssetProvider<RTexture2D>>>();
 			acsepter.Dropped.Target = ChangeProfile;
 
@@ -526,26 +684,15 @@ namespace RhuEngine.Components
 			_taskbarElementHolder.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
 			_taskbarElementHolder.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
 		}
-		[NoSave]
-		[NoSync]
-		[NoLoad]
-		[NoSyncUpdate]
+
 		private TextLabel _textLabel;
-		[NoSave]
-		[NoSync]
-		[NoLoad]
-		[NoSyncUpdate]
 		private Button _startButton;
-		[NoSave]
-		[NoSync]
-		[NoLoad]
-		[NoSyncUpdate]
 		private Button _profileSideButton;
-		[NoSave]
-		[NoSync]
-		[NoLoad]
-		[NoSyncUpdate]
 		private UIElement _profileElement;
+		private BoxContainer _startListBox;
+		private Button _allProgramsButton;
+		private ScrollContainer _startscroll;
+		private BoxContainer _startListBoxAllPrograms;
 
 		private void BuildRightTaskBar(UIElement right) {
 			var holder = right.Entity.AddChild("Holder").AttachComponent<BoxContainer>();

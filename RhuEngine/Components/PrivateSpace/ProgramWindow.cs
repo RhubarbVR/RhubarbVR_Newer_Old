@@ -34,6 +34,12 @@ namespace RhuEngine.Components
 		[NoSyncUpdate]
 		public PrivateSpaceWindow PrivateSpaceWindow { get; set; }
 
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Program Program { get; set; }
+
 		public abstract bool CanClose { get; }
 
 		public event Action OnClosedWindow;

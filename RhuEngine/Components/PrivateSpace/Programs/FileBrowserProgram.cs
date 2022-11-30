@@ -293,21 +293,23 @@ namespace RhuEngine.Components
 					itemData.MinSize.Value = new Vector2i(190, 20);
 					itemData.GrowVertical.Value = RGrowVertical.Both;
 					itemData.VerticalFilling.Value = RFilling.ShrinkCenter;
-
-					var ProgressitemData = boxButtonCon2.Entity.AddChild("Progress").AttachComponent<ProgressBar>();
-					ProgressitemData.Value.Value = item.UsedBytes;
-					ProgressitemData.MaxValue.Value = item.TotalBytes;
-					ProgressitemData.MinSize.Value = itemData.MinSize.Value;
-					ProgressitemData.GrowVertical.Value = RGrowVertical.Both;
-					ProgressitemData.VerticalFilling.Value = RFilling.ShrinkCenter;
-
+					if (!(item.TotalBytes == item.UsedBytes && item.UsedBytes == 0)) {
+						var ProgressitemData = boxButtonCon2.Entity.AddChild("Progress").AttachComponent<ProgressBar>();
+						ProgressitemData.Value.Value = item.UsedBytes;
+						ProgressitemData.MaxValue.Value = item.TotalBytes;
+						ProgressitemData.MinSize.Value = itemData.MinSize.Value;
+						ProgressitemData.GrowVertical.Value = RGrowVertical.Both;
+						ProgressitemData.VerticalFilling.Value = RFilling.ShrinkCenter;
+					}
 					var Text = boxButtonCon2.Entity.AddChild("ProgressText").AttachComponent<TextLabel>();
 					Text.VerticalAlignment.Value = RVerticalAlignment.Top;
 					Text.MinSize.Value = itemData.MinSize.Value;
 					Text.GrowVertical.Value = RGrowVertical.Both;
 					Text.VerticalFilling.Value = RFilling.ShrinkCenter;
 					Text.TextSize.Value = 15;
-					Text.Text.Value = Engine.localisationManager.GetLocalString("Programs.FileExplorer.FreeOf", FileSizeFormatter.FormatSize(item.TotalBytes - item.UsedBytes), FileSizeFormatter.FormatSize(item.TotalBytes));
+					Text.Text.Value = item.TotalBytes == item.UsedBytes && item.UsedBytes == 0
+						? ""
+						: Engine.localisationManager.GetLocalString("Programs.FileExplorer.FreeOf", FileSizeFormatter.FormatSize(item.TotalBytes - item.UsedBytes), FileSizeFormatter.FormatSize(item.TotalBytes));
 
 
 					var Namedel = buttonBase.Entity.AttachComponent<DelegateCall>();
@@ -417,11 +419,17 @@ namespace RhuEngine.Components
 				scrollRoot.ClipContents.Value = true;
 				var box = scrollRoot.Entity.AddChild("list").AttachComponent<BoxContainer>();
 				box.Vertical.Value = true;
+				box.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
+
 				var boxCon = box.Entity.AddChild("top").AttachComponent<BoxContainer>();
+				boxCon.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
+
 				var nameLabel = boxCon.Entity.AddChild("Name").AttachComponent<TextLabel>();
 				nameLabel.HorizontalAlignment.Value = RHorizontalAlignment.Left;
 				nameLabel.MinSize.Value = new Vector2i(300, 0);
 				nameLabel.TextSize.Value = 20;
+				nameLabel.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
+
 				var sizeName = nameLabel.Entity.AttachComponent<StandardLocale>();
 				sizeName.TargetValue.Target = nameLabel.Text;
 				sizeName.Key.Value = "Programs.FileExplorer.FileName";
@@ -448,8 +456,10 @@ namespace RhuEngine.Components
 				bottomBOx.Vertical.Value = true;
 				foreach (var item in allFolders) {
 					var buttonBase = bottomBOx.Entity.AddChild(item.Name).AttachComponent<Button>();
+					buttonBase.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 					buttonBase.MinSize.Value = new Vector2i(0, 45);
 					var boxButtonCon = buttonBase.Entity.AddChild().AttachComponent<BoxContainer>();
+					boxButtonCon.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 					var Icon = boxButtonCon.Entity.AddChild().AttachComponent<TextureRect>();
 					Icon.MinSize.Value = new Vector2i(45);
 					var asset = Icon.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
@@ -460,8 +470,22 @@ namespace RhuEngine.Components
 					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<LineEdit>();
 					itemData.Text.Value = item.Name;
 					itemData.MinSize.Value = new Vector2i(255, 0);
+					itemData.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 
-
+					var typeText = boxButtonCon.Entity.AddChild("Type").AttachComponent<TextLabel>();
+					typeText.HorizontalAlignment.Value = RHorizontalAlignment.Right;
+					typeText.MinSize.Value = new Vector2i(150, 0);
+					typeText.Text.Value = "Folder";
+					typeText.TextSize.Value = 17;
+					typeText.AutowrapMode.Value = RAutowrapMode.Arbitrary;
+					typeText.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
+					var sizeText = boxButtonCon.Entity.AddChild("Size").AttachComponent<TextLabel>();
+					sizeText.HorizontalAlignment.Value = RHorizontalAlignment.Right;
+					sizeText.MinSize.Value = new Vector2i(150, 0);
+					sizeText.TextSize.Value = 17;
+					sizeText.Text.Value = "";
+					sizeText.AutowrapMode.Value = RAutowrapMode.Arbitrary;
+					sizeText.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
 					var Namedel = buttonBase.Entity.AttachComponent<DelegateCall>();
 					itemData.TextSubmitted.Target = Namedel.CallDelegate;
 					Namedel.action = () => {
@@ -483,6 +507,7 @@ namespace RhuEngine.Components
 					var buttonBase = bottomBOx.Entity.AddChild(item.Name).AttachComponent<Button>();
 					buttonBase.MinSize.Value = new Vector2i(0, 45);
 					var boxButtonCon = buttonBase.Entity.AddChild().AttachComponent<BoxContainer>();
+					boxButtonCon.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 					var Icon = boxButtonCon.Entity.AddChild().AttachComponent<TextureRect>();
 					Icon.MinSize.Value = new Vector2i(45);
 					var asset = Icon.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
@@ -490,10 +515,30 @@ namespace RhuEngine.Components
 					Icon.IgnoreTextureSize.Value = true;
 					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
 					asset.LoadAsset(item.Texture);
+
 					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<LineEdit>();
 					itemData.Text.Value = item.Name;
 					itemData.MinSize.Value = new Vector2i(255, 0);
+					itemData.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 
+					var typeText = boxButtonCon.Entity.AddChild("Type").AttachComponent<TextLabel>();
+					typeText.HorizontalAlignment.Value = RHorizontalAlignment.Right;
+					typeText.MinSize.Value = new Vector2i(150, 0);
+					typeText.Text.Value = item.Type;//Todo add fancy name
+					typeText.TextSize.Value = 17;
+					typeText.AutowrapMode.Value = RAutowrapMode.Arbitrary;
+					typeText.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
+
+					var sizeText = boxButtonCon.Entity.AddChild("Size").AttachComponent<TextLabel>();
+					sizeText.HorizontalAlignment.Value = RHorizontalAlignment.Right;
+					sizeText.MinSize.Value = new Vector2i(150, 0);
+					sizeText.TextSize.Value = 17;
+					sizeText.Text.Value = FileSizeFormatter.FormatSize(item.SizeInBytes);
+					if (string.IsNullOrEmpty(sizeText.Text.Value)) {
+						sizeLabel.Text.Value = "SizeError";
+					}
+					sizeText.AutowrapMode.Value = RAutowrapMode.Arbitrary;
+					sizeText.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
 
 					var Namedel = buttonBase.Entity.AttachComponent<DelegateCall>();
 					itemData.TextSubmitted.Target = Namedel.CallDelegate;
@@ -524,16 +569,41 @@ namespace RhuEngine.Components
 				delcal.action = action;
 				button.Pressed.Target = delcal.CallDelegate;
 			}
-			var Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-			var MyPictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-			var MyDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-			var MyVideos = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
-			var MyMusic = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-			AddSideButton(Engine.localisationManager.GetLocalString("Programs.FileExplorer.SpecialFolder.Desktop"), () => NavToPath(Desktop));
-			AddSideButton(Engine.localisationManager.GetLocalString("Programs.FileExplorer.SpecialFolder.MyPictures"), () => NavToPath(MyPictures));
-			AddSideButton(Engine.localisationManager.GetLocalString("Programs.FileExplorer.SpecialFolder.MyDocuments"), () => NavToPath(MyDocuments));
-			AddSideButton(Engine.localisationManager.GetLocalString("Programs.FileExplorer.SpecialFolder.MyVideos"), () => NavToPath(MyVideos));
-			AddSideButton(Engine.localisationManager.GetLocalString("Programs.FileExplorer.SpecialFolder.MyMusic"), () => NavToPath(MyMusic));
+			try {
+				var Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+				AddSideButton(Engine.localisationManager.GetLocalString("Programs.FileExplorer.SpecialFolder.Desktop"), () =>  NavToPath(Path.GetFullPath(Desktop)));
+			}
+			catch {
+
+			}
+			try {
+				var MyPictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+				AddSideButton(Engine.localisationManager.GetLocalString("Programs.FileExplorer.SpecialFolder.MyPictures"), () => NavToPath(Path.GetFullPath(MyPictures)));
+			}
+			catch {
+
+			}
+			try {
+				var MyDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+				AddSideButton(Engine.localisationManager.GetLocalString("Programs.FileExplorer.SpecialFolder.MyDocuments"), () => NavToPath(Path.GetFullPath(MyDocuments)));
+			}
+			catch {
+
+			}
+			try {
+				var MyVideos = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
+				AddSideButton(Engine.localisationManager.GetLocalString("Programs.FileExplorer.SpecialFolder.MyVideos"), () => NavToPath(Path.GetFullPath(MyVideos)));
+			}
+			catch {
+
+			}
+			try {
+				var MyMusic = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+				AddSideButton(Engine.localisationManager.GetLocalString("Programs.FileExplorer.SpecialFolder.MyMusic"), () => NavToPath(Path.GetFullPath(MyMusic)));
+			}
+			catch {
+
+			}
 			var thisPcLoc = Engine.localisationManager.GetLocalString("Programs.FileExplorer.ThisPC");
 			AddSideButton(thisPcLoc, () => NavToPath(thisPcLoc));
 

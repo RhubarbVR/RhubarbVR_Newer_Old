@@ -273,8 +273,8 @@
     "Programs.Terminal.Name": "Terminal",
     "Actions.ChangeVR.Enable": "Enter VR",
     "Actions.ChangeVR.Disable": "Leave VR",
-    "Programs.PublicSessions.Name": "Public Sessions",
-
+    "Programs.SessionsFinder.Name": "Sessions Finder",
+    "Start.AllPrograms": "All Programs",
     "Program.OpenBrowser.Name": "Open System Webbrowser",
     "Program.OpenBrowser.Text": "This link will take you to \n {0}.\n Open in browser?",
     "Program.OpenBrowser.Yes": "Yes",

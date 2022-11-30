@@ -21,6 +21,28 @@ namespace RhubarbVR.Bindings
 			var rot = node3D.Transform.basis.GetRotationQuaternion();
 			return Matrix.TRS(new Vector3f(pos.x, pos.y, pos.z), new Quaternionf(rot.x, rot.y, rot.z, rot.w), new Vector3f(scale.x, scale.y, scale.z));
 		}
+
+		public static Transform3D CastMatrix(this Matrix matrix) {
+			return new Transform3D(
+				new Vector3(matrix.M.M11, matrix.M.M21, matrix.M.M31),
+				new Vector3(matrix.M.M12, matrix.M.M22, matrix.M.M32),
+				new Vector3(matrix.M.M13, matrix.M.M23, matrix.M.M33),
+				new Vector3(matrix.M.M14, matrix.M.M24, matrix.M.M34)
+				);
+		}
+
+		public static Transform3D GetTrans(this Matrix matrix) {
+			matrix.Decompose(out var pos, out var rot, out var scale);
+			return pos.IsAnyNan || rot.IsAnyNan || scale.IsAnyNan
+				? new Transform3D()
+				: new Transform3D {
+					basis = new Basis(new Quaternion(rot.x, rot.y, rot.z, rot.w)) {
+						Scale = new Vector3(scale.x, scale.y, scale.z)
+					},
+					origin = new Vector3(pos.x, pos.y, pos.z)
+				};
+		}
+
 		public static void SetPos(this Node3D node3D, Matrix matrix) {
 			matrix.Decompose(out var pos, out var rot, out var scale);
 			if (pos.IsAnyNan || rot.IsAnyNan || scale.IsAnyNan) {

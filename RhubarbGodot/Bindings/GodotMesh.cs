@@ -14,7 +14,6 @@ using Array = Godot.Collections.Array;
 using SArray = System.Array;
 using NAudio.Wave;
 using RhuEngine;
-
 namespace RhubarbVR.Bindings
 {
 
@@ -207,14 +206,20 @@ namespace RhubarbVR.Bindings
 		public RMesh RMesh { get; private set; }
 
 		public ArrayMesh LoadedMesh { get; private set; }
+		public Skin LoadedSkin { get; private set; }
 
 		public Mesh.BlendShapeMode shapeMode = Mesh.BlendShapeMode.Relative;
 
 		public string Name;
 
+		public Array<Godot.Collections.Array> BlendShapes;
+
 		public string[] BlendShapeNames = SArray.Empty<string>();
 
+		public Matrix[] BonePos = SArray.Empty<Matrix>();
+
 		public (Mesh.PrimitiveType, Array)[] subMeshes = SArray.Empty<(Mesh.PrimitiveType, Array)>();
+
 
 		private static IEnumerable<float> GetData(Vector4 data) {
 			yield return data.x;
@@ -339,6 +344,7 @@ namespace RhubarbVR.Bindings
 
 		public GodotMesh(ArrayMesh loaded) {
 			LoadedMesh = loaded;
+			LoadedSkin = null;
 		}
 
 		public void Init(RMesh rMesh) {
@@ -348,6 +354,7 @@ namespace RhubarbVR.Bindings
 			}
 			Name = Guid.NewGuid().ToString();
 			LoadedMesh = new ArrayMesh();
+			LoadedSkin = null;
 		}
 
 		public void LoadMeshData(IMesh mesh) {
@@ -405,6 +412,7 @@ namespace RhubarbVR.Bindings
 				if (complexMesh.HasBones) {
 					BoneVertexWights = new BoneWeight[complexMesh.VertexCount];
 					var BoneIndex = 0;
+					BonePos = complexMesh.Bones.Select(x=>x.OffsetMatrix).ToArray();
 					foreach (var Bone in complexMesh.Bones) {
 						foreach (var vertexWe in Bone.VertexWeights) {
 							BoneVertexWights[vertexWe.VertexID].AddBone(BoneIndex, vertexWe.Weight);
@@ -432,36 +440,47 @@ namespace RhubarbVR.Bindings
 					}
 				}
 
-
-
-				//if (complexMesh.HasMeshAttachments) {
-				//	blendShapeFrames = new BlendShapeFrame[complexMesh.MeshAttachments.Count()];
-				//	var current = 0;
-				//	foreach (var item in complexMesh.MeshAttachments) {
-				//		try {
-				//			blendShapeFrames[current].vertices = new Vector3[complexMesh.VertexCount];
-				//			var smallist = Math.Min(item.Vertices.Count, complexMesh.VertexCount);
-				//			for (int i = 0; i < smallist; i++) {
-				//				blendShapeFrames[current].vertices[i] = new Vector3(item.Vertices[i].x, item.Vertices[i].y, item.Vertices[i].z) - cvertices[i];
-				//			}
-				//			blendShapeFrames[current].normals = new Vector3[complexMesh.VertexCount];
-				//			var smallistnorm = Math.Min(item.Normals.Count, complexMesh.VertexCount);
-				//			for (int i = 0; i < smallistnorm; i++) {
-				//				blendShapeFrames[current].normals[i] = new Vector3(item.Normals[i].x, item.Normals[i].y, item.Normals[i].z) - cnormals[i];
-				//			}
-				//			blendShapeFrames[current].tangents = new Vector3[complexMesh.VertexCount];
-				//			var smallitsTang = Math.Min(complexMesh.Tangents.Count, complexMesh.VertexCount);
-				//			for (int i = 0; i < smallitsTang; i++) {
-				//				var tangent = item.Tangents[i];
-				//				blendShapeFrames[current].tangents[i] = new Vector3(tangent.x - ctangents[i].x, tangent.y - ctangents[i].y, tangent.z - ctangents[i].z);
-				//			}
-				//			blendShapeFrames[current].name = item.Name;
-				//			blendShapeFrames[current].wight = item.Weight;
-				//			current++;
-				//		}
-				//		catch { }
-				//	}
-				//}
+				BlendShapes?.Clear();
+				BlendShapes ??= new Array<Array>();
+				if (complexMesh.HasMeshAttachments) {
+					var current = 0;
+					var blendNames = new List<string>();
+					foreach (var item in complexMesh.MeshAttachments) {
+						var shapedata = new Array();
+						shapedata.Resize(3);
+						var verts = new Vector3[complexMesh.VertexCount];
+						var smallist = Math.Min(item.Vertices.Count, complexMesh.VertexCount);
+						for (var i = 0; i < smallist; i++) {
+							verts[i] = new Vector3(item.Vertices[i].x, item.Vertices[i].y, item.Vertices[i].z) - cvertices[i];
+						}
+						shapedata[0] = verts.AsSpan();
+						var norms = new Vector3[complexMesh.VertexCount];
+						var smallistnorm = Math.Min(item.Normals.Count, complexMesh.VertexCount);
+						for (var i = 0; i < smallistnorm; i++) {
+							norms[i] = new Vector3(item.Normals[i].x, item.Normals[i].y, item.Normals[i].z) - cnormals[i];
+						}
+						if (cnormals is not null) {
+							shapedata[1] = norms.AsSpan();
+						}
+						
+						var tangents = new Vector3[complexMesh.VertexCount];
+						var smallitsTang = Math.Min(complexMesh.Tangents.Count, complexMesh.VertexCount);
+						for (var i = 0; i < smallitsTang; i++) {
+							var tangent = item.Tangents[i];
+							tangents[i] = new Vector3(tangent.x - ctangents[i].x, tangent.y - ctangents[i].y, tangent.z - ctangents[i].z);
+						}
+						if (ctangents is not null) {
+							shapedata[2] = tangents.AsSpan();
+						}
+						BlendShapes.Add(shapedata);
+						blendNames.Add(item.Name);
+						current++;
+					}
+					BlendShapeNames = blendNames.ToArray();
+				}
+				else {
+					BlendShapeNames = SArray.Empty<string>();
+				}
 
 				Name = "Complex Mesh:" + complexMesh.MeshName;
 				subMeshes = new (Mesh.PrimitiveType, Array)[complexMesh.SubMeshes.Count() + 1];
@@ -500,12 +519,25 @@ namespace RhubarbVR.Bindings
 			LoadedMesh.ClearBlendShapes();
 			LoadedMesh.BlendShapeMode = shapeMode;
 			LoadedMesh.ResourceName = Name;
+			if (BonePos.Length != 0) {
+				LoadedSkin ??= new Skin();
+				LoadedSkin?.ClearBinds();
+				for (var i = 0; i < BonePos.Length; i++) {
+					LoadedSkin.AddBind(i, BonePos[i].CastMatrix());
+				}
+			}
+			else {
+				LoadedSkin?.ClearBinds();
+			}
+
+
 			foreach (var item in BlendShapeNames) {
 				LoadedMesh.AddBlendShape(item);
 			}
+
 			foreach (var item in subMeshes) {
 				if (item.Item2 is not null) {
-					LoadedMesh.AddSurfaceFromArrays(item.Item1, item.Item2);
+					LoadedMesh.AddSurfaceFromArrays(item.Item1, item.Item2,BlendShapes);
 				}
 			}
 		}

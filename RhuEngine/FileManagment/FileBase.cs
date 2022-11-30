@@ -24,6 +24,8 @@ namespace RhuEngine
 
 		public abstract RTexture2D Texture { get; }
 
+		public abstract string Type { get; }
+
 		public abstract void Open();
 	}
 }

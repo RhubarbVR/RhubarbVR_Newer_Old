@@ -24,6 +24,7 @@ namespace RhuEngine.Components
 {
 	[ProgramOpenWith("*")]
 	[Category(new string[] { "Assets/Importers" })]
+	[ProgramHide]
 	public sealed class ImportProgram : Program
 	{
 

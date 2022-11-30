@@ -78,20 +78,28 @@ namespace RhuEngine.Components
 			}
 			try {
 				RLog.Info("Starting load of static Asset");
+				//Todo set up system to use cache headers on http and https
 				var uri = new Uri(url);
-				var data = Engine.assetManager.GetCached(uri);
-				if (data is null) {
-					lock (tryingToLoad) {
-						if (!tryingToLoad.Contains(uri)) {
-							tryingToLoad.Add(uri);
-							Task.Run(LoadAssetIn);
+				if (uri.Scheme == "http" | uri.Scheme == "https" | uri.Scheme == "rdb" | uri.Scheme == "local") {
+					var data = Engine.assetManager.GetCached(uri);
+					if (data is null) {
+						lock (tryingToLoad) {
+							if (!tryingToLoad.Contains(uri)) {
+								tryingToLoad.Add(uri);
+								Task.Run(LoadAssetIn);
+							}
 						}
+					}
+					else {
+						RLog.Info("loaded static Asset from cache");
+						LoadAsset(data);
+						_staticAssetLoaded = true;
 					}
 				}
 				else {
-					RLog.Info("loaded static Asset from cache");
-					LoadAsset(data);
-					_staticAssetLoaded = true;
+					RLog.Info("loaded static Asset no Cache");
+					LoadAsset(null);
+					_staticAssetLoaded = false;
 				}
 			}
 			catch (Exception e) {

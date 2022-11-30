@@ -36,6 +36,8 @@ namespace RhuEngine
 
 		public override RTexture2D Texture => _networkedDrive.Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.File);
 
+		public override string Type => _item.Type;//Todo Change For program
+
 		public override void Open() {
 
 		}

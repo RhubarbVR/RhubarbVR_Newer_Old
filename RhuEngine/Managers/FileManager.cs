@@ -14,8 +14,10 @@ namespace RhuEngine.Managers
 	{
 		public readonly List<SystemDrive> Drives = new();
 		public readonly Dictionary<Guid, NetworkedDrive> NetDrives = new();
+		public FakeStaticDrive fakeStaticFolder;
 
 		public IEnumerable<IDrive> GetDrives() {
+			yield return fakeStaticFolder;
 			lock (_engine.netApiManager.Client.RootFolders) {
 				foreach (var item in _engine.netApiManager.Client.RootFolders) {
 					if (NetDrives.TryGetValue(item.ID, out var drive)) {
@@ -97,6 +99,7 @@ namespace RhuEngine.Managers
 
 		public void Init(Engine engine) {
 			_engine = engine;
+			fakeStaticFolder = new FakeStaticDrive(engine);
 			_engine.netApiManager.Client.OnLogin += (x) => ReloadAllDrives();
 			_engine.netApiManager.Client.OnLogout += ReloadAllDrives;
 			ReloadAllDrives();

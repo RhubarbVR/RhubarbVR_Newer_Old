@@ -27,14 +27,22 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			Armature_Changed(null);
 		}
 
+		public override void Render() {
+			base.Render();
+			var currentIndex = 0;
+			foreach (SkinnedMeshRender.BlendShape item in LinkedComp.BlendShapes) {
+				node.SetBlendShapeValue(currentIndex, item.Weight.Value);
+				currentIndex++;
+			}
+		}
+
+
 		private void Armature_Changed(IChangeable obj) {
-			return; //Todo fix armature problems
 			var target = LinkedComp.Armature.Target?.WorldLink;
 			if (target is null) {
 				node.Skeleton = null;
 				return;
 			}
-
 			if (target is ArmatureLink armature) {
 				node.Skeleton = armature.node.GetPath();
 			}
@@ -214,9 +222,11 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			}
 			if (obj is null) {
 				node.Mesh = null;
+				node.Skin = null;
 				return;
 			}
 			node.Mesh = ((GodotMesh)obj.Inst).LoadedMesh;
+			node.Skin = ((GodotMesh)obj.Inst).LoadedSkin;
 		}
 	}
 

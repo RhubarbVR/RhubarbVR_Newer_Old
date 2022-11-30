@@ -16,6 +16,7 @@ namespace RhuEngine
 		public DateTimeOffset LastEdit { get; }
 		public long SizeInBytes { get; }
 		public IDrive Drive { get; }
+		public string Type { get; }
 		public RTexture2D Texture { get; }
 		public void Open();
 	}
