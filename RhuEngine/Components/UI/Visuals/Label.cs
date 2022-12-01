@@ -21,7 +21,7 @@ namespace RhuEngine.Components
 		public readonly Sync<string> Text;
 		public readonly Sync<int> LineSpacing;
 		public readonly AssetRef<RFont> Font;
-		[Default(96)]
+		[Default(20)]
 		public readonly Sync<int> TextSize;
 		public readonly Sync<Colorf> TextColor;
 		public readonly Sync<int> OutlineSize;

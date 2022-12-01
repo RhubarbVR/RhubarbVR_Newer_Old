@@ -314,6 +314,9 @@ namespace RhuEngine.Components
 		[Default(RCursorShape.Arrow)]
 		public readonly Sync<RCursorShape> CursorShape;
 
+		public readonly Sync<string> ToolTipText;
+
+
 		protected override void OnAttach() {
 			base.OnAttach();
 			Scale.Value = Vector2f.One;

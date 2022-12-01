@@ -19,8 +19,6 @@ namespace RhuEngine
 		public IFolder[] Folders { get; }
 		public IDrive Drive { get; }
 
-		//public Task SaveFile(string type, Stream fileData);
-
 		public RTexture2D Texture { get; }
 
 		public Task Refresh();

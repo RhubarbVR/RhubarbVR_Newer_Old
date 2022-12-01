@@ -26,7 +26,7 @@ namespace NullContext
 
 		public bool CanInput => false;
 
-		public float Elapsedf { get; set; }
+		public double Elapsed { get; set; }
 
 		public bool ForceLibLoad => false;
 

@@ -149,7 +149,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Texture_LoadChange(RTexture2D obj) {
-			node.Texture = LinkedComp.texture.Asset?.Inst is GodotTexture2D texture2D ? texture2D.Texture2D : null;
+			node.Texture = LinkedComp.texture?.Asset?.Inst is GodotTexture2D texture2D ? texture2D.Texture2D : null;
 		}
 
 		private void Rect_Changed(IChangeable obj) {

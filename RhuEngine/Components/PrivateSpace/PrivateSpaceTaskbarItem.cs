@@ -20,10 +20,14 @@ namespace RhuEngine.Components
 
 		private Button _closeButton;
 
+		private Button _mainButton;
+
 
 		protected override void OnLoaded() {
 			base.OnLoaded();
-			PrivateSpaceManager.UserInterfaceManager.privateSpaceTaskbarItems.Add(this);
+			lock (PrivateSpaceManager?.UserInterfaceManager.privateSpaceTaskbarItems) {
+				PrivateSpaceManager.UserInterfaceManager.privateSpaceTaskbarItems.Add(this);
+			}
 		}
 
 		private bool _overBackGorund;
@@ -40,9 +44,12 @@ namespace RhuEngine.Components
 			_overClose = true;
 			InputUpdate();
 		}
-
+		private bool _overRideClose = false;
 		private void InputUpdate() {
-			_closeButton.Entity.enabled.Value = (_privateSpaceWindow?.Window?.CanClose ?? false) && (_overBackGorund || _overClose);
+			if(_closeButton is null) {
+				return;
+			}
+			_closeButton.Entity.enabled.Value = ((_privateSpaceWindow?.Window?.CanClose ?? false) || _overRideClose) && (_overBackGorund || _overClose);
 		}
 
 		[Exposed]
@@ -58,6 +65,9 @@ namespace RhuEngine.Components
 		}
 
 		private void UpdatePanel() {
+			if(_isOpen is null) {
+				return;
+			}
 			if (_privateSpaceWindow?.Minimized ?? false) {
 				_isOpen.MinOffset.Value = new Vector2f(-25, -10);
 				_isOpen.MaxOffset.Value = new Vector2f(25, -5);
@@ -74,18 +84,18 @@ namespace RhuEngine.Components
 			root.VerticalFilling.Value = RFilling.ShrinkCenter;
 			root.MinSize.Value = new Vector2i(80);
 
-			var mainButton = Entity.AddChild("MainButton").AttachComponent<Button>();
-			mainButton.Flat.Value = true;
-			mainButton.Pressed.Target = MainButtonClick;
+			_mainButton = Entity.AddChild("MainButton").AttachComponent<Button>();
+			_mainButton.Flat.Value = true;
+			_mainButton.Pressed.Target = MainButtonClick;
 
-			var inputEvents = mainButton.Entity.AttachComponent<UIInputEvents>();
+			var inputEvents = _mainButton.Entity.AttachComponent<UIInputEvents>();
 			inputEvents.InputEntered.Target = InputOverBackGround;
 			inputEvents.InputExited.Target = InputLeaveBackGround;
 
 
-			mainButton.IconAlignment.Value = RButtonAlignment.Center;
-			mainButton.ExpandIcon.Value = true;
-			mainButton.Icon.Target = _iconProvider = Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+			_mainButton.IconAlignment.Value = RButtonAlignment.Center;
+			_mainButton.ExpandIcon.Value = true;
+			_mainButton.Icon.Target = _iconProvider = Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 			_iconProvider.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
 
 			_isOpen = Entity.AddChild("IsOpen").AttachComponent<Panel>();
@@ -125,12 +135,12 @@ namespace RhuEngine.Components
 		private DateTimeOffset _lastClick;
 		private DateTimeOffset _lastLastClick;
 
-		private Action _fallBackAction;
+		private Action _fallBackOpenAction;
 
 		[Exposed]
 		public void MainButtonClick() {
 			if (_privateSpaceWindow is null) {
-				_fallBackAction?.Invoke();
+				_fallBackOpenAction?.Invoke();
 				return;
 			}
 			var newTime = DateTimeOffset.UtcNow;
@@ -147,23 +157,31 @@ namespace RhuEngine.Components
 			_lastClick = DateTimeOffset.UtcNow;
 		}
 
+		private Action _fallBackCloseAction;
 
 		[Exposed]
 		public void OnClose() {
+			if (_privateSpaceWindow is null) {
+				_fallBackCloseAction?.Invoke();
+				return;
+			}
 			_privateSpaceWindow?.Window.Close();
 		}
 
 		public override void Dispose() {
-			base.Dispose();
+			IsDestroying= true;
 			OpennedPorgram(null);
-			PrivateSpaceManager?.UserInterfaceManager.privateSpaceTaskbarItems.Remove(this);
+			lock (PrivateSpaceManager?.UserInterfaceManager.privateSpaceTaskbarItems) {
+				PrivateSpaceManager?.UserInterfaceManager.privateSpaceTaskbarItems.Remove(this);
+			}
+			base.Dispose();
 		}
 
 		private static event Action ProgramsUpdate;
 
 		private PrivateSpaceWindow _privateSpaceWindow;
 		public void OpennedPorgram(PrivateSpaceWindow privateSpaceWindow) {
-			if (_privateSpaceWindow is not null) {
+			if (_privateSpaceWindow?.Window is not null) {
 				_privateSpaceWindow.Window.OnUpdatedData -= Window_UpdateData;
 				_privateSpaceWindow.OnMinimize -= UpdatePanel;
 			}
@@ -172,43 +190,66 @@ namespace RhuEngine.Components
 				_privateSpaceWindow.Window.OnUpdatedData += Window_UpdateData;
 				_privateSpaceWindow.OnMinimize += UpdatePanel;
 			}
-			_isOpen.Entity.enabled.Value = privateSpaceWindow is not null;
-			Window_UpdateData();
-			UpdatePanel();
+			if (!IsDestroying) {
+				if (_isOpen is not null) {
+					_isOpen.Entity.enabled.Value = privateSpaceWindow is not null;
+				}
+				Window_UpdateData();
+				UpdatePanel();
+			}
 			ProgramsUpdate?.Invoke();
 		}
 
 		private Type _innnerType;
 
-		public void SetUpProgramOpen(Type type,int localtion) {
+		public void SetUpProgramOpen(Type type, int localtion) {
 			Entity.orderOffset.Value = localtion + 1;
 			_innnerType = type;
 			ProgramsUpdate += UpdateHide;
 			var programInfo = type.GetProgramInfo();
+			if (_mainButton is not null) {
+				_mainButton.ToolTipText.Value = programInfo.ProgramName;
+			}
+			if (_closeButton is not null) {
+				_closeButton.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.CloseThing", programInfo.ProgramName);
+			}
 			_iconProvider.LoadAsset(programInfo.icon ?? Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
-			_fallBackAction = () => PrivateSpaceManager.ProgramManager.OpenProgram(type);
+			_fallBackOpenAction = () => PrivateSpaceManager.ProgramManager.OpenProgram(type);
 			UpdateHide();
 		}
 
 		private void UpdateHide() {
 			var foundProgram = false;
-			foreach (var item in PrivateSpaceManager.UserInterfaceManager.privateSpaceTaskbarItems) {
-				if (item._privateSpaceWindow?.Window?.Program is null) {
-					continue;
-				}
-				if (item._privateSpaceWindow.Window.Program.GetType() == _innnerType) {
-					item.Entity.orderOffset.Value = Entity.orderOffset.Value;
-					Entity.enabled.Value = false;
-					foundProgram = true;
-					break;
+			lock (PrivateSpaceManager.UserInterfaceManager.privateSpaceTaskbarItems) {
+				foreach (var item in PrivateSpaceManager.UserInterfaceManager.privateSpaceTaskbarItems) {
+					if (item._privateSpaceWindow?.Window?.Program is null) {
+						continue;
+					}
+					if (item._privateSpaceWindow.Window.Program.GetType() == _innnerType) {
+						item.Entity.orderOffset.Value = Entity.orderOffset.Value;
+						Entity.enabled.Value = false;
+						foundProgram = true;
+						break;
+					}
 				}
 			}
 			Entity.enabled.Value = !foundProgram;
 		}
 
 		private void Window_UpdateData() {
+			if(IsDestroying | IsRemoved) {
+				return;
+			}
 			InputUpdate();
-			_iconProvider.LoadAsset(_privateSpaceWindow?.Window?.Icon ?? Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
+			if (_mainButton is not null) {
+				_mainButton.ToolTipText.Value = _privateSpaceWindow?.Window?.WindowTitle ?? string.Empty;
+			}
+			if (_closeButton is not null) {
+				_closeButton.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.CloseThing", _privateSpaceWindow?.Window?.WindowTitle ?? string.Empty);
+			}
+			if (_iconProvider is not null) {
+				_iconProvider.LoadAsset(_privateSpaceWindow?.Window?.Icon ?? Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
+			}
 			ProgramsUpdate?.Invoke();
 		}
 
@@ -220,7 +261,27 @@ namespace RhuEngine.Components
 		public void SetUpItemOpen(IFile file, int count) {
 			Entity.orderOffset.Value = count + 1;
 			_iconProvider.LoadAsset(file.Texture ?? Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
-			_fallBackAction = () => file.Open();
+			_fallBackOpenAction = () => file.Open();
+		}
+
+		internal void SetUpWorld(World item) {
+			_iconProvider.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Location));
+			_fallBackOpenAction = () => item.Focus = World.FocusLevel.Focused;
+			_fallBackCloseAction = () => Engine.worldManager.RemoveWorld(item);
+			_overRideClose = item != Engine.worldManager.LocalWorld;
+			if (_mainButton is not null) {
+				_mainButton.ToolTipText.Value = item.SessionName.Value;
+			}
+			if (_closeButton is not null) {
+				_closeButton.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.CloseThing", item.SessionName.Value);
+			}
+			var e = _mainButton.Entity.AddChild("SessionName").AttachComponent<TextLabel>();
+			e.Text.Value = item.SessionName.Value;
+			e.TextSize.Value = 15;
+			e.OverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
+			e.MinOffset.Value = new Vector2f(0, 30);
+			e.MaxOffset.Value = new Vector2f(0, 30);
+			e.InputFilter.Value = RInputFilter.Ignore;
 		}
 	}
 }

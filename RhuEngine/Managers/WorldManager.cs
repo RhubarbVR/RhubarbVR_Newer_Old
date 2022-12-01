@@ -18,6 +18,7 @@ using RhuEngine.Linker;
 using DataModel.Enums;
 using Esprima;
 using RhuEngine.WorldObjects.ECS;
+using static RhuEngine.WorldObjects.World;
 
 namespace RhuEngine.Managers
 {
@@ -39,7 +40,7 @@ namespace RhuEngine.Managers
 		public bool SaveLocalWorld { get; set; } = true;
 		public bool LoadLocalWorld { get; set; } = true;
 
-		public float TotalStepTime { get; private set; }
+		public double TotalStepTime { get; private set; }
 
 		public PrivateSpaceManager PrivateSpaceManager { get; internal set; }
 
@@ -73,26 +74,13 @@ namespace RhuEngine.Managers
 			OnWorldUpdateTaskBar?.Invoke();
 		}
 
-		private readonly Stack<World> _isRunning = new();
+		private readonly List<World> _isRunning = new();
+		private readonly List<World> _backgroundLoading = new();
 
-		private Task ShowLoadingFeedback(World world, World.FocusLevel focusLevel) {
-			return Task.Run(async () => {
-				_isRunning.Push(world);
-				while (world.IsLoading && !world.IsDisposed) {
-					await Task.Delay(100);
-				}
-				if (world.IsDisposed || world.HasError) {
-					RLog.Err($"Failed to start world {world.WorldDebugName} Error {world.LoadMsg}");
-					await Task.Delay(3000);
-					_isRunning.Pop();
-					world.Dispose();
-				}
-				else {
-					RLog.Info($"Done loading world {world.WorldDebugName}");
-					world.Focus = focusLevel;
-					_isRunning.Pop();
-				}
-			});
+		private void ShowLoadingFeedback(World world, World.FocusLevel focusLevel) {
+			world._startFocus = focusLevel;
+			_isRunning.Add(world);
+			_backgroundLoading.Add(world);
 		}
 
 		public World GetWorldBySessionID(Guid sessionID) {
@@ -128,11 +116,11 @@ namespace RhuEngine.Managers
 			return world;
 		}
 
-		public World CreateNewWorld(World.FocusLevel focusLevel, string sessionName, AccessLevel accessLevel, int maxUsers, bool isHiden, Guid? assosiatedGroup = null) {
+		public World CreateNewWorld(World.FocusLevel focusLevel, string sessionName, AccessLevel accessLevel, int maxUsers, bool isHiden, bool localWorld, Guid? assosiatedGroup = null) {
 			var world = new World(this) {
 				Focus = World.FocusLevel.Background
 			};
-			world.Initialize(true, false, false, false);
+			world.Initialize(!localWorld, false, false, false);
 			world.RootEntity.name.Value = "Root";
 			world.RootEntity.AttachComponent<SimpleSpawn>();
 			world.SessionName.Value = sessionName;
@@ -140,7 +128,12 @@ namespace RhuEngine.Managers
 			world.AccessLevel.Value = accessLevel;
 			world.MaxUserCount.Value = maxUsers;
 			world.IsHidden.Value = isHiden;
-			Task.Run(async () => await world.StartNetworking(true));
+			if (!localWorld) {
+				Task.Run(async () => await world.StartNetworking(true));
+			}
+			else {
+				world.WaitingForWorldStartState = false;
+			}
 			worlds.Add(world);
 			OnWorldUpdateTaskBar?.Invoke();
 			ShowLoadingFeedback(world, focusLevel);
@@ -191,7 +184,8 @@ namespace RhuEngine.Managers
 			PrivateOverlay.RootEntity.AddChild("PrivateSpace").AttachComponent<PrivateSpaceManager>();
 			Engine.IntMsg = "Creating Loading Text";
 			_loadingText = PrivateOverlay.RootEntity.AddChild("LoadingText").AttachComponent<TextLabel3D>();
-			//_loadingText.Size.Value = 0.35f; Todo fix size
+			_loadingText.PixelSize.Value = 0.0005f;
+			_loadingText.FontSize.Value = 50;
 			Engine.IntMsg = "Creating Overlay World";
 			OverlayWorld = CreateNewWorld(World.FocusLevel.Overlay, true);
 			Engine.IntMsg = "Creating Overlay World Manager";
@@ -243,7 +237,7 @@ namespace RhuEngine.Managers
 			OnWorldUpdateTaskBar?.Invoke();
 		}
 		public void Step() {
-			float totalStep = 0;
+			double totalStep = 0;
 			for (var i = worlds.Count - 1; i >= 0; i--) {
 				try {
 					_stepStopwatch.Restart();
@@ -254,8 +248,8 @@ namespace RhuEngine.Managers
 				}
 				finally {
 					_stepStopwatch.Stop();
-					worlds[i].stepTime = (float)_stepStopwatch.Elapsed.TotalSeconds;
-					totalStep += (float)_stepStopwatch.Elapsed.TotalSeconds;
+					worlds[i].stepTime = _stepStopwatch.Elapsed.TotalSeconds;
+					totalStep += _stepStopwatch.Elapsed.TotalSeconds;
 				}
 			}
 			TotalStepTime = totalStep;
@@ -287,12 +281,33 @@ namespace RhuEngine.Managers
 			if (PrivateOverlay.GetLocalUser() is null) {
 				return;
 			}
+			for (var i = 0; i < _backgroundLoading.Count; i++) {
+				var item = _backgroundLoading[i];
+				if(item.IsLoading && !item.IsDisposed) {
+					continue;
+				}
+				i--;
+				_backgroundLoading.Remove(item);
+				if (item.IsDisposed || item.HasError) {
+					RLog.Err($"Failed to start world {item.WorldDebugName} Error {item.LoadMsg}");
+					Task.Run(async () => {
+						await Task.Delay(1000);
+						_isRunning.Remove(item);
+						RemoveWorld(item);
+					});
+				}
+				else {
+					RLog.Info($"Done loading world {item.WorldDebugName}");
+					item.Focus = item._startFocus;
+					_isRunning.Remove(item);
+				}
+			}
 			_loadingText.Entity.enabled.Value = _isRunning.Count != 0;
 			try {
 				if (_isRunning.Count != 0) {
-					var world = _isRunning.Peek();
+					var world = _isRunning[_isRunning.Count - 1];
 					var textpos = Matrix.T(Vector3f.Forward * 0.35f) * Matrix.T(0, -0.1f, 0) * Engine.inputManager.ScreenHeadMatrix;
-					_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 3.5f, 1);
+					_loadingPos += (Vector3f)(((Vector3d)textpos.Translation - (Vector3d)_loadingPos) * Math.Min(RTime.Elapsed * 3.5, 1));
 					var userPOS = PrivateOverlay.GetLocalUser().userRoot.Target?.Entity.GlobalTrans ?? Matrix.Identity;
 					if (world.IsLoading && !world.IsDisposed) {
 						_loadingText.Text.Value = $"{Engine.localisationManager.GetLocalString("Common.LoadingWorld")}\n {Engine.localisationManager.GetLocalString(world.LoadMsg)}";
@@ -343,7 +358,9 @@ namespace RhuEngine.Managers
 
 		public void RemoveWorld(World world) {
 			if (FocusedWorld == world) {
-				LocalWorld.Focus = World.FocusLevel.Focused;
+				if (LocalWorld is not null) {
+					LocalWorld.Focus = World.FocusLevel.Focused;
+				}
 			}
 			worlds.Remove(world);
 			world.Dispose();

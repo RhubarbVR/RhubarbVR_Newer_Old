@@ -144,11 +144,13 @@ namespace RhuEngine
 			}
 			var thedata = (MainSettingsObject)Activator.CreateInstance(theType);
 			MainSettings = lists.Count == 0 ? thedata : SettingsManager.LoadSettingsObject(thedata, lists.ToArray());
-			MainSettings.RenderSettings.RenderSettingsChange?.Invoke();
+			PindingRestart = PindingRestart | MainSettings.RenderSettings.RenderSettingsUpdate();
 			if (EngineLink.CanRender) {
 				RRenderer.Fov = thedata.Fov;
 			}
 		}
+
+		public bool PindingRestart;
 
 		public bool HasKeyboard => KeyboardInteraction is not null;
 
@@ -202,7 +204,7 @@ namespace RhuEngine
 			}
 			var thedata = (MainSettingsObject)Activator.CreateInstance(theType);
 			MainSettings = lists.Count == 0 ? thedata : SettingsManager.LoadSettingsObject(thedata, lists.ToArray());
-			MainSettings.RenderSettings.RenderSettingsChange?.Invoke();
+			PindingRestart = PindingRestart | MainSettings.RenderSettings.RenderSettingsUpdate();
 			UpdateSettings();
 		}
 
@@ -371,7 +373,7 @@ namespace RhuEngine
 						var textpos = Matrix.T(Vector3f.Forward * 0.5f) * (EngineLink.CanInput ? headMat : Matrix.S(1));
 						var playerPos = RRenderer.CameraRoot.Translation;
 						_loadingPos += playerPos - _oldPlayerPos;
-						_loadingPos += (textpos.Translation - _loadingPos) * Math.Min(RTime.Elapsedf * 5f, 1);
+						_loadingPos += (Vector3f)(((Vector3d)textpos.Translation - (Vector3d)_loadingPos) * Math.Min(RTime.Elapsed * 5, 1));
 						_oldPlayerPos = playerPos;
 						var rootMatrix = Matrix.TR(_loadingPos, Quaternionf.LookAt(EngineLink.CanInput ? headMat.Translation : Vector3f.Zero, _loadingPos));
 						if (StartingText is not null) {

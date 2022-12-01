@@ -49,9 +49,7 @@
 			Target.Link(this);
 		}
 		private void Unlink() {
-			if (_linked != null) {
-				_linked.KillLink();
-			}
+			_linked?.KillLink();
 		}
 
 		public override void Dispose() {

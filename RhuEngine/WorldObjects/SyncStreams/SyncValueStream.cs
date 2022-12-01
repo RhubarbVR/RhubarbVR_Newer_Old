@@ -107,5 +107,10 @@ namespace RhuEngine.WorldObjects
 		public void SetValue(object data) {
 			Value = (T)data;
 		}
+
+		public override void Dispose() {
+			Changed = null;
+			base.Dispose();
+		}
 	}
 }

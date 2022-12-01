@@ -73,9 +73,9 @@ namespace RhuEngine.Components
 					_targetRotation = HeadRot;
 				}
 			}
-			var pos = Vector3f.Lerp(Entity.GlobalTrans.Translation, _targetPosition, (float)(RTime.Elapsedf * positionSpeed.Value));
+			var pos = Vector3f.Lerp(Entity.GlobalTrans.Translation, _targetPosition, (float)(RTime.Elapsed * positionSpeed.Value));
 			var rot = Quaternionf.CreateFromEuler(0f, 0f, 0f);
-			rot.SetToSlerp(Entity.GlobalTrans.Rotation, _targetRotation, (float)RTime.Elapsedf * rotationSpeed.Value);
+			rot.SetToSlerp(Entity.GlobalTrans.Rotation, _targetRotation, (float)RTime.Elapsed * rotationSpeed.Value);
 			Entity.GlobalTrans = Matrix.S(1f) * Matrix.R(rot) * Matrix.T(pos);
 		}
 

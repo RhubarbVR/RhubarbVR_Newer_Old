@@ -218,7 +218,7 @@ namespace RhuEngine.Components
 			WorldManager.PrivateSpaceManager = this;
 		}
 
-		private float _contextMenuHoldTime = 0f;
+		private double _contextMenuHoldTime = 0;
 		private bool _updateDashState;
 		private Handed _contextHand;
 
@@ -254,7 +254,7 @@ namespace RhuEngine.Components
 				}
 			}
 			if (InputManager.GetInputAction(InputTypes.ContextMenu).Activated() && !Engine.HasKeyboard) {
-				_contextMenuHoldTime += RTime.Elapsedf;
+				_contextMenuHoldTime += RTime.Elapsed;
 			}
 			if (InputManager.GetInputAction(InputTypes.ContextMenu).JustDeActivated() && !_updateDashState) {
 				_contextMenuHoldTime = 0;

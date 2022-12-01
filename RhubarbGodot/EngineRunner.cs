@@ -131,7 +131,7 @@ public partial class EngineRunner : Node3D, IRTime
 
 	private bool IsDisposeing { set; get; }
 
-	public float Elapsedf => (float)GetProcessDeltaTime();
+	public double Elapsed => GetProcessDeltaTime();
 
 	public Vector2f MouseDelta { get; internal set; }
 	public Vector2f MousePos { get; internal set; }

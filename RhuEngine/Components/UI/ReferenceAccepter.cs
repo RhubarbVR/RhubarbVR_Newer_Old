@@ -113,8 +113,8 @@ namespace RhuEngine.Components.UI
 		}
 
 		public override void Dispose() {
-			base.Dispose();
 			PrivateSpaceManager.OnUpdateHolderReferen -= PrivateSpaceManager_OnUpdateHolderReferen;
+			base.Dispose();
 		}
 
 		private void PrivateSpaceManager_OnUpdateHolderReferen() {

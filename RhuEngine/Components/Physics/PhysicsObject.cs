@@ -68,9 +68,9 @@ namespace RhuEngine.Components
 		}
 
 		public override void Dispose() {
-			base.Dispose();
 			Entity.GlobalTransformChange -= Entity_GlobalTransformChange;
 			Entity.enabled.Changed -= Enabled_Changed;
+			base.Dispose();
 		}
 		private void Entity_GlobalTransformChange(Entity obj,bool isStandaredMove) {
 			if (!isStandaredMove) {

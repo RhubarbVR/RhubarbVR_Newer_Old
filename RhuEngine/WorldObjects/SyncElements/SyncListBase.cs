@@ -23,7 +23,7 @@ namespace RhuEngine.WorldObjects
 	}
 	public abstract class SyncListBase<T> : SyncObject, ISyncList, INetworkedObject, IEnumerable<ISyncObject>, IChangeable, ISyncMember where T : ISyncObject
 	{
-		private readonly SynchronizedCollection<T> _syncObjects = new(5);
+		private readonly List<T> _syncObjects = new(5);
 
 		public event Action<IChangeable> ChildChanged;
 
@@ -63,7 +63,7 @@ namespace RhuEngine.WorldObjects
 
 		public bool NoSync { get; set; }
 
-		public object Lock => _syncObjects.SyncRoot;
+		public object Lock => _syncObjects;
 
 		public void DisposeAtIndex(int index) {
 			_syncObjects[index].Dispose();
@@ -91,7 +91,7 @@ namespace RhuEngine.WorldObjects
 				var offset = (IChangeable)newElement;
 				offset.Changed += UpdateChildChanged;
 			}
-			lock (_syncObjects.SyncRoot) {
+			lock (_syncObjects) {
 				var hasAdded = false;
 				for (var i = 0; i < _syncObjects.Count; i++) {
 					var elementOffset = 0;
@@ -119,8 +119,10 @@ namespace RhuEngine.WorldObjects
 		}
 
 		private void FixAllNames() {
-			for (var i = 0; i < Count; i++) {
-				_syncObjects[i].ChangeName(i.ToString());
+			lock (_syncObjects) {
+				for (var i = 0; i < Count; i++) {
+					_syncObjects[i].ChangeName(i.ToString());
+				}
 			}
 		}
 
@@ -141,7 +143,7 @@ namespace RhuEngine.WorldObjects
 				var offset = (IChangeable)value;
 				offset.Changed -= UpdateChildChanged;
 			}
-			lock (_syncObjects.SyncRoot) {
+			lock (_syncObjects) {
 				_syncObjects.Remove(value);
 				FixAllNames();
 			}
@@ -154,14 +156,16 @@ namespace RhuEngine.WorldObjects
 			if (IsRemoved) {
 				return;
 			}
-			var newOrder = from e in _syncObjects.AsParallel()
-						   orderby (typeof(IOffsetableElement).IsAssignableFrom(e.GetType()) ? ((IOffsetableElement)e).Offset : 0) ascending
-						   select e;
-			var index = 0;
-			foreach (var item in newOrder) {
-				item.ChangeName(index.ToString());
-				_syncObjects.Remove(item);
-				_syncObjects.Insert(index, item);
+			lock (_syncObjects) {
+				var newOrder = from e in _syncObjects.AsParallel()
+							   orderby (typeof(IOffsetableElement).IsAssignableFrom(e.GetType()) ? ((IOffsetableElement)e).Offset : 0) ascending
+							   select e;
+				var index = 0;
+				foreach (var item in newOrder) {
+					item.ChangeName(index.ToString());
+					_syncObjects.Remove(item);
+					_syncObjects.Insert(index, item);
+				}
 			}
 			Changed?.Invoke(this);
 			OnReorderList?.Invoke();
@@ -213,10 +217,13 @@ namespace RhuEngine.WorldObjects
 					objecte.Destroy();
 					break;
 				case 3:
-					foreach (var item in _syncObjects) {
-						item.Dispose();
+					lock (_syncObjects) {
+						var startAmount = _syncObjects.Count;
+						for (var i = 0; i < startAmount; i++) {
+							_syncObjects[0].IsDestroying = true;
+							_syncObjects[0].Dispose();
+						}
 					}
-					_syncObjects.Clear();
 					break;
 				default:
 					break;
@@ -234,10 +241,8 @@ namespace RhuEngine.WorldObjects
 		}
 
 		IEnumerator<ISyncObject> IEnumerable<ISyncObject>.GetEnumerator() {
-			lock (_syncObjects.SyncRoot) {
-				for (var i = 0; i < _syncObjects.Count; i++) {
-					yield return _syncObjects[i];
-				}
+			for (var i = 0; i < _syncObjects.Count; i++) {
+				yield return _syncObjects[i];
 			}
 		}
 
@@ -245,12 +250,21 @@ namespace RhuEngine.WorldObjects
 			return ((IEnumerable<IWorldObject>)this).GetEnumerator();
 		}
 		public override void Dispose() {
-			base.Dispose();
-			for (var i = 0; i < _syncObjects.Count; i++) {
-				_syncObjects[i].IsDestroying = true;
-				_syncObjects[i].Dispose();
+			IsDestroying = true;
+			lock (_syncObjects) {
+				var startAmount = _syncObjects.Count;
+				Changed = null;
+				ChildChanged = null;
+				for (var i = 0; i < startAmount; i++) {
+					_syncObjects[0].IsDestroying = true;
+					_syncObjects[0].Dispose();
+				}
+				if (_syncObjects.Count != 0) {
+					RLog.Err($"Sync object list {Pointer} did not remove all data so might ram leak");
+					_syncObjects.Clear();
+				}
 			}
-			_syncObjects.Clear();
+			base.Dispose();
 		}
 
 	}

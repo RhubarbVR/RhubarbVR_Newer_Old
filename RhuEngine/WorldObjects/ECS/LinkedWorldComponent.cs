@@ -42,8 +42,10 @@ namespace RhuEngine.WorldObjects.ECS
 				}
 				WorldLink = (IWorldLink)Activator.CreateInstance(linker);
 				WorldLink.LinkCompGen = this;
-				WorldLink.Init();
-				World_FoucusChanged();
+				if(!(IsRemoved || IsDestroying)) { 
+					WorldLink.Init();
+					World_FoucusChanged();
+				}
 			});
 		}
 		protected override void OnLoaded() {
@@ -62,7 +64,7 @@ namespace RhuEngine.WorldObjects.ECS
 				WorldLink?.Stopped();
 			}
 			else {
-				if (Entity.IsEnabled && Enabled.Value) {
+				if (Entity.IsEnabled && (Enabled?.Value??false)) {
 					WorldLink?.Started();
 				}
 				else {
@@ -85,11 +87,16 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		public override void Dispose() {
-			World.FoucusChanged -= World_FoucusChanged;
-			if (AddToUpdateList) {
-				World.UnregisterWorldLinkObject(this);
-			}
-			WorldLink?.Remove();
+			var savedWorldLink = WorldLink;
+			var savedWorld = World;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				savedWorld.FoucusChanged -= World_FoucusChanged;
+				if (AddToUpdateList) {
+					savedWorld.UnregisterWorldLinkObject(this);
+				}
+				savedWorldLink?.CleanUp();
+				WorldLink = null;
+			});
 			base.Dispose();
 		}
 

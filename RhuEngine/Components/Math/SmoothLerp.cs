@@ -27,13 +27,13 @@ namespace RhuEngine.Components
 			if (driver.Linked) {
 				try {
 					if (typeof(T) == typeof(Quaternionf)) {
-						driver.LinkedValue = Quaternionf.Slerp((dynamic)driver.LinkedValue, (dynamic)to.Value, (float)Multiply.Value * RTime.Elapsedf);
+						driver.LinkedValue = Quaternionf.Slerp((dynamic)driver.LinkedValue, (dynamic)to.Value, (float)(Multiply.Value * RTime.Elapsed));
 					}
 					else if (typeof(T) == typeof(Quaterniond)) {
-						driver.LinkedValue = Quaterniond.Slerp((dynamic)driver.LinkedValue, (dynamic)to.Value, Multiply.Value * RTime.Elapsedf);
+						driver.LinkedValue = Quaterniond.Slerp((dynamic)driver.LinkedValue, (dynamic)to.Value, Multiply.Value * RTime.Elapsed);
 					}
 					else {
-						driver.LinkedValue = MathUtil.DynamicLerp(driver.LinkedValue, to.Value, Multiply.Value * RTime.Elapsedf);
+						driver.LinkedValue = MathUtil.DynamicLerp(driver.LinkedValue, to.Value, Multiply.Value * RTime.Elapsed);
 					}
 				}
 				catch {

@@ -61,17 +61,20 @@ namespace RBullet
 				callback1.Invoke(cp.PositionWorldOnA, cp.PositionWorldOnB, cp.NormalWorldOnB, cp.Distance, cp.Distance1, (BRigidBodyCollider)colObj1Wrap.CollisionObject.UserObject);
 				return 0;
 			}
+
 		}
 
 		public void RunCallBacks() {
 			Updates.SafeOperation((list) => {
 				foreach (var item in list) {
 					if (item.collisionObject != null) {
-						_physicsWorld.ContactTest(item.collisionObject, new Tester((Vector3 PositionWorldOnA, Vector3 PositionWorldOnB, Vector3 NormalWorldOnB, double Distance, double Distance1, BRigidBodyCollider hit) => {
+						using (var test = new Tester((Vector3 PositionWorldOnA, Vector3 PositionWorldOnB, Vector3 NormalWorldOnB, double Distance, double Distance1, BRigidBodyCollider hit) => {
 							item.Call(new Vector3f((float)PositionWorldOnA.X, (float)PositionWorldOnA.Y, (float)PositionWorldOnA.Z),
 								new Vector3f((float)PositionWorldOnB.X, (float)PositionWorldOnB.Y, (float)PositionWorldOnB.Z),
 								new Vector3f((float)NormalWorldOnB.X, (float)NormalWorldOnB.Y, (float)NormalWorldOnB.Z), Distance, Distance1, hit.Collider);
-						}));
+						})) {
+							_physicsWorld.ContactTest(item.collisionObject, test);
+						}
 					}
 				}
 			});
@@ -104,6 +107,7 @@ namespace RBullet
 			}
 			HitPointWorld = new Vector3f(callback.HitPointWorld.X, callback.HitPointWorld.Y, callback.HitPointWorld.Z);
 			HitNormalWorld = new Vector3f(callback.HitNormalWorld.X, callback.HitNormalWorld.Y, callback.HitNormalWorld.Z);
+			callback.Dispose();
 			return callback.HasHit;
 		}
 
@@ -133,11 +137,13 @@ namespace RBullet
 			}
 			HitPointWorld = new Vector3f(callback.HitPointWorld.X, callback.HitPointWorld.Y, callback.HitPointWorld.Z);
 			HitNormalWorld = new Vector3f(callback.HitNormalWorld.X, callback.HitNormalWorld.Y, callback.HitNormalWorld.Z);
-			return callback.HasHit;
+			var hasHit = callback.HasHit;
+			callback.Dispose();
+			return hasHit;
 		}
 
-		public void UpdateSim(object obj,float DeltaSeconds) {
-			((BPhysicsSim)obj)._physicsWorld.StepSimulation(DeltaSeconds);
+		public void UpdateSim(object obj,double DeltaSeconds) {
+			((BPhysicsSim)obj)._physicsWorld.StepSimulation((float)DeltaSeconds);
 			((BPhysicsSim)obj)._physicsWorld.ComputeOverlappingPairs();
 			((BPhysicsSim)obj).RunCallBacks();
 		}

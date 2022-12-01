@@ -66,8 +66,8 @@ namespace RhuEngine.Components
 				min += windSize * new Vector2f(0, 1);
 			}
 			if (!(_moveWindow || _resizeWindow)) {
-				WindowVRElement.MaxOffset.Value = new Vector2i(max.x, -min.y) + new Vector2i(5);
-				WindowVRElement.MinOffset.Value = new Vector2i(min.x, -max.y) - new Vector2i(5);
+				WindowVRElement.MaxOffset.Value = new Vector2i(max.x, -min.y) + new Vector2i(15);
+				WindowVRElement.MinOffset.Value = new Vector2i(min.x, -max.y) - new Vector2i(15);
 				if (WindowVRElement.Min.Value + WindowVRElement.Max.Value != new Vector2f(0, 2)) {
 					WindowVRElement.Min.Value = WindowVRElement.Max.Value = new Vector2f(0, 1);
 				}
@@ -89,6 +89,9 @@ namespace RhuEngine.Components
 			if (RootElement is null) {
 				return;
 			}
+			if (CloseButton is not null) {
+				CloseButton.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.CloseThing", Window?.WindowTitle);
+			}
 			Label.Text.Value = Window?.WindowTitle;
 			CloseButton.Entity.enabled.Value = Window?.CanClose ?? false;
 		}
@@ -101,6 +104,7 @@ namespace RhuEngine.Components
 		public UIElement TopElement { get; set; }
 
 		public RawAssetProvider<RTexture2D> Clapse { get; set; }
+		public Button Clapse_Button { get; set; }
 
 		public bool Collapse
 		{
@@ -115,9 +119,11 @@ namespace RhuEngine.Components
 				TopElement.Entity.enabled.Value = value;
 				if (NotCollapse) {
 					Clapse.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Collapse));
+					Clapse_Button.ToolTipText.Value = Engine.localisationManager.GetLocalString("Window.Collapses");
 				}
 				else {
 					Clapse.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Uncollapse));
+					Clapse_Button.ToolTipText.Value = Engine.localisationManager.GetLocalString("Window.Expand");
 				}
 				UpdateVRPos();
 			}
@@ -197,12 +203,17 @@ namespace RhuEngine.Components
 				buton.Pressed.Target = action;
 				return (buton, texture);
 			}
-			var buton = elements.Entity.AddChild("Resize").AttachComponent<ButtonBase>();
+
+			var buton = elements.Entity.AddChild("Resize").AttachComponent<Button>();
 			buton.CursorShape.Value = RCursorShape.Bdiagsize;
 			ResizeButon = buton;
 			buton.MinSize.Value = new Vector2i(37, 0);
 			buton.ButtonDown.Target = ResizeDown;
 			buton.ButtonUp.Target = ResizeUp;
+			var butonlocal = buton.Entity.AttachComponent<StandardLocale>();
+			butonlocal.TargetValue.Target = buton.ToolTipText;
+			butonlocal.Key.Value = "Window.Rescale";
+
 
 			MoveButon = elements.Entity.AddChild("MoveWindow").AttachComponent<ButtonBase>();
 			MoveButon.CursorShape.Value = RCursorShape.Move;
@@ -219,9 +230,22 @@ namespace RhuEngine.Components
 			Label.HorizontalAlignment.Value = RHorizontalAlignment.Center;
 			Label.VerticalAlignment.Value = RVerticalAlignment.Center;
 
-			AddButton("PopOut", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Share), Popout);
-			Clapse = AddButton("Clapse", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Collapse), ClapseToggle).Item2;
-			AddButton("Minimize", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Minimize), MinimizeWindow);
+			var popout = AddButton("PopOut", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Share), Popout);
+			var local = popout.Item1.Entity.AttachComponent<StandardLocale>();
+			local.TargetValue.Target = popout.Item1.ToolTipText;
+			local.Key.Value = "Window.PopOutSystemWindow";
+
+			var clap = AddButton("Clapse", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Collapse), ClapseToggle);
+			Clapse = clap.Item2;
+			Clapse_Button = clap.Item1;
+			Clapse_Button.ToolTipText.Value = Engine.localisationManager.GetLocalString("Window.Collapses");
+
+			var min = AddButton("Minimize", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Minimize), MinimizeWindow);
+			var minlocal = min.Item1.Entity.AttachComponent<StandardLocale>();
+			minlocal.TargetValue.Target = min.Item1.ToolTipText;
+			minlocal.Key.Value = "Window.Minimize";
+
+
 			CloseButton = AddButton("Close", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Close), CloseWindow).Item1;
 			OnMinimize?.Invoke();
 			UpdateVRPos();
@@ -315,10 +339,10 @@ namespace RhuEngine.Components
 		}
 
 		public override void Dispose() {
-			base.Dispose();
 			PrivateSpaceTaskbarItem?.WindowClosed();
 			RootElement?.Entity?.Destroy();
 			WindowVRElement?.Entity?.Destroy();
+			base.Dispose();
 		}
 
 		private void LoadTaskBarItem() {

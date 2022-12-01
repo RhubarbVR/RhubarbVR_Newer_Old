@@ -8,11 +8,16 @@ namespace RhuEngine.Settings
 {
 	public class NullRenderSettingsBase : RenderSettingsBase
 	{
+		public override bool RenderSettingsUpdate() {
+			return false;
+		}
 	}
 
 	public abstract class RenderSettingsBase:SettingsObject
 	{
+		public RenderSettingsBase() {
+		}
 
-		public Action RenderSettingsChange;
+		public abstract bool RenderSettingsUpdate();
 	}
 }

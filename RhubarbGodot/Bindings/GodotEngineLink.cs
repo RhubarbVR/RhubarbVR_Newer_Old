@@ -16,6 +16,8 @@ using RhuEngine.Linker;
 using RhuEngine.Managers;
 using RhuEngine.Settings;
 
+using RhuSettings;
+
 using RNumerics;
 
 using Engine = RhuEngine.Engine;
@@ -24,6 +26,32 @@ namespace RhubarbVR.Bindings
 {
 	public class GodotRenderSettings : RenderSettingsBase
 	{
+		public enum VsyncMode {
+			Disabled,
+			Enabled,
+			Adaptive,
+			Mailbox,
+		}
+
+		[SettingsField("VSync")]
+		public VsyncMode VSync = VsyncMode.Enabled;
+
+		[SettingsField("MaxFrameRate")]
+		public int MaxFrameRate = 500;
+
+		public override bool RenderSettingsUpdate() {
+			Godot.Engine.MaxFps = MaxFrameRate;
+			var oldValue = (int)Godot.ProjectSettings.GetSetting("display/window/vsync/vsync_mode");
+			if ((int)VSync != oldValue) {
+				Godot.ProjectSettings.SetSetting("display/window/vsync/vsync_mode", (int)VSync);
+				Godot.ProjectSettings.Save();
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
 	}
 
 

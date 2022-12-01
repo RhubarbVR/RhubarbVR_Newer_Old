@@ -17,7 +17,8 @@ namespace RhuEngine.WorldObjects
 {
 	public delegate NetPointer NetPointerUpdateDelegate();
 
-	public abstract class SyncObject : ISyncObject {
+	public abstract class SyncObject : ISyncObject
+	{
 		private readonly HashSet<IDisposable> _disposables = new();
 
 		public void AddDisposable(IDisposable disposable) {
@@ -94,10 +95,11 @@ namespace RhuEngine.WorldObjects
 			if (IsRemoved) {
 				return;
 			}
-			OnDispose?.Invoke(this);
 			IsRemoved = true;
-			if (typeof(IGlobalStepable).IsAssignableFrom(GetType())) {
-				World.UnregisterGlobalStepable((IGlobalStepable)this);
+			IsDestroying = true;
+			OnDispose?.Invoke(this);
+			if (this is IGlobalStepable global) {
+				World.UnregisterGlobalStepable(global);
 			}
 			foreach (var item in _disposables.ToArray()) {
 				if (item is SyncObject @object) {
@@ -106,6 +108,8 @@ namespace RhuEngine.WorldObjects
 				item?.Dispose();
 			}
 			World?.UnRegisterWorldObject(this);
+			OnDispose = null;
+			ClearAllSyncMembers();
 		}
 
 		protected virtual void FirstCreation() {
@@ -181,7 +185,8 @@ namespace RhuEngine.WorldObjects
 					if (!deserialize) {
 						OnLoaded();
 					}
-				}catch(Exception ex) {
+				}
+				catch (Exception ex) {
 					throw new Exception("Failed to load", ex);
 				}
 				if (typeof(IGlobalStepable).IsAssignableFrom(GetType())) {
@@ -205,6 +210,14 @@ namespace RhuEngine.WorldObjects
 		protected virtual void OnSave() {
 		}
 
+		protected virtual void ClearAllSyncMembers() {
+			var data = GetType().GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+			foreach (var item in data) {
+				if (typeof(SyncObject).IsAssignableFrom(item.FieldType)) {
+					item.SetValue(this, null);
+				}
+			}
+		}
 
 		protected virtual void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer) {
 			try {

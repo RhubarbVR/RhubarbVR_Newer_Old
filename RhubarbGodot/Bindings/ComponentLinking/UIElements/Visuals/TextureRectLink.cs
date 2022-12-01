@@ -33,10 +33,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Texture_LoadChange(RTexture2D obj) {
-			if (node is null) {
-				return;
-			}
-			node.Texture = LinkedComp.Texture.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			node.Texture = LinkedComp.Texture?.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
 		}
 
 		private void FlipHorizontal_Changed(IChangeable obj) {

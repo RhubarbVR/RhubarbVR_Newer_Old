@@ -6,11 +6,11 @@ namespace RhuEngine.Linker
 {
 	public interface IRTime
 	{
-		public float Elapsedf { get; }
+		public double Elapsed { get; }
 	}
 	public class RTime
 	{
 		public static IRTime Instance { get; set; }
-		public static float Elapsedf => Instance.Elapsedf;
+		public static double Elapsed => Instance.Elapsed;
 	}
 }

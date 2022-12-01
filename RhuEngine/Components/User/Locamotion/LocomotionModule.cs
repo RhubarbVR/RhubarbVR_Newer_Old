@@ -17,23 +17,23 @@ namespace RhuEngine.Components
 
 		public float MoveSpeed => Engine.inputManager.GetInputAction(InputTypes.MoveSpeed).RawValue();
 
-		public float Jump => Engine.inputManager.GetInputAction(InputTypes.Jump).RawValue() * RTime.Elapsedf;
+		public float Jump => (float)(Engine.inputManager.GetInputAction(InputTypes.Jump).RawValue() * RTime.Elapsed);
 
-		public float Forward => Engine.inputManager.GetInputAction(InputTypes.Forward).RawValue() * RTime.Elapsedf;
+		public float Forward => (float)(Engine.inputManager.GetInputAction(InputTypes.Forward).RawValue() * RTime.Elapsed);
 
-		public float Back => Engine.inputManager.GetInputAction(InputTypes.Back).RawValue() * RTime.Elapsedf;
+		public float Back => (float)(Engine.inputManager.GetInputAction(InputTypes.Back).RawValue() * RTime.Elapsed);
 
-		public float Right => Engine.inputManager.GetInputAction(InputTypes.Right).RawValue() * RTime.Elapsedf;
+		public float Right => (float)(Engine.inputManager.GetInputAction(InputTypes.Right).RawValue() * RTime.Elapsed);
 
-		public float Left => Engine.inputManager.GetInputAction(InputTypes.Left).RawValue() * RTime.Elapsedf;
+		public float Left => (float)(Engine.inputManager.GetInputAction(InputTypes.Left).RawValue() * RTime.Elapsed);
 
-		public float FlyDown => Engine.inputManager.GetInputAction(InputTypes.FlyDown).RawValue() * RTime.Elapsedf;
+		public float FlyDown => (float)(Engine.inputManager.GetInputAction(InputTypes.FlyDown).RawValue() * RTime.Elapsed);
 
-		public float FlyUp => Engine.inputManager.GetInputAction(InputTypes.FlyUp).RawValue() * RTime.Elapsedf;
+		public float FlyUp => (float)(Engine.inputManager.GetInputAction(InputTypes.FlyUp).RawValue() * RTime.Elapsed);
 
-		public float RotateLeft => Engine.inputManager.GetInputAction(InputTypes.RotateLeft).RawValue() * RTime.Elapsedf;
+		public float RotateLeft => (float)(Engine.inputManager.GetInputAction(InputTypes.RotateLeft).RawValue() * RTime.Elapsed);
 
-		public float RotateRight => Engine.inputManager.GetInputAction(InputTypes.RotateRight).RawValue() * RTime.Elapsedf;
+		public float RotateRight => (float)(Engine.inputManager.GetInputAction(InputTypes.RotateRight).RawValue() * RTime.Elapsed);
 
 		public Entity UserRootEnity => World.GetLocalUser()?.userRoot.Target?.Entity;
 		public UserRoot UserRoot => World.GetLocalUser()?.userRoot.Target;

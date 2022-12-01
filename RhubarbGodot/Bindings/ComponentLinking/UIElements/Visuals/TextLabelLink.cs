@@ -69,30 +69,18 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Text_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.Text = LinkedComp.Text.Value;
 		}
 
 		private void Font_LoadChange(RFont obj) {
-			if (node is null) {
-				return;
-			}
-			node.LabelSettings.Font = LinkedComp.Font.Asset?.Inst is GodotFont font ? (font?.FontFile) : null;
+			node.LabelSettings.Font = LinkedComp.Font?.Asset?.Inst is GodotFont font ? (font?.FontFile) : null;
 		}
 
 		private void Language_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.Language = LinkedComp.Language.Value;
 		}
 
 		private void TextDir_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.TextDirection = LinkedComp.TextDir.Value switch {
 				RTextDirection.Auto => TextDirection.Auto,
 				RTextDirection.Ltr => TextDirection.Ltr,
@@ -102,16 +90,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void VisibleRatio_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.VisibleRatio = LinkedComp.VisibleRatio.Value;
 		}
 
 		private void VisibleCharactersBehavior_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.VisibleCharactersBehavior = LinkedComp.VisibleCharactersBehavior.Value switch {
 				RhuEngine.Components.RVisibleCharactersBehavior.CharactersBeforeShaping => VisibleCharactersBehavior.CharsBeforeShaping,
 				RhuEngine.Components.RVisibleCharactersBehavior.CharactersAfterShaping => VisibleCharactersBehavior.CharsAfterShaping,
@@ -122,30 +104,18 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void MaxLinesVisible_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.MaxLinesVisible = LinkedComp.MaxLinesVisible.Value;
 		}
 
 		private void LinesSkipped_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.LinesSkipped = LinkedComp.LinesSkipped.Value;
 		}
 
 		private void Uppercase_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.Uppercase = LinkedComp.Uppercase.Value;
 		}
 
 		private void OverrunBehavior_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.TextOverrunBehavior = LinkedComp.OverrunBehavior.Value switch {
 				ROverrunBehavior.TrimChar => OverrunBehavior.TrimChar,
 				ROverrunBehavior.TrimWord => OverrunBehavior.TrimWord,
@@ -156,16 +126,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void ClipText_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.ClipText = LinkedComp.ClipText.Value;
 		}
 
 		private void AutowrapMode_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.AutowrapMode = LinkedComp.AutowrapMode.Value switch {
 				RAutowrapMode.Arbitrary => AutowrapMode.Arbitrary,
 				RAutowrapMode.Word => AutowrapMode.Word,
@@ -175,9 +139,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void VerticalAlignment_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.VerticalAlignment = LinkedComp.VerticalAlignment.Value switch {
 				RVerticalAlignment.Top => VerticalAlignment.Top,
 				RVerticalAlignment.Center => VerticalAlignment.Center,
@@ -187,9 +148,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void HorizontalAlignment_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.HorizontalAlignment = LinkedComp.HorizontalAlignment.Value switch {
 				RHorizontalAlignment.Left => HorizontalAlignment.Left,
 				RHorizontalAlignment.Center => HorizontalAlignment.Center,
@@ -199,58 +157,34 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void ShadowOffset_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.LabelSettings.ShadowOffset = new Vector2(LinkedComp.ShadowOffset.Value.x, LinkedComp.ShadowOffset.Value.y);
 		}
 
 		private void ShadowColor_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.LabelSettings.ShadowColor = new Color(LinkedComp.ShadowColor.Value.r, LinkedComp.ShadowColor.Value.g, LinkedComp.ShadowColor.Value.b, LinkedComp.ShadowColor.Value.a);
 		}
 
 		private void ShadowSize_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.LabelSettings.ShadowSize = LinkedComp.ShadowSize.Value;
 		}
 
 		private void OutlineColor_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.LabelSettings.OutlineColor = new Color(LinkedComp.OutlineColor.Value.r, LinkedComp.OutlineColor.Value.g, LinkedComp.OutlineColor.Value.b, LinkedComp.OutlineColor.Value.a);
 		}
 
 		private void OutlineSize_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.LabelSettings.OutlineSize = LinkedComp.OutlineSize.Value;
 		}
 
 		private void TextColor_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.LabelSettings.FontColor = new Color(LinkedComp.TextColor.Value.r, LinkedComp.TextColor.Value.g, LinkedComp.TextColor.Value.b, LinkedComp.TextColor.Value.a);
 		}
 
 		private void TextSize_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.LabelSettings.FontSize = LinkedComp.TextSize.Value;
 		}
 
 		private void LineSpacing_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.LabelSettings.LineSpacing = LinkedComp.LineSpacing.Value;
 		}
 	}

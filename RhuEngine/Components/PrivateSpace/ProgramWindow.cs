@@ -66,9 +66,9 @@ namespace RhuEngine.Components
 		}
 
 		public override void Dispose() {
-			base.Dispose();
 			OnClosedWindow?.Invoke();
 			ProgramManager.UnLoadProgramWindow(this);
+			base.Dispose();
 		}
 
 		public void Maximize() {

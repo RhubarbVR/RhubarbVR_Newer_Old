@@ -107,11 +107,14 @@
     "Common.Worlds": "Worlds",
     "Common.Contacts": "Acquaintances",
     "Common.Sessions": "Sessions",
+    "Common.ExitSession": "Exit Session",
     "Common.Exit": "Exit",
     "Common.Logout": "Logout",
     "Common.Refresh": "refresh",
     "Common.Refreshing": "Refreshing..",
     "Common.CustomStatus": "Custom Status",
+    "Common.ExitRhubarbVR": "Exit RhubarbVR",
+    "Common.CloseThing": "Close {0}",
 
     "Fact.Month1.Day16": "Jan 16th is Appreciate a Dragon Day",
     "Fact.Month2.Day13": "Feb 13th is World Radio Day",
@@ -205,6 +208,12 @@
     "Editor.RemoveComponent": "Remove Component",
     "Editor.Components": "Components",
 
+    "Window.Collapses": "Collapses",
+    "Window.Expand": "Expand",
+    "Window.Minimize": "Minimize",
+    "Window.PopOutSystemWindow": "Pop Out",
+    "Window.Rescale": "Rescale",
+
     "Programs.Offline.Name": "Offline",
     "Programs.Offline.GoOnline": "Go Online",
 
@@ -269,6 +278,7 @@
     "Programs.FileExplorer.ThisPC": "This PC",
     "Programs.FileExplorer.Name": "File Explorer",
     "Programs.FileExplorer.Path": "Path",
+    "Programs.CreateNewWorld.NewSession.Name": "Create New Session",
     "Programs.CreateNewWorld.Name": "Create New World",
     "Programs.Terminal.Name": "Terminal",
     "Actions.ChangeVR.Enable": "Enter VR",
@@ -288,6 +298,8 @@
     "Status.DoNotDisturb": "DoNotDisturb",
     "Status.Stream": "Stream",
     "Status.Offline": "Offline",
+
+    "ToolTips.StartMenu": "Start",
 
     "Free.Of": "{0} free of {1}",
     "Messaging.CreateDm": "Create DM",

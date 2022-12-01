@@ -76,9 +76,9 @@ namespace RNumerics
 			w = 1;
 			SetFromRotationMatrix(mat);
 		}
-		[Exposed,IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Quaterniond Zero = new(0.0, 0.0, 0.0, 0.0);
-		[Exposed,IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Quaterniond Identity = new(0.0, 0.0, 0.0, 1.0);
 
 		public double this[in int key]
@@ -407,8 +407,14 @@ namespace RNumerics
 
 
 		// [TODO] should we be normalizing in these casts??
-		public static implicit operator Quaterniond(in Quaternionf q) => new(q.x, q.y, q.z, q.w);
-		public static explicit operator Quaternionf(in Quaterniond q) => new((float)q.x, (float)q.y, (float)q.z, (float)q.w);
+		public static implicit operator Quaterniond(in Quaternionf q) {
+			q.Normalize();
+			return new Quaterniond(q.x, q.y, q.z, q.w);
+		}
+		public static explicit operator Quaternionf(in Quaterniond q) {
+			q.Normalize();
+			return new Quaternionf((float)q.x, (float)q.y, (float)q.z, (float)q.w);
+		}
 
 
 		public override string ToString() {
@@ -417,5 +423,44 @@ namespace RNumerics
 		public string ToString(in string fmt) {
 			return string.Format("{0} {1} {2} {3}", x.ToString(fmt), y.ToString(fmt), z.ToString(fmt), w.ToString(fmt));
 		}
+
+		public static Quaterniond CreateFromEuler(in double yaw, in double pitch, in double roll) {
+			return CreateFromYawPitchRoll(MathUtil.DEG_2_RAD * yaw, MathUtil.DEG_2_RAD * pitch, MathUtil.DEG_2_RAD * roll);
+		}
+
+		/// <summary>
+		/// Creates a new Quaternion from the given yaw, pitch, and roll, in radians.
+		/// </summary>
+		/// <param name="yaw">The yaw angle, in radians, around the Y-axis.</param>
+		/// <param name="pitch">The pitch angle, in radians, around the X-axis.</param>
+		/// <param name="roll">The roll angle, in radians, around the Z-axis.</param>
+		/// <returns></returns>
+		public static Quaterniond CreateFromYawPitchRoll(in double yaw, in double pitch, in double roll) {
+			//  Roll first, about axis the object is facing, then
+			//  pitch upward, then yaw to face into the new heading
+			double sr, cr, sp, cp, sy, cy;
+
+			var halfRoll = roll * 0.5f;
+			sr = Math.Sin(halfRoll);
+			cr = Math.Cos(halfRoll);
+
+			var halfPitch = pitch * 0.5f;
+			sp = Math.Sin(halfPitch);
+			cp = Math.Cos(halfPitch);
+
+			var halfYaw = yaw * 0.5f;
+			sy = Math.Sin(halfYaw);
+			cy = Math.Cos(halfYaw);
+
+			Quaterniond result;
+
+			result.x = (cy * sp * cr) + (sy * cp * sr);
+			result.y = (sy * cp * cr) - (cy * sp * sr);
+			result.z = (cy * cp * sr) - (sy * sp * cr);
+			result.w = (cy * cp * cr) + (sy * sp * sr);
+
+			return result;
+		}
+
 	}
 }

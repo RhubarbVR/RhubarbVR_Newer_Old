@@ -359,9 +359,9 @@ namespace RhuEngine.Components
 		}
 
 		public override void Dispose() {
-			base.Dispose();
 			_material?.Dispose();
 			_material = null;
+			base.Dispose();
 		}
 
 		protected override void OnLoaded() {

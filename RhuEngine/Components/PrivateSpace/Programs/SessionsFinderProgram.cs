@@ -28,7 +28,7 @@ namespace RhuEngine.Components
 	{
 		public override RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.Worlds;
 
-		public override string ProgramNameLocName => "Programs.CreateNewWorld.Name";
+		public override string ProgramNameLocName => "Programs.SessionsFinder.Name";
 
 		public override void StartProgram(Stream file = null, string mimetype = null, string ex = null, params object[] args) {
 			AddWindow();

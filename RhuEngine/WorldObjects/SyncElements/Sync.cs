@@ -242,7 +242,7 @@ namespace RhuEngine.WorldObjects
 		public virtual T StartingValue => default;
 
 		public void KillLink() {
-			linkedFromObj.RemoveLinkLocation();
+			linkedFromObj?.RemoveLinkLocation();
 			IsLinkedTo = false;
 		}
 
@@ -279,5 +279,10 @@ namespace RhuEngine.WorldObjects
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static implicit operator T(Sync<T> data) => data.Value;
+
+		public override void Dispose() {
+			Changed = null;
+			base.Dispose();
+		}
 	}
 }

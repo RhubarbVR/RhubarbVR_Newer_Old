@@ -46,10 +46,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Icon_LoadChange(RTexture2D obj) {
-			if(node is null) {
-				return;
-			}
-			node.Icon = LinkedComp.Icon.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			node.Icon = LinkedComp.Icon?.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
 		}
 
 		private void Language_Changed(IChangeable obj) {

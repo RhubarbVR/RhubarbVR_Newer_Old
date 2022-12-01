@@ -122,6 +122,9 @@ namespace RhuEngine.WorldObjects
 			PrivateOverlay
 		}
 
+		internal FocusLevel _startFocus = FocusLevel.Background;
+
+
 		private FocusLevel _focus = FocusLevel.Background;
 		public DateTime LastFocusChange { get; private set; }
 
@@ -220,7 +223,7 @@ namespace RhuEngine.WorldObjects
 		/// <summary>
 		/// Time in seconds the most recent Step call took.
 		/// </summary>
-		public float stepTime = 0f;
+		public double stepTime = 0f;
 
 
 		[NoSync]
@@ -271,7 +274,9 @@ namespace RhuEngine.WorldObjects
 				}
 				foreach (var item in _sorrtedEntity) {
 					foreach (var ent in item) {
-						ent.RenderStep();
+						if (!ent.IsDestroying) {
+							ent.RenderStep();
+						}
 					}
 				}
 			}
@@ -302,7 +307,7 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			try {
-				PhysicsSim.UpdateSim(RTime.Elapsedf);
+				PhysicsSim.UpdateSim(RTime.Elapsed);
 			}
 			catch (Exception e) {
 				RLog.Err($"Failed To update PhysicsSim Error:{e}");
@@ -321,7 +326,9 @@ namespace RhuEngine.WorldObjects
 				}
 				foreach (var item in _sorrtedEntity) {
 					foreach (var ent in item) {
-						ent.Step();
+						if (!ent.IsDestroying) {
+							ent.Step();
+						}
 					}
 				}
 			}
@@ -373,6 +380,12 @@ namespace RhuEngine.WorldObjects
 					_netManager?.DisconnectAll();
 				}
 				catch { }
+				var data = GetType().GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+				foreach (var item in data) {
+					if (typeof(SyncObject).IsAssignableFrom(item.FieldType)) {
+						item.SetValue(this, null);
+					}
+				}
 				GC.Collect();
 			});
 		}

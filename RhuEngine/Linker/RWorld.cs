@@ -32,13 +32,19 @@ namespace RhuEngine.Linker
 			lock (StartOfFrameExecute) {
 				var startcountlist = StartOfFrameList.Count;
 				for (var i = 0; i < startcountlist; i++) {
-					StartOfFrameList[0].Invoke();
+					try {
+						StartOfFrameList[0].Invoke();
+					}
+					catch { }
 					StartOfFrameList.RemoveAt(0);
 				}
 				var dectionaryvalues = StartOfFrameExecute.ToArray();
 				for (var i = 0; i < dectionaryvalues.Length; i++) {
 					var currentobj = dectionaryvalues[i];
-					currentobj.Value.Invoke();
+					try {
+						currentobj.Value.Invoke();
+					}
+					catch { }
 					StartOfFrameExecute.Remove(currentobj.Key);
 				}
 			}
@@ -70,13 +76,19 @@ namespace RhuEngine.Linker
 			lock (EndOfFrameExecute) {
 				var startcountlist = EndOfFrameList.Count;
 				for (var i = 0; i < startcountlist; i++) {
-					EndOfFrameList[0].Invoke();
+					try {
+						EndOfFrameList[0].Invoke();
+					}
+					catch { }
 					EndOfFrameList.RemoveAt(0);
 				}
 				var dectionaryvalues = EndOfFrameExecute.ToArray();
 				for (var i = 0; i < dectionaryvalues.Length; i++) {
 					var currentobj = dectionaryvalues[i];
-					currentobj.Value.Invoke();
+					try {
+						currentobj.Value.Invoke();
+					}
+					catch { }
 					EndOfFrameExecute.Remove(currentobj.Key);
 				}
 			}

@@ -65,9 +65,9 @@ namespace Rhubarb_VR_HeadLess
 				while (_isRunning) {
 					EngineStopWatch.Start();
 					_app.Step();
-					_rhu.Elapsedf = EngineStopWatch.ElapsedMilliseconds;
+					_rhu.Elapsed = EngineStopWatch.ElapsedMilliseconds;
 					EngineStopWatch.Restart();
-					var wait = (int)((1000 / 120) - _rhu.Elapsedf);
+					var wait = (int)((1000 / 120) - _rhu.Elapsed);
 					if (wait > 0) {
 						Thread.Sleep(wait);
 					}

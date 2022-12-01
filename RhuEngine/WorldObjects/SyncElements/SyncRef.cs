@@ -195,6 +195,9 @@ namespace RhuEngine.WorldObjects
 			drivenFromObj = value;
 			IsLinkedTo = true;
 		}
-
+		public override void Dispose() {
+			Changed = null;
+			base.Dispose();
+		}
 	}
 }

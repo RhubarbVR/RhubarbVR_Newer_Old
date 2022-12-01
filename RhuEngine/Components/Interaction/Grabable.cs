@@ -68,9 +68,9 @@ namespace RhuEngine.Components
 		}
 
 		public override void Dispose() {
-			base.Dispose();
 			Entity.OnLazerPyhsics -= Entity_OnLazerPyhsics;
 			Entity.OnGrip -= GripProcess;
+			base.Dispose();
 		}
 
 		private void Entity_OnLazerPyhsics(uint arg1, Vector3f arg2, Vector3f arg3, float arg4, float arg5, Handed handed) {
@@ -160,9 +160,9 @@ namespace RhuEngine.Components
 			if (aimPos is null) {
 				aimPosMatrix = LocalUser.userRoot.Target.head.Target.GlobalTrans;
 			}
-			Entity.GlobalTrans = Matrix.RS(Quaternionf.CreateFromEuler(rotate * RTime.Elapsedf * 25, 0, 0) * Entity.GlobalTrans.Rotation, Entity.GlobalTrans.Scale) * Matrix.T(Entity.GlobalTrans.Translation);
+			Entity.GlobalTrans = Matrix.RS(Quaternionf.CreateFromEuler((float)(rotate * RTime.Elapsed * 25), 0, 0) * Entity.GlobalTrans.Rotation, Entity.GlobalTrans.Scale) * Matrix.T(Entity.GlobalTrans.Translation);
 			var localPos = Entity.GlobalTrans * aimPosMatrix.Inverse;
-			localPos.Translation -= new Vector3f(0, 0, pushBackAndForth) * RTime.Elapsedf;
+			localPos.Translation -= new Vector3f(0, 0, pushBackAndForth * RTime.Elapsed);
 			if (localPos.Translation.z >= -0.01f) {
 				LaserGrabbed = false;
 			}

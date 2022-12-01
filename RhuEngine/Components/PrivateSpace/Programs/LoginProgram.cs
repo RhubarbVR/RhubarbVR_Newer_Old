@@ -47,7 +47,7 @@ namespace RhuEngine.Components
 
 		private TextLabel _loadingText;
 
-		private float _lastUpdate;
+		private double _lastUpdate;
 
 		protected override void Step() {
 			base.Step();
@@ -57,7 +57,7 @@ namespace RhuEngine.Components
 				}
 				_lastUpdate -= 5;
 			}
-			_lastUpdate += RTime.Elapsedf;
+			_lastUpdate += RTime.Elapsed;
 		}
 		private bool _loginUI;
 

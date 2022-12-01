@@ -13,6 +13,7 @@ namespace RhuEngine.Linker
 		public void Stopped();
 
 		public void Render();
+		public void CleanUp();
 
 		public void Remove();
 
@@ -31,6 +32,12 @@ namespace RhuEngine.Linker
 		public LinkedWorldComponent LinkCompGen { get => LinkedComp; set => LinkedComp = (T)value; }
 
 		public abstract void Init();
+
+		public void CleanUp() {
+			Remove();
+			LinkCompGen = null;
+			LinkedComp = null;
+		}
 
 		public abstract void Remove();
 

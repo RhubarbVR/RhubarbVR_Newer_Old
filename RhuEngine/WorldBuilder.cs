@@ -14,6 +14,23 @@ namespace RhuEngine
 	public static class WorldBuilder
 	{
 
+		public static void BuildDefaultWorld(this World world) {
+			RLog.Info("Building Default World");
+			var floor = world.RootEntity.AddChild("Floor");
+			floor.position.Value = new Vector3f(0, 0, 0);
+			var coloider = floor.AttachComponent<CylinderShape>();
+			var (mesh, mit, render) = floor.AttachMeshWithMeshRender<CylinderMesh, UnlitMaterial>();
+			mit.Transparency.Value = Transparency.Blend;
+			mit.Tint.Value = new Colorf(10, 10, 10, 150);
+			mesh.TopRadius.Value = 4;
+			mesh.BaseRadius.Value = 3.5f;
+			mesh.Height.Value = 0.25f;
+			coloider.boxHalfExtent.Value = new Vector3d(8, 0.5f, 8) / 2;
+			var spinningCubes = world.RootEntity.AddChild("SpinningCubes");
+			spinningCubes.position.Value = new Vector3f(0, 0.5f, 0);
+			AttachSpiningCubes(spinningCubes);
+		}
+
 		public static void BuildLocalWorld(this World world) {
 			RLog.Info("Building Local World");
 			var floor = world.RootEntity.AddChild("Floor");

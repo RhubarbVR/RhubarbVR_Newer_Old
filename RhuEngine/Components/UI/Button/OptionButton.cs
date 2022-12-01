@@ -10,6 +10,8 @@ namespace RhuEngine.Components
 	[Category("UI/Button")]
 	public class OptionButton : Button
 	{
+		protected override bool AddToUpdateList => true;
+
 		[Default(-1)]
 		public readonly Sync<int> Selected;
 		[Default(true)]
@@ -20,6 +22,7 @@ namespace RhuEngine.Components
 		public class MenuButtonItem : SyncObject
 		{
 			public readonly Sync<string> Text;
+			public readonly Sync<string> ToolTip;
 			public readonly AssetRef<RTexture2D> Icon;
 			public readonly Sync<int> Id;
 			public readonly Sync<bool> Disabled;

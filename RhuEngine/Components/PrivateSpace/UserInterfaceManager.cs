@@ -20,6 +20,7 @@ using DataModel.Enums;
 using RhuEngine.Components.UI;
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace RhuEngine.Components
 {
@@ -147,9 +148,12 @@ namespace RhuEngine.Components
 			if (Engine.netApiManager.Client.IsLogin) {
 				ClearStart();
 				ClearTaskBar();
-
-
-
+				foreach (var item in _startTypes) {
+					AddStartProgram(item);
+				}
+				foreach (var item in _taskBarTypes) {
+					AddTaskBarItemProgram(item);
+				}
 				_offlineStart = false;
 			}
 			else if (!_offlineStart) {
@@ -172,8 +176,12 @@ namespace RhuEngine.Components
 				foreach (var privateSpaceTaskbarItem in _taskBarItems) {
 					privateSpaceTaskbarItem.Entity.Destroy();
 				}
-				foreach (var item in privateSpaceTaskbarItems) {
-					item.Entity.orderOffset.Value = 0;
+				lock (privateSpaceTaskbarItems) {
+					foreach (var item in privateSpaceTaskbarItems) {
+						if (item.Entity.orderOffset.Value < 500) {
+							item.Entity.orderOffset.Value = 0;
+						}
+					}
 				}
 				_taskBarItems.Clear();
 			}
@@ -201,6 +209,7 @@ namespace RhuEngine.Components
 				button.IconAlignment.Value = RButtonAlignment.Left;
 				button.ExpandIcon.Value = true;
 				button.Text.Value = info.ProgramName;
+				button.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.Open") + " " + info.ProgramName;
 				var asset = button.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 				button.Icon.Target = asset;
 				asset.LoadAsset(info.icon);
@@ -225,6 +234,7 @@ namespace RhuEngine.Components
 			button.IconAlignment.Value = RButtonAlignment.Left;
 			button.ExpandIcon.Value = true;
 			button.Text.Value = info.ProgramName;
+			button.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.Open") + " " + info.ProgramName;
 			var asset = button.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 			button.Icon.Target = asset;
 			asset.LoadAsset(info.icon);
@@ -262,6 +272,8 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
+			Engine.worldManager.OnWorldUpdateTaskBar = WorldManager_WorldChanged;
+			Engine.worldManager.WorldChanged += WorldManager_WorldChanged;
 			Engine.netApiManager.Client.OnLogout += Client_OnLogout;
 			Engine.netApiManager.Client.OnLogin += Client_OnLogin;
 			Engine.netApiManager.Client.HasGoneOfline += Client_OnLogout;
@@ -318,6 +330,7 @@ namespace RhuEngine.Components
 			EngineLink_VRChange(Engine.IsInVR);
 
 			Start = RootUIEntity.AddChild("Start").AttachComponent<UIElement>();
+
 			BuildStartMenu(Start);
 			ToggleStart(false);
 			Client_StatusUpdate();
@@ -326,6 +339,34 @@ namespace RhuEngine.Components
 			}
 			else {
 				Client_OnLogout();
+			}
+		}
+
+		private readonly List<PrivateSpaceTaskbarItem> _worldItems = new();
+
+		private void WorldManager_WorldChanged() {
+			WorldManager_WorldChanged(null);
+		}
+
+		private void WorldManager_WorldChanged(World obj) {
+			lock (_worldItems) {
+				foreach (var item in _worldItems) {
+					item.Entity.Destroy();
+				}
+				_worldItems.Clear();
+				foreach (var item in Engine.worldManager.worlds) {
+					if(item.Focus is not World.FocusLevel.Background and not World.FocusLevel.Focused) {
+						continue;
+					}
+					if(item.IsLoading || item.IsDisposed || item.IsRemoved) {
+						continue;
+					}
+					var newItem = PrivateSpaceManager.UserInterfaceManager._taskbarElementHolder?.Entity?.AddChild(item.Name)?.AttachComponent<PrivateSpaceTaskbarItem>();
+					//Todo remove or keep show focused world first
+					newItem.Entity.orderOffset.Value = item.Focus == World.FocusLevel.Focused ? 502 : 501;
+					newItem.SetUpWorld(item);
+					_worldItems.Add(newItem);
+				}
 			}
 		}
 
@@ -583,6 +624,10 @@ namespace RhuEngine.Components
 			locale.TargetValue.Target = logoutButton.Text;
 			logoutButton.Pressed.Target = Logout;
 			locale.Key.Value = "Common.Logout";
+			var local = logoutButton.Entity.AttachComponent<StandardLocale>();
+			local.TargetValue.Target = logoutButton.ToolTipText;
+			local.Key.Value = "Common.Logout";
+
 			logoutButton.HorizontalFilling.Value = RFilling.ShrinkCenter;
 			logoutButton.MinSize.Value = new Vector2i(230, 35);
 			var logouttextureRef = logoutButton.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
@@ -624,23 +669,40 @@ namespace RhuEngine.Components
 			acsepter.Dropped.Target = ChangeProfile;
 
 			if (Engine.EngineLink.LiveVRChange) {
-				AddSideButton("VRSwitch", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.VRHeadset), () => { Engine.EngineLink.ChangeVR(!Engine.IsInVR); ToggleStart(false); });
+				var vrswitch = AddSideButton("VRSwitch", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.VRHeadset), () => {
+					Engine.EngineLink.ChangeVR(!Engine.IsInVR);
+					ToggleStart(false);
+				});
+				var vrswitchlocal = vrswitch.Entity.AttachComponent<StandardLocale>();
+				vrswitchlocal.TargetValue.Target = vrswitch.ToolTipText;
+				var action = void(bool state) => vrswitchlocal.Key.Value = state ? "Actions.ChangeVR.Disable" : "Actions.ChangeVR.Enable";
+				Engine.EngineLink.VRChange += action;
+				action(Engine.EngineLink.InVR);
 			}
 			else {
 				sideBar.Entity.AddChild("VRSwitch").AttachComponent<UIElement>().MinSize.Value = new Vector2i(0, 84);
 			}
-			AddSideButton("Files", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Folder), () => {
+			var files = AddSideButton("Files", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Folder), () => {
 				ProgramManager.PrivateOpenProgram<FileExplorerProgram>();
 				ToggleStart(false);
 			});
-			AddSideButton("Settings", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Settings), () => {
+			var fileslocal = files.Entity.AttachComponent<StandardLocale>();
+			fileslocal.TargetValue.Target = files.ToolTipText;
+			fileslocal.Key.Value = "Programs.FileExplorer.Name";
+			var settings = AddSideButton("Settings", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Settings), () => {
 				ProgramManager.OpenOnePrivateOpenProgram<SettingsProgram>();
 				ToggleStart(false);
 			});
-			AddSideButton("Exit", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Shutdown), () => {
+			var settingslocal = settings.Entity.AttachComponent<StandardLocale>();
+			settingslocal.TargetValue.Target = settings.ToolTipText;
+			settingslocal.Key.Value = "Programs.Settings.Name";
+			var exit = AddSideButton("Exit", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Shutdown), () => {
 				Engine.Close();
 				ToggleStart(false);
 			});
+			var exitlocal = exit.Entity.AttachComponent<StandardLocale>();
+			exitlocal.TargetValue.Target = exit.ToolTipText;
+			exitlocal.Key.Value = "Common.ExitRhubarbVR";
 		}
 
 
@@ -653,6 +715,10 @@ namespace RhuEngine.Components
 			_startButton.ToggleMode.Value = true;
 			_startButton.Toggled.Target = ToggleStart;
 			_startButton.ExpandIcon.Value = true;
+			var local = _startButton.Entity.AttachComponent<StandardLocale>();
+			local.TargetValue.Target = _startButton.ToolTipText;
+			local.Key.Value = "ToolTips.StartMenu";
+
 			var starticon = _startButton.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 			starticon.Load(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.RhubarbVR));
 			_startButton.Icon.Target = starticon;
@@ -683,6 +749,11 @@ namespace RhuEngine.Components
 			_taskbarElementHolder = scrollCont.Entity.AddChild("Box").AttachComponent<BoxContainer>();
 			_taskbarElementHolder.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
 			_taskbarElementHolder.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+
+			var e = _taskbarElementHolder.Entity.AddChild("Spacer").AttachComponent<Panel>();
+			e.Entity.orderOffset.Value = 500;
+			e.MinSize.Value = new Vector2i(8, 38);
+			e.VerticalFilling.Value = RFilling.ShrinkCenter;
 		}
 
 		private TextLabel _textLabel;
@@ -726,7 +797,7 @@ namespace RhuEngine.Components
 			var date = DateTime.Now;
 			var sysFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
 			var sysFormatTime = CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern;
-			_textLabel.Text.Value = $"{date.ToString(sysFormatTime, CultureInfo.InvariantCulture)}\n{date.ToString(sysFormat, CultureInfo.InvariantCulture)}\nFPS:{1 / RTime.Elapsedf:f0}";
+			_textLabel.Text.Value = $"{date.ToString(sysFormatTime, CultureInfo.InvariantCulture)}\n{date.ToString(sysFormat, CultureInfo.InvariantCulture)}\nFPS:{1 / RTime.Elapsed:f0}";
 		}
 	}
 }

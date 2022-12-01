@@ -126,6 +126,14 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		public override void Init() {
 			base.Init();
+			node.FocusEntered += Node_FocusEntered;
+			node.FocusExited += Node_FocusExited;
+			foreach (var item in node.GetChildren(true)) {
+				if (item is Control control) {
+					control.FocusEntered += Node_FocusEntered;
+					control.FocusExited += Node_FocusExited;
+				}
+			}
 			LinkedComp.ClipContents.Changed += ClipContents_Changed;
 			LinkedComp.MinSize.Changed += MinSize_Changed;
 			LinkedComp.LayoutDir.Changed += LayoutDir_Changed;
@@ -146,6 +154,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.ForceScrollEventPassing.Changed += ForceScrollEventPassing_Changed;
 			LinkedComp.CursorShape.Changed += CursorShape_Changed;
 			LinkedComp.FocusMode.Changed += FocusMode_Changed;
+			LinkedComp.ToolTipText.Changed += ToolTipText_Changed;
+			ToolTipText_Changed(null);
 			ClipContents_Changed(null);
 			MinSize_Changed(null);
 			LayoutDir_Changed(null);
@@ -168,30 +178,39 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			FocusMode_Changed(null);
 			LinkedComp.KeyboardUnBindAction = KeyboardUnBindAction;
 			LinkedComp.KeyboardBindAction = KeyboardBindAction;
-			node.FocusEntered += Node_FocusEntered;
-			node.FocusExited += Node_FocusExited;
-			foreach (var item in node.GetChildren(true)) {
-				if (item is Control control) {
-					control.FocusEntered += Node_FocusEntered;
-					control.FocusExited += Node_FocusExited;
-				}
-			}
 			if (LinkedComp.Engine.staticResources.MainFont.Inst is GodotFont font) {
 				node.Theme ??= new Theme();
 				node.Theme.DefaultFont = font.FontFile;
 			}
 		}
+
+		private void ToolTipText_Changed(IChangeable obj) {
+			node.TooltipText = LinkedComp.ToolTipText.Value;
+		}
+
 		protected void Node_FocusExited() {
+			if (LinkedComp is null) {
+				return;
+			}
 			if (node is null) {
 				return;
 			}
-			if (LinkedComp.Entity.Viewport?.TakeKeyboardFocus?.Value??true) {
+			if (LinkedComp.IsRemoved | LinkedComp.IsDestroying) {
+				return;
+			}
+			if (LinkedComp.Entity.Viewport?.TakeKeyboardFocus?.Value ?? true) {
 				LinkedComp.Engine.KeyboardInteractionUnBind(LinkedComp);
 			}
 		}
 
 		protected void Node_FocusEntered() {
-			if (node is null) {
+			if(LinkedComp is null) {
+				return;
+			}
+			if(node is null) {
+				return;
+			}
+			if(LinkedComp.IsRemoved | LinkedComp.IsDestroying) {
 				return;
 			}
 			if (FreeKeyboard & (LinkedComp.Entity.Viewport?.TakeKeyboardFocus?.Value ?? true)) {
@@ -200,16 +219,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void KeyboardBindAction() {
-			if (node is null) {
-				return;
-			}
 			node.GrabFocus();
 		}
 
 		private void KeyboardUnBindAction() {
-			if (node is null) {
-				return;
-			}
 			node.ReleaseFocus();
 			foreach (var item in node.GetChildren(true)) {
 				if (item is Control control) {
@@ -219,9 +232,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void FocusMode_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.FocusMode = LinkedComp.FocusMode.Value switch {
 				RFocusMode.Click => FocusModeEnum.Click,
 				RFocusMode.All => FocusModeEnum.All,
@@ -230,23 +240,14 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void CursorShape_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.MouseDefaultCursorShape = (CursorShape)LinkedComp.CursorShape.Value;
 		}
 
 		private void ForceScrollEventPassing_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.MouseForcePassScrollEvents = LinkedComp.ForceScrollEventPassing.Value;
 		}
 
 		private void InputFilter_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.MouseFilter = LinkedComp.InputFilter.Value switch {
 				RInputFilter.Pass => MouseFilterEnum.Pass,
 				RInputFilter.Ignore => MouseFilterEnum.Ignore,
@@ -255,58 +256,34 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void AutoTranslate_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.AutoTranslate = LinkedComp.AutoTranslate.Value;
 		}
 
 		private void StretchRatio_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.SizeFlagsStretchRatio = LinkedComp.StretchRatio.Value;
 		}
 
 		private void VerticalFilling_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.SizeFlagsVertical = (int)LinkedComp.VerticalFilling.Value;
 		}
 
 		private void HorizontalFilling_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.SizeFlagsHorizontal = (int)LinkedComp.HorizontalFilling.Value;
 		}
 
 		private void PivotOffset_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.PivotOffset = new Vector2(LinkedComp.PivotOffset.Value.x, LinkedComp.PivotOffset.Value.y);
 		}
 
 		private void Scale_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.Scale = new Vector2(LinkedComp.Scale.Value.x, LinkedComp.Scale.Value.y);
 		}
 
 		private void Rotation_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.Rotation = LinkedComp.Rotation.Value * RNumerics.MathUtil.DEG_2_RADF;
 		}
 
 		private void GrowVertical_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.GrowVertical = LinkedComp.GrowVertical.Value switch {
 				RGrowVertical.Top => GrowDirection.Begin,
 				RGrowVertical.Bottom => GrowDirection.End,
@@ -315,9 +292,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void GrowHorizontal_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.GrowHorizontal = LinkedComp.GrowHorizontal.Value switch {
 				RGrowHorizontal.Left => GrowDirection.Begin,
 				RGrowHorizontal.Right => GrowDirection.End,
@@ -326,41 +300,26 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void MaxOffset_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.OffsetBottom = LinkedComp.MaxOffset.Value.y;
 			node.OffsetLeft = LinkedComp.MaxOffset.Value.x;
 		}
 
 		private void MinOffset_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.OffsetTop = LinkedComp.MinOffset.Value.y;
 			node.OffsetRight = LinkedComp.MinOffset.Value.x;
 		}
 
 		private void Max_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.AnchorBottom = LinkedComp.Max.Value.y;
 			node.AnchorRight = LinkedComp.Max.Value.x;
 		}
 
 		private void Min_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.AnchorTop = LinkedComp.Min.Value.y;
 			node.AnchorLeft = LinkedComp.Min.Value.x;
 		}
 
 		private void LayoutDir_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.LayoutDirection = LinkedComp.LayoutDir.Value switch {
 				RLayoutDir.Locale => LayoutDirectionEnum.Locale,
 				RLayoutDir.Left_to_Right => LayoutDirectionEnum.Ltr,
@@ -370,16 +329,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void MinSize_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.CustomMinimumSize = new Vector2i(LinkedComp.MinSize.Value.x, LinkedComp.MinSize.Value.y);
 		}
 
 		private void ClipContents_Changed(IChangeable obj) {
-			if (node is null) {
-				return;
-			}
 			node.ClipContents = LinkedComp.ClipContents.Value;
 		}
 

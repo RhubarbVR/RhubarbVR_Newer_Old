@@ -395,7 +395,7 @@ namespace RhuEngine.WorldObjects.ECS
 			UpdateEnableList();
 		}
 		[Exposed]
-		public bool IsEnabled => parentEnabled && enabled.Value && !IsDestroying && !IsRemoved;
+		public bool IsEnabled => parentEnabled && (enabled?.Value??false) && !IsDestroying && !IsRemoved;
 
 		private void GoBackToOld() {
 			if (parent.Target != InternalParent) {
@@ -599,11 +599,11 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 		public override void Dispose() {
-			base.Dispose();
 			World.UnregisterEntity(this);
 			if (HasUpdatingComponent) {
 				World.UnregisterUpdatingEntity(this);
 			}
+			base.Dispose();
 		}
 
 		[NoShow]

@@ -45,22 +45,38 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		public CanvasItem CanvasItem => node;
 
+		
+
 		public override void Init() {
 			node = new T2 {
 				Name = ObjectName
 			};
 			LinkedComp.Entity.ViewportUpdateEvent += NotifyParrentUpdate;
 			LinkedComp.Entity.CanvasItemUpdateEvent += NotifyParrentUpdate;
-			LinkedComp.Entity.children.OnReorderList += Children_OnReorderList;
+			LinkedComp.Entity.children.OnReorderList += Children_OnReorderListUpdate;
 			LinkedComp.Entity.OnParentChanged += NotifyParrentUpdate;
 			UpdateParrent();
 			LoadCanvasItemLink();
 			StartContinueInit();
-			Children_OnReorderList();
+			Children_OnReorderListUpdate();
+		}
+
+		public void Children_OnReorderListUpdate() {
+			RenderThread.ExecuteOnEndOfFrame(Children_OnReorderList);
 		}
 
 		public void Children_OnReorderList() {
-			foreach (Entity item in LinkedComp.Entity.children) {
+			if(node is null) {
+				return;
+			}
+			if(LinkedComp is null) {
+				return;
+			}
+			if(LinkedComp.IsDestroying | LinkedComp.IsRemoved) {
+				return;
+			}
+			for (var i = 0; i < LinkedComp.Entity.children.Count; i++) {
+				var item = LinkedComp.Entity.children[i];
 				if (item?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
 					if (canvasItem?.CanvasItem?.GetParent() == CanvasItem) {
 						node.MoveChild(canvasItem.CanvasItem, -1);
@@ -87,6 +103,15 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 
 		public virtual void UpdateParrent() {
+			if(node is null) {
+				return;
+			}
+			if(LinkedComp is null) {
+				return;
+			}
+			if (LinkedComp.IsDestroying | LinkedComp.IsRemoved) {
+				return;
+			}
 			node.GetParent()?.RemoveChild(node);
 			var addToViewPort = false;
 			if (LinkedComp.Entity.InternalParent?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
@@ -125,6 +150,12 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public abstract void StartContinueInit();
 
 		public override void Remove() {
+			LinkedComp.Entity.ViewportUpdateEvent -= NotifyParrentUpdate;
+			LinkedComp.Entity.CanvasItemUpdateEvent -= NotifyParrentUpdate;
+			if (LinkedComp.Entity.children is not null) {
+				LinkedComp.Entity.children.OnReorderList -= Children_OnReorderList;
+			}
+			LinkedComp.Entity.OnParentChanged -= NotifyParrentUpdate;
 			node?.QueueFree();
 			node = null;
 		}
@@ -167,7 +198,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Material_LoadChange(RMaterial obj) {
-			node.Material = LinkedComp.Material.Asset?.Target is GodotMaterial godotMaterial ? (godotMaterial?.Material) : null;
+			node.Material = LinkedComp.Material?.Asset?.Target is GodotMaterial godotMaterial ? (godotMaterial?.Material) : null;
 		}
 
 		private void UseParentMaterial_Changed(IChangeable obj) {
@@ -238,9 +269,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		public virtual void Entity_ViewportUpdateEvent() {
-			if (node.GetParent() is not null) {
-				node.GetParent().RemoveChild(node);
-			}
+			node.GetParent()?.RemoveChild(node);
 			if (LinkedComp.Entity.Viewport?.WorldLink is ViewportLink ee) {
 				if (LinkedComp.Entity.Viewport != LinkedComp) {
 					ee.node.AddChild(node);
@@ -273,6 +302,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public abstract void StartContinueInit();
 
 		public override void Remove() {
+			LinkedComp.Entity.ViewportUpdateEvent -= Entity_ViewportUpdateEvent;
 			node?.QueueFree();
 			node = null;
 		}
@@ -290,11 +320,17 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			UpdatePosThisFrame = true;
 		}
 
+		public override void Remove() {
+			LinkedComp.Entity.GlobalTransformChange -= Entity_GlobalTransformChange;
+			base.Remove();
+		}
+
 
 		public override void Started() {
-			if(node is null) {
+			if (node is null) {
 				return;
 			}
+
 			node.Visible = true;
 		}
 
@@ -302,6 +338,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			if (node is null) {
 				return;
 			}
+
 			node.Visible = false;
 		}
 

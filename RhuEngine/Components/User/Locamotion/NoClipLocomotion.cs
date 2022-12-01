@@ -40,16 +40,16 @@ namespace RhuEngine.Components
 				}
 			}
 			var speed = AllowMultiplier ? MathUtil.Lerp(MovementSpeed, MaxSprintSpeed, MoveSpeed) : MovementSpeed;
-			var tempRight = InputManager.GetInputAction(InputTypes.Right).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
-			var tempLeft = InputManager.GetInputAction(InputTypes.Left).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
-			var tempFlyUp = InputManager.GetInputAction(InputTypes.FlyUp).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
-			var tempFlyDown = InputManager.GetInputAction(InputTypes.FlyDown).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
-			var tempForward = InputManager.GetInputAction(InputTypes.Forward).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
-			var tempBack = InputManager.GetInputAction(InputTypes.Back).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
+			var tempRight = InputManager.GetInputAction(InputTypes.Right).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsed;
+			var tempLeft = InputManager.GetInputAction(InputTypes.Left).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsed;
+			var tempFlyUp = InputManager.GetInputAction(InputTypes.FlyUp).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsed;
+			var tempFlyDown = InputManager.GetInputAction(InputTypes.FlyDown).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsed;
+			var tempForward = InputManager.GetInputAction(InputTypes.Forward).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsed;
+			var tempBack = InputManager.GetInputAction(InputTypes.Back).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsed;
 			var pos = new Vector3f(0, 0, -tempForward + tempBack) * speed;
 			var Rotspeed = AllowMultiplier ? MathUtil.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
-			var tempRotateRight = InputManager.GetInputAction(InputTypes.RotateLeft).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
-			var tempRotateLeft = InputManager.GetInputAction(InputTypes.RotateRight).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsedf;
+			var tempRotateRight = InputManager.GetInputAction(InputTypes.RotateLeft).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsed;
+			var tempRotateLeft = InputManager.GetInputAction(InputTypes.RotateRight).HandedValue(InputManager.GetHand(isMain)) * RTime.Elapsed;
 			var AddToMatrix = Matrix.T(pos);
 			var handPos = InputManager.XRInputSystem.GetHand(Engine.inputManager.GetHand(isMain))[Input.XRInput.TrackerPos.Aim];
 			ProcessGlobalRotToUserRootMovement(AddToMatrix, Matrix.TR(handPos.Position, handPos.Rotation) * UserRootEnity.GlobalTrans);
@@ -65,7 +65,7 @@ namespace RhuEngine.Components
 			if (isMain || otherHandNotUsable) {
 				var headPos = Matrix.T(UserRoot.head.Target.position.Value) * UserRootEnity.GlobalTrans;
 				var headLocal = headPos * UserRootEnity.GlobalTrans.Inverse;
-				var newHEadPos = Matrix.R(Quaternionf.CreateFromEuler((tempRotateRight - tempRotateLeft) * RotationSpeed, 0, 0)) * headPos;
+				var newHEadPos = Matrix.R((Quaternionf)Quaterniond.CreateFromEuler((tempRotateRight - tempRotateLeft) * RotationSpeed, 0, 0)) * headPos;
 				SetUserRootGlobal(headLocal.Inverse * newHEadPos);
 			}
 		}

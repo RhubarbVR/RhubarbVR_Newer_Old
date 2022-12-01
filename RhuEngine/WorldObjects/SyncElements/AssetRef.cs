@@ -44,6 +44,11 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
+		public override void Dispose() {
+			LoadChange = null;
+			base.Dispose();
+		}
+
 
 		public void BindMethod(string name, object obje) {
 			var method = obje.GetType().GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);

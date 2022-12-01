@@ -36,16 +36,16 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 			public bool IsClickedPrime;
 			public bool IsClickedPrimeLastFrame;
-			public float IsClickedPrimeTimeStateChange;
+			public double IsClickedPrimeTimeStateChange;
 
 
 			public bool IsClickedSecod;
 			public bool IsClickedSecodLastFrame;
-			public float IsClickedSecodTimeStateChange;
+			public double IsClickedSecodTimeStateChange;
 
 			public bool IsClickedTur;
 			public bool IsClickedTurLastFrame;
-			public float IsClickedTurTimeStateChange;
+			public double IsClickedTurTimeStateChange;
 
 		}
 
@@ -173,7 +173,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					value.IsClickedPrimeTimeStateChange = 0;
 				}
 				else {
-					value.IsClickedPrimeTimeStateChange += RTime.Elapsedf;
+					value.IsClickedPrimeTimeStateChange += RTime.Elapsed;
 				}
 
 				if (value.IsClickedSecod != value.IsClickedSecodLastFrame) {
@@ -189,7 +189,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					value.IsClickedSecodTimeStateChange = 0;
 				}
 				else {
-					value.IsClickedSecodTimeStateChange += RTime.Elapsedf;
+					value.IsClickedSecodTimeStateChange += RTime.Elapsed;
 				}
 
 
@@ -206,7 +206,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					value.IsClickedTurTimeStateChange = 0;
 				}
 				else {
-					value.IsClickedTurTimeStateChange += RTime.Elapsedf;
+					value.IsClickedTurTimeStateChange += RTime.Elapsed;
 				}
 
 				value.IsClickedPrimeLastFrame = value.IsClickedPrime;

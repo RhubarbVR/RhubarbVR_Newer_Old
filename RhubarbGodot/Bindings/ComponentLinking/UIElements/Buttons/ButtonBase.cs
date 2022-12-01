@@ -16,6 +16,15 @@ namespace RhubarbVR.Bindings.ComponentLinking
 {
 	public abstract class ButtonBase<T, T2> : UIElementLinkBase<T, T2> where T : ButtonBase, new() where T2 : BaseButton, new()
 	{
+		public override void Remove() {
+			node.ButtonDown -= Node_ButtonDown;
+			node.ButtonUp -= Node_ButtonUp;
+			node.Pressed -= Node_Pressed;
+			node.Toggled -= Node_Toggled;
+			node.GuiInput -= Node_GuiInput;
+			base.Remove();
+		}
+
 		public override void Init() {
 			base.Init();
 			LinkedComp.Disabled.Changed += Disabled_Changed;
@@ -56,12 +65,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Node_GuiInput(InputEvent @event) {
-			if(LinkedComp is null) {
-				return;
-			}
-			if(node is null) {
-				return;
-			}
 			if (@event is InputEventMouse mouse) {
 				var newPos = new Vector2f(mouse.GlobalPosition.x, mouse.GlobalPosition.y);
 				switch (GetSideFromMouseID(mouse.Device)) {
@@ -103,15 +106,14 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		private void Node_Pressed() {
 			SendState();
 			RUpdateManager.ExecuteOnEndOfFrame(() => {
-				LinkedComp.Pressed.Invoke();
-				LinkedComp.SendPressedAction();
+				LinkedComp?.Pressed?.Invoke();
+				LinkedComp?.SendPressedAction();
 			});
 		}
 
 		private void Node_Toggled(bool buttonPressed) {
 			SendState();
-			RUpdateManager.ExecuteOnEndOfFrame(() => LinkedComp.Toggled.Target?.Invoke(buttonPressed));
-			;
+			RUpdateManager.ExecuteOnEndOfFrame(() => LinkedComp?.Toggled?.Target?.Invoke(buttonPressed));
 		}
 
 		private void KeepPressedOutside_Changed(IChangeable obj) {

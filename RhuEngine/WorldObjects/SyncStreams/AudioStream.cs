@@ -81,7 +81,6 @@ namespace RhuEngine.WorldObjects
 
 		protected override void OnLoaded() {
 			UpdateFrameSize();
-
 		}
 
 		public IWaveProvider LoadedWaveProvider;

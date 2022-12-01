@@ -33,9 +33,9 @@ namespace RhuEngine.GameTests.Tests
 		public void Step() {
 			EngineStopWatch.Start();
 			app.Step();
-			rhu.Elapsedf = EngineStopWatch.ElapsedMilliseconds;
+			rhu.Elapsed = EngineStopWatch.ElapsedMilliseconds;
 			EngineStopWatch.Restart();
-			var wait = (int)((1000 / 120) - rhu.Elapsedf);
+			var wait = (int)((1000 / 120) - rhu.Elapsed);
 			if (wait > 0) {
 				Thread.Sleep(wait);
 			}

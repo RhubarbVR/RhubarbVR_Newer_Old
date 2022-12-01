@@ -82,5 +82,11 @@ namespace RhuEngine.WorldObjects
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static implicit operator T(SyncProperty<T> data) => data.Value;
+
+		public override void Dispose() {
+			SetValue = null;
+			GetValue = null;
+			base.Dispose();
+		}
 	}
 }

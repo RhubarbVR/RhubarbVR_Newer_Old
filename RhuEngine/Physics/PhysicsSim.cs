@@ -29,7 +29,7 @@ namespace RhuEngine.Physics
 	public interface ILinkedPhysicsSim
 	{
 		public object NewSim();
-		public void UpdateSim(object obj,float DeltaSeconds);
+		public void UpdateSim(object obj,double DeltaSeconds);
 		public bool ConvexRayTest(object sem,ColliderShape colliderShape, ref Matrix from, ref Matrix to, out RigidBodyCollider rigidBodyCollider, out Vector3f HitNormalWorld, out Vector3f HitPointWorld, ECollisionFilterGroups mask, ECollisionFilterGroups group);
 
 		public bool RayTest(object sem,ref Vector3f rayFromWorld, ref Vector3f rayToWorld, out RigidBodyCollider rigidBodyCollider, out Vector3f HitNormalWorld, out Vector3f HitPointWorld, ECollisionFilterGroups mask, ECollisionFilterGroups group);
@@ -40,7 +40,7 @@ namespace RhuEngine.Physics
 
 		public object obj;
 
-		public void UpdateSim(float DeltaSeconds) {
+		public void UpdateSim(double DeltaSeconds) {
 			Manager.UpdateSim(obj, DeltaSeconds);
 		}
 		public bool ConvexRayTest(ColliderShape colliderShaperef,ref Matrix from, ref Matrix to, out RigidBodyCollider rigidBodyCollider, out Vector3f hitNormalWorld, out Vector3f hitPointWorld, ECollisionFilterGroups mask = ECollisionFilterGroups.AllFilter, ECollisionFilterGroups group = ECollisionFilterGroups.AllFilter) {

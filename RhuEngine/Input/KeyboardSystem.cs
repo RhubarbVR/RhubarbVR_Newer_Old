@@ -36,7 +36,7 @@ namespace RhuEngine.Input
 		public KeyboardSystem(InputManager inputManager) {
 			InputManager = inputManager;
 			virtualKeyboard = new();
-			_stateChangeTime = new float[_keys.Length];
+			_stateChangeTime = new double[_keys.Length];
 			LoadDevice(virtualKeyboard);
 		}
 		private readonly List<IKeyboardInputDriver> _keyboardDrivers = new();
@@ -44,10 +44,10 @@ namespace RhuEngine.Input
 		public static readonly Key[] _keys = (Key[])Enum.GetValues(typeof(Key));
 		private readonly List<Key> _lastFrame = new();
 		private readonly List<Key> _thisFrame = new();
-		private readonly float[] _stateChangeTime;
+		private readonly double[] _stateChangeTime;
 		public string TypeDelta { get; private set; }
 
-		public float GetStateChangeTime(Key key) {
+		public double GetStateChangeTime(Key key) {
 			return _stateChangeTime[Array.IndexOf(_keys, key)];
 		}
 
@@ -97,7 +97,7 @@ namespace RhuEngine.Input
 					_stateChangeTime[i] = 0;
 				}
 				else {
-					_stateChangeTime[i] += RTime.Elapsedf;
+					_stateChangeTime[i] += RTime.Elapsed;
 				}
 			}
 		}
