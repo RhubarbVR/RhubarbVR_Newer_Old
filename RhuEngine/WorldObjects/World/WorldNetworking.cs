@@ -264,6 +264,7 @@ namespace RhuEngine.WorldObjects
 
 		private void ProcessPackedData(DataNodeGroup dataGroup, DeliveryMethod deliveryMethod, Peer peer) {
 			if (WaitingForWorldStartState) {
+				LoadMsg = "Waiting For World Start State";
 				try {
 					var worldData = dataGroup.GetValue("WorldData");
 					if (worldData == null) {
@@ -417,7 +418,7 @@ namespace RhuEngine.WorldObjects
 						throw new Exception("data packed could not be read");
 					}
 				}
-				else if (peer.Tag is string or null) {
+				else if (peer.Tag is Guid or null) {
 					//Still loading peer
 				}
 				else {
@@ -463,7 +464,7 @@ namespace RhuEngine.WorldObjects
 				ProcessUserConnection(newpeer);
 			}
 			else {
-				RLog.Err("Peer had no tag noidea what to do");
+				RLog.Err($"Peer had no tag noidea what to do {peer.Tag}");
 			}
 		}
 
