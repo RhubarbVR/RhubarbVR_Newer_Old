@@ -29,6 +29,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		public override void Render() {
 			base.Render();
+			if(node.Mesh is null) {
+				return;
+			}
 			var currentIndex = 0;
 			foreach (SkinnedMeshRender.BlendShape item in LinkedComp.BlendShapes) {
 				node.SetBlendShapeValue(currentIndex, item.Weight.Value);

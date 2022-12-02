@@ -234,21 +234,25 @@ namespace RhuEngine.WorldObjects
 				NatPunchEnabled = true
 			};
 			_netManager.NatPunchModule.Init(_natPunchListener);
-			_netManager.Start();
 			_netManager.EnableStatistics = true;
 			_netManager.MaxConnectAttempts = 15;
-			_netManager.DisconnectTimeout = 100000;
+			_netManager.DisconnectTimeout = 5000;
 			_netManager.UpdateTime = 33;
 			_netManager.ChannelsCount = 3;
 			_netManager.AutoRecycle = true;
 
 			//Made unsync to make run faster
 			_netManager.UnsyncedDeliveryEvent = true;
-			_netManager.UnsyncedEvents= true;
+			_netManager.UnsyncedEvents = true;
 			_netManager.UnsyncedReceiveEvent = true;
 			//0 is main
 			//1 is syncStreams
 			//2 is assetPackeds
+			if (!_netManager.Start()) {
+				LoadMsg = "Failed to start world networking";
+				RLog.Err("Failed to start world networking");
+			}
+
 		}
 
 		private void ClientListener_NetworkLatencyUpdateEvent(NetPeer peer, int latency) {

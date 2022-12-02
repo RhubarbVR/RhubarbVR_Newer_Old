@@ -90,17 +90,18 @@ namespace RelayHolePuncher
 			};
 
 			_relay = new NetManager(clientListener) {
-				IPv6Enabled = IPv6Mode.SeparateSocket//Todo change to dule mode
+				IPv6Enabled = IPv6Mode.SeparateSocket
 			};
 			_relay.Start(port);
 			_relay.MaxConnectAttempts = 15;
 			_relay.ChannelsCount = 3;
-			_relay.DisconnectTimeout = 1000000;
+			_relay.DisconnectTimeout = 5000;
 			_relay.ReuseAddress = true;
 			_relay.UpdateTime = 30;
 			_relay.UnsyncedDeliveryEvent = true;
 			_relay.UnsyncedEvents = true;
 			_relay.UnsyncedReceiveEvent = true;
+			_relay.AutoRecycle = true;
 			Console.WriteLine($"Started Relay Server on port {port}");
 		}
 
@@ -159,7 +160,6 @@ namespace RelayHolePuncher
 			catch (Exception ex) {
 				Console.WriteLine("error with relay resive error:" + ex.ToString());
 			}
-			reader.Recycle();
 		}
 	}
 }

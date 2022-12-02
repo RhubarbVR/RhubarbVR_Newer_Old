@@ -247,7 +247,6 @@ namespace RhuEngine.WorldObjects
 
 		public void RenderStep() {
 			_netManager?.NatPunchModule.PollEvents();
-			_netManager?.PollEvents();
 			WorldThreadSafty.MethodCalls = 0;
 			if (IsLoading | (_focus == FocusLevel.Background)) {
 				return;
@@ -300,7 +299,6 @@ namespace RhuEngine.WorldObjects
 		private bool _sortEntitys;
 
 		public void Step() {
-			_netManager?.PollEvents();
 			_netManager?.NatPunchModule.PollEvents();
 			WorldThreadSafty.MethodCalls = 0;
 			if (IsLoading | (_focus == FocusLevel.Background)) {
