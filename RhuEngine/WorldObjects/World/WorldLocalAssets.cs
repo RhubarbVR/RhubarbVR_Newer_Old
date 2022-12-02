@@ -106,13 +106,8 @@ namespace RhuEngine.WorldObjects
 				tag.SendAsset(Serializer.Save<IAssetRequest>(new AssetResponse { URL = assetRequest.URL, Bytes = data, MimeType = dataMime }), ASSET_DELIVERY_METHOD);
 				return;
 			}
-			if (!firstData.StartsWith($"{SessionID.Value}-{tag.UserID}")) {
-				if(tag.UserID == Engine.netApiManager.Client?.User?.Id) {
-					RLog.Err("Some how sent asset to self");
-				}
-				else {
-					RLog.Err("Asset from some one how does not own asset");
-				}
+			if (!firstData.StartsWith($"{SessionID.Value}-{tag.User.ID}")) {
+				RLog.Err("Asset from some one how does not own asset");
 				return;
 			}
 			if (assetRequest is AssetResponse assetData) {
