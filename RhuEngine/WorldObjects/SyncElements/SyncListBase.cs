@@ -21,7 +21,7 @@ namespace RhuEngine.WorldObjects
 		void DestroyAtIndex(int index);
 		void DisposeAtIndex(int index);
 	}
-	public abstract class SyncListBase<T> : SyncObject, ISyncList, INetworkedObject, IEnumerable<ISyncObject>, IChangeable, ISyncMember where T : ISyncObject
+	public abstract class SyncListBase<T> : SyncObject, ISyncList, INetworkedObject, IEnumerable<ISyncObject>, IChangeable, ISyncMember where T : class, ISyncObject
 	{
 		private readonly List<T> _syncObjects = new(5);
 
@@ -57,7 +57,18 @@ namespace RhuEngine.WorldObjects
 		[Exposed]
 		public T this[int i] => _syncObjects[i];
 
-		public T this[NetPointer pointer] => _syncObjects.Where((val) => val.Pointer == pointer).First();
+		public T this[NetPointer pointer] {
+			get {
+				lock (Lock) {
+					foreach (var item in _syncObjects) {
+						if(item.Pointer== pointer) {
+							return item;
+						}
+					}
+					return null;
+				}
+			}
+		}
 
 		public int Count => _syncObjects.Count;
 
@@ -211,10 +222,24 @@ namespace RhuEngine.WorldObjects
 					AddInternal(LoadElement(nodeGroup["ElementData"]));
 					break;
 				case 2:
-					var objecte = this[(DataNode<NetPointer>)nodeGroup["ref"]];
-					RLog.Info("Removed net");
-					RemoveInternal(objecte);
-					objecte.Destroy();
+					var targetID = ((DataNode<NetPointer>)nodeGroup["ref"]).Value;
+					var objecte = this[targetID];
+					if(objecte is null) {
+						RLog.Err($"Did not have value in list ID:{targetID}");
+						var worldobject = World.GetWorldObject((DataNode<NetPointer>)nodeGroup["ref"]);
+						if (worldobject is not null) {
+							RLog.Info($"Try to fix error by: removeing world object ID:{targetID}");
+							worldobject.Dispose();
+						}
+						else {
+							RLog.Info($"Object also was not in the world ID:{targetID}");
+						}
+					}
+					else {
+						RLog.Info($"Removed net ID:{targetID}");
+						RemoveInternal(objecte);
+						objecte.Destroy();
+					}
 					break;
 				case 3:
 					lock (_syncObjects) {
