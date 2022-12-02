@@ -106,7 +106,7 @@ namespace RhuEngine.WorldObjects
 				tag.SendAsset(Serializer.Save<IAssetRequest>(new AssetResponse { URL = assetRequest.URL, Bytes = data, MimeType = dataMime }), ASSET_DELIVERY_METHOD);
 				return;
 			}
-			if (!firstData.StartsWith($"{SessionID.Value}-{tag.User.ID}")) {
+			if (!firstData.StartsWith($"{SessionID.Value}-{tag.UserID}")) {
 				return;
 			}
 			if (assetRequest is AssetResponse assetData) {
