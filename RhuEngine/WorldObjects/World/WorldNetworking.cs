@@ -240,6 +240,12 @@ namespace RhuEngine.WorldObjects
 			_netManager.DisconnectTimeout = 100000;
 			_netManager.UpdateTime = 45;
 			_netManager.ChannelsCount = 3;
+			_netManager.AutoRecycle = true;
+
+			//Made unsync to make run faster
+			_netManager.UnsyncedDeliveryEvent = true;
+			_netManager.UnsyncedEvents= true;
+			_netManager.UnsyncedReceiveEvent = true;
 			//0 is main
 			//1 is syncStreams
 			//2 is assetPackeds
