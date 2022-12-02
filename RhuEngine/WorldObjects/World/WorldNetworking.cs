@@ -176,8 +176,12 @@ namespace RhuEngine.WorldObjects
 				RLog.Info($"NatIntroductionSuccess {point}  {addrType}  {token}");
 				NatIntroductionSuccessIsGood[token] = true;
 				var peer = _netManager.Connect(point, token + '~' + KEY);
+				var reload = peer.Tag is bool ta && ta;
 				peer.Tag = NatUserIDS[token];
 				NatConnection.TryAdd(token, peer);
+				if (reload) {
+					PeerConnected(peer);
+				}
 			};
 
 			_natPunchListener.NatIntroductionRequest += (point, addrType, token) => {
@@ -505,7 +509,8 @@ namespace RhuEngine.WorldObjects
 				ProcessUserConnection(newpeer);
 			}
 			else {
-				RLog.Err($"Peer had no tag noidea what to do {peer.Tag}");
+				RLog.Err($"Peer had no tag noidea what to do {peer.Tag} marking for reload");
+				peer.Tag = true;
 			}
 		}
 
@@ -525,9 +530,13 @@ namespace RhuEngine.WorldObjects
 					LoadMsg = "Direct Connected to User";
 					var idUri = new Uri(user.Data);
 					var dpeer = _netManager.Connect(idUri.Host, idUri.Port, KEY);
+					var reload = dpeer.Tag is bool ta && ta;
 					dpeer.Tag = user.UserID;
 					lock (ActiveConnections) {
 						ActiveConnections.Remove(user);
+					}
+					if(reload) {
+						PeerConnected(dpeer);
 					}
 					break;
 				case ConnectionType.HolePunch:
