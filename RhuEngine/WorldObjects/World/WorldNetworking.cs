@@ -149,9 +149,9 @@ namespace RhuEngine.WorldObjects
 
 		private string KEY => $"Rhubarb_{worldManager.Engine.netApiManager.Client.ClientCompatibility}";
 
-		public ConcurrentDictionary<string, bool> NatIntroductionSuccessIsGood = new();
-		public ConcurrentDictionary<string, NetPeer> NatConnection = new();
-		public ConcurrentDictionary<string, Guid> NatUserIDS = new();
+		public readonly ConcurrentDictionary<string, bool> NatIntroductionSuccessIsGood = new();
+		public readonly ConcurrentDictionary<string, NetPeer> NatConnection = new();
+		public readonly ConcurrentDictionary<string, Guid> NatUserIDS = new();
 
 		private void FindNewMaster() {
 			for (var i = 0; i < Users.Count; i++) {
