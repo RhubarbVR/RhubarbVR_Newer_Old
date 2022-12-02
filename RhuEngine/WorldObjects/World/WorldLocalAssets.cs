@@ -107,7 +107,7 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			if (!firstData.StartsWith($"{SessionID.Value}-{tag.User.ID}")) {
-				RLog.Err("Asset from some one how does not own asset");
+				RLog.Err($"Asset from {tag.User.ID} some one how does not own asset");
 				return;
 			}
 			if (assetRequest is AssetResponse assetData) {
