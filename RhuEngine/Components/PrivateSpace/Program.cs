@@ -70,17 +70,21 @@ namespace RhuEngine.Components
 
 		protected override void OnLoaded() {
 			base.OnLoaded();
-			ProgramManager.LoadProgram(this);
+			if (Pointer.GetOwnerID() == World.LocalUserID) {
+				ProgramManager.LoadProgram(this);
+			}
 		}
 
 		public override void Dispose() {
 			base.Dispose();
-			if (programWindows is not null) {
-				foreach (SyncRef<ProgramWindow> item in programWindows) {
-					item.Target?.Close();
+			if (Pointer.GetOwnerID() == World.LocalUserID) {
+				if (programWindows is not null) {
+					foreach (SyncRef<ProgramWindow> item in programWindows) {
+						item.Target?.Close();
+					}
 				}
+				ProgramManager?.UnLoadProgram(this);
 			}
-			ProgramManager?.UnLoadProgram(this);
 		}
 	}
 }
