@@ -119,20 +119,23 @@ namespace RhubarbCloudClient
 			if (userID == Guid.Empty) {
 				return null;
 			}
-			if (_loadedUsers.TryGetValue(userID, out var val)) {
-				return val;
-			}
-			else {
-				var newData = new ManagedUser(UserRelation.None, this);
-				_loadedUsers.Add(userID, newData);
-				await newData.UpdateUserStatus();
-				await newData.UpdateUserData();
-				await newData.UpdateUserRelation();
-				if (userID != (User?.Id ?? Guid.Empty)) {
-					await _hub.InvokeAsync("UserUpdateListen", userID);
+			ManagedUser managedUser = null;
+			lock (_loadedUsers) {
+				if (_loadedUsers.TryGetValue(userID, out managedUser)) {
+					return managedUser;
 				}
-				return newData;
+				else {
+					managedUser = new ManagedUser(UserRelation.None, this);
+					_loadedUsers.Add(userID, managedUser);
+				}
 			}
+			await managedUser.UpdateUserStatus();
+			await managedUser.UpdateUserData();
+			await managedUser.UpdateUserRelation();
+			if (userID != (User?.Id ?? Guid.Empty)) {
+				await _hub.InvokeAsync("UserUpdateListen", userID);
+			}
+			return managedUser;
 		}
 
 		public async Task<ServerResponse<bool>> ChangeProfile(Guid Target) {
