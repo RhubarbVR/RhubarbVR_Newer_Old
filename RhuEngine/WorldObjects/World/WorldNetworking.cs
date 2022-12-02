@@ -340,6 +340,10 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			try {
+				if (peer.Tag is Guid) {
+					//Did not run conect yet
+					PeerConnected(peer);
+				}
 				var data = reader.GetRemainingBytes();
 				if (peer.Tag is Peer) {
 					var tag = peer.Tag as Peer;
@@ -418,9 +422,6 @@ namespace RhuEngine.WorldObjects
 						throw new Exception("data packed could not be read");
 					}
 				}
-				else if (peer.Tag is Guid or null) {
-					//Still loading peer
-				}
 				else {
 					RLog.Err("Peer is not known");
 				}
@@ -428,7 +429,6 @@ namespace RhuEngine.WorldObjects
 			catch (Exception ex) {
 				RLog.Err($"Failed to proccess packed Error {ex}");
 			}
-			reader.Recycle();
 		}
 
 		public void ProcessUserConnection(Peer peer) {
@@ -448,6 +448,10 @@ namespace RhuEngine.WorldObjects
 		}
 
 		private void PeerConnected(NetPeer peer) {
+			if(peer.Tag is Peer) {
+				RLog.Info("Peer alreadyLoaded");
+				return;
+			}
 			RLog.Info("Peer connected");
 			if (peer.EndPoint.Address.ToString().Contains("127.0.0.1") && peer.Tag is not RelayPeer) {  // this is to make debuging essayer
 				return;
@@ -511,9 +515,7 @@ namespace RhuEngine.WorldObjects
 							if (NatConnection.TryGetValue(user.Data, out var peer)) {
 								if ((peer?.ConnectionState ?? ConnectionState.Disconnected) != ConnectionState.Connected) {
 									try {
-										if (peer is not null) {
-											peer.Disconnect();
-										}
+										peer?.Disconnect();
 									}
 									catch {
 										return;
