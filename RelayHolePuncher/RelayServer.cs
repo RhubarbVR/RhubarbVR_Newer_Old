@@ -77,6 +77,7 @@ namespace RelayHolePuncher
 					request.Reject();
 				}
 				else {
+					Console.WriteLine($"Connection Relay Accept Tag{data}");
 					var peer = request.Accept();
 					peer.Tag = data;
 				}
@@ -95,7 +96,7 @@ namespace RelayHolePuncher
 			_relay.Start(port);
 			_relay.MaxConnectAttempts = 15;
 			_relay.ChannelsCount = 3;
-			_relay.DisconnectTimeout = 5000;
+			_relay.DisconnectTimeout = 60000;
 			_relay.ReuseAddress = true;
 			_relay.UpdateTime = 30;
 			_relay.UnsyncedDeliveryEvent = true;
