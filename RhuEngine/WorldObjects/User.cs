@@ -7,6 +7,7 @@ using LiteNetLib;
 using RhubarbCloudClient.Model;
 
 using RhuEngine.Components;
+using RhuEngine.Linker;
 
 using RNumerics;
 
@@ -101,7 +102,11 @@ namespace RhuEngine.WorldObjects
 			if (CurrentPeer is null) {
 				try {
 					if (World.peers.Count != 0) {
-						var foundPeer = World.peers.Where((val) => val.UserID.ToString() == userID).First();
+						var peer = World.peers.Where((val) => val.UserID.ToString() == userID.Value).ToArray();
+						if (peer.Length == 0) {
+							return;
+						}
+						var foundPeer = peer[0];
 						if (foundPeer is not null) {
 							if (foundPeer.User is null) {
 								CurrentPeer = foundPeer;

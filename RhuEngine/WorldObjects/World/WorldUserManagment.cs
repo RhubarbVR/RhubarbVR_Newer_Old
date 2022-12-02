@@ -61,6 +61,7 @@ namespace RhuEngine.WorldObjects
 					}
 					else {
 						user.CurrentPeer = peer;
+						peer.User = user;
 					}
 				}
 			}
