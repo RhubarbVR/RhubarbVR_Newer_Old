@@ -113,28 +113,30 @@ namespace RelayHolePuncher
 			try {
 				var data = reader.GetRemainingBytes();
 				if (peer.Tag is List<UserConnection> userconections) {
-					if (Serializer.TryToRead<ConnectToAnotherUser>(data, out var connectToAnotherUser)) {
-						ProcessConnection(peer, connectToAnotherUser.Key);
-					}
-					else if (Serializer.TryToRead<DataPacked>(data, out var packed)) {
-						if (userconections.Count > packed.Id - 1) {
-							if (userconections[packed.Id - 1].waitingData is not null) {
-								if (deliveryMethod == DeliveryMethod.ReliableOrdered) {
-									userconections[packed.Id - 1].waitingData.Add(packed.Data);
+					if (Serializer.TryToRead<IRelayNetPacked>(data, out var relayPacked)) {
+						if (relayPacked is ConnectToAnotherUser connectToAnotherUser) {
+							ProcessConnection(peer, connectToAnotherUser.Key);
+						}
+						else if (relayPacked is DataPacked packed) {
+							if (userconections.Count > packed.Id - 1) {
+								if (userconections[packed.Id - 1].waitingData is not null) {
+									if (deliveryMethod == DeliveryMethod.ReliableOrdered) {
+										userconections[packed.Id - 1].waitingData.Add(packed.Data);
+									}
+								}
+								else {
+									userconections[packed.Id - 1].otherConnection.Peer.Send(Serializer.Save<IRelayNetPacked>(new DataPacked(packed.Data, userconections[packed.Id - 1].otherConnection.index)), 2, deliveryMethod);
 								}
 							}
-							else {
-								userconections[packed.Id - 1].otherConnection.Peer.Send(Serializer.Save(new DataPacked(packed.Data, userconections[packed.Id - 1].otherConnection.index)), 2, deliveryMethod);
-							}
 						}
-					}
-					else if (Serializer.TryToRead<StreamDataPacked>(data, out var streampacked)) {
-						foreach (var item in userconections) {
-							try {
-								item.otherConnection?.Peer.Send(Serializer.Save(new DataPacked(data, item.otherConnection.index)), 1, deliveryMethod);
-							}
-							catch (Exception e) {
-								Console.WriteLine("Failed to send to user" + e.ToString());
+						else if (relayPacked is StreamDataPacked streampacked) {
+							foreach (var item in userconections) {
+								try {
+									item.otherConnection?.Peer.Send(Serializer.Save<IRelayNetPacked>(new DataPacked(data, item.otherConnection.index)), 1, deliveryMethod);
+								}
+								catch (Exception e) {
+									Console.WriteLine("Failed to send to user" + e.ToString());
+								}
 							}
 						}
 					}
@@ -147,7 +149,7 @@ namespace RelayHolePuncher
 									}
 								}
 								else {
-									item.otherConnection.Peer.Send(Serializer.Save(new DataPacked(data, item.otherConnection.index)), 0, deliveryMethod);
+									item.otherConnection.Peer.Send(Serializer.Save<IRelayNetPacked>(new DataPacked(data, item.otherConnection.index)), 0, deliveryMethod);
 								}
 							}
 							catch (Exception e) {

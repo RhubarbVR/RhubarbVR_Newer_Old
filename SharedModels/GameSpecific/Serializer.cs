@@ -102,7 +102,7 @@ namespace SharedModels.GameSpecific
 
 		public static bool TrySave<T>(T data, out byte[] outData) {
 			try {
-				outData = MessagePackSerializer.Serialize(data, Options);
+				outData = MessagePackSerializer.Serialize<T>(data, Options);
 				return true;
 			}
 			catch {
@@ -111,7 +111,7 @@ namespace SharedModels.GameSpecific
 			}
 		}
 		public static byte[] Save<T>(T data) {
-			return MessagePackSerializer.Serialize(data, Options);
+			return MessagePackSerializer.Serialize<T>(data, Options);
 		}
 	}
 }

@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 using LiteNetLib;
 
+using MessagePack;
+
 using Newtonsoft.Json;
 
 using RhubarbCloudClient.Model;
@@ -339,6 +341,11 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
+		[Union(0, typeof(BlockStore))]
+		[Union(1, typeof(IAssetRequest))]
+		public interface INetPacked
+		{
+		}
 
 		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod) {
 			if (IsDisposed) {
@@ -353,28 +360,32 @@ namespace RhuEngine.WorldObjects
 				if (peer.Tag is Peer) {
 					var tag = peer.Tag as Peer;
 					if (deliveryMethod == DeliveryMethod.Unreliable) {
-						if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
+						if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
 							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
 						}
-						else if (Serializer.TryToRead<BlockStore>(data, out var keyValuePairs)) {
-							ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
-						}
-						else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
-							AssetResponses(assetRequest, tag, deliveryMethod);
+						else if (Serializer.TryToRead<INetPacked>(data, out var rawDataPacked)) {
+							if (rawDataPacked is BlockStore keyValuePairs) {
+								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
+							}
+							else if (rawDataPacked is IAssetRequest assetRequest) {
+								AssetResponses(assetRequest, tag, deliveryMethod);
+							}
 						}
 						else {
 							throw new Exception("Uknown Data from User");
 						}
 					}
 					else {
-						if (Serializer.TryToRead<BlockStore>(data, out var keyValuePairs)) {
-							ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
+						if (Serializer.TryToRead<INetPacked>(data, out var rawDataPacked)) {
+							if (rawDataPacked is BlockStore keyValuePairs) {
+								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
+							}
+							else if (rawDataPacked is IAssetRequest assetRequest) {
+								AssetResponses(assetRequest, tag, deliveryMethod);
+							}
 						}
-						else if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
+						else if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
 							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
-						}
-						else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
-							AssetResponses(assetRequest, tag, deliveryMethod);
 						}
 						else {
 							throw new Exception("Uknown Data from User");
@@ -384,51 +395,57 @@ namespace RhuEngine.WorldObjects
 				}
 				else if (peer.Tag is RelayPeer) {
 					var tag = peer.Tag as RelayPeer;
-					if (Serializer.TryToRead<DataPacked>(data, out var packed)) {
-						if (deliveryMethod == DeliveryMethod.Unreliable) {
-							if (Serializer.TryToRead<StreamDataPacked>(packed.Data, out var streamDataPacked)) {
-								ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
-							}
-							else if (Serializer.TryToRead<BlockStore>(packed.Data, out var keyValuePairs)) {
-								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
-							}
-							else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
-								AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+					if (Serializer.TryToRead<IRelayNetPacked>(data, out var packede)) {
+						if (packede is DataPacked packed) {
+							if (deliveryMethod == DeliveryMethod.Unreliable) {
+								if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
+									ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
+								}
+								else if (Serializer.TryToRead<INetPacked>(data, out var rawDataPacked)) {
+									if (rawDataPacked is BlockStore keyValuePairs) {
+										ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
+									}
+									else if (rawDataPacked is IAssetRequest assetRequest) {
+										AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+									}
+								}
+								else {
+									throw new Exception("Uknown Data from relay");
+								}
 							}
 							else {
-								throw new Exception("Uknown Data from relay");
+								if (Serializer.TryToRead<INetPacked>(data, out var rawDataPacked)) {
+									if (rawDataPacked is BlockStore keyValuePairs) {
+										ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
+									}
+									else if (rawDataPacked is IAssetRequest assetRequest) {
+										AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+									}
+								}
+								if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
+									ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
+								}
+								else {
+									throw new Exception("Uknown Data from relay");
+								}
 							}
+						}
+						else if (packede is OtherUserLeft otherUserLeft) {
+							var rpeer = tag.peers[otherUserLeft.id];
+							tag.peers.Remove(rpeer);
+							rpeer.KillRelayConnection();
+							PeerDisconect(rpeer);
 						}
 						else {
-							if (Serializer.TryToRead<BlockStore>(packed.Data, out var keyValuePairs)) {
-								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
-							}
-							else if (Serializer.TryToRead<StreamDataPacked>(packed.Data, out var streamDataPacked)) {
-								ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
-							}
-							else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
-								AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
-							}
-							else {
-								throw new Exception("Uknown Data from relay");
-							}
+							throw new Exception("realy packed not known");
 						}
-					}
-					else if (Serializer.TryToRead<OtherUserLeft>(data, out var otherUserLeft)) {
-						var rpeer = tag.peers[otherUserLeft.id];
-						tag.peers.Remove(rpeer);
-						rpeer.KillRelayConnection();
-						PeerDisconect(rpeer);
-					}
-					else if (Serializer.TryToRead<DataNodeGroup>(data, out _)) {
-						throw new Exception("Got a datanode group not a packed");
 					}
 					else {
 						throw new Exception("data packed could not be read");
 					}
 				}
 				else {
-					RLog.Err("Peer is not known");
+					throw new Exception("Peer is not known");
 				}
 			}
 			catch (Exception ex) {

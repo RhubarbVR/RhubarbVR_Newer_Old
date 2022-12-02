@@ -9,6 +9,8 @@ using RNumerics;
 
 using SharedModels.GameSpecific;
 
+using static RhuEngine.WorldObjects.World;
+
 namespace RhuEngine.DataStructure
 {
 	[Union(0, typeof(DataNodeList))]
@@ -119,7 +121,7 @@ namespace RhuEngine.DataStructure
 	}
 
 	[MessagePackObject]
-	public sealed class BlockStore
+	public sealed class BlockStore : INetPacked
 	{
 		[Key(0)]
 		public List<DataNodeHolder> dataNodes = new();

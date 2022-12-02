@@ -20,7 +20,7 @@ namespace SharedModels.GameSpecific
 			return new StreamDataPacked(data);
 		}
 	}
-	public struct StreamDataPacked
+	public struct StreamDataPacked : IRelayNetPacked
 	{
 		public byte[] Data;
 		public StreamDataPacked(byte[] data) : this() {

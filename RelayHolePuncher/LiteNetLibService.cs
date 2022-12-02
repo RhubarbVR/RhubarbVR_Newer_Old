@@ -27,7 +27,9 @@ namespace RelayHolePuncher
 
 		public async Task StartUpdateLoop() {
 			while (punchServer._puncher.IsRunning && relayServer._relay.IsRunning) {
-				await Task.Delay(1000);
+				punchServer._puncher.PollEvents();
+				relayServer._relay.PollEvents();
+				await Task.Delay(25);
 			}
 		}
 
