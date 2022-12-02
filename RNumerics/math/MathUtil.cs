@@ -45,7 +45,6 @@ namespace RNumerics
 			return (float)Math.Abs(a - b) <= epsilon;
 		}
 
-		//ToDo: NoMoreDynmaic
 		public static T Clamp<T>(in T f, in T low, in T high) {
 			return ((RDynamic<T>)f < low) ? low : ((RDynamic<T>)f > high) ? high : f;
 		}

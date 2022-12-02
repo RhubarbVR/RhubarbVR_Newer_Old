@@ -20,10 +20,9 @@ namespace RhuEngine.WorldObjects
 		public readonly SyncObjList<User> Users;
 
 		public User GetUserFromID(Guid id) {
-			//Todo: make forLoop
-			foreach (var item in Users.Cast<User>()) {
-				if (item.userID.Value == id.ToString()) {
-					return item;
+			for (var i = 0; i < Users.Count; i++) {
+				if (Users[i].userID.Value == id.ToString()) {
+					return Users[i];
 				}
 			}
 			return null;
