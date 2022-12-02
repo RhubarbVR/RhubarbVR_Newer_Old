@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using LibVLCSharp.Shared;
+
 using LiteNetLib;
 
 using MessagePack;
@@ -467,7 +469,7 @@ namespace RhuEngine.WorldObjects
 				RLog.Info("Sending initial world state to a new user");
 				var dataGroup = new DataNodeGroup();
 				dataGroup.SetValue("WorldData", Serialize(new SyncObjectSerializerObject(true)));
-				peer.Send(new DataSaver(dataGroup).SaveStore(), DeliveryMethod.ReliableOrdered);
+				peer.Send(Serializer.Save<INetPacked>(new DataSaver(dataGroup).Store), DeliveryMethod.ReliableOrdered);
 			}
 			LoadUserIn(peer);
 			FindNewMaster();
@@ -639,7 +641,7 @@ namespace RhuEngine.WorldObjects
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			_netManager.SendToAll(new DataSaver(netData).SaveStore(), 0, deliveryMethod);
+			_netManager.SendToAll(Serializer.Save<INetPacked>(new DataSaver(netData).Store), 0, deliveryMethod);
 		}
 
 		public void BroadcastDataToAllStream(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
@@ -659,7 +661,7 @@ namespace RhuEngine.WorldObjects
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			_netManager.SendToAll(Serializer.Save(new StreamDataPacked(new DataSaver(netData).SaveStore())), 1, deliveryMethod);
+			_netManager.SendToAll(Serializer.Save<IRelayNetPacked>(new StreamDataPacked(new DataSaver(netData).SaveStore())), 1, deliveryMethod);
 		}
 
 

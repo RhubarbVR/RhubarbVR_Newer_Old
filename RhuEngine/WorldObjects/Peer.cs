@@ -83,7 +83,7 @@ namespace RhuEngine.WorldObjects
 				NetPeer.Send(data, 0, reliableOrdered);
 			}
 			else {
-				NetPeer.Send(Serializer.Save(new DataPacked(data, ID)), 0, reliableOrdered);
+				NetPeer.Send(Serializer.Save<IRelayNetPacked>(new DataPacked(data, ID)), 0, reliableOrdered);
 			}
 		}
 
