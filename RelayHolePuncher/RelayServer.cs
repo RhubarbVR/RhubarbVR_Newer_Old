@@ -26,7 +26,7 @@ namespace RelayHolePuncher
 
 	public class RelayServer : INetworkingServer
 	{
-		private NetManager _relay;
+		public NetManager _relay;
 
 		private readonly Dictionary<string, UserConnection> _waitingConections = new();
 
@@ -97,12 +97,11 @@ namespace RelayHolePuncher
 			_relay.ChannelsCount = 3;
 			_relay.DisconnectTimeout = 1000000;
 			_relay.ReuseAddress = true;
-			_relay.UpdateTime = 120;//Todo change update speed
+			_relay.UpdateTime = 30;
+			_relay.UnsyncedDeliveryEvent = true;
+			_relay.UnsyncedEvents = true;
+			_relay.UnsyncedReceiveEvent = true;
 			Console.WriteLine($"Started Relay Server on port {port}");
-		}
-
-		public void Update() {
-			_relay.PollEvents();
 		}
 
 		public void Kill() {

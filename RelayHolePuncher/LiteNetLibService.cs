@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 using LiteNetLib;
 
@@ -24,13 +25,10 @@ namespace RelayHolePuncher
 			relayServer.Initialize(7857);
 		}
 
-		public void StartUpdateLoop() {
-			//Todo make loop run smoother
-			var thread = new Thread(() => { while (true) { punchServer.Update(); } });
-			var thread2 = new Thread(() => { while (true) { relayServer.Update(); } });
-			thread.Start();
-			thread2.Start();
-			thread.Join();
+		public async Task StartUpdateLoop() {
+			while (punchServer._puncher.IsRunning && relayServer._relay.IsRunning) {
+				await Task.Delay(1000);
+			}
 		}
 
 		public static bool CheckIfValidGUID(string guid) {

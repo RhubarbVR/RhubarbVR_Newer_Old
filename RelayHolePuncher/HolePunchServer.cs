@@ -64,9 +64,7 @@ namespace RelayHolePuncher
 			Console.WriteLine($"Started HolePunchServer on port {port}");
 			_puncher.Start(port);
 			_puncher.NatPunchModule.Init(this);
-		}
-		public void Update() {
-			_puncher.NatPunchModule.PollEvents();
+			_puncher.UnsyncedEvents = true;
 		}
 
 		public void Kill() {

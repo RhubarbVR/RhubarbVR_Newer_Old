@@ -238,7 +238,7 @@ namespace RhuEngine.WorldObjects
 			_netManager.EnableStatistics = true;
 			_netManager.MaxConnectAttempts = 15;
 			_netManager.DisconnectTimeout = 100000;
-			_netManager.UpdateTime = 45;
+			_netManager.UpdateTime = 33;
 			_netManager.ChannelsCount = 3;
 			_netManager.AutoRecycle = true;
 
@@ -264,6 +264,9 @@ namespace RhuEngine.WorldObjects
 
 		private void ProcessPackedData(DataNodeGroup dataGroup, DeliveryMethod deliveryMethod, Peer peer) {
 			if (WaitingForWorldStartState) {
+				if(deliveryMethod == DeliveryMethod.Unreliable) {
+					return;
+				}
 				LoadMsg = "Waiting For World Start State";
 				try {
 					var worldData = dataGroup.GetValue("WorldData");
