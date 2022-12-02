@@ -270,6 +270,8 @@ namespace RhuEngine.WorldObjects
 
 		public NetStatistics NetStatistics => _netManager?.Statistics;
 
+		private bool _waitingForUsers = false;
+
 		private void ProcessPackedData(DataNodeGroup dataGroup, DeliveryMethod deliveryMethod, Peer peer) {
 			if (WaitingForWorldStartState) {
 				if (deliveryMethod == DeliveryMethod.Unreliable) {
@@ -277,43 +279,47 @@ namespace RhuEngine.WorldObjects
 				}
 				LoadMsg = "Waiting For World Start State";
 				try {
-
 					var worldData = dataGroup.GetValue("WorldData");
 					if (worldData == null) {
 						throw new Exception();
 					}
-					Task.Run(async () => {
-						try {
-							LoadMsg = "World state Found";
-							// Wait for everyone
-							while (ActiveConnections.Count > 0) {
-								LoadMsg = "Waiting for connections";
-								await Task.Delay(1000);
-							}
-							_worldObjects.Clear();
-							var deserializer = new SyncObjectDeserializerObject(false);
-							Deserialize((DataNodeGroup)worldData, deserializer);
-							LocalUserID = (ushort)(Users.Count + 1);
-							RLog.Info(LoadMsg = "World state loaded");
-							foreach (var peer1 in _netManager.ConnectedPeerList) {
-								if (peer1.Tag is Peer contpeer) {
-									LoadUserIn(contpeer);
+					if (_waitingForUsers) {
+						return;
+					}
+					else {
+						_waitingForUsers = true;
+						Task.Run(async () => {
+							try {
+								// Wait for everyone
+								LoadMsg = "waiting on all users connections";
+								while (ActiveConnections.Count > 0) {
+									await Task.Delay(100);
 								}
+								_worldObjects.Clear();
+								var deserializer = new SyncObjectDeserializerObject(false);
+								Deserialize((DataNodeGroup)worldData, deserializer);
+								LocalUserID = (ushort)(Users.Count + 1);
+								RLog.Info(LoadMsg = "World state loaded");
+								foreach (var peer1 in _netManager.ConnectedPeerList) {
+									if (peer1.Tag is Peer contpeer) {
+										LoadUserIn(contpeer);
+									}
+								}
+								FindNewMaster();
+								AddLocalUser();
+								foreach (var item in deserializer.onLoaded) {
+									item?.Invoke();
+								}
+								RLog.Info(LoadMsg = "DoneDeserlizing");
+								IsDeserializing = false;
+								WaitingForWorldStartState = false;
 							}
-							FindNewMaster();
-							AddLocalUser();
-							foreach (var item in deserializer.onLoaded) {
-								item?.Invoke();
+							catch (Exception ex) {
+								RLog.Err("Failed to load world state" + ex);
+								LoadMsg = "Failed to load world state" + ex;
 							}
-							RLog.Info(LoadMsg = "DoneDeserlizing");
-							IsDeserializing = false;
-							WaitingForWorldStartState = false;
-						}
-						catch (Exception ex) {
-							RLog.Err("Failed to load world state" + ex);
-							LoadMsg = "Failed to load world state" + ex;
-						}
-					});
+						});
+					}
 				}
 				catch { }
 			}
