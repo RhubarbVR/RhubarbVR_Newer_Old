@@ -107,6 +107,12 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			if (!firstData.StartsWith($"{SessionID.Value}-{tag.UserID}")) {
+				if(tag.UserID == Engine.netApiManager.Client?.User?.Id) {
+					RLog.Err("Some how sent asset to self");
+				}
+				else {
+					RLog.Err("Asset from some one how does not own asset");
+				}
 				return;
 			}
 			if (assetRequest is AssetResponse assetData) {

@@ -347,8 +347,8 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			try {
-				if (peer.Tag is Guid) {
-					//Did not run conect yet
+				if (peer.Tag is Guid id) {
+					RLog.Err($"Did not connect user yet {id}");
 					PeerConnected(peer);
 				}
 				var data = reader.GetRemainingBytes();
@@ -468,9 +468,12 @@ namespace RhuEngine.WorldObjects
 				relayServers.Add(relayPeer);
 				relayPeer.OnConnect();
 			}
-			else if (peer.Tag is Guid @string) {
+			else if (peer.Tag is Guid @id) {
+				if(@id == Engine.netApiManager.Client?.User?.Id) {
+					RLog.Err("Normal Peer id was self");
+				}
 				RLog.Info("Normal Peer Loaded");
-				var newpeer = new Peer(peer, @string);
+				var newpeer = new Peer(peer, @id);
 				peer.Tag = newpeer;
 				ProcessUserConnection(newpeer);
 			}
