@@ -109,6 +109,7 @@ namespace RhuEngine.WorldObjects
 			}
 			World?.UnRegisterWorldObject(this);
 			OnDispose = null;
+			Parent = null;
 			ClearAllSyncMembers();
 		}
 

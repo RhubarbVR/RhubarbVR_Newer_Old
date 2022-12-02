@@ -28,6 +28,9 @@ namespace RhuEngine.Components
 			}
 			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
 				try {
+					if(IsDestroying || IsRemoved) {
+						return;
+					}
 					ComputeMesh();
 				}
 				catch (Exception e) {

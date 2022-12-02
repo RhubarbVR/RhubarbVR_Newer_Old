@@ -104,7 +104,7 @@ namespace RhuEngine.Components
 
 
 			_optionsAccess = rightBox.Entity.AddChild("Options").AttachComponent<OptionButton>();
-			_optionsAccess.Selected.Value = 0;
+			_optionsAccess.Selected.Value = 1;
 			var privates = _optionsAccess.Items.Add();
 			privates.Text.Value = "Private";
 			privates.Id.Value = 0;

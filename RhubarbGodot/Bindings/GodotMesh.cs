@@ -344,7 +344,7 @@ namespace RhubarbVR.Bindings
 
 		public GodotMesh(ArrayMesh loaded) {
 			LoadedMesh = loaded;
-			LoadedSkin = null;
+			LoadedSkin = new Skin();
 		}
 
 		public void Init(RMesh rMesh) {
@@ -354,7 +354,7 @@ namespace RhubarbVR.Bindings
 			}
 			Name = Guid.NewGuid().ToString();
 			LoadedMesh = new ArrayMesh();
-			LoadedSkin = null;
+			LoadedSkin = new Skin();
 		}
 
 		public void LoadMeshData(IMesh mesh) {
@@ -520,7 +520,6 @@ namespace RhubarbVR.Bindings
 			LoadedMesh.BlendShapeMode = shapeMode;
 			LoadedMesh.ResourceName = Name;
 			if (BonePos.Length != 0) {
-				LoadedSkin ??= new Skin();
 				LoadedSkin?.ClearBinds();
 				for (var i = 0; i < BonePos.Length; i++) {
 					LoadedSkin.AddBind(i, BonePos[i].CastMatrix());

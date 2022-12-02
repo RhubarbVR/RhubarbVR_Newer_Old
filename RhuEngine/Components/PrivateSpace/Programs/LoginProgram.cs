@@ -111,11 +111,16 @@ namespace RhuEngine.Components
 		}
 
 		public void Error(string msg) {
-			_infoTopText.Key.Value = msg;
+			if (_infoTopText != null) {
+				_infoTopText.Key.Value = msg;
+			}
 		}
 
 		private void TwoFaLoad() {
 			RenderThread.ExecuteOnStartOfFrame(() => {
+				if(IsDestroying | IsRemoved) {
+					return;
+				}
 				_twoFA.Entity.enabled.Value = true;
 				_username.Entity.enabled.Value = false;
 				_email.Entity.enabled.Value = false;

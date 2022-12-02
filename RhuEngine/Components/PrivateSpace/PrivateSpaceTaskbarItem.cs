@@ -174,6 +174,7 @@ namespace RhuEngine.Components
 			lock (PrivateSpaceManager?.UserInterfaceManager.privateSpaceTaskbarItems) {
 				PrivateSpaceManager?.UserInterfaceManager.privateSpaceTaskbarItems.Remove(this);
 			}
+			ProgramsUpdate -= UpdateHide;
 			base.Dispose();
 		}
 
@@ -219,6 +220,9 @@ namespace RhuEngine.Components
 		}
 
 		private void UpdateHide() {
+			if (IsDestroying | IsRemoved) {
+				return;
+			}
 			var foundProgram = false;
 			lock (PrivateSpaceManager.UserInterfaceManager.privateSpaceTaskbarItems) {
 				foreach (var item in PrivateSpaceManager.UserInterfaceManager.privateSpaceTaskbarItems) {
