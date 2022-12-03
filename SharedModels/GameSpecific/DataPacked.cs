@@ -19,7 +19,7 @@ namespace SharedModels.GameSpecific
 			return new DataPacked(data,id);
 		}
 	}
-	public struct DataPacked
+	public struct DataPacked : IRelayNetPacked
 	{
 		public byte[] Data;
 		public ushort Id;

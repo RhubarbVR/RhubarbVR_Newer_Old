@@ -20,7 +20,7 @@ namespace SharedModels.GameSpecific
 			return new ConnectToAnotherUser(id);
 		}
 	}
-	public struct ConnectToAnotherUser
+	public struct ConnectToAnotherUser : IRelayNetPacked
 	{
 		public string Key;
 		public ConnectToAnotherUser(string key) : this() {

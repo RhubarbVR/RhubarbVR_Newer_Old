@@ -57,7 +57,7 @@ namespace RhuEngine.WorldObjects
 		public static implicit operator T[](SyncValueList<T> data) => data.ToArray().Select((objec) => ((Sync<T>)objec).Value).ToArray();
 	}
 
-	public class SyncObjList<T> : SyncListBase<T>, ISyncObjectList<T>, INetworkedObject, IEnumerable<ISyncObject> where T : ISyncObject, new()
+	public class SyncObjList<T> : SyncListBase<T>, ISyncObjectList<T>, INetworkedObject, IEnumerable<ISyncObject> where T : class, ISyncObject, new()
 	{
 		public T AddWithCustomRefIds(bool networkedObject = false, bool deserialize = false, NetPointerUpdateDelegate func = null) {
 			var newElement = new T();

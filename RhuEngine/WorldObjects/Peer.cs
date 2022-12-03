@@ -51,7 +51,19 @@ namespace RhuEngine.WorldObjects
 
 	public sealed class Peer
 	{
-		public User User { get; set; }
+		private User _user;
+
+		public User User
+		{
+			get {
+				if (_user is null) {
+					RLog.Err("User Not loaded");
+				}
+				return _user;
+			}
+			set => _user = value;
+		}
+
 		public Guid UserID { get; private set; }
 		public ushort ID { get; private set; }
 		public NetPeer NetPeer { get; private set; }
@@ -71,7 +83,7 @@ namespace RhuEngine.WorldObjects
 				NetPeer.Send(data, 0, reliableOrdered);
 			}
 			else {
-				NetPeer.Send(Serializer.Save(new DataPacked(data, ID)), 0, reliableOrdered);
+				NetPeer.Send(Serializer.Save<IRelayNetPacked>(new DataPacked(data, ID)), 0, reliableOrdered);
 			}
 		}
 

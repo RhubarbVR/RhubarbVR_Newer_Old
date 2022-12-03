@@ -61,6 +61,7 @@ namespace RhuEngine.WorldObjects
 					}
 					else {
 						user.CurrentPeer = peer;
+						peer.User = user;
 					}
 				}
 			}
@@ -71,7 +72,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public ushort GetUserID(User user) {
-			return (ushort)Users.IndexOf(user);
+			return (ushort)(Users.IndexOf(user) + 1);
 		}
 
 		[Exposed]

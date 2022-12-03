@@ -8,7 +8,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using LibVLCSharp.Shared;
+
 using LiteNetLib;
+
+using MessagePack;
 
 using Newtonsoft.Json;
 
@@ -149,9 +153,9 @@ namespace RhuEngine.WorldObjects
 
 		private string KEY => $"Rhubarb_{worldManager.Engine.netApiManager.Client.ClientCompatibility}";
 
-		public ConcurrentDictionary<string, bool> NatIntroductionSuccessIsGood = new();
-		public ConcurrentDictionary<string, NetPeer> NatConnection = new();
-		public ConcurrentDictionary<string, Guid> NatUserIDS = new();
+		public readonly ConcurrentDictionary<string, bool> NatIntroductionSuccessIsGood = new();
+		public readonly ConcurrentDictionary<string, NetPeer> NatConnection = new();
+		public readonly ConcurrentDictionary<string, Guid> NatUserIDS = new();
 
 		private void FindNewMaster() {
 			for (var i = 0; i < Users.Count; i++) {
@@ -172,8 +176,12 @@ namespace RhuEngine.WorldObjects
 				RLog.Info($"NatIntroductionSuccess {point}  {addrType}  {token}");
 				NatIntroductionSuccessIsGood[token] = true;
 				var peer = _netManager.Connect(point, token + '~' + KEY);
+				var reload = peer.Tag is bool ta && ta;
 				peer.Tag = NatUserIDS[token];
 				NatConnection.TryAdd(token, peer);
+				if (reload) {
+					PeerConnected(peer);
+				}
 			};
 
 			_natPunchListener.NatIntroductionRequest += (point, addrType, token) => {
@@ -192,9 +200,13 @@ namespace RhuEngine.WorldObjects
 						if (e[1] == KEY) {
 							RLog.Info($"ConnectionRequestEvent Accepted");
 							var peer = request.Accept();
+							var reload = peer.Tag is bool ta && ta;
 							peer.Tag = NatUserIDS[e[0]];
 							NatIntroductionSuccessIsGood.TryAdd(e[0], true);
 							NatConnection.TryAdd(e[0], peer);
+							if (reload) {
+								PeerConnected(peer);
+							}
 						}
 						else {
 							RLog.Info($"ConnectionRequestEvent Reject Key invalied");
@@ -234,21 +246,25 @@ namespace RhuEngine.WorldObjects
 				NatPunchEnabled = true
 			};
 			_netManager.NatPunchModule.Init(_natPunchListener);
-			_netManager.Start();
 			_netManager.EnableStatistics = true;
 			_netManager.MaxConnectAttempts = 15;
-			_netManager.DisconnectTimeout = 100000;
-			_netManager.UpdateTime = 45;
+			_netManager.DisconnectTimeout = 60000;
+			_netManager.UpdateTime = 33;
 			_netManager.ChannelsCount = 3;
 			_netManager.AutoRecycle = true;
 
 			//Made unsync to make run faster
 			_netManager.UnsyncedDeliveryEvent = true;
-			_netManager.UnsyncedEvents= true;
+			_netManager.UnsyncedEvents = true;
 			_netManager.UnsyncedReceiveEvent = true;
 			//0 is main
 			//1 is syncStreams
 			//2 is assetPackeds
+			if (!_netManager.Start()) {
+				LoadMsg = "Failed to start world networking";
+				RLog.Err("Failed to start world networking");
+			}
+
 		}
 
 		private void ClientListener_NetworkLatencyUpdateEvent(NetPeer peer, int latency) {
@@ -262,44 +278,56 @@ namespace RhuEngine.WorldObjects
 
 		public NetStatistics NetStatistics => _netManager?.Statistics;
 
+		private bool _waitingForUsers = false;
+
 		private void ProcessPackedData(DataNodeGroup dataGroup, DeliveryMethod deliveryMethod, Peer peer) {
 			if (WaitingForWorldStartState) {
+				if (deliveryMethod == DeliveryMethod.Unreliable) {
+					return;
+				}
+				LoadMsg = "Waiting For World Start State";
 				try {
 					var worldData = dataGroup.GetValue("WorldData");
 					if (worldData == null) {
 						throw new Exception();
 					}
-					Task.Run(async () => {
-						try {
-							LoadMsg = "World state Found";
-							// Wait for everyone
-							while (ActiveConnections.Count > 0) {
-								LoadMsg = "Waiting for connections";
-								await Task.Delay(1000);
-							}
-							_worldObjects.Clear();
-							var deserializer = new SyncObjectDeserializerObject(false);
-							Deserialize((DataNodeGroup)worldData, deserializer);
-							LocalUserID = (ushort)(Users.Count + 1);
-							RLog.Info(LoadMsg = "World state loaded");
-							foreach (var peer1 in _netManager.ConnectedPeerList) {
-								if (peer1.Tag is Peer contpeer) {
-									LoadUserIn(contpeer);
+					if (_waitingForUsers) {
+						return;
+					}
+					else {
+						_waitingForUsers = true;
+						Task.Run(async () => {
+							try {
+								// Wait for everyone
+								LoadMsg = "waiting on all users connections";
+								while (ActiveConnections.Count > 0) {
+									await Task.Delay(100);
 								}
+								_worldObjects.Clear();
+								var deserializer = new SyncObjectDeserializerObject(false);
+								Deserialize((DataNodeGroup)worldData, deserializer);
+								LocalUserID = (ushort)(Users.Count + 1);
+								RLog.Info(LoadMsg = "World state loaded");
+								foreach (var peer1 in _netManager.ConnectedPeerList) {
+									if (peer1.Tag is Peer contpeer) {
+										LoadUserIn(contpeer);
+									}
+								}
+								FindNewMaster();
+								AddLocalUser();
+								foreach (var item in deserializer.onLoaded) {
+									item?.Invoke();
+								}
+								RLog.Info(LoadMsg = "DoneDeserlizing");
+								IsDeserializing = false;
+								WaitingForWorldStartState = false;
 							}
-							FindNewMaster();
-							AddLocalUser();
-							foreach (var item in deserializer.onLoaded) {
-								item?.Invoke();
+							catch (Exception ex) {
+								RLog.Err("Failed to load world state" + ex);
+								LoadMsg = "Failed to load world state" + ex;
 							}
-							IsDeserializing = false;
-							WaitingForWorldStartState = false;
-						}
-						catch (Exception ex) {
-							RLog.Err("Failed to load world state" + ex);
-							LoadMsg = "Failed to load world state" + ex;
-						}
-					});
+						});
+					}
 				}
 				catch { }
 			}
@@ -333,38 +361,51 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
+		[Union(0, typeof(BlockStore))]
+		[Union(1, typeof(IAssetRequest))]
+		public interface INetPacked
+		{
+		}
 
 		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod) {
 			if (IsDisposed) {
 				return;
 			}
 			try {
+				if (peer.Tag is Guid id) {
+					RLog.Err($"Did not connect user yet {id}");
+					PeerConnected(peer);
+				}
 				var data = reader.GetRemainingBytes();
 				if (peer.Tag is Peer) {
 					var tag = peer.Tag as Peer;
 					if (deliveryMethod == DeliveryMethod.Unreliable) {
-						if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
+						if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
 							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
 						}
-						else if (Serializer.TryToRead<BlockStore>(data, out var keyValuePairs)) {
-							ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
-						}
-						else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
-							AssetResponses(assetRequest, tag, deliveryMethod);
+						else if (Serializer.TryToRead<INetPacked>(data, out var rawDataPacked)) {
+							if (rawDataPacked is BlockStore keyValuePairs) {
+								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
+							}
+							else if (rawDataPacked is IAssetRequest assetRequest) {
+								AssetResponses(assetRequest, tag, deliveryMethod);
+							}
 						}
 						else {
 							throw new Exception("Uknown Data from User");
 						}
 					}
 					else {
-						if (Serializer.TryToRead<BlockStore>(data, out var keyValuePairs)) {
-							ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
+						if (Serializer.TryToRead<INetPacked>(data, out var rawDataPacked)) {
+							if (rawDataPacked is BlockStore keyValuePairs) {
+								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
+							}
+							else if (rawDataPacked is IAssetRequest assetRequest) {
+								AssetResponses(assetRequest, tag, deliveryMethod);
+							}
 						}
-						else if (Serializer.TryToRead<StreamDataPacked>(data, out var streamDataPacked)) {
+						else if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
 							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
-						}
-						else if (Serializer.TryToRead<IAssetRequest>(data, out var assetRequest)) {
-							AssetResponses(assetRequest, tag, deliveryMethod);
 						}
 						else {
 							throw new Exception("Uknown Data from User");
@@ -374,60 +415,62 @@ namespace RhuEngine.WorldObjects
 				}
 				else if (peer.Tag is RelayPeer) {
 					var tag = peer.Tag as RelayPeer;
-					if (Serializer.TryToRead<DataPacked>(data, out var packed)) {
-						if (deliveryMethod == DeliveryMethod.Unreliable) {
-							if (Serializer.TryToRead<StreamDataPacked>(packed.Data, out var streamDataPacked)) {
-								ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
-							}
-							else if (Serializer.TryToRead<BlockStore>(packed.Data, out var keyValuePairs)) {
-								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
-							}
-							else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
-								AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+					if (Serializer.TryToRead<IRelayNetPacked>(data, out var packede)) {
+						if (packede is DataPacked packed) {
+							if (deliveryMethod == DeliveryMethod.Unreliable) {
+								if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
+									ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
+								}
+								else if (Serializer.TryToRead<INetPacked>(data, out var rawDataPacked)) {
+									if (rawDataPacked is BlockStore keyValuePairs) {
+										ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
+									}
+									else if (rawDataPacked is IAssetRequest assetRequest) {
+										AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+									}
+								}
+								else {
+									throw new Exception("Uknown Data from relay");
+								}
 							}
 							else {
-								throw new Exception("Uknown Data from relay");
+								if (Serializer.TryToRead<INetPacked>(data, out var rawDataPacked)) {
+									if (rawDataPacked is BlockStore keyValuePairs) {
+										ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
+									}
+									else if (rawDataPacked is IAssetRequest assetRequest) {
+										AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+									}
+								}
+								if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
+									ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
+								}
+								else {
+									throw new Exception("Uknown Data from relay");
+								}
 							}
+						}
+						else if (packede is OtherUserLeft otherUserLeft) {
+							var rpeer = tag.peers[otherUserLeft.id];
+							tag.peers.Remove(rpeer);
+							rpeer.KillRelayConnection();
+							PeerDisconect(rpeer);
 						}
 						else {
-							if (Serializer.TryToRead<BlockStore>(packed.Data, out var keyValuePairs)) {
-								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
-							}
-							else if (Serializer.TryToRead<StreamDataPacked>(packed.Data, out var streamDataPacked)) {
-								ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
-							}
-							else if (Serializer.TryToRead<IAssetRequest>(packed.Data, out var assetRequest)) {
-								AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
-							}
-							else {
-								throw new Exception("Uknown Data from relay");
-							}
+							throw new Exception("realy packed not known");
 						}
-					}
-					else if (Serializer.TryToRead<OtherUserLeft>(data, out var otherUserLeft)) {
-						var rpeer = tag.peers[otherUserLeft.id];
-						tag.peers.Remove(rpeer);
-						rpeer.KillRelayConnection();
-						PeerDisconect(rpeer);
-					}
-					else if (Serializer.TryToRead<DataNodeGroup>(data, out _)) {
-						throw new Exception("Got a datanode group not a packed");
 					}
 					else {
 						throw new Exception("data packed could not be read");
 					}
 				}
-				else if (peer.Tag is string or null) {
-					//Still loading peer
-				}
 				else {
-					RLog.Err("Peer is not known");
+					throw new Exception("Peer is not known");
 				}
 			}
 			catch (Exception ex) {
 				RLog.Err($"Failed to proccess packed Error {ex}");
 			}
-			reader.Recycle();
 		}
 
 		public void ProcessUserConnection(Peer peer) {
@@ -440,13 +483,17 @@ namespace RhuEngine.WorldObjects
 				RLog.Info("Sending initial world state to a new user");
 				var dataGroup = new DataNodeGroup();
 				dataGroup.SetValue("WorldData", Serialize(new SyncObjectSerializerObject(true)));
-				peer.Send(new DataSaver(dataGroup).SaveStore(), DeliveryMethod.ReliableOrdered);
+				peer.Send(Serializer.Save<INetPacked>(new DataSaver(dataGroup).Store), DeliveryMethod.ReliableOrdered);
 			}
 			LoadUserIn(peer);
 			FindNewMaster();
 		}
 
 		private void PeerConnected(NetPeer peer) {
+			if (peer.Tag is Peer) {
+				RLog.Info("Peer alreadyLoaded");
+				return;
+			}
 			RLog.Info("Peer connected");
 			if (peer.EndPoint.Address.ToString().Contains("127.0.0.1") && peer.Tag is not RelayPeer) {  // this is to make debuging essayer
 				return;
@@ -456,14 +503,18 @@ namespace RhuEngine.WorldObjects
 				relayServers.Add(relayPeer);
 				relayPeer.OnConnect();
 			}
-			else if (peer.Tag is Guid @string) {
+			else if (peer.Tag is Guid @id) {
+				if (@id == Engine.netApiManager.Client?.User?.Id) {
+					RLog.Err("Normal Peer id was self");
+				}
 				RLog.Info("Normal Peer Loaded");
-				var newpeer = new Peer(peer, @string);
+				var newpeer = new Peer(peer, @id);
 				peer.Tag = newpeer;
 				ProcessUserConnection(newpeer);
 			}
 			else {
-				RLog.Err("Peer had no tag noidea what to do");
+				RLog.Err($"Peer had no tag noidea what to do {peer.Tag} marking for reload");
+				peer.Tag = true;
 			}
 		}
 
@@ -483,9 +534,13 @@ namespace RhuEngine.WorldObjects
 					LoadMsg = "Direct Connected to User";
 					var idUri = new Uri(user.Data);
 					var dpeer = _netManager.Connect(idUri.Host, idUri.Port, KEY);
+					var reload = dpeer.Tag is bool ta && ta;
 					dpeer.Tag = user.UserID;
 					lock (ActiveConnections) {
 						ActiveConnections.Remove(user);
+					}
+					if(reload) {
+						PeerConnected(dpeer);
 					}
 					break;
 				case ConnectionType.HolePunch:
@@ -510,9 +565,7 @@ namespace RhuEngine.WorldObjects
 							if (NatConnection.TryGetValue(user.Data, out var peer)) {
 								if ((peer?.ConnectionState ?? ConnectionState.Disconnected) != ConnectionState.Connected) {
 									try {
-										if (peer is not null) {
-											peer.Disconnect();
-										}
+										peer?.Disconnect();
 									}
 									catch {
 										return;
@@ -607,7 +660,7 @@ namespace RhuEngine.WorldObjects
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			_netManager.SendToAll(new DataSaver(netData).SaveStore(), 0, deliveryMethod);
+			_netManager.SendToAll(Serializer.Save<INetPacked>(new DataSaver(netData).Store), 0, deliveryMethod);
 		}
 
 		public void BroadcastDataToAllStream(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
@@ -627,7 +680,7 @@ namespace RhuEngine.WorldObjects
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			_netManager.SendToAll(Serializer.Save(new StreamDataPacked(new DataSaver(netData).SaveStore())), 1, deliveryMethod);
+			_netManager.SendToAll(Serializer.Save<IRelayNetPacked>(new StreamDataPacked(new DataSaver(netData).SaveStore())), 1, deliveryMethod);
 		}
 
 

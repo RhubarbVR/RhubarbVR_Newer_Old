@@ -246,7 +246,6 @@ namespace RhuEngine.WorldObjects
 		public GrabbableHolder HeadGrabbableHolder;
 
 		public void RenderStep() {
-			//_netManager?.PollEvents(); Should not needed cuz in unsynced mode
 			_netManager?.NatPunchModule.PollEvents();
 			WorldThreadSafty.MethodCalls = 0;
 			if (IsLoading | (_focus == FocusLevel.Background)) {
@@ -300,7 +299,6 @@ namespace RhuEngine.WorldObjects
 		private bool _sortEntitys;
 
 		public void Step() {
-			_netManager?.PollEvents();
 			_netManager?.NatPunchModule.PollEvents();
 			WorldThreadSafty.MethodCalls = 0;
 			if (IsLoading | (_focus == FocusLevel.Background)) {

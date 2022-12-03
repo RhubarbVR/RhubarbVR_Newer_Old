@@ -62,12 +62,16 @@ namespace RhuEngine.Components
 
 		protected override void OnLoaded() {
 			base.OnLoaded();
-			ProgramManager.LoadProgramWindow(this);
+			if (Pointer.GetOwnerID() == World.LocalUserID) {
+				ProgramManager.LoadProgramWindow(this);
+			}
 		}
 
 		public override void Dispose() {
-			OnClosedWindow?.Invoke();
-			ProgramManager.UnLoadProgramWindow(this);
+			if (Pointer.GetOwnerID() == World.LocalUserID) {
+				OnClosedWindow?.Invoke();
+				ProgramManager.UnLoadProgramWindow(this);
+			}
 			base.Dispose();
 		}
 

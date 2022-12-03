@@ -58,7 +58,7 @@ namespace RhuEngine.WorldObjects
 		public readonly HashSet<Uri> WaitingOnAssets = new();
 		public void RequestAsset(Uri target) {
 			WaitingOnAssets.Add(target);
-			_netManager.SendToAll(Serializer.Save(new RequestAsset { URL = target.ToString() }), 2, ASSET_DELIVERY_METHOD);
+			_netManager.SendToAll(Serializer.Save<INetPacked>(new RequestAsset { URL = target.ToString() }), 2, ASSET_DELIVERY_METHOD);
 		}
 
 		public async Task PremoteAssetAsync(Uri target, Guid? arreay) {
@@ -79,7 +79,7 @@ namespace RhuEngine.WorldObjects
 			var createdrec = returndata.Data;
 			var newUrl = new Uri($"rdb://{createdrec.RecordID}");
 			Engine.assetManager.PremoteAsset(target, newUrl);
-			_netManager.SendToAll(Serializer.Save(new PremoteAsset { URL = target.ToString(), NewURL = newUrl.ToString() }), 2, ASSET_DELIVERY_METHOD);
+			_netManager.SendToAll(Serializer.Save<INetPacked>(new PremoteAsset { URL = target.ToString(), NewURL = newUrl.ToString() }), 2, ASSET_DELIVERY_METHOD);
 			OnPremoteLocalAssets?.Invoke(target, newUrl);
 		}
 
@@ -100,13 +100,14 @@ namespace RhuEngine.WorldObjects
 				}
 				var data = Engine.assetManager.GetCached(dataUrl);
 				if (data is null || !AssetMimeType.TryGetValue(dataUrl, out var dataMime)) {
-					tag.SendAsset(Serializer.Save(new AssetResponse { URL = assetRequest.URL, Bytes = null, MimeType = null }), ASSET_DELIVERY_METHOD);
+					tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, Bytes = null, MimeType = null }), ASSET_DELIVERY_METHOD);
 					return;
 				}
-				tag.SendAsset(Serializer.Save(new AssetResponse { URL = assetRequest.URL, Bytes = data, MimeType = dataMime }), ASSET_DELIVERY_METHOD);
+				tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, Bytes = data, MimeType = dataMime }), ASSET_DELIVERY_METHOD);
 				return;
 			}
-			if (!firstData.StartsWith($"{SessionID.Value}-{tag.User.ID}")) {
+			if (!firstData.StartsWith($"{SessionID.Value}-{tag.User.ID}-")) {
+				RLog.Err($"Asset from {tag.User.ID} some one how does not own asset");
 				return;
 			}
 			if (assetRequest is AssetResponse assetData) {

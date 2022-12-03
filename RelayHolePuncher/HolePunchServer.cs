@@ -63,10 +63,8 @@ namespace RelayHolePuncher
 			};
 			Console.WriteLine($"Started HolePunchServer on port {port}");
 			_puncher.Start(port);
+			_puncher.MaxConnectAttempts = 15;
 			_puncher.NatPunchModule.Init(this);
-		}
-		public void Update() {
-			_puncher.NatPunchModule.PollEvents();
 		}
 
 		public void Kill() {

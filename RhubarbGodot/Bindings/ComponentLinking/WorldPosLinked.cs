@@ -338,7 +338,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			if (node is null) {
 				return;
 			}
-
 			node.Visible = false;
 		}
 

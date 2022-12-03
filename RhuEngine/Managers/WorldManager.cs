@@ -313,7 +313,7 @@ namespace RhuEngine.Managers
 						_loadingText.Text.Value = $"{Engine.localisationManager.GetLocalString("Common.LoadingWorld")}\n {Engine.localisationManager.GetLocalString(world.LoadMsg)}";
 						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.ScreenHeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}
-					if (!world.HasError) {
+					else if (!world.HasError) {
 						_loadingText.Text.Value = $"{Engine.localisationManager.GetLocalString("Common.LoadedWorld")}";
 						_loadingText.Entity.GlobalTrans = Matrix.R(Quaternionf.Yawed180) * Matrix.TR(_loadingPos, Quaternionf.LookAt(Engine.EngineLink.CanInput ? Engine.inputManager.ScreenHeadMatrix.Translation : Vector3f.Zero, _loadingPos)) * userPOS;
 					}

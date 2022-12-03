@@ -20,7 +20,7 @@ namespace SharedModels.GameSpecific
 			return new OtherUserLeft(id);
 		}
 	}
-	public struct OtherUserLeft
+	public struct OtherUserLeft : IRelayNetPacked
 	{
 		public ushort id;
 		public OtherUserLeft(ushort id) : this() {
