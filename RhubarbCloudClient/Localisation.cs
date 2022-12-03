@@ -9,21 +9,34 @@ using Newtonsoft.Json.Linq;
 
 namespace RhubarbCloudClient
 {
+	/// <summary>
+	/// Base class for Localisation
+	/// </summary>
 	public abstract class Localisation
 	{
+		/// <summary>
+		/// Fired when the localisation is reloaded
+		/// </summary>
 		public event Action LocalReload;
 		public JToken fallBack;
 		public JToken parretnfallBack;
 		public JToken main;
 
 		public HashSet<string> NeededKeys;
-
+		/// <summary>
+		/// The name of the local, the authors of the local and the language name.
+		/// </summary>
+		/// <returns></returns>
 		public struct LocalInfo
 		{
 			public string name;
 			public string[] authors;
 			public string languageName;
 		}
+		/// <summary>
+		/// The name of the local, the authors of the local and the language name.
+		/// </summary>
+		/// <returns></returns>
 		public struct KeyLayoutInfo
 		{
 			public string name;
@@ -34,8 +47,15 @@ namespace RhubarbCloudClient
 		public abstract IEnumerable<string> GetFiles();
 		public abstract string ReadFile(string item);
 		public abstract void Log(string data);
-
+		/// <summary>
+		/// Get the 3 letter code of the local
+		/// </summary>
+		/// <returns></returns>
 		public abstract string Three_Letter { get; }
+		/// <summary>
+		/// Gets a list of the locals
+		/// </summary>
+		/// <returns>A List of the locals</returns>
 		public IEnumerable<LocalInfo> GetLocals() {
 			foreach (var item in GetFiles()) {
 				LocalInfo? localInfo = null;
@@ -50,7 +70,10 @@ namespace RhubarbCloudClient
 			}
 
 		}
-
+		/// <summary>
+		/// Gets all keyboard layouts
+		/// </summary>
+		/// <returns></returns>
 		public IEnumerable<KeyLayoutInfo> GetKeyboardLayouts() {
 			foreach (var item in GetFiles()) {
 				KeyLayoutInfo? localInfo = null;
@@ -65,7 +88,11 @@ namespace RhubarbCloudClient
 			}
 
 		}
-
+		/// <summary>
+		/// Gets a keyboard layout from the ID
+		/// </summary>
+		/// <param name="id">The keyboard layout to use</param>
+		/// <returns>A JObject with the keyboard layout. If no layout is found qwerty english is returned.</returns>
 		public JObject GetKeyboardLayout(int id) {
 			JObject english = null;
 			foreach (var item in GetFiles()) {
@@ -89,11 +116,20 @@ namespace RhubarbCloudClient
 			return english;
 		}
 
+		///<summary>
+		/// Get Local String
+		///</summary>
+		///<param name="key">Localisastion key</param>
+		///<param name="prams">Objects to pass to the string formatter</param>
 		public string GetLocalString(string key, params object[] prams) {
 			return GetLocalString(key + ";" + string.Join(";", prams.Select((x) => x?.ToString() ?? "NULL")));
 		}
 
-
+		/// <summary>
+		/// Gets a localised string
+		/// </summary>
+		/// <param name="dataString">The string to localise, in the form of key;param1;param2;...</param>
+		/// <returns>The localised string.</returns>
 		public string GetLocalString(string dataString) {
 			var prams = dataString?.Split(';') ?? Array.Empty<string>();
 			if (prams.Length == 0) {
@@ -127,7 +163,9 @@ namespace RhubarbCloudClient
 			returnobj = fallBack[key];
 			return returnobj is not null ? string.Format((string)returnobj, prams) : dataString;
 		}
-
+		/// <summary>
+		/// Loads the local
+		/// </summary>
 		public void LoadLocal() {
 			var targetcode = CultureInfo.InstalledUICulture;
 			if (Three_Letter is not null) {

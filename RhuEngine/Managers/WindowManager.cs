@@ -62,7 +62,9 @@ namespace RhuEngine.Managers
 	}
 
 
-
+	/// <summary>
+	/// A window, controls stuff like if its fullscreen, and stuff like that
+	/// </summary>
 	public interface IWindow : IDisposable
 	{
 		public bool LoadedIn { get; }
@@ -114,12 +116,17 @@ namespace RhuEngine.Managers
 		public event Action SizeChanged;
 
 	}
-
+	/// <summary>
+	/// This interface is used to link the WindowManager to the backend
+	/// </summary>
 	public interface IWindowManagerLink
 	{
 		public IWindow CreateNewWindow();
 	}
 
+	/// <summary>
+	/// WindowManager is used to manage the windows of the Game
+	/// </summary>
 	public sealed class WindowManager : IManager
 	{
 
@@ -146,7 +153,12 @@ namespace RhuEngine.Managers
 		public void Dispose() {
 
 		}
-
+		/// <summary>
+		/// Creates a new window
+		/// </summary>
+		/// <param name="width">The Width</param>
+		/// <param name="height">The Height</param>
+		/// <returns></returns>
 		public IWindow CreateNewWindow(int width = 800,int height = 600) {
 			var data = windowManagerLink?.CreateNewWindow();
 			data.WaitOnLoadedIn(LoadWindow);
@@ -156,7 +168,10 @@ namespace RhuEngine.Managers
 			});
 			return data;
 		}
-
+		/// <summary>
+		/// Loads the window.
+		/// </summary>
+		/// <param name="window">Window.</param>
 		public void LoadWindow(IWindow window) {
 			MainWindow ??= window;
 			_windows.Add(window);
@@ -164,6 +179,10 @@ namespace RhuEngine.Managers
 			RLog.Info($"Loaded Window\nTitle:{window.Title}\nPosition:{window.Position}\nWidth:{window.Width}\nHeight:{window.Height}");
 #endif
 		}
+		/// <summary>
+		/// Unloads a window
+		/// </summary>
+		/// <param name="window">Window to unload</param>
 		public void UnLoadWindow(IWindow window) {
 			_windows.Remove(window);
 		}

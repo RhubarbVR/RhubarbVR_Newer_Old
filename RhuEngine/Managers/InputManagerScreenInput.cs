@@ -14,29 +14,72 @@ namespace RhuEngine.Managers
 {
 	public sealed partial class InputManager : IManager
 	{
-
+		/// <summary>
+		/// ScreenInput class
+		/// </summary>
 		public class ScreenInput
 		{
+			/// <summary>
+			/// The head position of the user
+			/// </summary>
 			public Vector3f pos = new(0, 1.84f, 0);
-
+			///<summary>
+			///Yaw, Pitch in Euler
+			///</summary>
 			public Vector2f yawpitch;
+			/// <summary>
+			/// Yaw in degress
+			/// </summary>
+			public float Yaw
+			{
+				get => yawpitch.x;
+				set => yawpitch.x = value;
+			}
+			/// <summary>
+			/// Pitch in degress
+			/// </summary>
+			public float Pitch
+			{
+				get => yawpitch.y;
+				set => yawpitch.y = value;
+			}
+
+			/// <summary>
+			/// the clamp angle of the head
+			/// </summary>
 			public const float PITCH = 85.5f;
+			///<summary>
+			///Mousespeed
+			///</summary>
 			public const float SPEED = -0.5f;
-
-			public bool MouseFree { get; set; }
+			/// <summary>
+			/// True when mouse is free
+			/// </summary>
+			public bool MouseFree { get; private set; }
 			public InputManager InputManager { get; }
-
+			/// <summary>
+			/// Event that is called when the mouse is free/locked
+			/// </summary>
 			public event Action<bool> MouseStateUpdate;
-
+			/// <summary>
+			/// Creates a new ScreenInput object
+			/// </summary>
+			/// <param name="inputManager">The inputManager to use</param>
 			public ScreenInput(InputManager inputManager) {
 				InputManager = inputManager;
 				UnFreeMouse();
 			}
+			/// <summary>
+			/// Set mouse free and free the cursor
+			/// </summary>
 			public void FreeMouse() {
 				Engine.MainEngine.MouseFree = false;
 				MouseFree = true;
 				MouseStateUpdate?.Invoke(true);
 			}
+			/// <summary>
+			/// Set mouse Unfree and locks the cursor
+			/// </summary>
 			public void UnFreeMouse() {
 				Engine.MainEngine.MouseFree = true;
 				MouseFree = false;
@@ -44,8 +87,14 @@ namespace RhuEngine.Managers
 			}
 
 			public Matrix _camPos = Matrix.Identity;
+			/// <summary>
+			/// Head position in World Space
+			/// </summary>
 			public Matrix HeadPos { get; set; } = Matrix.Identity;
 
+			/// <summary>
+			/// Step the screen input
+			/// </summary>
 			public void Step() {
 				if (InputManager.GetInputAction(InputTypes.UnlockMouse).JustActivated() && !InputManager._engine.HasKeyboard) {
 					if (MouseFree) {

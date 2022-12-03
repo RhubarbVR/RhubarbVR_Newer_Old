@@ -10,12 +10,36 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.Managers
 {
+	/// <summary>
+	/// Manages all the drives, physical and networked.
+	/// </summary>
 	public sealed class FileManager : IManager
 	{
 		public readonly List<SystemDrive> Drives = new();
 		public readonly Dictionary<Guid, NetworkedDrive> NetDrives = new();
 		public FakeStaticDrive fakeStaticFolder;
 
+		/// <summary>
+		/// Gets the specified drive.
+		/// </summary>
+		/// <param name="driveName">Name of the drive.</param>
+		/// <returns></returns>
+		public IDrive GetDrive(string driveName) {
+			foreach (var item in GetDrives()) {
+				if (item.Name == driveName) {
+					return item;
+				}
+				if (item.Path == driveName) {
+					return item;
+				}
+			}
+			return null;
+		}
+
+		/// <summary>
+		/// Gets the drives.
+		/// </summary>
+		/// <returns></returns>
 		public IEnumerable<IDrive> GetDrives() {
 			yield return fakeStaticFolder;
 			lock (_engine.netApiManager.Client.RootFolders) {
@@ -38,6 +62,9 @@ namespace RhuEngine.Managers
 			}
 		}
 
+		/// <summary>
+		/// Reloads all System Drives
+		/// </summary>
 		public void ReloadSystemDrives() {
 			lock (Drives) {
 				Drives.Clear();
@@ -47,15 +74,29 @@ namespace RhuEngine.Managers
 			}
 		}
 
+		/// <summary>
+		/// Reloads all drives, including networked drives
+		/// </summary>
 		public void ReloadAllDrives() {
 			ReloadSystemDrives();
 			Task.Run(_engine.netApiManager.Client.GetRootFolders);
 		}
+
+		/// <summary>
+		/// This is a async version of <see cref="ReloadAllDrives"/>
+		/// </summary>
+		/// <returns></returns>
 		public async Task ReloadAllDrivesAsync() {
 			ReloadSystemDrives();
 			await _engine.netApiManager.Client.GetRootFolders();
 		}
 
+		/// <summary>
+		/// Tries to get the Folder/File from a Path.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <param name="folder"></param>
+		/// <param name="file"></param>
 		public bool TryGetDataFromPath(string path, out IFolder folder, out IFile file) {
 			if (Directory.Exists(path)) {
 				folder = path.EndsWith("\\") || path.EndsWith("/") ? GetSystemFolder(path) : (IFolder)GetSystemFolder(path + "\\");
@@ -97,6 +138,10 @@ namespace RhuEngine.Managers
 
 		private Engine _engine;
 
+		/// <summary>
+		/// Initializes the FileManager
+		/// </summary>
+		/// <param name="engine">Instance of the Engine</param>
 		public void Init(Engine engine) {
 			_engine = engine;
 			fakeStaticFolder = new FakeStaticDrive(engine);

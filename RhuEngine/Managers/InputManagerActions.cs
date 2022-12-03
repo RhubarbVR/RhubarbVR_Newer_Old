@@ -140,7 +140,9 @@ namespace RhuEngine.Managers
 			UnlockMouse.BindedAction = _engine.MainSettings.InputSettings.UnlockMouse;
 			ObserverOpen.BindedAction = _engine.MainSettings.InputSettings.ObserverOpen;
 		}
-
+		/// <summary>
+		/// UserInputAction is a class to handle configurable input of the user
+		/// </summary>
 		public sealed class UserInputAction
 		{
 			public InputManager InputManager { get; set; }
@@ -161,6 +163,12 @@ namespace RhuEngine.Managers
 			private float _lastFrame;
 			private float _thisFrame;
 
+			/// <summary>
+			/// Processes Update
+			/// </summary>
+			/// <param name="lastFrame"></param>
+			/// <param name="thisFrame"></param>
+			/// <param name="hand"></param>
 			private void ProsessUpdate(ref float lastFrame,ref float thisFrame,Handed hand) {
 				lastFrame = thisFrame;
 				thisFrame = 0f;
@@ -178,6 +186,9 @@ namespace RhuEngine.Managers
 				thisFrame = Math.Min(1f, thisFrame);
 			}
 
+			/// <summary>
+			/// Prosesses the Update
+			/// </summary>
 			public void Update() {
 				ProsessUpdate(ref _lastFrameLeft, ref _thisFrameLeft, Handed.Left);
 				ProsessUpdate(ref _lastFrameRight, ref _thisFrameRight, Handed.Right);
@@ -187,66 +198,120 @@ namespace RhuEngine.Managers
 				_lastFrame = Math.Min(1f, _lastFrame);
 				_thisFrame = Math.Min(1f, _thisFrame);
 			}
-
+			/// <summary>
+			/// Return this frame value - last frame value
+			/// </summary>
 			public float RightDeltaValue() {
 				return _thisFrameRight - _lastFrameRight;
 			}
+			//// <summary>
+			/// Get the raw value from of this frame
+			/// </summary>
 			public float RightRawValue() {
 				return _thisFrameRight;
 			}
+			// <summary>
+			/// Checks if current value of this frame is not 0
+			/// </summary>
+			/// <returns></returns>
 			public bool RightActivated() {
 				return _thisFrameRight != 0;
 			}
+			/// <summary>
+			/// Returns true only first frame of activation 
+			/// </summary>
+			/// <returns></returns>
 			public bool RightJustActivated() {
 				return _lastFrameRight == 0 & _thisFrameRight != 0;
 			}
-
+			/// <summary>
+			/// Return this frame value - last frame value
+			/// </summary>
 			public float OtherDeltaValue() {
 				return _thisFrameOther - _lastFrameOther;
 			}
+			//// <summary>
+			/// Get the raw value from of this frame
+			/// </summary>
 			public float OtherRawValue() {
 				return _thisFrameOther;
 			}
+			// <summary>
+			/// Checks if current value of this frame is not 0
+			/// </summary>
+			/// <returns></returns>
 			public bool OtherActivated() {
 				return _thisFrameOther != 0;
 			}
+			/// <summary>
+			/// Returns true only first frame of activation 
+			/// </summary>
+			/// <returns></returns>
 			public bool OtherJustActivated() {
 				return _lastFrameOther == 0 & _thisFrameOther != 0;
 			}
 
-
+			/// <summary>
+			/// Return this frame value - last frame value
+			/// </summary>
 			public float LeftDeltaValue() {
 				return _thisFrameLeft - _lastFrameLeft;
 			}
+			//// <summary>
+			/// Get the raw value from of this frame
+			/// </summary>
 			public float LeftRawValue() {
 				return _thisFrameLeft;
 			}
+			// <summary>
+			/// Checks if current value of this frame is not 0
+			/// </summary>
+			/// <returns></returns>
 			public bool LeftActivated() {
 				return _thisFrameLeft != 0;
 			}
+			/// <summary>
+			/// Returns true only first frame of activation 
+			/// </summary>
+			/// <returns></returns>
 			public bool LeftJustActivated() {
 				return _lastFrameLeft == 0 & _thisFrameLeft != 0;
 			}
 
 
-
+			///<summary>
+			/// Get delta action value for all hands
+			/// </summary>
 			public float DeltaValue() {
 				return _thisFrame - _lastFrame;
 			}
+			///<summary>
+			/// Get action value for all hands
+			/// </summary>
 			public float RawValue() {
 				return _thisFrame;
 			}
+			///<summary>
+			/// Returns if the action is currently active or not.
+			///</summary>
 			public bool Activated() {
 				return _thisFrame != 0;
 			}
+			///<summary>
+			///Returns true if the action just got activated this frame.
+			///</summary>
 			public bool JustActivated() {
 				return _lastFrame == 0 & _thisFrame != 0;
 			}
-
+			///<summary>
+			/// If the action was active last frame and not active in this frame
+			/// </summary>
 			public bool JustDeActivated() {
 				return _lastFrame != 0 & _thisFrame == 0;
 			}
-
+			///<summary>
+			/// Returns the value for the given handed value.
+			///</summary>
 			public float HandedValue(Handed handed) {
 				return handed switch {
 					Handed.Left => LeftRawValue(),
@@ -254,7 +319,9 @@ namespace RhuEngine.Managers
 					_ => OtherRawValue(),
 				};
 			}
-
+			///<summary>
+			///Constructor for UserInputAction
+			///</summary>
 			public UserInputAction(InputManager inputManager) {
 				InputManager = inputManager;
 			}

@@ -22,6 +22,9 @@ using static RhuEngine.WorldObjects.World;
 
 namespace RhuEngine.Managers
 {
+	/// <summary>
+	/// Manages the Worlds
+	/// </summary>
 	public sealed class WorldManager : IManager
 	{
 		public Action OnWorldUpdateTaskBar;
@@ -82,7 +85,9 @@ namespace RhuEngine.Managers
 			_isRunning.Add(world);
 			_backgroundLoading.Add(world);
 		}
-
+		/// <summary>
+		/// Gets world by the sessiong id of the world
+		/// </summary>
 		public World GetWorldBySessionID(Guid sessionID) {
 			for (var i = worlds.Count - 1; i >= 0; i--) {
 				try {

@@ -28,11 +28,20 @@ using RhuEngine.WorldObjects;
 
 namespace RhuEngine.Managers
 {
+	/// <summary>
+	/// Handles all networking with the rhubarb cloud
+	/// </summary>
 	public sealed class NetApiManager : IManager
 	{
 		public WorldManager WorldManager { get; private set; }
+		/// <summary>
+		/// Handles all requests to and from the rhubarb cloud
+		/// </summary>
 		public RhubarbAPIClient Client { get; private set; }
-
+		/// <summary>
+		/// Constructs a new API client with the specified path for the cookies
+		/// </summary>
+		/// <param name="path">Path of the API</param>
 		public NetApiManager(string path) {
 #if false && DEBUG
 			Client = new RhubarbAPIClient(RhubarbAPIClient.BaseUri, path) {
@@ -48,6 +57,11 @@ namespace RhuEngine.Managers
 			};
 #endif
 		}
+		/// <summary>
+		/// Called when the api returns an error from the session
+		/// </summary>
+		/// <param name="data">The error message.</param>
+		/// <param name="session">the session it corresponds to.</param>
 		public void SessionError(string data, Guid session) {
 			var targetWorld = WorldManager.GetWorldBySessionID(session);
 			RLog.Info($"Error With session {session} MSG:{data}");
@@ -58,6 +72,11 @@ namespace RhuEngine.Managers
 			targetWorld.HasError = true;
 			targetWorld.LoadMsg = data;
 		}
+		/// <summary>
+		/// This is called when a user connection is made.
+		/// </summary>
+		/// <param name="connectToUser">An object containing the user info that is attempting to connect.</param>
+		/// <param name="session">The session that the connection is being made to.</param>
 		public async Task UserConnection(ConnectToUser connectToUser, Guid session) {
 			var targetWorld = WorldManager.GetWorldBySessionID(session);
 			RLog.Info($"UserConnection {session} ConnectToUser:{connectToUser.UserID}");
@@ -67,7 +86,11 @@ namespace RhuEngine.Managers
 			}
 			await targetWorld.ConnectToUser(connectToUser);
 		}
-
+		/// <summary>
+		/// Fires when the server sends a new session id
+		/// </summary>
+		/// <param name="newID"></param>
+		/// <param name="session"></param>
 		public void SessionIDupdate(Guid newID, Guid session) {
 			var targetWorld = WorldManager.GetWorldBySessionID(session);
 			RLog.Info($"LoadedSessionID {session} NewID:{newID}");

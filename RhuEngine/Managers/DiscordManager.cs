@@ -23,6 +23,9 @@ using Jint;
 
 namespace RhuEngine.Managers
 {
+	/// <summary>
+	/// Manager that holds Discord related data and functions.
+	/// </summary>
 	public sealed class DiscordManager : IManager, ILogger
 	{
 
@@ -65,6 +68,10 @@ namespace RhuEngine.Managers
 
 		private Engine _engine;
 
+		/// <summary>
+		/// Initializes the manager by passing an engine reference
+		/// </summary>
+		/// <param name="engine">The engine to reference</param>
 		public void Init(Engine engine) {
 			try {
 				_engine = engine;
@@ -86,6 +93,10 @@ namespace RhuEngine.Managers
 			FocusWorld(obj);
 		}
 
+		/// <summary>
+		/// This is called when the world changes, it will set the discord presence to the current world
+		/// </summary>
+		/// <param name="world"></param>
 		public void FocusWorld(World world) {
 			if (world is null) {
 				return;
@@ -151,6 +162,9 @@ namespace RhuEngine.Managers
 			}
 			catch { }
 		}
+		/// <summary>
+		/// This is the first data that is sent to discord.
+		/// </summary>
 		public void StartUpData() {
 			discordRpcClient?.SetPresence(new RichPresence() {
 				Details = "In the Engine",
@@ -173,8 +187,15 @@ namespace RhuEngine.Managers
 
 		}
 
+		/// <summary>
+		/// Updates the discord data every 90 steps
+		/// the amount of steps it currently is at
+		/// </summary>
 		public short TimeLastUpdate { get; set; }
 
+		//// <summary>
+		/// Updates the discord data every 90 steps
+		/// </summary>
 		public void Step() {
 			if (discordRpcClient is not null) {
 				if (TimeLastUpdate > 90) {

@@ -14,11 +14,19 @@ using RhubarbCloudClient;
 
 namespace RhuEngine.Managers
 {
+	/// <summary>
+	/// LocalisationManager
+	/// </summary>
+	/// <seealso cref="RhubarbCloudClient.Localisation" />
+	/// <seealso cref="RhuEngine.Managers.IManager" />
 	public sealed class LocalisationManager : Localisation, IManager
 	{
 		private Engine _engine;
 		public string localDir;
 
+		/// <summary>
+		/// Gets the three letter language code for current localisation
+		/// </summary>
 		public override string Three_Letter => _engine.MainSettings.ThreeLetterLanguageName;
 
 		public void Dispose() {
@@ -51,7 +59,9 @@ namespace RhuEngine.Managers
 		}
 		public void RenderStep() {
 		}
-
+		/// <summary>
+		/// Loads local files
+		/// </summary>
 		public override IEnumerable<string> GetFiles() {
 			if (Directory.Exists(localDir)) {
 				foreach (var item in Directory.GetFiles(localDir)) {
@@ -59,11 +69,18 @@ namespace RhuEngine.Managers
 				}
 			}
 		}
-
+		/// <summary>
+		/// Reads local files
+		/// </summary>
+		/// <param name="item"></param>
+		/// <returns></returns>
 		public override string ReadFile(string item) {
 			return File.ReadAllText(item);
 		}
-
+		/// <summary>
+		/// Logs some data
+		/// </summary>
+		/// <param name="data"></param>
 		public override void Log(string data) {
 			RLog.Info(data);
 		}
