@@ -30,22 +30,36 @@ namespace RhuEngine.Managers
 
 		public DiscordRPC.Logging.LogLevel Level { get; set; }
 
+		public bool LogData;
+
 		public void Dispose() {
 			discordRpcClient?.Dispose();
 		}
 
 		public void Error(string message, params object[] args) {
+			if (!LogData) {
+				return;
+			}
 			RLog.Err(message + string.Join(",", args));
 		}
 
 		public void Info(string message, params object[] args) {
+			if (!LogData) {
+				return;
+			}
 			RLog.Info(message + string.Join(",", args));
 		}
 		public void Trace(string message, params object[] args) {
+			if (!LogData) {
+				return;
+			}
 			RLog.Info(message + string.Join(",", args));
 		}
 
 		public void Warning(string message, params object[] args) {
+			if (!LogData) {
+				return;
+			}
 			RLog.Warn(message + string.Join(",", args));
 		}
 
