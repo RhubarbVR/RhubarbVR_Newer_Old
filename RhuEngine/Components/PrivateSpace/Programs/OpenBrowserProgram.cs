@@ -7,6 +7,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
+using Assimp.Unmanaged;
+
 using RhubarbCloudClient;
 
 using RhuEngine.Commads;
@@ -110,10 +112,35 @@ namespace RhuEngine.Components
 
 		[Exposed]
 		public void OpenWebbrowserCall() {
-			Process.Start(new ProcessStartInfo {
-				FileName = targetURI?.ToString(),
-				UseShellExecute = true
-			});
+			if (targetURI is null || !allowedScheme.Contains(targetURI.Scheme)) {
+				CloseProgram();
+				return;
+			}
+			// Check if the code is running on macOS
+			if (Environment.OSVersion.Platform == PlatformID.MacOSX) {
+				// Use the `open` command to open the URI in the default web browser on macOS
+				Process.Start(new ProcessStartInfo {
+					FileName = "open",
+					Arguments = targetURI.ToString(),
+					UseShellExecute = false,
+				});
+			}
+			else if (Environment.OSVersion.Platform == PlatformID.Unix) {
+				// Use the `xdg-open` command to open the URI in the default web browser on Linux
+				Process.Start(new ProcessStartInfo {
+					FileName = "xdg-open",
+					Arguments = targetURI.ToString(),
+					UseShellExecute = false,
+				});
+			}
+			else {
+				// Use `explorer.exe` to open the URI in the default web browser on Windows
+				Process.Start(new ProcessStartInfo {
+					FileName = "explorer.exe",
+					Arguments = targetURI.ToString(),
+					UseShellExecute = false,
+				});
+			}
 			CloseProgram();
 		}
 
