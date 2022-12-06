@@ -366,7 +366,9 @@ namespace RhuEngine.WorldObjects
 		}
 
 		[Union(0, typeof(BlockStore))]
-		[Union(1, typeof(IAssetRequest))]
+		[Union(1, typeof(RequestAsset))]
+		[Union(2, typeof(AssetResponse))]
+		[Union(3, typeof(PremoteAsset))]
 		public interface INetPacked
 		{
 		}
