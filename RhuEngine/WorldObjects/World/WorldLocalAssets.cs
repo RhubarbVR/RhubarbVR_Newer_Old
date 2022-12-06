@@ -23,7 +23,7 @@ namespace RhuEngine.WorldObjects
 {
 	public sealed partial class World
 	{
-		public const DeliveryMethod ASSET_DELIVERY_METHOD = DeliveryMethod.ReliableUnordered;
+		public const DeliveryMethod ASSET_DELIVERY_METHOD = DeliveryMethod.ReliableOrdered; //Todo make ReliableUnordered with asset blocks
 
 		public async Task<Uri> CreateLocalAsset(Stream data, string mimeType) {
 			var newID = Guid.NewGuid();
