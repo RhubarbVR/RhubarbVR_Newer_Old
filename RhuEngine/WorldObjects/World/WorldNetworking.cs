@@ -396,6 +396,9 @@ namespace RhuEngine.WorldObjects
 							else if (rawDataPacked is IAssetRequest assetRequest) {
 								AssetResponses(assetRequest, tag, deliveryMethod);
 							}
+							else {
+								throw new Exception($"Not none {rawDataPacked?.GetType()?.GetFormattedName()}");
+							}
 						}
 						else {
 							throw new Exception("Uknown Data from User");
@@ -408,6 +411,9 @@ namespace RhuEngine.WorldObjects
 							}
 							else if (rawDataPacked is IAssetRequest assetRequest) {
 								AssetResponses(assetRequest, tag, deliveryMethod);
+							}
+							else {
+								throw new Exception($"Not none {rawDataPacked?.GetType()?.GetFormattedName()}");
 							}
 						}
 						else if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
