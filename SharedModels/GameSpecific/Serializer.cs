@@ -72,7 +72,10 @@ namespace SharedModels.GameSpecific
 		public static T Read<T>(byte[] data) {
 			return MessagePackSerializer.Deserialize<T>(data, Options);
 		}
-		public static MessagePackSerializerOptions Options = SerializerOptions();
+
+		private static MessagePackSerializerOptions _options;
+
+		public static MessagePackSerializerOptions Options => _options ??= SerializerOptions();
 
 
 		public static MessagePackSerializerOptions SerializerOptions() {
@@ -89,7 +92,7 @@ namespace SharedModels.GameSpecific
 			var custom = MessagePack.Resolvers.CompositeResolver.Create(data.ToArray());
 
 			var resolver = MessagePack.Resolvers.CompositeResolver.Create(
-				MessagePack.Resolvers.DynamicUnionResolver.Instance,
+							MessagePack.Resolvers.DynamicUnionResolver.Instance,
 							MessagePack.Resolvers.AttributeFormatterResolver.Instance,
 							MessagePack.Resolvers.DynamicEnumAsStringResolver.Instance,
 							custom,
