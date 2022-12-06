@@ -176,6 +176,10 @@ namespace RhuEngine.WorldObjects
 				RLog.Info($"NatIntroductionSuccess {point}  {addrType}  {token}");
 				NatIntroductionSuccessIsGood[token] = true;
 				var peer = _netManager.Connect(point, token + '~' + KEY);
+				if(peer is null) {
+					RLog.Info($"NatIntroduction Failed");
+					return;
+				}
 				var reload = peer.Tag is bool ta && ta;
 				peer.Tag = NatUserIDS[token];
 				NatConnection.TryAdd(token, peer);

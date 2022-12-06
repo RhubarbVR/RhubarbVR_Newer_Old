@@ -52,7 +52,7 @@ namespace RhuEngine.WorldObjects
 					throw new Exception($"Unable to add unassignable type {type.FullName} to a list of {typeof(T).FullName}");
 				}
 				var objrc = (T)Activator.CreateInstance(type);
-				objrc.Initialize(World, this, "List element", true, false);
+				objrc.Initialize(World, this, "List element", true, true);
 				var deserlizer = new SyncObjectDeserializerObject(false);
 				objrc.Deserialize(nodeGroup.GetValue("ElementData"), deserlizer);
 				foreach (var item in deserlizer.onLoaded) {
