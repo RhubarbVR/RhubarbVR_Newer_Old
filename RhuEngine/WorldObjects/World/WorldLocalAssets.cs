@@ -23,7 +23,7 @@ namespace RhuEngine.WorldObjects
 {
 	public sealed partial class World
 	{
-		public const DeliveryMethod ASSET_DELIVERY_METHOD = DeliveryMethod.ReliableOrdered; //Todo make ReliableUnordered with asset blocks
+		public const DeliveryMethod ASSET_DELIVERY_METHOD = DeliveryMethod.ReliableUnordered;
 
 		public async Task<Uri> CreateLocalAsset(Stream data, string mimeType) {
 			var newID = Guid.NewGuid();
@@ -50,7 +50,7 @@ namespace RhuEngine.WorldObjects
 
 		public Uri CreateLocalAsset(ComplexMesh amesh) {
 			var newID = Guid.NewGuid();
-			Engine.assetManager.SaveNew(SessionID.Value, LocalUserID, newID, RhubarbFileManager.SaveFile(Engine.netApiManager.Client.User?.Id??Guid.Empty, amesh));
+			Engine.assetManager.SaveNew(SessionID.Value, LocalUserID, newID, RhubarbFileManager.SaveFile(Engine.netApiManager.Client.User?.Id ?? Guid.Empty, amesh));
 			var uri = new Uri($"local://{SessionID.Value}-{LocalUserID}-{newID}");
 			AssetMimeType.Add(uri, "application/rhubarbvr_mesh");
 			return uri;
@@ -89,6 +89,10 @@ namespace RhuEngine.WorldObjects
 
 		public static readonly Dictionary<Uri, string> AssetMimeType = new();
 
+		public int SizeOfEachPart = 1024 * 5;
+
+		public static readonly Dictionary<Uri, (int, Stream)> assetSaving = new();
+
 		private void AssetResponses(IAssetRequest assetRequest, Peer tag, DeliveryMethod deliveryMethod) {
 			var dataUrl = new Uri(assetRequest.URL);
 			var firstData = dataUrl.Host;
@@ -100,10 +104,20 @@ namespace RhuEngine.WorldObjects
 				}
 				var data = Engine.assetManager.GetCached(dataUrl);
 				if (data is null || !AssetMimeType.TryGetValue(dataUrl, out var dataMime)) {
-					tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, Bytes = null, MimeType = null }), ASSET_DELIVERY_METHOD);
+					tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, PartBytes = null, MimeType = null }), ASSET_DELIVERY_METHOD);
 					return;
 				}
-				tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, Bytes = data, MimeType = dataMime }), ASSET_DELIVERY_METHOD);
+				var size = data.LongLength;
+				var amountOfSections = size / SizeOfEachPart;
+				var lastSize = (amountOfSections * SizeOfEachPart) - size;
+				for (var i = 0; i < amountOfSections; i++) {
+					var partData = new byte[SizeOfEachPart];
+					if ((i + 1) == amountOfSections) {
+						partData = new byte[SizeOfEachPart - lastSize];
+					}
+					data.CopyTo(partData, i * SizeOfEachPart);
+					tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, PartBytes = partData, MimeType = dataMime, CurrentPart = i, SizeOfData = size, SizeOfPart = SizeOfEachPart }), ASSET_DELIVERY_METHOD);
+				}
 				return;
 			}
 			if (!firstData.StartsWith($"{SessionID.Value}-{tag.User.ID}-")) {
@@ -115,11 +129,36 @@ namespace RhuEngine.WorldObjects
 					return;
 				}
 				WaitingOnAssets.Remove(dataUrl);
-				if (assetData.Bytes is null) {
+				if (assetData.PartBytes is null) {
 					return;
 				}
-				AssetMimeType.Add(dataUrl, assetData.MimeType);
-				OnLoadedLocalAssets?.Invoke(dataUrl, assetData.Bytes);
+				if (assetSaving.ContainsKey(dataUrl)) {
+					var data = assetSaving[dataUrl];
+					data.Item1++;
+					data.Item2.Write(assetData.PartBytes, assetData.CurrentPart * assetData.SizeOfPart, assetData.PartBytes.Length);
+					assetSaving[dataUrl] = data;
+					if (data.Item1 == assetData.SizeOfData / assetData.SizeOfPart) {
+						var dataLate = new byte[assetData.SizeOfData];
+						data.Item2.Read(dataLate, 0, dataLate.Length);
+						data.Item2.Dispose();
+						AssetMimeType.Add(dataUrl, assetData.MimeType);
+						OnLoadedLocalAssets?.Invoke(dataUrl, dataLate);
+					}
+				}
+				else {
+					if (assetData.SizeOfData >= assetData.SizeOfPart) {
+						AssetMimeType.Add(dataUrl, assetData.MimeType);
+						OnLoadedLocalAssets?.Invoke(dataUrl, assetData.PartBytes);
+					}
+					else {
+						var data = File.Create(Path.GetTempFileName());
+						data.Write(assetData.PartBytes, assetData.CurrentPart * assetData.SizeOfPart, assetData.PartBytes.Length);
+						assetSaving.Add(dataUrl, (1, data));
+					}
+
+				}
+
+
 			}
 			else if (assetRequest is PremoteAsset premote) {
 				Engine.assetManager.PremoteAsset(dataUrl, new Uri(premote.NewURL));
