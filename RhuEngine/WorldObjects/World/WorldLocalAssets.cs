@@ -155,10 +155,7 @@ namespace RhuEngine.WorldObjects
 						data.Write(assetData.PartBytes, assetData.CurrentPart * assetData.SizeOfPart, assetData.PartBytes.Length);
 						assetSaving.Add(dataUrl, (1, data));
 					}
-
 				}
-
-
 			}
 			else if (assetRequest is PremoteAsset premote) {
 				Engine.assetManager.PremoteAsset(dataUrl, new Uri(premote.NewURL));
