@@ -91,7 +91,7 @@ namespace RhuEngine.WorldObjects
 
 		public int SizeOfEachPart = 1024 * 5;
 
-		public static readonly Dictionary<Uri, (int, Stream)> assetSaving = new();
+		public static readonly Dictionary<Uri, (int, MemoryStream)> assetSaving = new();
 
 		private void AssetResponses(IAssetRequest assetRequest, Peer tag, DeliveryMethod deliveryMethod) {
 			var dataUrl = new Uri(assetRequest.URL);
@@ -107,7 +107,6 @@ namespace RhuEngine.WorldObjects
 					tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, PartBytes = null, MimeType = null }), ASSET_DELIVERY_METHOD);
 					return;
 				}
-				//TODO: Can not send files that are larger than 2gb 
 				var size = data.LongLength;
 				var amountOfSections = (size / SizeOfEachPart) + ((size % SizeOfEachPart == 0) ? 0 : 1);
 				var lastSize = (amountOfSections * SizeOfEachPart) - size;
@@ -119,6 +118,7 @@ namespace RhuEngine.WorldObjects
 					Array.Copy(data, i * SizeOfEachPart, partData, 0, partData.Length);
 					tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, PartBytes = partData, MimeType = dataMime, CurrentPart = i, SizeOfData = size, SizeOfPart = SizeOfEachPart }), ASSET_DELIVERY_METHOD);
 				}
+				RLog.Info($"Asset Sent to {tag.User.ID} PartAmount:{amountOfSections} Size:{size}");
 				return;
 			}
 			if (!firstData.StartsWith($"{SessionID.Value}-{tag.User.ID}-")) {
@@ -134,26 +134,29 @@ namespace RhuEngine.WorldObjects
 					return;
 				}
 				if (assetSaving.ContainsKey(dataUrl)) {
+					RLog.Info($"Stream asset AddData Asset Resived to {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
 					var data = assetSaving[dataUrl];
 					data.Item1++;
 					data.Item2.Write(assetData.PartBytes, assetData.CurrentPart * assetData.SizeOfPart, assetData.PartBytes.Length);
 					assetSaving[dataUrl] = data;
 					
 					if (data.Item1 == ((assetData.SizeOfData / assetData.SizeOfPart) + ((assetData.SizeOfData % assetData.SizeOfPart == 0) ? 0 : 1))) {
-						var dataLate = new byte[assetData.SizeOfData];
-						data.Item2.Read(dataLate, 0, dataLate.Length);
+						RLog.Info($"Stream asset ALL Asset Resived to {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
+						var buffer = data.Item2.GetBuffer();
 						data.Item2.Dispose();
 						AssetMimeType.Add(dataUrl, assetData.MimeType);
-						OnLoadedLocalAssets?.Invoke(dataUrl, dataLate);
+						OnLoadedLocalAssets?.Invoke(dataUrl, buffer);
 					}
 				}
 				else {
 					if (assetData.SizeOfData < assetData.SizeOfPart) {
+						RLog.Info($"One File Asset Resived to {tag.User.ID} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
 						AssetMimeType.Add(dataUrl, assetData.MimeType);
 						OnLoadedLocalAssets?.Invoke(dataUrl, assetData.PartBytes);
 					}
 					else {
-						var data = File.Create(Path.GetTempFileName());
+						RLog.Info($"Stream asset Create Asset Resived to {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
+						var data = new MemoryStream(new byte[assetData.SizeOfData]);
 						data.Write(assetData.PartBytes, assetData.CurrentPart * assetData.SizeOfPart, assetData.PartBytes.Length);
 						assetSaving.Add(dataUrl, (1, data));
 					}
