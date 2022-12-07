@@ -11,8 +11,9 @@ namespace Rhubarb_VR_HeadLess.Commads
 	{
 		public override string HelpMsg => "Close RhubarbVR";
 
-		public override void RunCommand() {
+		public override Task RunCommand() {
 			Program._isRunning = false;
+			return Task.CompletedTask;
 		}
 	}
 }
