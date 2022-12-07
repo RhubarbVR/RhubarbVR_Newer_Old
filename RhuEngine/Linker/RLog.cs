@@ -21,6 +21,13 @@ namespace RhuEngine.Linker
 	public static class RLog
 	{
 		public static IRLog Instance { get; set; }
+		public static void VerBoseInfo(string value) {
+			if (value == null) {
+				Instance?.Info("Value was Null");
+				return;
+			}
+			Instance?.Info(value);
+		}
 
 		public static void Info(string value) {
 			if(value == null) {

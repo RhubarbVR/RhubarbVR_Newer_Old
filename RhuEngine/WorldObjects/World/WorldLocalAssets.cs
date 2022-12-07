@@ -89,7 +89,7 @@ namespace RhuEngine.WorldObjects
 
 		public static readonly Dictionary<Uri, string> AssetMimeType = new();
 
-		public int SizeOfEachPart = 1024 * 5;
+		public int SizeOfEachPart = 1024 * 50;
 
 		public static readonly Dictionary<Uri, (int, MemoryStream)> assetSaving = new();
 
@@ -118,7 +118,7 @@ namespace RhuEngine.WorldObjects
 					Array.Copy(data, i * SizeOfEachPart, partData, 0, partData.Length);
 					tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, PartBytes = partData, MimeType = dataMime, CurrentPart = i, SizeOfData = size, SizeOfPart = SizeOfEachPart }), ASSET_DELIVERY_METHOD);
 				}
-				RLog.Info($"Asset Sent to {tag.User.ID} PartAmount:{amountOfSections} Size:{size}");
+				RLog.VerBoseInfo($"Asset Sent to {tag.User.ID} PartAmount:{amountOfSections} Size:{size}");
 				return;
 			}
 			if (!firstData.StartsWith($"{SessionID.Value}-{tag.User.ID}-")) {
@@ -126,7 +126,7 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			if (assetRequest is AssetResponse assetData) {
-				RLog.Info($"assetData Asset Resived from {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
+				RLog.VerBoseInfo($"assetData Asset Resived from {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
 				if (!WaitingOnAssets.Contains(dataUrl)) {
 					RLog.Err($"assetData Not waiting for data");
 					return;
@@ -136,14 +136,15 @@ namespace RhuEngine.WorldObjects
 					return;
 				}
 				if (assetSaving.ContainsKey(dataUrl)) {
-					RLog.Info($"Stream asset AddData Asset Resived from {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
+					RLog.VerBoseInfo($"Stream asset AddData Asset Resived from {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
 					var data = assetSaving[dataUrl];
 					data.Item1++;
-					data.Item2.Write(assetData.PartBytes, assetData.CurrentPart * assetData.SizeOfPart, assetData.PartBytes.Length);
+					data.Item2.Position = assetData.CurrentPart * assetData.SizeOfPart;
+					data.Item2.Write(assetData.PartBytes, 0, assetData.PartBytes.Length);
 					assetSaving[dataUrl] = data;
 					
 					if (data.Item1 == ((assetData.SizeOfData / assetData.SizeOfPart) + ((assetData.SizeOfData % assetData.SizeOfPart == 0) ? 0 : 1))) {
-						RLog.Info($"Stream asset ALL Asset Resived from {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
+						RLog.VerBoseInfo($"Stream asset ALL Asset Resived from {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
 						var buffer = data.Item2.GetBuffer();
 						data.Item2.Dispose();
 						AssetMimeType.Add(dataUrl, assetData.MimeType);
@@ -153,20 +154,20 @@ namespace RhuEngine.WorldObjects
 				}
 				else {
 					if (assetData.SizeOfData < assetData.SizeOfPart) {
-						RLog.Info($"One File Asset Resived from {tag.User.ID} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
+						RLog.VerBoseInfo($"One File Asset Resived from {tag.User.ID} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
 						AssetMimeType.Add(dataUrl, assetData.MimeType);
 						OnLoadedLocalAssets?.Invoke(dataUrl, assetData.PartBytes);
 					}
 					else {
-						RLog.Info($"Stream asset Create Asset Resived to {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
-						var data = new MemoryStream(new byte[assetData.SizeOfData]);
+						RLog.VerBoseInfo($"Stream asset Create Asset Resived to {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
+						var data = new MemoryStream(new byte[(int)assetData.SizeOfData], 0, (int)assetData.SizeOfData, true, true);
 						data.Write(assetData.PartBytes, assetData.CurrentPart * assetData.SizeOfPart, assetData.PartBytes.Length);
 						assetSaving.Add(dataUrl, (1, data));
 					}
 				}
 			}
 			else if (assetRequest is PremoteAsset premote) {
-				RLog.Info($"premote Asset Resived from {tag.User.ID} URL:{premote.URL} NewURL:{premote.NewURL}");
+				RLog.VerBoseInfo($"premote Asset Resived from {tag.User.ID} URL:{premote.URL} NewURL:{premote.NewURL}");
 				Engine.assetManager.PremoteAsset(dataUrl, new Uri(premote.NewURL));
 				OnPremoteLocalAssets?.Invoke(dataUrl, new Uri(premote.NewURL));
 			}
