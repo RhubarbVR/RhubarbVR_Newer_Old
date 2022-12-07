@@ -148,7 +148,7 @@ namespace RhuEngine.WorldObjects
 					}
 				}
 				else {
-					if (assetData.SizeOfData >= assetData.SizeOfPart) {
+					if (assetData.SizeOfData < assetData.SizeOfPart) {
 						AssetMimeType.Add(dataUrl, assetData.MimeType);
 						OnLoadedLocalAssets?.Invoke(dataUrl, assetData.PartBytes);
 					}
