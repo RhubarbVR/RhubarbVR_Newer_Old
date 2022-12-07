@@ -126,31 +126,34 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			if (assetRequest is AssetResponse assetData) {
+				RLog.Info($"assetData Asset Resived from {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
 				if (!WaitingOnAssets.Contains(dataUrl)) {
+					RLog.Err($"assetData Not waiting for data");
 					return;
 				}
-				WaitingOnAssets.Remove(dataUrl);
 				if (assetData.PartBytes is null) {
+					RLog.Err($"assetData HadNoData");
 					return;
 				}
 				if (assetSaving.ContainsKey(dataUrl)) {
-					RLog.Info($"Stream asset AddData Asset Resived to {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
+					RLog.Info($"Stream asset AddData Asset Resived from {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
 					var data = assetSaving[dataUrl];
 					data.Item1++;
 					data.Item2.Write(assetData.PartBytes, assetData.CurrentPart * assetData.SizeOfPart, assetData.PartBytes.Length);
 					assetSaving[dataUrl] = data;
 					
 					if (data.Item1 == ((assetData.SizeOfData / assetData.SizeOfPart) + ((assetData.SizeOfData % assetData.SizeOfPart == 0) ? 0 : 1))) {
-						RLog.Info($"Stream asset ALL Asset Resived to {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
+						RLog.Info($"Stream asset ALL Asset Resived from {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
 						var buffer = data.Item2.GetBuffer();
 						data.Item2.Dispose();
 						AssetMimeType.Add(dataUrl, assetData.MimeType);
 						OnLoadedLocalAssets?.Invoke(dataUrl, buffer);
+						WaitingOnAssets.Remove(dataUrl);
 					}
 				}
 				else {
 					if (assetData.SizeOfData < assetData.SizeOfPart) {
-						RLog.Info($"One File Asset Resived to {tag.User.ID} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
+						RLog.Info($"One File Asset Resived from {tag.User.ID} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
 						AssetMimeType.Add(dataUrl, assetData.MimeType);
 						OnLoadedLocalAssets?.Invoke(dataUrl, assetData.PartBytes);
 					}
@@ -163,8 +166,12 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			else if (assetRequest is PremoteAsset premote) {
+				RLog.Info($"premote Asset Resived from {tag.User.ID} URL:{premote.URL} NewURL:{premote.NewURL}");
 				Engine.assetManager.PremoteAsset(dataUrl, new Uri(premote.NewURL));
 				OnPremoteLocalAssets?.Invoke(dataUrl, new Uri(premote.NewURL));
+			}
+			else {
+				RLog.Err($"AssetType Not known");
 			}
 		}
 
