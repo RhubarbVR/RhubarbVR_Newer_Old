@@ -89,7 +89,7 @@ namespace RhuEngine.WorldObjects
 
 		public static readonly Dictionary<Uri, string> AssetMimeType = new();
 
-		public int SizeOfEachPart = 1024 * 50;
+		public int SizeOfEachPart = 1024 * 64;
 
 		public static readonly Dictionary<Uri, (int, MemoryStream)> assetSaving = new();
 

@@ -230,6 +230,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			}
 			node.Mesh = ((GodotMesh)obj.Inst).LoadedMesh;
 			node.Skin = ((GodotMesh)obj.Inst).LoadedSkin;
+			MatUpdate(null);
 		}
 	}
 
