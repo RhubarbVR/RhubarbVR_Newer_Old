@@ -116,7 +116,7 @@ namespace RhuEngine.WorldObjects
 					if ((i + 1) == amountOfSections) {
 						partData = new byte[SizeOfEachPart - lastSize];
 					}
-					data.CopyTo(partData, i * SizeOfEachPart);
+					Array.Copy(data, i * SizeOfEachPart, partData, 0, partData.Length);
 					tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, PartBytes = partData, MimeType = dataMime, CurrentPart = i, SizeOfData = size, SizeOfPart = SizeOfEachPart }), ASSET_DELIVERY_METHOD);
 				}
 				return;
