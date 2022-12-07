@@ -107,8 +107,9 @@ namespace RhuEngine.WorldObjects
 					tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, PartBytes = null, MimeType = null }), ASSET_DELIVERY_METHOD);
 					return;
 				}
+				//TODO: Can not send files that are larger than 2gb 
 				var size = data.LongLength;
-				var amountOfSections = size / SizeOfEachPart;
+				var amountOfSections = (size / SizeOfEachPart) + ((size % SizeOfEachPart == 0) ? 0 : 1);
 				var lastSize = (amountOfSections * SizeOfEachPart) - size;
 				for (var i = 0; i < amountOfSections; i++) {
 					var partData = new byte[SizeOfEachPart];
@@ -137,7 +138,8 @@ namespace RhuEngine.WorldObjects
 					data.Item1++;
 					data.Item2.Write(assetData.PartBytes, assetData.CurrentPart * assetData.SizeOfPart, assetData.PartBytes.Length);
 					assetSaving[dataUrl] = data;
-					if (data.Item1 == assetData.SizeOfData / assetData.SizeOfPart) {
+					
+					if (data.Item1 == ((assetData.SizeOfData / assetData.SizeOfPart) + ((assetData.SizeOfData % assetData.SizeOfPart == 0) ? 0 : 1))) {
 						var dataLate = new byte[assetData.SizeOfData];
 						data.Item2.Read(dataLate, 0, dataLate.Length);
 						data.Item2.Dispose();
