@@ -4,6 +4,7 @@ using System.Text;
 using System.Numerics;
 using MessagePack;
 using MessagePack.Formatters;
+using Newtonsoft.Json;
 
 namespace RNumerics
 {
@@ -31,7 +32,7 @@ namespace RNumerics
 		[Key(0)]
 		public Matrix4x4 m;
 
-		[Exposed, IgnoreMember]
+		[Exposed, IgnoreMember, JsonIgnore]
 		public Matrix4x4 M
 		{
 			get => m;
@@ -70,17 +71,17 @@ namespace RNumerics
 		/// <summary>An identity Matrix is the matrix equivalent of '1'! 
 		/// Transforming anything by this will leave it at the exact same
 		/// place.</summary>
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public static Matrix Identity => Matrix4x4.Identity;
 
 		/// <summary>A fast Property that will return or set the translation
 		/// component embedded in this transform matrix.</summary>
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public Vector3f Translation { get => m.Translation; set => m.Translation = value; }
 		/// <summary>Returns the scale embedded in this transform matrix. Not
 		/// exactly cheap, requires 3 sqrt calls, but is cheaper than calling
 		/// Decompose.</summary>
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public Vector3f Scale
 		{
 			get {
@@ -92,7 +93,7 @@ namespace RNumerics
 		/// embedded in this transform matrix. This is backed by Decompose,
 		/// so if you need any additional info, it's better to just call
 		/// Decompose instead.</summary>
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public Quaternionf Rotation
 		{
 			get {
@@ -106,9 +107,9 @@ namespace RNumerics
 		/// from a -> b, then its inverse takes the point from b -> a.
 		/// </summary>
 		/// <returns>An inverse matrix of the current one.</returns>
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public Matrix Inverse { get { Matrix4x4.Invert(m, out var result); return result; } }
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public Matrix InvScale
 		{
 			get {

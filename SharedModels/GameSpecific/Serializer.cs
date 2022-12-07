@@ -1,10 +1,14 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using System.Text;
 
 using MessagePack;
 using MessagePack.Formatters;
+
+using Newtonsoft.Json;
 
 namespace SharedModels.GameSpecific
 {
@@ -58,6 +62,15 @@ namespace SharedModels.GameSpecific
 	}
 	public static class Serializer
 	{
+
+		public static T SlowRead<T>(string data) {
+			return JsonConvert.DeserializeObject<T>(data);
+		}
+
+		public static string SlowSave<T>(T data) {
+			return JsonConvert.SerializeObject(data);
+		}
+
 		public static bool TryToRead<T>(byte[] data, out T value) {
 			try {
 				value = MessagePackSerializer.Deserialize<T>(data, Options);
@@ -81,10 +94,10 @@ namespace SharedModels.GameSpecific
 		public static MessagePackSerializerOptions SerializerOptions() {
 			var data = from e in AppDomain.CurrentDomain.GetAssemblies().AsParallel()
 					   .SelectMany(x => {
-				//Mono is broke and this is to get around it
-				try { return x.GetTypes(); }
-				catch { return Array.Empty<Type>(); }
-			})
+						   //Mono is broke and this is to get around it
+						   try { return x.GetTypes(); }
+						   catch { return Array.Empty<Type>(); }
+					   })
 					   where typeof(IMessagePackFormatter).IsAssignableFrom(e)
 					   where e.GetCustomAttribute<FormatterAttribute>() is not null
 					   select (IMessagePackFormatter)Activator.CreateInstance(e);

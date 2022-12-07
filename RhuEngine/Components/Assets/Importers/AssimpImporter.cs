@@ -164,7 +164,13 @@ namespace RhuEngine.Components
 				return;
 			}
 			foreach (var item in scene.scene.Meshes) {
-				scene.meshes.Add(new ComplexMesh(item));
+				var newMesh = new ComplexMesh(item);
+				if(item.MorphMethod == MeshMorphingMethod.None && newMesh.MeshAttachments.Count != 0) {
+					newMesh.MorphingMethod = RMeshMorphingMethod.VertexBlend;
+				}
+				RLog.Info($"New Mesh MeshName:{newMesh.MeshName} MorphingMethod:{newMesh.MorphingMethod} VertexCount:{newMesh.VertexCount}  MeshAttachmentsCount:{newMesh.MeshAttachments.Count}");
+				newMesh.Optimize();
+				scene.meshes.Add(newMesh);
 				RLog.Info($"Loaded Mesh {item.Name}");
 			}
 		}
@@ -311,6 +317,7 @@ namespace RhuEngine.Components
 		}
 
 		private static void AddMeshRender(Entity entity, Node node, AssimpHolder scene, ComplexMesh amesh, IEnumerable<int> mits) {
+			RLog.Info($"Added Mesh Render SubMeshesCount:{amesh.SubMeshes.Count} VertexCount:{amesh.VertexCount} MeshAttachmentsCount:{amesh.MeshAttachments.Count} MeshBlendMode:{amesh.MorphingMethod}");
 			var rmesh = scene.assetEntity.AttachComponent<StaticMesh>();
 			if (amesh is not null) {
 				rmesh.url.Value = entity.World.CreateLocalAsset(amesh).ToString();

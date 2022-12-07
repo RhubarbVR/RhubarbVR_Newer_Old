@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 
 using Assimp;
 
 using MessagePack;
 
+using Newtonsoft.Json;
+
 namespace RNumerics
 {
+
+	//TODO:
+	/// Make a better way of saving mesh to save on space
 	[MessagePackObject]
 	public struct RSubMesh : ISubMesh
 	{
@@ -20,7 +26,7 @@ namespace RNumerics
 		public List<RFace> rFaces;
 		[Key(2)]
 		public int rCount;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public int Count => rFaces.Count;
 
 		public RSubMesh() {
@@ -38,7 +44,7 @@ namespace RNumerics
 			rFaces = faces;
 			rCount = count;
 		}
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public IEnumerable<IFace> Faces
 		{
 			get {
@@ -74,9 +80,9 @@ namespace RNumerics
 			Weight = 0;
 		}
 
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		int IVertexWeight.VertexID => VertexID;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		float IVertexWeight.Weight => Weight;
 	}
 
@@ -93,16 +99,16 @@ namespace RNumerics
 		[Key(2)]
 		public string BoneName;
 
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public bool HasVertexWeights => VertexWeights.Count > 0;
 
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public int VertexWeightCount => VertexWeights.Count;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public string Name => BoneName;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		Matrix IBone.OffsetMatrix => OffsetMatrix;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		IEnumerable<IVertexWeight> IBone.VertexWeights
 		{
 			get {
@@ -144,7 +150,7 @@ namespace RNumerics
 	{
 		[Key(0)]
 		public List<int> Indices = new();
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<int> IFace.Indices => Indices;
 
 		public RFace(in Face face) {
@@ -211,21 +217,21 @@ namespace RNumerics
 		public List<Vector3f>[] TexCoords = Array.Empty<List<Vector3f>>();
 		[Key(7)]
 		public float Weight;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		float IAnimationAttachment.Weight => Weight;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.Vertices => Vertices;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.Normals => Normals;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.Tangents => Tangents;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.BiTangents => BiTangents;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<Colorf>[] IRawComplexMeshData.Colors => Colors;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<Vector3f>[] IRawComplexMeshData.TexCoords => TexCoords;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		string IAnimationAttachment.Name => Name;
 
 		public RAnimationAttachment(in MeshAnimationAttachment meshAnimationAttachment) {
@@ -268,7 +274,7 @@ namespace RNumerics
 		public int[] TexComponentCount = Array.Empty<int>();
 		[Key(10)]
 		public List<RBone> Bones = new();
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public int BonesCount => Bones.Count;
 		[Key(11)]
 		public List<RAnimationAttachment> MeshAttachments = new();
@@ -278,10 +284,10 @@ namespace RNumerics
 		[Key(13)]
 		public List<RSubMesh> SubMeshes = new();
 
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		bool IComplexMesh.HasSubMeshs => SubMeshes.Count > 0;
 
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		IEnumerable<ISubMesh> IComplexMesh.SubMeshes
 		{
 			get {
@@ -312,6 +318,12 @@ namespace RNumerics
 			if (complexMesh.HasSubMeshs) {
 				throw new Exception("Adding Mesh Already Has a submesh");
 			}
+			if (MorphingMethod == RMeshMorphingMethod.None && complexMesh.MorphingMethod != RMeshMorphingMethod.None) {
+				MorphingMethod = complexMesh.MorphingMethod;
+			}
+			if (complexMesh.MorphingMethod != MorphingMethod) {
+				throw new Exception("Not able to connvert MorphingMethod to be the same for mesh");
+			}
 			var startingVert = Vertices.Count;
 			Vertices.AddRange(complexMesh.Vertices);
 			if (Normals.Count > 0) {
@@ -339,7 +351,7 @@ namespace RNumerics
 			}
 			foreach (var item in complexMesh.Bones) {
 				for (var i = 0; i < Bones.Count; i++) {
-					if(item.Name == Bones[i].Name) {
+					if (item.Name == Bones[i].Name) {
 						Bones[i].VertexWeights.AddRange(item.VertexWeights.Select((x) => new RVertexWeight { VertexID = x.VertexID + startingVert, Weight = x.Weight }));
 					}
 				}
@@ -386,31 +398,31 @@ namespace RNumerics
 			return SubMeshes.Count - 1;
 		}
 
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public bool IsTriangleMesh => PrimitiveType == RPrimitiveType.Triangle;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public int TriangleCount => Faces.Count;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public int MaxTriangleID => Faces.Count;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public bool HasVertexUVs => (TexCoords.Length > 0) & TexCoords[0].Count > 0;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public bool HasTriangleGroups => PrimitiveType == RPrimitiveType.Triangle;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public int VertexCount => Vertices.Count;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public int MaxVertexID => Vertices.Count;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public bool HasVertexNormals => Normals.Count > 0;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public bool HasVertexColors => (Colors.Length > 0) & Colors[0].Count > 0;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public int Timestamp => int.MaxValue;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		string IComplexMesh.MeshName => MeshName;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		RPrimitiveType IComplexMesh.PrimitiveType => PrimitiveType;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		IEnumerable<IBone> IComplexMesh.Bones
 		{
 			get {
@@ -419,7 +431,7 @@ namespace RNumerics
 				}
 			}
 		}
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		IEnumerable<IFace> IComplexMesh.Faces
 		{
 			get {
@@ -428,9 +440,9 @@ namespace RNumerics
 				}
 			}
 		}
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		int[] IComplexMesh.TexComponentCount => TexComponentCount;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		IEnumerable<IAnimationAttachment> IComplexMesh.MeshAttachments
 		{
 			get {
@@ -440,25 +452,25 @@ namespace RNumerics
 			}
 		}
 
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		RMeshMorphingMethod IComplexMesh.MorphingMethod => MorphingMethod;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.Vertices => Vertices;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.Normals => Normals;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.Tangents => Tangents;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.BiTangents => BiTangents;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<Colorf>[] IRawComplexMeshData.Colors => Colors;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		List<Vector3f>[] IRawComplexMeshData.TexCoords => TexCoords;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public bool HasBones => Bones.Count > 0;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public bool HasMeshAttachments => MeshAttachments.Count > 0;
-		[IgnoreMember]
+		[IgnoreMember, JsonIgnore]
 		public bool IsBasicMesh => !(HasBones || HasMeshAttachments);
 
 		public Vector2f GetVertexUV(in int i, in int channel = 1) {
@@ -596,6 +608,31 @@ namespace RNumerics
 		public IEnumerable<Vector3f> VertexPos() {
 			foreach (var item in Vertices) {
 				yield return item;
+			}
+		}
+
+		public void Optimize() {
+			if (MorphingMethod == RMeshMorphingMethod.VertexBlend) {
+				foreach (var item in MeshAttachments) {
+					var verts = new Vector3[VertexCount];
+					var smallist = Math.Min(item.Vertices.Count, VertexCount);
+					for (var i = 0; i < smallist; i++) {
+						verts[i] = new Vector3(item.Vertices[i].x, item.Vertices[i].y, item.Vertices[i].z) - Vertices[i];
+					}
+					var norms = new Vector3[VertexCount];
+					var smallistnorm = Math.Min(item.Normals.Count, VertexCount);
+					for (var i = 0; i < smallistnorm; i++) {
+						norms[i] = new Vector3(item.Normals[i].x, item.Normals[i].y, item.Normals[i].z) - Normals[i];
+					}
+
+					var tangents = new Vector3[VertexCount];
+					var smallitsTang = Math.Min(Tangents.Count, VertexCount);
+					for (var i = 0; i < smallitsTang; i++) {
+						var tangent = item.Tangents[i];
+						tangents[i] = new Vector3(tangent.x - Tangents[i].x, tangent.y - Tangents[i].y, tangent.z - Tangents[i].z);
+					}
+				}
+				MorphingMethod = RMeshMorphingMethod.MorphRelative;
 			}
 		}
 

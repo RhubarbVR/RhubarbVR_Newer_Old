@@ -34,6 +34,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			}
 			var currentIndex = 0;
 			foreach (SkinnedMeshRender.BlendShape item in LinkedComp.BlendShapes) {
+				if(node.Mesh._GetBlendShapeCount() <= currentIndex) {
+					currentIndex++;
+					continue;
+				}
 				node.SetBlendShapeValue(currentIndex, item.Weight.Value);
 				currentIndex++;
 			}
