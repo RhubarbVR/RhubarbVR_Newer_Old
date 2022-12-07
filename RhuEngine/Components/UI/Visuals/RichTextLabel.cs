@@ -22,7 +22,7 @@ namespace RhuEngine.Components
 		[Default(true)]public readonly Sync<bool> MetaUnderline;
 		[Default(true)]public readonly Sync<bool> HintUnderline;
 		[Default(true)]public readonly Sync<bool> Threading;
-		[Default(500)]public readonly Sync<int> ProgressBarDelay;
+		[Default(1000)]public readonly Sync<int> ProgressBarDelay;
 		public readonly Sync<bool> TextSelectionEnabled;
 		[Default(true)]public readonly Sync<bool> DeselectingOnFocusLossEnabled;
 		public readonly Sync<RVisibleCharactersBehavior> VisibleCharactersBehavior;

@@ -13,7 +13,7 @@ namespace RhuEngine.Commads
 	{
 		public override string HelpMsg => "Game Debug Info";
 
-		public override void RunCommand() {
+		public override async Task RunCommand() {
 			if(args.Length == 1) {
 				Console.WriteLine("Need arg of EngineStatistics,FocusedWorld,FocusedWorldUsers and FocusedWorldNetStatistics");
 				return;

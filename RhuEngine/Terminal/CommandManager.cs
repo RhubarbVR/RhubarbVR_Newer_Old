@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using RhuEngine.Linker;
+
 namespace RhuEngine
 {
 	public sealed class CommandManager
@@ -60,13 +62,20 @@ namespace RhuEngine
 			}
 			var foundcomand = false;
 			foreach (var item in _commands) {
-				if (line.ToLower().StartsWith(item.Name.ToLower()+" ") || (line.ToLower() == item.Name.ToLower())) {
+				if (line.ToLower().StartsWith(item.Name.ToLower() + " ") || (line.ToLower() == item.Name.ToLower())) {
 					foundcomand = true;
 					var comand = (Command)Activator.CreateInstance(item);
 					comand.args = line.Split(' ');
 					comand.FullCommand = line;
 					comand.Manager = this;
-					Task.Run(() => comand.RunCommand());
+					Task.Run(async () => {
+						try {
+							await comand.RunCommand();
+						}
+						catch(Exception e) {
+							RLog.Err($"Command Error:{e}");
+						}
+					});;
 				}
 			}
 			if (!foundcomand) {

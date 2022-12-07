@@ -31,13 +31,14 @@ namespace RhuEngine.Commads
 		}
 		public override string HelpMsg => "Spawn Object";
 
-		public override void RunCommand() {
-			if(args.Length == 1) {
+		public override Task RunCommand() {
+			if (args.Length == 1) {
 				Console.WriteLine("Need Object To Spawn");
 				foreach (var item in Enum.GetNames(typeof(SpawnObject))) {
 					Console.WriteLine(item);
 				}
-				return;
+
+				return Task.CompletedTask;
 			}
 			var spawntype = (SpawnObject)Enum.Parse(typeof(SpawnObject), args[1], true);
 			var enty = Manager.Engine.worldManager.FocusedWorld.GetLocalUser().userRoot.Target?.head.Target ?? Manager.Engine.worldManager.FocusedWorld.RootEntity;
@@ -95,6 +96,8 @@ namespace RhuEngine.Commads
 					AttachEntiyTo.AttachComponent<BoxShape>();
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 	}
 }

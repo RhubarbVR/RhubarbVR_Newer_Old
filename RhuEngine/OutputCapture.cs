@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,42 +19,19 @@ namespace RhuEngine
 
 		private TextWriter _stdOutWriter;
 
-
-		public int currentLine = 0;
-
 		public override Encoding Encoding => Encoding.ASCII;
 
 		public event Action TextEdied;
 
-		public int AmountOfNewLines;
-
-		public void RemoveNewLines(int amount) {
-			if(amount < 0) {
-				return;
-			}
-			var lastIndex = 0;
-			for (var i = 0; i < amount; i++) {
-				lastIndex = InGameConsole.IndexOf('\n', lastIndex) + 1;
-				if(lastIndex == -1) {
-					InGameConsole = null;
-					AmountOfNewLines = 0;
-					break;
-				}
-			}
-			InGameConsole = InGameConsole.Substring(lastIndex);
-			AmountOfNewLines -= amount;
-		}
-
 		public void WriteText(string data) {
 			data = data.AutoBrakeLine();
-			var amountOfnewLines = data.Count((car) => car == '\n');
-			AmountOfNewLines += amountOfnewLines;
 			var consoleColor = RhuConsole.ForegroundColor;
-			if(consoleColor == ConsoleColor.Gray) {
+			if (consoleColor == ConsoleColor.Gray) {
 				consoleColor = ConsoleColor.White;
 			}
-			InGameConsole += $"<color{consoleColor}>{data.Replace("info", "<colorBlue>info</color>").Replace("error", "<colorRed>error</color>").Replace("diagnostic", "<colorMidnightBlue>diagnostic</color>").Replace("warn", "<coloryellow>warn</color>")}</clearstyle>";
-			RemoveNewLines(AmountOfNewLines - 35);
+			InGameConsole += $"[color={consoleColor}]{data.Replace("info", "[color=Blue]info[/color]").Replace("error", "[color=Red]error[/color]").Replace("diagnostic", "[color=MidnightBlue]diagnostic[/color]").Replace("warn", "[color=yellow]warn[/color]")}";
+			var splitLines = InGameConsole.Split('\n');
+			InGameConsole = string.Join("\n", splitLines.Skip(Math.Max(0, splitLines.Length - 30)));
 			_writer?.Write(data);
 			TextEdied?.Invoke();
 		}
@@ -72,8 +50,7 @@ namespace RhuEngine
 			WriteText(text);
 		}
 
-		public new void Dispose() 
-		{
+		public new void Dispose() {
 			RLog.Unsubscribe(LogCall);
 			_writer.Close();
 			_writer.Dispose();
@@ -82,13 +59,19 @@ namespace RhuEngine
 		}
 
 		override public void Write(string output) {
+			if (string.IsNullOrEmpty(LogsPath)) {
+				output = " ";
+			}
 			// Capture the output and also send it to StdOut
 			WriteText(output);
 			_stdOutWriter.Write(output);
 		}
 
 		override public void WriteLine(string output) {
-			WriteText(output+"\n");
+			if(string.IsNullOrEmpty(LogsPath)) {
+				output = " ";
+			}
+			WriteText(output + "\n");
 			_stdOutWriter.WriteLine(output);
 		}
 	}

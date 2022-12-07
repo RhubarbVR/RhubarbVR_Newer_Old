@@ -256,7 +256,7 @@ namespace RhuEngine.Components
 			if (InputManager.GetInputAction(InputTypes.ContextMenu).Activated() && !Engine.HasKeyboard) {
 				_contextMenuHoldTime += RTime.Elapsed;
 			}
-			if (InputManager.GetInputAction(InputTypes.ContextMenu).JustDeActivated() && !_updateDashState) {
+			if (InputManager.GetInputAction(InputTypes.ContextMenu).JustDeActivated() && !_updateDashState && !Engine.HasKeyboard) {
 				_contextMenuHoldTime = 0;
 				_updateDashState = false;
 #if DEBUG

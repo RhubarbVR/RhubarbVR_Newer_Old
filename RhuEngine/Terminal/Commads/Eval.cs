@@ -17,10 +17,10 @@ namespace RhuEngine.Commads
 		
 		public override string HelpMsg => "Runs ecma Script";
 
-		public override void RunCommand() {
-			if(args.Length == 1) {
+		public override Task RunCommand() {
+			if (args.Length == 1) {
 				Console.WriteLine("Needs code to run");
-				return;
+				return Task.CompletedTask;
 			}
 			var enty = Manager.Engine.worldManager.FocusedWorld.GetLocalUser().userRoot.Target?.Entity ?? Manager.Engine.worldManager.FocusedWorld.RootEntity;
 			var comp = enty.AttachComponent<RawECMAScript>();
@@ -39,6 +39,7 @@ namespace RhuEngine.Commads
 			var returnData = comp.InvokeWithReturn("Eval");
 			Console.WriteLine(returnData.ToString());
 			comp.Destroy();
+			return Task.CompletedTask;
 		}
 	}
 }

@@ -11,7 +11,7 @@ namespace RhuEngine.Commads
 	{
 		public override string HelpMsg => "Faolan Says Hi";
 
-		public override void RunCommand() {
+		public override Task RunCommand() {
 			RhuConsole.ForegroundColor = ConsoleColor.DarkMagenta;
 			Console.Write("Faolan Says ");
 			RhuConsole.ForegroundColor = ConsoleColor.White;
@@ -21,6 +21,7 @@ namespace RhuEngine.Commads
 			RhuConsole.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine("!!");
 			RhuConsole.ForegroundColor = ConsoleColor.White;
+			return Task.CompletedTask;
 		}
 	}
 }

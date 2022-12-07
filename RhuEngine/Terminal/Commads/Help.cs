@@ -11,7 +11,7 @@ namespace RhuEngine.Commads
 	public class Help : Command
 	{
 		public override string HelpMsg => "Lists all commands and what they do";
-		public override void RunCommand() {
+		public override Task RunCommand() {
 			Console.WriteLine($"  ======  Help {Engine.MainEngine.version}  ======");
 			Console.WriteLine("");
 			foreach (var comand in Manager._commands) {
@@ -23,6 +23,7 @@ namespace RhuEngine.Commads
 			RhuConsole.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine("");
 			Console.WriteLine("  --------===========--------");
+			return Task.CompletedTask;
 		}
 	}
 }

@@ -12,7 +12,7 @@ namespace RhuEngine.Commads
 	{
 		public override string HelpMsg => "Register a RhubarbVR account";
 
-		public override void RunCommand() {
+		public override async Task RunCommand() {
 			Console.WriteLine("Email");
 			var email = ReadNextLine();
 			Console.WriteLine("Username");
@@ -25,15 +25,14 @@ namespace RhuEngine.Commads
 				Console.WriteLine("Passwords are not the same");
 				return;
 			}
-			Task.Run(async () => {
-				var req = await Engine.MainEngine.netApiManager.Client.RegisterAccount(username, email, Password);
-				if (!req?.IsDataGood ?? false) {
-					Console.WriteLine(req.Data);
-				}
-				else {
-					Console.WriteLine("Failed to Create Account Error " + req?.Data ?? "Error is null");
-				}
-			});
+			var req = await Engine.MainEngine.netApiManager.Client.RegisterAccount(username, email, Password);
+			if (!req?.IsDataGood ?? false) {
+				Console.WriteLine(req.Data);
+			}
+			else {
+				Console.WriteLine("Failed to Create Account Error " + req?.Data ?? "Error is null");
+			}
 		}
 	}
 }
+

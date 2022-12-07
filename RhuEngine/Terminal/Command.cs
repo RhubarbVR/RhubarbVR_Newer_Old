@@ -18,7 +18,7 @@ namespace RhuEngine
 			return Manager.PasswordInput();
 		}
 
-		public abstract void RunCommand();
+		public abstract Task RunCommand();
 
 		public string[] args;
 
