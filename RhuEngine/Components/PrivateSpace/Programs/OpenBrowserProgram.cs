@@ -25,6 +25,7 @@ namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
 	[ProgramOpenWith("nofile/uri")]
+	[ProgramHide]
 	public sealed class OpenBrowserProgram : PrivateSpaceProgram
 	{
 		public override RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.Link;

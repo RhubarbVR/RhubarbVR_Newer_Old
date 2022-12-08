@@ -179,7 +179,6 @@ namespace RhuEngine.Components
 			IconTexRender.Entity.orderOffset.Value = -100;
 			UserInterface = screen.AddChild("UserInterface").AttachComponent<UIElement>();
 			UserInterface.InputFilter.Value = RInputFilter.Pass;
-			UserInterface.Enabled.Value = false;
 			UserInterfaceManager = DashMover.AttachComponent<UserInterfaceManager>();
 			var size = new Vector2f(0.075f);
 			IconTexRender.Min.Value = new Vector2f(0.5f, 0.5f) - (size / 2);

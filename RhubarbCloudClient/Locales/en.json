@@ -287,6 +287,9 @@
     "Programs.SessionsFinder.NoSessionsFound": "No public Sessions could be found",
     "Programs.SessionsFinder.Error": "Error finding public sessions",
 
+    "Programs.DevTools.Name": "Developer Tools",
+
+
     "Start.AllPrograms": "All Programs",
     "Program.OpenBrowser.Name": "Open System Webbrowser",
     "Program.OpenBrowser.Text": "This link will take you to \n {0}.\n Open in browser?",

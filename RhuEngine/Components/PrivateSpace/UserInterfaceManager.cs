@@ -69,14 +69,40 @@ namespace RhuEngine.Components
 		[NoLoad]
 		[NoSyncUpdate]
 		public UnlitMaterial UImaterial;
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIElement TaskBarRoot;
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIElement ToolBarHolder;
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Button ToolBarCloseButton;
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public BoxContainer ToolBarButtons;
+
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public UIElement ToolBarRoot;
 
 		public readonly List<PrivateSpaceTaskbarItem> privateSpaceTaskbarItems = new();
 
 		public bool OpenCloseDash
 		{
-			get => UserInterface.Enabled.Value;
+			get => Windows.Enabled.Value;
 			set {
-				UserInterface.Enabled.Value = value;
+				Windows.Enabled.Value = value;
 				VrElements.enabled.Value = value && Engine.IsInVR;
 				_PrivateSpaceManager.VRViewPort.UpdateMode.Value = value && Engine.IsInVR ? RUpdateMode.Always : RUpdateMode.Disable;
 				if (value) {
@@ -86,14 +112,15 @@ namespace RhuEngine.Components
 					InputManager.screenInput.UnFreeMouse();
 				}
 #if DEBUG
-				if (UserInterface.Enabled.Value) {
+				if (Windows.Enabled.Value) {
 					RLog.Info("Opened Dash");
 				}
 				else {
 					RLog.Info("Closed Dash");
 				}
 #endif
-				if (!UserInterface.Enabled.Value) {
+				TaskBarRoot.Enabled.Value = Windows.Enabled.Value;
+				if (!Windows.Enabled.Value) {
 					ToggleStart(false);
 					_allProgramsButton.Entity.enabled.Value = true;
 					_startscroll.Entity.enabled.Value = true;
@@ -117,6 +144,9 @@ namespace RhuEngine.Components
 				RLog.Info("Closed Start");
 			}
 #endif
+			if (!startState && !_startListBox.Entity.enabled.Value) {
+				_allProgramsButton.Pressed.Invoke();
+			}
 			StartVRElement.Entity.enabled.Value = startState;
 			Start.Entity.enabled.Value = startState;
 			_startButton.ButtonPressed.Value = startState;
@@ -281,6 +311,7 @@ namespace RhuEngine.Components
 
 			Windows = RootUIEntity.AddChild("Windows").AttachComponent<UIElement>();
 			Windows.InputFilter.Value = RInputFilter.Pass;
+			Windows.Enabled.Value = false;
 			UImaterial = Entity.AttachComponent<UnlitMaterial>();
 			UImaterial.DullSided.Value = true;
 			UImaterial.Transparency.Value = Transparency.Blend;
@@ -311,13 +342,13 @@ namespace RhuEngine.Components
 			VrElements.enabled.Value = false;
 			Engine.EngineLink.VRChange += EngineLink_VRChange;
 
-			var TaskBar = RootUIEntity.AddChild("TaskBar").AttachComponent<UIElement>();
-			TaskBar.Min.Value = new Vector2f(0, 1);
-			TaskBar.MinOffset.Value = new Vector2f(0, -100);
+			TaskBarRoot = RootUIEntity.AddChild("TaskBar").AttachComponent<UIElement>();
+			TaskBarRoot.Min.Value = new Vector2f(0, 1);
+			TaskBarRoot.MinOffset.Value = new Vector2f(0, -100);
 
-			TaskBar.Entity.AddChild("Panel").AttachComponent<Panel>();
-			var taskBardata = TaskBar.Entity.AddChild("BoxContainer").AttachComponent<BoxContainer>();
-
+			TaskBarRoot.Entity.AddChild("Panel").AttachComponent<Panel>();
+			var taskBardata = TaskBarRoot.Entity.AddChild("BoxContainer").AttachComponent<BoxContainer>();
+			TaskBarRoot.Enabled.Value = false;
 			var leftElement = taskBardata.Entity.AddChild("Left").AttachComponent<UIElement>();
 			leftElement.MinSize.Value = new Vector2i(190, 0);
 			var centerElement = taskBardata.Entity.AddChild("Center").AttachComponent<UIElement>();
@@ -332,6 +363,7 @@ namespace RhuEngine.Components
 			Start = RootUIEntity.AddChild("Start").AttachComponent<UIElement>();
 
 			BuildStartMenu(Start);
+			BuildToolBar();
 			ToggleStart(false);
 			Client_StatusUpdate();
 			if (Engine.netApiManager.Client.IsLogin) {
@@ -340,6 +372,26 @@ namespace RhuEngine.Components
 			else {
 				Client_OnLogout();
 			}
+		}
+
+		private void BuildToolBar() {
+			ToolBarRoot = RootUIEntity.AddChild("ToolBarRoot").AttachComponent<UIElement>();
+			ToolBarRoot.Enabled.Value = false;
+			ToolBarRoot.Entity.AddChild("Color").AttachComponent<Panel>();
+			ToolBarRoot.Max.Value = new Vector2f(1, 0);
+			ToolBarRoot.MaxOffset.Value = new Vector2f(0, 45f);
+			ToolBarRoot.InputFilter.Value = RInputFilter.Stop;
+			var data = ToolBarRoot.Entity.AddChild("ToolBarRoot").AttachComponent<BoxContainer>();
+			ToolBarButtons = data.Entity.AddChild("Buttons").AttachComponent<BoxContainer>();
+			ToolBarHolder = data.Entity.AddChild("Holder").AttachComponent<UIElement>();
+			ToolBarHolder.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+			ToolBarCloseButton = data.Entity.AddChild("CloseTaskBarItem").AttachComponent<Button>();
+			ToolBarCloseButton.IconAlignment.Value = RButtonAlignment.Center;
+			ToolBarCloseButton.ExpandIcon.Value = true;
+			var texture = ToolBarCloseButton.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+			ToolBarCloseButton.Icon.Target = texture;
+			texture.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Close));
+			ToolBarCloseButton.MinSize.Value = new Vector2i(45);
 		}
 
 		private readonly List<PrivateSpaceTaskbarItem> _worldItems = new();
@@ -355,10 +407,10 @@ namespace RhuEngine.Components
 				}
 				_worldItems.Clear();
 				foreach (var item in Engine.worldManager.worlds) {
-					if(item.Focus is not World.FocusLevel.Background and not World.FocusLevel.Focused) {
+					if (item.Focus is not World.FocusLevel.Background and not World.FocusLevel.Focused) {
 						continue;
 					}
-					if(item.IsLoading || item.IsDisposed || item.IsRemoved) {
+					if (item.IsLoading || item.IsDisposed || item.IsRemoved) {
 						continue;
 					}
 					var newItem = PrivateSpaceManager.UserInterfaceManager._taskbarElementHolder?.Entity?.AddChild(item.Name)?.AttachComponent<PrivateSpaceTaskbarItem>();
@@ -675,7 +727,7 @@ namespace RhuEngine.Components
 				});
 				var vrswitchlocal = vrswitch.Entity.AttachComponent<StandardLocale>();
 				vrswitchlocal.TargetValue.Target = vrswitch.ToolTipText;
-				var action = void(bool state) => vrswitchlocal.Key.Value = state ? "Actions.ChangeVR.Disable" : "Actions.ChangeVR.Enable";
+				var action = void (bool state) => vrswitchlocal.Key.Value = state ? "Actions.ChangeVR.Disable" : "Actions.ChangeVR.Enable";
 				Engine.EngineLink.VRChange += action;
 				action(Engine.EngineLink.InVR);
 			}

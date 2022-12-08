@@ -14,6 +14,7 @@ using RhuEngine.Physics;
 using RhuEngine.WorldObjects;
 using System.IO;
 using System.Reflection;
+using Esprima.Ast;
 
 namespace RhuEngine.Components
 {
@@ -70,6 +71,7 @@ namespace RhuEngine.Components
 
 		public readonly List<Program> Programs = new();
 		public readonly List<ProgramWindow> ProgramWindows = new();
+		public readonly List<ProgramToolBar> ProgramToolBars = new();
 
 		public T GetProgram<T>() where T : Program, new() {
 			foreach (var item in Programs) {
@@ -143,5 +145,14 @@ namespace RhuEngine.Components
 		internal void UnLoadProgram(Program program) {
 			Programs.Remove(program);
 		}
+
+		internal void LoadProgramToolBar(ProgramToolBar programToolBar) {
+			ProgramToolBars.Add(programToolBar);
+			Entity.AddChild().AttachComponent<PrivateSpaceToolBar>().InitPrivateSpaceToolBar(programToolBar);
+		}
+		internal void UnLoadProgramToolBar(ProgramToolBar programToolBar) {
+			ProgramToolBars.Remove(programToolBar);
+		}
+
 	}
 }

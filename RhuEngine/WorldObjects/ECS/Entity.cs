@@ -480,6 +480,9 @@ namespace RhuEngine.WorldObjects.ECS
 		public Matrix GlobalTrans
 		{
 			get {
+				if (IsDestroying) {
+					return _cachedGlobalMatrix;
+				}
 				if (_dirtyGlobal) {
 					_cachedGlobalMatrix = LocalTrans * InternalParent?.GlobalTrans ?? Matrix.Identity;
 					_dirtyGlobal = false;
@@ -510,6 +513,9 @@ namespace RhuEngine.WorldObjects.ECS
 		public Matrix LocalTrans
 		{
 			get {
+				if (IsDestroying) {
+					return _cachedLocalMatrix;
+				}
 				if (_dirtyLocal) {
 					_cachedLocalMatrix = Matrix.TRS(position.Value, rotation.Value, scale.Value);
 					_dirtyLocal = false;

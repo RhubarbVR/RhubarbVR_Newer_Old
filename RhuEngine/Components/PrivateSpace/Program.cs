@@ -13,6 +13,8 @@ namespace RhuEngine.Components
 {
 	public abstract class Program : Component
 	{
+		public readonly SyncObjList<SyncRef<ProgramToolBar>> programToolBars;
+
 		public readonly SyncObjList<SyncRef<ProgramWindow>> programWindows;
 
 		public ProgramWindow this[int c] => programWindows[c].Target;
@@ -32,6 +34,22 @@ namespace RhuEngine.Components
 			return window;
 		}
 
+		public ViewPortProgramToolBar AddToolBar(RhubarbAtlasSheet.RhubarbIcons icon, string name = null, bool closeProgramOnToolClose = true, bool canClose = true) {
+			var window = Entity.AddChild(ProgramName).AttachComponent<ViewPortProgramToolBar>();
+			window.Program = this;
+			window.ToolBarCanClose.Value = canClose;
+			if (canClose) {
+				if (closeProgramOnToolClose) {
+					window.OnClosedToolBar += () => CloseProgram();
+				}
+			}
+			window.ToolbarTitle.Value = name ?? ProgramName;
+			programToolBars.Add().Target = window;
+			var nicon = window.Entity.AttachComponent<SingleIconTex>();
+			nicon.Icon.Value = icon;
+			window.IconTexture.Target = nicon;
+			return window;
+		}
 
 		public ViewPortProgramWindow AddWindow(string name = null, RTexture2D icon = null, bool closeProgramOnWindowClose = true, bool canClose = true) {
 			var window = Entity.AddChild(name ?? ProgramName).AttachComponent<ViewPortProgramWindow>();
