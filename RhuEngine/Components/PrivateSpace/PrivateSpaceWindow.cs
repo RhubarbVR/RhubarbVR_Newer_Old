@@ -33,7 +33,6 @@ namespace RhuEngine.Components
 			Window = window;
 			Window.PrivateSpaceWindow = this;
 			LoadTaskBarItem();
-			LoadUI();
 			Window.OnViewportUpdate += Window_OnViewportUpdate;
 			window.OnUpdatedData += Window_OnUpdatedData;
 			window.OnClosedWindow += Window_OnClosedWindow;
@@ -350,9 +349,6 @@ namespace RhuEngine.Components
 			PrivateSpaceTaskbarItem?.OpennedPorgram(this);
 		}
 
-		private void LoadUI() {
-
-		}
 
 		protected override void AlwaysStep() {
 			base.AlwaysStep();

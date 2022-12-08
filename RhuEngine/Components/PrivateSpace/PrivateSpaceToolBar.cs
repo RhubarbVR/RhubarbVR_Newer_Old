@@ -12,8 +12,6 @@ using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 
-using static System.Collections.Specialized.BitVector32;
-
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
@@ -37,6 +35,9 @@ namespace RhuEngine.Components
 		}
 
 		private void Tool_OnViewportUpdate() {
+			if(ConnectedViewPort is null) {
+				return;
+			}
 			ConnectedViewPort.Target.Target = Tool.TargetViewport;
 		}
 
@@ -92,15 +93,16 @@ namespace RhuEngine.Components
 					continue;
 				}
 				if (ui != ToggleButton) {
-					RenderThread.ExecuteOnStartOfFrame(() => {
-						ui.ButtonUp.Target?.Invoke();
-					});
+					RenderThread.ExecuteOnStartOfFrame(() => ui.ButtonUp.Target?.Invoke());
 					break;
 				}
 			}
 		}
 
 		private void LoadUI() {
+			if (PrivateSpaceManager?.UserInterfaceManager?.ToolBarButtons?.Entity is null) {
+				return;
+			}
 			ToggleButton = PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.AddChild(Tool.Title).AttachComponent<Button>();
 			ToggleButton.IconAlignment.Value = RButtonAlignment.Center;
 			ToggleButton.FocusMode.Value = RFocusMode.None;
@@ -108,7 +110,6 @@ namespace RhuEngine.Components
 			ToggleButton.MinSize.Value = new Vector2i(45);
 			ToggleButton.ToggleMode.Value = true;
 			ToggleButton.ButtonUp.Target = ButtonUP;
-
 			ConnectedViewPort = PrivateSpaceManager.UserInterfaceManager.ToolBarHolder.Entity.AddChild(Tool.Title).AttachComponent<ViewportConnector>();
 			ConnectedViewPort.Target.AllowCrossWorld();
 
@@ -116,9 +117,11 @@ namespace RhuEngine.Components
 		}
 
 		private void Tool_OnClosedToolBar() {
-			ConnectedViewPort.Entity.Destroy();
-			ToggleButton.Entity.Dispose();
-			PrivateSpaceManager.UserInterfaceManager.ToolBarRoot.Enabled.Value = PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children.Count > 0;
+			ConnectedViewPort?.Entity?.Destroy();
+			ToggleButton?.Entity?.Dispose();
+			if (PrivateSpaceManager?.UserInterfaceManager?.ToolBarButtons?.Entity is not null) {
+				PrivateSpaceManager.UserInterfaceManager.ToolBarRoot.Enabled.Value = PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children.Count > 0;
+			}
 			Entity.Destroy();
 		}
 	}
