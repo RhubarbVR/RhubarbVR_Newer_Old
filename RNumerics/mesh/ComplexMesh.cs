@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -75,6 +76,11 @@ namespace RNumerics
 			VertexID = vertexWeight.VertexID;
 			Weight = vertexWeight.Weight;
 		}
+		public RVertexWeight(in float weight, in int vertexID) {
+			VertexID = vertexID;
+			Weight = weight;
+		}
+
 		public RVertexWeight() {
 			VertexID = 0;
 			Weight = 0;
@@ -180,6 +186,7 @@ namespace RNumerics
 	[Flags]
 	public enum RPrimitiveType : byte
 	{
+		None = 0,
 		/// <summary>
 		/// Point primitive. This is just a single vertex in the virtual world. A face has
 		/// one index for such a primitive.</summary>
@@ -195,7 +202,8 @@ namespace RNumerics
 		/// <summary>
 		/// A n-Gon that has more than three edges (thus is not a triangle).
 		/// </summary>
-		Polygon = 0x8
+		Polygon = 0x8,
+		All = Point | Line | Triangle | Polygon,
 	}
 
 	[MessagePackObject]
@@ -249,13 +257,712 @@ namespace RNumerics
 		}
 	}
 
+	[Flags]
+	public enum SaveFlags : ushort
+	{
+		None = 0,
+		/// <summary>
+		/// Point primitive. This is just a single vertex in the virtual world. A face has
+		/// one index for such a primitive.</summary>
+		Point = 0x1,
+		/// <summary>
+		/// Line primitive. This is a line defined through a start and an end position. A
+		/// face contains exactly two indices for such a primitive.</summary>
+		Line = 0x2,
+		/// <summary>
+		/// Triangle primitive, consisting of three indices.
+		/// </summary>
+		Triangle = 0x4,
+		/// <summary>
+		/// A n-Gon that has more than three edges (thus is not a triangle).
+		/// </summary>
+		Polygon = 0x8,
+		Normals = 0x10,
+		Tangents = 0x20,
+		Colors = 0x40,
+		UVs = 0x80,
+		Bones = 0x100,
+		ShapeKeys = 0x200,
+		/// <summary>
+		/// Interpolation between morph targets.
+		/// </summary>
+		VertexBlend = 0x400,
+		/// <summary>
+		/// Normalized morphing between morph targets.
+		/// </summary>
+		MorphNormalized = 0x400,
+		/// <summary>
+		/// Relative morphing between morph targets.
+		/// </summary>
+		MorphRelative = 0x800,
+		HasSubMeshes = 0x1000,
+		NOTSetTwo = 0x2000,
+		NOTSetThree = 0x4000,
+		NOTSetFour = 0x8000,
+	}
+
 	[MessagePackObject]
 	public sealed class ComplexMesh : IComplexMesh, IMesh
 	{
+		public void WriteData(BinaryWriter binaryWriter) {
+			binaryWriter.Write(MeshName);
+			var flags = SaveFlags.None;
+			flags |= (SaveFlags)PrimitiveType;
+			flags |= MorphingMethod switch {
+				RMeshMorphingMethod.None => SaveFlags.None,
+				RMeshMorphingMethod.VertexBlend => SaveFlags.VertexBlend,
+				RMeshMorphingMethod.MorphNormalized => SaveFlags.MorphNormalized,
+				RMeshMorphingMethod.MorphRelative => SaveFlags.MorphRelative,
+				_ => SaveFlags.None,
+			};
+			if (HasVertexNormals) {
+				flags |= SaveFlags.Normals;
+			}
+			if (HasVertexUVs) {
+				flags |= SaveFlags.UVs;
+			}
+			if (Tangents.Count != 0) {
+				flags |= SaveFlags.Tangents;
+			}
+			if (HasVertexColors) {
+				flags |= SaveFlags.Colors;
+			}
+			if (HasBones) {
+				flags |= SaveFlags.Bones;
+			}
+			if (HasMeshAttachments) {
+				flags |= SaveFlags.ShapeKeys;
+			}
+			if (SubMeshes.Count != 0) {
+				flags |= SaveFlags.HasSubMeshes;
+			}
+			binaryWriter.Write((ushort)flags);
+			binaryWriter.Write(VertexCount);
+			if (HasVertexColors) {
+				var ColorChannelCount = Colors.Length;
+				for (var i = 0; i < Colors.Length; i++) {
+					if (Colors[i].Count != 0) {
+						ColorChannelCount = i + 1;
+					}
+					else {
+						break;
+					}
+				}
+				binaryWriter.Write(ColorChannelCount);
+			}
+			if (HasVertexUVs) {
+				var textCordAmount = TexCoords.Length;
+				for (var i = 0; i < TexCoords.Length; i++) {
+					if (TexCoords[i].Count != 0) {
+						textCordAmount = i + 1;
+					}
+				}
+				binaryWriter.Write(textCordAmount);
+				for (var i = 0; i < textCordAmount; i++) {
+					binaryWriter.Write((byte)TexComponentCount[i]);
+				}
+			}
+			for (var i = 0; i < VertexCount; i++) {
+				var vert = Vertices[i];
+				binaryWriter.Write(vert.x);
+				binaryWriter.Write(vert.y);
+				binaryWriter.Write(vert.z);
+				if (HasVertexNormals) {
+					var norm = Normals[i];
+					binaryWriter.Write(norm.x);
+					binaryWriter.Write(norm.y);
+					binaryWriter.Write(norm.z);
+				}
+				if (Tangents.Count != 0) {
+					var tan = Tangents[i];
+					var BiT = BiTangents[i];
+					binaryWriter.Write(tan.x);
+					binaryWriter.Write(tan.y);
+					binaryWriter.Write(tan.z);
+					binaryWriter.Write(BiT.x);
+					binaryWriter.Write(BiT.y);
+					binaryWriter.Write(BiT.z);
+				}
+				if (HasVertexColors) {
+					for (var currentColor = 0; currentColor < Colors.Length; currentColor++) {
+						if (Colors[currentColor].Count == 0) {
+							break;
+						}
+						var coler = Colors[currentColor][i];
+						binaryWriter.Write(coler.r);
+						binaryWriter.Write(coler.g);
+						binaryWriter.Write(coler.b);
+						binaryWriter.Write(coler.a);
+					}
+				}
+				if (HasVertexUVs) {
+					for (var uvChannel = 0; uvChannel < TexCoords.Length; uvChannel++) {
+						var amountOfChannel = TexComponentCount[uvChannel];
+						if (amountOfChannel == 0) {
+							continue;
+						}
+						var uv = TexCoords[uvChannel][i];
+						if (amountOfChannel == 1) {
+							binaryWriter.Write(uv.x);
+						}
+						else if (amountOfChannel == 2) {
+							binaryWriter.Write(uv.x);
+							binaryWriter.Write(uv.y);
+						}
+						else if (amountOfChannel == 3) {
+							binaryWriter.Write(uv.x);
+							binaryWriter.Write(uv.y);
+							binaryWriter.Write(uv.z);
+						}
+						else {
+							throw new InvalidDataException($"Amount of Channel was {amountOfChannel}");
+						}
+					}
+				}
+			}
+
+			var faces = Faces.GroupBy(x => x.Indices.Count).ToList();
+			binaryWriter.Write(faces.Count);
+			for (var i = 0; i < faces.Count; i++) {
+				var group = faces[i];
+				var values = group.ToArray();
+				binaryWriter.Write((ushort)group.Key);
+				binaryWriter.Write(values.Length);
+				foreach (var item in values.SelectMany(x => x.Indices)) {
+					binaryWriter.Write(item);
+				}
+			}
+
+			if (SubMeshes.Count != 0) {
+				binaryWriter.Write(SubMeshes.Count);
+				for (var subMesh = 0; subMesh < SubMeshes.Count; subMesh++) {
+					var currentSubMesh = SubMeshes[subMesh];
+					binaryWriter.Write((byte)currentSubMesh.rPrimitiveType);
+					var subMeshfaces = currentSubMesh.rFaces.GroupBy(x => x.Indices.Count).ToList();
+					binaryWriter.Write(subMeshfaces.Count);
+					for (var i = 0; i < subMeshfaces.Count; i++) {
+						var group = subMeshfaces[i];
+						var values = group.ToArray();
+						binaryWriter.Write((ushort)group.Key);
+						binaryWriter.Write(values.Length);
+						foreach (var item in values.SelectMany(x => x.Indices)) {
+							binaryWriter.Write(item);
+						}
+					}
+
+				}
+			}
+
+			if (HasBones) {
+				var bones = Bones.GroupBy(x => x.VertexWeights.Count).ToArray();
+				binaryWriter.Write(bones.Length);
+				for (var i = 0; i < bones.Length; i++) {
+					var bone = bones[i];
+					var amountOfBone = bone.ToArray();
+					binaryWriter.Write(bone.Key);
+					binaryWriter.Write(amountOfBone.Length);
+					for (var currentWate = 0; currentWate < amountOfBone.Length; currentWate++) {
+						var currentBone = amountOfBone[currentWate];
+						binaryWriter.Write(currentBone.BoneName);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M11);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M12);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M13);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M14);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M21);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M22);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M23);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M24);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M31);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M32);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M33);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M34);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M41);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M42);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M43);
+						binaryWriter.Write(currentBone.OffsetMatrix.m.M44);
+						for (var curentWeights = 0; curentWeights < currentBone.VertexWeights.Count; curentWeights++) {
+							binaryWriter.Write(currentBone.VertexWeights[curentWeights].Weight);
+							binaryWriter.Write(currentBone.VertexWeights[curentWeights].VertexID);
+						}
+					}
+				}
+			}
+
+			if (HasMeshAttachments) {
+				binaryWriter.Write(MeshAttachments.Count);
+				for (var attach = 0; attach < MeshAttachments.Count; attach++) {
+					var attachment = MeshAttachments[attach];
+					binaryWriter.Write(attachment.Name);
+					binaryWriter.Write(attachment.Weight);
+					var meshAttachflags = (byte)0x00;
+					var hasVert = false;
+					var hasNorm = false;
+					var hasTan = false;
+					var hasBit = false;
+					var hasColor = false;
+					var hasUV = false;
+					var saneVertsIndex = new HashSet<int>();
+					var saneNormsIndex = new HashSet<int>();
+					var saneTansIndex = new HashSet<int>();
+					var saneBitsIndex = new HashSet<int>();
+					var saneColorIndex = new HashSet<int>();
+					var saneUVIndex = new HashSet<int>();
+
+					for (var i = 0; i < VertexCount; i++) {
+						var vert = attachment.Vertices[i];
+						if (vert != Vertices[i]) {
+							meshAttachflags |= 0x01;
+							hasVert = true;
+						}
+						else {
+							saneVertsIndex.Add(i);
+						}
+						if (HasVertexNormals) {
+							var norm = attachment.Normals[i];
+							if (norm != Normals[i]) {
+								meshAttachflags |= 0x02;
+								hasNorm = true;
+							}
+							else {
+								saneNormsIndex.Add(i);
+							}
+						}
+						if (Tangents.Count != 0) {
+							var tan = attachment.Tangents[i];
+							if (tan != Tangents[i]) {
+								meshAttachflags |= 0x04;
+								hasTan = true;
+							}
+							else {
+								saneTansIndex.Add(i);
+							}
+							var BiT = attachment.BiTangents[i];
+							if (BiT != BiTangents[i]) {
+								meshAttachflags |= 0x08;
+								hasBit = true;
+							}
+							else {
+								saneBitsIndex.Add(i);
+							}
+						}
+						if (HasVertexColors) {
+							for (var currentColor = 0; currentColor < Colors.Length; currentColor++) {
+								if (Colors[currentColor].Count == 0) {
+									continue;
+								}
+								var coler = attachment.Colors[currentColor][i];
+								if (coler != Colors[currentColor][i]) {
+									meshAttachflags |= 0x10;
+									hasColor = true;
+								}
+								else {
+									saneColorIndex.Add(i);
+								}
+							}
+						}
+						if (HasVertexUVs) {
+							for (var uvChannel = 0; uvChannel < TexCoords.Length; uvChannel++) {
+								var amountOfChannel = TexComponentCount[uvChannel];
+								if (amountOfChannel == 0) {
+									continue;
+								}
+								var uv = attachment.TexCoords[uvChannel][i];
+								if (uv != TexCoords[uvChannel][i]) {
+									meshAttachflags |= 0x20;
+									hasUV = true;
+								}
+								else {
+									saneUVIndex.Add(i);
+								}
+							}
+						}
+					}
+
+					binaryWriter.Write(meshAttachflags);
+					if (hasVert) {
+						var change = saneVertsIndex.ToArray();
+						binaryWriter.Write(change.Length);
+						for (var targetIndex = 0; targetIndex < change.Length; targetIndex++) {
+							binaryWriter.Write(change[targetIndex]);
+						}
+					}
+					if (hasNorm) {
+						var change = saneNormsIndex.ToArray();
+						binaryWriter.Write(change.Length);
+						for (var targetIndex = 0; targetIndex < change.Length; targetIndex++) {
+							binaryWriter.Write(change[targetIndex]);
+						}
+					}
+					if (hasTan) {
+						var change = saneTansIndex.ToArray();
+						binaryWriter.Write(change.Length);
+						for (var targetIndex = 0; targetIndex < change.Length; targetIndex++) {
+							binaryWriter.Write(change[targetIndex]);
+						}
+					}
+					if (hasBit) {
+						var change = saneBitsIndex.ToArray();
+						binaryWriter.Write(change.Length);
+						for (var targetIndex = 0; targetIndex < change.Length; targetIndex++) {
+							binaryWriter.Write(change[targetIndex]);
+						}
+					}
+					if (hasColor) {
+						var change = saneColorIndex.ToArray();
+						binaryWriter.Write(change.Length);
+						for (var targetIndex = 0; targetIndex < change.Length; targetIndex++) {
+							binaryWriter.Write(change[targetIndex]);
+						}
+					}
+					if (hasUV) {
+						var change = saneUVIndex.ToArray();
+						binaryWriter.Write(change.Length);
+						for (var targetIndex = 0; targetIndex < change.Length; targetIndex++) {
+							binaryWriter.Write(change[targetIndex]);
+						}
+					}
+
+					for (var i = 0; i < VertexCount; i++) {
+						var vert = attachment.Vertices[i];
+						if (hasVert && !saneVertsIndex.Contains(i)) {
+							binaryWriter.Write(vert.x);
+							binaryWriter.Write(vert.y);
+							binaryWriter.Write(vert.z);
+						}
+						if (HasVertexNormals && hasNorm && !saneNormsIndex.Contains(i)) {
+							var norm = attachment.Normals[i];
+							binaryWriter.Write(norm.x);
+							binaryWriter.Write(norm.y);
+							binaryWriter.Write(norm.z);
+						}
+						if (Tangents.Count != 0) {
+							var tan = attachment.Tangents[i];
+							var BiT = attachment.BiTangents[i];
+							if (hasTan && !saneTansIndex.Contains(i)) {
+								binaryWriter.Write(tan.x);
+								binaryWriter.Write(tan.y);
+								binaryWriter.Write(tan.z);
+							}
+							if (hasBit && !saneBitsIndex.Contains(i)) {
+								binaryWriter.Write(BiT.x);
+								binaryWriter.Write(BiT.y);
+								binaryWriter.Write(BiT.z);
+							}
+						}
+						if (HasVertexColors && hasColor && !saneColorIndex.Contains(i)) {
+							for (var currentColor = 0; currentColor < Colors.Length; currentColor++) {
+								if (Colors[currentColor].Count == 0) {
+									continue;
+								}
+								var coler = attachment.Colors[currentColor][i];
+								binaryWriter.Write(coler.r);
+								binaryWriter.Write(coler.g);
+								binaryWriter.Write(coler.b);
+								binaryWriter.Write(coler.a);
+							}
+						}
+						if (HasVertexUVs && hasUV && !saneUVIndex.Contains(i)) {
+							for (var uvChannel = 0; uvChannel < TexCoords.Length; uvChannel++) {
+								var amountOfChannel = TexComponentCount[uvChannel];
+								if (amountOfChannel == 0) {
+									continue;
+								}
+								var uv = attachment.TexCoords[uvChannel][i];
+								if (amountOfChannel == 1) {
+									binaryWriter.Write(uv.x);
+								}
+								else if (amountOfChannel == 2) {
+									binaryWriter.Write(uv.x);
+									binaryWriter.Write(uv.y);
+								}
+								else if (amountOfChannel == 3) {
+									binaryWriter.Write(uv.x);
+									binaryWriter.Write(uv.y);
+									binaryWriter.Write(uv.z);
+								}
+								else {
+									throw new InvalidDataException($"Amount of Channel was {amountOfChannel}");
+								}
+							}
+						}
+					}
+
+				}
+			}
+
+		}
+
+
+		public void ReadData(BinaryReader reader) {
+			MeshName = reader.ReadString();
+			var saveFlags = (SaveFlags)reader.ReadUInt16();
+			PrimitiveType = (RPrimitiveType)saveFlags & RPrimitiveType.All;
+			MorphingMethod = saveFlags.HasFlag(SaveFlags.MorphRelative)
+				? RMeshMorphingMethod.MorphRelative
+				: saveFlags.HasFlag(SaveFlags.VertexBlend)
+					? RMeshMorphingMethod.VertexBlend
+					: saveFlags.HasFlag(SaveFlags.MorphNormalized) ? RMeshMorphingMethod.MorphNormalized : RMeshMorphingMethod.None;
+
+			var vertCount = reader.ReadInt32();
+
+			if (saveFlags.HasFlag(SaveFlags.Colors)) {
+				var colorChannelCount = reader.ReadInt32();
+				Colors = new List<Colorf>[colorChannelCount];
+				for (var i = 0; i < Colors.Length; i++) {
+					Colors[i] ??= new List<Colorf>();
+				}
+			}
+			if (saveFlags.HasFlag(SaveFlags.UVs)) {
+				var textCordAmount = reader.ReadInt32();
+				TexComponentCount = new int[textCordAmount];
+				TexCoords = new List<Vector3f>[textCordAmount];
+				for (var i = 0; i < textCordAmount; i++) {
+					TexComponentCount[i] = reader.ReadByte();
+					TexCoords[i] = new List<Vector3f>();
+				}
+			}
+
+			for (var i = 0; i < vertCount; i++) {
+				Vertices.Add(new Vector3f(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+				if (saveFlags.HasFlag(SaveFlags.Normals)) {
+					Normals.Add(new Vector3f(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+				}
+				if (saveFlags.HasFlag(SaveFlags.Tangents)) {
+					Tangents.Add(new Vector3f(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+					BiTangents.Add(new Vector3f(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+				}
+				if (saveFlags.HasFlag(SaveFlags.Colors)) {
+					for (var currentColor = 0; currentColor < Colors.Length; currentColor++) {
+						Colors[currentColor].Add(new Colorf(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+					}
+				}
+				if (saveFlags.HasFlag(SaveFlags.UVs)) {
+					for (var uvChannel = 0; uvChannel < TexCoords.Length; uvChannel++) {
+						var amountOfChannel = TexComponentCount[uvChannel];
+						if (amountOfChannel == 0) {
+							continue;
+						}
+						if (amountOfChannel == 1) {
+							TexCoords[uvChannel].Add(new Vector3f(reader.ReadSingle(), 0, 0));
+						}
+						else if (amountOfChannel == 2) {
+							TexCoords[uvChannel].Add(new Vector3f(reader.ReadSingle(), reader.ReadSingle(), 0));
+						}
+						else if (amountOfChannel == 3) {
+							TexCoords[uvChannel].Add(new Vector3f(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+						}
+						else {
+							throw new InvalidDataException($"Amount of Channel was {amountOfChannel}");
+						}
+					}
+				}
+			}
+
+
+			var amountOfFaceGroups = reader.ReadInt32();
+			for (var i = 0; i < amountOfFaceGroups; i++) {
+				var amounOfInexs = reader.ReadUInt16();
+				var ammountOfFaces = reader.ReadInt32();
+				for (var faceIndex = 0; faceIndex < ammountOfFaces; faceIndex++) {
+					var face = new RFace();
+					for (var readVal = 0; readVal < amounOfInexs; readVal++) {
+						face.Indices.Add(reader.ReadInt32());
+					}
+					Faces.Add(face);
+				}
+			}
+
+			if (saveFlags.HasFlag(SaveFlags.HasSubMeshes)) {
+				var subMeshCount = reader.ReadInt32();
+				for (var subMesh = 0; subMesh < subMeshCount; subMesh++) {
+					var primitiveType = (RPrimitiveType)reader.ReadByte();
+					var subMeshFaces = new List<RFace>();
+					var amountOfFaceGroupsSub = reader.ReadInt32();
+					for (var i = 0; i < amountOfFaceGroupsSub; i++) {
+						var amounOfInexs = reader.ReadUInt16();
+						var ammountOfFaces = reader.ReadInt32();
+						for (var faceIndex = 0; faceIndex < ammountOfFaces; faceIndex++) {
+							var face = new RFace();
+							for (var readVal = 0; readVal < amounOfInexs; readVal++) {
+								face.Indices.Add(reader.ReadInt32());
+							}
+							subMeshFaces.Add(face);
+						}
+					}
+					SubMeshes.Add(new RSubMesh(primitiveType, subMeshFaces, subMeshFaces.Count));
+				}
+			}
+
+			if (saveFlags.HasFlag(SaveFlags.Bones)) {
+				var boneGroupCount = reader.ReadInt32();
+				for (var i = 0; i < boneGroupCount; i++) {
+					var wateCount = reader.ReadInt32();
+					var amountOfBone = reader.ReadInt32();
+					for (var currentWate = 0; currentWate < amountOfBone; currentWate++) {
+						var newBone = new RBone {
+							BoneName = reader.ReadString(),
+							OffsetMatrix = new Matrix(new System.Numerics.Matrix4x4(
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle(),
+								reader.ReadSingle()))
+						};
+						for (var curentWeights = 0; curentWeights < wateCount; curentWeights++) {
+							newBone.VertexWeights.Add(new RVertexWeight(reader.ReadSingle(), reader.ReadInt32()));
+						}
+					}
+				}
+			}
+
+			if (saveFlags.HasFlag(SaveFlags.ShapeKeys)) {
+				var amountOfShapeKeys = reader.ReadInt32();
+				for (var attach = 0; attach < amountOfShapeKeys; attach++) {
+					var attachment = new RAnimationAttachment {
+						Name = reader.ReadString(),
+						Weight = reader.ReadSingle()
+					};
+					var meshAttachflags = reader.ReadByte();
+					var hasVert = (meshAttachflags & 0x01) != 0;
+					var hasNorm = (meshAttachflags & 0x02) != 0;
+					var hasTan = (meshAttachflags & 0x04) != 0;
+					var hasBit = (meshAttachflags & 0x08) != 0;
+					var hasColor = (meshAttachflags & 0x10) != 0;
+					var hasUV = (meshAttachflags & 0x20) != 0;
+					var Verts = new HashSet<int>();
+					var Norms = new HashSet<int>();
+					var Tans = new HashSet<int>();
+					var Bits = new HashSet<int>();
+					var _Colors = new HashSet<int>();
+					var UVs = new HashSet<int>();
+					if (hasVert) {
+						var length = reader.ReadInt32();
+						for (var targetIndex = 0; targetIndex < length; targetIndex++) {
+							Verts.Add(reader.ReadInt32());
+						}
+					}
+					if (hasNorm) {
+						var length = reader.ReadInt32();
+						for (var targetIndex = 0; targetIndex < length; targetIndex++) {
+							Norms.Add(reader.ReadInt32());
+						}
+					}
+					if (hasTan) {
+						var length = reader.ReadInt32();
+						for (var targetIndex = 0; targetIndex < length; targetIndex++) {
+							Tans.Add(reader.ReadInt32());
+						}
+					}
+					if (hasBit) {
+						var length = reader.ReadInt32();
+						for (var targetIndex = 0; targetIndex < length; targetIndex++) {
+							Bits.Add(reader.ReadInt32());
+						}
+					}
+					if (hasColor) {
+						var length = reader.ReadInt32();
+						for (var targetIndex = 0; targetIndex < length; targetIndex++) {
+							_Colors.Add(reader.ReadInt32());
+						}
+					}
+					if (hasUV) {
+						var length = reader.ReadInt32();
+						for (var targetIndex = 0; targetIndex < length; targetIndex++) {
+							UVs.Add(reader.ReadInt32());
+						}
+					}
+					for (var i = 0; i < VertexCount; i++) {
+						if (hasVert && !Verts.Contains(i)) {
+							attachment.Vertices.Add(new Vector3f(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+						}
+						if (hasVert && Verts.Contains(i)) {
+							attachment.Vertices.Add(Vertices[i]);
+						}
+						if (hasNorm && !Norms.Contains(i)) {
+							attachment.Normals.Add(new Vector3f(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+						}
+						if (hasNorm && Norms.Contains(i)) {
+							attachment.Normals.Add(Normals[i]);
+						}
+						if (hasTan && !Tans.Contains(i)) {
+							attachment.Tangents.Add(new Vector3f(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+						}
+						if (hasTan && Tans.Contains(i)) {
+							attachment.Tangents.Add(Tangents[i]);
+						}
+						if (hasBit && !Bits.Contains(i)) {
+							attachment.BiTangents.Add(new Vector3f(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+						}
+						if (hasBit && Bits.Contains(i)) {
+							attachment.BiTangents.Add(BiTangents[i]);
+						}
+						if (hasColor && !_Colors.Contains(i)) {
+							for (var currentColor = 0; currentColor < Colors.Length; currentColor++) {
+								var coler = attachment.Colors[currentColor];
+								coler.Add(new Colorf(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+							}
+						}
+						if (hasColor && _Colors.Contains(i)) {
+							for (var currentColor = 0; currentColor < Colors.Length; currentColor++) {
+								attachment.Colors[currentColor].Add(Colors[currentColor][i]);
+							}
+						}
+						if (hasUV && !UVs.Contains(i)) {
+							for (var uvChannel = 0; uvChannel < TexCoords.Length; uvChannel++) {
+								var amountOfChannel = TexComponentCount[uvChannel];
+								if (amountOfChannel == 0) {
+									continue;
+								}
+								if (amountOfChannel == 1) {
+									attachment.TexCoords[uvChannel].Add(new Vector3f(reader.ReadSingle(), 0, 0));
+								}
+								else if (amountOfChannel == 2) {
+									attachment.TexCoords[uvChannel].Add(new Vector3f(reader.ReadSingle(), reader.ReadSingle(), 0));
+								}
+								else if (amountOfChannel == 3) {
+									attachment.TexCoords[uvChannel].Add(new Vector3f(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+								}
+								else {
+									throw new InvalidDataException($"Amount of Channel was {amountOfChannel}");
+								}
+							}
+						}
+						if (hasUV && UVs.Contains(i)) {
+							for (var uvChannel = 0; uvChannel < TexCoords.Length; uvChannel++) {
+								var amountOfChannel = TexComponentCount[uvChannel];
+								if (amountOfChannel == 0) {
+									continue;
+								}
+								attachment.TexCoords[uvChannel].Add(TexCoords[uvChannel][i]);
+							}
+						}
+					}
+
+				}
+
+
+			}
+		}
+
+
+
 		[Key(0)]
 		public string MeshName;
 		[Key(1)]
 		public RPrimitiveType PrimitiveType;
+		[Key(12)]
+		public RMeshMorphingMethod MorphingMethod = RMeshMorphingMethod.None;
 		[Key(2)]
 		public List<Vector3f> Vertices = new();
 		[Key(3)]
@@ -278,9 +985,6 @@ namespace RNumerics
 		public int BonesCount => Bones.Count;
 		[Key(11)]
 		public List<RAnimationAttachment> MeshAttachments = new();
-		[Key(12)]
-		public RMeshMorphingMethod MorphingMethod = RMeshMorphingMethod.None;
-
 		[Key(13)]
 		public List<RSubMesh> SubMeshes = new();
 
@@ -608,31 +1312,6 @@ namespace RNumerics
 		public IEnumerable<Vector3f> VertexPos() {
 			foreach (var item in Vertices) {
 				yield return item;
-			}
-		}
-
-		public void Optimize() {
-			if (MorphingMethod == RMeshMorphingMethod.VertexBlend) {
-				foreach (var item in MeshAttachments) {
-					var verts = new Vector3[VertexCount];
-					var smallist = Math.Min(item.Vertices.Count, VertexCount);
-					for (var i = 0; i < smallist; i++) {
-						verts[i] = new Vector3(item.Vertices[i].x, item.Vertices[i].y, item.Vertices[i].z) - Vertices[i];
-					}
-					var norms = new Vector3[VertexCount];
-					var smallistnorm = Math.Min(item.Normals.Count, VertexCount);
-					for (var i = 0; i < smallistnorm; i++) {
-						norms[i] = new Vector3(item.Normals[i].x, item.Normals[i].y, item.Normals[i].z) - Normals[i];
-					}
-
-					var tangents = new Vector3[VertexCount];
-					var smallitsTang = Math.Min(Tangents.Count, VertexCount);
-					for (var i = 0; i < smallitsTang; i++) {
-						var tangent = item.Tangents[i];
-						tangents[i] = new Vector3(tangent.x - Tangents[i].x, tangent.y - Tangents[i].y, tangent.z - Tangents[i].z);
-					}
-				}
-				MorphingMethod = RMeshMorphingMethod.MorphRelative;
 			}
 		}
 

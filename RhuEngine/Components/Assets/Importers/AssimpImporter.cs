@@ -169,7 +169,6 @@ namespace RhuEngine.Components
 					newMesh.MorphingMethod = RMeshMorphingMethod.VertexBlend;
 				}
 				RLog.Info($"New Mesh MeshName:{newMesh.MeshName} MorphingMethod:{newMesh.MorphingMethod} VertexCount:{newMesh.VertexCount}  MeshAttachmentsCount:{newMesh.MeshAttachments.Count}");
-				newMesh.Optimize();
 				scene.meshes.Add(newMesh);
 				RLog.Info($"Loaded Mesh {item.Name}");
 			}

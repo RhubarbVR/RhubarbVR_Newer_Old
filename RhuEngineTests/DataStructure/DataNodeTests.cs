@@ -13,6 +13,7 @@ namespace RhuEngine.DataStructure.Tests
 	[TestClass()]
 	public class DataNodeTests
 	{
+
 		[TestMethod()]
 		public void TestAllDataNodes() {
 			var dataNodeGroup = new DataNodeGroup();

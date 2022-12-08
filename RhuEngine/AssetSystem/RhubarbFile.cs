@@ -15,18 +15,27 @@ namespace RhuEngine.AssetSystem
 		Avatar,
 	}
 
+	public enum FileCompressionType : byte 
+	{
+		Uncompressed,
+		DeflateStream,
+		DeflateStreamFast,
+	}
+
 	[MessagePackObject]
 	public sealed class RhubarbFile
 	{
 		[Key(0)]
 		public FileType FileType { get; set; }
 		[Key(1)]
-		public DateTimeOffset CreationData { get; set; }
+		public FileCompressionType CompressionType { get; set; }
 		[Key(3)]
-		public string Creator { get; set; }
+		public DateTimeOffset CreationData { get; set; }
 		[Key(4)]
-		public string Name { get; set; }
+		public Guid Creator { get; set; }
 		[Key(5)]
+		public string Name { get; set; }
+		[Key(6)]
 		public byte[] Data { get; set; }
 	}
 }
