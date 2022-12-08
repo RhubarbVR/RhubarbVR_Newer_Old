@@ -179,7 +179,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public List<AssetRef<RMaterial>> BoundTo = new();
 
 		private void AssetUpdate(RMaterial rMaterial) {
-			RUpdateManager.ExecuteOnStartOfFrame(this, MitReloadAction);
+			RUpdateManager.ExecuteOnStartOfFrame(BoundTo, MitReloadAction);
 		}
 
 		private void Materials_Changed(IChangeable obj) {
@@ -220,7 +220,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void MatUpdate(RhuEngine.WorldObjects.IChangeable obj) {
-			RUpdateManager.ExecuteOnStartOfFrame(this, MitReloadAction);
+			RUpdateManager.ExecuteOnStartOfFrame(BoundTo, MitReloadAction);
 		}
 
 		private void Mesh_LoadChange(RhuEngine.Linker.RMesh obj) {
@@ -234,7 +234,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			}
 			node.Mesh = ((GodotMesh)obj.Inst).LoadedMesh;
 			node.Skin = ((GodotMesh)obj.Inst).LoadedSkin;
-			MatUpdate(null);
+			Materials_Changed(null);
 		}
 	}
 

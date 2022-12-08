@@ -67,7 +67,7 @@ namespace RhuEngine.Components
 			public bool ReScale = true;
 			public float TargetSize = 0.5f;
 			public Dictionary<string, Entity> Nodes = new();
-			public Dictionary<string[], Armature> Armatures = new(new StringArrayEqualityComparer());
+			public Dictionary<string, Armature> Armatures = new();
 			public AxisAlignedBox3f BoundingBox = AxisAlignedBox3f.CenterZero;
 			public List<(Entity, Node)> LoadMeshNodes = new();
 
@@ -165,7 +165,7 @@ namespace RhuEngine.Components
 			}
 			foreach (var item in scene.scene.Meshes) {
 				var newMesh = new ComplexMesh(item);
-				if(item.MorphMethod == MeshMorphingMethod.None && newMesh.MeshAttachments.Count != 0) {
+				if (item.MorphMethod == MeshMorphingMethod.None && newMesh.MeshAttachments.Count != 0) {
 					newMesh.MorphingMethod = RMeshMorphingMethod.VertexBlend;
 				}
 				RLog.Info($"New Mesh MeshName:{newMesh.MeshName} MorphingMethod:{newMesh.MorphingMethod} VertexCount:{newMesh.VertexCount}  MeshAttachmentsCount:{newMesh.MeshAttachments.Count}");
@@ -322,23 +322,37 @@ namespace RhuEngine.Components
 				rmesh.url.Value = entity.World.CreateLocalAsset(amesh).ToString();
 			}
 			if (amesh.HasBones || amesh.HasMeshAttachments) {
-				var boneNames = amesh.Bones.Select((x) => x.Name).ToArray();
 				Armature armiturer;
-				if (!scene.Armatures.ContainsKey(boneNames)) {
-					armiturer = entity.AttachComponent<Armature>();
-					foreach (var bone in amesh.Bones) {
-						if (scene.Nodes.ContainsKey(bone.Name)) {
-							armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
-						}
-						else {
-							RLog.Info($"Didn't FindNode for {bone.Name}");
-							var ent = entity.AddChild(bone.Name);
-							armiturer.ArmatureEntitys.Add().Target = ent;
+				scene.Nodes.TryGetValue(amesh.Bones[0].BoneName, out var armitureEntity);
+				if (armitureEntity?.parent.Target is not null) {
+					armiturer = armitureEntity.parent.Target.GetFirstComponentOrAttach<Armature>();
+					if(armiturer.ArmatureEntitys.Count < amesh.Bones.Count) {
+						foreach (var bone in amesh.Bones.Skip(armiturer.ArmatureEntitys.Count)) {
+							if (scene.Nodes.ContainsKey(bone.Name)) {
+								armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
+							}
+							else {
+								RLog.Info($"Didn't FindNode for {bone.Name}");
+								var ent = entity.AddChild(bone.Name);
+								armiturer.ArmatureEntitys.Add().Target = ent;
+							}
 						}
 					}
 				}
 				else {
-					armiturer = scene.Armatures[boneNames];
+					armiturer = entity.GetFirstComponentOrAttach<Armature>();
+					if (armiturer.ArmatureEntitys.Count < amesh.Bones.Count) {
+						foreach (var bone in amesh.Bones.Skip(armiturer.ArmatureEntitys.Count)) {
+							if (scene.Nodes.ContainsKey(bone.Name)) {
+								armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
+							}
+							else {
+								RLog.Info($"Didn't FindNode for {bone.Name}");
+								var ent = entity.AddChild(bone.Name);
+								armiturer.ArmatureEntitys.Add().Target = ent;
+							}
+						}
+					}
 				}
 				var meshRender = entity.AttachComponent<SkinnedMeshRender>();
 				meshRender.Armature.Target = armiturer;
