@@ -13,9 +13,6 @@ using Newtonsoft.Json;
 
 namespace RNumerics
 {
-
-	//TODO:
-	/// Make a better way of saving mesh to save on space
 	[MessagePackObject]
 	public struct RSubMesh : ISubMesh
 	{
@@ -304,7 +301,10 @@ namespace RNumerics
 	[MessagePackObject]
 	public sealed class ComplexMesh : IComplexMesh, IMesh
 	{
+		public const byte MESH_VERSION = 0;
+
 		public void WriteData(BinaryWriter binaryWriter) {
+			binaryWriter.Write(MESH_VERSION);
 			binaryWriter.Write(MeshName);
 			var flags = SaveFlags.None;
 			flags |= (SaveFlags)PrimitiveType;
@@ -694,6 +694,12 @@ namespace RNumerics
 
 
 		public void ReadData(BinaryReader reader) {
+			var version = reader.ReadByte();
+			if(version != MESH_VERSION) {
+				//Add old Read code here
+
+				throw new Exception("Don't know how to read mesh");
+			}
 			MeshName = reader.ReadString();
 			var saveFlags = (SaveFlags)reader.ReadUInt16();
 			PrimitiveType = (RPrimitiveType)saveFlags & RPrimitiveType.All;
