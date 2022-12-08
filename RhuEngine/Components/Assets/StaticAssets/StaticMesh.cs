@@ -21,7 +21,8 @@ namespace RhuEngine.Components
 				if (!Engine.EngineLink.CanRender) {
 					return;
 				}
-				Load(new RMesh(RhubarbFileManager.ReadComplexMesh(data).Item1, false));
+				var meshData = RhubarbFileManager.ReadComplexMesh(data).Item1;
+				RenderThread.ExecuteOnStartOfFrame(() => Load(new RMesh(meshData, false)));
 			}
 			catch (Exception err) {
 				RLog.Err($"Failed to load Static Mesh Error {err}");
