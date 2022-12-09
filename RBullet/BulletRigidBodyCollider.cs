@@ -37,20 +37,10 @@ namespace RBullet
 		}
 
 		public static Matrix CastMet(Matrix4x4 matrix4X4) {
-			var t = new Matrix(
-				(float)matrix4X4.M11, (float)matrix4X4.M12, (float)matrix4X4.M13, (float)matrix4X4.M14,
-				(float)matrix4X4.M21, (float)matrix4X4.M22, (float)matrix4X4.M23, (float)matrix4X4.M24,
-				(float)matrix4X4.M31, (float)matrix4X4.M32, (float)matrix4X4.M33, (float)matrix4X4.M34,
-				(float)matrix4X4.M41, (float)matrix4X4.M42, (float)matrix4X4.M43, (float)matrix4X4.M44);
-			return t;
+			return new Matrix(matrix4X4);
 		}
 		public static Matrix4x4 CastMet(Matrix matrix4X4) {
-			var t = new Matrix4x4(
-				matrix4X4.m.M11, matrix4X4.m.M12, matrix4X4.m.M13, matrix4X4.m.M14,
-				matrix4X4.m.M21, matrix4X4.m.M22, matrix4X4.m.M23, matrix4X4.m.M24,
-				matrix4X4.m.M31, matrix4X4.m.M32, matrix4X4.m.M33, matrix4X4.m.M34,
-				matrix4X4.m.M41, matrix4X4.m.M42, matrix4X4.m.M43, matrix4X4.m.M44);
-			return t;
+			return matrix4X4.m;
 		}
 		public static RigidBody LocalCreateRigidBody(float mass, Matrix startTransform, CollisionShape shape) {
 			//rigidbody is dynamic if and only if mass is non zero, otherwise static

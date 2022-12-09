@@ -556,15 +556,15 @@ namespace RhuEngine.WorldObjects.ECS
 			GlobalTransMark();
 		}
 
-		internal void GlobalTransMark(bool physics = true) {
+		internal void GlobalTransMark(bool nonePhysics = true) {
 			if (IsRoot) {
 				return;
 			}
 			if (!_dirtyGlobal) {
 				for (var i = 0; i < children.Count; i++) {
-					children[i].GlobalTransMark(physics);
+					children[i].GlobalTransMark(nonePhysics);
 				}
-				GlobalTransformChange?.Invoke(this, physics);
+				GlobalTransformChange?.Invoke(this, nonePhysics);
 				_dirtyGlobal = true;
 			}
 		}

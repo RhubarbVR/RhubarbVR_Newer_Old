@@ -7,6 +7,8 @@ namespace RhuEngine
 {
 	public static class RenderThread
 	{
+		public static ulong UpdateCount { get; private set; }
+
 		public static Dictionary<object, Action> StartOfFrameExecute = new();
 		public static List<Action> StartOfFrameList = new();
 
@@ -74,6 +76,7 @@ namespace RhuEngine
 
 		public static void RunOnEndOfFrame() {
 			lock (EndOfFrameExecute) {
+				UpdateCount++;
 				var startcountlist = EndOfFrameList.Count;
 				for (var i = 0; i < startcountlist; i++) {
 					try {

@@ -52,6 +52,10 @@ namespace RhuEngine
 			var DebugStuff = floor.AddChild("DebugStuff");
 			DebugStuff.position.Value = new Vector3f(-1.5f, 0f, -1f);
 
+			var gizmo3D = DebugStuff.AddChild("Gizmo3D");
+			gizmo3D.position.Value = new Vector3f(3, 1f, 0.1f);
+			gizmo3D.AttachComponent<Gizmo3D>();
+
 			var things = DebugStuff.AddChild("Thing");
 			things.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
 			things.position.Value = Vector3f.Up * 5;
@@ -76,7 +80,6 @@ namespace RhuEngine
 			subViewPOrtdatae.Item2.MainTexture.Target = viewporte;
 			var cameras = SubviewPorte.AddChild("Camera").AttachComponent<Camera3D>();
 			cameras.Entity.rotation.Value = Quaternionf.Yawed180 * Quaternionf.Rolled180;
-
 
 
 			var SubviewPortCam = DebugStuff.AddChild("Camera");
@@ -187,6 +190,7 @@ namespace RhuEngine
 					}
 				}
 			}
+
 			var testCubes = DebugStuff.AddChild("Test cubes");
 			testCubes.position.Value = new Vector3f(2, 0.5f, -2);
 			testCubes.scale.Value = new Vector3f(0.5f);
@@ -217,6 +221,7 @@ namespace RhuEngine
 			dfg.AttachComponent<Grabbable>();
 			dfg.AttachComponent<BoxShape>();
 
+
 			var dfg2 = textureStuff.AddChild("DFG-Checker");
 			dfg2.position.Value = new Vector3f(4, 0, 0);
 			var (dfgMesh2, dfgMat2, dfgRender2) = dfg2.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
@@ -244,6 +249,16 @@ namespace RhuEngine
 			dfgMat4.MainTexture.Target = edgeTexture;
 			dfg4.AttachComponent<Grabbable>();
 			dfg4.AttachComponent<BoxShape>();
+
+			var CheckSCale = textureStuff.AddChild("CheckSCale");
+			CheckSCale.position.Value = new Vector3f(10, 0, 0);
+			CheckSCale.scale.Value = new Vector3f(1, 2, 1);
+
+			var CheckSCale2 = CheckSCale.AddChild("CheckSCale");
+			CheckSCale2.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+			CheckSCale2.AttachComponent<Grabbable>();
+			CheckSCale2.AttachComponent<BoxShape>();
+
 
 			RLog.Info("Built Debug Local World");
 

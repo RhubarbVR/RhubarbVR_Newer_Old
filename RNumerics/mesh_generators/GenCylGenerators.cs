@@ -20,7 +20,7 @@ namespace RNumerics
 	/// vertex normals
 	/// 
 	/// </summary>
-	public sealed class TubeGenerator : MeshGenerator
+	public class TubeGenerator : MeshGenerator
 	{
 		public List<Vector3d> Vertices;
 		public Polygon2d Polygon;

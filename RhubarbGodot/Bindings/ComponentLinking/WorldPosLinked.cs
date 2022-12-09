@@ -45,7 +45,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		public CanvasItem CanvasItem => node;
 
-		
+
 
 		public override void Init() {
 			node = new T2 {
@@ -66,13 +66,13 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		public void Children_OnReorderList() {
-			if(node is null) {
+			if (node is null) {
 				return;
 			}
-			if(LinkedComp is null) {
+			if (LinkedComp is null) {
 				return;
 			}
-			if(LinkedComp.IsDestroying | LinkedComp.IsRemoved) {
+			if (LinkedComp.IsDestroying | LinkedComp.IsRemoved) {
 				return;
 			}
 			for (var i = 0; i < LinkedComp.Entity.children.Count; i++) {
@@ -103,10 +103,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 
 		public virtual void UpdateParrent() {
-			if(node is null) {
+			if (node is null) {
 				return;
 			}
-			if(LinkedComp is null) {
+			if (LinkedComp is null) {
 				return;
 			}
 			if (LinkedComp.IsDestroying | LinkedComp.IsRemoved) {
@@ -315,6 +315,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 	{
 		public override void Init() {
 			base.Init();
+			node.TopLevel = true;
+			node.RotationEditMode = Node3D.RotationEditModeEnum.Basis;
 			LinkedComp.Entity.GlobalTransformChange += Entity_GlobalTransformChange;
 			StartContinueInit();
 			UpdatePosThisFrame = true;

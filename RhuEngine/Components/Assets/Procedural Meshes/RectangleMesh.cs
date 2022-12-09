@@ -33,6 +33,13 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<bool> WantNormals;
 
+		[OnChanged(nameof(LoadMesh))]
+		public readonly Sync<Vector3f> OffsetPos;
+
+		[Default(true)]
+		[OnChanged(nameof(LoadMesh))]
+		public readonly Sync<bool> DoubleSided;
+
 		protected override void FirstCreation() {
 			base.FirstCreation();
 			IndicesMap.Value = new(1, 3);
@@ -56,8 +63,12 @@ namespace RhuEngine.Components
 				WantUVs = WantUVs.Value,
 				WantNormals = WantNormals,
 			};
-			mesh.Generate();
-			GenMesh(mesh.MakeSimpleMesh());
+			var simpMesh = mesh.Generate().MakeSimpleMesh();
+			simpMesh.Translate(OffsetPos.Value.x, OffsetPos.Value.y, OffsetPos.Value.z);
+			if (DoubleSided.Value) {
+				simpMesh.MakeDoubleSided();
+			}
+			GenMesh(simpMesh);
 		}
 	}
 }

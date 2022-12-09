@@ -7,6 +7,8 @@ namespace RhuEngine.Linker
 {
 	public static class RUpdateManager
 	{
+		public static ulong UpdateCount { get; private set; }
+
 		public static Dictionary<object, Action> StartOfFrameExecute = new();
 		public static List<Action> StartOfFrameList = new();
 
@@ -30,6 +32,7 @@ namespace RhuEngine.Linker
 
 		public static void RunOnStartOfFrame() {
 			lock (StartOfFrameExecute) {
+				UpdateCount++;
 				var startcountlist = StartOfFrameList.Count;
 				for (var i = 0; i < startcountlist; i++) {
 					try {

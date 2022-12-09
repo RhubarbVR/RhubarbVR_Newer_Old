@@ -2,7 +2,7 @@
 
 namespace RNumerics
 {
-	public sealed class TorusGenerator : Curve3Axis3RevolveGenerator
+	public sealed class TorusGenerator : TubeGenerator
 	{
 		public float MajorRadius;
 		public float MinorRadius;
@@ -10,20 +10,22 @@ namespace RNumerics
 		public int MinorSegments;
 
 		public TorusGenerator() : base() {
-			Axis = new Frame3f(new Vector3f(1, 0, 0), new Quaternionf(0, 0, 0, 1));
 			Capped = false;
 			NoSharedVertices = true;
 			startCapCenterIndex = -1;
 			endCapCenterIndex = -1;
+			ClosedLoop = true;
 		}
 
 		public override MeshGenerator Generate() {
-			Curve = new Vector3d[MinorSegments + 1];
-			for (var i = 0; i < MinorSegments + 1; i++) {
-				Curve[i] = new Vector3d(
-					(Math.Cos(i * (MathUtil.TWO_PI / MinorSegments)) * MinorRadius) + MajorRadius,
-					Math.Sin(i * (MathUtil.TWO_PI / MinorSegments)) * MinorRadius,
-					0);
+			Polygon = Polygon2d.MakeCircle(MinorRadius, MinorSegments);
+			Vertices ??= new System.Collections.Generic.List<Vector3d>();
+			Vertices.Clear();
+			for (var i = 0; i < MajorSegments + 1; i++) {
+				Vertices.Add( new Vector3d(
+					Math.Cos(i * (MathUtil.TWO_PI / MajorSegments)) * (MajorRadius - (MinorRadius/2)),
+					Math.Sin(i * (MathUtil.TWO_PI / MajorSegments)) * (MajorRadius - (MinorRadius / 2)),
+					0));
 			}
 			return base.Generate();
 		}

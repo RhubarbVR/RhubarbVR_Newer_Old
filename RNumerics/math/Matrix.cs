@@ -8,20 +8,6 @@ using Newtonsoft.Json;
 
 namespace RNumerics
 {
-
-
-	/// <summary>A Matrix in StereoKit is a 4x4 grid of numbers that is used 
-	/// to represent a transformation for any sort of position or vector! 
-	/// This is an oversimplification of what a matrix actually is, but it's
-	/// accurate in this case.
-	/// 
-	/// Matrices are really useful for transforms because you can chain 
-	/// together all sorts of transforms into a single Matrix! A Matrix
-	/// transform really shines when applied to many positions, as the more
-	/// expensive operations get cached within the matrix values.
-	/// 
-	/// Matrices are prominently used within shaders for mesh transforms!
-	/// </summary>
 	[MessagePackObject]
 	public struct Matrix
 	{

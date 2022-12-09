@@ -31,7 +31,7 @@ namespace RhuEngine.Components
 
 		public Vector3f HitPoint;
 
-
+		public readonly Sync<bool> Locked;
 		public readonly Sync<Handed> Side;
 
 		public readonly SyncRef<CurvedTubeMesh> Mesh;

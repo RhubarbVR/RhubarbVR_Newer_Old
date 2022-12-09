@@ -14,6 +14,11 @@ namespace RhuEngine.Physics
 		public object GetCapsuleShapeZ(double radius, double height);
 		public object GetCapsuleShape(double radius, double height);
 
+		public object GetSingleCompoundShape();
+		public void CompoundShapeAdd(object comp, object shape, Matrix matrix);
+		public void CompoundShapeMove(object comp, object shape, Matrix matrix);
+		public void CompoundShapeRemove(object comp, object shape);
+
 		public object GetBox2D(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ);
 		public object GetBox3D(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ);
 		public object GetCone(double radius, double height);
@@ -29,27 +34,89 @@ namespace RhuEngine.Physics
 		public object GetSphereShape(double radus);
 	}
 
-	public abstract class ColliderShape
+	public abstract class ColliderShape:IDisposable
 	{
 		public static ILinkedColliderShape Manager { get; set; }
 
 		public object obj;
 
-		public RigidBodyCollider GetCollider(PhysicsSim physicsSim,object selfobject = null,bool startActive = true) {
-			var col =  Manager?.GetCollider(this, physicsSim);
+		public RigidBodyCollider GetCollider(PhysicsSim physicsSim, object selfobject = null, bool startActive = true) {
+			var col = Manager?.GetCollider(this, physicsSim);
 			col.CustomObject = selfobject;
 			col.Enabled = startActive;
 			return col;
 		}
-		public RigidBodyCollider GetCollider(PhysicsSim physicsSim,Matrix startingpos, object selfobject = null, bool startActive = true) {
+		public RigidBodyCollider GetCollider(PhysicsSim physicsSim, Matrix startingpos, object selfobject = null, bool startActive = true) {
 			var col = Manager?.GetCollider(this, physicsSim);
 			col.CustomObject = selfobject;
 			col.Matrix = startingpos;
 			col.Enabled = startActive;
 			return col;
 		}
-	}
 
+		public virtual void Dispose() {
+			if(obj is IDisposable disposable) {
+				disposable.Dispose();
+			}
+		}
+	}
+	public class RCompoundShape : ColliderShape
+	{
+		private readonly List<ColliderShape> _colliderShapes = new();
+		private readonly List<Matrix> _pos = new();
+
+		public bool HasShape(ColliderShape colliderShape) {
+			lock (_colliderShapes) {
+				return _colliderShapes.Contains(colliderShape);
+			}
+		}
+
+		public Matrix ShapePos(ColliderShape colliderShapes) {
+			lock (_colliderShapes) {
+				return _pos[_colliderShapes.IndexOf(colliderShapes)];
+			}
+		}
+		public void RemoveShape(ColliderShape colliderShape) {
+			lock (_colliderShapes) {
+				Manager?.CompoundShapeRemove(obj, colliderShape.obj);
+				var index = _colliderShapes.IndexOf(colliderShape);
+				_colliderShapes.RemoveAt(index);
+				_pos.RemoveAt(index);
+			}
+		}
+		public void AddShape(ColliderShape colliderShape, Matrix matrix) {
+			lock (_colliderShapes) {
+				Manager?.CompoundShapeAdd(obj, colliderShape.obj, matrix);
+				_colliderShapes.Add(colliderShape);
+				_pos.Add(matrix);
+			}
+		}
+
+		public void MoveShape(ColliderShape colliderShape, Matrix matrix) {
+			lock (_colliderShapes) {
+				Manager?.CompoundShapeMove(obj, colliderShape.obj, matrix);
+				_colliderShapes.Add(colliderShape);
+				_pos.Add(matrix);
+			}
+		}
+
+		public override void Dispose() {
+			lock (_colliderShapes) {
+				foreach (var item in _colliderShapes) {
+					item.Dispose();
+				}
+				_colliderShapes.Clear();
+				_pos.Clear();
+			}
+			if (obj is IDisposable disposable) {
+				disposable.Dispose();
+			}
+		}
+
+		public RCompoundShape() {
+			obj = Manager?.GetSingleCompoundShape();
+		}
+	}
 	public class RConvexMeshShape : ColliderShape
 	{
 		public RConvexMeshShape(IMesh mesh) {
@@ -118,7 +185,7 @@ namespace RhuEngine.Physics
 			obj = Manager?.GetSphereShape(radus);
 		}
 	}
-	
+
 	public class RBox2DShape : ColliderShape
 	{
 		public RBox2DShape(double boxHalfExtentX, double boxHalfExtentY, double boxHalfExtentZ) {
@@ -127,9 +194,9 @@ namespace RhuEngine.Physics
 	}
 
 
-	public class RCapsuleShapeX:ColliderShape
+	public class RCapsuleShapeX : ColliderShape
 	{
-		public RCapsuleShapeX(double radius, double height) { 
+		public RCapsuleShapeX(double radius, double height) {
 			obj = Manager?.GetCapsuleShapeX(radius, height);
 		}
 	}

@@ -304,6 +304,27 @@ namespace RNumerics
 		}
 
 
+		public void AppendMesh(in IMesh copy) {
+			var mapV = new int[copy.MaxVertexID];
+			foreach (var vid in copy.VertexIndices()) {
+				var vi = copy.GetVertexAll(vid);
+				var new_vid = AppendVertex(vi);
+				mapV[vid] = new_vid;
+			}
+			foreach (var tid in copy.TriangleIndices()) {
+				var t = copy.GetTriangle(tid);
+				t[0] = mapV[t[0]];
+				t[1] = mapV[t[1]];
+				t[2] = mapV[t[2]];
+				if (copy.HasTriangleGroups) {
+					AppendTriangle(t[0], t[1], t[2], copy.GetTriangleGroup(tid));
+				}
+				else {
+					AppendTriangle(t[0], t[1], t[2]);
+				}
+			}
+		}
+
 		public void Initialize(in bool bWantNormals = true, in bool bWantColors = true, in bool bWantUVs = true, in bool bWantFaceGroups = true) {
 			Vertices = new DVector<double>();
 			Normals = bWantNormals ? new DVector<float>() : null;
@@ -812,6 +833,14 @@ namespace RNumerics
 			}
 		}
 
+		public void MakeDoubleSided() {
+			var copy = Triangles.ToArray();
+			for (var i = 0; i < copy.Length; i+=3) {
+				Triangles.Add(copy[i + 1]);
+				Triangles.Add(copy[i]);
+				Triangles.Add(copy[i+2]);
+			}
+		}
 	}
 
 

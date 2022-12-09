@@ -64,7 +64,7 @@ namespace RBullet
 		}
 
 		public object GetConvexMeshShape(IMesh mesh) {
-			if(mesh == null) {
+			if (mesh == null) {
 				return new EmptyShape();
 			}
 			var verts = mesh.VertexPos().Select((val) => new Vector3(val.x, val.y, val.z)).ToArray();
@@ -76,21 +76,42 @@ namespace RBullet
 			if (mesh == null) {
 				return new EmptyShape();
 			}
-			if(mesh.TriangleCount <= 0) {
+			if (mesh.TriangleCount <= 0) {
 				return new EmptyShape();
 			}
+
 			var indces = mesh.RenderIndices().ToArray();
 			var verts = mesh.VertexPos().Select((val) => new Vector3(val.x, val.y, val.z)).ToArray();
 			var indexVertexArray2 = new TriangleIndexVertexArray();
 			var _initialMesh = new IndexedMesh();
-			_initialMesh.Allocate(indces.Length/3, verts.Length);
+			_initialMesh.Allocate(indces.Length / 3, verts.Length);
 			_initialMesh.SetData(indces, verts);
 			indexVertexArray2.AddIndexedMesh(_initialMesh);
-			var trys = new GImpactMeshShape(indexVertexArray2);
-			trys.LockChildShapes();
-			trys.PostUpdate();
-			trys.UpdateBound();
+			var trys = new BvhTriangleMeshShape(indexVertexArray2, false);
 			return trys;
+		}
+
+		public object GetSingleCompoundShape() {
+			return new CompoundShape();
+		}
+
+		public void CompoundShapeAdd(object comp, object shape, Matrix matrix) {
+			if (comp is CompoundShape compound) {
+				compound.AddChildShape(matrix.m, (CollisionShape)shape);
+			}
+		}
+
+		public void CompoundShapeMove(object comp, object shape, Matrix matrix) {
+			if (comp is CompoundShape compound) {
+				compound.RemoveChildShape((CollisionShape)shape);
+				compound.AddChildShape(matrix.m, (CollisionShape)shape);
+			}
+		}
+
+		public void CompoundShapeRemove(object comp, object shape) {
+			if (comp is CompoundShape compound) {
+				compound.RemoveChildShape((CollisionShape)shape);
+			}
 		}
 	}
 }

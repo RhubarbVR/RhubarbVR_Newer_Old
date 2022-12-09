@@ -5,11 +5,15 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class CircleMesh : ProceduralMesh
+	public sealed class PuncturedCircleMesh : ProceduralMesh
 	{
 		[Default(1.0f)]
 		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<float> Radius;
+		public readonly Sync<float> OuterRadius;
+
+		[Default(0.5f)]
+		[OnChanged(nameof(LoadMesh))]
+		public readonly Sync<float> InnerRadius;
 
 		[Default(0.0f)]
 		[OnChanged(nameof(LoadMesh))]
@@ -19,7 +23,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<float> EndAngleDeg;
 
-		[Default(32)]
+		[Default(16)]
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<int> Slices;
 
@@ -35,8 +39,9 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			var mesh = new TrivialDiscGenerator {
-				Radius = Radius,
+			var mesh = new PuncturedDiscGenerator {
+				OuterRadius = OuterRadius,
+				InnerRadius= InnerRadius,
 				StartAngleDeg = StartAngleDeg,
 				EndAngleDeg = EndAngleDeg,
 				Slices = Slices

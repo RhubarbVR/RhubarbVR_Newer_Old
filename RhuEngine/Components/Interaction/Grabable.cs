@@ -130,6 +130,9 @@ namespace RhuEngine.Components
 			}
 			StartingPos = LocalToUser * aimPosMatrix.Inverse;
 			if (Laser) {
+				if (grabbableHolder.Target is not null) {
+					PrivateSpaceManager.GetLazer(grabbableHolder.Target.source.Value).Locked.Value = true;
+				}
 				grabbableHolder.Target?.UpdateReferencer();
 			}
 			Entity.CallOnGrabbed(this);

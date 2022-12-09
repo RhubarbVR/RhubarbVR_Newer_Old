@@ -186,6 +186,7 @@ namespace RhuEngine.Components
 					catch { }
 				}
 				gripping = false;
+				PrivateSpaceManager.GetLazer(source.Value).Locked.Value = false;
 				UpdateReferencer();
 			}
 			_overLappingObjects.Clear();

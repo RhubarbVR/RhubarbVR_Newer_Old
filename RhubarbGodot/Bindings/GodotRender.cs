@@ -31,30 +31,25 @@ namespace RhubarbVR.Bindings
 				);
 		}
 
+		public static Transform3D CastPosMatrix(this Matrix matrix) {
+			return new Transform3D(
+				new Vector3(matrix.M.M11, matrix.M.M12, matrix.M.M13),
+				new Vector3(matrix.M.M21, matrix.M.M22, matrix.M.M23),
+				new Vector3(matrix.M.M31, matrix.M.M32, matrix.M.M33),
+				new Vector3(matrix.M.M41, matrix.M.M42, matrix.M.M43)
+				);
+		}
+
 		public static Transform3D GetTrans(this Matrix matrix) {
 			matrix.Decompose(out var pos, out var rot, out var scale);
-			return pos.IsAnyNan || rot.IsAnyNan || scale.IsAnyNan
-				? new Transform3D()
-				: new Transform3D {
-					basis = new Basis(new Quaternion(rot.x, rot.y, rot.z, rot.w)) {
-						Scale = new Vector3(scale.x, scale.y, scale.z)
-					},
-					origin = new Vector3(pos.x, pos.y, pos.z)
-				};
+			if (pos.IsAnyNan || rot.IsAnyNan || scale.IsAnyNan) {
+				return new Transform3D();
+			}
+			return CastPosMatrix(matrix);
 		}
 
 		public static void SetPos(this Node3D node3D, Matrix matrix) {
-			matrix.Decompose(out var pos, out var rot, out var scale);
-			if (pos.IsAnyNan || rot.IsAnyNan || scale.IsAnyNan) {
-				node3D.Transform = new Transform3D();
-				return;
-			}
-			var trans = node3D.Transform;
-			trans.basis = new Basis(new Quaternion(rot.x, rot.y, rot.z, rot.w)) {
-				Scale = new Vector3(scale.x, scale.y, scale.z)
-			};
-			trans.origin = new Vector3(pos.x, pos.y, pos.z);
-			node3D.Transform = trans;
+			node3D.Transform = GetTrans(matrix);
 		}
 	}
 	public sealed class GodotRender : IRRenderer

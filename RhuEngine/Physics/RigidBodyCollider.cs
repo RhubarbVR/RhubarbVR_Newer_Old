@@ -37,7 +37,7 @@ namespace RhuEngine.Physics
 
 	}
 
-	public class RigidBodyCollider
+	public class RigidBodyCollider:IDisposable
 	{
 		public delegate void OverlapCallback(Vector3f PositionWorldOnA, Vector3f PositionWorldOnB, Vector3f NormalWorldOnB, double Distance, double Distance1, RigidBodyCollider hit);
 
@@ -89,6 +89,12 @@ namespace RhuEngine.Physics
 
 		public void Remove() {
 			Manager.Remove(obj);
+		}
+
+		public void Dispose() {
+			if(obj is IDisposable disposable) {
+				disposable.Dispose();
+			}
 		}
 
 		public ColliderShape CollisionShape { get; set; }
