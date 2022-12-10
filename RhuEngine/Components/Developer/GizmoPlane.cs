@@ -54,14 +54,14 @@ namespace RhuEngine.Components
 		protected override void OnAttach() {
 			base.OnAttach();
 			var plane = Entity.AddChild("Plane");
-			plane.position.Value = new Vector3f(0.6f, 0, 0.6f);
+			plane.position.Value = new Vector3f(0.6f / 5, 0, 0.6f / 5);
 			var positionMeshRender = plane.AttachComponent<MeshRender>();
 			Position.Target = positionMeshRender.Enabled;
 			var planeMesh = plane.AttachComponent<RectangleMesh>();
-			planeMesh.Dimensions.Value = new Vector2f(0.5f);
+			planeMesh.Dimensions.Value = new Vector2f(0.5f / 5);
 
 			var posColider = plane.AttachComponent<BoxShape>();
-			posColider.boxHalfExtent.Value = new Vector3d(0.5f, 0.02f, 0.5f)/2;
+			posColider.boxHalfExtent.Value = new Vector3d(0.5f, 0.02f, 0.5f)/2 / 5;
 			posColider.Group.Value = ECollisionFilterGroups.UI;
 			posColider.Mask.Value = ECollisionFilterGroups.AllFilter;
 			PositionCollider.Target = posColider.Enabled;

@@ -31,7 +31,7 @@ namespace RhuEngine.Components
 		public readonly SyncRef<IValueSource<Vector3f>> Scale;
 		public readonly SyncRef<IValueSource<Quaternionf>> Rot;
 
-		[Default(0.15f)]
+		[Default(1f)]
 		public readonly Sync<float> TargetSize;
 		protected override void Step() {
 			base.Step();
