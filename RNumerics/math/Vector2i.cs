@@ -92,14 +92,7 @@ namespace RNumerics
 			return this == (Vector2i)obj;
 		}
 		public override int GetHashCode() {
-			unchecked // Overflow is fine, just wrap
-			{
-				var hash = (int)2166136261;
-				// Suitable nullity checks etc, of course :)
-				hash = (hash * 16777619) ^ x.GetHashCode();
-				hash = (hash * 16777619) ^ y.GetHashCode();
-				return hash;
-			}
+			return HashCode.Combine(x, y);
 		}
 
 		public int CompareTo(Vector2i other) {
@@ -122,7 +115,7 @@ namespace RNumerics
 			return string.Format("{0} {1}", x, y);
 		}
 
-		public TypeCode GetTypeCode() {
+		public static TypeCode GetTypeCode() {
 			return TypeCode.Object;
 		}
 	}
@@ -206,14 +199,7 @@ namespace RNumerics
 			return this == (Vector2l)obj;
 		}
 		public override int GetHashCode() {
-			unchecked // Overflow is fine, just wrap
-			{
-				var hash = (int)2166136261;
-				// Suitable nullity checks etc, of course :)
-				hash = (hash * 16777619) ^ x.GetHashCode();
-				hash = (hash * 16777619) ^ y.GetHashCode();
-				return hash;
-			}
+			return HashCode.Combine(x, y);
 		}
 
 		public int CompareTo(Vector2l other) {

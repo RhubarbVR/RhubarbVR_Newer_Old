@@ -8,14 +8,9 @@
 		<Optimize>True</Optimize>
 		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Unity|AnyCPU'">
-		<AssemblyName>RhuEngine</AssemblyName>
-		<Optimize>True</Optimize>
-		<LangVersion>preview</LangVersion>
-	</PropertyGroup>
 	<PropertyGroup>
-		<Configurations>Debug;Release;Unity</Configurations>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<Configurations>Debug;Release</Configurations>
+		<TargetFramework>net6.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
@@ -38,7 +33,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
-		<PackageReference Include="BEPUik" Version="1.5.1" />
 		<PackageReference Include="DiscordRichPresence" Version="1.1.3.18" />
 		<PackageReference Include="Jint" Version="3.0.0-beta-2043" />
 		<PackageReference Include="LibVLCSharp" Version="3.6.7" />

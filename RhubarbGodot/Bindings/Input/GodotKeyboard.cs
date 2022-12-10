@@ -15,7 +15,7 @@ namespace RhubarbVR.Bindings.Input
 {
 	public class GodotKeyboard : IKeyboardInputDriver
 	{
-		public string TypeDelta => EngineRunner._.TypeDelta;
+		public string TypeDelta => EngineRunnerHelpers._.TypeDelta;
 
 		public bool GetIsDown(Key key) {
 			return Godot.Input.IsPhysicalKeyPressed(ToGodotKey(key));

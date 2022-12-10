@@ -57,6 +57,7 @@ namespace RhuEngine.Components
 				ProgramManager.UnLoadProgramToolBar(this);
 			}
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 	}
 }

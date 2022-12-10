@@ -105,8 +105,7 @@ namespace RNumerics
 			return iter < MaxIterations;
 		}
 
-
-		void UpdateP(in double[] P,in double beta,in double[] R)
+		static void UpdateP(in double[] P,in double beta,in double[] R)
 		{
 			for (var i = 0; i < P.Length; ++i) {
 				P[i] = R[i] + (beta * P[i]);
@@ -591,17 +590,7 @@ namespace RNumerics
 			return iter < MaxIterations;
 		}
 
-
-
-
-
-
-
-
-
-
-
-		void UpdateP(double[][] P, double[] beta, double[][] R, bool[] converged)
+		static void UpdateP(double[][] P, double[] beta, double[][] R, bool[] converged)
 		{
 			var rhs = Interval1i.Range(P.Length);
 			GParallel.ForEach(rhs, (j) =>

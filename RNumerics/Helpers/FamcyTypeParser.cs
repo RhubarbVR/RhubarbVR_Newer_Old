@@ -9,8 +9,10 @@ namespace RNumerics
 	{
 		public static Type PraseType(in string type, Assembly[] asm = null) {
 			asm ??= AppDomain.CurrentDomain.GetAssemblies();
-			return type.Contains("<") && type.Contains(">") ? PraseGeneric(type,asm) : SingleTypeParse(type,asm);
+			return type.Contains('<') && type.Contains('>') ? PraseGeneric(type,asm) : SingleTypeParse(type,asm);
 		}
+
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Non-constant fields should not be visible", Justification = "<Pending>")]
 		public static string[] ExtraNameSpaces = new string[] {
 			"System.",
 			"RNumerics.",

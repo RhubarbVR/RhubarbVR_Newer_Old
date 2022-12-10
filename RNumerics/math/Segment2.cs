@@ -122,7 +122,7 @@ namespace RNumerics
 			var x1 = vec1.x - vec0.x;
 			var y1 = vec1.y - vec0.y;
 			var det = (x0 * y1) - (x1 * y0);
-			return (det > tol ? +1 : (det < -tol ? -1 : 0));
+			return det > tol ? +1 : (det < -tol ? -1 : 0);
 		}
 
 
@@ -215,7 +215,7 @@ namespace RNumerics
 			var x1 = b.x - a.x;
 			var y1 = b.y - a.y;
 			var det = (x0 * y1) - (x1 * y0);
-			return (det > tol ? +1 : (det < -tol ? -1 : 0));
+			return det > tol ? +1 : (det < -tol ? -1 : 0);
 		}
 
 

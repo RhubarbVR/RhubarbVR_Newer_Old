@@ -1,6 +1,7 @@
 ﻿using RhuEngine.WorldObjects.ECS;
 using RhuEngine.WorldObjects;
 using RNumerics;
+using System;
 
 namespace RhuEngine.Components
 {
@@ -35,7 +36,8 @@ namespace RhuEngine.Components
 				return;
 			}
 			var mesh = new SimpleMesh();
-			foreach (Triangle tri in listOfTris) {
+			for (var i = 0; i < listOfTris.Count; i++) {
+				var tri = listOfTris[i];
 				mesh.AppendTriangle(tri.a.VertexInfo, tri.b.VertexInfo, tri.c.VertexInfo);
 			}
 			GenMesh(mesh);
@@ -77,7 +79,7 @@ namespace RhuEngine.Components
 				}
 			}
 
-			public NewVertexInfo VertexInfo => new NewVertexInfo(ver, norm, color.Value.ToRGB(), uv);
+			public NewVertexInfo VertexInfo => new(ver, norm, color.Value.ToRGB(), uv);
 		}
 
 	}

@@ -45,12 +45,7 @@ namespace RhuSettings
 				}
 				else {
 					var value = ((DataNode)item.Value)?.Getval();
-					if (value is string[][] data) {
-						obj[item.Key] = new JArray(data.Select(x=>new JArray(x)).ToArray());
-					}
-					else {
-						obj[item.Key] = new JValue(value);
-					}
+					obj[item.Key] = value is string[][] data ? new JArray(data.Select(x=>new JArray(x)).ToArray()) : new JValue(value);
 				}
 			}
 			return obj;

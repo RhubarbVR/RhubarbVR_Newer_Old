@@ -20,10 +20,7 @@ namespace RhubarbVR.Bindings
 	public static class GodotMaterialHelper
 	{
 		public static Color GetColor(this Material target) {
-			if (target is StandardMaterial3D standard) {
-				return standard.AlbedoColor;
-			}
-			return new Color();
+			return target is StandardMaterial3D standard ? standard.AlbedoColor : new Color();
 		}
 
 		public static void SetColor(this Material target, Color color) {

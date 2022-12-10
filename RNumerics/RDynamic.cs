@@ -12,8 +12,6 @@ namespace RNumerics
 
 	public unsafe struct RDynamic<T> : IRDynamic
 	{
-		public static T DefaultValue = default;
-
 		private readonly T _data;
 
 		public RDynamic(T data) {
@@ -244,6 +242,14 @@ namespace RNumerics
 
 		public static T2 CastTo<T2>(T value) {
 			return ((RDynamic<T>)value).CastTo<T2>();
+		}
+
+		public override bool Equals(object obj) {
+			return obj is RDynamic<T> data && data == this;
+		}
+
+		public override int GetHashCode() {
+			return _data.GetHashCode();
 		}
 	}
 }

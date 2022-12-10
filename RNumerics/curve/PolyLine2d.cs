@@ -309,8 +309,7 @@ namespace RNumerics
 
 
 		public void Simplify(in double clusterTol = 0.0001,
-							  in double lineDeviationTol = 0.01,
-							  in bool bSimplifyStraightLines = true)
+							  in double lineDeviationTol = 0.01)
 		{
 			var n = vertices.Count;
 

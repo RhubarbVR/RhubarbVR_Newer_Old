@@ -23,17 +23,18 @@ namespace RhubarbCloudClient
 	public sealed partial class RhubarbAPIClient : IDisposable
 	{
 
-		private async Task LoadStartGroups() {
+		private Task LoadStartGroups() {
 			//var req = await SendGetServerResponses<UserDM[]>(API_PATH + DMSPATH + "DMs");
-
+			return Task.CompletedTask;
 		}
 
 
 		public bool IsPartOfGroup(string data) {
 			return Guid.TryParse(data, out var group) && IsPartOfGroup(group);
 		}
+
 		public bool IsPartOfGroup(Guid groupID) {
-			return false;
+			return groupID != Guid.Empty && false;
 		}
 	}
 }

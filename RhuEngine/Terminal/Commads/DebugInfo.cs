@@ -13,10 +13,10 @@ namespace RhuEngine.Commads
 	{
 		public override string HelpMsg => "Game Debug Info";
 
-		public override async Task RunCommand() {
-			if(args.Length == 1) {
+		public override Task RunCommand() {
+			if (args.Length == 1) {
 				Console.WriteLine("Need arg of EngineStatistics,FocusedWorld,FocusedWorldUsers and FocusedWorldNetStatistics");
-				return;
+				return Task.CompletedTask;
 			}
 			switch (args[1].ToLower()) {
 				case "enginestatistics":
@@ -41,7 +41,7 @@ LastFocusChange {Manager.Engine.worldManager.FocusedWorld?.LastFocusChange}
 					break;
 				case "focusedworldnetstatistics":
 					Console.WriteLine(@$"=====FocusedWorldNetStatistics=====
-{((Manager.Engine.worldManager.FocusedWorld?.NetStatistics is not null) ?
+{(Manager.Engine.worldManager.FocusedWorld?.NetStatistics is not null ?
 $@"BytesReceived {Manager.Engine.worldManager.FocusedWorld?.NetStatistics?.BytesReceived.ToString()}
 BytesSent {Manager.Engine.worldManager.FocusedWorld?.NetStatistics?.BytesSent}
 PacketLoss {Manager.Engine.worldManager.FocusedWorld?.NetStatistics?.PacketLoss}
@@ -72,7 +72,10 @@ stepTime { (Manager.Engine.worldManager.FocusedWorld?.stepTime * 1000f).Value:f3
 ===== -----------------------=====");
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
+
 		private string GetUserList() {
 			var returnstring = "";
 			if (Manager.Engine.worldManager.FocusedWorld != null) {

@@ -158,6 +158,7 @@ namespace RhuEngine.Components
 			}
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
 		private static void LoadMesh(Entity entity, AssimpHolder scene) {
 			if (!scene.scene.HasMeshes) {
 				RLog.Info($"No Meshes");
@@ -276,20 +277,20 @@ namespace RhuEngine.Components
 			}
 		}
 
-		private static void LoadAnimations(Entity entity, AssimpHolder scene) {
-			if (!scene.scene.HasAnimations) {
-				RLog.Info("No Animations");
-				return;
-			}
-			RLog.Err("not supported");
-		}
+		//private static void LoadAnimations(Entity entity, AssimpHolder scene) {
+		//	if (!scene.scene.HasAnimations) {
+		//		RLog.Info("No Animations");
+		//		return;
+		//	}
+		//	RLog.Err("not supported");
+		//}
 
-		private static void LoadCameras(Entity entity, AssimpHolder scene) {
-			if (!scene.scene.HasCameras) {
-				RLog.Info("No Cameras");
-				return;
-			}
-		}
+		//private static void LoadCameras(Entity entity, AssimpHolder scene) {
+		//	if (!scene.scene.HasCameras) {
+		//		RLog.Info("No Cameras");
+		//		return;
+		//	}
+		//}
 		private static void LoadMeshNode(Entity entity, Node node, AssimpHolder scene) {
 			ComplexMesh complexMesh = null;
 			var mits = new List<int>();

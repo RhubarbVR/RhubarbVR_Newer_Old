@@ -7,6 +7,7 @@ using RhuEngine.Linker;
 
 using System;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1050:Declare types in namespaces", Justification = "<Pending>")]
 public partial class ConnectedViewport : TextureRect
 {
 	public Viewport targetViewport;

@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 
 		private bool _staticAssetLoaded = false;
 
-		private async Task<byte[]> LoadAssetInWebUrl(Uri targetUri) {
+		private static async Task<byte[]> LoadAssetInWebUrl(Uri targetUri) {
 			var HttpClientHandler = new HttpClientHandler {
 				AllowAutoRedirect = true,
 			};

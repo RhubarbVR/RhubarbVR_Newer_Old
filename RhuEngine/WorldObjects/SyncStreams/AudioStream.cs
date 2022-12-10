@@ -77,6 +77,7 @@ namespace RhuEngine.WorldObjects
 		public override void Dispose() {
 			Load(null);
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 
 		protected override void OnLoaded() {

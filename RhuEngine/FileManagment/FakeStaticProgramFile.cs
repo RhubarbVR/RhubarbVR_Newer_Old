@@ -17,9 +17,9 @@ namespace RhuEngine
 			Drive = drive;
 			Parrent = parrent;
 			_program = program;
-			var programInfo = program.GetProgramInfo();
-			Name = programInfo.ProgramName;
-			Texture = programInfo.icon;
+			var (ProgramName, icon) = program.GetProgramInfo();
+			Name = ProgramName;
+			Texture = icon;
 		}
 
 		private readonly Type _program;

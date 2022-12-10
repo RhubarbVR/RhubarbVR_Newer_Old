@@ -10,6 +10,7 @@ using System.ComponentModel;
 using RhuEngine.Linker;
 using LibVLCSharp.Shared;
 using NAudio.Wave;
+
 namespace RhuEngine.VLC
 {
 	public sealed class VlcVideoSourceProvider : INotifyPropertyChanged, IDisposable
@@ -76,7 +77,7 @@ namespace RhuEngine.VLC
 		/// <param name="dimension">The dimension to be aligned</param>
 		/// <param name="mod">The modulus</param>
 		/// <returns>The aligned dimension</returns>
-		private uint GetAlignedDimension(uint dimension, uint mod) {
+		private static uint GetAlignedDimension(uint dimension, uint mod) {
 			var modResult = dimension % mod;
 			return modResult == 0 ? dimension : dimension + mod - (dimension % mod);
 		}
@@ -159,7 +160,7 @@ namespace RhuEngine.VLC
 		/// <param name="userdata">The pointer to the buffer (the out parameter of the <see cref="VideoFormat"/> callback)</param>
 		/// <param name="picture">The pointer returned by the <see cref="LockVideo"/> callback. This is not used.</param>
 		private void DisplayVideo(IntPtr userdata, IntPtr picture) {
-			if (Engine.MainEngine.IsCloseing) {
+			if (EngineHelpers.MainEngine.IsCloseing) {
 				return;
 			}
 			if (VideoSource != null) {
@@ -189,6 +190,7 @@ namespace RhuEngine.VLC
 		/// Disposes the control.
 		/// </summary>
 		/// <param name="disposing">The parameter is not used.</param>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
 		private void Dispose(bool disposing) {
 			if (!_disposedValue) {
 				_disposedValue = true;

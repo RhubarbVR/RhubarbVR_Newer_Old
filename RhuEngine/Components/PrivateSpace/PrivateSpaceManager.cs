@@ -300,6 +300,7 @@ namespace RhuEngine.Components
 		}
 
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
 		public bool RunTouchCastInWorld(uint handed, World world, Vector3f pos, ref Vector3f Frompos, ref Vector3f ToPos, Handed handedSide) {
 			if (World is null) {
 				return false;
@@ -358,42 +359,11 @@ namespace RhuEngine.Components
 		}
 
 		public static RhubarbAtlasSheet.RhubarbIcons GetIcon(RCursorShape rCursorShape) {
-			switch (rCursorShape) {
-				//case RCursorShape.Ibeam:
-				//	return RhubarbAtlasSheet.RhubarbIcons.Ibeam;
-				case RCursorShape.PointingHand:
-					return RhubarbAtlasSheet.RhubarbIcons.CursorCircle;
-				//case RCursorShape.Cross:
-				//	break;
-				//case RCursorShape.Wait:
-				//	break;
-				//case RCursorShape.Busy:
-				//	break;
-				//case RCursorShape.Drag:
-				//	break;
-				//case RCursorShape.CanDrop:
-				//	break;
-				//case RCursorShape.Forbidden:
-				//	break;
-				//case RCursorShape.Vsize:
-				//	break;
-				//case RCursorShape.Hsize:
-				//	break;
-				//case RCursorShape.Bdiagsize:
-				//	break;
-				//case RCursorShape.Fdiagsize:
-				//	break;
-				case RCursorShape.Move:
-					return RhubarbAtlasSheet.RhubarbIcons.CursorMove;
-				//case RCursorShape.Vsplit:
-				//	break;
-				//case RCursorShape.Hsplit:
-				//	break;
-				//case RCursorShape.Help:
-				//	break;
-				default:
-					return RhubarbAtlasSheet.RhubarbIcons.Cursor;
-			}
+			return rCursorShape switch {
+				RCursorShape.PointingHand => RhubarbAtlasSheet.RhubarbIcons.CursorCircle,
+				RCursorShape.Move => RhubarbAtlasSheet.RhubarbIcons.CursorMove,
+				_ => RhubarbAtlasSheet.RhubarbIcons.Cursor,
+			};
 		}
 
 		public void UpdateLazer(Entity heand, Handed handed, Lazer lazer) {
@@ -480,6 +450,7 @@ namespace RhuEngine.Components
 			HeadLazerHitFocus = hitFocus;
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
 		public void KeyBoardUpdate(Matrix openLocation) {
 			var wasAlreadyOpen = KeyboardEntity.enabled.Value;
 			KeyboardEntity.enabled.Value = Engine.HasKeyboard && Engine.IsInVR;

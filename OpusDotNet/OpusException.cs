@@ -21,24 +21,16 @@ namespace OpusDotNet
 		public OpusError Error { get; }
 
 		private static string GetMessage(OpusError error) {
-			switch (error) {
-				case OpusError.BadArg:
-					return "One or more invalid/out of range arguments.";
-				case OpusError.BufferTooSmall:
-					return "Not enough bytes allocated in the buffer.";
-				case OpusError.InternalError:
-					return "An internal error was detected.";
-				case OpusError.InvalidPacket:
-					return "The compressed data passed is corrupted.";
-				case OpusError.Unimplemented:
-					return "Invalid/unsupported request number.";
-				case OpusError.InvalidState:
-					return "An encoder or decoder structure is invalid or already freed.";
-				case OpusError.AllocFail:
-					return "Memory allocation has failed.";
-				default:
-					return "An unknown error has occurred.";
-			}
+			return error switch {
+				OpusError.BadArg => "One or more invalid/out of range arguments.",
+				OpusError.BufferTooSmall => "Not enough bytes allocated in the buffer.",
+				OpusError.InternalError => "An internal error was detected.",
+				OpusError.InvalidPacket => "The compressed data passed is corrupted.",
+				OpusError.Unimplemented => "Invalid/unsupported request number.",
+				OpusError.InvalidState => "An encoder or decoder structure is invalid or already freed.",
+				OpusError.AllocFail => "Memory allocation has failed.",
+				_ => "An unknown error has occurred.",
+			};
 		}
 	}
 }

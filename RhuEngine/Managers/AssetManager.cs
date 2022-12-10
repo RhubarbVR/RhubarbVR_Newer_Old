@@ -20,14 +20,14 @@ namespace RhuEngine.Managers
 		/// Engine.BaseDir + "/Cache"
 		/// </summary>
 		public AssetManager() {
-			CacheDir = Engine.BaseDir + "/Cache";
+			CacheDir = EngineHelpers.BaseDir + "/Cache";
 		}
 		/// <summary>
 		/// Creates AssetManager with custom cache path
 		/// </summary>
 		/// <param name="cachePath"></param>
 		public AssetManager(string cachePath) {
-			CacheDir = cachePath is null ? Engine.BaseDir + "/Cache" : cachePath;
+			CacheDir = cachePath is null ? EngineHelpers.BaseDir + "/Cache" : cachePath;
 		}
 
 		/// <summary>

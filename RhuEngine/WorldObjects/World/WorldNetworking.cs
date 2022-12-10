@@ -167,6 +167,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
 		private void PeerDisconect(Peer peer) {
 			FindNewMaster();
 		}
@@ -176,7 +177,7 @@ namespace RhuEngine.WorldObjects
 				RLog.Info($"NatIntroductionSuccess {point}  {addrType}  {token}");
 				NatIntroductionSuccessIsGood[token] = true;
 				var peer = _netManager.Connect(point, token + '~' + KEY);
-				if(peer is null) {
+				if (peer is null) {
 					RLog.Info($"NatIntroduction Failed");
 					return;
 				}
@@ -394,7 +395,7 @@ namespace RhuEngine.WorldObjects
 								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
 							}
 							else if (rawDataPacked is IAssetRequest assetRequest) {
-								AssetResponses(assetRequest, tag, deliveryMethod);
+								AssetResponses(assetRequest, tag);
 							}
 							else {
 								throw new Exception($"Not none {rawDataPacked?.GetType()?.GetFormattedName()}");
@@ -410,7 +411,7 @@ namespace RhuEngine.WorldObjects
 								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
 							}
 							else if (rawDataPacked is IAssetRequest assetRequest) {
-								AssetResponses(assetRequest, tag, deliveryMethod);
+								AssetResponses(assetRequest, tag);
 							}
 							else {
 								throw new Exception($"Not none {rawDataPacked?.GetType()?.GetFormattedName()}");
@@ -438,7 +439,7 @@ namespace RhuEngine.WorldObjects
 										ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
 									}
 									else if (rawDataPacked is IAssetRequest assetRequest) {
-										AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+										AssetResponses(assetRequest, tag[packed.Id]);
 									}
 								}
 								else {
@@ -451,7 +452,7 @@ namespace RhuEngine.WorldObjects
 										ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
 									}
 									else if (rawDataPacked is IAssetRequest assetRequest) {
-										AssetResponses(assetRequest, tag[packed.Id], deliveryMethod);
+										AssetResponses(assetRequest, tag[packed.Id]);
 									}
 								}
 								if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
@@ -551,7 +552,7 @@ namespace RhuEngine.WorldObjects
 					lock (ActiveConnections) {
 						ActiveConnections.Remove(user);
 					}
-					if(reload) {
+					if (reload) {
 						PeerConnected(dpeer);
 					}
 					break;

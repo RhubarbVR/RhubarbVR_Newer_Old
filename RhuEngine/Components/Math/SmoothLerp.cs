@@ -26,15 +26,11 @@ namespace RhuEngine.Components
 		protected override void Step() {
 			if (driver.Linked) {
 				try {
-					if (typeof(T) == typeof(Quaternionf)) {
-						driver.LinkedValue = Quaternionf.Slerp((dynamic)driver.LinkedValue, (dynamic)to.Value, (float)(Multiply.Value * RTime.Elapsed));
-					}
-					else if (typeof(T) == typeof(Quaterniond)) {
-						driver.LinkedValue = Quaterniond.Slerp((dynamic)driver.LinkedValue, (dynamic)to.Value, Multiply.Value * RTime.Elapsed);
-					}
-					else {
-						driver.LinkedValue = MathUtil.DynamicLerp(driver.LinkedValue, to.Value, Multiply.Value * RTime.Elapsed);
-					}
+					driver.LinkedValue = typeof(T) == typeof(Quaternionf)
+						? (T)Quaternionf.Slerp((dynamic)driver.LinkedValue, (dynamic)to.Value, (float)(Multiply.Value * RTime.Elapsed))
+						: typeof(T) == typeof(Quaterniond)
+							? (T)Quaterniond.Slerp((dynamic)driver.LinkedValue, (dynamic)to.Value, Multiply.Value * RTime.Elapsed)
+							: MathUtil.DynamicLerp(driver.LinkedValue, to.Value, Multiply.Value * RTime.Elapsed);
 				}
 				catch {
 					driver.LinkedValue = default;

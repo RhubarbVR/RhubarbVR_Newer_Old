@@ -32,11 +32,11 @@ namespace RhuEngine.Components.PrivateSpace.Programs.OverlayDialogues
 			Action lastAction = null;
 			foreach (var data in ProgramOpenWithAttribute.GetAllPrograms(mimeType, Assembly.GetExecutingAssembly())) {
 				amountOfPrograms++;
-				var programInfo = data.GetProgramInfo();
+				var (ProgramName, icon) = data.GetProgramInfo();
 				var elemnt = items.Entity.AddChild(data.Name).AttachComponent<Button>();
 				elemnt.MinSize.Value = new Vector2i(0, 40);
 				elemnt.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
-				elemnt.Text.Value = programInfo.ProgramName ?? "NULL";
+				elemnt.Text.Value = ProgramName ?? "NULL";
 				elemnt.ExpandIcon.Value = true;
 				elemnt.IconAlignment.Value = RButtonAlignment.Left;
 				var texture = elemnt.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
@@ -47,7 +47,7 @@ namespace RhuEngine.Components.PrivateSpace.Programs.OverlayDialogues
 					CloseWindow();
 				};
 				elemnt.Icon.Target = texture;
-				texture.LoadAsset(programInfo.icon);
+				texture.LoadAsset(icon);
 			}
 			if(amountOfPrograms == 1) { //Auto open when one program
 				lastAction?.Invoke();

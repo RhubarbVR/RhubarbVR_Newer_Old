@@ -13,10 +13,10 @@ namespace RhuEngine.Physics
 		public void ActivateSet(object obj, bool val);
 		public bool EnabledGet(object obj);
 
-		public void EnabledSet(object obj,bool val);
+		public void EnabledSet(object obj, bool val);
 
 		public float MassGet(object obj);
-		public void MassSet(object obj,float val);
+		public void MassSet(object obj, float val);
 
 		public ECollisionFilterGroups GroupGet(object obj);
 		public void GroupSet(object obj, ECollisionFilterGroups val);
@@ -30,14 +30,14 @@ namespace RhuEngine.Physics
 		public void NoneStaticBodySet(object obj, bool val);
 
 		public Matrix MatrixGet(object obj);
-		public void MatrixSet(object obj,Matrix val);
+		public void MatrixSet(object obj, Matrix val);
 
 		public void AddOverlapCallback(object obj, RigidBodyCollider.OverlapCallback overlapCallback);
 		public void RemoveOverlapCallback(object obj, RigidBodyCollider.OverlapCallback overlapCallback);
 
 	}
 
-	public class RigidBodyCollider:IDisposable
+	public class RigidBodyCollider : IDisposable
 	{
 		public delegate void OverlapCallback(Vector3f PositionWorldOnA, Vector3f PositionWorldOnB, Vector3f NormalWorldOnB, double Distance, double Distance1, RigidBodyCollider hit);
 
@@ -49,7 +49,7 @@ namespace RhuEngine.Physics
 		public bool Enabled
 		{
 			get => Manager.EnabledGet(obj);
-			set => Manager.EnabledSet(obj,value);
+			set => Manager.EnabledSet(obj, value);
 		}
 
 		public bool Activate
@@ -61,13 +61,13 @@ namespace RhuEngine.Physics
 		public float Mass
 		{
 			get => Manager.MassGet(obj);
-			set=> Manager.MassSet(obj,value);
+			set => Manager.MassSet(obj, value);
 		}
 
 		public ECollisionFilterGroups Group
 		{
 			get => Manager.GroupGet(obj);
-			set => Manager?.GroupSet(obj,value);
+			set => Manager?.GroupSet(obj, value);
 		}
 
 		public ECollisionFilterGroups Mask
@@ -78,13 +78,13 @@ namespace RhuEngine.Physics
 		public bool NoneStaticBody
 		{
 			get => Manager.NoneStaticBodyGet(obj);
-			set => Manager.NoneStaticBodySet(obj,value);
+			set => Manager.NoneStaticBodySet(obj, value);
 		}
 
 		public Matrix Matrix
 		{
 			get => Manager.MatrixGet(obj);
-			set => Manager.MatrixSet(obj,value);
+			set => Manager.MatrixSet(obj, value);
 		}
 
 		public void Remove() {
@@ -92,9 +92,10 @@ namespace RhuEngine.Physics
 		}
 
 		public void Dispose() {
-			if(obj is IDisposable disposable) {
+			if (obj is IDisposable disposable) {
 				disposable.Dispose();
 			}
+			GC.SuppressFinalize(this);
 		}
 
 		public ColliderShape CollisionShape { get; set; }

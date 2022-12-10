@@ -96,7 +96,7 @@ namespace RNumerics
 				? _rotation * Vector3f.AxisX
 				: nAxis == 1
 					? _rotation * Vector3f.AxisY
-					: nAxis == 2 ? _rotation * Vector3f.AxisZ : throw new ArgumentOutOfRangeException("nAxis");
+					: nAxis == 2 ? _rotation * Vector3f.AxisZ : throw new ArgumentOutOfRangeException(nameof(nAxis));
 		}
 
 

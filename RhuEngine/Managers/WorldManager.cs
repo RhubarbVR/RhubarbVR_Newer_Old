@@ -60,7 +60,7 @@ namespace RhuEngine.Managers
 				RLog.Info("Saving Local World");
 				try {
 					var data = LocalWorld.Serialize(new SyncObjectSerializerObject(false));
-					File.WriteAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld", new DataSaver(data).SaveStore());
+					File.WriteAllBytes(EngineHelpers.BaseDir + "LocalWorldTest.RWorld", new DataSaver(data).SaveStore());
 				}
 				catch (Exception ex) {
 					RLog.Err($"Failed to save world {ex}");
@@ -197,10 +197,10 @@ namespace RhuEngine.Managers
 			OverlayWorld.RootEntity.AddChild("OverlayWorldManager").AttachComponent<OverlayWorldManager>();
 			Engine.IntMsg = "Loading Local World";
 			var loaddedData = false;
-			if (LoadLocalWorld && File.Exists(Engine.BaseDir + "LocalWorldTest.RWorld")) {
+			if (LoadLocalWorld && File.Exists(EngineHelpers.BaseDir + "LocalWorldTest.RWorld")) {
 				try {
 					Engine.IntMsg = "Loading Local World From File ";
-					LocalWorld = LoadWorldFromBytes(World.FocusLevel.Focused, File.ReadAllBytes(Engine.BaseDir + "LocalWorldTest.RWorld"), true);
+					LocalWorld = LoadWorldFromBytes(World.FocusLevel.Focused, File.ReadAllBytes(EngineHelpers.BaseDir + "LocalWorldTest.RWorld"), true);
 					LocalWorld.SessionName.Value = "Local World";
 					LocalWorld.WorldName.Value = "Local World";
 					Engine.IntMsg = "Loaded Local World From File";
@@ -352,7 +352,7 @@ namespace RhuEngine.Managers
 			}
 		}
 
-		private void CopyPosToWorld(Entity Entity, UserRoot focusUserRoot) {
+		private static void CopyPosToWorld(Entity Entity, UserRoot focusUserRoot) {
 			if (Entity is null) {
 				return;
 			}

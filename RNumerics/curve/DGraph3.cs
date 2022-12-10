@@ -251,7 +251,7 @@ namespace RNumerics
 
 
 		// internal used in SplitEdge
-		private int Append_new_split_vertex(in int a, in int b) {
+		public int Append_new_split_vertex(in int a, in int b) {
 			var vNew = 0.5 * (GetVertex(a) + GetVertex(b));
 			var cNew = HasVertexColors ? (0.5f * (GetVertexColor(a) + GetVertexColor(b))) : Vector3f.One;
 			var f = AppendVertex(vNew, cNew);

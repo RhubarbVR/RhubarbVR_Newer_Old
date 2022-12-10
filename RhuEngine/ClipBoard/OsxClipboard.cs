@@ -62,13 +62,13 @@ static class OsxClipboard
         return Task.CompletedTask;
     }
 
-    [DllImport("/System/Library/Frameworks/AppKit.framework/AppKit")]
+    [DllImport("/System/Library/Frameworks/AppKit.framework/AppKit", CharSet = CharSet.Unicode)]
     static extern IntPtr objc_getClass(string className);
 
     [DllImport("/System/Library/Frameworks/AppKit.framework/AppKit")]
     static extern IntPtr objc_msgSend(IntPtr receiver, IntPtr selector);
 
-    [DllImport("/System/Library/Frameworks/AppKit.framework/AppKit")]
+    [DllImport("/System/Library/Frameworks/AppKit.framework/AppKit", CharSet = CharSet.Unicode)]
     static extern IntPtr objc_msgSend(IntPtr receiver, IntPtr selector, string arg1);
 
     [DllImport("/System/Library/Frameworks/AppKit.framework/AppKit")]
@@ -77,6 +77,6 @@ static class OsxClipboard
     [DllImport("/System/Library/Frameworks/AppKit.framework/AppKit")]
     static extern IntPtr objc_msgSend(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
 
-    [DllImport("/System/Library/Frameworks/AppKit.framework/AppKit")]
+    [DllImport("/System/Library/Frameworks/AppKit.framework/AppKit", CharSet = CharSet.Unicode)]
     static extern IntPtr sel_registerName(string selectorName);
 }

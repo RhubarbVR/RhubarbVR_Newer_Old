@@ -34,13 +34,11 @@ namespace RhuEngine.Linker
 
 	public static class StaticMaterialManager
 	{
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Non-constant fields should not be visible", Justification = "<Pending>")]
 		public static IStaticMaterialManager Instanances;
 
 		public static T GetMaterial<T>() where T : IStaticMaterial {
-			if (typeof(T) == typeof(IUnlitMaterial)) {
-				return (T)Instanances.CreateUnlitMaterial();
-			}
-			return default;
+			return typeof(T) == typeof(IUnlitMaterial) ? (T)Instanances.CreateUnlitMaterial() : default;
 		}
 	}
 
@@ -64,6 +62,7 @@ namespace RhuEngine.Linker
 
 		public void Dispose() {
 			Material.Dispose();
+			GC.SuppressFinalize(this);
 		}
 	}
 }

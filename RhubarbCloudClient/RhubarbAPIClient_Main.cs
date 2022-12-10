@@ -22,7 +22,7 @@ namespace RhubarbCloudClient
 		private HttpClientHandler HttpClientHandler { get; set; }
 		public CookieContainer Cookies => HttpClientHandler?.CookieContainer;
 		public HttpClient HttpClient;
-		public static Uri LocalUri => new Uri("http://LocalHost:5000/");
+		public static Uri LocalUri => new("http://LocalHost:5000/");
 
 		//public static Uri LocalUri => new("http://192.168.1.120:5000/");
 		public static Uri BaseUri => LocalUri;

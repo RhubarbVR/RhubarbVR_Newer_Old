@@ -41,7 +41,7 @@ namespace OpusDotNet
 					throw new ArgumentException("Value must be one of the following: 8000, 12000, 16000, 24000 or 48000.", nameof(sampleRate));
 			}
 
-			if (channels < 1 || channels > 2) {
+			if (channels is < 1 or > 2) {
 				throw new ArgumentOutOfRangeException(nameof(channels), "Value must be between 1 and 2.");
 			}
 
@@ -145,7 +145,7 @@ namespace OpusDotNet
 				if (!NativeLib.Load()) {
 					throw new Exception("Failed to load opus lib");
 				}
-				if (value < 0 || value > 10) {
+				if (value is < 0 or > 10) {
 					throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 10.");
 				}
 
@@ -201,7 +201,7 @@ namespace OpusDotNet
 				if (!NativeLib.Load()) {
 					throw new Exception("Failed to load opus lib");
 				}
-				if (value < 0 || value > 100) {
+				if (value is < 0 or > 100) {
 					throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 100.");
 				}
 

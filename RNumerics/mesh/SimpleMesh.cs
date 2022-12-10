@@ -38,7 +38,7 @@ namespace RNumerics
 		public SimpleMesh Copy() {
 			return new SimpleMesh(this);
 		}
-		private (Vector2f[], Colorf) CalcNewUV(in Colorf colorOne, in Colorf colorTwo, in Vector3d newtry1, in Vector3d v1, in Vector3d v2, in Vector2f[] uv1, in Vector2f[] uv2) {
+		private static (Vector2f[], Colorf) CalcNewUV(in Colorf colorOne, in Colorf colorTwo, in Vector3d newtry1, in Vector3d v1, in Vector3d v2, in Vector2f[] uv1, in Vector2f[] uv2) {
 			var newUvs = new Vector2f[uv1.Length];
 			//TODO: Try to remove sqrt from this
 			var disttwo = v1.Distance(v2);
@@ -67,7 +67,7 @@ namespace RNumerics
 
 		}
 
-		public List<(NewVertexInfo, NewVertexInfo, NewVertexInfo)> MakeCutTriangles(in List<(NewVertexInfo, NewVertexInfo, NewVertexInfo)> trys, in PlaneSetting planeSetting) {
+		public static List<(NewVertexInfo, NewVertexInfo, NewVertexInfo)> MakeCutTriangles(in List<(NewVertexInfo, NewVertexInfo, NewVertexInfo)> trys, in PlaneSetting planeSetting) {
 			var savedCount = trys.Count;
 			for (var i = 0; i < savedCount; i++) {
 				var v1 = trys[i].Item1;
@@ -183,12 +183,12 @@ namespace RNumerics
 			return trys;
 		}
 
-		public void AppendUVRectangle(in Matrix offset, in Vector2f bottomleft, in Vector2f topright, in Vector2f size, in float yoffset, in Colorf color) {
+		public void AppendUVRectangle(in Matrix offset, in Vector2f bottomleft, in Vector2f topright, in Vector2f size, in float zoffset, in Colorf color) {
 			var ftopLeft = new Vector2f(bottomleft.x, topright.y);
 			var fbottomLeft = bottomleft;
 			var ftopRight = topright;
 			var fbottomRight = new Vector2f(topright.x, bottomleft.y);
-			var zoff = 0.01f;
+			var zoff = 0.01f + zoffset;
 			var offseter = size.y * -0.2f;
 			var topLeft = offset.Transform(size._Y_ + new Vector3f(0, offseter, zoff));
 			var bottomLeft = offset.Transform(new Vector3f(0, offseter, zoff));
@@ -223,7 +223,7 @@ namespace RNumerics
 				var selfAngle = angle * x;
 				var anglecalfirst = angle * (((float)Math.Floor(x * splits)) / splits);
 				var anglecalnext = angle * ((float)(Math.Floor(x * splits) + 1) / splits);
-				var value1 = (-radus + (Vertices[(3 * i) + 2] * scale.z));
+				var value1 = -radus + (Vertices[(3 * i) + 2] * scale.z);
 				var firstx = (value1 * MathUtil.FastCos(anglecalfirst * MathUtil.DEG_2_RADF)) + radus;
 				var firstz = value1 * MathUtil.FastSin(anglecalfirst * MathUtil.DEG_2_RADF);
 				var first = new Vector2f(firstx, firstz);
@@ -872,7 +872,7 @@ namespace RNumerics
 		}
 
 		public void SetActiveMesh(in int id) {
-			_nActiveMesh = id >= 0 && id < Meshes.Count ? id : throw new ArgumentOutOfRangeException("active mesh id is out of range");
+			_nActiveMesh = id >= 0 && id < Meshes.Count ? id : throw new ArgumentOutOfRangeException(nameof(id));
 		}
 
 		public int AppendTriangle(in int i, in int j, in int k) {

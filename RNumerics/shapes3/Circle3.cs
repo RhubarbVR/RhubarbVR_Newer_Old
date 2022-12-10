@@ -49,7 +49,7 @@ namespace RNumerics
 			Radius = radius;
 		}
 		[IgnoreMember]
-		public bool IsClosed => true;
+		public const bool IS_CLOSED = true;
 
 		public void Reverse() {
 			IsReversed = !IsReversed;
@@ -72,7 +72,7 @@ namespace RNumerics
 
 
 		[IgnoreMember]
-		public double ParamLength => 1.0f;
+		public const double PARAM_LENGTH = 1.0f;
 
 		// t in range[0,1] spans circle [0,2pi]
 		public Vector3d SampleT(in double t) {
@@ -82,7 +82,7 @@ namespace RNumerics
 		}
 
 		[IgnoreMember]
-		public bool HasArcLength => true;
+		public const bool HAS_ARC_LENGTH = true;
 
 		[IgnoreMember]
 		public double ArcLength => MathUtil.TWO_PI * Radius;

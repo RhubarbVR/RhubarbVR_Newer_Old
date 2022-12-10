@@ -105,13 +105,13 @@ namespace RhuEngine.Components
 				: OpenProgram(programType, WorldManager.FocusedWorld, file, mimetype, ex, args);
 		}
 
-		public Program OpenProgram(Type programType, World world, Stream file = null, string mimetype = null, string ex = null, params object[] args) {
+		public static Program OpenProgram(Type programType, World world, Stream file = null, string mimetype = null, string ex = null, params object[] args) {
 			var program = world.RootEntity.AddChild(programType.Name).AttachComponent<Program>(programType);
 			program.StartProgram(file, mimetype, ex, args);
 			return program;
 		}
 
-		public T OpenProgram<T>(World world, Stream file = null, string mimetype = null, string ex = null, params object[] args) where T : Program, new() {
+		public static T OpenProgram<T>(World world, Stream file = null, string mimetype = null, string ex = null, params object[] args) where T : Program, new() {
 			var program = world.RootEntity.AddChild(typeof(T).Name).AttachComponent<T>();
 			program.StartProgram(file, mimetype, ex, args);
 			return program;

@@ -169,17 +169,16 @@ namespace RNumerics
 		}
 
 
-		public double Dot(in double x0, in double y0, in double x1, in double y1) {
+		public static double Dot(in double x0, in double y0, in double x1, in double y1) {
 			return (x0 * x1) + (y0 * y1);
 		}
 
-
-		double Det2(in double x0, in double y0, in double x1, in double y1) {
+		public static double Det2(in double x0, in double y0, in double x1, in double y1) {
 			return (x0 * y1) - (x1 * y0);
 		}
 
 
-		public double Det3(in double x0, in double y0, in double z0, in double x1, in double y1, in double z1, in double x2, in double y2, in double z2) {
+		public static double Det3(in double x0, in double y0, in double z0, in double x1, in double y1, in double z1, in double x2, in double y2, in double z2) {
 			var c00 = (y1 * z2) - (y2 * z1);
 			var c01 = (y2 * z0) - (y0 * z2);
 			var c02 = (y0 * z1) - (y1 * z0);
@@ -209,7 +208,7 @@ namespace RNumerics
 		// functions return 'true' for a positive ordering and 'false' for a
 		// negative ordering.
 
-		public bool Sort(ref int v0, ref int v1) {
+		public static bool Sort(ref int v0, ref int v1) {
 			int j0, j1;
 			bool positive;
 
@@ -230,7 +229,7 @@ namespace RNumerics
 			return positive;
 		}
 
-		public bool Sort(ref int v0, ref int v1, ref int v2) {
+		public static bool Sort(ref int v0, ref int v1, ref int v2) {
 			int j0, j1, j2;
 			bool positive;
 
@@ -282,7 +281,7 @@ namespace RNumerics
 			return positive;
 		}
 
-		public bool Sort(ref int v0, ref int v1, ref int v2, ref int v3) {
+		public static bool Sort(ref int v0, ref int v1, ref int v2, ref int v3) {
 			int j0, j1, j2, j3;
 			bool positive;
 

@@ -280,9 +280,9 @@ namespace RNumerics
 			var nWindingNumber = 0;
 
 			var N = vertices.Count;
-			Vector2d a = vertices[0], b = Vector2d.Zero;
+			var a = vertices[0];
 			for (var i = 0; i < N; ++i) {
-				b = vertices[(i + 1) % N];
+				var b = vertices[(i + 1) % N];
 
 				if (a.y <= P.y) {   // y <= P.y (below)
 					if (b.y > P.y) {                         // an upward crossing

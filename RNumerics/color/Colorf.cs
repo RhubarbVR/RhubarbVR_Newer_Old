@@ -64,7 +64,7 @@ namespace RNumerics
 						return new Colorf(r, g, b, a);
 					}
 				}
-				if (colorString.Contains("(") && colorString.Contains(")")) {
+				if (colorString.Contains('(') && colorString.Contains(')')) {
 					var lowerText = colorString.ToLower();
 					var waStrings = lowerText.Substring(lowerText.IndexOf('(')).GetArgStrings().GetEnumerator();
 					if (lowerText.Contains("rgba")) {
@@ -104,11 +104,12 @@ namespace RNumerics
 				return White;
 			}
 		}
+
 		[IgnoreMember, JsonIgnore]
-		public static Random random = new();
+		private static readonly Random _random = new();
 
 		public static Colorf RandomHue() {
-			var color = new ColorHSV((float)random.NextDouble() * 360, 1, 1);
+			var color = new ColorHSV((float)_random.NextDouble() * 360, 1, 1);
 			return color.ConvertToRGB();
 		}
 

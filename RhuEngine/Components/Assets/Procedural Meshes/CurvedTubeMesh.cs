@@ -52,7 +52,7 @@ namespace RhuEngine.Components
 			mesh.Vertices ??= new List<Vector3d>();
 			mesh.Vertices.Clear();
 			for (var i = 0; i < CurveSteps.Value; i++) {
-				var poser = (float)(i) / ((float)CurveSteps.Value - 1);
+				var poser = i / ((float)CurveSteps.Value - 1);
 				mesh.Vertices.Add(Vector3d.Bezier(Vector3d.Zero, StartHandle.Value, EndHandle.Value, Endpoint.Value, poser));
 			}
 		}

@@ -27,6 +27,7 @@ namespace RhuEngine.Components
 		public override void Dispose() {
 			Load(null);
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 
 		public BufferedWaveProvider audio;

@@ -163,7 +163,7 @@ namespace RhuEngine.GameTests.Tests
 			((IDisposable)tester).Dispose();
 		}
 
-		public IEnumerable<Type> GetAllTypes(Func<Type, bool> func) {
+		public static IEnumerable<Type> GetAllTypes(Func<Type, bool> func) {
 			return from asm in AppDomain.CurrentDomain.GetAssemblies()
 				   from type in asm.GetTypes()
 				   where type.IsPublic
@@ -172,7 +172,7 @@ namespace RhuEngine.GameTests.Tests
 		}
 
 
-		public List<Type> MakeTestGenerics(Type type) {
+		public static List<Type> MakeTestGenerics(Type type) {
 			var TestTypes = new List<Type>();
 			var newType = type;
 			var arguments = type.GetGenericArguments();
@@ -235,11 +235,11 @@ namespace RhuEngine.GameTests.Tests
 			return TestTypes;
 		}
 
-		public void RunComponentTest(Component component) {
+		public static void RunComponentTest(Component component) {
 			RunSyncObjectTest(component);
 			Assert.IsNotNull(component);
 		}
-		public void RunSyncObjectTest(SyncObject syncObject) {
+		public static void RunSyncObjectTest(SyncObject syncObject) {
 			syncObject.RunOnSave();
 			var serlize = syncObject.Serialize(new SyncObjectSerializerObject(true));
 			syncObject.Deserialize(serlize, new SyncObjectDeserializerObject(true));
@@ -671,12 +671,10 @@ namespace RhuEngine.GameTests.Tests
 			((IDisposable)tester).Dispose();
 		}
 
-		public static bool RunAcountLoginAndCreation = false;
-
 		[TestMethod()]
 		public async Task TestAcountLoginAndCreation() {
 			SetUpForNormalTest();
-			if (!RunAcountLoginAndCreation) {
+			if (!GenericGameTestHelpers.RunAcountLoginAndCreation) {
 				tester.RunForSteps();
 				((IDisposable)tester).Dispose();
 				return;

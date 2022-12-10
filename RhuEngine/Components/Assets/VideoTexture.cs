@@ -131,13 +131,7 @@ namespace RhuEngine.Components
 				return int.MinValue;
 			}
 			codec = codec.ToLower();
-			if (codec.Contains("none")) {
-				return int.MinValue;
-			}
-			if (codec.Contains("mp4a")) {
-				return 200;
-			}
-			return 100;
+			return codec.Contains("none") ? int.MinValue : codec.Contains("mp4a") ? 200 : 100;
 		}
 
 		private static int RateVideoCodec(string codec) {
@@ -145,16 +139,7 @@ namespace RhuEngine.Components
 				return int.MinValue;
 			}
 			codec = codec.ToLower();
-			if (codec.Contains("none")) {
-				return int.MinValue;
-			}
-			if (codec.Contains("avc")) {
-				return 100;
-			}
-			if (codec.Contains("h264")) {
-				return 100;
-			}
-			return 100;
+			return codec.Contains("none") ? int.MinValue : codec.Contains("avc") ? 100 : codec.Contains("h264") ? 100 : 100;
 		}
 
 		private async Task LoadMedia() {

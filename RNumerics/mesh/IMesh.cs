@@ -183,7 +183,7 @@ namespace RNumerics
 	{
 		readonly List<T> _enumer;
 
-		public int Count => _enumer.Count();
+		public int Count => _enumer.Count;
 
 		public bool IsReadOnly => false;
 

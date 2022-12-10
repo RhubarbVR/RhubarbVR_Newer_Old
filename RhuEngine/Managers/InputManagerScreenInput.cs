@@ -73,7 +73,7 @@ namespace RhuEngine.Managers
 			/// Set mouse free and free the cursor
 			/// </summary>
 			public void FreeMouse() {
-				Engine.MainEngine.MouseFree = false;
+				EngineHelpers.MainEngine.MouseFree = false;
 				MouseFree = true;
 				MouseStateUpdate?.Invoke(true);
 			}
@@ -81,7 +81,7 @@ namespace RhuEngine.Managers
 			/// Set mouse Unfree and locks the cursor
 			/// </summary>
 			public void UnFreeMouse() {
-				Engine.MainEngine.MouseFree = true;
+				EngineHelpers.MainEngine.MouseFree = true;
 				MouseFree = false;
 				MouseStateUpdate?.Invoke(false);
 			}

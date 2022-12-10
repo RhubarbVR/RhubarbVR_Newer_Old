@@ -22,7 +22,7 @@ namespace RNumerics
 		}
 
 
-		public bool IsClosed => true;
+		public const bool IS_CLOSED = true;
 
 
 		public Hexagon2d Clone()

@@ -9,8 +9,8 @@ namespace RhuEngine.Linker
 	{
 		public static ulong UpdateCount { get; private set; }
 
-		public static Dictionary<object, Action> StartOfFrameExecute = new();
-		public static List<Action> StartOfFrameList = new();
+		public static readonly Dictionary<object, Action> StartOfFrameExecute = new();
+		public static readonly List<Action> StartOfFrameList = new();
 
 		public static void ExecuteOnStartOfFrame(Action p) {
 			lock (StartOfFrameExecute) {
@@ -54,8 +54,8 @@ namespace RhuEngine.Linker
 		}
 
 
-		public static Dictionary<object, Action> EndOfFrameExecute = new();
-		public static List<Action> EndOfFrameList = new();
+		public static readonly Dictionary<object, Action> EndOfFrameExecute = new();
+		public static readonly List<Action> EndOfFrameList = new();
 
 		public static void ExecuteOnEndOfFrame(Action p) {
 			lock (EndOfFrameExecute) {

@@ -207,14 +207,14 @@ namespace RhuEngine.Components
 			Entity.orderOffset.Value = localtion + 1;
 			_innnerType = type;
 			ProgramsUpdate += UpdateHide;
-			var programInfo = type.GetProgramInfo();
+			var (ProgramName, icon) = type.GetProgramInfo();
 			if (_mainButton is not null) {
-				_mainButton.ToolTipText.Value = programInfo.ProgramName;
+				_mainButton.ToolTipText.Value = ProgramName;
 			}
 			if (_closeButton is not null) {
-				_closeButton.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.CloseThing", programInfo.ProgramName);
+				_closeButton.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.CloseThing", ProgramName);
 			}
-			_iconProvider.LoadAsset(programInfo.icon ?? Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
+			_iconProvider.LoadAsset(icon ?? Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
 			_fallBackOpenAction = () => PrivateSpaceManager.ProgramManager.OpenProgram(type);
 			UpdateHide();
 		}
@@ -251,9 +251,7 @@ namespace RhuEngine.Components
 			if (_closeButton is not null) {
 				_closeButton.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.CloseThing", _privateSpaceWindow?.Window?.WindowTitle ?? string.Empty);
 			}
-			if (_iconProvider is not null) {
-				_iconProvider.LoadAsset(_privateSpaceWindow?.Window?.Icon ?? Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
-			}
+			_iconProvider?.LoadAsset(_privateSpaceWindow?.Window?.Icon ?? Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.MissingFile));
 			ProgramsUpdate?.Invoke();
 		}
 

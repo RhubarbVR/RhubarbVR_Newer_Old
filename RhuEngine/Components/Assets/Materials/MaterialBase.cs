@@ -41,6 +41,7 @@ namespace RhuEngine.Components
 			_material?.Dispose();
 			_material = default;
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 
 		protected override void OnLoaded() {

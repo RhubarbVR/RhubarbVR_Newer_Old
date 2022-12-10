@@ -93,7 +93,7 @@ namespace RhuEngine.WorldObjects
 
 		public static readonly Dictionary<Uri, (int, MemoryStream)> assetSaving = new();
 
-		private void AssetResponses(IAssetRequest assetRequest, Peer tag, DeliveryMethod deliveryMethod) {
+		private void AssetResponses(IAssetRequest assetRequest, Peer tag) {
 			var dataUrl = new Uri(assetRequest.URL);
 			var firstData = dataUrl.Host;
 			if (assetRequest is RequestAsset reqwest) {

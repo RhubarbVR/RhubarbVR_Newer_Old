@@ -21,7 +21,8 @@ namespace RhuEngine.Components
 		public readonly SyncRef<ButtonBase> GrabButton;
 
 		public void UpdateLayer() {
-			foreach (KeyboardButton item in KeyboardButtons) {
+			for (var i = 0; i < KeyboardButtons.Count; i++) {
+				var item = KeyboardButtons[i];
 				item?.UpdateLabel();
 			}
 		}
@@ -232,7 +233,8 @@ namespace RhuEngine.Components
 			if (!(World.IsOverlayWorld || World.IsPersonalSpace) || World.IsNetworked) {
 				return;
 			}
-			foreach (KeyboardButton item in KeyboardButtons) {
+			for (var i = 0; i < KeyboardButtons.Count; i++) {
+				var item = KeyboardButtons[i];
 				if (item.Pressed) {
 					item.SendClick(Layer);
 				}

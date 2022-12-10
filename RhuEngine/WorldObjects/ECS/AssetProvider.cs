@@ -28,6 +28,7 @@ namespace RhuEngine.WorldObjects.ECS
 		public override void Dispose() {
 			Load(null);
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 	}
 }

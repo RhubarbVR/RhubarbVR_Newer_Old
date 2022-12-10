@@ -31,6 +31,7 @@ namespace RhubarbVR.Bindings.TextureBindings
 
 		public void Dispose() {
 			Image.Free();
+			GC.SuppressFinalize(this);
 		}
 
 		public void Init(RImage rTexture2D) {

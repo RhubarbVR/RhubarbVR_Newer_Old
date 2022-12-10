@@ -245,7 +245,7 @@ namespace RNumerics
 		//    double     | BSRational   | 1587
 		// This is the same as the first-listed ToLine calls because the worst-case
 		// path has the same computational complexity.
-		public OrderType ToLineExtended(in Vector2d P, in Vector2d Q0, in Vector2d Q1) {
+		public static OrderType ToLineExtended(in Vector2d P, in Vector2d Q0, in Vector2d Q1) {
 			const double ZERO = 0.0;
 
 			var x0 = Q1[0] - Q0[0];

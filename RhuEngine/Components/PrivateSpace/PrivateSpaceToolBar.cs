@@ -49,14 +49,16 @@ namespace RhuEngine.Components
 		}
 
 		private void UpdateSelected() {
-			foreach (Entity item in PrivateSpaceManager.UserInterfaceManager.ToolBarHolder.Entity.children) {
+			for (var i = 0; i < PrivateSpaceManager.UserInterfaceManager.ToolBarHolder.Entity.children.Count; i++) {
+				var item = PrivateSpaceManager.UserInterfaceManager.ToolBarHolder.Entity.children[i];
 				var ui = item.GetFirstComponent<ViewportConnector>();
 				if (ui is null) {
 					continue;
 				}
 				item.enabled.Value = ui == ConnectedViewPort;
 			}
-			foreach (Entity item in PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children) {
+			for (var i = 0; i < PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children.Count; i++) {
+				var item = PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children[i];
 				var ui = item.GetFirstComponent<Button>();
 				if (ui is null) {
 					continue;
@@ -87,7 +89,8 @@ namespace RhuEngine.Components
 		[Exposed]
 		public void CloseTaskBar() {
 			Tool.Close();
-			foreach (Entity item in PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children) {
+			for (var i = 0; i < PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children.Count; i++) {
+				var item = PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children[i];
 				var ui = item.GetFirstComponent<Button>();
 				if (ui is null) {
 					continue;

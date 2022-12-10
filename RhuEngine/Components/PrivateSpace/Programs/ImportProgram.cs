@@ -28,15 +28,15 @@ namespace RhuEngine.Components
 	public sealed class ImportProgram : Program
 	{
 
-		public RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.AddFile;
+		public static RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.AddFile;
 
-		public string ProgramNameLocName => "Common.ImportFile";
+		public static string ProgramNameLocName => "Common.ImportFile";
 
-		public override RTexture2D ProgramIcon => Engine.MainEngine.staticResources.IconSheet.GetElement(IconFind);
+		public override RTexture2D ProgramIcon => EngineHelpers.MainEngine.staticResources.IconSheet.GetElement(IconFind);
 
-		public override string ProgramName => Engine.MainEngine.localisationManager.GetLocalString(ProgramNameLocName);
+		public override string ProgramName => EngineHelpers.MainEngine.localisationManager.GetLocalString(ProgramNameLocName);
 
-		private (Button, Action) AddSelectionButton(Entity attachTo, string text, Action action) {
+		private static (Button, Action) AddSelectionButton(Entity attachTo, string text, Action action) {
 			var button = attachTo.AddChild(text).AttachComponent<Button>();
 			button.Text.Value = text;
 			button.Alignment.Value = RButtonAlignment.Center;

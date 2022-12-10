@@ -16,10 +16,10 @@ namespace RhuEngine.Components
 	{
 		public abstract RhubarbAtlasSheet.RhubarbIcons IconFind { get; }
 
-		public override RTexture2D ProgramIcon => Engine.MainEngine.staticResources.IconSheet.GetElement(IconFind);
+		public override RTexture2D ProgramIcon => EngineHelpers.MainEngine.staticResources.IconSheet.GetElement(IconFind);
 
 		public abstract string ProgramNameLocName { get; }
 
-		public override string ProgramName => Engine.MainEngine.localisationManager.GetLocalString(ProgramNameLocName);
+		public override string ProgramName => EngineHelpers.MainEngine.localisationManager.GetLocalString(ProgramNameLocName);
 	}
 }

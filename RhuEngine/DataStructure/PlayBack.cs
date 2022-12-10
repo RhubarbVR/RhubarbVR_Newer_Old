@@ -21,7 +21,7 @@ namespace RhuEngine.DataStructure
 		[Key(4)]
 		public double Position { get; set; }
 
-		public TypeCode GetTypeCode() {
+		public static TypeCode GetTypeCode() {
 			return TypeCode.Object;
 		}
 	}

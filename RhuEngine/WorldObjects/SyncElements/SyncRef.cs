@@ -198,6 +198,7 @@ namespace RhuEngine.WorldObjects
 		public override void Dispose() {
 			Changed = null;
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 	}
 }

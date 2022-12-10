@@ -24,10 +24,9 @@ namespace RhuEngine.WorldObjects
 	public class User : SyncObject
 	{
 		public Matrix GetBodyNodeTrans(BodyNode bodyNode) {
-			if (bodyNode == BodyNode.None) {
-				return Matrix.Identity;
-			}
-			return userRoot.Target is null
+			return bodyNode == BodyNode.None
+				? Matrix.Identity
+				: userRoot.Target is null
 				? Matrix.Identity
 				: bodyNode switch {
 					BodyNode.UserRoot => userRoot.Target.Entity.GlobalTrans,

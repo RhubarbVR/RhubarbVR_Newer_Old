@@ -117,12 +117,7 @@ namespace RNumerics
 			return c == 0 ? max.CompareTo(other.max) : c;
 		}
 		public override int GetHashCode() {
-			unchecked { // Overflow is fine, just wrap
-				var hash = (int)2166136261;
-				hash = (hash * 16777619) ^ min.GetHashCode();
-				hash = (hash * 16777619) ^ max.GetHashCode();
-				return hash;
-			}
+			return HashCode.Combine(min, max);
 		}
 
 

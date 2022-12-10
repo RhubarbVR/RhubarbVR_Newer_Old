@@ -16,9 +16,9 @@ namespace NullContext
 
 		public bool SpawnPlayer => false;
 
-		private string TimeStamp => DateTime.Now.ToLongTimeString();
+		private static string TimeStamp => DateTime.Now.ToLongTimeString();
 
-		private readonly Semaphore _semaphore = new Semaphore(1, 1);
+		private readonly Semaphore _semaphore = new(1, 1);
 
 		public bool CanRender => false;
 
@@ -89,6 +89,7 @@ namespace NullContext
 		}
 
 		public event Action<LogLevel, string> Log;
+
 		public event Action<bool> VRChange;
 
 		public void Subscribe(Action<LogLevel, string> logCall) {

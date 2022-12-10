@@ -46,11 +46,9 @@ namespace RhuEngine
 		/// <param name="mimeType">The name of the MIME-type</param>
 		/// <returns>All available extensions for the given MIME-type</returns>
 		public static IEnumerable<string> GetMimeTypeExtensions(string mimeType) {
-			if (mimeType is null) {
-				throw new ArgumentNullException(nameof(mimeType));
-			}
-
-			return _typeMap
+			return mimeType is null
+				?               throw new ArgumentNullException(nameof(mimeType))
+				: _typeMap
 				.Where(keyPair => string.Equals(keyPair.Value, mimeType, StringComparison.OrdinalIgnoreCase))
 				.Select(keyPair => keyPair.Key);
 		}
@@ -84,11 +82,9 @@ namespace RhuEngine
 		/// <param name="fileName">The name of the file.</param>
 		/// <returns>The MIME-type for the given file name.</returns>
 		public static string GetMimeType(string fileName) {
-			if (fileName is null) {
-				throw new ArgumentNullException(nameof(fileName));
-			}
-
-			return TryGetMimeType(fileName, out var result) ? result : FallbackMimeType;
+			return fileName is null
+				?               throw new ArgumentNullException(nameof(fileName))
+				: TryGetMimeType(fileName, out var result) ? result : FallbackMimeType;
 		}
 	}
 

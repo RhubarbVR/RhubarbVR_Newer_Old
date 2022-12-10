@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using RhuEngine;
 using RhuEngine.Linker;
 namespace RhuEngine.Commads
 {
@@ -25,7 +24,7 @@ namespace RhuEngine.Commads
 				Console.WriteLine("Passwords are not the same");
 				return;
 			}
-			var req = await Engine.MainEngine.netApiManager.Client.RegisterAccount(username, email, Password);
+			var req = await EngineHelpers.MainEngine.netApiManager.Client.RegisterAccount(username, email, Password);
 			if (!req?.IsDataGood ?? false) {
 				Console.WriteLine(req.Data);
 			}

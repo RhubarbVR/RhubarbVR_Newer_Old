@@ -94,15 +94,17 @@ namespace RhuEngine.Components
 		}
 
 		public override void Dispose() {
-			base.Dispose();
 			if (Pointer.GetOwnerID() == World.LocalUserID) {
 				if (programWindows is not null) {
-					foreach (SyncRef<ProgramWindow> item in programWindows) {
+					for (var i = 0; i < programWindows.Count; i++) {
+						var item = programWindows[i];
 						item.Target?.Close();
 					}
 				}
 				ProgramManager?.UnLoadProgram(this);
 			}
+			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 	}
 }

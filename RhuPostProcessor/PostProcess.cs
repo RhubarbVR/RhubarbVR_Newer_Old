@@ -13,21 +13,14 @@ using Mono.Cecil.Rocks;
 
 namespace RhuPostProcessor
 {
-	public sealed class PostProcess
+	public static class PostProcess
 	{
 
-		public static Action<string>? logAction;
-
 		public static void Log(string logstring) {
-			if (logAction is null) {
-				Console.WriteLine(logstring);
-			}
-			else {
-				logAction(logstring);
-			}
+			Console.WriteLine(logstring);
 		}
 
-		public (AssemblyDefinition, bool) GetAssemblyFromDLLPath(string targetDLL, string[] extraDlls) {
+		public static (AssemblyDefinition, bool) GetAssemblyFromDLLPath(string targetDLL, string[] extraDlls) {
 			var defaultAssemblyResolver = new DefaultAssemblyResolver();
 			defaultAssemblyResolver.AddSearchDirectory(Path.GetDirectoryName(targetDLL));
 			foreach (var item in extraDlls) {
@@ -42,7 +35,7 @@ namespace RhuPostProcessor
 			}), pdbFileExists);
 		}
 
-		public class FieldInfoForMethod
+		public sealed class FieldInfoForMethod
 		{
 			public FieldDefinition Field;
 			public FieldInfoForMethod(FieldDefinition field) {
@@ -58,17 +51,17 @@ namespace RhuPostProcessor
 			public CustomAttribute? OnChangedAttribute;
 			public CustomAttribute? NoSyncUpdateAttribute;
 		}
-		public List<AddILJob> addILJobs = new List<AddILJob>();
-		public void BuildInitializeMembersMethod(TypeDefinition typeDefinition, List<FieldInfoForMethod> fieldInfos) {
-			var newMethod = new MethodDefinition("InitializeMembers", MethodAttributes.Family | MethodAttributes.Virtual | MethodAttributes.HideBySig, voidType);
-			newMethod.Parameters.Add(new ParameterDefinition("networkedObject", ParameterAttributes.None, boolType));
-			newMethod.Parameters.Add(new ParameterDefinition("deserialize", ParameterAttributes.None, boolType));
-			newMethod.Parameters.Add(new ParameterDefinition("netPointer", ParameterAttributes.None, funcNetPointerType));
+		private static readonly List<AddILJob> _addILJobs = new();
+		public static void BuildInitializeMembersMethod(TypeDefinition typeDefinition, List<FieldInfoForMethod> fieldInfos) {
+			var newMethod = new MethodDefinition("InitializeMembers", MethodAttributes.Family | MethodAttributes.Virtual | MethodAttributes.HideBySig, _voidType);
+			newMethod.Parameters.Add(new ParameterDefinition("networkedObject", ParameterAttributes.None, _boolType));
+			newMethod.Parameters.Add(new ParameterDefinition("deserialize", ParameterAttributes.None, _boolType));
+			newMethod.Parameters.Add(new ParameterDefinition("netPointer", ParameterAttributes.None, _funcNetPointerType));
 			typeDefinition.Methods.Add(newMethod);
 			newMethod.Body.InitLocals = true;
-			addILJobs.Add(new AddILJob(typeDefinition, fieldInfos, newMethod));
+			_addILJobs.Add(new AddILJob(typeDefinition, fieldInfos, newMethod));
 		}
-		public class AddILJob
+		public sealed class AddILJob
 		{
 			readonly TypeDefinition _typeDefinition;
 			readonly List<FieldInfoForMethod> _fieldInfos;
@@ -275,7 +268,7 @@ namespace RhuPostProcessor
 		}
 
 
-		public void SetUpInitializeMembersMethod(TypeDefinition typeDefinition) {
+		public static void SetUpInitializeMembersMethod(TypeDefinition typeDefinition) {
 			var fieldsToAddToMethod = new List<FieldInfoForMethod>();
 			foreach (var field in typeDefinition.Fields) {
 				if (!(field.IsPublic | field.IsInitOnly)) {
@@ -350,21 +343,20 @@ namespace RhuPostProcessor
 			BuildInitializeMembersMethod(typeDefinition, fieldsToAddToMethod);
 		}
 
-		public bool IsBasedOff(TypeDefinition typeDefinition, string type = "RhuEngine.WorldObjects.SyncObject") {
+		public static bool IsBasedOff(TypeDefinition typeDefinition, string type = "RhuEngine.WorldObjects.SyncObject") {
 			var parrentType = typeDefinition?.BaseType;
 			return parrentType != null && (parrentType.FullName == type || IsBasedOff(parrentType.Resolve(), type));
 		}
-		public TypeReference? voidType;
-		public TypeReference? boolType;
-		public TypeReference? netPointerType;
-		public TypeReference? actionType;
-		public TypeReference? changableType;
+		private static TypeReference? _voidType;
+		private static TypeReference? _boolType;
+		private static TypeReference? _netPointerType;
+		private static TypeReference? _actionType;
+		private static TypeReference? _changableType;
 
-		public TypeReference? funcNetPointerType;
-		public TypeReference? syncObject;
-		public TypeReference? actionWithChangeable;
+		private static TypeReference? _funcNetPointerType;
+		private static TypeReference? _actionWithChangeable;
 
-		public bool ProcessDLL(string targetDLL, string[] extraDlls) {
+		public static bool ProcessDLL(string targetDLL, string[] extraDlls) {
 			if (!File.Exists(targetDLL)) {
 				Log("targetDLL did not exists");
 				return false;
@@ -372,16 +364,15 @@ namespace RhuPostProcessor
 			var (assembly, pdbFileExists) = GetAssemblyFromDLLPath(targetDLL, extraDlls);
 			var module = assembly.MainModule;
 			var getTypes = module.GetTypes().ToList();
-			voidType = module.ImportReference(typeof(void));
-			boolType = module.ImportReference(typeof(bool));
-			syncObject = module.GetType("RhuEngine.WorldObjects.SyncObject", runtimeName: true);
-			actionType = module.ImportReference(typeof(System.Action<>));
-			netPointerType = module.GetType("RhuEngine.Datatypes.NetPointer", runtimeName: true);
-			changableType = module.GetType("RhuEngine.WorldObjects.IChangeable", runtimeName: true);
-			Log($"LoadedType {netPointerType.Name}");
-			funcNetPointerType = module.GetType("RhuEngine.WorldObjects.NetPointerUpdateDelegate", runtimeName: true);
-			Log($"LoadedType {funcNetPointerType.FullName}");
-			actionWithChangeable = actionType.MakeGenericInstanceType(changableType);
+			_voidType = module.ImportReference(typeof(void));
+			_boolType = module.ImportReference(typeof(bool));
+			_actionType = module.ImportReference(typeof(System.Action<>));
+			_netPointerType = module.GetType("RhuEngine.Datatypes.NetPointer", runtimeName: true);
+			_changableType = module.GetType("RhuEngine.WorldObjects.IChangeable", runtimeName: true);
+			Log($"LoadedType {_netPointerType.Name}");
+			_funcNetPointerType = module.GetType("RhuEngine.WorldObjects.NetPointerUpdateDelegate", runtimeName: true);
+			Log($"LoadedType {_funcNetPointerType.FullName}");
+			_actionWithChangeable = _actionType.MakeGenericInstanceType(_changableType);
 			foreach (var item in assembly.MainModule.CustomAttributes) {
 				foreach (var constructorArgument in item.ConstructorArguments) {
 					if (constructorArgument.Value is string value) {
@@ -420,8 +411,8 @@ namespace RhuPostProcessor
 			}
 
 			Log("Running IL Building");
-			foreach (var item in addILJobs) {
-				item.BuildIL(module, actionWithChangeable, voidType, changableType, actionType);
+			foreach (var item in _addILJobs) {
+				item.BuildIL(module, _actionWithChangeable, _voidType, _changableType, _actionType);
 			}
 			Log("DoneWith IL Building");
 			Log("Removing InitializeMembers from SyncObject");

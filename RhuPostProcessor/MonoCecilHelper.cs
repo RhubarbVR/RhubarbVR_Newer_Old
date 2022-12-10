@@ -19,40 +19,29 @@ namespace RhuPostProcessor
 			if(obj.GetType() == typeof(CustomAttributeArgument)) {
 				obj = ((CustomAttributeArgument)obj).Value;
 			}
-			if (obj.GetType() == typeof(int)) {
-				return Instruction.Create(OpCodes.Ldc_I4,(int)obj);
-			}
-			if (obj.GetType() == typeof(uint)) {
-				return Instruction.Create(OpCodes.Ldc_I4_S, (uint)obj);
-			}
-			if (obj.GetType() == typeof(bool)) {
-				return (bool)obj ? Instruction.Create(OpCodes.Ldc_I4_1) : Instruction.Create(OpCodes.Ldc_I4_0);
-			}
-			if (obj.GetType() == typeof(char)) {
-				return Instruction.Create(OpCodes.Ldc_I4_S,(uint)obj);
-			}
-			if (obj.GetType() == typeof(string)) {
-				return Instruction.Create(OpCodes.Ldstr,(string)obj);
-			}
-			if (obj.GetType() == typeof(float)) {
-				return Instruction.Create(OpCodes.Ldc_R4,(float)obj);
-			}
-			if (obj.GetType() == typeof(double)) {
-				return Instruction.Create(OpCodes.Ldc_R8, (double)obj);
-			}
-			if (obj.GetType() == typeof(long)) {
-				return Instruction.Create(OpCodes.Ldc_I8,(long)obj);
-			}
-			if (obj.GetType() == typeof(ulong)) {
-				return Instruction.Create(OpCodes.Ldc_I8, (ulong)obj);
-			}
-			if (obj.GetType() == typeof(byte)) {
-				return Instruction.Create(OpCodes.Ldc_I4, (int)obj);
-			}
-			if (obj.GetType() == typeof(sbyte)) {
-				return Instruction.Create(OpCodes.Ldc_I4_S, (uint)obj);
-			}
-			return obj.GetType() == typeof(short)
+			return obj.GetType() == typeof(int)
+				? Instruction.Create(OpCodes.Ldc_I4,(int)obj)
+				: obj.GetType() == typeof(uint)
+				? Instruction.Create(OpCodes.Ldc_I4_S, (uint)obj)
+				: obj.GetType() == typeof(bool)
+				? (bool)obj ? Instruction.Create(OpCodes.Ldc_I4_1) : Instruction.Create(OpCodes.Ldc_I4_0)
+				: obj.GetType() == typeof(char)
+				? Instruction.Create(OpCodes.Ldc_I4_S,(uint)obj)
+				: obj.GetType() == typeof(string)
+				? Instruction.Create(OpCodes.Ldstr,(string)obj)
+				: obj.GetType() == typeof(float)
+				? Instruction.Create(OpCodes.Ldc_R4,(float)obj)
+				: obj.GetType() == typeof(double)
+				? Instruction.Create(OpCodes.Ldc_R8, (double)obj)
+				: obj.GetType() == typeof(long)
+				? Instruction.Create(OpCodes.Ldc_I8,(long)obj)
+				: obj.GetType() == typeof(ulong)
+				? Instruction.Create(OpCodes.Ldc_I8, (ulong)obj)
+				: obj.GetType() == typeof(byte)
+				? Instruction.Create(OpCodes.Ldc_I4, (int)obj)
+				: obj.GetType() == typeof(sbyte)
+				? Instruction.Create(OpCodes.Ldc_I4_S, (uint)obj)
+				: obj.GetType() == typeof(short)
 				? Instruction.Create(OpCodes.Ldc_I4_S, (uint)obj)
 				: obj.GetType() == typeof(ushort)
 				? Instruction.Create(OpCodes.Ldc_I4, (int)obj)
@@ -74,10 +63,9 @@ namespace RhuPostProcessor
 		}
 	
 		public static IEnumerable<MethodDefinition> GetConstructors(this TypeDefinition self) {
-			if (self == null) {
-				throw new ArgumentNullException("self");
-			}
-			return !self.HasMethods ? (IEnumerable<MethodDefinition>)Array.Empty<MethodDefinition>() : self.Methods.Where((MethodDefinition method) => method.IsConstructor);
+			return self == null
+				?               throw new ArgumentNullException(nameof(self))
+				: !self.HasMethods ? (IEnumerable<MethodDefinition>)Array.Empty<MethodDefinition>() : self.Methods.Where((MethodDefinition method) => method.IsConstructor);
 		}
 
 		public static MethodReference GetConstructor(this TypeReference type, ModuleDefinition module, out bool isMethodCall,bool AllowPrams = false) {
@@ -100,9 +88,9 @@ namespace RhuPostProcessor
 				isMethodCall = false;
 				return result2;
 			}
-			catch (Exception ex) {
+			catch {
 				Console.WriteLine("Exception getting constructor for type: " + type.FullName);
-				throw ex;
+				throw;
 			}
 		}
 
@@ -115,10 +103,10 @@ namespace RhuPostProcessor
 		}
 		public static GenericInstanceMethod MakeGenericMethodType(this MethodDefinition self, params TypeReference[] arguments) {
 			if (arguments.Length == 0) {
-				throw new ArgumentException();
+				throw new ArgumentException(nameof(arguments.Length));
 			}
 			if (self.GenericParameters.Count != arguments.Length) {
-				throw new ArgumentException();
+				throw new ArgumentException(nameof(arguments.Length));
 			}
 			var genericInstanceType = new GenericInstanceMethod(self);
 			foreach (var item in arguments) {
@@ -128,10 +116,10 @@ namespace RhuPostProcessor
 		}
 		public static GenericInstanceType MakeGenericInstanceType(this TypeReference self, params TypeReference[] arguments) {
 			if (arguments.Length == 0) {
-				throw new ArgumentException();
+				throw new ArgumentException(nameof(arguments.Length));
 			}
 			if (self.GenericParameters.Count != arguments.Length) {
-				throw new ArgumentException();
+				throw new ArgumentException(nameof(arguments.Length));
 			}
 			var genericInstanceType = new GenericInstanceType(self);
 			foreach (var item in arguments) {

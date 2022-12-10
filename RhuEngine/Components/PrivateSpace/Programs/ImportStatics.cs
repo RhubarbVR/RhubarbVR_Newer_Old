@@ -55,7 +55,7 @@ namespace RhuEngine.Components
 			if (IsTextureImport(fileName, mimeType)) {
 				fileTypes |= FileTypes.Image;
 			}
-			if(IsFontImport(fileName, mimeType)) {
+			if (IsFontImport(fileName, mimeType)) {
 				fileTypes |= FileTypes.Font;
 			}
 			return fileTypes == FileTypes.None ? FileTypes.Unknown : fileTypes;
@@ -66,13 +66,13 @@ namespace RhuEngine.Components
 		}
 
 		public static bool IsTextImport(string fileName, string mimeType) {
-			return ChechMimeType(mimeType, "text") || ChechMimeType(mimeType, "json") || ChechMimeType(mimeType, "xml");
+			return ChechMimeType(mimeType, "text") || ChechMimeType(mimeType, "json") || ChechMimeType(mimeType, "xml") || (fileName?.EndsWith(".txt") ?? false);
 		}
 		public static bool IsAudioImport(string fileName, string mimeType) {
-			return ChechMimeType(mimeType, "audio");
+			return ChechMimeType(mimeType, "audio") || (fileName?.EndsWith(".mp3") ?? false) || (fileName?.EndsWith(".wav") ?? false) || (fileName?.EndsWith(".ogg") ?? false);
 		}
 		public static bool IsFontImport(string fileName, string mimeType) {
-			return ChechMimeType(mimeType, "font");
+			return ChechMimeType(mimeType, "font") || (fileName?.EndsWith(".otf") ?? false) || (fileName?.EndsWith(".ttf") ?? false);
 		}
 
 		public static bool IsVideoImport(string fileName, string mimeType) {
@@ -103,7 +103,7 @@ namespace RhuEngine.Components
 		}
 
 		public static bool IsValidVideoImport(string path) {
-			if(string.IsNullOrEmpty(path)) {
+			if (string.IsNullOrEmpty(path)) {
 				return false;
 			}
 			path = path.ToLower();

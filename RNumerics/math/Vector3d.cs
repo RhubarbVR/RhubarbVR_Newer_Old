@@ -267,16 +267,9 @@ namespace RNumerics
 			return this == (Vector3d)obj;
 		}
 		public override int GetHashCode() {
-			unchecked // Overflow is fine, just wrap
-			{
-				var hash = (int)2166136261;
-				// Suitable nullity checks etc, of course :)
-				hash = (hash * 16777619) ^ x.GetHashCode();
-				hash = (hash * 16777619) ^ y.GetHashCode();
-				hash = (hash * 16777619) ^ z.GetHashCode();
-				return hash;
-			}
+			return HashCode.Combine(x, y, z);
 		}
+
 		public int CompareTo(Vector3d other) {
 			if (x != other.x) {
 				return x < other.x ? -1 : 1;

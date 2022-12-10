@@ -11,7 +11,7 @@ namespace RhuEngine.WorldObjects
 {
 	public static class TypeCollections
 	{
-		public static Type[] StandaredTypes = new[] {
+		public static readonly Type[] StandaredTypes = new[] {
 			typeof(int),
 			typeof(uint),
 			typeof(bool),

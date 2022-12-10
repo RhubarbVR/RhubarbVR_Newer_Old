@@ -112,7 +112,7 @@ namespace RNumerics
 		/// compute givens angles of B for (p,q). Only 
 		/// ever called with p,q as [0,1], [0,2], or [1,2]
 		/// </summary>
-		Vector2d GivensAngles(in SymmetricMatrix3d B, in int p, in int q) {
+		static Vector2d GivensAngles(in SymmetricMatrix3d B, in int p, in int q) {
 			double ch = 0, sh = 0;
 			if (p == 0) {
 				if (q == 1) {
@@ -142,19 +142,14 @@ namespace RNumerics
 			return new Vector2d(ch, sh);
 		}
 
-
-
-
-		void ComputeAV(ref Matrix3d matrix, ref Vector4d V, in double[] buf) {
+		static void ComputeAV(ref Matrix3d matrix, ref Vector4d V, in double[] buf) {
 			var qV = new Quaterniond(V[1], V[2], V[3], V[0]);
 			var MV = qV.ToRotationMatrix();
 			var AV = matrix * MV;
 			AV.ToBuffer(buf);
 		}
 
-
-
-		void QRFactorize(in double[] AV, ref Vector4d V, in double eps, ref Vector3d S, ref Vector4d U) {
+		static void QRFactorize(in double[] AV, ref Vector4d V, in double eps, ref Vector3d S, ref Vector4d U) {
 			PermuteColumns(AV, ref V);
 
 			U = new Vector4d(1, 0, 0, 0);
@@ -178,7 +173,7 @@ namespace RNumerics
 
 		//returns the 2 components of the quaternion
 		//such that Q^T * B has a 0 in element p, q
-		Vector2d ComputeGivensQR(in double[] B, in double eps, in int r, in int c) {
+		static Vector2d ComputeGivensQR(in double[] B, in double eps, in int r, in int c) {
 			var app = B[4 * c];
 			var apq = B[(3 * r) + c];
 
@@ -200,7 +195,7 @@ namespace RNumerics
 
 
 		//Q is the rot matrix defined by quaternion (ch, . . . sh .. . ) where sh is coord i
-		void GivensQTB2(in double[] B, in double ch, in double sh) {
+		static void GivensQTB2(in double[] B, in double ch, in double sh) {
 			//quat is (ch, 0, 0, sh), rotation around Z axis
 			var c = (ch * ch) - (sh * sh);
 			var s = 2 * sh * ch;
@@ -225,7 +220,7 @@ namespace RNumerics
 
 		//This will be called after givensQTB<2>, so we know that
 		//B10 is 0... which actually doesn't matter since that row won't change
-		void GivensQTB1(in double[] B, in double ch, in double sh) {
+		static void GivensQTB1(in double[] B, in double ch, in double sh) {
 			var c = (ch * ch) - (sh * sh);
 			var s = 2 * sh * ch;
 			//Q = [c 0 s; 0 1 0; -s 0 c];
@@ -247,7 +242,7 @@ namespace RNumerics
 		}
 
 		//B10 and B20 are 0, so don't bother filling in/computing them :)
-		void GivensQTB0(in double[] B, in double ch, in double sh) {
+		static void GivensQTB0(in double[] B, in double ch, in double sh) {
 			var c = (ch * ch) - (sh * sh);
 			var s = 2 * ch * sh;
 
@@ -266,9 +261,7 @@ namespace RNumerics
 			B[8] = newb22;
 		}
 
-
-
-		void QuatTimesEqualCoordinateAxis(ref Vector4d lhs, in double c, in double s, in int i) {
+		static void QuatTimesEqualCoordinateAxis(ref Vector4d lhs, in double c, in double s, in int i) {
 			//the quat we're multiplying by is (c, ? s ?)  where s is in slot i of the vector part,
 			//and the other entries are 0
 			var newS = (lhs.x * c) - (lhs[i + 1] * s);
@@ -292,7 +285,7 @@ namespace RNumerics
 		const double SIN_BACKUP = 0.38268343236508973; //0.5 * Math.Sqrt(2.0 - MathUtil.SqrtTwo);
 		const double COS_BACKUP = 0.92387953251128674; //0.5 * Math.Sqrt(2.0 + MathUtil.SqrtTwo);
 
-		void PermuteColumns(in double[] B, ref Vector4d V) {
+		static void PermuteColumns(in double[] B, ref Vector4d V) {
 			var magx = (B[0] * B[0]) + (B[3] * B[3]) + (B[6] * B[6]);
 			var magy = (B[1] * B[1]) + (B[4] * B[4]) + (B[7] * B[7]);
 			var magz = (B[2] * B[2]) + (B[5] * B[5]) + (B[8] * B[8]);
@@ -318,9 +311,7 @@ namespace RNumerics
 
 		}
 
-
-
-		void SwapColsNeg(in double[] B, in int i, in int j) {
+		static void SwapColsNeg(in double[] B, in int i, in int j) {
 			var tmp = -B[i];
 			B[i] = B[j];
 			B[j] = tmp;

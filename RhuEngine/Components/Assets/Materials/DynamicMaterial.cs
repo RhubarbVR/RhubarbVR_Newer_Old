@@ -129,7 +129,7 @@ namespace RhuEngine.Components
 			get => (bool)GetParam("WIREFRAME_RHUBARB_CUSTOM").Item1.GetData();
 			set => TrySet("WIREFRAME_RHUBARB_CUSTOM", value);
 		}
-		private void LoadMaterial() {
+		private static void LoadMaterial() {
 			//if (!Engine.EngineLink.CanRender) {
 			//	return;
 			//}

@@ -61,7 +61,7 @@ namespace RhubarbCloudClient
 				LocalInfo? localInfo = null;
 				try {
 					var mainobject = JObject.Parse(ReadFile(item));
-					localInfo = new LocalInfo { name = (string)mainobject["name"], languageName = (string)mainobject["languageName"], authors = ((mainobject["authors"]).ToObject<List<string>>()).ToArray() };
+					localInfo = new LocalInfo { name = (string)mainobject["name"], languageName = (string)mainobject["languageName"], authors = mainobject["authors"].ToObject<List<string>>().ToArray() };
 				}
 				catch { }
 				if (localInfo is not null) {
@@ -79,7 +79,7 @@ namespace RhubarbCloudClient
 				KeyLayoutInfo? localInfo = null;
 				try {
 					var mainobject = JObject.Parse(ReadFile(item));
-					localInfo = new KeyLayoutInfo { name = (string)mainobject["name"], id = (int)mainobject["id"], authors = ((mainobject["authors"]).ToObject<List<string>>()).ToArray() };
+					localInfo = new KeyLayoutInfo { name = (string)mainobject["name"], id = (int)mainobject["id"], authors = mainobject["authors"].ToObject<List<string>>().ToArray() };
 				}
 				catch { }
 				if (localInfo is not null) {
@@ -100,7 +100,7 @@ namespace RhubarbCloudClient
 				JObject mainobject = null;
 				try {
 					mainobject = JObject.Parse(ReadFile(item));
-					localInfo = new KeyLayoutInfo { name = (string)mainobject["name"], id = (int)mainobject["id"], authors = ((mainobject["authors"]).ToObject<List<string>>()).ToArray() };
+					localInfo = new KeyLayoutInfo { name = (string)mainobject["name"], id = (int)mainobject["id"], authors = mainobject["authors"].ToObject<List<string>>().ToArray() };
 				}
 				catch { }
 				if (localInfo is not null) {

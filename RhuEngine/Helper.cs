@@ -26,70 +26,6 @@ namespace RhuEngine
 			}
 		}
 
-		public static int RuneLength(this string value) {
-			return value.EnumerateRunes().Count();
-		}
-		public static string ToNormalString(this IEnumerable<Rune> value) {
-			return string.Join(string.Empty, value.Select((x) => x.ToString()).ToArray());
-		}
-
-		public static string RuneSubstring(this string value, int startIndex, int endlength = int.MaxValue) {
-			var newstring = new List<Rune>();
-			var runeIndex = 0;
-			var endIndex = startIndex + endlength;
-			foreach (var item in value.EnumerateRunes()) {
-				if (runeIndex >= startIndex && runeIndex <= endIndex) {
-					newstring.Add(item);
-				}
-				runeIndex++;
-			}
-			return newstring.ToNormalString();
-		}
-		public static string AutoBrakeLine(this string value, int amount = 155) {
-			var newSTreing = "";
-			var currentAmount = 0;
-			foreach (var item in value) {
-				newSTreing += item;
-				currentAmount++;
-				if (item == '\n') {
-					currentAmount = 0;
-				}
-				if (currentAmount >= amount) {
-					newSTreing += '\n';
-					currentAmount = 0;
-				}
-			}
-			return newSTreing;
-		}
-
-		public static string ApplyStringFunctions(this string value) {
-			var newstring = new List<Rune>();
-			foreach (var currentchar in value.EnumerateRunes()) {
-				if (currentchar == new Rune('\r')) {
-					newstring.Add(new Rune('\n'));
-				}
-				else if (currentchar == new Rune('\b')) {
-					if (newstring.Count != 0) {
-						newstring.RemoveAt(newstring.Count - 1);
-					}
-				}
-				else {
-					newstring.Add(currentchar);
-				}
-			}
-			return newstring.ToNormalString();
-		}
-
-		public static string CleanPath(this string path) {
-			var regexSearch = new string(Path.GetInvalidPathChars());
-			var r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
-			return r.Replace(path, "");
-		}
-
-		public static string TouchUpPath(this string path) {
-			return path.Replace("\\", "/");
-		}
-
 		public static Matrix RotNormalized(this Matrix oldmatrix) {
 			oldmatrix.Decompose(out var trans, out var rot, out var scale);
 			return Matrix.TRS(trans, rot, scale);
@@ -304,13 +240,9 @@ namespace RhuEngine
 		}
 
 		public static Type GetHighestAttributeInherit<T>(this Type type) where T : Attribute {
-			if (type.GetCustomAttribute<T>() is not null) {
-				return type;
-			}
-			if (type.GetCustomAttribute<T>(true) is null) {
-				return null;
-			}
-			return type.BaseType?.GetHighestAttributeInherit<T>();
+			return type.GetCustomAttribute<T>() is not null
+				? type
+				: type.GetCustomAttribute<T>(true) is null ? null : (type.BaseType?.GetHighestAttributeInherit<T>());
 		}
 
 

@@ -25,6 +25,7 @@ namespace RhuEngine.Linker
 		public void Dispose() {
 			Inst.Dispose();
 			Inst = null;
+			GC.SuppressFinalize(this);
 		}
 	}
 }

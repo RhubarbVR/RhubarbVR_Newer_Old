@@ -30,7 +30,7 @@ namespace RhuEngine.Datatypes
 			return new NetPointer((position << 16) | (user & 0xFFFFuL));
 		}
 		[IgnoreMember]
-		public static NetPointer Blank = new();
+		public static readonly NetPointer Blank = new();
 		public string HexString() {
 			try {
 				var temp = BitConverter.ToString(BitConverter.GetBytes(id).Reverse().ToArray()).Replace("-", "");
@@ -66,7 +66,7 @@ namespace RhuEngine.Datatypes
 			return HexString();
 		}
 
-		public static explicit operator NetPointer(string data) => new NetPointer(Convert.ToUInt64(data, 16));
+		public static explicit operator NetPointer(string data) => new(Convert.ToUInt64(data, 16));
 
 		public static bool operator ==(NetPointer a, NetPointer b) => a.Equals(b);
 		public static bool operator !=(NetPointer a, NetPointer b) => !a.Equals(b);

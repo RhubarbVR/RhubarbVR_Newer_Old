@@ -136,12 +136,12 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				}
 				else {
 					if (LinkedComp.World.IsPersonalSpace) {
-						EngineRunner._.AddChild(node);
-						node.Owner = EngineRunner._;
+						EngineRunnerHelpers._.AddChild(node);
+						node.Owner = EngineRunnerHelpers._;
 					}
 					else {
-						EngineRunner._.ThowAway.AddChild(node);
-						node.Owner = EngineRunner._.ThowAway;
+						EngineRunnerHelpers._.ThowAway.AddChild(node);
+						node.Owner = EngineRunnerHelpers._.ThowAway;
 					}
 				}
 			}
@@ -277,24 +277,24 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				}
 				else {
 					if (GoToEngineRoot) {
-						EngineRunner._.AddChild(node);
-						node.Owner = EngineRunner._;
+						EngineRunnerHelpers._.AddChild(node);
+						node.Owner = EngineRunnerHelpers._;
 					}
 					else {
-						EngineRunner._.ThowAway.AddChild(node);
-						node.Owner = EngineRunner._.ThowAway;
+						EngineRunnerHelpers._.ThowAway.AddChild(node);
+						node.Owner = EngineRunnerHelpers._.ThowAway;
 					}
 
 				}
 			}
 			else {
 				if (GoToEngineRoot) {
-					EngineRunner._.AddChild(node);
-					node.Owner = EngineRunner._;
+					EngineRunnerHelpers._.AddChild(node);
+					node.Owner = EngineRunnerHelpers._;
 				}
 				else {
-					EngineRunner._.ThowAway.AddChild(node);
-					node.Owner = EngineRunner._.ThowAway;
+					EngineRunnerHelpers._.ThowAway.AddChild(node);
+					node.Owner = EngineRunnerHelpers._.ThowAway;
 				}
 			}
 		}

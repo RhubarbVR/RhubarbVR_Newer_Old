@@ -277,14 +277,7 @@ namespace RNumerics
 			return this == (Vector2f)obj;
 		}
 		public override int GetHashCode() {
-			unchecked // Overflow is fine, just wrap
-			{
-				var hash = (int)2166136261;
-				// Suitable nullity checks etc, of course :)
-				hash = (hash * 16777619) ^ x.GetHashCode();
-				hash = (hash * 16777619) ^ y.GetHashCode();
-				return hash;
-			}
+			return HashCode.Combine(x, y);
 		}
 
 		public Vector2f ClosestPointOnLine(in Vector2f first, in Vector2f next) {

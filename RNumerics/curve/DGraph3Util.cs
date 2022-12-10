@@ -68,9 +68,7 @@ namespace RNumerics
 				var path = new DCurve3() { Closed = false };
 				var pathE = bWantLoopIndices ? new List<int>() : null;
 				path.AppendVertex(graph.GetVertex(vid));
-				if (pathE != null) {
-					pathE.Add(eid);
-				}
+				pathE?.Add(eid);
 
 				while (true) {
 					used.Add(eid);
@@ -82,9 +80,7 @@ namespace RNumerics
 						break;  // done!
 					}
 
-					if (pathE != null) {
-						pathE.Add(eid);
-					}
+					pathE?.Add(eid);
 				}
 				if (reverse) {
 					path.Reverse();
@@ -120,9 +116,7 @@ namespace RNumerics
 					var path = new DCurve3() { Closed = false };
 					var pathE = bWantLoopIndices ? new List<int>() : null;
 					path.AppendVertex(graph.GetVertex(vid));
-					if (pathE != null) {
-						pathE.Add(eid);
-					}
+					pathE?.Add(eid);
 
 					while (true) {
 						used.Add(eid);
@@ -134,9 +128,7 @@ namespace RNumerics
 							break;  // done!
 						}
 
-						if (pathE != null) {
-							pathE.Add(eid);
-						}
+						pathE?.Add(eid);
 					}
 
 					// we could end up back at our start junction vertex!
@@ -199,9 +191,7 @@ namespace RNumerics
 				var poly = new DCurve3() { Closed = true };
 				var polyE = bWantLoopIndices ? new List<int>() : null;
 				poly.AppendVertex(graph.GetVertex(vid));
-				if (polyE != null) {
-					polyE.Add(eid);
-				}
+				polyE?.Add(eid);
 
 				while (true) {
 					used.Add(eid);
@@ -209,9 +199,7 @@ namespace RNumerics
 					eid = next.a;
 					vid = next.b;
 					poly.AppendVertex(graph.GetVertex(vid));
-					if (polyE != null) {
-						polyE.Add(eid);
-					}
+					polyE?.Add(eid);
 
 					if (eid == int.MaxValue || junctions.Contains(vid)) {
 						throw new Exception("how did this happen??");

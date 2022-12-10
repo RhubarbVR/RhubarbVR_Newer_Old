@@ -27,14 +27,14 @@ namespace RhubarbVR.Bindings
 	{
 		public IWindow CreateNewWindow() {
 			var newWindow = new GodotWindow();
-			EngineRunner._.RunOnMainThread(() => {
+			EngineRunnerHelpers._.RunOnMainThread(() => {
 				var newWin = new Window {
 					TransparentBg = true
 				};
 				var con = new ConnectedViewport();
 				newWin.AddChild(con);
 				con.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-				EngineRunner._.AddChild(newWin);
+	EngineRunnerHelpers._.AddChild(newWin);
 				newWindow.LoadInValue(newWin);
 			});
 			return newWindow;
@@ -56,7 +56,7 @@ namespace RhubarbVR.Bindings
 		public int Width { get => window.Size.x; set => window.Size = new Godot.Vector2i(value, window.Size.y); }
 		public int Height { get => window.Size.y; set => window.Size = new Godot.Vector2i(window.Size.x, value); }
 		public string Title { get => window.Title; set => window.Title = value; }
-		public RNumerics.Vector2i Position { get => new RNumerics.Vector2i(window.Position.x, window.Position.y); set => window.Position = new Godot.Vector2i(value.x, value.y); }
+		public RNumerics.Vector2i Position { get => new(window.Position.x, window.Position.y); set => window.Position = new Godot.Vector2i(value.x, value.y); }
 
 		public bool LoadedIn => window is not null;
 
@@ -101,7 +101,7 @@ namespace RhubarbVR.Bindings
 		public void Dispose() {
 			window?.QueueFree();
 			window = null;
-			EngineRunner._.engine.windowManager.UnLoadWindow(this);
+			EngineRunnerHelpers._.engine.windowManager.UnLoadWindow(this);
 		}
 
 		public void WaitOnLoadedIn(Action<IWindow> action) {

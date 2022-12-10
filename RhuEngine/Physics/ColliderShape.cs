@@ -58,6 +58,7 @@ namespace RhuEngine.Physics
 			if(obj is IDisposable disposable) {
 				disposable.Dispose();
 			}
+			GC.SuppressFinalize(this);
 		}
 	}
 	public class RCompoundShape : ColliderShape
@@ -111,6 +112,8 @@ namespace RhuEngine.Physics
 			if (obj is IDisposable disposable) {
 				disposable.Dispose();
 			}
+			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 
 		public RCompoundShape() {

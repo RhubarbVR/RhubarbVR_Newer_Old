@@ -19,6 +19,7 @@ namespace RhubarbVR.Bindings.FontBindings
 		public RFont RFont;
 		public void Dispose() {
 			FontFile.Free();
+			GC.SuppressFinalize(this);
 		}
 
 		public void Init(RFont rFont) {

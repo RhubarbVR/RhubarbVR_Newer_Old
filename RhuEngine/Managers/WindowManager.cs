@@ -129,9 +129,6 @@ namespace RhuEngine.Managers
 	/// </summary>
 	public sealed class WindowManager : IManager
 	{
-
-		private Engine _engine;
-
 		private readonly List<IWindow> _windows = new();
 
 		public IWindow MainWindow { get; private set; }
@@ -139,7 +136,6 @@ namespace RhuEngine.Managers
 		public IWindowManagerLink windowManagerLink;
 
 		public void Init(Engine engine) {
-			_engine = engine;
 			if (windowManagerLink is null) {
 				return;//Stop no window manager
 			}

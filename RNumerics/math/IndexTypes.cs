@@ -120,16 +120,9 @@ namespace RNumerics
 			return this == (Index3i)obj;
 		}
 		public override int GetHashCode() {
-			unchecked // Overflow is fine, just wrap
-			{
-				var hash = (int)2166136261;
-				// Suitable nullity checks etc, of course :)
-				hash = (hash * 16777619) ^ a.GetHashCode();
-				hash = (hash * 16777619) ^ b.GetHashCode();
-				hash = (hash * 16777619) ^ c.GetHashCode();
-				return hash;
-			}
+			return HashCode.Combine(a, b, c);
 		}
+
 		public int CompareTo(Index3i other) {
 			if (a != other.a) {
 				return a < other.a ? -1 : 1;
@@ -243,15 +236,9 @@ namespace RNumerics
 			return this == (Index2i)obj;
 		}
 		public override int GetHashCode() {
-			unchecked // Overflow is fine, just wrap
-			{
-				var hash = (int)2166136261;
-				// Suitable nullity checks etc, of course :)
-				hash = (hash * 16777619) ^ a.GetHashCode();
-				hash = (hash * 16777619) ^ b.GetHashCode();
-				return hash;
-			}
+			return HashCode.Combine(a, b);
 		}
+
 		public int CompareTo(Index2i other) {
 			if (a != other.a) {
 				return a < other.a ? -1 : 1;
@@ -271,7 +258,7 @@ namespace RNumerics
 			return string.Format("[{0},{1}]", a, b);
 		}
 
-		public TypeCode GetTypeCode() {
+		public static TypeCode GetTypeCode() {
 			return TypeCode.Object;
 		}
 	}
@@ -391,17 +378,9 @@ namespace RNumerics
 			return this == (Index4i)obj;
 		}
 		public override int GetHashCode() {
-			unchecked // Overflow is fine, just wrap
-			{
-				var hash = (int)2166136261;
-				// Suitable nullity checks etc, of course :)
-				hash = (hash * 16777619) ^ a.GetHashCode();
-				hash = (hash * 16777619) ^ b.GetHashCode();
-				hash = (hash * 16777619) ^ c.GetHashCode();
-				hash = (hash * 16777619) ^ d.GetHashCode();
-				return hash;
-			}
+			return HashCode.Combine(a, b, c, d);
 		}
+
 		public int CompareTo(in Index4i other) {
 			if (a != other.a) {
 				return a < other.a ? -1 : 1;

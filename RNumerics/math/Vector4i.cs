@@ -141,16 +141,7 @@ namespace RNumerics
 			return this == (Vector4i)obj;
 		}
 		public override int GetHashCode() {
-			unchecked // Overflow is fine, just wrap
-			{
-				var hash = (int)2166136261;
-				// Suitable nullity checks etc, of course :)
-				hash = (hash * 16777619) ^ x.GetHashCode();
-				hash = (hash * 16777619) ^ y.GetHashCode();
-				hash = (hash * 16777619) ^ z.GetHashCode();
-				hash = (hash * 16777619) ^ w.GetHashCode();
-				return hash;
-			}
+			return HashCode.Combine(x, y, z, w);
 		}
 		public int CompareTo(Vector4i other) {
 			if (x != other.x) {

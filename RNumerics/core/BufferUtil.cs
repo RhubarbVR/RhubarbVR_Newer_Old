@@ -522,7 +522,7 @@ namespace RNumerics
 		/// </summary>
 		static public byte[] CompressZLib(in byte[] buffer, in bool bFast) {
 			var ms = new MemoryStream();
-			var zip = new DeflateStream(ms, (bFast) ? CompressionLevel.Fastest : CompressionLevel.Optimal, true);
+			var zip = new DeflateStream(ms, bFast ? CompressionLevel.Fastest : CompressionLevel.Optimal, true);
 			zip.Write(buffer, 0, buffer.Length);
 			zip.Close();
 			ms.Position = 0;

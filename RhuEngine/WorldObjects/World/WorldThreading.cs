@@ -15,9 +15,10 @@ namespace RhuEngine.WorldObjects
 	public static class WorldThreadSafty
 	{
 		[ThreadStatic]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Non-constant fields should not be visible", Justification = "<Pending>")]
 		public static uint MethodCalls = 0;
 
-		public static uint MaxCalls = 25;
+		public const uint MAX_CALLS = 25;
 	}
 
 	public partial class World

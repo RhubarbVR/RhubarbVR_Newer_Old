@@ -450,7 +450,7 @@ namespace RNumerics
 		}
 
 		// A helper for generating Givens rotation sine and cosine robustly.
-		private void GetSinCos(in double x,in double y, ref double cs, ref double sn) {
+		private static void GetSinCos(in double x,in double y, ref double cs, ref double sn) {
 			// Solves sn*x + cs*y = 0 robustly.
 			double tau;
 			if (y != 0) {

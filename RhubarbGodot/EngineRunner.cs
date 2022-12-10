@@ -12,6 +12,7 @@ using System.Collections;
 using RNumerics;
 using RhubarbVR.Bindings.Input;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1050:Declare types in namespaces", Justification = "<Pending>")]
 public partial class EngineRunner : Node3D, IRTime
 {
 
@@ -36,10 +37,7 @@ public partial class EngineRunner : Node3D, IRTime
 	public Engine engine;
 
 	[ThreadStatic]
-	public static bool IsMainThread = false;
-
-	public static EngineRunner _;
-
+	private static bool _isMainThread = false;
 	public OutputCapture outputCapture;
 
 	public GodotEngineLink link;
@@ -47,7 +45,7 @@ public partial class EngineRunner : Node3D, IRTime
 	private readonly List<Action> _runOnMainThread = new();
 
 	public void RunOnMainThread(Action action) {
-		if (IsMainThread) {
+		if (_isMainThread) {
 			action?.Invoke();
 		}
 		else {
@@ -69,13 +67,13 @@ public partial class EngineRunner : Node3D, IRTime
 			RLog.Err("Engine already running");
 			return;
 		}
-		if (!IsMainThread) {
+		if (!_isMainThread) {
 			if (Thread.CurrentThread.Name != "Godot Main Thread") {
 				Thread.CurrentThread.Name = "Godot Main Thread";
 			}
 			Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
-			IsMainThread = true;
-			_ = this;
+			_isMainThread = true;
+			EngineRunnerHelpers._ = this;
 		}
 		outputCapture = new OutputCapture();
 		link = new GodotEngineLink(this);
@@ -148,7 +146,7 @@ public partial class EngineRunner : Node3D, IRTime
 				engine.IsCloseing = true;
 				engine.Dispose();
 				engine = null;
-				Engine.MainEngine = null;
+				EngineHelpers.MainEngine = null;
 			}
 		}
 		catch (Exception ex) {

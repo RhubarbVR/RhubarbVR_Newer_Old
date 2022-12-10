@@ -111,6 +111,7 @@ namespace RhuEngine.WorldObjects
 			OnDispose = null;
 			Parent = null;
 			ClearAllSyncMembers();
+			GC.SuppressFinalize(this);
 		}
 
 		protected virtual void FirstCreation() {
@@ -140,7 +141,7 @@ namespace RhuEngine.WorldObjects
 				foreach (var arguiminet in arguments) {
 					var isVailed = false;
 					var types = GetType().GetCustomAttributes<GenericTypeConstraintAttribute>(true);
-					if (types.Count() == 0) {
+					if (!types.Any()) {
 						isVailed = true;
 					}
 					foreach (var item in types) {
@@ -195,12 +196,12 @@ namespace RhuEngine.WorldObjects
 				}
 				IsInitialized = true;
 			}
-			catch (Exception e) {
+			catch {
 				try {
 					Dispose();
 				}
 				catch { }
-				throw e;
+				throw;
 			}
 		}
 
@@ -263,7 +264,7 @@ namespace RhuEngine.WorldObjects
 								else {
 									var prams = method.GetParameters();
 									if (prams.Length == 0) {
-										((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[0] { });
+										((IChangeable)instance).Changed += (obj) => method.Invoke(this, Array.Empty<object>());
 									}
 									else if (prams[0].ParameterType == typeof(IChangeable)) {
 										((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[1] { obj });

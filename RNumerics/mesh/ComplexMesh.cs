@@ -287,7 +287,7 @@ namespace RNumerics
 		/// <summary>
 		/// Normalized morphing between morph targets.
 		/// </summary>
-		MorphNormalized = 0x400,
+		MorphNormalized = 0x600,
 		/// <summary>
 		/// Relative morphing between morph targets.
 		/// </summary>

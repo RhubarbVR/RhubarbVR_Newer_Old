@@ -964,7 +964,7 @@ namespace RNumerics
 
 		// Simplex/OpenSimplex2 Noise
 
-		private float SingleSimplex(in int seed, in FNLfloat x, in FNLfloat y) {
+		private static float SingleSimplex(in int seed, in FNLfloat x, in FNLfloat y) {
 			// 2D OpenSimplex2 case uses the same algorithm as ordinary Simplex.
 
 			const float SQRT3 = 1.7320508075688772935274463415059f;
@@ -1020,7 +1020,7 @@ namespace RNumerics
 			return (n0 + n1 + n2) * 99.83685446303647f;
 		}
 
-		private float SingleOpenSimplex2(int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
+		private static float SingleOpenSimplex2(int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
 			// 3D OpenSimplex2 case uses two offset rotated cube grids.
 
 			/*
@@ -1110,7 +1110,7 @@ namespace RNumerics
 
 		// OpenSimplex2S Noise
 
-		private float SingleOpenSimplex2S(in int seed, in FNLfloat x, in FNLfloat y) {
+		private static float SingleOpenSimplex2S(in int seed, in FNLfloat x, in FNLfloat y) {
 			// 2D OpenSimplex2S case is a modified 2D simplex noise.
 
 			const FNLfloat SQRT3 = (FNLfloat)1.7320508075688772935274463415059;
@@ -1221,7 +1221,7 @@ namespace RNumerics
 			return value * 18.24196194486065f;
 		}
 
-		private float SingleOpenSimplex2S(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
+		private static float SingleOpenSimplex2S(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
 			// 3D OpenSimplex2S case uses two offset rotated cube grids.
 
 			/*
@@ -1635,7 +1635,7 @@ namespace RNumerics
 
 		// Perlin Noise
 
-		private float SinglePerlin(in int seed, in FNLfloat x, in FNLfloat y) {
+		private static float SinglePerlin(in int seed, in FNLfloat x, in FNLfloat y) {
 			var x0 = FastFloor(x);
 			var y0 = FastFloor(y);
 
@@ -1658,7 +1658,7 @@ namespace RNumerics
 			return Lerp(xf0, xf1, ys) * 1.4247691104677813f;
 		}
 
-		private float SinglePerlin(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
+		private static float SinglePerlin(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
 			var x0 = FastFloor(x);
 			var y0 = FastFloor(y);
 			var z0 = FastFloor(z);
@@ -1695,7 +1695,7 @@ namespace RNumerics
 
 		// Value Cubic Noise
 
-		private float SingleValueCubic(in int seed, in FNLfloat x, in FNLfloat y) {
+		private static float SingleValueCubic(in int seed, in FNLfloat x, in FNLfloat y) {
 			var x1 = FastFloor(x);
 			var y1 = FastFloor(y);
 
@@ -1723,7 +1723,7 @@ namespace RNumerics
 				ys) * (1 / (1.5f * 1.5f));
 		}
 
-		private float SingleValueCubic(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
+		private static float SingleValueCubic(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
 			var x1 = FastFloor(x);
 			var y1 = FastFloor(y);
 			var z1 = FastFloor(z);
@@ -1778,7 +1778,7 @@ namespace RNumerics
 
 		// Value Noise
 
-		private float SingleValue(in int seed, in FNLfloat x, in FNLfloat y) {
+		private static float SingleValue(in int seed, in FNLfloat x, in FNLfloat y) {
 			var x0 = FastFloor(x);
 			var y0 = FastFloor(y);
 
@@ -1796,7 +1796,7 @@ namespace RNumerics
 			return Lerp(xf0, xf1, ys);
 		}
 
-		private float SingleValue(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
+		private static float SingleValue(in int seed, in FNLfloat x, in FNLfloat y, in FNLfloat z) {
 			var x0 = FastFloor(x);
 			var y0 = FastFloor(y);
 			var z0 = FastFloor(z);
@@ -1964,7 +1964,7 @@ namespace RNumerics
 
 		// Domain Warp Basic Grid
 
-		private void SingleDomainWarpBasicGrid(in int seed, in float warpAmp, in float frequency, in FNLfloat x, in FNLfloat y, ref FNLfloat xr, ref FNLfloat yr) {
+		private static void SingleDomainWarpBasicGrid(in int seed, in float warpAmp, in float frequency, in FNLfloat x, in FNLfloat y, ref FNLfloat xr, ref FNLfloat yr) {
 			var xf = x * frequency;
 			var yf = y * frequency;
 
@@ -1996,7 +1996,7 @@ namespace RNumerics
 			yr += Lerp(ly0x, ly1x, ys) * warpAmp;
 		}
 
-		private void SingleDomainWarpBasicGrid(in int seed, in float warpAmp, in float frequency, in FNLfloat x, in FNLfloat y, in FNLfloat z, ref FNLfloat xr, ref FNLfloat yr, ref FNLfloat zr) {
+		private static void SingleDomainWarpBasicGrid(in int seed, in float warpAmp, in float frequency, in FNLfloat x, in FNLfloat y, in FNLfloat z, ref FNLfloat xr, ref FNLfloat yr, ref FNLfloat zr) {
 			var xf = x * frequency;
 			var yf = y * frequency;
 			var zf = z * frequency;
@@ -2055,7 +2055,7 @@ namespace RNumerics
 
 
 		// Domain Warp Simplex/OpenSimplex2
-		private void SingleDomainWarpSimplexGradient(in int seed, in float warpAmp, in float frequency,  FNLfloat x, FNLfloat y, ref FNLfloat xr, ref FNLfloat yr, in bool outGradOnly) {
+		private static void SingleDomainWarpSimplexGradient(in int seed, in float warpAmp, in float frequency,  FNLfloat x, FNLfloat y, ref FNLfloat xr, ref FNLfloat yr, in bool outGradOnly) {
 			const float SQRT3 = 1.7320508075688772935274463415059f;
 			const float G2 = (3 - SQRT3) / 6;
 
@@ -2157,7 +2157,7 @@ namespace RNumerics
 			yr += vy * warpAmp;
 		}
 
-		private void SingleDomainWarpOpenSimplex2Gradient(int seed, in float warpAmp, in float frequency, FNLfloat x, FNLfloat y, FNLfloat z, ref FNLfloat xr, ref FNLfloat yr, ref FNLfloat zr, in bool outGradOnly) {
+		private static void SingleDomainWarpOpenSimplex2Gradient(int seed, in float warpAmp, in float frequency, FNLfloat x, FNLfloat y, FNLfloat z, ref FNLfloat xr, ref FNLfloat yr, ref FNLfloat zr, in bool outGradOnly) {
 			x *= frequency;
 			y *= frequency;
 			z *= frequency;

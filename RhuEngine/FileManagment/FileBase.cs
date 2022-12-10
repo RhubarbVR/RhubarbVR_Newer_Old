@@ -11,7 +11,7 @@ namespace RhuEngine
 		public abstract string Name { get; set; }
 
 
-		public string Path => System.IO.Path.Combine((Parrent?.Path ?? Drive?.Path ?? "NULL://"), Name);
+		public string Path => System.IO.Path.Combine(Parrent?.Path ?? Drive?.Path ?? "NULL://", Name);
 
 		public abstract IFolder Parrent { get; }
 

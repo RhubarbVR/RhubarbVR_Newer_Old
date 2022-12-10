@@ -117,14 +117,13 @@ namespace RhuEngine.Managers
 
 
 		public void UpdateHash() {
-			using (var mD5CryptoServiceProvider = new MD5CryptoServiceProvider()) {
-				var concatenatedStream = new ConcatenatedStream();
-				concatenatedStream.Enqueue(new MemoryStream(BitConverter.GetBytes(10)));
-				//AddExtraToHash concatenatedStream.Enqueue(DataFormClassesInDLLS)
-				var inArray = mD5CryptoServiceProvider.ComputeHash(concatenatedStream);
-				Client.ClientCompatibility = Convert.ToBase64String(inArray);
-				RLog.Info("Client Compatibility: " + Client.ClientCompatibility);
-			}
+			var hasher = SHA256.Create();
+			var concatenatedStream = new ConcatenatedStream();
+			concatenatedStream.Enqueue(new MemoryStream(BitConverter.GetBytes(10)));
+			//AddExtraToHash concatenatedStream.Enqueue(DataFormClassesInDLLS)
+			var inArray = hasher.ComputeHash(concatenatedStream);
+			Client.ClientCompatibility = Convert.ToBase64String(inArray);
+			RLog.Info("Client Compatibility: " + Client.ClientCompatibility);
 		}
 
 		public void Step() {

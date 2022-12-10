@@ -290,6 +290,7 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 
 	}

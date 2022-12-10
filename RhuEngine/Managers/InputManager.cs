@@ -137,7 +137,7 @@ namespace RhuEngine.Managers
 		/// <summary>
 		/// Returns a value from -1 to 1 for a given input string.
 		/// </summary>
-		private float GetActionStringValue(string v) {
+		public float GetActionStringValue(string v) {
 			return Math.Min(GetActionStringValue(v, Handed.Left) + GetActionStringValue(v, Handed.Right) + GetActionStringValue(v, Handed.Max), 1f);
 		}
 

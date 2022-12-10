@@ -6,6 +6,7 @@ using System.Reflection;
 
 namespace RhuEngine.WorldObjects.ECS
 {
+	[AttributeUsage(AttributeTargets.Class)]
 	public class NotLinkedRenderingComponentAttribute : Attribute
 	{
 
@@ -16,8 +17,6 @@ namespace RhuEngine.WorldObjects.ECS
 		protected virtual bool AddToUpdateList => true;
 		public IWorldLink WorldLink { get; set; }
 
-		public static Dictionary<Type, Type> loadedCasts = new();
-
 		private void BuildRenderLink() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
@@ -26,7 +25,7 @@ namespace RhuEngine.WorldObjects.ECS
 				if (GetType().GetCustomAttribute<NotLinkedRenderingComponentAttribute>() is not null) {
 					return;
 				}
-				if (!loadedCasts.TryGetValue(GetType(), out var linker)) {
+				if (!LinkedWorldComponentHelpers.loadedCasts.TryGetValue(GetType(), out var linker)) {
 					var generic = typeof(IWorldLink<>).MakeGenericType(GetType());
 					var types = from a in AppDomain.CurrentDomain.GetAssemblies()
 								from t in a.GetTypes()
@@ -38,7 +37,7 @@ namespace RhuEngine.WorldObjects.ECS
 						throw new Exception("No linker found or to many found");
 					}
 					linker = types.First();
-					loadedCasts.Add(GetType(), linker);
+					LinkedWorldComponentHelpers.loadedCasts.Add(GetType(), linker);
 				}
 				WorldLink = (IWorldLink)Activator.CreateInstance(linker);
 				WorldLink.LinkCompGen = this;
@@ -98,6 +97,7 @@ namespace RhuEngine.WorldObjects.ECS
 				WorldLink = null;
 			});
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 
 		internal void RunRender() {

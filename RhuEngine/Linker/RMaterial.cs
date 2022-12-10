@@ -121,6 +121,7 @@ namespace RhuEngine.Linker
 		public void Dispose() {
 			OnDispose?.Invoke(this);
 			Target = null;
+			GC.SuppressFinalize(this);
 		}
 
 		/// <summary>Information and details about the shader parameters

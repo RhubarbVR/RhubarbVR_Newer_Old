@@ -62,7 +62,7 @@ namespace OpusDotNet
 					throw new ArgumentException("Value must be one of the following: 8000, 12000, 16000, 24000 or 48000.", nameof(sampleRate));
 			}
 
-			if (channels < 1 || channels > 2) {
+			if (channels is < 1 or > 2) {
 				throw new ArgumentOutOfRangeException(nameof(channels), "Value must be between 1 and 2.");
 			}
 

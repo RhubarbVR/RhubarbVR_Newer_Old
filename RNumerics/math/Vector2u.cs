@@ -85,15 +85,9 @@ namespace RNumerics
 			return this == (Vector2u)obj;
 		}
 		public override int GetHashCode() {
-			unchecked {
-				var hash = (int)2166136261;
-				// Suitable nullity checks etc, of course :)
-				hash = (hash * 16777619) ^ x.GetHashCode();
-				hash = (hash * 16777619) ^ y.GetHashCode();
-				return hash;
-			}
-
+			return HashCode.Combine(x, y);
 		}
+
 		public int CompareTo(Vector2u other) {
 			if (x != other.x) {
 				return x < other.x ? -1 : 1;

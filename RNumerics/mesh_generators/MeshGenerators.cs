@@ -180,31 +180,31 @@ namespace RNumerics
 		}
 
 
-		protected Vector3d Bilerp(in Vector3d v00, in Vector3d v10, in Vector3d v11, in Vector3d v01, in double tx, in double ty) {
+		protected static Vector3d Bilerp(in Vector3d v00, in Vector3d v10, in Vector3d v11, in Vector3d v01, in double tx, in double ty) {
 			var a = Vector3d.Lerp( v00, v01, ty);
 			var b = Vector3d.Lerp( v10, v11, ty);
 			return Vector3d.Lerp(a, b, tx);
 		}
 
-		protected Vector2d Bilerp(in Vector2d v00, in Vector2d v10, in Vector2d v11, in Vector2d v01, in double tx, in double ty) {
+		protected static Vector2d Bilerp(in Vector2d v00, in Vector2d v10, in Vector2d v11, in Vector2d v01, in double tx, in double ty) {
 			var a = Vector2d.Lerp( v00,  v01, ty);
 			var b = Vector2d.Lerp( v10,  v11, ty);
 			return Vector2d.Lerp(a, b, tx);
 		}
-		protected Vector2f Bilerp(in Vector2f v00, in Vector2f v10, in Vector2f v11, in Vector2f v01, in float tx, in float ty) {
+		protected static Vector2f Bilerp(in Vector2f v00, in Vector2f v10, in Vector2f v11, in Vector2f v01, in float tx, in float ty) {
 			var a = Vector2f.Lerp( v00, v01, ty);
 			var b = Vector2f.Lerp( v10, v11, ty);
 			return Vector2f.Lerp(a, b, tx);
 		}
 
-		protected Vector3i Bilerp(in Vector3i v00, in Vector3i v10, in Vector3i v11, in Vector3i v01, in double tx, in double ty) {
+		protected static Vector3i Bilerp(in Vector3i v00, in Vector3i v10, in Vector3i v11, in Vector3i v01, in double tx, in double ty) {
 			var a = Vector3d.Lerp((Vector3d)v00, (Vector3d)v01, ty);
 			var b = Vector3d.Lerp((Vector3d)v10, (Vector3d)v11, ty);
 			var c = Vector3d.Lerp(a, b, tx);
 			return new Vector3i((int)Math.Round(c.x), (int)Math.Round(c.y), (int)Math.Round(c.z));
 		}
 
-		protected Vector3i Lerp(in Vector3i a, in Vector3i b, in double t) {
+		protected static Vector3i Lerp(in Vector3i a, in Vector3i b, in double t) {
 			var c = Vector3d.Lerp((Vector3d)a, (Vector3d)b, t);
 			return new Vector3i((int)Math.Round(c.x), (int)Math.Round(c.y), (int)Math.Round(c.z));
 		}

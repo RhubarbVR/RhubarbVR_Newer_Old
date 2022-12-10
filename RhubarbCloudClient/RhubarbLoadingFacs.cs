@@ -82,10 +82,7 @@ namespace RhubarbCloudClient
 
 		public static string GetRandomFactNoDate(Random random) {
 			var ran = random.Next(9);
-			if (ran <= 1) {
-				return GetRandomFunnyFact(random);
-			}
-			return ran <= 3 ? GetRandomFact(random) : GetRandomRhubarbFact(random);
+			return ran <= 1 ? GetRandomFunnyFact(random) : ran <= 3 ? GetRandomFact(random) : GetRandomRhubarbFact(random);
 		}
 
 		public static string GetRandomFact(Localisation loc) {

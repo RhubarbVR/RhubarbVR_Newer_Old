@@ -34,14 +34,7 @@ namespace RNumerics
 		}
 			
 		public override int GetHashCode() {
-			unchecked // Overflow is fine, just wrap
-			{
-				var hash = (int)2166136261;
-				// Suitable nullity checks etc, of course :)
-				hash = (hash * 16777619) ^ x.GetHashCode();
-				hash = (hash * 16777619) ^ y.GetHashCode();
-				return hash;
-			}
+			return HashCode.Combine(x, y);
 		}
 		[IgnoreMember]
 		public Vector2d Clean => new(double.IsNaN(x)?0:x, double.IsNaN(y) ? 0 : y);

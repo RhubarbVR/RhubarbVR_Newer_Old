@@ -599,6 +599,7 @@ namespace RhuEngine.Linker
 		public void Dispose() {
 			Inst.Dispose();
 			Inst = null;
+			GC.SuppressFinalize(this);
 		}
 		public void SetColors(int width, int height, Colorf[] colors) {
 			if (width * height != colors.Length) {

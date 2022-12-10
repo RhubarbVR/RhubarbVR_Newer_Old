@@ -265,7 +265,7 @@ namespace RNumerics
 
 
 		/// returns true if priority at higher is less than at lower
-		private bool Has_higher_priority(in T higher, in T lower) {
+		private static bool Has_higher_priority(in T higher, in T lower) {
 			return higher.Priority < lower.Priority;
 		}
 

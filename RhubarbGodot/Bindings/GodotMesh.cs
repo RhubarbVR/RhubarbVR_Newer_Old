@@ -85,7 +85,7 @@ namespace RhubarbVR.Bindings
 			instance3D = new MeshInstance3D();
 			targetMesh ??= MakeQuad();
 			instance3D.Mesh = targetMesh;
-			EngineRunner._.AddChild(instance3D);
+			EngineRunnerHelpers._.AddChild(instance3D);
 		}
 	}
 
@@ -288,7 +288,7 @@ namespace RhubarbVR.Bindings
 				switch (primitiveType) {
 					case RPrimitiveType.Point:
 						if (item.Indices.Count > 0) {
-							yield return (item.Indices[0]);
+							yield return item.Indices[0];
 						}
 						break;
 					case RPrimitiveType.Line:
@@ -303,23 +303,23 @@ namespace RhubarbVR.Bindings
 						break;
 					case RPrimitiveType.Triangle:
 						if (item.Indices.Count == 3) {
-							yield return (item.Indices[0]);
-							yield return (item.Indices[1]);
-							yield return (item.Indices[2]);
+							yield return item.Indices[0];
+							yield return item.Indices[1];
+							yield return item.Indices[2];
 						}
 						else if (item.Indices.Count == 4) {
-							yield return (item.Indices[0]);
-							yield return (item.Indices[1]);
-							yield return (item.Indices[2]);
-							yield return (item.Indices[0]);
-							yield return (item.Indices[2]);
-							yield return (item.Indices[3]);
+							yield return item.Indices[0];
+							yield return item.Indices[1];
+							yield return item.Indices[2];
+							yield return item.Indices[0];
+							yield return item.Indices[2];
+							yield return item.Indices[3];
 						}
 						else {
 							for (var i = 1; i < (item.Indices.Count - 1); i++) {
-								yield return (item.Indices[i]);
-								yield return (item.Indices[i + 1]);
-								yield return (item.Indices[0]);
+								yield return item.Indices[i];
+								yield return item.Indices[i + 1];
+								yield return item.Indices[0];
 							}
 						}
 						break;
@@ -387,7 +387,7 @@ namespace RhubarbVR.Bindings
 					cuve[i] = new Vector3f[complexMesh.Vertices.Count];
 					for (var x = 0; x < complexMesh.Vertices.Count; x++) {
 						if (complexMesh.TexCoords[i].Count > i) {
-							cuve[i][x] = (new Vector3f(complexMesh.TexCoords[i][x].x, complexMesh.TexCoords[i][x].y, complexMesh.TexCoords[i][x].z));
+							cuve[i][x] = new Vector3f(complexMesh.TexCoords[i][x].x, complexMesh.TexCoords[i][x].y, complexMesh.TexCoords[i][x].z);
 						}
 					}
 				}

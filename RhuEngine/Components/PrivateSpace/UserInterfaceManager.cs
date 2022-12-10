@@ -219,10 +219,15 @@ namespace RhuEngine.Components
 		private void ClearStart() {
 			_startListBox.Entity.DestroyChildren();
 		}
-
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
 		private void AddStartFolder(IFolder folder) {
 
 		}
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
 		private void AddStartItem(IFile file) {
 
 		}
@@ -231,18 +236,18 @@ namespace RhuEngine.Components
 		private void BuildAllPrograms() {
 			var e = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).Where(x => !x.IsAbstract).Where(x => x.IsAssignableTo(typeof(Program))).Where(x => x.GetCustomAttribute<ProgramHideAttribute>(true) is null);
 			foreach (var type in e) {
-				var info = type.GetProgramInfo();
+				var (ProgramName, icon) = type.GetProgramInfo();
 				var button = _startListBoxAllPrograms.Entity.AddChild(type.Name).AttachComponent<Button>();
 				button.MinSize.Value = new Vector2i(230, 50);
 				button.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
 				button.Alignment.Value = RButtonAlignment.Left;
 				button.IconAlignment.Value = RButtonAlignment.Left;
 				button.ExpandIcon.Value = true;
-				button.Text.Value = info.ProgramName;
-				button.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.Open") + " " + info.ProgramName;
+				button.Text.Value = ProgramName;
+				button.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.Open") + " " + ProgramName;
 				var asset = button.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 				button.Icon.Target = asset;
-				asset.LoadAsset(info.icon);
+				asset.LoadAsset(icon);
 				var delCaller = button.Entity.AttachComponent<DelegateCall>();
 				delCaller.action = () => {
 					ProgramManager.OpenProgram(type);
@@ -256,18 +261,18 @@ namespace RhuEngine.Components
 			if (type is null) {
 				return;
 			}
-			var info = type.GetProgramInfo();
+			var (ProgramName, icon) = type.GetProgramInfo();
 			var button = _startListBox.Entity.AddChild(type.Name).AttachComponent<Button>();
 			button.MinSize.Value = new Vector2i(230, 50);
 			button.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
 			button.Alignment.Value = RButtonAlignment.Left;
 			button.IconAlignment.Value = RButtonAlignment.Left;
 			button.ExpandIcon.Value = true;
-			button.Text.Value = info.ProgramName;
-			button.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.Open") + " " + info.ProgramName;
+			button.Text.Value = ProgramName;
+			button.ToolTipText.Value = Engine.localisationManager.GetLocalString("Common.Open") + " " + ProgramName;
 			var asset = button.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 			button.Icon.Target = asset;
-			asset.LoadAsset(info.icon);
+			asset.LoadAsset(icon);
 			var delCaller = button.Entity.AttachComponent<DelegateCall>();
 			delCaller.action = () => {
 				ProgramManager.OpenProgram(type);
@@ -276,6 +281,7 @@ namespace RhuEngine.Components
 			button.Pressed.Target = delCaller.CallDelegate;
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
 		private void AddTaskBarItem(IFile file) {
 			if (file is null) {
 				return;

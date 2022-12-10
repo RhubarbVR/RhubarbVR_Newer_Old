@@ -124,6 +124,7 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 			catch { }
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 	}
 }

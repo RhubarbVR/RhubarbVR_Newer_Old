@@ -30,13 +30,13 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Developer" })]
 	public sealed class DevToolsProgram : Program
 	{
-		public RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.Mouse;
+		public static RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.Mouse;
 
-		public string ProgramNameLocName => "Programs.DevTools.Name";
+		public static string ProgramNameLocName => "Programs.DevTools.Name";
 
-		public override RTexture2D ProgramIcon => Engine.MainEngine.staticResources.IconSheet.GetElement(IconFind);
+		public override RTexture2D ProgramIcon => EngineHelpers.MainEngine.staticResources.IconSheet.GetElement(IconFind);
 
-		public override string ProgramName => Engine.MainEngine.localisationManager.GetLocalString(ProgramNameLocName);
+		public override string ProgramName => EngineHelpers.MainEngine.localisationManager.GetLocalString(ProgramNameLocName);
 
 		public override void StartProgram(Stream file = null, string mimetype = null, string ex = null, params object[] args) {
 			var tool = AddToolBar(IconFind);

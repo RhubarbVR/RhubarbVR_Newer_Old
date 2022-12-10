@@ -423,7 +423,7 @@ namespace RNumerics
 		///   Find four points in the point cloud that are not coplanar for the
 		///   seed hull
 		/// </summary>
-		void FindInitialHullIndices(in Vector3f[] points, out int b0, out int b1, out int b2, out int b3) {
+		static void FindInitialHullIndices(in Vector3f[] points, out int b0, out int b1, out int b2, out int b3) {
 			var count = points.Length;
 
 			for (var i0 = 0; i0 < count - 3; i0++) {
@@ -922,7 +922,7 @@ namespace RNumerics
 		///   the point is above the face)
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		float PointFaceDistance(in Vector3f point, in Vector3f pointOnFace, in Face face) {
+		static float PointFaceDistance(in Vector3f point, in Vector3f pointOnFace, in Face face) {
 			return Dot(face.Normal, point - pointOnFace);
 		}
 
@@ -930,7 +930,7 @@ namespace RNumerics
 		///   Calculate normal for triangle
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		Vector3f Normal(in Vector3f v0, in Vector3f v1, in Vector3f v2) {
+		static Vector3f Normal(in Vector3f v0, in Vector3f v1, in Vector3f v2) {
 			return Cross(v1 - v0, v2 - v0).Normalized;
 		}
 
@@ -959,7 +959,7 @@ namespace RNumerics
 		///   Check if two points are coincident
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		bool AreCoincident(in Vector3f a, in Vector3f b) {
+		static bool AreCoincident(in Vector3f a, in Vector3f b) {
 			return (a - b).Magnitude <= EPSILON;
 		}
 
@@ -967,7 +967,7 @@ namespace RNumerics
 		///   Check if three points are collinear
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		bool AreCollinear(in Vector3f a, in Vector3f b, in Vector3f c) {
+		static bool AreCollinear(in Vector3f a, in Vector3f b, in Vector3f c) {
 			return Cross(c - a, c - b).Magnitude <= EPSILON;
 		}
 
@@ -975,7 +975,7 @@ namespace RNumerics
 		///   Check if four points are coplanar
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		bool AreCoplanar(in Vector3f a, in Vector3f b, in Vector3f c, in Vector3f d) {
+		static bool AreCoplanar(in Vector3f a, in Vector3f b, in Vector3f c, in Vector3f d) {
 			var n1 = Cross(c - a, c - b);
 			var n2 = Cross(d - a, d - b);
 

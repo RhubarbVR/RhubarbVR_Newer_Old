@@ -73,6 +73,7 @@ namespace RhuEngine.Components
 				ProgramManager.UnLoadProgramWindow(this);
 			}
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 
 		public void Maximize() {

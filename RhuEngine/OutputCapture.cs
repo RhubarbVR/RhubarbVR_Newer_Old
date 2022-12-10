@@ -24,7 +24,6 @@ namespace RhuEngine
 		public event Action TextEdied;
 
 		public void WriteText(string data) {
-			data = data.AutoBrakeLine();
 			var consoleColor = RhuConsole.ForegroundColor;
 			if (consoleColor == ConsoleColor.Gray) {
 				consoleColor = ConsoleColor.White;

@@ -315,7 +315,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Children_OnReorderList() {
-			foreach (Entity item in LinkedComp.Entity.children) {
+			for (var i = 0; i < LinkedComp.Entity.children.Count; i++) {
+				var item = LinkedComp.Entity.children[i];
 				if (item?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
 					if (canvasItem?.CanvasItem?.GetParent() == node) {
 						node.MoveChild(canvasItem.CanvasItem, -1);

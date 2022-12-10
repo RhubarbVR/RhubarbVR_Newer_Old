@@ -18,7 +18,7 @@ namespace RhuEngine.WorldObjects
 
 		public bool Persistence => true;
 
-		public EditLevel EditLevel => EditLevel.None;
+		public static EditLevel EditLevel => EditLevel.None;
 
 		public string Name => "World";
 	}

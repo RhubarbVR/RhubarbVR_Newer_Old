@@ -50,18 +50,13 @@ namespace RhuEngine
 #endif
 
 		public readonly string SettingsFile;
-
-		public static Engine MainEngine;
-
-		public static string BaseDir = AppDomain.CurrentDomain.BaseDirectory;
-
 		public Action OnEngineStarted;
 
 		public CommandManager commandManager;
 
 		public Engine(IEngineLink _EngineLink, string[] arg, OutputCapture outputCapture, string baseDir = null, bool PassErrors = false) : base() {
 			baseDir ??= AppDomain.CurrentDomain.BaseDirectory;
-			BaseDir = baseDir;
+			EngineHelpers.BaseDir = baseDir;
 			RhuConsole.ForegroundColor = ConsoleColor.White;
 			this.PassErrors = PassErrors;
 			EngineLink = _EngineLink;
@@ -72,7 +67,7 @@ namespace RhuEngine
 			_EngineLink.BindEngine(this);
 			RLog.Info($"Platform Information OSArc: {RuntimeInformation.OSArchitecture} Framework: {RuntimeInformation.FrameworkDescription} OS: {RuntimeInformation.OSDescription} ProcessArc: {RuntimeInformation.ProcessArchitecture}");
 			EngineLink.LoadStatics();
-			MainEngine = this;
+			EngineHelpers.MainEngine = this;
 			string error = null;
 			_buildMissingLocal = arg.Any((v) => v.ToLower() == "--build-missing-local") | arg.Any((v) => v.ToLower() == "-build-missing-local") | arg.Any((v) => v.ToLower() == "-buildmissinglocal");
 			_forceFlatscreen = arg.Any((v) => v.ToLower() == "--no-vr") | arg.Any((v) => v.ToLower() == "-no-vr") | arg.Any((v) => v.ToLower() == "-novr");
@@ -144,7 +139,7 @@ namespace RhuEngine
 			}
 			var thedata = (MainSettingsObject)Activator.CreateInstance(theType);
 			MainSettings = lists.Count == 0 ? thedata : SettingsManager.LoadSettingsObject(thedata, lists.ToArray());
-			PindingRestart = PindingRestart | MainSettings.RenderSettings.RenderSettingsUpdate();
+			PindingRestart |= MainSettings.RenderSettings.RenderSettingsUpdate();
 			if (EngineLink.CanRender) {
 				RRenderer.Fov = thedata.Fov;
 			}
@@ -204,7 +199,7 @@ namespace RhuEngine
 			}
 			var thedata = (MainSettingsObject)Activator.CreateInstance(theType);
 			MainSettings = lists.Count == 0 ? thedata : SettingsManager.LoadSettingsObject(thedata, lists.ToArray());
-			PindingRestart = PindingRestart | MainSettings.RenderSettings.RenderSettingsUpdate();
+			PindingRestart |= MainSettings.RenderSettings.RenderSettingsUpdate();
 			UpdateSettings();
 		}
 
@@ -294,7 +289,7 @@ namespace RhuEngine
 					return;
 				}
 				IntMsg = "Building NetApiManager";
-				netApiManager = new NetApiManager((_userDataPathOverRide ?? BaseDir) + "/rhuCookie");
+				netApiManager = new NetApiManager((_userDataPathOverRide ?? EngineHelpers.BaseDir) + "/rhuCookie");
 				IntMsg = "Building AssetManager";
 				assetManager = new AssetManager(_cachePathOverRide);
 				_managers = new IManager[] { discordManager, windowManager, fileManager, localisationManager, inputManager, netApiManager, assetManager, worldManager };
@@ -386,7 +381,7 @@ namespace RhuEngine
 					}
 					catch (Exception ex) {
 						RLog.Err("Failed to update msg text Error: " + ex.ToString());
-						throw ex;
+						throw;
 					}
 				}
 				return;
@@ -405,7 +400,7 @@ namespace RhuEngine
 					}
 					catch (Exception ex) {
 						RLog.Err($"Failed to render step {item.GetType().GetFormattedName()} Error: {ex}");
-						throw ex;
+						throw;
 					}
 				}
 			}
@@ -423,7 +418,7 @@ namespace RhuEngine
 					}
 					catch (Exception ex) {
 						RLog.Err($"Failed to step {item.GetType().GetFormattedName()} Error: {ex}");
-						throw ex;
+						throw;
 					}
 				}
 				RUpdateManager.RunOnEndOfFrame();
@@ -457,7 +452,7 @@ namespace RhuEngine
 				catch (Exception ex) {
 					RLog.Err($"Failed to Disposed {item.GetType().GetFormattedName()} Error: {ex}");
 					if (PassErrors) {
-						throw ex;
+						throw;
 					}
 				}
 			}

@@ -16,7 +16,7 @@ namespace RhubarbPostProcessor
 				exstras[i] = args[i + 1];
 				Console.WriteLine($"Added Extra LibFolder {exstras[i]}");
 			}
-			new RhuPostProcessor.PostProcess().ProcessDLL(targetFile, exstras);
+			RhuPostProcessor.PostProcess.ProcessDLL(targetFile, exstras);
 		}
 	}
 }

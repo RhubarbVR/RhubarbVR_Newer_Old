@@ -41,20 +41,20 @@ namespace RNumerics
 		public float Value(in float fX, in float fY)
 		{
 
-			var tx = (fX - _vCenter.x);
-			var ty = (fY - _vCenter.y);
+			var tx = fX - _vCenter.x;
+			var ty = fY - _vCenter.y;
 			var fDist2 = (tx * tx) + (ty * ty);
-			fDist2 /= (Radius * Radius);
+			fDist2 /= Radius * Radius;
 			fDist2 = 1.0f - fDist2;
 			return fDist2 < 0.0f ? 0.0f : fDist2 * fDist2 * fDist2;
 		}
 
-		public AxisAlignedBox2f Bounds => new AxisAlignedBox2f(LowX, LowY, HighX, HighY);
+		public AxisAlignedBox2f Bounds => new(LowX, LowY, HighX, HighY);
 
 		public void Gradient(in float fX, in float fY, ref float fGX, ref float fGY)
 		{
-			var tx = (fX - _vCenter.x);
-			var ty = (fY - _vCenter.y);
+			var tx = fX - _vCenter.y;
+			var ty = fY - _vCenter.y;
 			var fDist2 = (tx * tx) + (ty * ty);
 			var fTmp = 1.0f - fDist2;
 			if (fTmp < 0.0f)
@@ -73,7 +73,7 @@ namespace RNumerics
 
 		public bool InBounds(in float x, in float y)
 		{
-			return x >= LowX && x <= HighX && x >= LowY && x <= HighY;
+			return x >= LowX && x <= HighX && y >= LowY && y <= HighY;
 		}
 
 		public float LowX => _vCenter.x - Radius;

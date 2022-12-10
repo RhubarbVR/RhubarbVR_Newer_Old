@@ -154,7 +154,7 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			BindPointer(data, @object);
-			foreach (DataNodeGroup val in (DataNodeList)data.GetValue("list")) {
+			foreach (var val in (DataNodeList)data.GetValue("list")) {
 				@object.Add(!hasNewRefIDs, true).Deserialize(val, this);
 			}
 			if (typeof(ISyncObject).IsAssignableFrom(@object.GetType())) {
@@ -168,7 +168,11 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			BindPointer(data, @object);
-			foreach (DataNodeGroup val in (DataNodeList)data.GetValue("list")) {
+			var list = (DataNodeList)data.GetValue("list");
+			for (var i = 0; i < list._nodeGroup.Count; i++) {
+				if (list._nodeGroup[i] is not DataNodeGroup val) {
+					throw new Exception("Node group not found");
+				}
 				var ty = Type.GetType(((DataNode<string>)val.GetValue("Type")).Value);
 				if (ty == typeof(MissingComponent)) {
 					ty = Type.GetType(((DataNode<string>)((DataNodeGroup)val.GetValue("Value")).GetValue("type")).Value, false);

@@ -45,6 +45,7 @@ namespace RhuEngine.Components
 				UnLoadCanvasItem(LoadedData);
 			}
 			LoadedData = null;
+			GC.SuppressFinalize(this);
 		}
 	}
 }

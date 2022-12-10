@@ -21,7 +21,7 @@ using TextCopy;
 
 namespace RhuEngine.Components
 {
-
+	[AttributeUsage(AttributeTargets.Class)]
 	public sealed class ProgramHideAttribute : Attribute
 	{
 

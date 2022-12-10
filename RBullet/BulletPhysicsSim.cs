@@ -31,7 +31,7 @@ namespace RBullet
 			_physicsWorld.SetGravity(ref grav);
 		}
 
-		public SafeList<BRigidBodyCollider> Updates = new SafeList<BRigidBodyCollider>();
+		public SafeList<BRigidBodyCollider> Updates = new();
 
 		public void AddPhysicsCallBack(BRigidBodyCollider bRigidBodyCollider) {
 			Updates.SafeOperation((list) => {
@@ -68,13 +68,12 @@ namespace RBullet
 			Updates.SafeOperation((list) => {
 				foreach (var item in list) {
 					if (item.collisionObject != null) {
-						using (var test = new Tester((Vector3 PositionWorldOnA, Vector3 PositionWorldOnB, Vector3 NormalWorldOnB, double Distance, double Distance1, BRigidBodyCollider hit) => {
+						using var test = new Tester((Vector3 PositionWorldOnA, Vector3 PositionWorldOnB, Vector3 NormalWorldOnB, double Distance, double Distance1, BRigidBodyCollider hit) => {
 							item.Call(new Vector3f((float)PositionWorldOnA.X, (float)PositionWorldOnA.Y, (float)PositionWorldOnA.Z),
 								new Vector3f((float)PositionWorldOnB.X, (float)PositionWorldOnB.Y, (float)PositionWorldOnB.Z),
 								new Vector3f((float)NormalWorldOnB.X, (float)NormalWorldOnB.Y, (float)NormalWorldOnB.Z), Distance, Distance1, hit.Collider);
-						})) {
-							_physicsWorld.ContactTest(item.collisionObject, test);
-						}
+						});
+						_physicsWorld.ContactTest(item.collisionObject, test);
 					}
 				}
 			});

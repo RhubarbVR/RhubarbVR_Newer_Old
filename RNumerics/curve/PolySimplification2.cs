@@ -209,9 +209,7 @@ namespace RNumerics
 			return result;
 		}
 
-
-
-		List<Vector2d> Handle_tiny_case(in List<Vector2d> result, in List<Vector2d> input) {
+		static List<Vector2d> Handle_tiny_case(in List<Vector2d> result, in List<Vector2d> input) {
 			var N = input.Count;
 			if (N == 3) {
 				return input;       // not much we can really do here...

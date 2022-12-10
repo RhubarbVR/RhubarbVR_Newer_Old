@@ -49,7 +49,7 @@ namespace RNumerics
 
 		public void UpdateDeformation_Closed(in int nIterations = 1) {
 			if (Start < 0 || Start > Curve.VertexCount || End > Curve.VertexCount) {
-				throw new ArgumentOutOfRangeException("InPlaceIterativeCurveSmooth.UpdateDeformation: range is invalid");
+				throw new ArgumentOutOfRangeException(nameof(nIterations));
 			}
 
 			var N = Curve.VertexCount;
@@ -68,7 +68,7 @@ namespace RNumerics
 
 		public void UpdateDeformation_Open(in int nIterations = 1) {
 			if (Start < 0 || Start > Curve.VertexCount || End > Curve.VertexCount) {
-				throw new ArgumentOutOfRangeException("InPlaceIterativeCurveSmooth.UpdateDeformation: range is invalid");
+				throw new ArgumentOutOfRangeException(nameof(nIterations));
 			}
 
 			for (var iter = 0; iter < nIterations; ++iter) {
@@ -169,13 +169,6 @@ namespace RNumerics
 				Curve.SetVertex(roi_index[i], vNew);
 			}
 		}
-
-		public void EndDeformation() {
-			// do nothing
-		}
-
-
-
 
 		void Invalidate_roi() {
 			_roi_valid = false;

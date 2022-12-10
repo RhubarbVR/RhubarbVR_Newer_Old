@@ -79,7 +79,7 @@ namespace RhuEngine.WorldObjects
 								else {
 									var prams = method.GetParameters();
 									if (prams.Length == 0) {
-										((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[0] { });
+										((IChangeable)instance).Changed += (obj) => method.Invoke(this, Array.Empty<object>());
 									}
 									else if (prams[0].ParameterType == typeof(IChangeable)) {
 										((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[1] { obj });

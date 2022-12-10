@@ -45,9 +45,5 @@ namespace RhuEngine.DataStructure
 		public void ReadChildEnd(IDataNode child) {
 			//Not needed no children
 		}
-
-		public void ReadAction(DataReader dataReader) {
-			//Not needed no children
-		}
 	}
 }

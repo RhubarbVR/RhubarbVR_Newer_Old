@@ -59,7 +59,7 @@ namespace RBullet
 				CollisionShape = obj,
 				PhysicsSim = physicsSim
 			};
-			new BRigidBodyCollider(collider);
+			collider.obj = new BRigidBodyCollider(collider);
 			return collider;
 		}
 

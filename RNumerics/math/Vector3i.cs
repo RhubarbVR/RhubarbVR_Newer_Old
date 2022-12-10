@@ -131,14 +131,7 @@ namespace RNumerics
 			return this == (Vector3i)obj;
 		}
 		public override int GetHashCode() {
-			unchecked {
-				var hash = (int)2166136261;
-				// Suitable nullity checks etc, of course :)
-				hash = (hash * 16777619) ^ x.GetHashCode();
-				hash = (hash * 16777619) ^ y.GetHashCode();
-				hash = (hash * 16777619) ^ z.GetHashCode();
-				return hash;
-			}
+			return HashCode.Combine(x, y, z);
 		}
 
 		public int CompareTo(Vector3i other) {

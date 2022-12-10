@@ -45,6 +45,7 @@ namespace RhubarbVR.Bindings.FontBindings
 
 		public void Dispose() {
 			Label3D.Free();
+			GC.SuppressFinalize(this);
 		}
 
 		public RText TargetText;
@@ -52,7 +53,7 @@ namespace RhubarbVR.Bindings.FontBindings
 		public void Init(RText text) {
 			TargetText = text;
 			Label3D = new Label3D();
-			EngineRunner._.AddChild(Label3D);
+			EngineRunnerHelpers._.AddChild(Label3D);
 		}
 	}
 }

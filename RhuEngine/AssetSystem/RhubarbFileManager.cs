@@ -42,17 +42,11 @@ namespace RhuEngine.AssetSystem
 					CreationData = new DateTimeOffset(e.ReadInt32(), e.ReadInt32(), e.ReadInt32(), e.ReadInt32(), e.ReadInt32(), e.ReadInt32(), e.ReadInt32(), new TimeSpan(e.ReadInt32(), e.ReadInt32(), e.ReadInt32())),
 					FileType = (FileType)e.ReadByte(),
 				};
-				switch (file.CompressionType) {
-					case FileCompressionType.DeflateStream:
-						file.Data = DeflateStreamDecompress(e.ReadBytes(e.ReadInt32()));
-						break;
-					case FileCompressionType.DeflateStreamFast:
-						file.Data = DeflateStreamDecompress(e.ReadBytes(e.ReadInt32()));
-						break;
-					default:
-						file.Data = e.ReadBytes(e.ReadInt32());
-						break;
-				}
+				file.Data = file.CompressionType switch {
+					FileCompressionType.DeflateStream => DeflateStreamDecompress(e.ReadBytes(e.ReadInt32())),
+					FileCompressionType.DeflateStreamFast => DeflateStreamDecompress(e.ReadBytes(e.ReadInt32())),
+					_ => e.ReadBytes(e.ReadInt32()),
+				};
 			}
 			catch { }
 			return file;
@@ -152,10 +146,12 @@ namespace RhuEngine.AssetSystem
 			return SaveFile(CreateFile(owner, amesh.MeshName, FileType.Mesh, buffer));
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
 		public static byte[] SaveFile(Entity saveEntity, bool enbedAssets = false, bool preserveAssets = true) {
 			//Todo add avatar detection
 			throw new NotImplementedException();
 		}
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
 		public static byte[] SaveFile(World saveWorld, bool enbedAssets = false) {
 			throw new NotImplementedException();
 		}

@@ -73,13 +73,12 @@ namespace DataNodeReader
 
 		private async Task LoadData() {
 			try {
-				using (var memoryStream = new MemoryStream()) {
-					var fileStream = _openFileDialog.OpenFile();
-					await fileStream.CopyToAsync(memoryStream);
-					fileStream.Close();
-					_node = new DataReader(memoryStream.ToArray()).Data;
-					Invoke(NodeGroupUpdate);
-				}
+				using var memoryStream = new MemoryStream();
+				var fileStream = _openFileDialog.OpenFile();
+				await fileStream.CopyToAsync(memoryStream);
+				fileStream.Close();
+				_node = new DataReader(memoryStream.ToArray()).Data;
+				Invoke(NodeGroupUpdate);
 			}
 			catch (Exception er) {
 				MessageBox.Show(er.ToString(), "Error Opening file",
@@ -115,7 +114,7 @@ namespace DataNodeReader
 
 		}
 
-		private void LoadTreeNode((string AddedName, IDataNode dataNode, TreeNode parrent) current, List<(string AddedName, IDataNode dataNode, TreeNode parrent)> stack) {
+		private static void LoadTreeNode((string AddedName, IDataNode dataNode, TreeNode parrent) current, List<(string AddedName, IDataNode dataNode, TreeNode parrent)> stack) {
 			var node = new TreeNode(current.AddedName + " " + current.dataNode.GetType().GetFormattedName());
 			if (current.dataNode is DataNodeGroup dataNodeGroup) {
 				foreach (var item in dataNodeGroup._nodeGroup) {

@@ -4,6 +4,7 @@ using System.Text;
 
 namespace RhuSettings
 {
+	[AttributeUsage(AttributeTargets.Field)]
 	public class SettingsField : Attribute
 	{
 		public string Path = "/";

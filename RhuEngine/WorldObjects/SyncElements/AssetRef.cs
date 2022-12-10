@@ -58,7 +58,7 @@ namespace RhuEngine.WorldObjects
 			else {
 				var prams = method.GetParameters();
 				if (prams.Length == 0) {
-					LoadChange += (obj) => method.Invoke(obje, new object[0] { });
+					LoadChange += (obj) => method.Invoke(obje, Array.Empty<object>());
 				}
 				else if (prams[0].ParameterType == typeof(T)) {
 					LoadChange += (obj) => method.Invoke(obje, new object[1] { obj });

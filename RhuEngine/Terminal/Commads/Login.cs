@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using RhuEngine;
 using RhuEngine.Linker;
 namespace RhuEngine.Commads
 {
@@ -13,11 +12,11 @@ namespace RhuEngine.Commads
 		public override string HelpMsg => "Logout user if there login";
 
 		public override async Task RunCommand() {
-			if (!Engine.MainEngine.netApiManager.Client.IsLogin) {
+			if (!EngineHelpers.MainEngine.netApiManager.Client.IsLogin) {
 				Console.WriteLine("Need to be Loggedin to logout");
 				return;
 			}
-			await Engine.MainEngine.netApiManager.Client.LogOut();
+			await EngineHelpers.MainEngine.netApiManager.Client.LogOut();
 		}
 	}
 	public class Login : Command
@@ -25,7 +24,7 @@ namespace RhuEngine.Commads
 		public override string HelpMsg => "Login a user with email and password";
 
 		public override async Task RunCommand() {
-			if (Engine.MainEngine.netApiManager.Client.IsLogin) {
+			if (EngineHelpers.MainEngine.netApiManager.Client.IsLogin) {
 				Console.WriteLine("Already login need to logout");
 				return;
 			}
@@ -33,7 +32,7 @@ namespace RhuEngine.Commads
 			var email = ReadNextLine();
 			Console.WriteLine("Password");
 			var pass = PasswordInput();
-			var req = await Engine.MainEngine.netApiManager.Client.Login(email, pass, null);
+			var req = await EngineHelpers.MainEngine.netApiManager.Client.Login(email, pass, null);
 			if (req.Error) {
 				Console.WriteLine("Login Successfully as " + req.Data.UserName);
 			}

@@ -105,6 +105,7 @@ namespace RhuEngine.Components
 			Entity.enabled.Changed -= Enabled_Changed;
 			Enabled.Changed -= Enabled_Changed;
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 		private void Entity_GlobalTransformChange(Entity obj, bool isStandaredMove) {
 			if (!isStandaredMove) {

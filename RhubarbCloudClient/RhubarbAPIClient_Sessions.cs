@@ -52,12 +52,7 @@ namespace RhubarbCloudClient
 		}
 		public async Task<SessionInfo[]> GetTopPublicSessions() {
 			var data = await SendGet<SessionInfo[]>(API_PATH + SESSION_PATH + "GetTopPublicSessions");
-			if (data.IsDataGood) {
-				return data.Data;
-			}
-			else {
-				return Array.Empty<SessionInfo>();
-			}
+			return data.IsDataGood ? data.Data : Array.Empty<SessionInfo>();
 		}
 	}
 }

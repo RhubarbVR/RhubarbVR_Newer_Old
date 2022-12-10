@@ -106,6 +106,7 @@ namespace RhuEngine
 					item?.Dispose();
 				}
 			}
+			GC.SuppressFinalize(this);
 		}
 		public enum RhubarbIcons
 		{

@@ -36,6 +36,14 @@ namespace RNumerics
 			public bool Equals(GraphNode other) {
 				return id == other.id;
 			}
+
+			public override bool Equals(object obj) {
+				return Equals(obj as GraphNode);
+			}
+
+			public override int GetHashCode() {
+				return id;
+			}
 		}
 
 		readonly DynamicPriorityQueue<GraphNode> _sparseQueue;
@@ -61,6 +69,14 @@ namespace RNumerics
 				return id == other.id;
 			}
 			public static readonly GraphNodeStruct Zero = new() { id = -1, parent = -1, distance = INVALID_VALUE, frozen = false };
+
+			public override bool Equals(object obj) {
+				return obj is GraphNodeStruct @struct && Equals(@struct);
+			}
+
+			public override int GetHashCode() {
+				return HashCode.Combine(id, parent, frozen, distance);
+			}
 		}
 
 		readonly IndexPriorityQueue _denseQueue;

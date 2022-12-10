@@ -10,31 +10,12 @@ namespace OpusDotNet
 	/// </summary>
 	public static class AndroidTest
 	{
-		static bool? _isAndroid;
 		/// <summary>
 		/// Run Chech
 		/// </summary>
 		/// <returns>If it is anroid</returns>
 		public static bool Check() {
-			if (_isAndroid != null) {
-				return (bool)_isAndroid;
-			}
-			using (var process = new System.Diagnostics.Process()) {
-				process.StartInfo.FileName = "getprop";
-				process.StartInfo.Arguments = "ro.build.user";
-				process.StartInfo.RedirectStandardOutput = true;
-				process.StartInfo.UseShellExecute = false;
-				process.StartInfo.CreateNoWindow = true;
-				try {
-					process.Start();
-					var output = process.StandardOutput.ReadToEnd();
-					_isAndroid = string.IsNullOrEmpty(output) ? (bool?)false : (bool?)true;
-				}
-				catch {
-					_isAndroid = false;
-				}
-				return (bool)_isAndroid;
-			}
+			return OperatingSystem.IsAndroid();
 		}
 	}
 
@@ -77,8 +58,9 @@ namespace OpusDotNet
 		}
 
 
-		[DllImport("libdl", CharSet = CharSet.Ansi)]
+		[DllImport("libdl", CharSet = CharSet.Unicode)]
 		static extern IntPtr dlopen(string fileName, int flags);
+
 		static bool LoadUnix(string arch) {
 			const int RTLD_NOW = 2;
 			return dlopen("opus.so", RTLD_NOW) != IntPtr.Zero
@@ -96,7 +78,6 @@ namespace OpusDotNet
 		public static extern SafeEncoderHandle opus_encoder_create(int Fs, int channels, int application, out int error);
 
 		[DllImport("opus", CallingConvention = CallingConvention.Cdecl)]
-		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
 		public static extern void opus_encoder_destroy(IntPtr st);
 
 		[DllImport("opus", CallingConvention = CallingConvention.Cdecl)]
@@ -116,7 +97,6 @@ namespace OpusDotNet
 		public static extern SafeDecoderHandle opus_decoder_create(int Fs, int channels, out int error);
 
 		[DllImport("opus", CallingConvention = CallingConvention.Cdecl)]
-		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
 		public static extern void opus_decoder_destroy(IntPtr st);
 
 		[DllImport("opus", CallingConvention = CallingConvention.Cdecl)]

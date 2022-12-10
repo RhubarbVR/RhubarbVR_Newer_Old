@@ -43,19 +43,19 @@ namespace RhuEngine
 			return Assembly.GetCallingAssembly().GetManifestResourceStream("RhuEngine.Res." + name);
 		}
 		public static Stream GetStaticResource(string name) {
-			return File.Exists(Engine.BaseDir + "/" + name)
-				? File.OpenRead(Engine.BaseDir + "/" + name)
-				: File.Exists(Engine.BaseDir + "/res/" + name)
-				? File.OpenRead(Engine.BaseDir + "/" + name)
-				: File.Exists(Engine.BaseDir + "/Res/" + name)
-				? File.OpenRead(Engine.BaseDir + "/Res/" + name)
-				: File.Exists(Engine.BaseDir + "/OverRide/" + name)
-				? File.OpenRead(Engine.BaseDir + "/OverRide/" + name)
-				: File.Exists(Engine.BaseDir + "/override/" + name)
-				? File.OpenRead(Engine.BaseDir + "/override/" + name)
+			return File.Exists(EngineHelpers.BaseDir + "/" + name)
+				? File.OpenRead(EngineHelpers.BaseDir + "/" + name)
+				: File.Exists(EngineHelpers.BaseDir + "/res/" + name)
+				? File.OpenRead(EngineHelpers.BaseDir + "/" + name)
+				: File.Exists(EngineHelpers.BaseDir + "/Res/" + name)
+				? File.OpenRead(EngineHelpers.BaseDir + "/Res/" + name)
+				: File.Exists(EngineHelpers.BaseDir + "/OverRide/" + name)
+				? File.OpenRead(EngineHelpers.BaseDir + "/OverRide/" + name)
+				: File.Exists(EngineHelpers.BaseDir + "/override/" + name)
+				? File.OpenRead(EngineHelpers.BaseDir + "/override/" + name)
 				: GetStaticResourceStream(name);
 		}
-		public async Task<RTexture2D> LoadTextureAsync(string name) {
+		public static async Task<RTexture2D> LoadTextureAsync(string name) {
 			var img = new RImage(null);
 			using (var mem = new MemoryStream()) {
 				await GetStaticResource(name).CopyToAsync(mem);
@@ -68,7 +68,7 @@ namespace RhuEngine
 			var texture = new RImageTexture2D(img);
 			return texture;
 		}
-		public RTexture2D LoadTexture(string name, bool compress, string fileEx) {
+		public static RTexture2D LoadTexture(string name, bool compress, string fileEx) {
 			var img = new RImage(null);
 			var resourse = GetStaticResourceStream(name);
 			img.Load(resourse, fileEx);
@@ -82,14 +82,14 @@ namespace RhuEngine
 #if DEBUG
 		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("MilkSnake.png", true, "png");
 #else
-		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("RhubarbVR.png",true, "png");
+		public static RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("RhubarbVR.png",true, "png");
 #endif
 
 		private RTexture2D _rhubarbLogoV2;
 #if DEBUG
 		public RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("MilkSnake.png", true, "png");
 #else
-		public RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("RhubarbVR2.png",true, "png");
+		public static RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("RhubarbVR2.png",true, "png");
 #endif
 
 		private RTexture2D _grip;
@@ -125,7 +125,7 @@ namespace RhuEngine
 
 		public RhubarbAtlasSheet IconSheet => _rhubarbAtlasSheet ??= BuildStack();
 
-		private RFont LoadMainFont() {
+		private static RFont LoadMainFont() {
 			var MainFont = new RFont(null);
 			MainFont.LoadDynamicFont(GetStaticResource("Fonts.NotoSans-Regular.ttf"));
 			MainFont.AddFallBack(LoadFontFromStream(GetStaticResource("Fonts.NotoEmoji-Regular.ttf")));

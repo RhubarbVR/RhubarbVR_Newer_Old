@@ -92,7 +92,7 @@ namespace RhuEngine.Components
 			object reterndata = null;
 			try {
 				WorldThreadSafty.MethodCalls++;
-				if (WorldThreadSafty.MethodCalls > WorldThreadSafty.MaxCalls) {
+				if (WorldThreadSafty.MethodCalls > WorldThreadSafty.MAX_CALLS) {
 					throw new StackOverflowException();
 				}
 				if (_ecma.GetValue(function) == JsValue.Undefined) {
@@ -122,7 +122,7 @@ namespace RhuEngine.Components
 
 		protected abstract string Script { get; }
 
-		private object GetBestConstructor(IEnumerable<ConstructorInfo> constructors, params object[] objects) {
+		private static object GetBestConstructor(IEnumerable<ConstructorInfo> constructors, params object[] objects) {
 			foreach (var item in constructors) {
 				var prams = item.GetParameters();
 				var sendPrams = new object[prams.Length];

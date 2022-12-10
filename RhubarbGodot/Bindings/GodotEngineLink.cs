@@ -186,7 +186,7 @@ namespace RhubarbVR.Bindings
 			manager.LoadInputDriver<GodotMouse>();
 		}
 
-		private void CopyNeededFiles(string from) {
+		private static void CopyNeededFiles(string from) {
 			foreach (var item in Directory.GetDirectories(from)) {
 				try {
 					Directory.Move(item, Path.Combine(System.Environment.CurrentDirectory, Path.GetFileName(item)));
@@ -233,7 +233,7 @@ namespace RhubarbVR.Bindings
 			RTexture2D.White = new RImageTexture2D(image);
 			RTempQuad.Instance = typeof(GodotTempMeshRender);
 			Engine.windowManager.windowManagerLink = new GodotWindowManager();
-			if (EngineRunner._.GetViewport() is Window window) {
+			if (EngineRunnerHelpers._.GetViewport() is Window window) {
 				Engine.windowManager.LoadWindow(new GodotWindow(window));
 			}
 		}

@@ -63,36 +63,23 @@ namespace RhuEngine.WorldObjects
 			else {
 				if (inputType.IsEnum) {
 					var unType = inputType.GetEnumUnderlyingType();
-					if (unType == typeof(int)) {
-						Value = new DataNode<int>((int)(object)_value);
-					}
-					else if (unType == typeof(uint)) {
-						Value = new DataNode<uint>((uint)(object)_value);
-					}
-					else if (unType == typeof(bool)) {
-						Value = new DataNode<bool>((bool)(object)_value);
-					}
-					else if (unType == typeof(byte)) {
-						Value = new DataNode<byte>((byte)(object)_value);
-					}
-					else if (unType == typeof(sbyte)) {
-						Value = new DataNode<sbyte>((sbyte)(object)_value);
-					}
-					else if (unType == typeof(short)) {
-						Value = new DataNode<short>((short)(object)_value);
-					}
-					else if (unType == typeof(ushort)) {
-						Value = new DataNode<ushort>((ushort)(object)_value);
-					}
-					else if (unType == typeof(long)) {
-						Value = new DataNode<long>((long)(object)_value);
-					}
-					else if (unType == typeof(ulong)) {
-						Value = new DataNode<ulong>((ulong)(object)_value);
-					}
-					else {
-						throw new NotSupportedException();
-					}
+					Value = unType == typeof(int)
+						? new DataNode<int>((int)(object)_value)
+						: unType == typeof(uint)
+						? new DataNode<uint>((uint)(object)_value)
+						: unType == typeof(bool)
+						? new DataNode<bool>((bool)(object)_value)
+						: unType == typeof(byte)
+						? new DataNode<byte>((byte)(object)_value)
+						: unType == typeof(sbyte)
+						? new DataNode<sbyte>((sbyte)(object)_value)
+						: unType == typeof(short)
+						? new DataNode<short>((short)(object)_value)
+						: unType == typeof(ushort)
+						? new DataNode<ushort>((ushort)(object)_value)
+						: unType == typeof(long)
+						? new DataNode<long>((long)(object)_value)
+						: unType == typeof(ulong) ? (IDataNode)new DataNode<ulong>((ulong)(object)_value) : throw new NotSupportedException();
 				}
 				else {
 					Value = new DataNode<T>(_value);
@@ -119,36 +106,23 @@ namespace RhuEngine.WorldObjects
 			else {
 				if (inputType.IsEnum) {
 					var unType = inputType.GetEnumUnderlyingType();
-					if (unType == typeof(int)) {
-						newValue = (T)(object)((DataNode<int>)data).Value;
-					}
-					else if (unType == typeof(uint)) {
-						newValue = (T)(object)((DataNode<uint>)data).Value;
-					}
-					else if (unType == typeof(bool)) {
-						newValue = (T)(object)((DataNode<bool>)data).Value;
-					}
-					else if (unType == typeof(byte)) {
-						newValue = (T)(object)((DataNode<byte>)data).Value;
-					}
-					else if (unType == typeof(sbyte)) {
-						newValue = (T)(object)((DataNode<sbyte>)data).Value;
-					}
-					else if (unType == typeof(short)) {
-						newValue = (T)(object)((DataNode<short>)data).Value;
-					}
-					else if (unType == typeof(ushort)) {
-						newValue = (T)(object)((DataNode<ushort>)data).Value;
-					}
-					else if (unType == typeof(long)) {
-						newValue = (T)(object)((DataNode<long>)data).Value;
-					}
-					else if (unType == typeof(ulong)) {
-						newValue = (T)(object)((DataNode<ulong>)data).Value;
-					}
-					else {
-						throw new NotSupportedException();
-					}
+					newValue = unType == typeof(int)
+						? (T)(object)((DataNode<int>)data).Value
+						: unType == typeof(uint)
+						? (T)(object)((DataNode<uint>)data).Value
+						: unType == typeof(bool)
+						? (T)(object)((DataNode<bool>)data).Value
+						: unType == typeof(byte)
+						? (T)(object)((DataNode<byte>)data).Value
+						: unType == typeof(sbyte)
+						? (T)(object)((DataNode<sbyte>)data).Value
+						: unType == typeof(short)
+						? (T)(object)((DataNode<short>)data).Value
+						: unType == typeof(ushort)
+						? (T)(object)((DataNode<ushort>)data).Value
+						: unType == typeof(long)
+						? (T)(object)((DataNode<long>)data).Value
+						: unType == typeof(ulong) ? (T)(object)((DataNode<ulong>)data).Value : throw new NotSupportedException();
 				}
 				else {
 					newValue = (DataNode<T>)data;
@@ -283,6 +257,7 @@ namespace RhuEngine.WorldObjects
 		public override void Dispose() {
 			Changed = null;
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 	}
 }
