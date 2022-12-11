@@ -26,7 +26,8 @@ namespace RhubarbVR.Bindings
 {
 	public class GodotRenderSettings : RenderSettingsBase
 	{
-		public enum VsyncMode {
+		public enum VsyncMode
+		{
 			Disabled,
 			Enabled,
 			Adaptive,
@@ -176,7 +177,7 @@ namespace RhubarbVR.Bindings
 		}
 
 		public void LoadArgs() {
-			if (Engine._forceFlatscreen && InVR) {
+			if (InVR) {
 				ChangeVR(false);
 			}
 		}
@@ -184,22 +185,6 @@ namespace RhubarbVR.Bindings
 		public void LoadInput(InputManager manager) {
 			manager.LoadInputDriver<GodotKeyboard>();
 			manager.LoadInputDriver<GodotMouse>();
-		}
-
-		private static void CopyNeededFiles(string from) {
-			foreach (var item in Directory.GetDirectories(from)) {
-				try {
-					Directory.Move(item, Path.Combine(System.Environment.CurrentDirectory, Path.GetFileName(item)));
-				}
-				catch { }
-			}
-			foreach (var item in Directory.GetFiles(from)) {
-				try {
-					File.Copy(item, Path.Combine(System.Environment.CurrentDirectory, Path.GetFileName(item)), true);
-				}
-				catch { }
-			}
-			
 		}
 
 		public void LoadStatics() {

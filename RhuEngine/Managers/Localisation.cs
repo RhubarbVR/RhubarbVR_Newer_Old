@@ -47,9 +47,6 @@ namespace RhuEngine.Managers
 		public void Init(Engine engine) {
 			localDir = EngineHelpers.BaseDir + "/Locales/";
 			_engine = engine;
-			if (_engine._buildMissingLocal) {
-				NeededKeys = new HashSet<string>();
-			}
 			LoadLocal();
 			_engine.SettingsUpdate += LoadLocal;
 		}

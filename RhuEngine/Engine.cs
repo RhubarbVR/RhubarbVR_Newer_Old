@@ -31,12 +31,6 @@ namespace RhuEngine
 
 		public readonly object RenderLock = new();
 
-		public readonly bool _forceFlatscreen = false;
-
-		public readonly bool _buildMissingLocal = false;
-
-		public readonly bool _noVRSim = true;
-
 		private readonly string _cachePathOverRide = null;
 
 		private readonly string _userDataPathOverRide = null;
@@ -68,9 +62,6 @@ namespace RhuEngine
 			EngineLink.LoadStatics();
 			EngineHelpers.MainEngine = this;
 			string error = null;
-			_buildMissingLocal = arg.Any((v) => v.ToLower() == "--build-missing-local") | arg.Any((v) => v.ToLower() == "-build-missing-local") | arg.Any((v) => v.ToLower() == "-buildmissinglocal");
-			_forceFlatscreen = arg.Any((v) => v.ToLower() == "--no-vr") | arg.Any((v) => v.ToLower() == "-no-vr") | arg.Any((v) => v.ToLower() == "-novr");
-			_noVRSim = !(arg.Any((v) => v.ToLower() == "--vr-sim") | arg.Any((v) => v.ToLower() == "-vr-sim") | arg.Any((v) => v.ToLower() == "-vrsim"));
 			DebugVisuals = arg.Any((v) => v.ToLower() == "--debug-visuals") | arg.Any((v) => v.ToLower() == "-debug-visuals") | arg.Any((v) => v.ToLower() == "-debugvisuals");
 			_EngineLink.LoadArgs();
 			string settingsArg = null;
@@ -109,7 +100,7 @@ namespace RhuEngine
 				RLog.Info($"Launched with no arguments");
 			}
 			else {
-				RLog.Info($"Launched with {(_forceFlatscreen ? "forceFlatscreen " : "")}{(_noVRSim ? "noVRSim " : "")}{((_cachePathOverRide != null) ? "Cache Override: " + _cachePathOverRide + " " : "")}{((_userDataPathOverRide != null) ? "UserData Override: " + _userDataPathOverRide + " " : "")}");
+				RLog.Info($"Launched {((_cachePathOverRide != null) ? "Cache Override: " + _cachePathOverRide + " " : "")}{((_userDataPathOverRide != null) ? "UserData Override: " + _userDataPathOverRide + " " : "")}");
 			}
 			this.outputCapture = outputCapture;
 
