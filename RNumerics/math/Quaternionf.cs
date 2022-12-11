@@ -91,21 +91,21 @@ namespace RNumerics
 			w = 1;
 			SetFromRotationMatrix(mat);
 		}
-		[Exposed,IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Quaternionf Zero = new(0.0f, 0.0f, 0.0f, 0.0f);
-		[Exposed,IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Quaternionf Identity = new(0.0f, 0.0f, 0.0f, 1.0f);
-		[Exposed,IgnoreMember]
-		static public readonly Quaternionf Pitched = CreateFromEuler(0,90,0);
-		[Exposed,IgnoreMember]
+		[Exposed, IgnoreMember]
+		static public readonly Quaternionf Pitched = CreateFromEuler(0, 90, 0);
+		[Exposed, IgnoreMember]
 		static public readonly Quaternionf Pitched180 = CreateFromEuler(0, 180, 0);
-		[Exposed,IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Quaternionf Yawed = CreateFromEuler(90, 0, 0);
-		[Exposed,IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Quaternionf Yawed180 = CreateFromEuler(180, 0, 0);
-		[Exposed,IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Quaternionf Rolled = CreateFromEuler(0, 0, 90);
-		[Exposed,IgnoreMember]
+		[Exposed, IgnoreMember]
 		static public readonly Quaternionf Rolled180 = CreateFromEuler(0, 0, 180);
 		[IgnoreMember]
 		public float this[in int key]
@@ -342,6 +342,9 @@ namespace RNumerics
 		public bool IsAnyInfinity => float.IsInfinity(x) || float.IsInfinity(y) || float.IsInfinity(z);
 		[IgnoreMember]
 		public bool IsAnyNanOrInfinity => IsAnyNan || IsAnyInfinity;
+		[IgnoreMember]
+		public Quaternionf Clean => IsAnyNanOrInfinity ? Identity : this;
+
 		public float Angle(in Quaternionf e) {
 			return (float)Math.Acos(Math.Min(Math.Abs(Dot(e)), 1f)) * 2f * 57.29578f;
 		}
@@ -430,7 +433,7 @@ namespace RNumerics
 			return new Quaternionf(vFrom, vTo);
 		}
 		public static Quaternionf FromTo(in Vector3f vFrom, in Vector3f vTo, in Vector3f vOffset) {
-			return new Quaternionf(vFrom- vOffset, vTo- vOffset);
+			return new Quaternionf(vFrom - vOffset, vTo - vOffset);
 		}
 		public static Quaternionf FromToConstrained(in Vector3f vFrom, in Vector3f vTo, in Vector3f vAround) {
 			var fAngle = MathUtil.PlaneAngleSignedD(vFrom, vTo, vAround);
@@ -599,7 +602,7 @@ namespace RNumerics
 		}
 		public static Quaternionf LookAt(in Vector3f sourcePoint, in Vector3f destPoint, in Vector3f up) {
 			var toVector = (destPoint - sourcePoint).Normalized;
-			return LookRotation(toVector,up);
+			return LookRotation(toVector, up);
 		}
 
 		public static Quaternionf FromToRotation(in Vector3f from, in Vector3f to) {

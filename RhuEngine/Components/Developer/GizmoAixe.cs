@@ -99,9 +99,9 @@ namespace RhuEngine.Components
 			rotMesh.MajorRadius.Value = 1.7f / 5;
 			rotMesh.MinorRadius.Value = 0.05f / 5;
 			rotationMeshRender.mesh.Target = rotMesh;
-			var rotColider = Entity.AttachComponent<MeshShape>();
-			rotColider.TargetMesh.Target = rotMesh;
-			RotationCollider.Target = rotColider.Enabled;
+			//var rotColider = Entity.AttachComponent<MeshShape>();
+			//rotColider.TargetMesh.Target = rotMesh;
+			//RotationCollider.Target = rotColider.Enabled;
 
 			var mainBoxShapeColider = Entity.AddChild("TipCollider").AttachComponent<BoxShape>();
 

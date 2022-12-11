@@ -57,6 +57,10 @@ namespace RNumerics
 		public static int Clamp(in int f, in int low, in int high) {
 			return (f < low) ? low : (f > high) ? high : f;
 		}
+		public static Vector3f Clamp(in Vector3f f, in float low, in float high) {
+			return new Vector3f(Clamp(f.x, low, high), Clamp(f.y, low, high), Clamp(f.z, low, high));
+		}
+
 		public static Vector2f Clamp(in Vector2f f, in Vector2f low, in Vector2f high) {
 			return new Vector2f(Clamp(f.x, low.x, high.x), Clamp(f.y, low.y, high.y));
 		}

@@ -22,6 +22,8 @@ namespace RhuEngine.WorldObjects.ECS
 		[NoSyncUpdate]
 		public Entity Entity { get; private set; }
 
+		public bool IsEnabled => Enabled.Value && Entity.IsEnabled;
+
 		protected override void OnInitialize() {
 			base.OnInitialize();
 			Entity = (Entity)Parent.Parent;

@@ -24,7 +24,7 @@ namespace RhuEngine.Components
 			var size = new Vector3f(Radius.Value, Height.Value, Radius.Value);
 			ApplyGlobalScaleValues(ref size);
 			speculativeMargin = MathF.Min(speculativeMargin, MathUtil.Max(size.x, size.y, size.z));
-			var result = new BepuPhysics.Collidables.Capsule((size.x + size.y) / 2, size.y);
+			var result = new Capsule((size.x + size.z) / 2, size.y);
 			inertia = !mass.HasValue ? default : result.ComputeInertia(mass.Value);
 			return result;
 		}

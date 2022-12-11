@@ -5,9 +5,44 @@ using RNumerics;
 using RhuEngine.Linker;
 using System;
 using RhuEngine.Physics;
+using System.Runtime.CompilerServices;
 
 namespace RhuEngine.Components
 {
+	[Flags]
+	public enum EPhysicsMask : ushort
+	{
+		None = 0,
+		Layer1 = 1,
+		UI = Layer1,
+		Layer2 = 2,
+		Player = Layer2,
+		Layer3 = 4,
+		Floor = Layer3,
+		Layer4 = 8,
+		WorldObjects = Layer4,
+		Layer5 = 16,
+		Layer6 = 32,
+		Layer7 = 64,
+		Layer8 = 128,
+		Layer9 = 256,
+		Layer10 = 512,
+		Layer11 = 1024,
+		Layer12 = 2048,
+		Layer13 = 4096,
+		Layer14 = 8192,
+		Layer15 = 16384,
+		Normal = Layer1 | Layer2 | Layer3 | Layer4 | Layer5,
+		All = Layer1 | Layer2 | Layer3 | Layer4 | Layer5 | Layer6 | Layer7 | Layer8 | Layer9 | Layer10 | Layer11 | Layer12 | Layer13 | Layer14 | Layer15,
+	}
+
+	public static class EPhysicsMaskHelper {
+		[method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool BasicCheck(this EPhysicsMask a, EPhysicsMask b) {
+			return (a & b) != EPhysicsMask.None;
+		}
+	}
+
 	public abstract class PhysicsObject : Component
 	{
 		public const float SPECULATIVE_MARGIN = 0.1f;
@@ -16,8 +51,24 @@ namespace RhuEngine.Components
 
 		public PhysicsSimulation Simulation => World.PhysicsSimulation;
 
+		[Default(true)]
+		public readonly Sync<bool> CollisionEnabled;
+
+		[Default(EPhysicsMask.WorldObjects)]
+		[OnChanged(nameof(MaskUpdate))]
+		public readonly Sync<EPhysicsMask> Group;
+
+		[Default(EPhysicsMask.WorldObjects)]
+		[OnChanged(nameof(MaskUpdate))]
+		public readonly Sync<EPhysicsMask> Mask;
+
 		[Default(RCursorShape.Arrow)]
 		public readonly Sync<RCursorShape> CursorShape;
+
+		protected virtual void MaskUpdate() {
+
+		}
+		
 		protected override void OnAttach() {
 			base.OnAttach();
 			if (Entity.GetFirstComponent<Grabbable>() is not null) {
