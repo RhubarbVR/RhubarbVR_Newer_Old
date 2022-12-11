@@ -11,6 +11,7 @@ namespace RhuEngine.Components
 {
 
 	[Category(new string[] { "Developer" })]
+	[UpdateLevel(UpdateEnum.Normal)]
 	public sealed class GizmoPlane : Component
 	{
 
@@ -24,6 +25,14 @@ namespace RhuEngine.Components
 		public readonly Linker<bool> PositionCollider;
 
 		public readonly Linker<Colorf> ColorOfPositionGizmo;
+
+		public readonly SyncRef<PhysicsObject> PositionColliderTarget;
+		protected override void Step() {
+			base.Step();
+			if (PositionColliderTarget.Target is not null & ColorOfPositionGizmo.Linked) {
+				ColorOfPositionGizmo.LinkedValue = PositionColliderTarget.Target.LazeredThisFrame ? GetColor(0.7f) : GetColor();
+			}
+		}
 
 		private Colorf GetColor(float addedValue = 0) {
 			return Direction.Value switch {
@@ -45,14 +54,14 @@ namespace RhuEngine.Components
 		protected override void OnAttach() {
 			base.OnAttach();
 			var plane = Entity.AddChild("Plane");
-			plane.position.Value = new Vector3f(0.6f / 5, 0, 0.6f / 5);
+			plane.position.Value = new Vector3f(0.6f, 0, 0.6f);
 			var positionMeshRender = plane.AttachComponent<MeshRender>();
 			Position.Target = positionMeshRender.Enabled;
 			var planeMesh = plane.AttachComponent<RectangleMesh>();
-			planeMesh.Dimensions.Value = new Vector2f(0.5f / 5);
+			planeMesh.Dimensions.Value = new Vector2f(0.5f);
 
 			var posColider = plane.AttachComponent<BoxShape>();
-			posColider.Size.Value = new Vector3f(0.5f, 0.02f, 0.5f) / 5;
+			posColider.Size.Value = new Vector3f(0.5f, 0.02f, 0.5f);
 			PositionCollider.Target = posColider.Enabled;
 			positionMeshRender.mesh.Target = planeMesh;
 			var posmit = Entity.AttachComponent<UnlitMaterial>();
@@ -60,6 +69,7 @@ namespace RhuEngine.Components
 			posmit.Transparency.Value = Transparency.Blend;
 
 			ColorOfPositionGizmo.Target = posmit.Tint;
+			PositionColliderTarget.Target = posColider;
 		}
 
 		protected override void OnLoaded() {

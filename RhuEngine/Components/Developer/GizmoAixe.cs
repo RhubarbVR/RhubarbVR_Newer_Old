@@ -55,6 +55,24 @@ namespace RhuEngine.Components
 		public readonly Linker<Colorf> ColorOfScaleGizmo;
 		public readonly Linker<Colorf> ColorOfPositionGizmo;
 
+		public readonly SyncRef<PhysicsObject> RotationColliderTarget;
+		public readonly SyncRef<PhysicsObject> ScaleColliderTarget;
+		public readonly SyncRef<PhysicsObject> Scale2ColliderTarget;
+		public readonly SyncRef<PhysicsObject> PositionColliderTarget;
+
+		protected override void Step() {
+			base.Step();
+			if (RotationColliderTarget.Target is not null & ColorOfRotationGizmo.Linked) {
+				ColorOfRotationGizmo.LinkedValue = RotationColliderTarget.Target.LazeredThisFrame ? GetColor(0.85f) : GetColor();
+			}
+			if (ScaleColliderTarget.Target is not null & Scale2ColliderTarget.Target is not null & ColorOfScaleGizmo.Linked) {
+				ColorOfScaleGizmo.LinkedValue = (Scale2ColliderTarget.Target.LazeredThisFrame | ScaleColliderTarget.Target.LazeredThisFrame) ? GetColor(0.85f) : GetColor();
+			}
+			if (PositionColliderTarget.Target is not null & ColorOfPositionGizmo.Linked) {
+				ColorOfPositionGizmo.LinkedValue = PositionColliderTarget.Target.LazeredThisFrame ? GetColor(0.85f) : GetColor();
+			}
+		}
+
 
 		private void UpdateMeshes() {
 			if (RotationCollider.Linked) {
@@ -96,21 +114,23 @@ namespace RhuEngine.Components
 			var rotationMeshRender = Entity.AttachComponent<MeshRender>();
 			Rotation.Target = rotationMeshRender.Enabled;
 			var rotMesh = Entity.AttachComponent<TorusMesh>();
-			rotMesh.MajorRadius.Value = 1.7f / 5;
-			rotMesh.MinorRadius.Value = 0.05f / 5;
+			rotMesh.MajorRadius.Value = 1.7f;
+			rotMesh.MinorRadius.Value = 0.05f;
 			rotationMeshRender.mesh.Target = rotMesh;
 			//var rotColider = Entity.AttachComponent<MeshShape>();
 			//rotColider.TargetMesh.Target = rotMesh;
 			//RotationCollider.Target = rotColider.Enabled;
+			//RotationColliderTarget.Target = rotColider;
 
-			var mainBoxShapeColider = Entity.AddChild("TipCollider").AttachComponent<BoxShape>();
+			var mainBoxShapeColider = Entity.AttachComponent<BoxShape>();
 
-			var scaleMeshRender = mainBoxShapeColider.Entity.AttachComponent<MeshRender>();
+
+			var scaleMeshRender = Entity.AttachComponent<MeshRender>();
 			Scale.Target = scaleMeshRender.Enabled;
-			var boxStickMesh = mainBoxShapeColider.Entity.AttachComponent<TrivialBox3Mesh>();
-			boxStickMesh.Extent.Value = new Vector3f(0.2f / 5);
-
-			mainBoxShapeColider.Entity.position.Value = new Vector3f(0, 2.8f / 5, 0);
+			var boxStickMesh = Entity.AttachComponent<TrivialBox3Mesh>();
+			boxStickMesh.Extent.Value = new Vector3f(0.2f);
+			boxStickMesh.Center.Value = new Vector3f(0, 2.6f, 0);
+			mainBoxShapeColider.PosOffset.Value = new Vector3f(0, 2.6f, 0);
 			mainBoxShapeColider.Size.Value = boxStickMesh.Extent.Value;
 			ScaleCollider.Target = mainBoxShapeColider.Enabled;
 			scaleMeshRender.mesh.Target = boxStickMesh;
@@ -119,27 +139,28 @@ namespace RhuEngine.Components
 			Scale2.Target = scaletwo.Enabled;
 			var scalecyl = Entity.AttachComponent<CylinderMesh>();
 			scaletwo.mesh.Target = scalecyl;
-			scalecyl.Height.Value = 2.6f / 5;
-			scalecyl.BaseRadius.Value = scalecyl.TopRadius.Value = 0.03f / 5;
+			scalecyl.Height.Value = 2.6f;
+			scalecyl.BaseRadius.Value = scalecyl.TopRadius.Value = 0.03f;
 
 			var scaleColider = Entity.AttachComponent<CylinderShape>();
-			scaleColider.PosOffset.Value = new Vector3f(0, 2.6f / 2, 0);
+			scaleColider.PosOffset.Value = new Vector3f(0, 1.3f, 0);
 			scaleColider.Height.Value = 2.6f;
-			scaleColider.Radius.Value = 0.03f / 5;
+			scaleColider.Radius.Value = 0.03f;
 			Scale2Collider.Target = scaleColider.Enabled;
 
 			var positionMeshRender = Entity.AttachComponent<MeshRender>();
 			Position.Target = positionMeshRender.Enabled;
 			var arrowMesh = Entity.AttachComponent<ArrowMesh>();
-			arrowMesh.StickLength.Value = 1.98f / 5;
-			arrowMesh.StickRadius.Value = 0.04f / 5;
-			arrowMesh.HeadBaseRadius.Value = 0.1f / 5;
-			arrowMesh.HeadLength.Value = 0.4f / 5;
+			arrowMesh.StickLength.Value = 1.98f;
+			arrowMesh.StickRadius.Value = 0.04f;
+			arrowMesh.HeadBaseRadius.Value = 0.1f;
+			arrowMesh.HeadLength.Value = 0.4f;
 			var posColider = Entity.AttachComponent<CylinderShape>();
-			posColider.PosOffset.Value = new Vector3f(0, 1.2f / 5, 0);
-			posColider.Height.Value = 1.2f / 2.5f;
-			posColider.Radius.Value = 0.05f / 5;
+			posColider.PosOffset.Value = new Vector3f(0, 2.3f / 2, 0);
+			posColider.Height.Value = 2.3f;
+			posColider.Radius.Value = 0.05f;
 			PositionCollider.Target = posColider.Enabled;
+			PositionColliderTarget.Target = posColider;
 
 			positionMeshRender.mesh.Target = arrowMesh;
 
@@ -158,6 +179,8 @@ namespace RhuEngine.Components
 			ColorOfRotationGizmo.Target = rotmit.Tint;
 			ColorOfPositionGizmo.Target = posmit.Tint;
 			ColorOfScaleGizmo.Target = scalemit.Tint;
+			ScaleColliderTarget.Target = mainBoxShapeColider;
+			Scale2ColliderTarget.Target = scaleColider;
 
 		}
 

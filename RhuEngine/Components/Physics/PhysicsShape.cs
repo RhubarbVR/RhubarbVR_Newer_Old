@@ -123,7 +123,7 @@ namespace RhuEngine.Components
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private RigidPose GetRigidPose() {
-			var globalTrans = Entity.GlobalTrans;
+			var globalTrans = RNumerics.Matrix.T(PosOffset.Value) * Entity.GlobalTrans;
 			var rigidPose = new RigidPose(MathUtil.Clamp(globalTrans.Translation.Clean, -1E+08f, 1E+08f), (Quaternion)globalTrans.Rotation.Clean);
 			return rigidPose;
 		}
