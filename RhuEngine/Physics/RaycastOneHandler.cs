@@ -37,6 +37,7 @@ namespace RhuEngine.Physics
 			hitNormal = default;
 			hitCollidable = default;
 			hitChildIndex = 0;
+			hasHit = false;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
