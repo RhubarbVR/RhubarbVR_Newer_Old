@@ -20,8 +20,8 @@ namespace RhuEngine.Components
 		}
 
 		public override void RemoveShape() {
-			Simulation.Simulation.Shapes.RemoveAndDispose(shapeIndex, Simulation.BufferPool);
-			shapeIndex = default;
+			Simulation.Simulation.Shapes.RemoveAndDispose(ShapeIndex, Simulation.BufferPool);
+			ShapeIndex = default;
 		}
 	}
 }

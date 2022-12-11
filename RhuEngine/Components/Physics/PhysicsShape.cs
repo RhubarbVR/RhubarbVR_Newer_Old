@@ -13,6 +13,7 @@ using BepuUtilities;
 using System.Numerics;
 using static RNumerics.RoundRectGenerator;
 using System.Runtime.CompilerServices;
+using DiscordRPC;
 
 namespace RhuEngine.Components
 {
@@ -23,8 +24,28 @@ namespace RhuEngine.Components
 
 		public readonly Sync<Vector3f> PosOffset;
 
-		public TypedIndex shapeIndex;
+		protected override void OnLoaded() {
+			base.OnLoaded();
+			Entity.GlobalTransformChange += Entity_GlobalTransformChange;
+			UpdateShape();
+		}
 
+		public override void Dispose() {
+			IsDestroying = true;
+			Entity.GlobalTransformChange -= Entity_GlobalTransformChange;
+			RemoveShape();
+			base.Dispose();
+			GC.SuppressFinalize(this);
+		}
+
+		private void Entity_GlobalTransformChange(Entity arg1, bool arg2) {
+			if(_lastWorldScale != Entity.GlobalTrans.Scale) {
+				UpdateShape();
+			}
+		}
+
+		public TypedIndex ShapeIndex { get; protected set; }
+		public BodyInertia BodyInertiaCache { get; protected set; }
 		public abstract void RemoveShape();
 
 		public abstract T CreateShape(ref float speculativeMargin, float? mass, out BodyInertia inertia);
@@ -33,14 +54,27 @@ namespace RhuEngine.Components
 			RUpdateManager.ExecuteOnStartOfFrame(this, UpdateShapeNow);
 		}
 
+		private readonly bool _isChild;//Todo set true when used is sub body
+
+		public float? MassValue => _isChild ? Mass.Value : null;
+
+		private Vector3f _lastWorldScale;
+
 		private void UpdateShapeNow() {
+			if (IsDestroying) {
+				return;
+			}
 			var specultive = SPECULATIVE_MARGIN;
-			if (shapeIndex == default) {
-				var shape = CreateShape(ref specultive, null, out _);
-				shapeIndex = Simulation.Simulation.Shapes.Add(in shape);
+			if (ShapeIndex == default) {
+				var shape = CreateShape(ref specultive, MassValue, out var bodyInertiaCache);
+				_lastWorldScale = Entity.GlobalTrans.Scale;
+				ShapeIndex = Simulation.Simulation.Shapes.Add(in shape);
+				BodyInertiaCache = bodyInertiaCache;
 			}
 			else {
-				Simulation.Simulation.Shapes.GetShape<T>(shapeIndex.Index) = CreateShape(ref specultive, null, out _);
+				Simulation.Simulation.Shapes.GetShape<T>(ShapeIndex.Index) = CreateShape(ref specultive, MassValue, out var bodyInertiaCache);
+				_lastWorldScale = Entity.GlobalTrans.Scale;
+				BodyInertiaCache = bodyInertiaCache;
 			}
 		}
 

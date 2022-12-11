@@ -41,6 +41,14 @@ namespace RhuEngine.WorldObjects
 		public void Initialize(bool networkedWorld, bool networkedObject, bool deserialize, bool isPersonalSpace) {
 			IsPersonalSpace = isPersonalSpace;
 			try {
+				PhysicsSimulation = new PhysicsSimulation();
+				PhysicsSimulation.Init(this);
+			}
+			catch (Exception e) {
+				RLog.Err("Failed to start PhysicsSimulation for world Error:" + e.ToString());
+				throw;
+			}
+			try {
 				var data = typeof(World).GetFields(BindingFlags.Public | BindingFlags.Instance);
 				var disposeables = new HashSet<IDisposable>();
 				foreach (var item in data) {

@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 			var size = Size.Value;
 			ApplyGlobalScaleValues(ref size);
 			speculativeMargin = MathF.Min(speculativeMargin, MathUtil.Max(size.x, size.y, size.z));
-			var result = new BepuPhysics.Collidables.Box(size.x, size.y, size.z);
+			var result = new Box(size.x, size.y, size.z);
 			inertia = !mass.HasValue ? default : result.ComputeInertia(mass.Value);
 			return result;
 		}

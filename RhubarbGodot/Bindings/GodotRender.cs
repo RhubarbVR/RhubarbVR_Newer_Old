@@ -42,7 +42,7 @@ namespace RhubarbVR.Bindings
 
 		public static Transform3D GetTrans(this Matrix matrix) {
 			matrix.Decompose(out var pos, out var rot, out var scale);
-			return pos.IsAnyNan || rot.IsAnyNan || scale.IsAnyNan ? new Transform3D() : CastPosMatrix(matrix);
+			return pos.IsAnyNanOrInfinity || rot.IsAnyNanOrInfinity || scale.IsAnyNanOrInfinity ? new Transform3D() : CastPosMatrix(matrix);
 		}
 
 		public static void SetPos(this Node3D node3D, Matrix matrix) {

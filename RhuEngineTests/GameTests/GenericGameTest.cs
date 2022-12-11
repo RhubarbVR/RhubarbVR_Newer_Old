@@ -365,18 +365,18 @@ namespace RhuEngine.GameTests.Tests
 
 
 
-		[TestMethod]
-		public void RiggedBodEntityyTest() {
-			var testEntity = AttachEntity();
-			testEntity.position.Value = Vector3f.One * 10;
-			var a = testEntity.AddChild("A");
-			var boxShape = a.AttachComponent<BoxShape>();
-			var startTrans = a.GlobalTrans;
-			a.AttachComponent<RigidBody>();
-			tester.RunForSteps(20);
-			Assert.AreNotEqual(startTrans, a.GlobalTrans);
-			tester.Dispose();
-		}
+		//[TestMethod]
+		//public void RiggedBodEntityyTest() {
+		//	var testEntity = AttachEntity();
+		//	testEntity.position.Value = Vector3f.One * 10;
+		//	var a = testEntity.AddChild("A");
+		//	var boxShape = a.AttachComponent<BoxShape>();
+		//	var startTrans = a.GlobalTrans;
+		//	a.AttachComponent<RigidBody>();
+		//	tester.RunForSteps(20);
+		//	Assert.AreNotEqual(startTrans, a.GlobalTrans);
+		//	tester.Dispose();
+		//}
 
 
 	
