@@ -7,18 +7,20 @@ using System.Threading;
 using RhuEngine.Managers;
 using RhuEngine.WorldObjects.ECS;
 using RhuEngine.Linker;
-using RhuEngine.Physics;
 using RNumerics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using RhuEngine.Datatypes;
 using RhuEngine.Components;
+using BepuPhysics;
+using BepuUtilities.Memory;
+using RhuEngine.Physics;
+using System.Numerics;
 
 namespace RhuEngine.WorldObjects
 {
 	public sealed partial class World : IWorldObject
 	{
-		public PhysicsSim PhysicsSim { get; set; }
 
 		public bool IsLoading => (IsDeserializing || IsLoadingNet) & !HasError;
 		public bool IsOverlayWorld => worldManager.OverlayWorld == this;
@@ -28,8 +30,9 @@ namespace RhuEngine.WorldObjects
 		public readonly WorldManager worldManager;
 		public Engine Engine => worldManager.Engine;
 
+		public PhysicsSimulation PhysicsSimulation { get; private set; }
+
 		public World(WorldManager worldManager) {
-			PhysicsSim = new PhysicsSim();
 			this.worldManager = worldManager;
 		}
 
@@ -39,6 +42,7 @@ namespace RhuEngine.WorldObjects
 			IsPersonalSpace = isPersonalSpace;
 			try {
 				var data = typeof(World).GetFields(BindingFlags.Public | BindingFlags.Instance);
+				var disposeables = new HashSet<IDisposable>();
 				foreach (var item in data) {
 					if ((item.Attributes & FieldAttributes.InitOnly) == 0) {
 						continue;
@@ -46,7 +50,7 @@ namespace RhuEngine.WorldObjects
 					if ((item.GetCustomAttribute<NoLoadAttribute>() == null) && typeof(SyncObject).IsAssignableFrom(item.FieldType) && !((item.GetCustomAttribute<NoSaveAttribute>() != null) && (item.GetCustomAttribute<NoSyncAttribute>() != null))) {
 						var instance = (SyncObject)Activator.CreateInstance(item.FieldType);
 						instance.Initialize(this, this, item.Name, networkedObject, deserialize, null);
-						_disposables.Add(instance);
+						disposeables.Add(instance);
 						if (typeof(ISyncProperty).IsAssignableFrom(item.FieldType)) {
 							var startValue = item.GetCustomAttribute<BindPropertyAttribute>();
 							if (startValue != null) {
@@ -99,12 +103,14 @@ namespace RhuEngine.WorldObjects
 						item.SetValue(this, instance);
 					}
 				}
+				_disposables = disposeables.ToArray();
 			}
 			catch (Exception ex) {
 				RLog.Err("Failed to InitializeMembers" + ex.ToString());
 				throw new Exception("Failed to InitializeMembers", ex);
 			}
 			StartTime.Value = DateTime.UtcNow;
+			WorldGravity.Value = new Vector3(0, -10, 0);
 			if (isPersonalSpace | !networkedWorld) {
 				IsDeserializing = false;
 				AddLocalUser();
@@ -207,6 +213,8 @@ namespace RhuEngine.WorldObjects
 		[NoSave]
 		public readonly Sync<DateTime> StartTime;
 
+		public readonly Sync<Vector3f> WorldGravity;
+
 		public double WorldTime => (DateTime.UtcNow - StartTime).TotalSeconds;
 
 		[Default("New World")]
@@ -305,7 +313,7 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			try {
-				PhysicsSim.UpdateSim(RTime.Elapsed);
+				PhysicsSimulation.Update(RTime.Elapsed);
 			}
 			catch (Exception e) {
 				RLog.Err($"Failed To update PhysicsSim Error:{e}");
@@ -338,7 +346,7 @@ namespace RhuEngine.WorldObjects
 		public bool IsDisposed { get; private set; }
 		public bool HasError { get; internal set; }
 
-		internal readonly List<IDisposable> _disposables = new();
+		internal IDisposable[] _disposables = Array.Empty<IDisposable>();
 
 		public void Dispose() {
 			if (IsDisposed) {
@@ -347,9 +355,12 @@ namespace RhuEngine.WorldObjects
 			IsDisposed = true;
 			IsDisposeing?.Invoke(this);
 			Task.Run(async () => {
+				PhysicsSimulation?.Dispose();
+				PhysicsSimulation = null;
 				foreach (var item in _disposables) {
-					item.Dispose();
+					item?.Dispose();
 				}
+				_disposables = Array.Empty<IDisposable>();
 				try {
 					worldManager.RemoveWorld(this);
 				}

@@ -16,7 +16,6 @@ using RNumerics;
 using System.Threading;
 using RhuEngine.Components;
 using System.Runtime;
-using RhuEngine.Physics;
 
 namespace RhuEngine
 {
@@ -283,11 +282,6 @@ namespace RhuEngine
 				StartingLogo.Material = LoadingLogo.Material;
 			}
 			var startcode = () => {
-				if(PhysicsSim.Manager is null) {
-					IntMsg = "Failed to load Physics";
-					RLog.Err($"Failed to find Physics Library at startup");
-					return;
-				}
 				IntMsg = "Building NetApiManager";
 				netApiManager = new NetApiManager((_userDataPathOverRide ?? EngineHelpers.BaseDir) + "/rhuCookie");
 				IntMsg = "Building AssetManager";

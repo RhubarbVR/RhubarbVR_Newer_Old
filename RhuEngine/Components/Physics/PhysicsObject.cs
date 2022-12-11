@@ -3,118 +3,26 @@ using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 using RhuEngine.Linker;
-using RhuEngine.Physics;
 using System;
+using RhuEngine.Physics;
 
 namespace RhuEngine.Components
 {
 	public abstract class PhysicsObject : Component
 	{
-		private ColliderShape _collider;
+		public const float SPECULATIVE_MARGIN = 0.1f;
+		public const float COMMON_MAX = 1000000f;
+		public const float COMMON_MIN = 0.0000001f;
 
-		public RigidBodyCollider rigidBody;
-
-		[OnChanged(nameof(RebuildPysics))]
-		[Default(ECollisionFilterGroups.StaticFilter)]
-		public readonly Sync<ECollisionFilterGroups> Mask;
-
-		[OnChanged(nameof(RebuildPysics))]
-		[Default(ECollisionFilterGroups.StaticFilter)]
-		public readonly Sync<ECollisionFilterGroups> Group;
+		public PhysicsSimulation Simulation => World.PhysicsSimulation;
 
 		[Default(RCursorShape.Arrow)]
 		public readonly Sync<RCursorShape> CursorShape;
-
-		[OnChanged(nameof(RebuildPysics))]
-		public readonly Sync<Vector3f> Pos;
-		[OnChanged(nameof(RebuildPysics))]
-		public readonly Sync<Vector3f> Scale;
-		[OnChanged(nameof(RebuildPysics))]
-		public readonly Sync<Quaternionf> Rotation;
-
 		protected override void OnAttach() {
 			base.OnAttach();
-			Scale.Value = Vector3f.One;
-			Rotation.Value = Quaternionf.Identity;
 			if (Entity.GetFirstComponent<Grabbable>() is not null) {
 				CursorShape.Value = RCursorShape.Move;
 			}
-		}
-
-		public abstract ColliderShape PysicsBuild();
-		public void RebuildPysics() {
-			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
-				var shape = PysicsBuild();
-				if (shape is not null) {
-					BuildPhysics(shape);
-				}
-			});
-		}
-
-		public event Action<RigidBodyCollider> AddedData;
-
-		public void BuildPhysics(ColliderShape colliderShape) {
-			rigidBody?.Remove();
-			rigidBody?.Dispose();
-			rigidBody = null;
-			if (_collider is not null) {
-				_collider?.Dispose();
-				_collider = null;
-			}
-			if (Pos.Value == Vector3f.Zero && Rotation.Value == Quaternionf.Identity && Scale.Value == Vector3f.One) {
-				_collider = colliderShape;
-			}
-			else {
-				var mainShape = new RCompoundShape();
-				mainShape.AddShape(colliderShape, Matrix.TRS(Pos.Value, Rotation.Value, Scale.Value));
-				_collider = mainShape;
-			}
-			rigidBody = _collider.GetCollider(World.PhysicsSim, this);
-			rigidBody.Mask = Mask.Value;
-			rigidBody.Group = Group.Value;
-			rigidBody.Matrix = Entity.GlobalTrans;
-			rigidBody.Enabled = Entity.enabled;
-			AddedData?.Invoke(rigidBody);
-		}
-
-		protected override void OnLoaded() {
-			base.OnLoaded();
-			Entity.GlobalTransformChange += Entity_GlobalTransformChange;
-			Entity.enabled.Changed += Enabled_Changed;
-			Enabled.Changed += Enabled_Changed;
-			RebuildPysics();
-		}
-
-		private void Enabled_Changed(IChangeable obj) {
-			if(rigidBody is null) {
-				return;
-			}
-			rigidBody.Enabled = Entity.enabled && Enabled.Value;
-		}
-
-		public override void Dispose() {
-			if (_collider is not null) {
-				_collider?.Dispose();
-			}
-			_collider = null;
-			if (rigidBody is not null) {
-				rigidBody?.Dispose();
-			}
-			rigidBody = null;
-			Entity.GlobalTransformChange -= Entity_GlobalTransformChange;
-			Entity.enabled.Changed -= Enabled_Changed;
-			Enabled.Changed -= Enabled_Changed;
-			base.Dispose();
-			GC.SuppressFinalize(this);
-		}
-		private void Entity_GlobalTransformChange(Entity obj, bool isStandaredMove) {
-			if (!isStandaredMove) {
-				return;
-			}
-			if (rigidBody is null) {
-				return;
-			}
-			rigidBody.Matrix = Entity.GlobalTrans;
 		}
 
 		public ulong LastFrameTouch = 0;
@@ -164,5 +72,6 @@ namespace RhuEngine.Components
 				LazerHand = hand;
 			});
 		}
+
 	}
 }

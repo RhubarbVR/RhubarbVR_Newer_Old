@@ -3,29 +3,30 @@ using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 using RhuEngine.Linker;
-using RhuEngine.Physics;
+using BepuPhysics.Collidables;
+using BepuPhysics;
+using System;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public sealed class CapsuleShape : PhysicsObject
+	public sealed class CapsuleShape : BasicPhysicsShape<Capsule>
 	{
-		[OnChanged(nameof(RebuildPysics))]
-		[Default(0.5)]
-		public readonly Sync<double> Radius;
-		[OnChanged(nameof(RebuildPysics))]
-		[Default(1.0)]
-		public readonly Sync<double> Height;
-		[OnChanged(nameof(RebuildPysics))]
-		public readonly Sync<Dir> Direction;
+		[Default(0.5f)]
+		[OnChanged(nameof(UpdateShape))]
+		public readonly Sync<float> Radius;
 
-		public override ColliderShape PysicsBuild() {
-			return Direction.Value switch {
-				Dir.Y => new RCapsuleShape(Radius, Height),
-				Dir.X => new RCapsuleShapeX(Radius, Height),
-				Dir.Z => new RCapsuleShapeZ(Radius, Height),
-				_ => null,
-			};
+		[Default(1.0f)]
+		[OnChanged(nameof(UpdateShape))]
+		public readonly Sync<float> Height;
+
+		public override Capsule CreateShape(ref float speculativeMargin, float? mass, out BodyInertia inertia) {
+			var size = new Vector3f(Radius.Value, Height.Value, Radius.Value);
+			ApplyGlobalScaleValues(ref size);
+			speculativeMargin = MathF.Min(speculativeMargin, MathUtil.Max(size.x, size.y, size.z));
+			var result = new BepuPhysics.Collidables.Capsule((size.x + size.y) / 2, size.y);
+			inertia = !mass.HasValue ? default : result.ComputeInertia(mass.Value);
+			return result;
 		}
 	}
 }

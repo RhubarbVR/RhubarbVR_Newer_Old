@@ -203,19 +203,6 @@ namespace RhubarbVR.Bindings
 		}
 
 		public void LoadStatics() {
-			try {
-				new RBullet.BulletPhsyicsLink().RegisterPhysics();
-			}
-			catch {
-				var godotEngineMain = Path.Combine(System.Environment.CurrentDirectory, ".godot", "mono", "temp", "bin", "Debug");
-				if (Directory.Exists(godotEngineMain)) {
-					CopyNeededFiles(godotEngineMain);
-					new RBullet.BulletPhsyicsLink().RegisterPhysics();
-				}
-				else {
-					RLog.Err("Failed to find runtime folder");
-				}
-			}
 			RTime.Instance = EngineRunner;
 			RFont.Instance = typeof(GodotFont);
 			RText.Instance = typeof(GodotTextRender);

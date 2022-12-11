@@ -3,28 +3,30 @@ using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 using RhuEngine.Linker;
-using RhuEngine.Physics;
+using BepuPhysics.Collidables;
+using Assimp;
+using BepuPhysics;
+using System;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public sealed class CylinderShape : PhysicsObject
+	public sealed class CylinderShape : BasicPhysicsShape<Cylinder>
 	{
-		[OnChanged(nameof(RebuildPysics))]
-		public readonly Sync<Vector3d> boxHalfExtent;
-		[OnChanged(nameof(RebuildPysics))]
-		public readonly Sync<Dir> Direction;
-		protected override void OnAttach() {
-			base.OnAttach();
-			boxHalfExtent.Value = new Vector3d(0.5f);
-		}
-		public override ColliderShape PysicsBuild() {
-			return Direction.Value switch {
-				Dir.Y => new RCylinderShape(boxHalfExtent.Value.x, boxHalfExtent.Value.y, boxHalfExtent.Value.z),
-				Dir.X => new RCylinderXShape(boxHalfExtent.Value.x, boxHalfExtent.Value.y, boxHalfExtent.Value.z),
-				Dir.Z => new RCylinderZShape(boxHalfExtent.Value.x, boxHalfExtent.Value.y, boxHalfExtent.Value.z),
-				_ => null,
-			};
+		[Default(0.5f)]
+		[OnChanged(nameof(UpdateShape))]
+		public readonly Sync<float> Radius;
+		[Default(1.0f)]
+		[OnChanged(nameof(UpdateShape))]
+		public readonly Sync<float> Height;
+
+		public override Cylinder CreateShape(ref float speculativeMargin, float? mass, out BodyInertia inertia) {
+			var size = new Vector3f(Radius.Value, Height.Value, Radius.Value);
+			ApplyGlobalScaleValues(ref size);
+			speculativeMargin = MathF.Min(speculativeMargin, MathUtil.Max(size.x, size.y, size.z));
+			var result = new BepuPhysics.Collidables.Cylinder((size.x + size.y) / 2, size.y);
+			inertia = !mass.HasValue ? default : result.ComputeInertia(mass.Value);
+			return result;
 		}
 	}
 }

@@ -4,7 +4,6 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
 using System;
-using RhuEngine.Physics;
 using System.Collections.Generic;
 
 namespace RhuEngine.Components
@@ -70,13 +69,9 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<float> FrontBindRadus;
 
-		public RigidBodyCollider PhysicsCollider;
-
 		public Handed LastHand { get; private set; }
 
 		public override void ComputeMesh() {
-			PhysicsCollider?.Remove();
-			PhysicsCollider = null;
 			var min = Min.Value + ((Vector2f)MinOffset.Value / (Vector2f)Resolution.Value);
 			var max = Max.Value + ((Vector2f)MaxOffset.Value / (Vector2f)Resolution.Value);
 			var rectSize = max - min;
@@ -97,19 +92,16 @@ namespace RhuEngine.Components
 			NewMesh.Scale(Scale.Value.x / 10, Scale.Value.y / 10, Scale.Value.z / 10);
 			NewMesh.Translate(-(Scale.Value.x / 20), -(Scale.Value.y / 20), 0);
 			GenMesh(NewMesh);
-			PhysicsCollider = new RRawMeshShape(NewMesh).GetCollider(World.PhysicsSim);
-			PhysicsCollider.CustomObject = this;
-			PhysicsCollider.Group = ECollisionFilterGroups.UI;
-			PhysicsCollider.Mask = ECollisionFilterGroups.UI;
-			PhysicsCollider.Enabled = Entity.IsEnabled;
+			//PhysicsCollider = new RRawMeshShape(NewMesh).GetCollider(World.PhysicsSim);
+			//PhysicsCollider.CustomObject = this;
+			//PhysicsCollider.Group = ECollisionFilterGroups.UI;
+			//PhysicsCollider.Mask = ECollisionFilterGroups.UI;
+			//PhysicsCollider.Enabled = Entity.IsEnabled;
 		}
 
 		protected override void RenderStep() {
 			base.RenderStep();
 			RenderLocation = Entity.GlobalTrans;
-			if (PhysicsCollider is not null) {
-				PhysicsCollider.Matrix = RenderLocation;
-			}
 
 			foreach (var item in hitDatas) {
 				var pos = item.HitPointOnCanvas;
@@ -140,18 +132,6 @@ namespace RhuEngine.Components
 			Scale.Value = new Vector3f(16, 9, 1);
 			Max.Value = Vector2f.One;
 
-		}
-
-		protected override void OnLoaded() {
-			base.OnLoaded();
-			Entity.EnabledChanged += Entity_EnabledChanged;
-			Entity_EnabledChanged();
-		}
-
-		private void Entity_EnabledChanged() {
-			if (PhysicsCollider is not null) {
-				PhysicsCollider.Enabled = Entity.IsEnabled;
-			}
 		}
 
 		public Matrix RenderLocation;
@@ -250,11 +230,6 @@ namespace RhuEngine.Components
 		}
 		public void ProcessHitLazer(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForces, Handed side) {
 			AddHitData(new HitData(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side));
-		}
-
-		public override void Dispose() {
-			base.Dispose();
-			PhysicsCollider?.Remove();
 		}
 	}
 }

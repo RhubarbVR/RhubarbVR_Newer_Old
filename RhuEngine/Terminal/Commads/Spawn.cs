@@ -46,53 +46,56 @@ namespace RhuEngine.Commads
 			AttachEntiyTo.GlobalTrans = Matrix.TS(0, 0, -3,0.25f) * enty.GlobalTrans;
 			AttachEntiyTo.AttachComponent<Grabbable>();
 			IAssetProvider<RMesh> meshe;
+			void AttachMeshCollider() {
+				AttachEntiyTo.AttachComponent<MeshShape>().TargetMesh.Target = meshe;
+			}
 			switch (spawntype) {
 				case SpawnObject.sphere:
-					(meshe, _) = AttachEntiyTo.AttachMesh<Sphere3NormalizedCubeMesh, UnlitMaterial>();
+					(_, _) = AttachEntiyTo.AttachMesh<Sphere3NormalizedCubeMesh, UnlitMaterial>();
 					AttachEntiyTo.AttachComponent<SphereShape>();
 					break;
 				case SpawnObject.arrow:
 					(meshe, _) = AttachEntiyTo.AttachMesh<ArrowMesh, UnlitMaterial>();
-					AttachEntiyTo.AttachComponent<BoxShape>();
+					AttachMeshCollider();
 					break;
 				case SpawnObject.capsule:
-					(meshe, _) = AttachEntiyTo.AttachMesh<CapsuleMesh, UnlitMaterial>();
+					(_, _) = AttachEntiyTo.AttachMesh<CapsuleMesh, UnlitMaterial>();
 					AttachEntiyTo.AttachComponent<CapsuleShape>();
 					break;
 				case SpawnObject.cone:
 					(meshe, _) = AttachEntiyTo.AttachMesh<ConeMesh, UnlitMaterial>();
-					AttachEntiyTo.AttachComponent<ConeShape>();
+					AttachMeshCollider();
 					break;
 				case SpawnObject.cylinder:
-					(meshe, _) = AttachEntiyTo.AttachMesh<CylinderMesh, UnlitMaterial>();
+					(_, _) = AttachEntiyTo.AttachMesh<CylinderMesh, UnlitMaterial>();
 					AttachEntiyTo.AttachComponent<CylinderShape>();
 					break;
 				case SpawnObject.icosphere:
-					(meshe, _) = AttachEntiyTo.AttachMesh<IcosphereMesh, UnlitMaterial>();
+					(_, _) = AttachEntiyTo.AttachMesh<IcosphereMesh, UnlitMaterial>();
 					AttachEntiyTo.AttachComponent<SphereShape>();
 					break;
 				case SpawnObject.mobiusstrip:
 					(meshe, _) = AttachEntiyTo.AttachMesh<MobiusStripMesh, UnlitMaterial>();
-					AttachEntiyTo.AttachComponent<BoxShape>();
+					AttachMeshCollider();
 					break;
 				case SpawnObject.circle:
 					(meshe, _) = AttachEntiyTo.AttachMesh<CircleMesh, UnlitMaterial>();
-					AttachEntiyTo.AttachComponent<BoxShape>();
+					AttachMeshCollider();
 					break;
 				case SpawnObject.rectangle:
 					(meshe, _) = AttachEntiyTo.AttachMesh<RectangleMesh, UnlitMaterial>();
-					AttachEntiyTo.AttachComponent<BoxShape>();
+					AttachMeshCollider();
 					break;
 				case SpawnObject.torus:
 					(meshe, _) = AttachEntiyTo.AttachMesh<TorusMesh, UnlitMaterial>();
-					AttachEntiyTo.AttachComponent<BoxShape>();
+					AttachMeshCollider();
 					break;
 				case SpawnObject.triangle:
 					(meshe, _) = AttachEntiyTo.AttachMesh<TriangleMesh, UnlitMaterial>();
-					AttachEntiyTo.AttachComponent<BoxShape>();
+					AttachMeshCollider();
 					break;
 				default:
-					(meshe, _) = AttachEntiyTo.AttachMesh<TrivialBox3Mesh, UnlitMaterial>();
+					(_, _) = AttachEntiyTo.AttachMesh<TrivialBox3Mesh, UnlitMaterial>();
 					AttachEntiyTo.AttachComponent<BoxShape>();
 					break;
 			}

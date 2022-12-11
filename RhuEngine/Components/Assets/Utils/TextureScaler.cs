@@ -25,7 +25,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(TextScale))]
 		public readonly Linker<Vector2f> scale;
 		[OnChanged(nameof(TextScale))]
-		public readonly Linker<Vector3d> boxScale;
+		public readonly Linker<Vector3f> boxScale;
 
 		private void TextScale() {
 			if (texture.Asset is null) {
@@ -36,7 +36,7 @@ namespace RhuEngine.Components
 				scale.LinkedValue = mainSize;
 			}
 			if (boxScale.Linked) {
-				boxScale.LinkedValue = new Vector3f(mainSize.x, depth.Value, mainSize.y) / 2;
+				boxScale.LinkedValue = new Vector3f(mainSize.x, depth.Value, mainSize.y);
 			}
 		}
 

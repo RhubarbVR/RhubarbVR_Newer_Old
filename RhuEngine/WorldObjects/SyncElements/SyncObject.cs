@@ -19,19 +19,15 @@ namespace RhuEngine.WorldObjects
 
 	public abstract class SyncObject : ISyncObject
 	{
-		private readonly HashSet<IDisposable> _disposables = new();
+		private IDisposable[] _disposables = Array.Empty<IDisposable>();
 
 		public void AddDisposable(IDisposable disposable) {
 			lock (disposable) {
-				_disposables.Add(disposable);
+				Array.Resize(ref _disposables, _disposables.Length + 1);
+				_disposables[_disposables.Length - 1] = disposable;
 			}
 		}
 
-		public void RemoveDisposable(IDisposable disposable) {
-			lock (disposable) {
-				_disposables.Remove(disposable);
-			}
-		}
 		public UserProgramManager ProgramManager => WorldManager?.PrivateSpaceManager?._ProgramManager;
 		public PrivateSpaceManager PrivateSpaceManager => WorldManager?.PrivateSpaceManager;
 		public User LocalUser => World.GetLocalUser();
@@ -107,6 +103,7 @@ namespace RhuEngine.WorldObjects
 				}
 				item?.Dispose();
 			}
+			_disposables = Array.Empty<IDisposable>();
 			World?.UnRegisterWorldObject(this);
 			OnDispose = null;
 			Parent = null;

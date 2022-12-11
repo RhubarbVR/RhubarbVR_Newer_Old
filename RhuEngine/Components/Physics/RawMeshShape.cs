@@ -3,22 +3,25 @@ using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 using RhuEngine.Linker;
-using RhuEngine.Physics;
+using BepuPhysics.Collidables;
+using BepuPhysics;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public sealed class RawMeshShape : PhysicsObject
+	public sealed class MeshShape : PhysicsShape<Mesh>
 	{
-		[OnAssetLoaded(nameof(RebuildPysics))]
+		[OnAssetLoaded(nameof(UpdateShape))]
 		public readonly AssetRef<RMesh> TargetMesh;
 
-		public override ColliderShape PysicsBuild() {
-			return TargetMesh.Target is null
-				? null
-				: TargetMesh.Asset is null
-				? null
-				: TargetMesh.Asset.LoadedMesh is null ? null : (ColliderShape)new RRawMeshShape(TargetMesh.Asset.LoadedMesh);
+		public override Mesh CreateShape(ref float speculativeMargin, float? mass, out BodyInertia inertia) {
+			inertia = default;
+			return default;
+		}
+
+		public override void RemoveShape() {
+			Simulation.Simulation.Shapes.RemoveAndDispose(shapeIndex, Simulation.BufferPool);
+			shapeIndex = default;
 		}
 	}
 }

@@ -4,7 +4,6 @@ using System.Threading;
 using RhuEngine;
 using RhuEngine.Linker;
 using RhuEngine.Managers;
-using RhuEngine.Physics;
 
 namespace NullContext
 {
@@ -82,7 +81,6 @@ namespace NullContext
 
 		public void LoadStatics() {
 			RTime.Instance = this;
-			PhysicsHelper.RegisterPhysics<RBullet.BulletPhsyicsLink>();
 		}
 
 		public void Start() {

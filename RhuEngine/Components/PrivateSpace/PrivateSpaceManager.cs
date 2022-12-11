@@ -306,17 +306,17 @@ namespace RhuEngine.Components
 				return false;
 			}
 			try {
-				if (world.PhysicsSim.RayTest(ref Frompos, ref ToPos, out var collider, out var hitnormal, out var hitpointworld, Physics.ECollisionFilterGroups.AllNormal, Physics.ECollisionFilterGroups.AllNormal)) {
-					if (collider.CustomObject is CanvasMesh uIComponent) {
-						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-						uIComponent.ProcessHitTouch(handed, hitnormal, hitpointworld, handedSide);
-					}
-					if (collider.CustomObject is PhysicsObject physicsObject) {
-						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-						physicsObject.Touch(handed, hitnormal, hitpointworld, handedSide);
-					}
-					return true;
-				}
+				//if (world.PhysicsSim.RayTest(ref Frompos, ref ToPos, out var collider, out var hitnormal, out var hitpointworld, Physics.ECollisionFilterGroups.AllNormal, Physics.ECollisionFilterGroups.AllNormal)) {
+				//	if (collider.CustomObject is CanvasMesh uIComponent) {
+				//		World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
+				//		uIComponent.ProcessHitTouch(handed, hitnormal, hitpointworld, handedSide);
+				//	}
+				//	if (collider.CustomObject is PhysicsObject physicsObject) {
+				//		World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
+				//		physicsObject.Touch(handed, hitnormal, hitpointworld, handedSide);
+				//	}
+				//	return true;
+				//}
 			}
 			catch {
 			}
@@ -341,20 +341,20 @@ namespace RhuEngine.Components
 		}
 
 		public bool RunLaserCastInWorld(World world, ref Vector3f headFrompos, ref Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side, ref Vector3f hitPointWorld, ref RCursorShape rCursorShape) {
-			if (world.PhysicsSim.RayTest(ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld, Physics.ECollisionFilterGroups.AllNormal, Physics.ECollisionFilterGroups.AllNormal)) {
-				hitPointWorld = hitpointworld;
-				if (collider.CustomObject is CanvasMesh uIComponent) {
-					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.005f), new Colorf(1, 1, 0, 0.5f));
-					uIComponent.ProcessHitLazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
-					rCursorShape = uIComponent.InputInterface.Target?.RCursorShape ?? RCursorShape.Arrow;
-				}
-				if (collider.CustomObject is PhysicsObject physicsObject) {
-					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-					physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
-					rCursorShape = physicsObject.CursorShape.Value;
-				}
-				return true;
-			}
+			//if (world.PhysicsSim.RayCast(ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld, Physics.ECollisionFilterGroups.AllNormal, Physics.ECollisionFilterGroups.AllNormal)) {
+			//	hitPointWorld = hitpointworld;
+			//	if (collider.CustomObject is CanvasMesh uIComponent) {
+			//		World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.005f), new Colorf(1, 1, 0, 0.5f));
+			//		uIComponent.ProcessHitLazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
+			//		rCursorShape = uIComponent.InputInterface.Target?.RCursorShape ?? RCursorShape.Arrow;
+			//	}
+			//	if (collider.CustomObject is PhysicsObject physicsObject) {
+			//		World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
+			//		physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
+			//		rCursorShape = physicsObject.CursorShape.Value;
+			//	}
+			//	return true;
+			//}
 			return false;
 		}
 
