@@ -21,7 +21,6 @@ namespace RhuEngine.Physics
 {
 	public sealed class PhysicsSimulation : IDisposable
 	{
-
 		public Vector3 WorldGravity => World.WorldGravity.Value;
 
 		public World World { get; private set; }
@@ -92,6 +91,7 @@ namespace RhuEngine.Physics
 			}
 			colliders[index] = collider;
 		}
+
 		public bool RayCast(in Vector3f orgin, in Vector3f normal, in float dist, out PhysicsObject collider, out Vector3f hitnormal, out Vector3f hitpointworld, EPhysicsMask rayMask = EPhysicsMask.Normal) {
 			var hitTest = new RaycastOneHandler(this, x => x.Group.Value.BasicCheck(rayMask));
 			Simulation.RayCast(orgin, normal, dist, ref hitTest);
@@ -102,7 +102,7 @@ namespace RhuEngine.Physics
 		}
 
 		public bool RayCast(in Vector3f frompos, in Vector3f toPos, out PhysicsObject collider, out Vector3f hitnormal, out Vector3f hitpointworld, EPhysicsMask rayMask = EPhysicsMask.Normal) {
-			return RayCast(frompos, toPos - frompos, 1, out collider, out hitnormal, out hitpointworld, rayMask);
+			return RayCast(frompos, (toPos - frompos).Normalized, toPos.Distance(frompos), out collider, out hitnormal, out hitpointworld, rayMask);
 		}
 	}
 }
