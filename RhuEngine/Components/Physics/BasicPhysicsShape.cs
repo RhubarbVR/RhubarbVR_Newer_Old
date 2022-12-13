@@ -19,7 +19,9 @@ namespace RhuEngine.Components
 	public abstract class BasicPhysicsShape<T> : PhysicsShape<T> where T : unmanaged, IShape
 	{
 		public override void RemoveShape() {
-			Simulation.Simulation.Shapes.RemoveAndDispose(ShapeIndex.Value, Simulation.BufferPool);
+			if(ShapeIndex is not null) {
+				Simulation.Simulation.Shapes.RemoveAndDispose(ShapeIndex.Value, Simulation.BufferPool);
+			}
 			ShapeIndex = null;
 		}
 

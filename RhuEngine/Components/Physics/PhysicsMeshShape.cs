@@ -61,7 +61,9 @@ namespace RhuEngine.Components
 
 		public override void RemoveShape() {
 			CleanUpShapeData();
-			Simulation.Simulation.Shapes.RemoveAndDispose(ShapeIndex.Value, Simulation.BufferPool);
+			if (ShapeIndex is not null) {
+				Simulation.Simulation.Shapes.RemoveAndDispose(ShapeIndex.Value, Simulation.BufferPool);
+			}
 			ShapeIndex = null;
 		}
 
