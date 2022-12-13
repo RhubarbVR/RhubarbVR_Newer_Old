@@ -3,18 +3,27 @@ using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 using RhuEngine.Linker;
-using RhuEngine.Physics;
+using BepuPhysics.Collidables;
+using Assimp;
+using BepuPhysics;
+using System;
 
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public sealed class SphereShape : PhysicsObject
+	public sealed class SphereShape : BasicPhysicsShape<Sphere>
 	{
-		[OnChanged(nameof(RebuildPysics))]
-		[Default(0.50)]
-		public readonly Sync<double> Radus;
-		public override ColliderShape PysicsBuild() {
-			return new RSphereShape(Radus);
+		[Default(0.5f)]
+		[OnChanged(nameof(UpdateShape))]
+		public readonly Sync<float> Radius;
+
+		public override Sphere CreateShape(ref float speculativeMargin, float? mass, out BodyInertia inertia) {
+			var size = new Vector3f(Radius.Value, Radius.Value, Radius.Value);
+			ApplyGlobalScaleValues(ref size);
+			speculativeMargin = MathF.Min(speculativeMargin, MathUtil.Max(size.x, size.y, size.z));
+			var result = new Sphere((size.x + size.y + size.z) / 3);
+			inertia = !mass.HasValue ? default : result.ComputeInertia(mass.Value);
+			return result;
 		}
 	}
 }

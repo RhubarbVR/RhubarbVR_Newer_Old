@@ -258,48 +258,48 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 		[Exposed]
-		public Matrix GlobalToLocal(Matrix point, bool Child = true) {
+		public Matrix GlobalToLocal(in Matrix point, bool Child = true) {
 			var parentMatrix = Child ? GlobalTrans : parent.Target?.GlobalTrans ?? Matrix.Identity;
 			var newLocal = point * parentMatrix.Inverse;
 			return newLocal;
 		}
-		public void GlobalToLocal(Matrix point, bool Child, out Vector3f translation, out Quaternionf rotation, out Vector3f scale) {
+		public void GlobalToLocal(in Matrix point, bool Child, out Vector3f translation, out Quaternionf rotation, out Vector3f scale) {
 			GlobalToLocal(point, Child).Decompose(out translation, out rotation, out scale);
 		}
 		[Exposed]
-		public Vector3f GlobalPointToLocal(Vector3f point, bool Child = true) {
+		public Vector3f GlobalPointToLocal(in Vector3f point, bool Child = true) {
 			GlobalToLocal(Matrix.T(point), Child, out var newTranslation, out _, out _);
 			return newTranslation;
 		}
 		[Exposed]
-		public Vector3f GlobalScaleToLocal(Vector3f Scale, bool Child = true) {
+		public Vector3f GlobalScaleToLocal(in Vector3f Scale, bool Child = true) {
 			GlobalToLocal(Matrix.S(Scale), Child, out _, out _, out var newScale);
 			return newScale;
 		}
 		[Exposed]
-		public Quaternionf GlobalRotToLocal(Quaternionf Rot, bool Child = true) {
+		public Quaternionf GlobalRotToLocal(in Quaternionf Rot, bool Child = true) {
 			GlobalToLocal(Matrix.R(Rot), Child, out _, out var newRotation, out _);
 			return newRotation;
 		}
 		[Exposed]
-		public Matrix LocalToGlobal(Matrix point, bool Child = true) {
+		public Matrix LocalToGlobal(in Matrix point, bool Child = true) {
 			return point * (Child ? GlobalTrans : InternalParent?.GlobalTrans ?? Matrix.Identity);
 		}
-		public void LocalToGlobal(Matrix point, bool Child, out Vector3f translation, out Quaternionf rotation, out Vector3f scale) {
+		public void LocalToGlobal(in Matrix point, bool Child, out Vector3f translation, out Quaternionf rotation, out Vector3f scale) {
 			LocalToGlobal(point, Child).Decompose(out translation, out rotation, out scale);
 		}
 		[Exposed]
-		public Quaternionf LocalRotToGlobal(Quaternionf Rot, bool Child = true) {
+		public Quaternionf LocalRotToGlobal(in Quaternionf Rot, bool Child = true) {
 			LocalToGlobal(Matrix.R(Rot), Child, out _, out var newRotation, out _);
 			return newRotation;
 		}
 		[Exposed]
-		public Vector3f LocalScaleToGlobal(Vector3f scale, bool Child = true) {
+		public Vector3f LocalScaleToGlobal(in Vector3f scale, bool Child = true) {
 			LocalToGlobal(Matrix.S(scale), Child, out _, out _, out var newScale);
 			return newScale;
 		}
 		[Exposed]
-		public Vector3f LocalPosToGlobal(Vector3f pos, bool Child = true) {
+		public Vector3f LocalPosToGlobal(in Vector3f pos, bool Child = true) {
 			LocalToGlobal(Matrix.T(pos), Child, out var newPos, out _, out _);
 			return newPos;
 		}

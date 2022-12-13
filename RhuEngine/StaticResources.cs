@@ -82,14 +82,14 @@ namespace RhuEngine
 #if DEBUG
 		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("MilkSnake.png", true, "png");
 #else
-		public static RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("RhubarbVR.png",true, "png");
+		public RTexture2D RhubarbLogoV1 => _rhubarbLogoV1 ??= LoadTexture("RhubarbVR.png",true, "png");
 #endif
 
 		private RTexture2D _rhubarbLogoV2;
 #if DEBUG
 		public RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("MilkSnake.png", true, "png");
 #else
-		public static RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("RhubarbVR2.png",true, "png");
+		public RTexture2D RhubarbLogoV2 => _rhubarbLogoV2 ??= LoadTexture("RhubarbVR2.png",true, "png");
 #endif
 
 		private RTexture2D _grip;

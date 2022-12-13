@@ -36,7 +36,7 @@ namespace RhuEngine.Components
 				var scaler = Entity.AttachComponent<TextureScaler>();
 				scaler.scale.SetLinkerTarget(pmesh.Dimensions);
 				scaler.scaleMultiplier.Value = 0.1f;
-				scaler.boxScale.SetLinkerTarget(box.boxHalfExtent);
+				scaler.boxScale.SetLinkerTarget(box.Size);
 				var textur = Entity.AttachComponent<StaticTexture>();
 				scaler.texture.Target = textur;
 				textur.url.Value = data;

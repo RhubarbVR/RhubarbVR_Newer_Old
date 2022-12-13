@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 
 namespace RNumerics
@@ -57,6 +58,10 @@ namespace RNumerics
 		public static int Clamp(in int f, in int low, in int high) {
 			return (f < low) ? low : (f > high) ? high : f;
 		}
+		public static Vector3f Clamp(in Vector3f f, in float low, in float high) {
+			return new Vector3f(Clamp(f.x, low, high), Clamp(f.y, low, high), Clamp(f.z, low, high));
+		}
+
 		public static Vector2f Clamp(in Vector2f f, in Vector2f low, in Vector2f high) {
 			return new Vector2f(Clamp(f.x, low.x, high.x), Clamp(f.y, low.y, high.y));
 		}
@@ -729,7 +734,14 @@ namespace RNumerics
 		public static double FastCos(in double v) {
 			return FastSin(v + 1.5707963);
 		}
-
-
+		public static float Sign(in float value) {
+			return MathF.Sign(value);
+		}
+		public static Vector2f Sign(in Vector2f value) {
+			return new Vector2f(Sign(value.x), Sign(value.y));
+		}
+		public static Vector3f Sign(in Vector3f value) {
+			return new Vector3f(Sign(value.x), Sign(value.y), Sign(value.z));
+		}
 	}
 }

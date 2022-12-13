@@ -3,7 +3,6 @@ using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 using RhuEngine.Linker;
-using RhuEngine.Physics;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -31,8 +30,9 @@ namespace RhuEngine.Components
 		public readonly SyncRef<IValueSource<Vector3f>> Scale;
 		public readonly SyncRef<IValueSource<Quaternionf>> Rot;
 
-		[Default(1f)]
+		[Default(0.2f)]
 		public readonly Sync<float> TargetSize;
+
 		protected override void Step() {
 			base.Step();
 			if (ScaleLink.Linked) {
@@ -53,27 +53,27 @@ namespace RhuEngine.Components
 			var x = Entity.AddChild("X");
 			x.rotation.Value = Quaternionf.Rolled.Inverse * Quaternionf.Yawed180;
 			X.Target = x.AttachComponent<GizmoAixe>();
-			X.Target.Direction.Value = Dir.X;
+			X.Target.Direction.Value = GizmoDir.X;
 			XPlane.Target = x.AttachComponent<GizmoPlane>();
-			XPlane.Target.Direction.Value = Dir.X;
+			XPlane.Target.Direction.Value = GizmoDir.X;
 			driver.drivers.Add().Target = XPlane.Target.Mode;
 			driver.drivers.Add().Target = X.Target.Mode;
 
 			var y = Entity.AddChild("Y");
 			y.rotation.Value = Quaternionf.Yawed;
 			Y.Target = y.AttachComponent<GizmoAixe>();
-			Y.Target.Direction.Value = Dir.Y;
+			Y.Target.Direction.Value = GizmoDir.Y;
 			YPlane.Target = y.AttachComponent<GizmoPlane>();
-			YPlane.Target.Direction.Value = Dir.Y;
+			YPlane.Target.Direction.Value = GizmoDir.Y;
 			driver.drivers.Add().Target = YPlane.Target.Mode;
 			driver.drivers.Add().Target = Y.Target.Mode;
 
 			var z = Entity.AddChild("Z");
 			z.rotation.Value = Quaternionf.Pitched.Inverse;
 			Z.Target = z.AttachComponent<GizmoAixe>();
-			Z.Target.Direction.Value = Dir.Z;
+			Z.Target.Direction.Value = GizmoDir.Z;
 			ZPlane.Target = z.AttachComponent<GizmoPlane>();
-			ZPlane.Target.Direction.Value = Dir.Z;
+			ZPlane.Target.Direction.Value = GizmoDir.Z;
 			driver.drivers.Add().Target = ZPlane.Target.Mode;
 			driver.drivers.Add().Target = Z.Target.Mode;
 		}

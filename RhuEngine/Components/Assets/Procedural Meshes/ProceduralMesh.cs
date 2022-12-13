@@ -8,17 +8,15 @@ namespace RhuEngine.Components
 	[AllowedOnWorldRoot]
 	public abstract class ProceduralMesh : AssetProvider<RMesh>
 	{
-		public RMesh loadedMesh = null;
 		public SimpleMesh LoadedSimpleMesh { get; private set; }
 
 		public void GenMesh(IMesh mesh) {
 			LoadedSimpleMesh = mesh is SimpleMesh simple ? simple : null;
-			if (loadedMesh == null) {
-				loadedMesh = new RMesh(mesh, false);
-				Load(loadedMesh);
+			if (Value == null) {
+				Load(new RMesh(mesh, true));
 			}
 			else {
-				loadedMesh.LoadMesh(mesh);
+				Value.LoadMesh(mesh);
 			}
 		}
 
@@ -28,7 +26,7 @@ namespace RhuEngine.Components
 			}
 			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
 				try {
-					if(IsDestroying || IsRemoved) {
+					if (IsDestroying || IsRemoved) {
 						return;
 					}
 					ComputeMesh();

@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NullContext\NullContext.csproj" />
-    <ProjectReference Include="..\RBullet\RBullet.csproj" />
     <ProjectReference Include="..\RhuEngine\RhuEngine.csproj" />
   </ItemGroup>
 	

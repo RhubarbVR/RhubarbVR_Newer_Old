@@ -3,118 +3,77 @@ using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 using RhuEngine.Linker;
-using RhuEngine.Physics;
 using System;
+using RhuEngine.Physics;
+using System.Runtime.CompilerServices;
 
 namespace RhuEngine.Components
 {
+	[Flags]
+	public enum EPhysicsMask : ushort
+	{
+		None = 0,
+		Layer1 = 1,
+		UI = Layer1,
+		Layer2 = 2,
+		Player = Layer2,
+		Layer3 = 4,
+		Floor = Layer3,
+		Layer4 = 8,
+		WorldObjects = Layer4,
+		Layer5 = 16,
+		Layer6 = 32,
+		Layer7 = 64,
+		Layer8 = 128,
+		Layer9 = 256,
+		Layer10 = 512,
+		Layer11 = 1024,
+		Layer12 = 2048,
+		Layer13 = 4096,
+		Layer14 = 8192,
+		Layer15 = 16384,
+		Normal = Layer1 | Layer2 | Layer3 | Layer4 | Layer5,
+		All = Layer1 | Layer2 | Layer3 | Layer4 | Layer5 | Layer6 | Layer7 | Layer8 | Layer9 | Layer10 | Layer11 | Layer12 | Layer13 | Layer14 | Layer15,
+	}
+
+	public static class EPhysicsMaskHelper {
+		[method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool BasicCheck(this EPhysicsMask a, EPhysicsMask b) {
+			return (a & b) != EPhysicsMask.None;
+		}
+	}
+
 	public abstract class PhysicsObject : Component
 	{
-		private ColliderShape _collider;
+		public const float SPECULATIVE_MARGIN = 0.1f;
+		public const float COMMON_MAX = 1000000f;
+		public const float COMMON_MIN = 0.0000001f;
 
-		public RigidBodyCollider rigidBody;
+		public PhysicsSimulation Simulation => World.PhysicsSimulation;
 
-		[OnChanged(nameof(RebuildPysics))]
-		[Default(ECollisionFilterGroups.StaticFilter)]
-		public readonly Sync<ECollisionFilterGroups> Mask;
+		[Default(true)]
+		public readonly Sync<bool> CollisionEnabled;
 
-		[OnChanged(nameof(RebuildPysics))]
-		[Default(ECollisionFilterGroups.StaticFilter)]
-		public readonly Sync<ECollisionFilterGroups> Group;
+		[Default(EPhysicsMask.WorldObjects)]
+		[OnChanged(nameof(MaskUpdate))]
+		public readonly Sync<EPhysicsMask> Group;
+
+		[Default(EPhysicsMask.WorldObjects)]
+		[OnChanged(nameof(MaskUpdate))]
+		public readonly Sync<EPhysicsMask> Mask;
 
 		[Default(RCursorShape.Arrow)]
 		public readonly Sync<RCursorShape> CursorShape;
 
-		[OnChanged(nameof(RebuildPysics))]
-		public readonly Sync<Vector3f> Pos;
-		[OnChanged(nameof(RebuildPysics))]
-		public readonly Sync<Vector3f> Scale;
-		[OnChanged(nameof(RebuildPysics))]
-		public readonly Sync<Quaternionf> Rotation;
+		protected virtual void MaskUpdate() {
 
+		}
+		
 		protected override void OnAttach() {
 			base.OnAttach();
-			Scale.Value = Vector3f.One;
-			Rotation.Value = Quaternionf.Identity;
 			if (Entity.GetFirstComponent<Grabbable>() is not null) {
 				CursorShape.Value = RCursorShape.Move;
 			}
-		}
-
-		public abstract ColliderShape PysicsBuild();
-		public void RebuildPysics() {
-			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
-				var shape = PysicsBuild();
-				if (shape is not null) {
-					BuildPhysics(shape);
-				}
-			});
-		}
-
-		public event Action<RigidBodyCollider> AddedData;
-
-		public void BuildPhysics(ColliderShape colliderShape) {
-			rigidBody?.Remove();
-			rigidBody?.Dispose();
-			rigidBody = null;
-			if (_collider is not null) {
-				_collider?.Dispose();
-				_collider = null;
-			}
-			if (Pos.Value == Vector3f.Zero && Rotation.Value == Quaternionf.Identity && Scale.Value == Vector3f.One) {
-				_collider = colliderShape;
-			}
-			else {
-				var mainShape = new RCompoundShape();
-				mainShape.AddShape(colliderShape, Matrix.TRS(Pos.Value, Rotation.Value, Scale.Value));
-				_collider = mainShape;
-			}
-			rigidBody = _collider.GetCollider(World.PhysicsSim, this);
-			rigidBody.Mask = Mask.Value;
-			rigidBody.Group = Group.Value;
-			rigidBody.Matrix = Entity.GlobalTrans;
-			rigidBody.Enabled = Entity.enabled;
-			AddedData?.Invoke(rigidBody);
-		}
-
-		protected override void OnLoaded() {
-			base.OnLoaded();
-			Entity.GlobalTransformChange += Entity_GlobalTransformChange;
-			Entity.enabled.Changed += Enabled_Changed;
-			Enabled.Changed += Enabled_Changed;
-			RebuildPysics();
-		}
-
-		private void Enabled_Changed(IChangeable obj) {
-			if(rigidBody is null) {
-				return;
-			}
-			rigidBody.Enabled = Entity.enabled && Enabled.Value;
-		}
-
-		public override void Dispose() {
-			if (_collider is not null) {
-				_collider?.Dispose();
-			}
-			_collider = null;
-			if (rigidBody is not null) {
-				rigidBody?.Dispose();
-			}
-			rigidBody = null;
-			Entity.GlobalTransformChange -= Entity_GlobalTransformChange;
-			Entity.enabled.Changed -= Enabled_Changed;
-			Enabled.Changed -= Enabled_Changed;
-			base.Dispose();
-			GC.SuppressFinalize(this);
-		}
-		private void Entity_GlobalTransformChange(Entity obj, bool isStandaredMove) {
-			if (!isStandaredMove) {
-				return;
-			}
-			if (rigidBody is null) {
-				return;
-			}
-			rigidBody.Matrix = Entity.GlobalTrans;
 		}
 
 		public ulong LastFrameTouch = 0;
@@ -127,7 +86,7 @@ namespace RhuEngine.Components
 
 		public event Action<uint, Vector3f, Vector3f, Handed> OnTouchPyhsics;
 
-		public void Touch(uint handed, Vector3f hitnormal, Vector3f hitpointworld, Handed handedSide) {
+		public virtual void Touch(uint handed, Vector3f hitnormal, Vector3f hitpointworld, Handed handedSide) {
 			OnTouchPyhsics?.Invoke(handed, hitnormal, hitpointworld, handedSide);
 			Entity.CallOnTouch(handed, hitnormal, hitpointworld, handedSide);
 			RUpdateManager.ExecuteOnStartOfFrame(() => {
@@ -151,7 +110,7 @@ namespace RhuEngine.Components
 
 		public event Action<uint, Vector3f, Vector3f, float, float, Handed> OnLazerPyhsics;
 
-		public void Lazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce, Handed hand) {
+		public virtual void Lazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce, Handed hand) {
 			OnLazerPyhsics?.Invoke(v, hitnormal, hitpointworld, pressForce, gripForce, hand);
 			Entity.CallOnLazer(v, hitnormal, hitpointworld, pressForce, gripForce, hand);
 			RUpdateManager.ExecuteOnStartOfFrame(() => {
@@ -164,5 +123,6 @@ namespace RhuEngine.Components
 				LazerHand = hand;
 			});
 		}
+
 	}
 }

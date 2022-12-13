@@ -299,22 +299,14 @@ namespace RhuEngine.Components
 			}
 		}
 
-
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
-		public bool RunTouchCastInWorld(uint handed, World world, Vector3f pos, ref Vector3f Frompos, ref Vector3f ToPos, Handed handedSide) {
+		public bool RunTouchCastInWorld(uint handed, World world, Vector3f Frompos, Vector3f ToPos, Handed handedSide) {
 			if (World is null) {
 				return false;
 			}
 			try {
-				if (world.PhysicsSim.RayTest(ref Frompos, ref ToPos, out var collider, out var hitnormal, out var hitpointworld, Physics.ECollisionFilterGroups.AllNormal, Physics.ECollisionFilterGroups.AllNormal)) {
-					if (collider.CustomObject is CanvasMesh uIComponent) {
-						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-						uIComponent.ProcessHitTouch(handed, hitnormal, hitpointworld, handedSide);
-					}
-					if (collider.CustomObject is PhysicsObject physicsObject) {
-						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-						physicsObject.Touch(handed, hitnormal, hitpointworld, handedSide);
-					}
+				if (world.PhysicsSimulation.RayCast(Frompos, ToPos, out var collider, out var hitnormal, out var hitpointworld)) {
+					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
+					collider.Touch(handed, hitnormal, hitpointworld, handedSide);
 					return true;
 				}
 			}
@@ -332,27 +324,22 @@ namespace RhuEngine.Components
 			var vpos = pos.Translation;
 			var vFrompos = Frompos.Translation;
 			var vToPos = ToPos.Translation;
-			if (RunTouchCastInWorld(handed, World, vpos, ref vFrompos, ref vToPos, handedSide)) {
+			if (RunTouchCastInWorld(handed, World, vFrompos, vToPos, handedSide)) {
 
 			}
-			else if (RunTouchCastInWorld(handed, World.worldManager.FocusedWorld, vpos, ref vFrompos, ref vToPos, handedSide)) {
+			else if (RunTouchCastInWorld(handed, World.worldManager.FocusedWorld, vFrompos, vToPos, handedSide)) {
 
 			}
 		}
 
-		public bool RunLaserCastInWorld(World world, ref Vector3f headFrompos, ref Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side, ref Vector3f hitPointWorld, ref RCursorShape rCursorShape) {
-			if (world.PhysicsSim.RayTest(ref headFrompos, ref headToPos, out var collider, out var hitnormal, out var hitpointworld, Physics.ECollisionFilterGroups.AllNormal, Physics.ECollisionFilterGroups.AllNormal)) {
+		public bool RunLaserCastInWorld(World world, in Vector3f headFrompos, in Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side, ref Vector3f hitPointWorld, ref RCursorShape rCursorShape) {
+			if (world.PhysicsSimulation.RayCast(headFrompos, headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
 				hitPointWorld = hitpointworld;
-				if (collider.CustomObject is CanvasMesh uIComponent) {
-					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.005f), new Colorf(1, 1, 0, 0.5f));
-					uIComponent.ProcessHitLazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
-					rCursorShape = uIComponent.InputInterface.Target?.RCursorShape ?? RCursorShape.Arrow;
-				}
-				if (collider.CustomObject is PhysicsObject physicsObject) {
-					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-					physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
-					rCursorShape = physicsObject.CursorShape.Value;
-				}
+				World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.1f), new Colorf(1, 1, 0, 0.5f));
+				collider.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
+				rCursorShape = collider is UIMeshShape uIComponent
+					? uIComponent.InputInterface.Target?.RCursorShape ?? collider.CursorShape.Value
+					: collider.CursorShape.Value;
 				return true;
 			}
 			return false;
@@ -380,13 +367,13 @@ namespace RhuEngine.Components
 			var hitFocus = false;
 			var hitPoint = Vector3f.Zero;
 			var currsor = RCursorShape.Arrow;
-			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor)) {
+			if (RunLaserCastInWorld(World, vheadFrompos, vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor)) {
 				hitPrivate = true;
 			}
-			else if (RunLaserCastInWorld(World.worldManager.OverlayWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor)) {
+			else if (RunLaserCastInWorld(World.worldManager.OverlayWorld, vheadFrompos, vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor)) {
 				hitOverlay = true;
 			}
-			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor)) {
+			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, vheadFrompos, vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor)) {
 				hitFocus = true;
 			}
 			lazer.CurrsorIcon = GetIcon(currsor);
@@ -432,13 +419,13 @@ namespace RhuEngine.Components
 			var hitFocus = false;
 			var hitPoint = Vector3f.Zero;
 			var currsor = RCursorShape.Arrow;
-			if (RunLaserCastInWorld(World, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
+			if (RunLaserCastInWorld(World, vheadFrompos, vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
 				hitPrivate = true;
 			}
-			else if (RunLaserCastInWorld(WorldManager.OverlayWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
+			else if (RunLaserCastInWorld(WorldManager.OverlayWorld, vheadFrompos, vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
 				hitOverlay = true;
 			}
-			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, ref vheadFrompos, ref vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
+			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, vheadFrompos, vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
 				hitFocus = true;
 			}
 			CursorIcon = GetIcon(currsor);

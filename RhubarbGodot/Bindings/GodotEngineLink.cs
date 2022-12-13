@@ -26,7 +26,8 @@ namespace RhubarbVR.Bindings
 {
 	public class GodotRenderSettings : RenderSettingsBase
 	{
-		public enum VsyncMode {
+		public enum VsyncMode
+		{
 			Disabled,
 			Enabled,
 			Adaptive,
@@ -176,8 +177,8 @@ namespace RhubarbVR.Bindings
 		}
 
 		public void LoadArgs() {
-			if (Engine._forceFlatscreen && InVR) {
-				ChangeVR(false);
+			if (InVR) {
+				ChangeVR(true);
 			}
 		}
 
@@ -186,36 +187,7 @@ namespace RhubarbVR.Bindings
 			manager.LoadInputDriver<GodotMouse>();
 		}
 
-		private static void CopyNeededFiles(string from) {
-			foreach (var item in Directory.GetDirectories(from)) {
-				try {
-					Directory.Move(item, Path.Combine(System.Environment.CurrentDirectory, Path.GetFileName(item)));
-				}
-				catch { }
-			}
-			foreach (var item in Directory.GetFiles(from)) {
-				try {
-					File.Copy(item, Path.Combine(System.Environment.CurrentDirectory, Path.GetFileName(item)), true);
-				}
-				catch { }
-			}
-			
-		}
-
 		public void LoadStatics() {
-			try {
-				new RBullet.BulletPhsyicsLink().RegisterPhysics();
-			}
-			catch {
-				var godotEngineMain = Path.Combine(System.Environment.CurrentDirectory, ".godot", "mono", "temp", "bin", "Debug");
-				if (Directory.Exists(godotEngineMain)) {
-					CopyNeededFiles(godotEngineMain);
-					new RBullet.BulletPhsyicsLink().RegisterPhysics();
-				}
-				else {
-					RLog.Err("Failed to find runtime folder");
-				}
-			}
 			RTime.Instance = EngineRunner;
 			RFont.Instance = typeof(GodotFont);
 			RText.Instance = typeof(GodotTextRender);

@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RBullet\RBullet.csproj" />
     <ProjectReference Include="..\RhuEngine\RhuEngine.csproj" />
   </ItemGroup>
 

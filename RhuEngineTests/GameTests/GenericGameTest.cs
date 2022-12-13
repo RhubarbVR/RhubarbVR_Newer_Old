@@ -27,8 +27,6 @@ using RhuEngine.DataStructure;
 using System.Collections;
 using Assimp.Unmanaged;
 using System.Runtime.InteropServices;
-using static RBullet.BPhysicsSim;
-using static BulletSharp.Dbvt;
 
 namespace RhuEngine.GameTests.Tests
 {
@@ -366,90 +364,22 @@ namespace RhuEngine.GameTests.Tests
 		}
 
 
-		[TestMethod]
-		public void RiggedBodyTest() {
-			var testWorld = StartNewTestWorld();
-			tester.RunForSteps(20);
-			var box = new RBoxShape(0.5f);
-			var startPos = Matrix.TS(Vector3f.One, 1);
-			var collider = box.GetCollider(testWorld.PhysicsSim, startPos);
-			collider.NoneStaticBody = true;
-			collider.Mass = 100f;
-			collider.Enabled = true;
-			tester.RunForSteps(20);
-			Assert.AreNotEqual(startPos, collider.Matrix);
-			tester.Dispose();
-		}
+
+		//[TestMethod]
+		//public void RiggedBodEntityyTest() {
+		//	var testEntity = AttachEntity();
+		//	testEntity.position.Value = Vector3f.One * 10;
+		//	var a = testEntity.AddChild("A");
+		//	var boxShape = a.AttachComponent<BoxShape>();
+		//	var startTrans = a.GlobalTrans;
+		//	a.AttachComponent<RigidBody>();
+		//	tester.RunForSteps(20);
+		//	Assert.AreNotEqual(startTrans, a.GlobalTrans);
+		//	tester.Dispose();
+		//}
 
 
-		[TestMethod]
-		public void RiggedBodEntityyTest() {
-			var testEntity = AttachEntity();
-			testEntity.position.Value = Vector3f.One * 10;
-			var a = testEntity.AddChild("A");
-			var boxShape = a.AttachComponent<BoxShape>();
-			var startTrans = a.GlobalTrans;
-			a.AttachComponent<RigidBody>();
-			tester.RunForSteps(20);
-			Assert.AreNotEqual(startTrans, a.GlobalTrans);
-			tester.Dispose();
-		}
-
-
-		[TestMethod]
-		public void ConvexRayTest() {
-			var testWorld = StartNewTestWorld();
-			var box = new RBoxShape(0.5f);
-			var collider = box.GetCollider(testWorld.PhysicsSim, Matrix.TS(Vector3f.Zero, 1), "Trains");
-			var pointworld = Vector3f.AxisX * -5;
-			var OuterPoint = Vector3f.AxisX * 5;
-			tester.RunForSteps(2);
-			var outer = Matrix.T(OuterPoint);
-			var startpoint = Matrix.T(pointworld);
-			var hashit = testWorld.PhysicsSim.ConvexRayTest(box, ref startpoint, ref outer, out var hitcollider, out var hitnorm, out var worldhit);
-			Assert.IsTrue(hashit);
-			Assert.AreEqual("Trains", hitcollider.CustomObject);
-			tester.RunForSteps(2);
-			((IDisposable)tester).Dispose();
-		}
-
-		[TestMethod]
-		public void RayTestWithConvexMesh() {
-			var testWorld = StartNewTestWorld();
-			var gen = new TrivialBox3Generator {
-				Box = new Box3d(Vector3f.Zero, Vector3f.One)
-			};
-			gen.Generate();
-			var colider = new RConvexMeshShape(gen.MakeSimpleMesh());
-			var collider = colider.GetCollider(testWorld.PhysicsSim, Matrix.TS(Vector3f.Zero, 1), "Trains");
-			var pointworld = Vector3f.AxisX * -5;
-			var OuterPoint = Vector3f.AxisX * 5;
-			tester.RunForSteps();
-			var hashit = testWorld.PhysicsSim.RayTest(ref OuterPoint, ref pointworld, out var hitcollider, out var hitnorm, out var worldhit);
-			Assert.IsTrue(hashit);
-			Assert.AreEqual("Trains", hitcollider.CustomObject);
-			tester.RunForSteps();
-			((IDisposable)tester).Dispose();
-		}
-		[TestMethod]
-		public void RayTestWithRawMesh() {
-			var testWorld = StartNewTestWorld();
-			var gen = new TrivialBox3Generator {
-				Box = new Box3d(Vector3f.Zero, Vector3f.One)
-			};
-			gen.Generate();
-			var colider = new RRawMeshShape(gen.MakeSimpleMesh());
-			var collider = colider.GetCollider(testWorld.PhysicsSim, Matrix.TS(Vector3f.Zero, 1), "Trains");
-			var pointworld = Vector3f.AxisX * -5;
-			var OuterPoint = Vector3f.AxisX * 5;
-			tester.RunForSteps();
-			var hashit = testWorld.PhysicsSim.RayTest(ref OuterPoint, ref pointworld, out var hitcollider, out var hitnorm, out var worldhit);
-			Assert.IsTrue(hashit);
-			Assert.AreEqual("Trains", hitcollider.CustomObject);
-			tester.RunForSteps();
-			((IDisposable)tester).Dispose();
-		}
-
+	
 		[TestMethod]
 		public void ParentChildToSelf() {
 			var testWorld = StartNewTestWorld();
@@ -486,21 +416,6 @@ namespace RhuEngine.GameTests.Tests
 			Assert.AreEqual(amountatstart, testWorld.WorldObjectsCount);
 		}
 
-
-		[TestMethod]
-		public void RayTest() {
-			var testWorld = StartNewTestWorld();
-			var box = new RBoxShape(0.5f);
-			var collider = box.GetCollider(testWorld.PhysicsSim, Matrix.TS(Vector3f.Zero, 1), "Trains");
-			var pointworld = Vector3f.AxisX * -5;
-			var OuterPoint = Vector3f.AxisX * 5;
-			tester.RunForSteps();
-			var hashit = testWorld.PhysicsSim.RayTest(ref pointworld, ref OuterPoint, out var hitcollider, out var hitnorm, out var worldhit);
-			Assert.IsTrue(hashit);
-			Assert.AreEqual("Trains", hitcollider.CustomObject);
-			tester.RunForSteps();
-			((IDisposable)tester).Dispose();
-		}
 
 		[TestMethod()]
 		public void TestMultiOperatorsComponentNetPointer() {

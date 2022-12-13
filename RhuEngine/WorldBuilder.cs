@@ -25,7 +25,8 @@ namespace RhuEngine
 			mesh.TopRadius.Value = 4;
 			mesh.BaseRadius.Value = 3.5f;
 			mesh.Height.Value = 0.25f;
-			coloider.boxHalfExtent.Value = new Vector3d(8, 0.5f, 8) / 2;
+			coloider.Radius.Value = 4;
+			coloider.Height.Value = 0.25f;
 			var spinningCubes = world.RootEntity.AddChild("SpinningCubes");
 			spinningCubes.position.Value = new Vector3f(0, 0.5f, 0);
 			AttachSpiningCubes(spinningCubes);
@@ -42,7 +43,8 @@ namespace RhuEngine
 			mesh.TopRadius.Value = 4;
 			mesh.BaseRadius.Value = 3.5f;
 			mesh.Height.Value = 0.25f;
-			coloider.boxHalfExtent.Value = new Vector3d(8, 0.5f, 8) / 2;
+			coloider.Radius.Value = 4;
+			coloider.Height.Value = 0.5f;
 			var spinningCubes = world.RootEntity.AddChild("SpinningCubes");
 			spinningCubes.position.Value = new Vector3f(0, 0.5f, 0);
 			AttachSpiningCubes(spinningCubes);
@@ -142,7 +144,7 @@ namespace RhuEngine
 			pointLightmesh.Item1.Radius.Value = 0.05f;
 			pointLightmesh.Item3.colorLinear.Value = Colorf.Plum;
 			pointLight.AttachComponent<Grabbable>();
-			pointLight.AttachComponent<SphereShape>().Radus.Value = 0.05f;
+			pointLight.AttachComponent<SphereShape>().Radius.Value = 0.05f;
 			var plight = pointLight.AddChild("Light");
 			plight.position.Value = new Vector3f(0f, 0f, 0.1f);
 			plight.AttachComponent<Light>().LightType.Value = RLightType.Point;
@@ -153,7 +155,7 @@ namespace RhuEngine
 			dirLightmesh.Item1.Radius.Value = 0.05f;
 			dirLightmesh.Item3.colorLinear.Value = Colorf.Violet;
 			dirLight.AttachComponent<Grabbable>();
-			dirLight.AttachComponent<SphereShape>().Radus.Value = 0.05f;
+			dirLight.AttachComponent<SphereShape>().Radius.Value = 0.05f;
 			var dlight = dirLight.AddChild("Light");
 			dlight.position.Value = new Vector3f(0f, 0f, 0.1f);
 			dlight.AttachComponent<Light>().LightType.Value = RLightType.Directional;
@@ -164,7 +166,7 @@ namespace RhuEngine
 			spotLightmesh.Item1.Radius.Value = 0.05f;
 			spotLightmesh.Item3.colorLinear.Value = Colorf.Beige;
 			spotLight.AttachComponent<Grabbable>();
-			spotLight.AttachComponent<SphereShape>().Radus.Value = 0.05f;
+			spotLight.AttachComponent<SphereShape>().Radius.Value = 0.05f;
 			var slight = spotLight.AddChild("Light");
 			slight.position.Value = new Vector3f(0f, 0f, 0.1f);
 			slight.AttachComponent<Light>().LightType.Value = RLightType.Spot;

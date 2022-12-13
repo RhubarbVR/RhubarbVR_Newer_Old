@@ -4,7 +4,6 @@ using RhuEngine.WorldObjects.ECS;
 using RNumerics;
 using RhuEngine.Linker;
 using System.Collections.Generic;
-using RhuEngine.Physics;
 using System;
 
 namespace RhuEngine.Components
@@ -27,8 +26,6 @@ namespace RhuEngine.Components
 
 		public readonly List<Grabbable> GrabbedObjects = new();
 
-		private readonly List<RigidBodyCollider> _overLappingObjects = new();
-
 		internal void UpdateReferencer() {
 			try {
 				PrivateSpaceManager.GetGrabbableHolder(source.Value).UpdateHolderReferen();
@@ -36,17 +33,7 @@ namespace RhuEngine.Components
 			catch { }
 		}
 
-		private void RigidBody_Overlap(Vector3f PositionWorldOnA, Vector3f PositionWorldOnB, Vector3f NormalWorldOnB, double Distance, double Distance1, RigidBodyCollider hit) {
-			_overLappingObjects.Add(hit);
 
-		}
-
-		private void PhysicsObject_AddedData(RigidBodyCollider obj) {
-			if (obj is null) {
-				return;
-			}
-			obj.Overlap += RigidBody_Overlap;
-		}
 
 		protected override void OnAttach() {
 			base.OnAttach();
@@ -100,9 +87,7 @@ namespace RhuEngine.Components
 			source.Value = _source;
 			if (_source != Handed.Max) {
 				var shape = Entity.AttachComponent<SphereShape>();
-				shape.Radus.Value = 0.05f / 2;
-				shape.AddedData += PhysicsObject_AddedData;
-				PhysicsObject_AddedData(shape.rigidBody);
+				shape.Radius.Value = 0.05f / 2;
 			}
 			switch (_source) {
 				case Handed.Left:
@@ -154,15 +139,15 @@ namespace RhuEngine.Components
 			var isGrab = grabForce > 0.6;
 			grippingLastFrame = gripping;
 			if (isGrab && !gripping) {
-				foreach (var item in _overLappingObjects) {
-					if (item.CustomObject is PhysicsObject physicsObject) {
-						physicsObject.Entity.CallOnGrip(this, false, grabForce);
-						if (physicsObject.Entity == Entity) {
-							RLog.Info("Grabing self");
-						}
-						RLog.Info("Grip " + physicsObject.Entity.name.Value);
-					}
-				}
+				//foreach (var item in _overLappingObjects) {
+				//	if (item.CustomObject is PhysicsObject physicsObject) {
+				//		physicsObject.Entity.CallOnGrip(this, false, grabForce);
+				//		if (physicsObject.Entity == Entity) {
+				//			RLog.Info("Grabing self");
+				//		}
+				//		RLog.Info("Grip " + physicsObject.Entity.name.Value);
+				//	}
+				//}
 				gripping = true;
 				UpdateReferencer();
 				if (World.IsPersonalSpace) {
@@ -189,7 +174,7 @@ namespace RhuEngine.Components
 				PrivateSpaceManager.GetLazer(source.Value).Locked.Value = false;
 				UpdateReferencer();
 			}
-			_overLappingObjects.Clear();
+			//_overLappingObjects.Clear();
 		}
 	}
 }

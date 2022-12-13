@@ -151,6 +151,13 @@ namespace RNumerics
 		public float MinAbs => Math.Min(Math.Abs(x), Math.Min(Math.Abs(y), Math.Abs(z)));
 		[IgnoreMember, JsonIgnore]
 		public bool IsAnyNan => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z);
+		[IgnoreMember, JsonIgnore]
+		public bool IsAnyInfinity => float.IsInfinity(x) || float.IsInfinity(y) || float.IsInfinity(z);
+		[IgnoreMember, JsonIgnore]
+		public bool IsAnyNanOrInfinity => IsAnyNan || IsAnyInfinity;
+
+		[IgnoreMember, JsonIgnore]
+		public Vector3f Clean => IsAnyNanOrInfinity ? Zero : this;
 
 		public float Normalize(in float epsilon = MathUtil.EPSILONF) {
 			var length = Length;
@@ -190,6 +197,9 @@ namespace RNumerics
 		}
 		[IgnoreMember, JsonIgnore]
 		public float SqrMagnitude => (x * x) + (y * y) + (z * z);
+		[IgnoreMember, JsonIgnore]
+		public float MinComponent => MathUtil.Min(x, y, z);
+
 		public Vector3f RmoveSmallest() {
 			var smallist = Math.Min(x, Math.Min(y, z));
 			return y == smallist ? new Vector3f(x, 0, z) : x == smallist ? new Vector3f(0, y, z) : new Vector3f(x, y, 0);

@@ -29,9 +29,6 @@ public partial class EngineRunner : Node3D, IRTime
 	public AudioListener3D AudioListener;
 
 	[Export]
-	public bool StartInVR = false;
-
-	[Export]
 	public bool StartDebugVisuals = false;
 
 	public Engine engine;
@@ -78,9 +75,6 @@ public partial class EngineRunner : Node3D, IRTime
 		outputCapture = new OutputCapture();
 		link = new GodotEngineLink(this);
 		var args = new List<string>(Environment.GetCommandLineArgs());
-		if (!StartInVR) {
-			args.Add("--no-vr");
-		}
 		if (StartDebugVisuals) {
 			args.Add("--debug-visuals");
 		}

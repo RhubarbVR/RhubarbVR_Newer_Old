@@ -3,7 +3,6 @@ using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 using RhuEngine.Linker;
-using RhuEngine.Physics;
 using System.Reflection;
 using System.Threading.Tasks;
 using System;
@@ -19,12 +18,20 @@ namespace RhuEngine.Components
 		Position = 4,
 		All = Rotation | Scale | Position
 	}
+	[Flags]
+	public enum GizmoDir : byte
+	{
+		None = 0,
+		X = 1,
+		Y = 2,
+		Z = 4
+	}
 
 	[Category(new string[] { "Developer" })]
 	[UpdateLevel(UpdateEnum.Normal)]
 	public sealed class GizmoAixe : Component
 	{
-		public readonly Sync<Dir> Direction;
+		public readonly Sync<GizmoDir> Direction;
 		[OnChanged(nameof(UpdateMeshes))]
 		[Default(GizmoMode.All)]
 		public readonly Sync<GizmoMode> Mode;
@@ -66,6 +73,7 @@ namespace RhuEngine.Components
 			}
 		}
 
+
 		private void UpdateMeshes() {
 			if (RotationCollider.Linked) {
 				RotationCollider.LinkedValue = Mode.Value.HasFlag(GizmoMode.Rotation);
@@ -95,8 +103,8 @@ namespace RhuEngine.Components
 
 		private Colorf GetColor(float addedValue = 0) {
 			return Direction.Value switch {
-				Dir.Y => new Colorf(addedValue, 1, addedValue, Gizmo3D.ALPHA),
-				Dir.X => new Colorf(1, addedValue, addedValue, Gizmo3D.ALPHA),
+				GizmoDir.Y => new Colorf(addedValue, 1, addedValue, Gizmo3D.ALPHA),
+				GizmoDir.X => new Colorf(1, addedValue, addedValue, Gizmo3D.ALPHA),
 				_ => new Colorf(addedValue, addedValue, 1, Gizmo3D.ALPHA),
 			};
 		}
@@ -106,62 +114,55 @@ namespace RhuEngine.Components
 			var rotationMeshRender = Entity.AttachComponent<MeshRender>();
 			Rotation.Target = rotationMeshRender.Enabled;
 			var rotMesh = Entity.AttachComponent<TorusMesh>();
-			rotMesh.MajorRadius.Value = 1.7f / 5;
-			rotMesh.MinorRadius.Value = 0.05f / 5;
+			rotMesh.MajorRadius.Value = 1.7f;
+			rotMesh.MinorRadius.Value = 0.05f;
 			rotationMeshRender.mesh.Target = rotMesh;
-			var rotColider = Entity.AttachComponent<RawMeshShape>();
+			var rotColider = Entity.AttachComponent<MeshShape>();
 			rotColider.TargetMesh.Target = rotMesh;
-			rotColider.Group.Value = ECollisionFilterGroups.UI;
-			rotColider.Mask.Value = ECollisionFilterGroups.AllFilter;
 			RotationCollider.Target = rotColider.Enabled;
 			RotationColliderTarget.Target = rotColider;
 
-			var mainBoxShapeColider = Entity.AddChild("TipCollider").AttachComponent<BoxShape>();
+			var mainBoxShapeColider = Entity.AttachComponent<BoxShape>();
 
-			var scaleMeshRender = mainBoxShapeColider.Entity.AttachComponent<MeshRender>();
+
+			var scaleMeshRender = Entity.AttachComponent<MeshRender>();
 			Scale.Target = scaleMeshRender.Enabled;
-			var boxStickMesh = mainBoxShapeColider.Entity.AttachComponent<TrivialBox3Mesh>();
-			boxStickMesh.Extent.Value = new Vector3f(0.2f / 5);
-
-			mainBoxShapeColider.Entity.position.Value = new Vector3f(0, 2.8f / 5, 0);
-			mainBoxShapeColider.boxHalfExtent.Value = boxStickMesh.Extent.Value;
-			mainBoxShapeColider.Group.Value = ECollisionFilterGroups.UI;
-			mainBoxShapeColider.Mask.Value = ECollisionFilterGroups.AllFilter;
+			var boxStickMesh = Entity.AttachComponent<TrivialBox3Mesh>();
+			boxStickMesh.Extent.Value = new Vector3f(0.2f);
+			boxStickMesh.Center.Value = new Vector3f(0, 2.6f, 0);
+			mainBoxShapeColider.PosOffset.Value = new Vector3f(0, 2.6f, 0);
+			mainBoxShapeColider.Size.Value = boxStickMesh.Extent.Value;
 			ScaleCollider.Target = mainBoxShapeColider.Enabled;
-			ScaleColliderTarget.Target = mainBoxShapeColider;
 			scaleMeshRender.mesh.Target = boxStickMesh;
 
 			var scaletwo = Entity.AttachComponent<MeshRender>();
 			Scale2.Target = scaletwo.Enabled;
 			var scalecyl = Entity.AttachComponent<CylinderMesh>();
 			scaletwo.mesh.Target = scalecyl;
-			scalecyl.Height.Value = 2.6f / 5;
-			scalecyl.BaseRadius.Value = scalecyl.TopRadius.Value = 0.03f / 5;
+			scalecyl.Height.Value = 2.6f;
+			scalecyl.BaseRadius.Value = scalecyl.TopRadius.Value = 0.03f;
 
 			var scaleColider = Entity.AttachComponent<CylinderShape>();
-			scaleColider.Pos.Value = new Vector3f(0, 2.6f / 2, 0);
-			scaleColider.boxHalfExtent.Value = new Vector3d(0.03f / 5, 2.6f / 2, 0.03f / 5);
-			scaleColider.Group.Value = ECollisionFilterGroups.UI;
-			scaleColider.Mask.Value = ECollisionFilterGroups.AllFilter;
+			scaleColider.PosOffset.Value = new Vector3f(0, 1.3f, 0);
+			scaleColider.Height.Value = 2.6f;
+			scaleColider.Radius.Value = 0.03f;
 			Scale2Collider.Target = scaleColider.Enabled;
-			Scale2ColliderTarget.Target = scaleColider;
 
 			var positionMeshRender = Entity.AttachComponent<MeshRender>();
 			Position.Target = positionMeshRender.Enabled;
 			var arrowMesh = Entity.AttachComponent<ArrowMesh>();
-			arrowMesh.StickLength.Value = 1.98f / 5;
-			arrowMesh.StickRadius.Value = 0.04f / 5;
-			arrowMesh.HeadBaseRadius.Value = 0.1f / 5;
-			arrowMesh.HeadLength.Value = 0.4f / 5;
+			arrowMesh.StickLength.Value = 1.98f;
+			arrowMesh.StickRadius.Value = 0.04f;
+			arrowMesh.HeadBaseRadius.Value = 0.1f;
+			arrowMesh.HeadLength.Value = 0.4f;
 			var posColider = Entity.AttachComponent<CylinderShape>();
-			posColider.Pos.Value = new Vector3f(0, 1.2f / 5, 0);
-			posColider.Group.Value = ECollisionFilterGroups.UI;
-			posColider.Mask.Value = ECollisionFilterGroups.AllFilter;
-			posColider.boxHalfExtent.Value = new Vector3d(0.05f / 5, 1.2f / 5, 0.05f / 5);
+			posColider.PosOffset.Value = new Vector3f(0, 2.3f / 2, 0);
+			posColider.Height.Value = 2.3f;
+			posColider.Radius.Value = 0.05f;
 			PositionCollider.Target = posColider.Enabled;
+			PositionColliderTarget.Target = posColider;
 
 			positionMeshRender.mesh.Target = arrowMesh;
-			PositionColliderTarget.Target = posColider;
 
 			var rotmit = Entity.AttachComponent<UnlitMaterial>();
 			var scalemit = Entity.AttachComponent<UnlitMaterial>();
@@ -178,6 +179,8 @@ namespace RhuEngine.Components
 			ColorOfRotationGizmo.Target = rotmit.Tint;
 			ColorOfPositionGizmo.Target = posmit.Tint;
 			ColorOfScaleGizmo.Target = scalemit.Tint;
+			ScaleColliderTarget.Target = mainBoxShapeColider;
+			Scale2ColliderTarget.Target = scaleColider;
 
 		}
 

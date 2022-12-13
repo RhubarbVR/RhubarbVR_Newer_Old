@@ -10,6 +10,7 @@ namespace RhuEngine.Components
 	{
 		[OnChanged(nameof(LoadTexture))]
 		public readonly Sync<bool> Filled;
+		public override bool AutoDisposes => false;
 
 		private void LoadTexture() {
 			if (!Engine.EngineLink.CanRender) {

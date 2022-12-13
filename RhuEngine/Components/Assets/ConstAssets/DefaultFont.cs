@@ -7,13 +7,13 @@ namespace RhuEngine.Components
 	[AllowedOnWorldRoot]
 	public sealed class MainFont : AssetProvider<RFont>
 	{
-		RFont _font;
+		public override bool AutoDisposes => false;
+
 		private void LoadFont() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			_font = Engine.staticResources.MainFont;
-			Load(_font);
+			Load(Engine.staticResources.MainFont);
 		}
 		protected override void OnLoaded() {
 			base.OnLoaded();

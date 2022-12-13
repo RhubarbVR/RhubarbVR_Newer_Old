@@ -165,8 +165,9 @@ namespace RhuEngine.Components
 			var ee = WindowVRElement.Entity.AttachComponent<ValueCopy<Vector2i>>();
 			ee.Target.Target = WindowVRElement.Resolution;
 			ee.Source.Target = PrivateSpaceManager.VRViewPort.Size;
-			WindowVRElement.InputInterface.Target = PrivateSpaceManager.VRViewPort;
-
+			var meshShape = WindowVRElement.Entity.AttachComponent<UIMeshShape>();
+			meshShape.InputInterface.Target = PrivateSpaceManager.VRViewPort;
+			meshShape.TargetMesh.Target = WindowVRElement;
 
 			var root = PrivateSpaceManager.UserInterfaceManager.Windows;
 			RootElement = root.Entity.AddChild(Window.Name).AttachComponent<UIElement>();

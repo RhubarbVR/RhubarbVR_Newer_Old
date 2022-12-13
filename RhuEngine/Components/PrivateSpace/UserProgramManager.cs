@@ -10,7 +10,6 @@ using SharedModels;
 
 using RNumerics;
 using RhuEngine.Linker;
-using RhuEngine.Physics;
 using RhuEngine.WorldObjects;
 using System.IO;
 using System.Reflection;

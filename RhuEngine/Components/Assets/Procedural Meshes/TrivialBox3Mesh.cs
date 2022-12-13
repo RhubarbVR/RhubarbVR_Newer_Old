@@ -39,10 +39,10 @@ namespace RhuEngine.Components
 
 		protected override void FirstCreation() {
 			base.FirstCreation();
-			Extent.Value = new Vector3f(0.5f);
-			AxisX.Value = Vector3f.AxisX;
-			AxisY.Value = Vector3f.AxisY;
-			AxisZ.Value = Vector3f.AxisZ;
+			Extent.Value = new Vector3f(1f);
+			AxisX.Value = Vector3f.AxisX / 2f;
+			AxisY.Value = Vector3f.AxisY / 2f;
+			AxisZ.Value = Vector3f.AxisZ / 2f;
 		}
 
 		public override void ComputeMesh() {
