@@ -305,14 +305,8 @@ namespace RhuEngine.Components
 			}
 			try {
 				if (world.PhysicsSimulation.RayCast(Frompos, ToPos, out var collider, out var hitnormal, out var hitpointworld)) {
-					//if (collider.CustomObject is CanvasMesh uIComponent) {
-					//	World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-					//	uIComponent.ProcessHitTouch(handed, hitnormal, hitpointworld, handedSide);
-					//}
-					if (collider is PhysicsObject physicsObject) {
-						World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
-						physicsObject.Touch(handed, hitnormal, hitpointworld, handedSide);
-					}
+					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 0, 0.5f));
+					collider.Touch(handed, hitnormal, hitpointworld, handedSide);
 					return true;
 				}
 			}
@@ -341,16 +335,11 @@ namespace RhuEngine.Components
 		public bool RunLaserCastInWorld(World world, in Vector3f headFrompos, in Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side, ref Vector3f hitPointWorld, ref RCursorShape rCursorShape) {
 			if (world.PhysicsSimulation.RayCast(headFrompos, headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
 				hitPointWorld = hitpointworld;
-				//if (collider is CanvasMesh uIComponent) {
-				//	World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.005f), new Colorf(1, 1, 0, 0.5f));
-				//	uIComponent.ProcessHitLazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
-				//	rCursorShape = uIComponent.InputInterface.Target?.RCursorShape ?? RCursorShape.Arrow;
-				//}
-				if (collider is PhysicsObject physicsObject) {
-					World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.1f), new Colorf(1, 1, 0, 0.5f));
-					physicsObject.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
-					rCursorShape = physicsObject.CursorShape.Value;
-				}
+				World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.1f), new Colorf(1, 1, 0, 0.5f));
+				collider.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
+				rCursorShape = collider is UIMeshShape uIComponent
+					? uIComponent.InputInterface.Target?.RCursorShape ?? collider.CursorShape.Value
+					: collider.CursorShape.Value;
 				return true;
 			}
 			return false;

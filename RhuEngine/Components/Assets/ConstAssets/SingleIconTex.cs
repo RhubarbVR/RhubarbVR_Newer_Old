@@ -8,6 +8,8 @@ namespace RhuEngine.Components
 	[AllowedOnWorldRoot]
 	public sealed class SingleIconTex : AssetProvider<RTexture2D>
 	{
+		public override bool AutoDisposes => false;
+
 		[OnChanged(nameof(LoadTexture))]
 		public readonly Sync<RhubarbAtlasSheet.RhubarbIcons> Icon;
 		private void LoadTexture() {

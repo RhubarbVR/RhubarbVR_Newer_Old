@@ -43,7 +43,7 @@ namespace RhuEngine.Physics
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool AllowTest(CollidableReference collidable) {
 			var collider = _simulation.GetCollider(collidable);
-			return !collider.IsRemoved && (_filter == null || _filter(collider));
+			return !(collider?.IsRemoved ?? true) && (collider?.IsEnabled ?? false) && (_filter == null || _filter(collider));
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

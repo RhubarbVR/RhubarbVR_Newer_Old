@@ -207,11 +207,12 @@ namespace RhuEngine.Components
 			canvas.FrontBind.Value = false;
 			canvas.TopOffset.Value = false;
 			canvas.Scale.Value = new Vector3f(inputTexture.Size.Value.x / inputTexture.Size.Value.y, 1, 1) * 2;
-			canvas.InputInterface.Target = inputTexture;
 			var e = Entity.AttachComponent<ValueCopy<Vector2i>>();
 			e.Target.Target = canvas.Resolution;
 			e.Source.Target = inputTexture.Size;
-
+			var meshShape = canvas.Entity.AttachComponent<UIMeshShape>();
+			meshShape.InputInterface.Target = inputTexture;
+			meshShape.TargetMesh.Target = canvas;
 
 			_grabButton = Entity.AddChild("GrabBUtton").AttachComponent<ButtonBase>();
 			_grabButton.FocusMode.Value = RFocusMode.None;

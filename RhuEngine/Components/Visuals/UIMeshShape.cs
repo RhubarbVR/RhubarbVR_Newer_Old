@@ -12,9 +12,8 @@ namespace RhuEngine.Components
 	[SingleComponentLock]
 	[Category(new string[] { "Visuals" })]
 	[UpdateLevel(UpdateEnum.Rendering)]
-	public sealed class CanvasMesh : ProceduralMesh
+	public sealed class UIMeshShape : MeshShape
 	{
-
 		[Default(true)]
 		public readonly Sync<bool> Laserable;
 		[Default(0.5f)]
@@ -28,81 +27,15 @@ namespace RhuEngine.Components
 
 		[Default(true)]
 		public readonly Sync<bool> CustomTochable;
-		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<Vector2i> Resolution;
-		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<Vector2i> MinOffset;
-		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<Vector2i> MaxOffset;
-		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<Vector3f> Scale;
-		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<Vector2f> Min;
-		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<Vector2f> Max;
 
 		public readonly SyncRef<IInputInterface> InputInterface;
 
 		public readonly Sync<Vector2f> Tilt;
 
-		[Default(true)]
-		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<bool> TopOffset;
-
-		[Default(3f)]
-		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<float> TopOffsetValue;
-
-		[Default(true)]
-		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<bool> FrontBind;
-
-		[Default(20)]
-		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<int> FrontBindSegments;
-
-		[Default(135f)]
-		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<float> FrontBindAngle;
-
-		[Default(7.5f)]
-		[OnChanged(nameof(LoadMesh))]
-		public readonly Sync<float> FrontBindRadus;
-
 		public Handed LastHand { get; private set; }
-
-		public override void ComputeMesh() {
-			var min = Min.Value + ((Vector2f)MinOffset.Value / (Vector2f)Resolution.Value);
-			var max = Max.Value + ((Vector2f)MaxOffset.Value / (Vector2f)Resolution.Value);
-			var rectSize = max - min;
-			var rectMin = min;
-			var newMeshGen = new TrivialRectGenerator {
-				IndicesMap = new Index2i(1, 2),
-			};
-			var NewMesh = newMeshGen.Generate().MakeSimpleMesh();
-			NewMesh.Scale(1, -1, 1);
-			NewMesh.Translate(0.5f, 0.5f, 0);
-			NewMesh = NewMesh.Cut(rectSize + rectMin, rectMin);
-			if (TopOffset.Value) {
-				NewMesh.OffsetTop(TopOffsetValue.Value);
-			}
-			if (FrontBind.Value) {
-				NewMesh = NewMesh.UIBind(FrontBindAngle.Value, FrontBindRadus.Value, FrontBindSegments.Value, Scale);
-			}
-			NewMesh.Scale(Scale.Value.x / 10, Scale.Value.y / 10, Scale.Value.z / 10);
-			NewMesh.Translate(-(Scale.Value.x / 20), -(Scale.Value.y / 20), 0);
-			GenMesh(NewMesh);
-			//PhysicsCollider = new RRawMeshShape(NewMesh).GetCollider(World.PhysicsSim);
-			//PhysicsCollider.CustomObject = this;
-			//PhysicsCollider.Group = ECollisionFilterGroups.UI;
-			//PhysicsCollider.Mask = ECollisionFilterGroups.UI;
-			//PhysicsCollider.Enabled = Entity.IsEnabled;
-		}
 
 		protected override void RenderStep() {
 			base.RenderStep();
-			RenderLocation = Entity.GlobalTrans;
-
 			foreach (var item in hitDatas) {
 				var pos = item.HitPointOnCanvas;
 
@@ -125,34 +58,18 @@ namespace RhuEngine.Components
 					}
 				}
 			}
+			ClearHitData();
 		}
 
 		protected override void OnAttach() {
 			base.OnAttach();
-			Scale.Value = new Vector3f(16, 9, 1);
-			Max.Value = Vector2f.One;
-
-		}
-
-		public Matrix RenderLocation;
-
-		protected override void AlwaysStep() {
-			RUpdateManager.ExecuteOnEndOfFrame(ClearHitData);
+			Group.Value = Mask.Value = EPhysicsMask.UI;
 		}
 
 		public List<HitData> hitDatas = new();
 
 		public void ClearHitData() {
 			hitDatas.Clear();
-		}
-
-		public IEnumerable<HitData> HitDataInVolume(Vector2f min, Vector2f max) {
-			for (var i = 0; i < hitDatas.Count; i++) {
-				var hitData = hitDatas[i];
-				if (hitData.HitPointOnCanvas.IsWithIn(min, max)) {
-					yield return hitData;
-				}
-			}
 		}
 
 		public struct HitData
@@ -199,15 +116,15 @@ namespace RhuEngine.Components
 		}
 
 		private void AddHitData(HitData hitData) {
+			var RenderLocation = Entity.GlobalTrans * Matrix.T(PosOffset.Value);
 			var localPoint = RenderLocation.GetLocal(Matrix.T(hitData.Hitpointworld));
-
-			if (LoadedSimpleMesh is null) {
+			if (_last?.LoadedMesh is null) {
 				return;
 			}
 			var e = RenderLocation.GetLocal(Matrix.T(hitData.Hitpointworld));
 			var hitPoint = e.Translation;
 			World.DrawDebugSphere(RenderLocation, (Vector3f)hitPoint, new Vector3d(0.01), Colorf.Red, 0.5f);
-			var mesh = LoadedSimpleMesh;
+			var mesh = _last?.LoadedMesh;
 			var hittry = mesh.InsideTry(hitPoint);
 			if (hittry < 0 || hittry >= mesh.MaxTriangleID) {
 				return;
@@ -225,11 +142,13 @@ namespace RhuEngine.Components
 			hitDatas.Add(hitData);
 		}
 
-		public void ProcessHitTouch(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, Handed handed) {
+		public override void Touch(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, Handed handed) {
 			AddHitData(new HitData(touchUndex, hitnormal, hitpointworld, handed));
+			base.Touch(touchUndex, hitnormal, hitpointworld, handed);
 		}
-		public void ProcessHitLazer(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForces, Handed side) {
-			AddHitData(new HitData(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side));
+		public override void Lazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce, Handed hand) {
+			AddHitData(new HitData(v, hitnormal, hitpointworld, pressForce, gripForce, hand));
+			base.Lazer(v, hitnormal, hitpointworld, pressForce, gripForce, hand);
 		}
 	}
 }

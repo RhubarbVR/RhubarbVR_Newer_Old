@@ -178,7 +178,7 @@ namespace RhubarbVR.Bindings
 
 		public void LoadArgs() {
 			if (InVR) {
-				ChangeVR(false);
+				ChangeVR(true);
 			}
 		}
 

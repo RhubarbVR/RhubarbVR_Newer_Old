@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 
 namespace RNumerics
@@ -733,7 +734,14 @@ namespace RNumerics
 		public static double FastCos(in double v) {
 			return FastSin(v + 1.5707963);
 		}
-
-
+		public static float Sign(in float value) {
+			return MathF.Sign(value);
+		}
+		public static Vector2f Sign(in Vector2f value) {
+			return new Vector2f(Sign(value.x), Sign(value.y));
+		}
+		public static Vector3f Sign(in Vector3f value) {
+			return new Vector3f(Sign(value.x), Sign(value.y), Sign(value.z));
+		}
 	}
 }

@@ -59,9 +59,9 @@ namespace RhuEngine.Components
 			PosUpdate();
 		}
 
-		public TypedIndex ShapeIndex { get; protected set; }
+		public TypedIndex? ShapeIndex { get; protected set; }
 		public BodyInertia BodyInertiaCache { get; protected set; }
-		private StaticHandle _staticHandle;
+		private StaticHandle? _staticHandle;
 
 		public abstract void RemoveShape();
 
@@ -77,49 +77,55 @@ namespace RhuEngine.Components
 
 		private Vector3f _lastWorldScale;
 
+		public T? GetShape => ShapeIndex is null ? null : Simulation.Simulation.Shapes.GetShape<T>(ShapeIndex.Value.Index);
+
+		public virtual void ShapeDataUpdate() {
+
+		}
+
 		private void UpdateShapeNow() {
 			if (IsDestroying) {
 				return;
 			}
 			var specultive = SPECULATIVE_MARGIN;
-			if (ShapeIndex == default) {
+			if (ShapeIndex is null) {
 				var shape = CreateShape(ref specultive, MassValue, out var bodyInertiaCache);
 				_lastWorldScale = Entity.GlobalTrans.Scale;
-				ShapeIndex = Simulation.Simulation.Shapes.Add(in shape);
+				ShapeIndex = Simulation.Simulation.Shapes.Add(shape);
 				BodyInertiaCache = bodyInertiaCache;
 				LoadedShape();
 			}
 			else {
-				Simulation.Simulation.Shapes.GetShape<T>(ShapeIndex.Index) = CreateShape(ref specultive, MassValue, out var bodyInertiaCache);
+				ShapeDataUpdate();
+				Simulation.Simulation.Shapes.GetShape<T>(ShapeIndex.Value.Index) = CreateShape(ref specultive, MassValue, out var bodyInertiaCache);
 				_lastWorldScale = Entity.GlobalTrans.Scale;
 				BodyInertiaCache = bodyInertiaCache;
 			}
 		}
 
 		protected void PosUpdate() {
-			if (_staticHandle != default) {
+			if (_staticHandle is not null) {
 				var filter = new StaticChangeAwakeningFilter(Simulation, IsEnabled, Group);
-				Simulation.Simulation.Statics.GetDescription(_staticHandle, out var description);
+				Simulation.Simulation.Statics.GetDescription(_staticHandle.Value, out var description);
 				description.Pose = GetRigidPose();
-				Simulation.Simulation.Statics.ApplyDescription(_staticHandle, in description, ref filter);
+				Simulation.Simulation.Statics.ApplyDescription(_staticHandle.Value, description, ref filter);
 			}
 		}
-		
+
 		protected override void MaskUpdate() {
 			AwakeningFilterUpdate();
 		}
 
 		private void AwakeningFilterUpdate() {
-			if (_staticHandle != default) {
+			if (_staticHandle is not null) {
 				var filter = new StaticChangeAwakeningFilter(Simulation, IsEnabled, Group);
-				Simulation.Simulation.Statics.GetDescription(_staticHandle, out var description);
-				Simulation.Simulation.Statics.ApplyDescription(_staticHandle, in description, ref filter);
+				Simulation.Simulation.Statics.GetDescription(_staticHandle.Value, out var description);
+				Simulation.Simulation.Statics.ApplyDescription(_staticHandle.Value, description, ref filter);
+			}
+			if (_staticHandle != default) {
 			}
 		}
 
-		private void UpdatedShape() {
-			AwakeningFilterUpdate();
-		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private RigidPose GetRigidPose() {
@@ -129,11 +135,11 @@ namespace RhuEngine.Components
 		}
 
 		private void LoadedShape() {
-			if (HasStaticBody && _staticHandle == default) {
+			if (HasStaticBody && _staticHandle is null && ShapeIndex is not null) {
 				var rigidPose = GetRigidPose();
 				var filter = new StaticChangeAwakeningFilter(Simulation, IsEnabled, Group);
-				var description = new StaticDescription(rigidPose.Position, rigidPose.Orientation, ShapeIndex);
-				var handle = Simulation.Simulation.Statics.Add(in description, ref filter);
+				var description = new StaticDescription(rigidPose.Position, rigidPose.Orientation, ShapeIndex.Value);
+				var handle = Simulation.Simulation.Statics.Add(description, ref filter);
 				Simulation.RegisterPhysicsObject(handle, this);
 				_staticHandle = handle;
 			}
@@ -141,8 +147,8 @@ namespace RhuEngine.Components
 		}
 
 		public void RemoveBody() {
-			if(_staticHandle != default) {
-				Simulation.UnRegisterPhysicsObject(_staticHandle);
+			if (_staticHandle is not null) {
+				Simulation.UnRegisterPhysicsObject(_staticHandle.Value);
 				_staticHandle = default;
 			}
 		}
@@ -151,8 +157,8 @@ namespace RhuEngine.Components
 		public void ApplyGlobalScaleValues(ref Vector3f size) {
 			size *= Entity.GlobalTrans.Scale;
 			size = size.Clean;
-			size = MathUtil.Abs(in size);
-			size = MathUtil.Clamp(in size, new Vector3f(COMMON_MIN), new Vector3f(COMMON_MAX));
+			size = MathUtil.Abs(size);
+			size = MathUtil.Clamp(size, new Vector3f(COMMON_MIN), new Vector3f(COMMON_MAX));
 		}
 
 		public float MassAfterScale

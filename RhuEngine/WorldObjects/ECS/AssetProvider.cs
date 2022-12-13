@@ -17,7 +17,12 @@ namespace RhuEngine.WorldObjects.ECS
 
 		public A Value { get; private set; }
 
+		public virtual bool AutoDisposes => true;
+
 		public void Load(A data) {
+			if(AutoDisposes && Value is IDisposable disposable) {
+				disposable.Dispose();
+			}
 			Value = data;
 			Loaded = data != null;
 			OnAssetLoaded?.Invoke(data);

@@ -16,6 +16,7 @@ namespace RhuEngine.Components
 		[Default(0.5f)]
 		[OnChanged(nameof(UpdateShape))]
 		public readonly Sync<float> Radius;
+
 		[Default(1.0f)]
 		[OnChanged(nameof(UpdateShape))]
 		public readonly Sync<float> Height;

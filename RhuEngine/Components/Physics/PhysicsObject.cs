@@ -86,7 +86,7 @@ namespace RhuEngine.Components
 
 		public event Action<uint, Vector3f, Vector3f, Handed> OnTouchPyhsics;
 
-		public void Touch(uint handed, Vector3f hitnormal, Vector3f hitpointworld, Handed handedSide) {
+		public virtual void Touch(uint handed, Vector3f hitnormal, Vector3f hitpointworld, Handed handedSide) {
 			OnTouchPyhsics?.Invoke(handed, hitnormal, hitpointworld, handedSide);
 			Entity.CallOnTouch(handed, hitnormal, hitpointworld, handedSide);
 			RUpdateManager.ExecuteOnStartOfFrame(() => {
@@ -110,7 +110,7 @@ namespace RhuEngine.Components
 
 		public event Action<uint, Vector3f, Vector3f, float, float, Handed> OnLazerPyhsics;
 
-		public void Lazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce, Handed hand) {
+		public virtual void Lazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce, Handed hand) {
 			OnLazerPyhsics?.Invoke(v, hitnormal, hitpointworld, pressForce, gripForce, hand);
 			Entity.CallOnLazer(v, hitnormal, hitpointworld, pressForce, gripForce, hand);
 			RUpdateManager.ExecuteOnStartOfFrame(() => {

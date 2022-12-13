@@ -29,6 +29,8 @@ namespace RhuEngine.Physics
 
 		public BufferPool BufferPool { get; private set; }
 
+		public Buffer<Triangle> EmptyTriangles;
+
 		public void Dispose() {
 			Simulation.Dispose();
 			BufferPool.Clear();
@@ -39,7 +41,8 @@ namespace RhuEngine.Physics
 			World = world;
 			BufferPool = new BufferPool();
 			Simulation = Simulation.Create(BufferPool, new NarrowPhaseCallbacks(new SpringSettings(30, 1)), new PoseIntegratorCallbacks(this), new SolveDescription(8, 1));
-
+			BufferPool.Take(1, out EmptyTriangles);
+			EmptyTriangles[0] = new Triangle(Vector3f.Zero, Vector3f.Zero, Vector3f.Zero);
 		}
 
 		public void Update(double elapsed) {
@@ -96,7 +99,7 @@ namespace RhuEngine.Physics
 			var hitTest = new RaycastOneHandler(this, x => x.Group.Value.BasicCheck(rayMask));
 			Simulation.RayCast(orgin, normal, dist, ref hitTest);
 			hitnormal = hitTest.hitNormal;
-			hitpointworld = orgin + (normal * dist);
+			hitpointworld = orgin + (normal * hitTest.hitT);
 			collider = hitTest.hasHit ? GetCollider(hitTest.hitCollidable) : null;
 			return hitTest.hasHit;
 		}

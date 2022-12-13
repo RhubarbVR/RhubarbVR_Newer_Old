@@ -197,6 +197,9 @@ namespace RNumerics
 		}
 		[IgnoreMember, JsonIgnore]
 		public float SqrMagnitude => (x * x) + (y * y) + (z * z);
+		[IgnoreMember, JsonIgnore]
+		public float MinComponent => MathUtil.Min(x, y, z);
+
 		public Vector3f RmoveSmallest() {
 			var smallist = Math.Min(x, Math.Min(y, z));
 			return y == smallist ? new Vector3f(x, 0, z) : x == smallist ? new Vector3f(0, y, z) : new Vector3f(x, y, 0);

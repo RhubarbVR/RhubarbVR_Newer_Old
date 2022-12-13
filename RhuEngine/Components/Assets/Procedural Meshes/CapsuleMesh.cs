@@ -37,11 +37,6 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<bool> WantNormals;
 
-		protected override void FirstCreation() {
-			base.FirstCreation();
-
-		}
-
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {
 				return;

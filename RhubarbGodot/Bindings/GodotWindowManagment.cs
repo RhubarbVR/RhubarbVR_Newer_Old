@@ -34,7 +34,7 @@ namespace RhubarbVR.Bindings
 				var con = new ConnectedViewport();
 				newWin.AddChild(con);
 				con.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-	EngineRunnerHelpers._.AddChild(newWin);
+				EngineRunnerHelpers._.AddChild(newWin);
 				newWindow.LoadInValue(newWin);
 			});
 			return newWindow;

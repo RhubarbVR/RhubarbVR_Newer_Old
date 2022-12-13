@@ -8,6 +8,8 @@ namespace RhuEngine.Components
 	[AllowedOnWorldRoot]
 	public sealed class GridTex : AssetProvider<RTexture2D>
 	{
+		public override bool AutoDisposes => false;
+
 		private void LoadTexture() {
 			if (!Engine.EngineLink.CanRender) {
 				return;
