@@ -358,7 +358,7 @@ namespace RhuEngine.Components
 			var GripForce = Engine.inputManager.GetInputAction(InputTypes.Grab).HandedValue(handed);
 			var headPos = heand.GlobalTrans;
 			var headFrompos = headPos;
-			var headToPos = Matrix.T(Vector3f.AxisZ * -5) * headPos;
+			var headToPos = Matrix.T(Vector3f.AxisZ * -50) * headPos;
 			World.DrawDebugSphere(headToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
 			var vheadFrompos = headFrompos.Translation;
 			var vheadToPos = headToPos.Translation;
@@ -410,7 +410,7 @@ namespace RhuEngine.Components
 			var GripForce = Engine.inputManager.GetInputAction(InputTypes.Grab).HandedValue(Handed.Max);
 			var headPos = head.GlobalTrans;
 			var headFrompos = headPos;
-			var headToPos = Matrix.T(Vector3f.AxisZ * -5) * headPos;
+			var headToPos = Matrix.T(Vector3f.AxisZ * -50) * headPos;
 			World.DrawDebugSphere(headToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
 			var vheadFrompos = headFrompos.Translation;
 			var vheadToPos = headToPos.Translation;

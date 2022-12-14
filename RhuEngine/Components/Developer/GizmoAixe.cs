@@ -27,8 +27,8 @@ namespace RhuEngine.Components
 		Z = 4
 	}
 
-	[Category(new string[] { "Developer" })]
 	[UpdateLevel(UpdateEnum.Normal)]
+	[OverlayOnly]
 	public sealed class GizmoAixe : Component
 	{
 		public readonly Sync<GizmoDir> Direction;
@@ -55,21 +55,71 @@ namespace RhuEngine.Components
 		public readonly Linker<Colorf> ColorOfScaleGizmo;
 		public readonly Linker<Colorf> ColorOfPositionGizmo;
 
+		public readonly SyncRef<Gizmo3D> Gizmo3DTarget;
+
 		public readonly SyncRef<PhysicsObject> RotationColliderTarget;
 		public readonly SyncRef<PhysicsObject> ScaleColliderTarget;
 		public readonly SyncRef<PhysicsObject> Scale2ColliderTarget;
 		public readonly SyncRef<PhysicsObject> PositionColliderTarget;
 
+		public bool IsActive => isInRotation | isInScale | isInPos;
+
+		public bool isInRotation;
+		public bool isInScale;
+		public bool isInPos;
+		private Handed _handed;
 		protected override void Step() {
 			base.Step();
+			if(Gizmo3DTarget.Target?.GetIfOtherIsActive(this) ?? false) {
+				return;
+			}
 			if (RotationColliderTarget.Target is not null & ColorOfRotationGizmo.Linked) {
-				ColorOfRotationGizmo.LinkedValue = RotationColliderTarget.Target.LazeredThisFrame ? GetColor(0.85f) : GetColor();
+				if (!(isInPos | isInScale)) {
+					ColorOfRotationGizmo.LinkedValue = RotationColliderTarget.Target.LazeredThisFrame | isInRotation ? GetColor(0.85f) : GetColor();
+					if (!isInRotation) {
+						_handed = RotationColliderTarget.Target.LazerHand;
+						if (InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed) && RotationColliderTarget.Target.LazeredThisFrame) {
+							isInRotation = true;
+						}
+					}
+					else {
+						if (!InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed)) {
+							isInRotation = false;
+						}
+					}
+				}
 			}
 			if (ScaleColliderTarget.Target is not null & Scale2ColliderTarget.Target is not null & ColorOfScaleGizmo.Linked) {
-				ColorOfScaleGizmo.LinkedValue = (Scale2ColliderTarget.Target.LazeredThisFrame | ScaleColliderTarget.Target.LazeredThisFrame) ? GetColor(0.85f) : GetColor();
+				if (!(isInPos | isInRotation)) {
+					ColorOfScaleGizmo.LinkedValue = (Scale2ColliderTarget.Target.LazeredThisFrame | ScaleColliderTarget.Target.LazeredThisFrame | isInScale) ? GetColor(0.85f) : GetColor();
+					if (!isInScale) {
+						_handed = Scale2ColliderTarget.Target.LazeredThisFrame ? Scale2ColliderTarget.Target.LazerHand: ScaleColliderTarget.Target.LazerHand;
+						if (InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed) && (Scale2ColliderTarget.Target.LazeredThisFrame | ScaleColliderTarget.Target.LazeredThisFrame)) {
+							isInScale = true;
+						}
+					}
+					else {
+						if (!InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed)) {
+							isInScale = false;
+						}
+					}
+				}
 			}
 			if (PositionColliderTarget.Target is not null & ColorOfPositionGizmo.Linked) {
-				ColorOfPositionGizmo.LinkedValue = PositionColliderTarget.Target.LazeredThisFrame ? GetColor(0.85f) : GetColor();
+				if (!(isInScale | isInRotation)) {
+					ColorOfPositionGizmo.LinkedValue = PositionColliderTarget.Target.LazeredThisFrame | isInPos ? GetColor(0.85f) : GetColor();
+					if (!isInPos) {
+						_handed = PositionColliderTarget.Target.LazerHand;
+						if (InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed) && PositionColliderTarget.Target.LazeredThisFrame) {
+							isInPos = true;
+						}
+					}
+					else {
+						if (!InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed)) {
+							isInPos = false;
+						}
+					}
+				}
 			}
 		}
 
@@ -167,6 +217,11 @@ namespace RhuEngine.Components
 			var rotmit = Entity.AttachComponent<UnlitMaterial>();
 			var scalemit = Entity.AttachComponent<UnlitMaterial>();
 			var posmit = Entity.AttachComponent<UnlitMaterial>();
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				rotmit._material.NoDepthTest = true;
+				scalemit._material.NoDepthTest = true;
+				posmit._material.NoDepthTest = true;
+			});
 
 			rotationMeshRender.materials.Add().Target = rotmit;
 			scaleMeshRender.materials.Add().Target = scalemit;

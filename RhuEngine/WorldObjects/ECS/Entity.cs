@@ -589,6 +589,24 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 		}
 		[Exposed]
+		public Entity FindChildByName(string name = "Entity") {
+			for (var i = 0; i < children.Count; i++) {
+				if(children[i].IsDestroying || children[i].IsRemoved) {
+					continue;
+				}
+				if (children[i].name.Value == name) {
+					return children[i];
+				}
+			}
+			return null;
+		}
+
+		[Exposed]
+		public Entity FindChildOrAddChild(string name = "Entity") {
+			return FindChildByName(name) ?? AddChild(name);
+		}
+
+		[Exposed]
 		public Entity AddChild(string name = "Entity") {
 			var entity = children.Add();
 			entity.name.Value = name;

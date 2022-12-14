@@ -113,7 +113,7 @@ namespace RhuEngine.WorldObjects
 		{
 			get => _target?.IsRemoved ?? true ? null : _target;
 			set {
-				if (value?.World != World && value is not null && (!(_allowCrossWorld && World.IsPersonalSpace))) {
+				if (value?.World != World && value is not null && (!(_allowCrossWorld && (World.IsPersonalSpace || World.IsOverlayWorld)))) {
 					throw new NotSupportedException("World not the same");
 				}
 				lock (_syncRefLock) {

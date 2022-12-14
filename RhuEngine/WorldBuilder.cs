@@ -56,7 +56,9 @@ namespace RhuEngine
 
 			var gizmo3D = DebugStuff.AddChild("Gizmo3D");
 			gizmo3D.position.Value = new Vector3f(3, 1f, 0.1f);
-			gizmo3D.AttachComponent<Gizmo3D>();
+			gizmo3D.AttachComponent<WorldGizmo3D>().SetUpWithEntity(gizmo3D);
+			var (eemesh,mat,rend) = gizmo3D.AttachMeshWithMeshRender<TrivialBox3Mesh,UnlitMaterial>();
+			eemesh.Extent.Value = new Vector3f(0.2f);
 
 			var things = DebugStuff.AddChild("Thing");
 			things.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();

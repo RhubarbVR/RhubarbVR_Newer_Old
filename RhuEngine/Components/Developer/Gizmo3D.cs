@@ -8,15 +8,19 @@ using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
-	[Category(new string[] { "Developer" })]
 	[UpdateLevel(UpdateEnum.Normal)]
+	[OverlayOnly]
 	public sealed class Gizmo3D : Component
 	{
 		public const float ALPHA = 0.8f;
 		[Default(GizmoMode.All)]
 		public readonly Sync<GizmoMode> Mode;
+		public readonly Sync<bool> UseLocalRot;
 
 		public readonly Linker<Vector3f> ScaleLink;
+		public readonly Linker<Vector3f> PosLink;
+		public readonly Linker<Quaternionf> RotLink;
+
 		public readonly SyncRef<GizmoAixe> X;
 		public readonly SyncRef<GizmoAixe> Y;
 		public readonly SyncRef<GizmoAixe> Z;
@@ -25,16 +29,49 @@ namespace RhuEngine.Components
 		public readonly SyncRef<GizmoPlane> ZPlane;
 
 		public readonly SyncRef<Entity> TransformSpace;
+		public readonly SyncRef<Entity> ParentEntity;
 
 		public readonly SyncRef<IValueSource<Vector3f>> Pos;
 		public readonly SyncRef<IValueSource<Vector3f>> Scale;
 		public readonly SyncRef<IValueSource<Quaternionf>> Rot;
 
-		[Default(0.2f)]
+		[Default(0.15f)]
 		public readonly Sync<float> TargetSize;
+
+		public bool GetIfOtherIsActive(Component component) {
+			var isActive = false;
+			if(X.Target != component) {
+				isActive |= X.Target?.IsActive ?? false;
+			}
+			if (Y.Target != component) {
+				isActive |= Y.Target?.IsActive ?? false;
+			}
+			if (Z.Target != component) {
+				isActive |= Z.Target?.IsActive ?? false;
+			}
+			if (XPlane.Target != component) {
+				isActive |= XPlane.Target?.isInPos ?? false;
+			}
+			if (YPlane.Target != component) {
+				isActive |= YPlane.Target?.isInPos ?? false;
+			}
+			if (ZPlane.Target != component) {
+				isActive |= ZPlane.Target?.isInPos ?? false;
+			}
+			return isActive;
+		}
 
 		protected override void Step() {
 			base.Step();
+			var space = TransformSpace.Target ?? World.RootEntity;
+			var parrent = (ParentEntity.Target ?? World.RootEntity).GlobalTrans;
+			var globalTrans = Matrix.TRS(Pos.Target?.Value ?? Vector3f.Zero, Rot.Target?.Value ?? Quaternionf.Identity, Scale.Target?.Value ?? Vector3f.One) * parrent;		
+			if (RotLink.Linked) {
+				RotLink.LinkedValue = UseLocalRot ? globalTrans.Rotation : space.GlobalTrans.Rotation;
+			}
+			if (PosLink.Linked) {
+				PosLink.LinkedValue = globalTrans.Translation;
+			}
 			if (ScaleLink.Linked) {
 				var userRoot = LocalUser?.userRoot?.Target?.head.Target;
 				if (userRoot is null) {
@@ -47,15 +84,26 @@ namespace RhuEngine.Components
 
 		protected override void OnAttach() {
 			base.OnAttach();
+			Pos.AllowCrossWorld();
+			Scale.AllowCrossWorld();
+			Rot.AllowCrossWorld();
+			TransformSpace.AllowCrossWorld();
+			ParentEntity.AllowCrossWorld();
+
 			ScaleLink.Target = Entity.scale;
+			RotLink.Target = Entity.rotation;
+			PosLink.Target = Entity.position;
+
 			var driver = Entity.AttachComponent<ValueMultiDriver<GizmoMode>>();
 			driver.source.Target = Mode;
 			var x = Entity.AddChild("X");
 			x.rotation.Value = Quaternionf.Rolled.Inverse * Quaternionf.Yawed180;
 			X.Target = x.AttachComponent<GizmoAixe>();
+			X.Target.Gizmo3DTarget.Target = this;
 			X.Target.Direction.Value = GizmoDir.X;
 			XPlane.Target = x.AttachComponent<GizmoPlane>();
 			XPlane.Target.Direction.Value = GizmoDir.X;
+			XPlane.Target.Gizmo3DTarget.Target = this;
 			driver.drivers.Add().Target = XPlane.Target.Mode;
 			driver.drivers.Add().Target = X.Target.Mode;
 
@@ -63,7 +111,9 @@ namespace RhuEngine.Components
 			y.rotation.Value = Quaternionf.Yawed;
 			Y.Target = y.AttachComponent<GizmoAixe>();
 			Y.Target.Direction.Value = GizmoDir.Y;
+			Y.Target.Gizmo3DTarget.Target = this;
 			YPlane.Target = y.AttachComponent<GizmoPlane>();
+			YPlane.Target.Gizmo3DTarget.Target = this;
 			YPlane.Target.Direction.Value = GizmoDir.Y;
 			driver.drivers.Add().Target = YPlane.Target.Mode;
 			driver.drivers.Add().Target = Y.Target.Mode;
@@ -71,8 +121,10 @@ namespace RhuEngine.Components
 			var z = Entity.AddChild("Z");
 			z.rotation.Value = Quaternionf.Pitched.Inverse;
 			Z.Target = z.AttachComponent<GizmoAixe>();
+			Z.Target.Gizmo3DTarget.Target = this;
 			Z.Target.Direction.Value = GizmoDir.Z;
 			ZPlane.Target = z.AttachComponent<GizmoPlane>();
+			ZPlane.Target.Gizmo3DTarget.Target = this;
 			ZPlane.Target.Direction.Value = GizmoDir.Z;
 			driver.drivers.Add().Target = ZPlane.Target.Mode;
 			driver.drivers.Add().Target = Z.Target.Mode;

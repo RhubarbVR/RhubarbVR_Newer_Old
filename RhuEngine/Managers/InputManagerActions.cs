@@ -319,6 +319,29 @@ namespace RhuEngine.Managers
 					_ => OtherRawValue(),
 				};
 			}
+
+			///<summary>
+			/// Returns the JustActivated for the given handed value.
+			///</summary>
+			public bool HandedJustActivated(Handed handed) {
+				return handed switch {
+					Handed.Left => LeftJustActivated(),
+					Handed.Right => RightJustActivated(),
+					_ => OtherJustActivated(),
+				};
+			}
+
+			///<summary>
+			/// Returns the JustActivated for the given handed value.
+			///</summary>
+			public bool HandedActivated(Handed handed) {
+				return handed switch {
+					Handed.Left => LeftActivated(),
+					Handed.Right => RightActivated(),
+					_ => OtherActivated(),
+				};
+			}
+
 			///<summary>
 			///Constructor for UserInputAction
 			///</summary>

@@ -10,10 +10,11 @@ using System;
 namespace RhuEngine.Components
 {
 
-	[Category(new string[] { "Developer" })]
 	[UpdateLevel(UpdateEnum.Normal)]
+	[OverlayOnly]
 	public sealed class GizmoPlane : Component
 	{
+		public readonly SyncRef<Gizmo3D> Gizmo3DTarget;
 
 		public readonly Sync<GizmoDir> Direction;
 		[OnChanged(nameof(UpdateMeshes))]
@@ -27,10 +28,28 @@ namespace RhuEngine.Components
 		public readonly Linker<Colorf> ColorOfPositionGizmo;
 
 		public readonly SyncRef<PhysicsObject> PositionColliderTarget;
+
+		public bool isInPos;
+		private Handed _handed;
+
 		protected override void Step() {
 			base.Step();
+			if (Gizmo3DTarget.Target?.GetIfOtherIsActive(this) ?? false) {
+				return;
+			}
 			if (PositionColliderTarget.Target is not null & ColorOfPositionGizmo.Linked) {
-				ColorOfPositionGizmo.LinkedValue = PositionColliderTarget.Target.LazeredThisFrame ? GetColor(0.7f) : GetColor();
+				ColorOfPositionGizmo.LinkedValue = PositionColliderTarget.Target.LazeredThisFrame | isInPos ? GetColor(0.85f) : GetColor();
+				if (!isInPos) {
+					_handed = PositionColliderTarget.Target.LazerHand;
+					if (InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed) && PositionColliderTarget.Target.LazeredThisFrame) {
+						isInPos = true;
+					}
+				}
+				else {
+					if (!InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed)) {
+						isInPos = false;
+					}
+				}
 			}
 		}
 
@@ -67,7 +86,7 @@ namespace RhuEngine.Components
 			var posmit = Entity.AttachComponent<UnlitMaterial>();
 			positionMeshRender.materials.Add().Target = posmit;
 			posmit.Transparency.Value = Transparency.Blend;
-
+			RenderThread.ExecuteOnEndOfFrame(() => posmit._material.NoDepthTest = true);
 			ColorOfPositionGizmo.Target = posmit.Tint;
 			PositionColliderTarget.Target = posColider;
 		}
