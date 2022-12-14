@@ -24,7 +24,7 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.CanRender) {
 				return;
 			}
-			RUpdateManager.ExecuteOnEndOfFrame(this, () => {
+			RenderThread.ExecuteOnEndOfFrame(this, () => {
 				try {
 					if (IsDestroying || IsRemoved) {
 						return;

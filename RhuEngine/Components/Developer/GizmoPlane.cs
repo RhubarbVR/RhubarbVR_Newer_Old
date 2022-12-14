@@ -43,11 +43,13 @@ namespace RhuEngine.Components
 					_handed = PositionColliderTarget.Target.LazerHand;
 					if (InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed) && PositionColliderTarget.Target.LazeredThisFrame) {
 						isInPos = true;
+						PrivateSpaceManager.GetLazer(_handed).Locked.Value = true;
 					}
 				}
 				else {
 					if (!InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed)) {
 						isInPos = false;
+						PrivateSpaceManager.GetLazer(_handed).Locked.Value = false;
 					}
 				}
 			}

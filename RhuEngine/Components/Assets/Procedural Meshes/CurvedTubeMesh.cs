@@ -34,6 +34,8 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<bool> ClosedLoop;
 		[OnChanged(nameof(LoadMesh))]
+		public readonly Sync<Vector3d> Startpoint;
+		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<Vector3d> Endpoint;
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<Vector3d> EndHandle;
@@ -53,7 +55,7 @@ namespace RhuEngine.Components
 			mesh.Vertices.Clear();
 			for (var i = 0; i < CurveSteps.Value; i++) {
 				var poser = i / ((float)CurveSteps.Value - 1);
-				mesh.Vertices.Add(Vector3d.Bezier(Vector3d.Zero, StartHandle.Value, EndHandle.Value, Endpoint.Value, poser));
+				mesh.Vertices.Add(Vector3d.Bezier(Startpoint.Value, StartHandle.Value, EndHandle.Value, Endpoint.Value, poser));
 			}
 		}
 		public override void ComputeMesh() {

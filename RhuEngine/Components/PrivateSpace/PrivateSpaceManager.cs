@@ -25,15 +25,15 @@ namespace RhuEngine.Components
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public Lazer Leftlazer;
+		public LazerVisual Leftlazer;
 
 		[NoSave]
 		[NoSync]
 		[NoLoad]
 		[NoSyncUpdate]
-		public Lazer Rightlazer;
+		public LazerVisual Rightlazer;
 
-		public Lazer GetLazer(Handed handed) {
+		public LazerVisual GetLazer(Handed handed) {
 			return handed switch {
 				Handed.Left => Leftlazer,
 				_ => Rightlazer,
@@ -134,10 +134,10 @@ namespace RhuEngine.Components
 		public void BuildLazers() {
 			var user = LocalUser.userRoot.Target?.Entity;
 			var entLeftlazer = user.AddChild("LeftLazer");
-			Leftlazer = entLeftlazer.AttachComponent<Lazer>();
+			Leftlazer = entLeftlazer.AttachComponent<LazerVisual>();
 			Leftlazer.Side.Value = Handed.Left;
 			var entRightlazer = user.AddChild("RightLazer");
-			Rightlazer = entRightlazer.AttachComponent<Lazer>();
+			Rightlazer = entRightlazer.AttachComponent<LazerVisual>();
 			Rightlazer.Side.Value = Handed.Right;
 		}
 
@@ -232,6 +232,54 @@ namespace RhuEngine.Components
 			WorldManager.WorldCycling();
 		}
 
+		public Vector3f HeadLazerVec;
+		public Vector3f LeftLazerVec;
+		public Vector3f RightlaserVec;
+		public Entity GetLazerEntity(Handed handed) {
+			var head = LocalUser.userRoot.Target?.head.Target;
+			return handed switch {
+				Handed.Left => Leftlazer.Entity,
+				Handed.Right => Rightlazer.Entity,
+				_ => head,
+			};
+		}
+		public Vector3f GetLazerLocal(Handed handed) {
+			return handed switch {
+				Handed.Left => LeftLazerVec,
+				Handed.Right => RightlaserVec,
+				_ => HeadLazerVec,
+			};
+		}
+
+		public Vector3f LazerHitPoint(Handed handed) {
+			return handed switch {
+				Handed.Left => Leftlazer.HitPoint,
+				Handed.Right => Rightlazer.HitPoint,
+				_ => HeadLaserHitPoint,
+			};
+		}
+		public void SetLazerHitPoint(Handed handed, in Vector3f newPos) {
+			switch (handed) {
+				case Handed.Left:
+					Leftlazer.HitPoint = newPos;
+					break;
+				case Handed.Right:
+					Rightlazer.HitPoint = newPos;
+					break;
+				default:
+					HeadLaserHitPoint = newPos;
+					break;
+			}
+		}
+
+		public Vector3f LazerNormal(Handed handed) {
+			return (LocalUser.userRoot.Target.Entity.LocalPosToGlobal(GetLazerLocal(handed)) - LazerStartPos(handed)).Normalized;
+		}
+
+		public Vector3f LazerStartPos(Handed handed) {
+			return GetLazerEntity(handed).GlobalTrans.Translation;
+		}
+
 		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
@@ -282,15 +330,15 @@ namespace RhuEngine.Components
 			if (head != null) {
 				if (!Engine.IsInVR) {
 					if (isOnScreen) {
-						UpdateHeadLazer(head);
+						UpdateLazer(head, Handed.Max, null,ref HeadLazerVec);
 					}
 				}
 				if (Engine.IsInVR) {
 					if (Leftlazer is not null) {
-						UpdateLazer(Leftlazer.Entity, Handed.Left, Leftlazer);
+						UpdateLazer(Leftlazer.Entity, Handed.Left, Leftlazer,ref LeftLazerVec);
 					}
 					if (Rightlazer is not null) {
-						UpdateLazer(Rightlazer.Entity, Handed.Right, Rightlazer);
+						UpdateLazer(Rightlazer.Entity, Handed.Right, Rightlazer,ref RightlaserVec);
 					}
 				}
 				//Todo: fingerPos
@@ -332,14 +380,15 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public bool RunLaserCastInWorld(World world, in Vector3f headFrompos, in Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side, ref Vector3f hitPointWorld, ref RCursorShape rCursorShape) {
-			if (world.PhysicsSimulation.RayCast(headFrompos, headToPos, out var collider, out var hitnormal, out var hitpointworld)) {
+		public bool RunLaserCastInWorld(World world, in Vector3f headFrompos, in Vector3f headToPos, uint touchUndex, float pressForce, float gripForces, Handed side, ref Vector3f hitPointWorld, ref RCursorShape rCursorShape, ref PhysicsObject collider) {
+			if (world.PhysicsSimulation.RayCast(headFrompos, headToPos, out collider, out var hitnormal, out var hitpointworld)) {
 				hitPointWorld = hitpointworld;
 				World.DrawDebugSphere(Matrix.T(hitpointworld), Vector3f.Zero, new Vector3f(0.1f), new Colorf(1, 1, 0, 0.5f));
 				collider.Lazer(touchUndex, hitnormal, hitpointworld, pressForce, gripForces, side);
 				rCursorShape = collider is UIMeshShape uIComponent
 					? uIComponent.InputInterface.Target?.RCursorShape ?? collider.CursorShape.Value
 					: collider.CursorShape.Value;
+
 				return true;
 			}
 			return false;
@@ -353,36 +402,60 @@ namespace RhuEngine.Components
 			};
 		}
 
-		public void UpdateLazer(Entity heand, Handed handed, Lazer lazer) {
+		public void UpdateLazer(Entity heand, Handed handed, LazerVisual lazer, ref Vector3f moveVec) {
+			if (LocalUser.userRoot.Target is null) {
+				return;
+			}
 			var PressForce = Engine.inputManager.GetInputAction(InputTypes.Primary).HandedValue(handed);
 			var GripForce = Engine.inputManager.GetInputAction(InputTypes.Grab).HandedValue(handed);
 			var headPos = heand.GlobalTrans;
-			var headFrompos = headPos;
-			var headToPos = Matrix.T(Vector3f.AxisZ * -50) * headPos;
-			World.DrawDebugSphere(headToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
-			var vheadFrompos = headFrompos.Translation;
-			var vheadToPos = headToPos.Translation;
+			var targetPos = (Matrix.T(Vector3f.AxisZ * -5) * headPos).Translation;
+			var targetLocal = LocalUser.userRoot.Target.Entity.GlobalPointToLocal(targetPos);
+			var smoothingEx = Engine.MainSettings.InputSettings.LazerSmoothing / 200;
+			if(lazer is null) {
+				smoothingEx = 0;
+			}
+			smoothingEx = smoothingEx == 0 ? 100000000000000 : 1 / smoothingEx;
+			moveVec = Vector3f.Lerp(moveVec, targetLocal, MathUtil.Clamp(RTime.ElapsedF * smoothingEx, 0, 1));
+			var vheadFrompos = headPos.Translation;
+
+			var vTarget = LocalUser.userRoot.Target.Entity.LocalPosToGlobal(moveVec);
+			vTarget =  vheadFrompos + ((vTarget - vheadFrompos).Normalized * 50);
 			var hitPrivate = false;
 			var hitOverlay = false;
 			var hitFocus = false;
 			var hitPoint = Vector3f.Zero;
 			var currsor = RCursorShape.Arrow;
-			if (RunLaserCastInWorld(World, vheadFrompos, vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor)) {
+			PhysicsObject collider = null;
+			if (RunLaserCastInWorld(World, vheadFrompos, vTarget, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor, ref collider)) {
 				hitPrivate = true;
 			}
-			else if (RunLaserCastInWorld(World.worldManager.OverlayWorld, vheadFrompos, vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor)) {
+			else if (RunLaserCastInWorld(World.worldManager.OverlayWorld, vheadFrompos, vTarget, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor, ref collider)) {
 				hitOverlay = true;
 			}
-			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, vheadFrompos, vheadToPos, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor)) {
+			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, vheadFrompos, vTarget, 10, PressForce, GripForce, handed, ref hitPoint, ref currsor, ref collider)) {
 				hitFocus = true;
 			}
-			lazer.CurrsorIcon = GetIcon(currsor);
-			Engine.inputManager.MouseSystem.SetCurrsor(currsor);
-			lazer.HitFocus = hitFocus;
-			lazer.HitOverlay = hitOverlay;
-			lazer.HitPrivate = hitPrivate;
-			if (!lazer.Locked) {
-				lazer.HitPoint = hitPoint;
+			if (lazer is not null) {
+				lazer.CurrsorIcon = GetIcon(currsor);
+				Engine.inputManager.MouseSystem.SetCurrsor(currsor);
+				lazer.HitFocus = hitFocus;
+				lazer.HitOverlay = hitOverlay;
+				lazer.HitPrivate = hitPrivate;
+				lazer.hitPhysicsObject = collider;
+				if (!lazer.Locked) {
+					lazer.HitPoint = hitPoint;
+				}
+			}
+			else {
+				CursorIcon = GetIcon(currsor);
+				RootScreenElement.CursorShape.Value = currsor;
+				UserInterface.CursorShape.Value = currsor;
+				HeadLaserHitPoint = hitPoint;
+				HeadLazerHitPrivate = hitPrivate;
+				HeadLazerHitOverlay = hitOverlay;
+				HeadLazerHitFocus = hitFocus;
+				HeadLazerHitObject = collider;
 			}
 		}
 
@@ -390,6 +463,8 @@ namespace RhuEngine.Components
 		public bool HeadLazerHitPrivate;
 		public bool HeadLazerHitOverlay;
 		public bool HeadLazerHitFocus;
+		[NoLoad, NoSave, NoShow, NoSync]
+		public PhysicsObject HeadLazerHitObject;
 
 		public bool HeadLazerHitAny => HeadLazerHitFocus | HeadLazerHitOverlay | HeadLazerHitFocus;
 
@@ -402,39 +477,6 @@ namespace RhuEngine.Components
 		}
 		internal void HolderGrip() {
 			OnGrip?.Invoke();
-		}
-
-
-		public void UpdateHeadLazer(Entity head) {
-			var PressForce = Engine.inputManager.GetInputAction(InputTypes.Primary).HandedValue(Handed.Max);
-			var GripForce = Engine.inputManager.GetInputAction(InputTypes.Grab).HandedValue(Handed.Max);
-			var headPos = head.GlobalTrans;
-			var headFrompos = headPos;
-			var headToPos = Matrix.T(Vector3f.AxisZ * -50) * headPos;
-			World.DrawDebugSphere(headToPos, Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 0, 0.5f));
-			var vheadFrompos = headFrompos.Translation;
-			var vheadToPos = headToPos.Translation;
-			var hitPrivate = false;
-			var hitOverlay = false;
-			var hitFocus = false;
-			var hitPoint = Vector3f.Zero;
-			var currsor = RCursorShape.Arrow;
-			if (RunLaserCastInWorld(World, vheadFrompos, vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
-				hitPrivate = true;
-			}
-			else if (RunLaserCastInWorld(WorldManager.OverlayWorld, vheadFrompos, vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
-				hitOverlay = true;
-			}
-			else if (RunLaserCastInWorld(World.worldManager.FocusedWorld, vheadFrompos, vheadToPos, 10, PressForce, GripForce, Handed.Max, ref hitPoint, ref currsor)) {
-				hitFocus = true;
-			}
-			CursorIcon = GetIcon(currsor);
-			RootScreenElement.CursorShape.Value = currsor;
-			UserInterface.CursorShape.Value = currsor;
-			HeadLaserHitPoint = hitPoint;
-			HeadLazerHitPrivate = hitPrivate;
-			HeadLazerHitOverlay = hitOverlay;
-			HeadLazerHitFocus = hitFocus;
 		}
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]

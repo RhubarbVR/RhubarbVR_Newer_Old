@@ -30,6 +30,9 @@ namespace RhuEngine.Settings
 
 	public class InputSettingsObject : SettingsObject
 	{
+		[SettingsField("How MuchLazer smoothing 0 is none")]
+		public float LazerSmoothing = 10;
+
 		[SettingsField("If your primary hand is the right hand")]
 		public bool RightHanded = true;
 

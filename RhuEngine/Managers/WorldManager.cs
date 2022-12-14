@@ -245,6 +245,9 @@ namespace RhuEngine.Managers
 			double totalStep = 0;
 			for (var i = worlds.Count - 1; i >= 0; i--) {
 				try {
+					if (worlds[i].IsOverlayWorld || worlds[i].IsPersonalSpace) {
+						UpdateCameraPos();
+					}
 					_stepStopwatch.Restart();
 					worlds[i].Step();
 				}
@@ -261,10 +264,8 @@ namespace RhuEngine.Managers
 		}
 
 		public void RenderStep() {
-			var hasRan = false;
 			for (var i = worlds.Count - 1; i >= 0; i--) {
-				if ((worlds[i].IsOverlayWorld || worlds[i].IsPersonalSpace) && !hasRan) {
-					hasRan = true;
+				if (worlds[i].IsOverlayWorld || worlds[i].IsPersonalSpace) {
 					UpdateCameraPos();
 				}
 				try {

@@ -80,11 +80,16 @@ namespace RhuEngine.Components
 						_handed = RotationColliderTarget.Target.LazerHand;
 						if (InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed) && RotationColliderTarget.Target.LazeredThisFrame) {
 							isInRotation = true;
+							PrivateSpaceManager.GetLazer(_handed).Locked.Value = true;
 						}
 					}
 					else {
 						if (!InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed)) {
 							isInRotation = false;
+							PrivateSpaceManager.GetLazer(_handed).Locked.Value = false;
+						}
+						else {
+							//Proccess
 						}
 					}
 				}
@@ -96,11 +101,16 @@ namespace RhuEngine.Components
 						_handed = Scale2ColliderTarget.Target.LazeredThisFrame ? Scale2ColliderTarget.Target.LazerHand: ScaleColliderTarget.Target.LazerHand;
 						if (InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed) && (Scale2ColliderTarget.Target.LazeredThisFrame | ScaleColliderTarget.Target.LazeredThisFrame)) {
 							isInScale = true;
+							PrivateSpaceManager.GetLazer(_handed).Locked.Value = true;
 						}
 					}
 					else {
 						if (!InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed)) {
 							isInScale = false;
+							PrivateSpaceManager.GetLazer(_handed).Locked.Value = false;
+						}
+						else {
+							//Proccess
 						}
 					}
 				}
@@ -112,11 +122,16 @@ namespace RhuEngine.Components
 						_handed = PositionColliderTarget.Target.LazerHand;
 						if (InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed) && PositionColliderTarget.Target.LazeredThisFrame) {
 							isInPos = true;
+							PrivateSpaceManager.GetLazer(_handed).Locked.Value = true;
 						}
 					}
 					else {
 						if (!InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed)) {
 							isInPos = false;
+							PrivateSpaceManager.GetLazer(_handed).Locked.Value = false;
+						}
+						else {
+							//Proccess
 						}
 					}
 				}

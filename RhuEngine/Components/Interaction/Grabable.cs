@@ -91,6 +91,9 @@ namespace RhuEngine.Components
 			}
 		}
 
+		private float _lazerDist;
+		private Matrix _offsetFromLazer;
+
 		internal void GripProcess(GrabbableHolder obj, bool Laser, float gripForce) {
 			if (gripForce < GripForce.Value) {
 				return;
@@ -117,7 +120,17 @@ namespace RhuEngine.Components
 			}
 			grabbableHolder.Target = obj;
 			grabbingUser.Target = LocalUser;
-			Entity.SetParent(obj.holder.Target);
+			if (Laser) {
+				if (grabbableHolder.Target is not null) {
+					var hitPoint = PrivateSpaceManager.LazerHitPoint(grabbableHolder.Target.source.Value);
+					_lazerDist = PrivateSpaceManager.LazerStartPos(grabbableHolder.Target.source.Value).Distance(hitPoint);
+					_offsetFromLazer = Entity.GlobalTrans * Matrix.TR(hitPoint, Quaternionf.LookAt(hitPoint, PrivateSpaceManager.LazerStartPos(grabbableHolder.Target.source.Value))).Inverse;
+					grabbableHolder.Target?.AddLazerEntity(Entity);
+				}
+			}
+			else {
+				Entity.SetParent(obj.holder.Target);
+			}
 			try {
 				grabbableHolder.Target.GrabbedObjects.Add(this);
 			}
@@ -156,22 +169,31 @@ namespace RhuEngine.Components
 			if (grabbableHolder.Target is null) {
 				return;
 			}
-			var pushBackAndForth = InputManager.ObjectPush.HandedValue(GabbedSide) - InputManager.ObjectPull.HandedValue(GabbedSide);
-			var rotate = InputManager.RotateRight.HandedValue(GabbedSide) - InputManager.RotateLeft.HandedValue(GabbedSide);
-			var aimPos = InputManager.XRInputSystem.GetHand(grabbableHolder.Target.source.Value)?[TrackerPos.Aim];
-			var aimPosMatrix = Matrix.TR(aimPos?.Position ?? Vector3f.Zero, aimPos?.Rotation ?? Quaternionf.Identity) * LocalUser.userRoot.Target.Entity.GlobalTrans;
-			if (aimPos is null) {
-				aimPosMatrix = LocalUser.userRoot.Target.head.Target.GlobalTrans;
+			if (!(Entity.position.IsLinkedTo & Entity.scale.IsLinkedTo & Entity.rotation.IsLinkedTo)) {
+				return;
 			}
-			Entity.GlobalTrans = Matrix.RS(Quaternionf.CreateFromEuler((float)(rotate * RTime.Elapsed * 25), 0, 0) * Entity.GlobalTrans.Rotation, Entity.GlobalTrans.Scale) * Matrix.T(Entity.GlobalTrans.Translation);
-			var localPos = Entity.GlobalTrans * aimPosMatrix.Inverse;
-			localPos.Translation -= new Vector3f(0, 0, pushBackAndForth * RTime.Elapsed);
-			if (localPos.Translation.z >= -0.01f) {
+			var lastDis = _lazerDist;
+			_lazerDist = ((InputManager.ObjectPush.HandedValue(GabbedSide) - InputManager.ObjectPull.HandedValue(GabbedSide)) * RTime.ElapsedF) + _lazerDist;
+			var rotate = (InputManager.RotateRight.HandedValue(GabbedSide) - InputManager.RotateLeft.HandedValue(GabbedSide)) * RTime.ElapsedF * 10;
+			_offsetFromLazer *= Matrix.R(Quaternionf.CreateFromEuler(rotate, 0, 0));
+			if (_lazerDist <= -0.1) {
+				if(grabbableHolder.Target.source.Value == Handed.Max) {
+					_lazerDist = lastDis;
+					return;
+				}
 				LaserGrabbed = false;
+				Entity.SetParent(grabbableHolder.Target.holder.Target);
+				PrivateSpaceManager.GetLazer(grabbableHolder.Target.source.Value).Locked.Value = false;
+				return;
 			}
-			Entity.GlobalTrans = localPos * aimPosMatrix;
+			var netPos = (PrivateSpaceManager.LazerNormal(grabbableHolder.Target.source.Value) * _lazerDist) + PrivateSpaceManager.LazerStartPos(grabbableHolder.Target.source.Value);
+			var targetPos = Matrix.TR(netPos, Quaternionf.LookAt(netPos, PrivateSpaceManager.LazerStartPos(grabbableHolder.Target.source.Value)));
+			Entity.GlobalTrans = _offsetFromLazer * targetPos;
+			PrivateSpaceManager.SetLazerHitPoint(grabbableHolder.Target.source.Value, targetPos.Translation);
 			if (InputManager.Primary.HandedValue(GabbedSide) > 0.5) {
 				Entity.RotateToUpVector(LocalUser.userRoot.Target.Entity);
+				_offsetFromLazer = Entity.GlobalTrans * targetPos.Inverse;
+
 			}
 		}
 	}
