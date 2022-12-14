@@ -33,6 +33,9 @@ namespace RhuEngine.Settings
 		[SettingsField("How MuchLazer smoothing 0 is none")]
 		public float LazerSmoothing = 10;
 
+		[SettingsField("DeadZones on axis inputs")]
+		public bool DeadZones = true;
+
 		[SettingsField("If your primary hand is the right hand")]
 		public bool RightHanded = true;
 

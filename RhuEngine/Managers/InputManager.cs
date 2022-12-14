@@ -297,6 +297,22 @@ namespace RhuEngine.Managers
 							}
 							if (targetDevice.HasVectorInput(thread)) {
 								var data = targetDevice.VectorInput(thread);
+								if (_engine.MainSettings.InputSettings.DeadZones) {
+									var mag = MathF.Sqrt((data.x * data.x) + (data.y * data.y));
+									// Apply deadzone to mag
+									var theta = MathF.Atan2(data.x, data.y);
+									theta -= MathF.Sin(theta * 4) / 4;
+									var newx = mag * MathF.Sin(theta);
+									var newy = mag * MathF.Cos(theta);
+									// Apply deadzone to x and y individually
+									if(newx <= 0.1f & newx >= -0.1f) {
+										newx = 0;
+									}
+									if (newy <= 0.1f & newy >= -0.1f) {
+										newy = 0;
+									}
+									data = new Vector2f(newx, newy);
+								}
 								if (dir is "x") {
 									return data.x;
 								}

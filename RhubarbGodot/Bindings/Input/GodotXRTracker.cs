@@ -79,9 +79,6 @@ namespace RhubarbVR.Bindings.Input
 		}
 
 		private void Tracker_InputValueChanged(string name, double value) {
-//#if DEBUG
-//			RLog.Info("Value Input " + name);
-//#endif
 			if (_doubleinputs.ContainsKey(name)) {
 				_doubleinputs[name] = value;
 			}
@@ -91,9 +88,6 @@ namespace RhubarbVR.Bindings.Input
 		}
 
 		private void Tracker_InputAxisChanged(string name, Vector2 vector) {
-//#if DEBUG
-//			RLog.Info("Axis Input " + name);
-//#endif
 			if (_vectorinputs.ContainsKey(name)) {
 				_vectorinputs[name] = new Vector2f(vector.x,vector.y);
 			}
@@ -109,9 +103,6 @@ namespace RhubarbVR.Bindings.Input
 		private readonly System.Collections.Generic.Dictionary<string, bool> _boolinputs = new();
 
 		private void Tracker_ButtonReleased(string name) {
-//#if DEBUG
-//			RLog.Info("Button Released " + name);
-//#endif
 			if (_boolinputs.ContainsKey(name)) {
 				_boolinputs[name] = false;
 			}
@@ -121,9 +112,6 @@ namespace RhubarbVR.Bindings.Input
 		}
 
 		private void Tracker_ButtonPressed(string name) {
-//#if DEBUG
-//			RLog.Info("Button Press " + name);
-//#endif
 			if (_boolinputs.ContainsKey(name)) {
 				_boolinputs[name] = true;
 			}
