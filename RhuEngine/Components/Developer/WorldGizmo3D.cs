@@ -88,7 +88,7 @@ namespace RhuEngine.Components
 		}
 
 		public override void Dispose() {
-			_privateGizmo?.Destroy();
+			_privateGizmo?.Entity?.Destroy();
 			_privateGizmo = null;
 			base.Dispose();
 			GC.SuppressFinalize(this);

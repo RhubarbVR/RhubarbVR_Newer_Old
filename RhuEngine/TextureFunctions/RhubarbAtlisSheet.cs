@@ -281,6 +281,8 @@ namespace RhuEngine
 			AddObject = 168,
 			OpenDevWindow = 169,
 			OpenInspectorWindow = 170,
+			SingleSelect = 171,
+			MultiSelect = 172,
 		}
 
 		public RTexture2D GetElement(RhubarbIcons icons) {

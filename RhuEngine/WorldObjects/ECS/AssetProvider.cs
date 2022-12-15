@@ -31,6 +31,7 @@ namespace RhuEngine.WorldObjects.ECS
 		public bool Loaded { get; private set; } = false;
 
 		public override void Dispose() {
+			IsDestroying= true;
 			Load(null);
 			base.Dispose();
 			GC.SuppressFinalize(this);

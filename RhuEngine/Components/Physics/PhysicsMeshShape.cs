@@ -45,9 +45,11 @@ namespace RhuEngine.Components
 		protected abstract T CreateShape(T2 addon, ref float speculativeMargin, float? mass, out BodyInertia inertia);
 
 		public override T CreateShape(ref float speculativeMargin, float? mass, out BodyInertia inertia) {
-			return _last is null || !(GetAddon?.Loaded ?? false)
+			return ((TargetMesh.Target?.IsDestroying ?? true) | (TargetMesh.Target?.IsRemoved ?? true))
 				? CreateEmpty(ref speculativeMargin, mass, out inertia)
-				: CreateShape(GetAddon,ref speculativeMargin, mass, out inertia);
+				: (_last?.IsRemoved ?? true) | !(GetAddon?.Loaded ?? false)
+				? CreateEmpty(ref speculativeMargin, mass, out inertia)
+				: CreateShape(GetAddon, ref speculativeMargin, mass, out inertia);
 		}
 
 		protected T2 GetAddon => _last?.GetMeshAddon<T2>(World);

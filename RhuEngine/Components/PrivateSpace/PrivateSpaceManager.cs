@@ -235,6 +235,14 @@ namespace RhuEngine.Components
 		public Vector3f HeadLazerVec;
 		public Vector3f LeftLazerVec;
 		public Vector3f RightlaserVec;
+		public PhysicsObject GetLazerHitObject(Handed handed) {
+			return handed switch {
+				Handed.Left => Leftlazer?.hitPhysicsObject,
+				Handed.Right => Rightlazer?.hitPhysicsObject,
+				_ => HeadLazerHitObject,
+			};
+		}
+
 		public Entity GetLazerEntity(Handed handed) {
 			var head = LocalUser.userRoot.Target?.head.Target;
 			return handed switch {

@@ -41,6 +41,7 @@ namespace RhuEngine.Linker.MeshAddons
 		public override void Dispose() {
 			if (BufferPool != default) {
 				BufferPool.Return(ref TrianglesBuffer);
+				TrianglesBuffer = default;
 			}
 			base.Dispose();
 		}

@@ -51,6 +51,7 @@ namespace RhuEngine.Linker
 		public AxisAlignedBox3f BoundingBox { get; private set; }
 
 		public bool Dynamic { get; private set; }
+		public bool IsRemoved { get; private set; }
 
 		public static Type Instance { get; set; }
 
@@ -103,6 +104,7 @@ namespace RhuEngine.Linker
 		}
 
 		public void Dispose() {
+			IsRemoved = true;
 			Inst?.Dispose();
 			Inst = null;
 			foreach (var item in _rMeshAddons) {
