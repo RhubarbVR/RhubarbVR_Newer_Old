@@ -129,7 +129,11 @@ namespace RhuEngine.Components
 			_changeLayoutButton.Alignment.Value = RButtonAlignment.Center;
 
 			var refreshButton = headerBox.Entity.AddChild("refreshButton").AttachComponent<Button>();
-			refreshButton.Text.Value = "↻";
+			var refrech = headerBox.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
+			refreshButton.Icon.Target = refrech;
+			refrech.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Refresh));
+			refreshButton.ExpandIcon.Value = true;
+			refreshButton.IconAlignment.Value = RButtonAlignment.Center;
 			refreshButton.MinSize.Value = new Vector2i(40);
 			refreshButton.Pressed.Target = Refresh;
 			refreshButton.Alignment.Value = RButtonAlignment.Center;

@@ -86,7 +86,10 @@ namespace RhuEngine.Components
 			var Sidevec = Matrix.T(new Vector3f(1, 0, 0)) * Entity.GlobalTrans;
 			var start = global.Translation;
 			var up = UPvec.Rotation * Vector3f.Up;
+
 			var side = Sidevec.Rotation * Vector3f.Forward;
+			var otherSide = Sidevec.Rotation * Vector3f.Right;
+
 			var newMatrix = StartPos;
 			var lazerStart = PrivateSpaceManager.LazerStartPos(_handed);
 			var lazerEnd = (PrivateSpaceManager.LazerNormal(_handed) * 50) + lazerStart;
@@ -136,7 +139,7 @@ namespace RhuEngine.Components
 								return;
 							}
 							isInScale = true;
-							var plane = new Plane3f(side, start);
+							var plane = new Plane3f(otherSide, start);
 							var intersect = plane.IntersectLine(lazerStart, lazerEnd);
 							var localPoint = Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalPointToLocal(intersect) ?? Vector3f.Zero;
 							World.DrawDebugSphere(Matrix.T(new Vector3f(0, localPoint.y, 0)) * (Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalTrans ?? Matrix.Identity), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 1, 0.5f));
@@ -156,7 +159,7 @@ namespace RhuEngine.Components
 						}
 						else {
 							//Proccess
-							var plane = new Plane3f(side, start);
+							var plane = new Plane3f(otherSide, start);
 							var intersect = plane.IntersectLine(lazerStart, lazerEnd);
 							var localPoint = Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalPointToLocal(intersect) ?? Vector3f.Zero;
 							World.DrawDebugText(Matrix.T(intersect), Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 1, 0.5f), $"{localPoint}");
@@ -210,7 +213,7 @@ namespace RhuEngine.Components
 								return;
 							}
 							isInPos = true;
-							var plane = new Plane3f(side, start);
+							var plane = new Plane3f(otherSide, start);
 							var intersect = plane.IntersectLine(lazerStart, lazerEnd);
 							var localPoint = Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalPointToLocal(intersect) ?? Vector3f.Zero;
 							World.DrawDebugSphere(Matrix.T(new Vector3f(0, localPoint.y, 0)) * (Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalTrans ?? Matrix.Identity), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 1, 0.5f));
@@ -228,7 +231,7 @@ namespace RhuEngine.Components
 						}
 						else {
 							//Proccess
-							var plane = new Plane3f(side, start);
+							var plane = new Plane3f(otherSide, start);
 							var intersect = plane.IntersectLine(lazerStart, lazerEnd);
 							var localPoint = Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalPointToLocal(intersect) ?? Vector3f.Zero;
 							World.DrawDebugSphere(Matrix.T(new Vector3f(0, localPoint.y, 0)) * (Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalTrans ?? Matrix.Identity), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 1, 0.5f));

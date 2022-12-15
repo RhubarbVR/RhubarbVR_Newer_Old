@@ -274,6 +274,13 @@ namespace RhuEngine
 			Unlock = 161,
 			Lock = 162,
 			MilkSnake = 163,
+			Translate = 164,
+			Scale = 165,
+			Rotation = 166,
+			Refresh = 167,
+			AddObject = 168,
+			OpenDevWindow = 169,
+			OpenInspectorWindow = 170,
 		}
 
 		public RTexture2D GetElement(RhubarbIcons icons) {
