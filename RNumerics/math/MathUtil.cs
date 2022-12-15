@@ -743,5 +743,9 @@ namespace RNumerics
 		public static Vector3f Sign(in Vector3f value) {
 			return new Vector3f(Sign(value.x), Sign(value.y), Sign(value.z));
 		}
+
+		public static float Clean(in float v) {
+			return float.IsInfinity(v) | float.IsNaN(v) ? 0.0f  : v;
+		}
 	}
 }

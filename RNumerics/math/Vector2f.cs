@@ -97,7 +97,14 @@ namespace RNumerics
 		public float LengthSquared => (x * x) + (y * y);
 		[IgnoreMember]
 		public float Length => (float)Math.Sqrt(LengthSquared);
-
+		[IgnoreMember]
+		public float YAngleD => AngleD(AxisY);
+		[IgnoreMember]
+		public float YAngleR => AngleR(AxisY);
+		[IgnoreMember]
+		public float XAngleD => AngleD(AxisX);
+		[IgnoreMember]
+		public float XAngleR => AngleR(AxisX);
 		public float Normalize(in float epsilon = MathUtil.EPSILONF) {
 			var length = Length;
 			if (length > epsilon) {

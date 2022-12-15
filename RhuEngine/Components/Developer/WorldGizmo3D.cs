@@ -28,6 +28,12 @@ namespace RhuEngine.Components
 		public readonly SyncRef<IValueSource<Quaternionf>> Rot;
 		[OnChanged(nameof(UpdateModeData))]
 		public readonly Sync<bool> UseLocalRot;
+		[OnChanged(nameof(UpdateModeData))]
+		public readonly Sync<float> PosStep;
+		[OnChanged(nameof(UpdateModeData))]
+		public readonly Sync<float> ScaleStep;
+		[OnChanged(nameof(UpdateModeData))]
+		public readonly Sync<float> AngleStep;
 
 		private Gizmo3D _privateGizmo;
 
@@ -52,6 +58,11 @@ namespace RhuEngine.Components
 			_privateGizmo.TransformSpace.Target = TransformSpace.Target;
 			_privateGizmo.ParentEntity.Target = ParentEntity.Target;
 			_privateGizmo.UseLocalRot.Value = UseLocalRot.Value;
+
+			_privateGizmo.PosStep.Value = PosStep.Value;
+			_privateGizmo.ScaleStep.Value = ScaleStep.Value;
+			_privateGizmo.AngleStep.Value = AngleStep.Value;
+
 			var AllowedModes = GizmoMode.None;
 			if (Pos.Target is not null) {
 				AllowedModes |= GizmoMode.Position;

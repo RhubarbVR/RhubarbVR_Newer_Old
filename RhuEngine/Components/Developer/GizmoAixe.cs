@@ -62,7 +62,15 @@ namespace RhuEngine.Components
 		public readonly SyncRef<PhysicsObject> Scale2ColliderTarget;
 		public readonly SyncRef<PhysicsObject> PositionColliderTarget;
 
+		public float PosStep => Gizmo3DTarget.Target?.PosStep.Value ?? 0f;
+		public float AngleStep => Gizmo3DTarget.Target?.AngleStep.Value ?? 0f;
+		public float ScaleStep => Gizmo3DTarget.Target?.ScaleStep.Value ?? 0f;
+
 		public bool IsActive => isInRotation | isInScale | isInPos;
+
+
+		public Matrix StartPos;
+		public Vector3f StartData;
 
 		public bool isInRotation;
 		public bool isInScale;
@@ -70,16 +78,34 @@ namespace RhuEngine.Components
 		private Handed _handed;
 		protected override void Step() {
 			base.Step();
-			if(Gizmo3DTarget.Target?.GetIfOtherIsActive(this) ?? false) {
+			if (Gizmo3DTarget.Target?.GetIfOtherIsActive(this) ?? false) {
 				return;
 			}
+			var global = Entity.GlobalTrans;
+			var UPvec = Matrix.T(new Vector3f(0, 1, 0)) * Entity.GlobalTrans;
+			var Sidevec = Matrix.T(new Vector3f(1, 0, 0)) * Entity.GlobalTrans;
+			var start = global.Translation;
+			var up = UPvec.Rotation * Vector3f.Up;
+			var side = Sidevec.Rotation * Vector3f.Forward;
+			var newMatrix = StartPos;
+			var lazerStart = PrivateSpaceManager.LazerStartPos(_handed);
+			var lazerEnd = (PrivateSpaceManager.LazerNormal(_handed) * 50) + lazerStart;
 			if (RotationColliderTarget.Target is not null & ColorOfRotationGizmo.Linked) {
 				if (!(isInPos | isInScale)) {
 					ColorOfRotationGizmo.LinkedValue = RotationColliderTarget.Target.LazeredThisFrame | isInRotation ? GetColor(0.85f) : GetColor();
 					if (!isInRotation) {
 						_handed = RotationColliderTarget.Target.LazerHand;
 						if (InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed) && RotationColliderTarget.Target.LazeredThisFrame) {
+							if (PrivateSpaceManager.GetLazer(_handed).Locked.Value) {
+								return;
+							}
 							isInRotation = true;
+							newMatrix = StartPos = Gizmo3DTarget.Target?.LocalPos ?? Matrix.Identity;
+
+							var plane = new Plane3f(up, start);
+							var intersect = plane.IntersectLine(lazerStart, lazerEnd);
+							World.DrawDebugSphere(Matrix.T(intersect), Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 1, 0.5f));
+							StartData = intersect;
 							PrivateSpaceManager.GetLazer(_handed).Locked.Value = true;
 						}
 					}
@@ -90,6 +116,12 @@ namespace RhuEngine.Components
 						}
 						else {
 							//Proccess
+							var plane = new Plane3f(up, start);
+							var intersect = plane.IntersectLine(lazerStart, lazerEnd);
+							World.DrawDebugSphere(Matrix.T(intersect), Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 1, 0.5f));
+							//Todo Apply Rotation
+
+							PrivateSpaceManager.GetLazer(_handed).HitPoint = intersect;
 						}
 					}
 				}
@@ -98,9 +130,22 @@ namespace RhuEngine.Components
 				if (!(isInPos | isInRotation)) {
 					ColorOfScaleGizmo.LinkedValue = (Scale2ColliderTarget.Target.LazeredThisFrame | ScaleColliderTarget.Target.LazeredThisFrame | isInScale) ? GetColor(0.85f) : GetColor();
 					if (!isInScale) {
-						_handed = Scale2ColliderTarget.Target.LazeredThisFrame ? Scale2ColliderTarget.Target.LazerHand: ScaleColliderTarget.Target.LazerHand;
+						_handed = Scale2ColliderTarget.Target.LazeredThisFrame ? Scale2ColliderTarget.Target.LazerHand : ScaleColliderTarget.Target.LazerHand;
 						if (InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed) && (Scale2ColliderTarget.Target.LazeredThisFrame | ScaleColliderTarget.Target.LazeredThisFrame)) {
+							if (PrivateSpaceManager.GetLazer(_handed).Locked.Value) {
+								return;
+							}
 							isInScale = true;
+							var plane = new Plane3f(side, start);
+							var intersect = plane.IntersectLine(lazerStart, lazerEnd);
+							var localPoint = Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalPointToLocal(intersect) ?? Vector3f.Zero;
+							World.DrawDebugSphere(Matrix.T(new Vector3f(0, localPoint.y, 0)) * (Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalTrans ?? Matrix.Identity), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 1, 0.5f));
+							World.DrawDebugText(Matrix.T(intersect), Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 1, 0.5f), $"{localPoint}");
+							StartData = localPoint;
+							if (localPoint.IsAnyNanOrInfinity) {
+								return;
+							}
+							newMatrix = StartPos = Gizmo3DTarget.Target?.LocalPos ?? Matrix.Identity;
 							PrivateSpaceManager.GetLazer(_handed).Locked.Value = true;
 						}
 					}
@@ -111,6 +156,46 @@ namespace RhuEngine.Components
 						}
 						else {
 							//Proccess
+							var plane = new Plane3f(side, start);
+							var intersect = plane.IntersectLine(lazerStart, lazerEnd);
+							var localPoint = Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalPointToLocal(intersect) ?? Vector3f.Zero;
+							World.DrawDebugText(Matrix.T(intersect), Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 1, 0.5f), $"{localPoint}");
+							if (localPoint.IsAnyNanOrInfinity) {
+								return;
+							}
+							switch (Direction.Value) {
+								case GizmoDir.X: {
+									var sidePoint = Matrix.T(new Vector3f(localPoint.x, 0, 0)) * (Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalTrans ?? Matrix.Identity);
+									World.DrawDebugSphere(sidePoint, Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 1, 0.5f));
+									PrivateSpaceManager.GetLazer(_handed).HitPoint = intersect;
+
+									var defInValue = localPoint.x - StartData.x;
+									defInValue -= MathUtil.Clean(defInValue % ScaleStep);
+									newMatrix = Matrix.S(new Vector3f(1 + defInValue, 1, 1)) * StartPos;
+								}
+								break;
+								case GizmoDir.Y: {
+									var sidePoint = Matrix.T(new Vector3f(0, localPoint.y, 0)) * (Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalTrans ?? Matrix.Identity);
+									World.DrawDebugSphere(sidePoint, Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 1, 0.5f));
+									PrivateSpaceManager.GetLazer(_handed).HitPoint = intersect;
+
+									var defInValue = localPoint.y - StartData.y;
+									defInValue -= MathUtil.Clean(defInValue % ScaleStep);
+									newMatrix = Matrix.S(new Vector3f(1, defInValue + 1, 1)) * StartPos;
+								}
+								break;
+								default: {
+									var sidePoint = Matrix.T(new Vector3f(0, 0, localPoint.z)) * (Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalTrans ?? Matrix.Identity);
+									World.DrawDebugSphere(sidePoint, Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 1, 0.5f));
+									PrivateSpaceManager.GetLazer(_handed).HitPoint = intersect;
+
+									var defInValue = localPoint.z - StartData.z;
+									defInValue -= MathUtil.Clean(defInValue % ScaleStep);
+									newMatrix = Matrix.S(new Vector3f(1, 1, 1 - defInValue)) * StartPos;
+								}
+								break;
+							}
+
 						}
 					}
 				}
@@ -121,7 +206,18 @@ namespace RhuEngine.Components
 					if (!isInPos) {
 						_handed = PositionColliderTarget.Target.LazerHand;
 						if (InputManager.GetInputAction(InputTypes.Primary).HandedActivated(_handed) && PositionColliderTarget.Target.LazeredThisFrame) {
+							if (PrivateSpaceManager.GetLazer(_handed).Locked.Value) {
+								return;
+							}
 							isInPos = true;
+							var plane = new Plane3f(side, start);
+							var intersect = plane.IntersectLine(lazerStart, lazerEnd);
+							var localPoint = Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalPointToLocal(intersect) ?? Vector3f.Zero;
+							World.DrawDebugSphere(Matrix.T(new Vector3f(0, localPoint.y, 0)) * (Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalTrans ?? Matrix.Identity), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 1, 0.5f));
+							World.DrawDebugText(Matrix.T(intersect), Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 1, 0.5f), $"{localPoint}");
+							StartData = localPoint;
+
+							newMatrix = StartPos = Gizmo3DTarget.Target?.LocalPos ?? Matrix.Identity;
 							PrivateSpaceManager.GetLazer(_handed).Locked.Value = true;
 						}
 					}
@@ -132,9 +228,51 @@ namespace RhuEngine.Components
 						}
 						else {
 							//Proccess
+							var plane = new Plane3f(side, start);
+							var intersect = plane.IntersectLine(lazerStart, lazerEnd);
+							var localPoint = Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalPointToLocal(intersect) ?? Vector3f.Zero;
+							World.DrawDebugSphere(Matrix.T(new Vector3f(0, localPoint.y, 0)) * (Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalTrans ?? Matrix.Identity), Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 1, 0.5f));
+							World.DrawDebugText(Matrix.T(intersect), Vector3f.Zero, new Vector3f(0.02f), new Colorf(0, 1, 1, 0.5f), $"{localPoint}");
+							switch (Direction.Value) {
+								case GizmoDir.X: {
+									var sidePoint = Matrix.T(new Vector3f(localPoint.x, 0, 0)) * (Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalTrans ?? Matrix.Identity);
+									World.DrawDebugSphere(sidePoint, Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 1, 0.5f));
+									PrivateSpaceManager.GetLazer(_handed).HitPoint = intersect;
+
+									var defInValue = localPoint.x - StartData.x;
+									defInValue -= MathUtil.Clean(defInValue % PosStep);
+									newMatrix = StartPos * Matrix.T(new Vector3f(defInValue, 0, 0));
+								}
+								break;
+								case GizmoDir.Y: {
+									var sidePoint = Matrix.T(new Vector3f(0, localPoint.y, 0)) * (Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalTrans ?? Matrix.Identity);
+									World.DrawDebugSphere(sidePoint, Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 1, 0.5f));
+									PrivateSpaceManager.GetLazer(_handed).HitPoint = intersect;
+
+									var defInValue = localPoint.y - StartData.y;
+									defInValue -= MathUtil.Clean(defInValue % PosStep);
+									newMatrix = StartPos * Matrix.T(new Vector3f(0, defInValue, 0));
+								}
+								break;
+								default: {
+									var sidePoint = Matrix.T(new Vector3f(0, 0, localPoint.z)) * (Gizmo3DTarget.Target?.TransformSpace.Target?.GlobalTrans ?? Matrix.Identity);
+									World.DrawDebugSphere(sidePoint, Vector3f.Zero, new Vector3f(0.02f), new Colorf(1, 1, 1, 0.5f));
+									PrivateSpaceManager.GetLazer(_handed).HitPoint = intersect;
+
+									var defInValue = localPoint.z - StartData.z;
+									defInValue -= MathUtil.Clean(defInValue % PosStep);
+									newMatrix = StartPos * Matrix.T(new Vector3f(0, 0, defInValue));
+
+								}
+								break;
+							}
+
 						}
 					}
 				}
+			}
+			if (newMatrix != StartPos) {
+				Gizmo3DTarget.Target?.SetMatrix(newMatrix);
 			}
 		}
 
@@ -176,13 +314,14 @@ namespace RhuEngine.Components
 
 		protected override void OnAttach() {
 			base.OnAttach();
-			var rotationMeshRender = Entity.AttachComponent<MeshRender>();
+			var rotationMeshRender = Entity.AddChild("Rot").AttachComponent<MeshRender>();
+			rotationMeshRender.Entity.rotation.Value = Quaternionf.Pitched;
 			Rotation.Target = rotationMeshRender.Enabled;
 			var rotMesh = Entity.AttachComponent<TorusMesh>();
 			rotMesh.MajorRadius.Value = 1.7f;
 			rotMesh.MinorRadius.Value = 0.05f;
 			rotationMeshRender.mesh.Target = rotMesh;
-			var rotColider = Entity.AttachComponent<MeshShape>();
+			var rotColider = rotationMeshRender.Entity.AttachComponent<MeshShape>();
 			rotColider.TargetMesh.Target = rotMesh;
 			RotationCollider.Target = rotColider.Enabled;
 			RotationColliderTarget.Target = rotColider;

@@ -5,6 +5,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using System.Reflection;
 using System.Threading.Tasks;
+using System;
 
 namespace RhuEngine.Components
 {
@@ -16,6 +17,11 @@ namespace RhuEngine.Components
 		[Default(GizmoMode.All)]
 		public readonly Sync<GizmoMode> Mode;
 		public readonly Sync<bool> UseLocalRot;
+
+		public readonly Sync<float> PosStep;
+		public readonly Sync<float> ScaleStep;
+		public readonly Sync<float> AngleStep;
+
 
 		public readonly Linker<Vector3f> ScaleLink;
 		public readonly Linker<Vector3f> PosLink;
@@ -35,12 +41,15 @@ namespace RhuEngine.Components
 		public readonly SyncRef<IValueSource<Vector3f>> Scale;
 		public readonly SyncRef<IValueSource<Quaternionf>> Rot;
 
+		public Matrix GlobalPos => ParentEntity.Target?.LocalToGlobal(Matrix.TRS(Pos.Target?.Value ?? Vector3f.Zero, Rot.Target?.Value ?? Quaternionf.Identity, Scale.Target?.Value ?? Vector3f.One)) ?? Matrix.Identity;
+		public Matrix LocalPos => TransformSpace.Target?.GlobalToLocal(GlobalPos) ?? Matrix.Identity;
+
 		[Default(0.15f)]
 		public readonly Sync<float> TargetSize;
 
 		public bool GetIfOtherIsActive(Component component) {
 			var isActive = false;
-			if(X.Target != component) {
+			if (X.Target != component) {
 				isActive |= X.Target?.IsActive ?? false;
 			}
 			if (Y.Target != component) {
@@ -65,7 +74,7 @@ namespace RhuEngine.Components
 			base.Step();
 			var space = TransformSpace.Target ?? World.RootEntity;
 			var parrent = (ParentEntity.Target ?? World.RootEntity).GlobalTrans;
-			var globalTrans = Matrix.TRS(Pos.Target?.Value ?? Vector3f.Zero, Rot.Target?.Value ?? Quaternionf.Identity, Scale.Target?.Value ?? Vector3f.One) * parrent;		
+			var globalTrans = Matrix.TRS(Pos.Target?.Value ?? Vector3f.Zero, Rot.Target?.Value ?? Quaternionf.Identity, Scale.Target?.Value ?? Vector3f.One) * parrent;
 			if (RotLink.Linked) {
 				RotLink.LinkedValue = UseLocalRot ? globalTrans.Rotation : space.GlobalTrans.Rotation;
 			}
@@ -130,5 +139,19 @@ namespace RhuEngine.Components
 			driver.drivers.Add().Target = Z.Target.Mode;
 		}
 
+		public void SetMatrix(Matrix newMatrix) {
+			newMatrix = TransformSpace.Target?.LocalToGlobal(newMatrix) ?? Matrix.Identity;
+			newMatrix = ParentEntity.Target?.GlobalToLocal(newMatrix) ?? Matrix.Identity;
+			newMatrix.Decompose(out var trans, out var quaternionf, out var scale);
+			if (Pos.Target is not null) {
+				Pos.Target.Value = trans;
+			}
+			if (Scale.Target is not null) {
+				Scale.Target.Value = scale;
+			}
+			if (Rot.Target is not null) {
+				Rot.Target.Value = quaternionf;
+			}
+		}
 	}
 }

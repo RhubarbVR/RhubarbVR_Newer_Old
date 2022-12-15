@@ -349,7 +349,9 @@ namespace RhuEngine
 			if (EngineStarting) {
 				if (EngineLink.CanRender) {
 					try {
-						var headMat = RRenderer.GetMainViewMatrix;
+						var headMat = IsInVR
+							? Matrix.TR(inputManager.XRInputSystem.HeadPos, inputManager.XRInputSystem.HeadRot)
+							: inputManager.ScreenHeadMatrix;
 						var textpos = Matrix.T(Vector3f.Forward * 0.5f) * (EngineLink.CanInput ? headMat : Matrix.S(1));
 						var playerPos = RRenderer.CameraRoot.Translation;
 						_loadingPos += playerPos - _oldPlayerPos;

@@ -114,6 +114,11 @@ namespace RhuEngine.Components
 			if (!IsLaserGrabbable.Value && Laser) {
 				return;
 			}
+			if (grabbableHolder.Target is not null) {
+				if (Laser && PrivateSpaceManager.GetLazer(grabbableHolder.Target.source.Value).Locked.Value) {
+					return;
+				}
+			}
 			LaserGrabbed = Laser;
 			if (!Grabbed) {
 				lastParent.Target = Entity.parent.Target;
@@ -174,7 +179,7 @@ namespace RhuEngine.Components
 			}
 			var lastDis = _lazerDist;
 			_lazerDist = ((InputManager.ObjectPush.HandedValue(GabbedSide) - InputManager.ObjectPull.HandedValue(GabbedSide)) * RTime.ElapsedF) + _lazerDist;
-			var rotate = (InputManager.RotateRight.HandedValue(GabbedSide) - InputManager.RotateLeft.HandedValue(GabbedSide)) * RTime.ElapsedF * 10;
+			var rotate = (InputManager.RotateRight.HandedValue(GabbedSide) - InputManager.RotateLeft.HandedValue(GabbedSide)) * RTime.ElapsedF * 50;
 			_offsetFromLazer *= Matrix.R(Quaternionf.CreateFromEuler(rotate, 0, 0));
 			if (_lazerDist <= -0.1) {
 				if(grabbableHolder.Target.source.Value == Handed.Max) {

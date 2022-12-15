@@ -358,7 +358,22 @@ namespace RNumerics
 			return new Vector3f((s * a.x) + (t * b.x), (s * a.y) + (t * b.y), (s * a.z) + (t * b.z));
 		}
 
+		public static Vector3f GetClosestPointOnFiniteLine(in Vector3f point, in Vector3f line_start, in Vector3f line_end) {
+			var line_direction = line_end - line_start;
+			var line_length = line_direction.Magnitude;
+			line_direction = line_direction.Normalized;
+			var project_length = MathUtil.Clamp(Vector3f.Dot(point - line_start, line_direction), 0f, line_length);
+			return line_start + (line_direction * project_length);
+		}
 
+		public static Vector3f GetClosestPointOnInfiniteLine(in Vector3f point, in Vector3f line_start, in Vector3f line_end) {
+			return line_start + Project(point - line_start, line_end - line_start);
+		}
+
+		public static Vector3f Project(in Vector3f a, in Vector3f b) {
+			var v = b.Normalized;
+			return v * Dot(a, v);
+		}
 
 		public override string ToString() {
 			return string.Format("{0:F8} {1:F8} {2:F8}", x, y, z);

@@ -83,7 +83,7 @@ namespace RhuEngine.Managers
 		/// <summary>
 		/// Gets the head position of the screen.
 		/// </summary>
-		public Matrix ScreenHeadMatrix => screenInput.HeadPos;
+		public Matrix ScreenHeadMatrix => screenInput?.HeadPos ?? Matrix.Identity;
 
 		public void Dispose() {
 		}
@@ -193,7 +193,7 @@ namespace RhuEngine.Managers
 			if (handed == Handed.Max) {
 				if (device == "key") {
 					if (!Enum.TryParse<Key>(second, true, out var keydata)) {
-						if(Enum.TryParse<MouseKeys>(second,true,out var mouseCe)) {
+						if (Enum.TryParse<MouseKeys>(second, true, out var mouseCe)) {
 							var mouseKeyAction = () => MouseSystem.IsMouseKeyDown(mouseCe) ? 1f : 0f;
 							_actions.Add(lookValue, mouseKeyAction);
 							return mouseKeyAction();
@@ -305,7 +305,7 @@ namespace RhuEngine.Managers
 									var newx = mag * MathF.Sin(theta);
 									var newy = mag * MathF.Cos(theta);
 									// Apply deadzone to x and y individually
-									if(newx <= 0.1f & newx >= -0.1f) {
+									if (newx <= 0.1f & newx >= -0.1f) {
 										newx = 0;
 									}
 									if (newy <= 0.1f & newy >= -0.1f) {

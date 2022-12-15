@@ -698,54 +698,34 @@ namespace RNumerics
 			return CreateFromYawPitchRoll(MathUtil.DEG_2_RADF * yaw, MathUtil.DEG_2_RADF * pitch, MathUtil.DEG_2_RADF * roll);
 		}
 		public Vector3f GetEuler() {
-			var sqw = w * w;
-			var sqx = x * x;
-			var sqy = y * y;
-			var sqz = z * z;
-			var unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
-			var test = (x * w) - (y * z);
-			var v = Vector3f.Zero;
+			var angles = new Vector3f();
+			// roll / x
+			double sinr_cosp = 2 * ((W * X) + (Y * Z));
+			double cosr_cosp = 1 - (2 * ((X * X) + (Y * Y)));
+			angles.X = (float)Math.Atan2(sinr_cosp, cosr_cosp);
 
-			if (test > 0.4995f * unit) { // singularity at north pole
-				v.y = 2f * (float)Math.Atan2(y, x);
-				v.x = (float)Math.PI / 2;
-				v.z = 0;
-				return NormalizeAngles(v * (float)(Math.PI / 180));
-			}
-			if (test < -0.4995f * unit) { // singularity at south pole
-				v.y = -2f * (float)Math.Atan2(y, x);
-				v.x = -(float)Math.PI / 2;
-				v.z = 0;
-				return NormalizeAngles(v * (float)(Math.PI / 180));
-			}
-			var q = new Quaternionf(w, z, x, y);
-			v.y = (float)Math.Atan2((2f * q.x * q.w) + (2f * q.y * q.z), 1 - (2f * ((q.z * q.z) + (q.w * q.w))));     // Yaw
-			v.x = (float)Math.Asin(2f * ((q.x * q.z) - (q.w * q.y)));                             // Pitch
-			v.z = (float)Math.Atan2((2f * q.x * q.y) + (2f * q.z * q.w), 1 - (2f * ((q.y * q.y) + (q.z * q.z))));      // Roll
-			return NormalizeAngles(v * (float)(Math.PI / 180));
-		}
-		static Vector3f NormalizeAngles(Vector3f angles) {
-			angles.x = NormalizeAngle(angles.x);
-			angles.y = NormalizeAngle(angles.y);
-			angles.z = NormalizeAngle(angles.z);
+			// pitch / y
+			double sinp = 2 * ((W * Y) - (Z * X));
+			angles.Y = Math.Abs(sinp) >= 1 ? (float)Math.CopySign(Math.PI / 2, sinp) : (float)Math.Asin(sinp);
+
+			// yaw / z
+			double siny_cosp = 2 * ((W * Z) + (X * Y));
+			double cosy_cosp = 1 - (2 * ((Y * Y) + (Z * Z)));
+			angles.Z = (float)Math.Atan2(siny_cosp, cosy_cosp);
+
 			return angles;
 		}
-		static float NormalizeAngle(float angle) {
-			while (angle > 360) {
-				angle -= 360;
-			}
 
-			while (angle < 0) {
-				angle += 360;
-			}
-
-			return angle;
-		}
 		public override string ToString() {
 			return string.Format("{0:F8} {1:F8} {2:F8} {3:F8}", x, y, z, w);
 		}
 		public string ToString(in string fmt) {
 			return string.Format("{0} {1} {2} {3}", x.ToString(fmt), y.ToString(fmt), z.ToString(fmt), w.ToString(fmt));
+		}
+
+		public Quaternionf Snap(float angleStep) {
+			var startData = GetEuler();
+			return CreateFromEuler(new Vector3f(startData.x - MathUtil.Clean(startData.x % angleStep), startData.y - MathUtil.Clean(startData.y % angleStep), startData.z - MathUtil.Clean(startData.z % angleStep)));
 		}
 	}
 }
