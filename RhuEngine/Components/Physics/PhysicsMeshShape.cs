@@ -7,6 +7,7 @@ using BepuPhysics.Collidables;
 using BepuPhysics;
 using RhuEngine.Linker.MeshAddons;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace RhuEngine.Components
 {
@@ -44,6 +45,7 @@ namespace RhuEngine.Components
 		protected abstract T CreateEmpty(ref float speculativeMargin, float? mass, out BodyInertia inertia);
 		protected abstract T CreateShape(T2 addon, ref float speculativeMargin, float? mass, out BodyInertia inertia);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public override T CreateShape(ref float speculativeMargin, float? mass, out BodyInertia inertia) {
 			return ((TargetMesh.Target?.IsDestroying ?? true) | (TargetMesh.Target?.IsRemoved ?? true))
 				? CreateEmpty(ref speculativeMargin, mass, out inertia)
@@ -64,7 +66,7 @@ namespace RhuEngine.Components
 		public override void RemoveShape() {
 			CleanUpShapeData();
 			if (ShapeIndex is not null) {
-				Simulation.Simulation.Shapes.RemoveAndDispose(ShapeIndex.Value, Simulation.BufferPool);
+				Simulation.Simulation.Shapes.Remove(ShapeIndex.Value);
 			}
 			ShapeIndex = null;
 		}

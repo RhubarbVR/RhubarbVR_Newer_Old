@@ -16,6 +16,7 @@ using BepuPhysics.Collidables;
 using System.Runtime.CompilerServices;
 using BepuPhysics.CollisionDetection;
 using RNumerics;
+using BepuPhysics.Trees;
 
 namespace RhuEngine.Physics
 {
@@ -30,6 +31,7 @@ namespace RhuEngine.Physics
 		public BufferPool BufferPool { get; private set; }
 
 		public Buffer<Triangle> EmptyTriangles;
+		public Tree EmptyTree;
 
 		public void Dispose() {
 			Simulation.Dispose();
@@ -43,6 +45,17 @@ namespace RhuEngine.Physics
 			Simulation = Simulation.Create(BufferPool, new NarrowPhaseCallbacks(new SpringSettings(30, 1)), new PoseIntegratorCallbacks(this), new SolveDescription(8, 1));
 			BufferPool.Take(1, out EmptyTriangles);
 			EmptyTriangles[0] = new Triangle(Vector3f.Zero, Vector3f.Zero, Vector3f.Zero);
+			EmptyTree = new Tree(BufferPool, EmptyTriangles.Length);
+			BufferPool.Take(EmptyTriangles.Length, out Buffer<BoundingBox> buffer);
+			for (var i = 0; i < EmptyTriangles.Length; i++) {
+				ref var reference = ref EmptyTriangles[i];
+				ref var reference2 = ref buffer[i];
+				reference2.Min = Vector3.Min(reference.A, Vector3.Min(reference.B, reference.C));
+				reference2.Max = Vector3.Max(reference.A, Vector3.Max(reference.B, reference.C));
+			}
+
+			EmptyTree.SweepBuild(BufferPool, buffer);
+			BufferPool.Return(ref buffer);
 		}
 
 		public void Update(double elapsed) {

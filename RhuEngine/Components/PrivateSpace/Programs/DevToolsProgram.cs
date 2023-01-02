@@ -79,8 +79,8 @@ namespace RhuEngine.Components
 				AddGizmo(targetEntity);
 			}
 			else {
-				if (Gizmos.Count >= 1) {
-					RemoveGizmo(Gizmos[0].Target);
+				for (var i = Gizmos.Count - 1; i >= 0; i--) {
+					RemoveGizmo(Gizmos[i].Target);
 				}
 				AddGizmo(targetEntity);
 			}

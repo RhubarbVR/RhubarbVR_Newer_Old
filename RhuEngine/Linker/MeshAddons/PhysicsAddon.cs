@@ -12,7 +12,7 @@ namespace RhuEngine.Linker.MeshAddons
 {
 	public abstract class PhysicsAddon : RMeshAddon
 	{
-		public bool Loaded { get; private set; }
+		public bool Loaded { get; protected set; }
 		public BufferPool BufferPool => World.PhysicsSimulation.BufferPool;
 
 		public abstract void Unload();
