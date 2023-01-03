@@ -156,6 +156,10 @@ namespace RNumerics
 		[IgnoreMember, JsonIgnore]
 		List<int> IFace.Indices => Indices;
 
+		public RFace(params int[] face) {
+			Indices = face.ToList();
+		}
+
 		public RFace(in Face face) {
 			Indices = face.Indices;
 		}
@@ -695,7 +699,7 @@ namespace RNumerics
 
 		public void ReadData(BinaryReader reader) {
 			var version = reader.ReadByte();
-			if(version != MESH_VERSION) {
+			if (version != MESH_VERSION) {
 				//Add old Read code here
 
 				throw new Exception("Don't know how to read mesh");
@@ -1023,7 +1027,6 @@ namespace RNumerics
 			MorphingMethod = (RMeshMorphingMethod)(byte)(int)mesh.MorphMethod;
 		}
 
-
 		public int AddSubMesh(in IComplexMesh complexMesh) {
 			if (complexMesh.HasSubMeshs) {
 				throw new Exception("Adding Mesh Already Has a submesh");
@@ -1037,18 +1040,44 @@ namespace RNumerics
 			var startingVert = Vertices.Count;
 			Vertices.AddRange(complexMesh.Vertices);
 			if (Normals.Count > 0) {
-				Normals.AddRange(complexMesh.Normals);
+				if (complexMesh.Normals.Count > 0) {
+					Normals.AddRange(complexMesh.Normals);
+				}
+				else {
+					for (var i = 0; i < complexMesh.VertexCount; i++) {
+						Normals.Add(Vector3f.Zero);
+					}
+				}
 			}
 			if (Tangents.Count > 0) {
-				Tangents.AddRange(complexMesh.Tangents);
+				if (complexMesh.Tangents.Count > 0) {
+					Tangents.AddRange(complexMesh.Tangents);
+				}
+				else {
+					for (var i = 0; i < complexMesh.VertexCount; i++) {
+						Tangents.Add(Vector3f.Zero);
+					}
+				}
 			}
 			if (BiTangents.Count > 0) {
-				BiTangents.AddRange(complexMesh.BiTangents);
+				if (complexMesh.BiTangents.Count > 0) {
+					BiTangents.AddRange(complexMesh.BiTangents);
+				}
+				else {
+					for (var i = 0; i < complexMesh.VertexCount; i++) {
+						BiTangents.Add(Vector3f.Zero);
+					}
+				}
 			}
 			for (var i = 0; i < Colors.Length; i++) {
 				if (Colors[i].Count > 0) {
 					if (complexMesh.Colors.Length > i) {
 						Colors[i].AddRange(complexMesh.Colors[i]);
+					}
+					else {
+						for (var c = 0; c < complexMesh.VertexCount; c++) {
+							Colors[i].Add(Colorf.White);
+						}
 					}
 				}
 			}
@@ -1056,6 +1085,11 @@ namespace RNumerics
 				if (TexCoords[i].Count > 0) {
 					if (complexMesh.TexCoords.Length > i) {
 						TexCoords[i].AddRange(complexMesh.TexCoords[i]);
+					}
+					else {
+						for (var c = 0; c < complexMesh.VertexCount; c++) {
+							TexCoords[i].Add(Vector3f.Zero);
+						}
 					}
 				}
 			}
@@ -1111,7 +1145,18 @@ namespace RNumerics
 		[IgnoreMember, JsonIgnore]
 		public bool IsTriangleMesh => PrimitiveType == RPrimitiveType.Triangle;
 		[IgnoreMember, JsonIgnore]
-		public int TriangleCount => Faces.Count;
+		public int TriangleCount => Faces.Count + SubMeshTriangleCount;
+		[IgnoreMember, JsonIgnore]
+		public int SubMeshTriangleCount
+		{
+			get {
+				var amount = 0;
+				foreach (var item in SubMeshes) {
+					amount += item.rFaces.Count;
+				}
+				return amount;
+			}
+		}
 		[IgnoreMember, JsonIgnore]
 		public int MaxTriangleID => Faces.Count;
 		[IgnoreMember, JsonIgnore]
@@ -1125,7 +1170,7 @@ namespace RNumerics
 		[IgnoreMember, JsonIgnore]
 		public bool HasVertexNormals => Normals.Count > 0;
 		[IgnoreMember, JsonIgnore]
-		public bool HasVertexColors => (Colors.Length > 0) & Colors[0].Count > 0;
+		public bool HasVertexColors => Colors.Length != 0;
 		[IgnoreMember, JsonIgnore]
 		public int Timestamp => int.MaxValue;
 		[IgnoreMember, JsonIgnore]
@@ -1225,8 +1270,20 @@ namespace RNumerics
 		}
 
 		public Index3i GetTriangle(in int i) {
-			var face = Faces[i];
-			return new Index3i(face.Indices[0], face.Indices[1], face.Indices[2]);
+			if(i >= Faces.Count) {
+				var faceIndex = i - Faces.Count;
+				foreach (var item in SubMeshes) {
+					if(faceIndex < item.rFaces.Count) {
+						return new Index3i(item.rFaces[faceIndex].Indices[0], item.rFaces[faceIndex].Indices[1], item.rFaces[faceIndex].Indices[2]);
+					}
+					faceIndex -= item.rFaces.Count;
+				}
+				return new Index3i();
+			}
+			else {
+				var face = Faces[i];
+				return new Index3i(face.Indices[0], face.Indices[1], face.Indices[2]);
+			}
 		}
 
 		public int GetTriangleGroup(in int i) {

@@ -118,7 +118,7 @@ namespace RhuEngine.Components
 
 		private void TwoFaLoad() {
 			RenderThread.ExecuteOnStartOfFrame(() => {
-				if(IsDestroying | IsRemoved) {
+				if (IsDestroying | IsRemoved) {
 					return;
 				}
 				_twoFA.Entity.enabled.Value = true;

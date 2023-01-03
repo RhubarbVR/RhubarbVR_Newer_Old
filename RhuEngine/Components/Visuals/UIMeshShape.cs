@@ -5,6 +5,7 @@ using RNumerics;
 using RhuEngine.Linker;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace RhuEngine.Components
 {
@@ -24,7 +25,7 @@ namespace RhuEngine.Components
 		public readonly Sync<float> SecodaryNeededForce;
 		[Default(true)]
 		public readonly Sync<bool> Touchable;
-
+		public readonly Sync<bool> FlipY;
 		[Default(true)]
 		public readonly Sync<bool> CustomTochable;
 
@@ -38,7 +39,9 @@ namespace RhuEngine.Components
 			base.RenderStep();
 			foreach (var item in hitDatas) {
 				var pos = item.HitPointOnCanvas;
-
+				if (FlipY) {
+					pos = new Vector2f(pos.X, 1 - pos.Y);
+				}
 				var isPrime = item.PressForce >= PrimaryNeededForce.Value;
 				var isSec = item.GripForces >= GripNeededForce.Value;
 				var isMed = InputManager.GetInputAction(InputTypes.Secondary).HandedValue(item.Side) >= SecodaryNeededForce.Value;
@@ -114,12 +117,41 @@ namespace RhuEngine.Components
 				Side = side;
 			}
 		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		static float DistanceToTriangle(Vector3f point, params Vector3f[] triangle) {
+			var normal = Vector3f.Cross(triangle[1] - triangle[0], triangle[2] - triangle[0]);
+			var planeDistance = Vector3f.Dot(normal, triangle[0]);
 
-		private void AddHitData(HitData hitData) {
+			var distance = Vector3f.Dot(normal, point) - planeDistance;
+
+			var projection = point + normal * distance;
+			return Vector3f.Dot(Vector3f.Cross(triangle[1] - triangle[0], projection - triangle[0]), normal) > 0 &&
+				Vector3f.Dot(Vector3f.Cross(triangle[2] - triangle[1], projection - triangle[1]), normal) > 0 &&
+				Vector3f.Dot(Vector3f.Cross(triangle[0] - triangle[2], projection - triangle[2]), normal) > 0
+				? Math.Abs(distance)
+				: Math.Min(DistanceToSegment(point, triangle[0], triangle[1]),
+				Math.Min(DistanceToSegment(point, triangle[1], triangle[2]),
+				DistanceToSegment(point, triangle[2], triangle[0])));
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		static float DistanceToSegment(Vector3f point, Vector3f a, Vector3f b) {
+			var nearestPoint = ClosestPointOnSegment(point, a, b);
+			return point.Distance(nearestPoint);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		static Vector3f ClosestPointOnSegment(Vector3f point, Vector3f a, Vector3f b) {
+			var ab = b - a;
+			var t = Vector3f.Dot(point - a, ab) / Vector3f.Dot(ab, ab);
+			return t < 0 ? a : t > 1 ? b : a + t * ab;
+		}
+
+
+		private bool AddHitData(HitData hitData) {
 			var RenderLocation = Entity.GlobalTrans * Matrix.T(PosOffset.Value);
 			var localPoint = RenderLocation.GetLocal(Matrix.T(hitData.Hitpointworld));
 			if (_last?.LoadedMesh is null) {
-				return;
+				return false;
 			}
 			var e = RenderLocation.GetLocal(Matrix.T(hitData.Hitpointworld));
 			var hitPoint = e.Translation;
@@ -127,12 +159,18 @@ namespace RhuEngine.Components
 			var mesh = _last?.LoadedMesh;
 			var hittry = mesh.InsideTry(hitPoint);
 			if (hittry < 0 || hittry >= mesh.MaxTriangleID) {
-				return;
+				return false;
 			}
+
 			var tryangle = mesh.GetTriangle(hittry);
 			var p1 = mesh.GetVertexAll(tryangle.a);
 			var p2 = mesh.GetVertexAll(tryangle.b);
 			var p3 = mesh.GetVertexAll(tryangle.c);
+			var dis = DistanceToTriangle(hitPoint, (Vector3f)p1.v, (Vector3f)p2.v, (Vector3f)p3.v);
+			if (dis > 0.001f | dis < -0.001f) {
+				return false;
+			}
+
 			World.DrawDebugSphere(RenderLocation, (Vector3f)p1.v, new Vector3d(0.01), Colorf.Red, 0.5f);
 			World.DrawDebugSphere(RenderLocation, (Vector3f)p2.v, new Vector3d(0.01), Colorf.Blue, 0.5f);
 			World.DrawDebugSphere(RenderLocation, (Vector3f)p3.v, new Vector3d(0.01), Colorf.Green, 0.5f);
@@ -140,6 +178,7 @@ namespace RhuEngine.Components
 			World.DrawDebugText(RenderLocation, (Vector3f)hitPoint + new Vector3f(0, 0.1f, 0.1f), new Vector3f(0.1f), Colorf.BlueMetal, uvpos, 0.1f);
 			hitData.HitPointOnCanvas = uvpos;
 			hitDatas.Add(hitData);
+			return true;
 		}
 
 		public override void Touch(uint touchUndex, Vector3f hitnormal, Vector3f hitpointworld, Handed handed) {
@@ -147,8 +186,9 @@ namespace RhuEngine.Components
 			base.Touch(touchUndex, hitnormal, hitpointworld, handed);
 		}
 		public override void Lazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce, Handed hand) {
-			AddHitData(new HitData(v, hitnormal, hitpointworld, pressForce, gripForce, hand));
-			base.Lazer(v, hitnormal, hitpointworld, pressForce, gripForce, hand);
+			if (!AddHitData(new HitData(v, hitnormal, hitpointworld, pressForce, gripForce, hand))) {
+				base.Lazer(v, hitnormal, hitpointworld, pressForce, gripForce, hand);
+			}
 		}
 	}
 }

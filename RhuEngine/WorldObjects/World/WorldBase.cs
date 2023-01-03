@@ -261,6 +261,14 @@ namespace RhuEngine.WorldObjects
 		[NoLoad]
 		public GrabbableHolder HeadGrabbableHolder;
 
+		public GrabbableHolder GetGrabHolder(Handed handed) {
+			return handed switch {
+				Handed.Left => LeftGrabbableHolder,
+				Handed.Right => RightGrabbableHolder,
+				Handed.Max => HeadGrabbableHolder,
+				_ => null,
+			};
+		}
 		public void RenderStep() {
 			_netManager?.NatPunchModule.PollEvents();
 			WorldThreadSafty.MethodCalls = 0;

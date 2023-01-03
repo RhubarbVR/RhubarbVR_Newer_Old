@@ -68,7 +68,7 @@ namespace RhuEngine.Components
 			var viewPort = Viewport.Target = Entity.AttachComponent<Viewport>();
 			viewPort.TransparentBG.Value = true;
 			ViewPortSizeLink.Target = viewPort.Size;
-			Size.Value = new Vector2i(512, 45);
+			Size.Value = new Vector2i(512, 55);
 		}
 	}
 }

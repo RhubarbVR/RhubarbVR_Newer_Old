@@ -54,7 +54,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public const float TIME_FOR_DOUBLE_CLICK = 0.25f;
 
 		public override void Render() {
-			if (LinkedComp.Engine.KeyboardInteraction is Component element && element.Entity.Viewport == LinkedComp && ((!element.Entity.Viewport.IsConnected && !element.Engine.IsInVR) || element.Engine.IsInVR)) {
+			if (LinkedComp.Engine.KeyboardInteraction is Component element && element.Entity.Viewport == LinkedComp) {
 				foreach (var item in KeyboardSystem._keys) {
 					var time = LinkedComp.InputManager.KeyboardSystem.GetStateChangeTime(item);
 					if (time is 0 or > 0.5f) {

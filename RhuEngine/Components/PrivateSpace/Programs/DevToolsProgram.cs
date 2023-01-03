@@ -67,6 +67,14 @@ namespace RhuEngine.Components
 				return;
 			}
 			var hittingObject = PrivateSpaceManager.GetLazerHitObject(handed);
+			if(hittingObject is null) {
+				if (!MultiSelect) {
+					for (var i = Gizmos.Count - 1; i >= 0; i--) {
+						RemoveGizmo(Gizmos[i].Target);
+					}
+				}
+				return;
+			}
 			if(hittingObject?.World != World) {
 				return;
 			}
@@ -203,7 +211,7 @@ namespace RhuEngine.Components
 			var posTexture = pos.Entity.AttachComponent<SingleIconTex>();
 			posTexture.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.Translate;
 			pos.Icon.Target = posTexture;
-			pos.MinSize.Value = new Vector2i(45);
+			pos.MinSize.Value = new Vector2i(55);
 			pos.IconAlignment.Value = RButtonAlignment.Center;
 			pos.ExpandIcon.Value = true;
 			pos.FocusMode.Value = RFocusMode.None;
@@ -215,7 +223,7 @@ namespace RhuEngine.Components
 			var rotTexture = rot.Entity.AttachComponent<SingleIconTex>();
 			rotTexture.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.Rotation;
 			rot.Icon.Target = rotTexture;
-			rot.MinSize.Value = new Vector2i(45);
+			rot.MinSize.Value = new Vector2i(55);
 			rot.IconAlignment.Value = RButtonAlignment.Center;
 			rot.ExpandIcon.Value = true;
 			rot.FocusMode.Value = RFocusMode.None;
@@ -227,7 +235,7 @@ namespace RhuEngine.Components
 			var scaleTexture = scale.Entity.AttachComponent<SingleIconTex>();
 			scaleTexture.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.Scale;
 			scale.Icon.Target = scaleTexture;
-			scale.MinSize.Value = new Vector2i(45);
+			scale.MinSize.Value = new Vector2i(55);
 			scale.IconAlignment.Value = RButtonAlignment.Center;
 			scale.ExpandIcon.Value = true;
 			scale.FocusMode.Value = RFocusMode.None;
@@ -241,7 +249,7 @@ namespace RhuEngine.Components
 			var multiTexture = multi.Entity.AttachComponent<SingleIconTex>();
 			multiTexture.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.MultiSelect;
 			multi.Icon.Target = multiTexture;
-			multi.MinSize.Value = new Vector2i(45);
+			multi.MinSize.Value = new Vector2i(55);
 			multi.IconAlignment.Value = RButtonAlignment.Center;
 			multi.ExpandIcon.Value = true;
 			multi.FocusMode.Value = RFocusMode.None;
@@ -253,7 +261,7 @@ namespace RhuEngine.Components
 			var singleTexture = single.Entity.AttachComponent<SingleIconTex>();
 			singleTexture.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.SingleSelect;
 			single.Icon.Target = singleTexture;
-			single.MinSize.Value = new Vector2i(45);
+			single.MinSize.Value = new Vector2i(55);
 			single.IconAlignment.Value = RButtonAlignment.Center;
 			single.ExpandIcon.Value = true;
 			single.FocusMode.Value = RFocusMode.None;
@@ -267,7 +275,7 @@ namespace RhuEngine.Components
 			var openWindowTexture = openWindow.Entity.AttachComponent<SingleIconTex>();
 			openWindowTexture.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.OpenInspectorWindow;
 			openWindow.Icon.Target = openWindowTexture;
-			openWindow.MinSize.Value = new Vector2i(45);
+			openWindow.MinSize.Value = new Vector2i(55);
 			openWindow.IconAlignment.Value = RButtonAlignment.Center;
 			openWindow.ExpandIcon.Value = true;
 			openWindow.FocusMode.Value = RFocusMode.None;
@@ -277,7 +285,7 @@ namespace RhuEngine.Components
 			var openDevWindowTexture = openDevWindow.Entity.AttachComponent<SingleIconTex>();
 			openDevWindowTexture.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.OpenDevWindow;
 			openDevWindow.Icon.Target = openDevWindowTexture;
-			openDevWindow.MinSize.Value = new Vector2i(45);
+			openDevWindow.MinSize.Value = new Vector2i(55);
 			openDevWindow.IconAlignment.Value = RButtonAlignment.Center;
 			openDevWindow.ExpandIcon.Value = true;
 			openDevWindow.FocusMode.Value = RFocusMode.None;

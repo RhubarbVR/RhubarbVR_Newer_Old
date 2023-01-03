@@ -79,16 +79,17 @@ namespace RhuEngine.Components
 				sizeOfView = PrivateSpaceManager.VRViewPort.Size.Value.x;
 			}
 			if (Tool.CanClose) {
-				sizeOfView -= 48;
+				sizeOfView -= 58;
 			}
-			sizeOfView -= 48 * PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children.Count;
-			Tool.SizePixels = new Vector2i(sizeOfView, 45);
+			sizeOfView -= 58 * PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children.Count;
+			Tool.SizePixels = new Vector2i(sizeOfView, 55);
 			UpdateSelected();
 		}
 
 		[Exposed]
 		public void CloseTaskBar() {
 			Tool.Close();
+			PrivateSpaceManager.UserInterfaceManager.ToolBarVREntity.enabled.Value = PrivateSpaceManager.UserInterfaceManager.ToolBarHolder.Entity.children.Count > 0;
 			for (var i = 0; i < PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children.Count; i++) {
 				var item = PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children[i];
 				var ui = item.GetFirstComponent<Button>();
@@ -110,16 +111,19 @@ namespace RhuEngine.Components
 			ToggleButton.IconAlignment.Value = RButtonAlignment.Center;
 			ToggleButton.FocusMode.Value = RFocusMode.None;
 			ToggleButton.ExpandIcon.Value = true;
-			ToggleButton.MinSize.Value = new Vector2i(45);
+			ToggleButton.VerticalFilling.Value = RFilling.ShrinkCenter;
+			ToggleButton.MinSize.Value = new Vector2i(55);
 			ToggleButton.ToggleMode.Value = true;
 			ToggleButton.ButtonUp.Target = ButtonUP;
 			ConnectedViewPort = PrivateSpaceManager.UserInterfaceManager.ToolBarHolder.Entity.AddChild(Tool.Title).AttachComponent<ViewportConnector>();
 			ConnectedViewPort.Target.AllowCrossWorld();
 
 			PrivateSpaceManager.UserInterfaceManager.ToolBarRoot.Enabled.Value = PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children.Count > 0;
+			PrivateSpaceManager.UserInterfaceManager.ToolBarVREntity.enabled.Value = PrivateSpaceManager.UserInterfaceManager.ToolBarHolder.Entity.children.Count > 0;
 		}
 
 		private void Tool_OnClosedToolBar() {
+			PrivateSpaceManager.UserInterfaceManager.ToolBarVREntity.enabled.Value = PrivateSpaceManager.UserInterfaceManager.ToolBarHolder.Entity.children.Count > 0;
 			ConnectedViewPort?.Entity?.Destroy();
 			ToggleButton?.Entity?.Dispose();
 			if (PrivateSpaceManager?.UserInterfaceManager?.ToolBarButtons?.Entity is not null) {

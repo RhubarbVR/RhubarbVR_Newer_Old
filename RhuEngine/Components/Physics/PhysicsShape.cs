@@ -100,6 +100,7 @@ namespace RhuEngine.Components
 				Simulation.Simulation.Shapes.GetShape<T>(ShapeIndex.Value.Index) = CreateShape(ref specultive, MassValue, out var bodyInertiaCache);
 				_lastWorldScale = Entity.GlobalTrans.Scale;
 				BodyInertiaCache = bodyInertiaCache;
+				PosUpdate();
 			}
 		}
 

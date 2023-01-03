@@ -37,6 +37,7 @@ namespace RhuEngine.Components
 			inertia = !mass.HasValue ? default : result.ComputeOpenInertia(mass.Value);
 			return result;
 		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		protected override Mesh CreateShape(PhysicsMeshAddon addon, ref float speculativeMargin, float? mass, out BodyInertia inertia) {
 			return CreateShape(addon.TrianglesBuffer, addon.Tree, ref speculativeMargin, mass, out inertia);

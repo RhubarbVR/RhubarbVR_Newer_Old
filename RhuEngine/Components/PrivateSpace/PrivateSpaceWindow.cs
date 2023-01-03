@@ -76,7 +76,7 @@ namespace RhuEngine.Components
 					WindowVRElement.Min.Value = Vector2f.Zero;
 					WindowVRElement.Max.Value = Vector2f.One;
 
-					WindowVRElement.MaxOffset.Value = Vector2i.Zero;
+					WindowVRElement.MaxOffset.Value = PrivateSpaceManager.UserInterfaceManager.ToolBarButtons.Entity.children.Count > 0 ? new Vector2i(0, -60) : Vector2i.Zero;
 					WindowVRElement.MinOffset.Value = new Vector2i(0, 100);
 
 				}
@@ -230,6 +230,11 @@ namespace RhuEngine.Components
 			Label.HorizontalAlignment.Value = RHorizontalAlignment.Center;
 			Label.VerticalAlignment.Value = RVerticalAlignment.Center;
 
+			var popoutIntoWorld = AddButton("IntoWorld", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.World), PopoutIntoWorld);
+			var localIntoWorld = popoutIntoWorld.Item1.Entity.AttachComponent<StandardLocale>();
+			localIntoWorld.TargetValue.Target = popoutIntoWorld.Item1.ToolTipText;
+			localIntoWorld.Key.Value = "Window.PopOutIntoWorld";
+
 			var popout = AddButton("PopOut", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Share), Popout);
 			var local = popout.Item1.Entity.AttachComponent<StandardLocale>();
 			local.TargetValue.Target = popout.Item1.ToolTipText;
@@ -249,6 +254,40 @@ namespace RhuEngine.Components
 			CloseButton = AddButton("Close", Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Close), CloseWindow).Item1;
 			OnMinimize?.Invoke();
 			UpdateVRPos();
+		}
+
+		[Exposed]
+		public void PopoutIntoWorld() {
+			if (Window?.Program is null) {
+				return;
+			}
+			if (LocalUser?.userRoot.Target?.head.Target is null) {
+				return;
+			}
+			if (Window.TargetViewport is null) {
+				return;
+			}
+			var program = Window.Program.Entity.AddChild(Window.Program.Name).AttachComponent<UIWindow3D>();
+			var spawnPos = Matrix.TR(Vector3f.Forward * 0.5f, Quaternionf.Yawed180) * LocalUser.userRoot.Target.head.Target.GlobalTrans;
+			var reslution = program.Entity.AttachComponent<ValueCopy<Vector2i>>();
+			reslution.Target.Target = program.Reslution;
+			reslution.Source.Target = Window.TargetViewport.Size;
+			Window.OnDispose += (ob) => {
+				if (program.IsDestroying | program.IsRemoved) {
+					return;
+				}
+				program.Destroy();
+
+			};
+			if (program.MainUI.Target is not null) {
+				program.MainUI.Target.InputInterface.Target = Window.TargetViewport;
+			}
+
+			if (program.MainUIMat.Target is not null) {
+				program.MainUIMat.Target.MainTexture.Target = Window.TargetViewport;
+			}
+
+			program.Entity.GlobalTrans = spawnPos;
 		}
 
 		[Exposed]

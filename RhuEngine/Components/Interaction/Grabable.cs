@@ -63,38 +63,21 @@ namespace RhuEngine.Components
 
 		protected override void OnLoaded() {
 			base.OnLoaded();
-			Entity.OnLazerPyhsics += Entity_OnLazerPyhsics;
 			Entity.OnGrip += GripProcess;
 		}
 
 		public override void Dispose() {
-			Entity.OnLazerPyhsics -= Entity_OnLazerPyhsics;
 			Entity.OnGrip -= GripProcess;
 			base.Dispose();
-		}
-
-		private void Entity_OnLazerPyhsics(uint arg1, Vector3f arg2, Vector3f arg3, float arg4, float arg5, Handed handed) {
-			if (arg1 == 10) {
-				switch (handed) {
-					case Handed.Left:
-						GripProcess(World.LeftGrabbableHolder, true, arg5);
-						break;
-					case Handed.Right:
-						GripProcess(World.RightGrabbableHolder, true, arg5);
-						break;
-					case Handed.Max:
-						GripProcess(World.HeadGrabbableHolder, true, arg5);
-						break;
-					default:
-						break;
-				}
-			}
 		}
 
 		private float _lazerDist;
 		private Matrix _offsetFromLazer;
 
+		public static bool HITGRABABLE;
+
 		internal void GripProcess(GrabbableHolder obj, bool Laser, float gripForce) {
+			HITGRABABLE = true;
 			if (gripForce < GripForce.Value) {
 				return;
 			}

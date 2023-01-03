@@ -98,10 +98,15 @@ namespace RhuEngine.WorldObjects.ECS
 		public event Action<GrabbableHolder, bool, float> OnGrip;
 		internal void CallOnGrip(GrabbableHolder obj, bool Laser, float gripForce) {
 			OnGrip?.Invoke(obj, Laser, gripForce);
+			if (!Grabbable.HITGRABABLE) {
+				InternalParent?.CallOnGrip(obj, Laser, gripForce);
+			}
+			Grabbable.HITGRABABLE = false;
 		}
 		public event Action<uint, Vector3f, Vector3f, float, float, Handed> OnLazerPyhsics;
 
 		internal void CallOnLazer(uint v, Vector3f hitnormal, Vector3f hitpointworld, float pressForce, float gripForce, Handed handed) {
+			CallOnGrip(World.GetGrabHolder(handed), true, gripForce);
 			OnLazerPyhsics?.Invoke(v, hitnormal, hitpointworld, pressForce, gripForce, handed);
 		}
 
@@ -395,7 +400,7 @@ namespace RhuEngine.WorldObjects.ECS
 			UpdateEnableList();
 		}
 		[Exposed]
-		public bool IsEnabled => parentEnabled && (enabled?.Value??false) && !IsDestroying && !IsRemoved;
+		public bool IsEnabled => parentEnabled && (enabled?.Value ?? false) && !IsDestroying && !IsRemoved;
 
 		private void GoBackToOld() {
 			if (parent.Target != InternalParent) {
@@ -591,7 +596,7 @@ namespace RhuEngine.WorldObjects.ECS
 		[Exposed]
 		public Entity FindChildByName(string name = "Entity") {
 			for (var i = 0; i < children.Count; i++) {
-				if(children[i].IsDestroying || children[i].IsRemoved) {
+				if (children[i].IsDestroying || children[i].IsRemoved) {
 					continue;
 				}
 				if (children[i].name.Value == name) {

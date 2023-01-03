@@ -59,6 +59,10 @@ public partial class ConnectedViewport : TextureRect
 		if (Viewport.IsRemoved || Viewport.IsDestroying) {
 			return;
 		}
+		if(@event is InputEventKey) {
+			return;
+		}
+
 		if (!IsVisibleInTree()) {
 			return;
 		}

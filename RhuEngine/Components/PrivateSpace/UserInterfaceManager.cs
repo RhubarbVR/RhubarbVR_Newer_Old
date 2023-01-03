@@ -383,12 +383,37 @@ namespace RhuEngine.Components
 			}
 		}
 
+		[NoSave]
+		[NoSync]
+		[NoLoad]
+		[NoSyncUpdate]
+		public Entity ToolBarVREntity;
+
 		private void BuildToolBar() {
+			var tan = Entity.AddChild("ToolBarVR").AttachMesh<CanvasMesh>(UImaterial);
+			ToolBarVREntity = tan.Entity;
+			tan.Entity.enabled.Value = false;
+			tan.FrontBindRadus.Value -= 0.45f;
+
+			var emesh = tan.Entity.AttachComponent<UIMeshShape>();
+			emesh.TargetMesh.Target = tan;
+			emesh.InputInterface.Target = PrivateSpaceManager.VRViewPort;
+			tan.Scale.Value += new Vector3f(1f, 0, 0);
+			tan.Min.Value = new Vector2f(0, 1);
+			tan.Max.Value = new Vector2f(1, 1);
+			tan.MaxOffset.Value = new Vector2i(0, 0);
+			tan.MinOffset.Value = new Vector2i(0, -60);
+			tan.TopOffset.Value = false;
+			var e = tan.Entity.AttachComponent<ValueCopy<Vector2i>>();
+			e.Target.Target = tan.Resolution;
+			e.Source.Target = _PrivateSpaceManager.VRViewPort.Size;
+			tan.Entity.position.Value = new Vector3f(0.1f, -0.9f, 0);
+
 			ToolBarRoot = RootUIEntity.AddChild("ToolBarRoot").AttachComponent<UIElement>();
 			ToolBarRoot.Enabled.Value = false;
 			ToolBarRoot.Entity.AddChild("Color").AttachComponent<Panel>();
 			ToolBarRoot.Max.Value = new Vector2f(1, 0);
-			ToolBarRoot.MaxOffset.Value = new Vector2f(0, 45f);
+			ToolBarRoot.MaxOffset.Value = new Vector2f(0, 55f);
 			ToolBarRoot.InputFilter.Value = RInputFilter.Stop;
 			var data = ToolBarRoot.Entity.AddChild("ToolBarRoot").AttachComponent<BoxContainer>();
 			ToolBarButtons = data.Entity.AddChild("Buttons").AttachComponent<BoxContainer>();
@@ -400,7 +425,7 @@ namespace RhuEngine.Components
 			var texture = ToolBarCloseButton.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 			ToolBarCloseButton.Icon.Target = texture;
 			texture.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Close));
-			ToolBarCloseButton.MinSize.Value = new Vector2i(45);
+			ToolBarCloseButton.MinSize.Value = new Vector2i(65);
 		}
 
 		private readonly List<PrivateSpaceTaskbarItem> _worldItems = new();

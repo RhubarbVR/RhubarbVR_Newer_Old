@@ -24,7 +24,6 @@ namespace RhuEngine.Linker.MeshAddons
 
 		public ConvexHull convexHull;
 		public Vector3f Center { get; private set; }
-		
 
 		private static bool IsValidPoints(Span<Vector3> points) {
 			for (var i = 0; i < points.Length; i++) {

@@ -257,12 +257,12 @@ namespace RhuEngine
 			CursorScale = 144,
 			Cursor = 145,
 			VRHeadset = 146,
-			OnlineStatus=147,
+			OnlineStatus = 147,
 			IdleStatus = 148,
 			DoNotDistrubeStatus = 149,
 			StreamingStatus = 150,
 			OfflineStatus = 151,
-            LogOut=152,
+			LogOut = 152,
 			/*=153,*/
 			Battery1 = 154,
 			Battery2 = 155,
@@ -283,6 +283,19 @@ namespace RhuEngine
 			OpenInspectorWindow = 170,
 			SingleSelect = 171,
 			MultiSelect = 172,
+		}
+
+		public (Vector2f max, Vector2f min) GetUVs(RhubarbIcons icons) {
+			var number = (int)icons;
+			return GetElementUVs(number % 26, number / 26);
+		}
+
+		public (Vector2f max, Vector2f min) GetElementUVs(int x, int y) {
+			var xSize = 1f / _gridSize.x;
+			var ySize = 1f / _gridSize.y;
+
+			var min = new Vector2f(xSize * x,  ySize * y);
+			return (min + new Vector2f(xSize, ySize), min);
 		}
 
 		public RTexture2D GetElement(RhubarbIcons icons) {

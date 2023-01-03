@@ -211,6 +211,7 @@
     "Window.Collapses": "Collapses",
     "Window.Expand": "Expand",
     "Window.Minimize": "Minimize",
+    "Window.PopOutIntoWorld": "3D Window",
     "Window.PopOutSystemWindow": "Pop Out",
     "Window.Rescale": "Rescale",
 
