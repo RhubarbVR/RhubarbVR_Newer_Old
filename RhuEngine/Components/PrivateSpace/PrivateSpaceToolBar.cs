@@ -71,6 +71,9 @@ namespace RhuEngine.Components
 
 		[Exposed]
 		public void ButtonUP() {
+			if(ToggleButton is null) {
+				return;
+			}
 			ToggleButton.ButtonPressed.Value = true;
 			PrivateSpaceManager.UserInterfaceManager.ToolBarCloseButton.Enabled.Value = Tool.CanClose;
 			PrivateSpaceManager.UserInterfaceManager.ToolBarCloseButton.Pressed.Target = CloseTaskBar;
@@ -123,7 +126,9 @@ namespace RhuEngine.Components
 		}
 
 		private void Tool_OnClosedToolBar() {
-			PrivateSpaceManager.UserInterfaceManager.ToolBarVREntity.enabled.Value = PrivateSpaceManager.UserInterfaceManager.ToolBarHolder.Entity.children.Count > 0;
+			if (PrivateSpaceManager?.UserInterfaceManager?.ToolBarVREntity is not null) {
+				PrivateSpaceManager.UserInterfaceManager.ToolBarVREntity.enabled.Value = PrivateSpaceManager.UserInterfaceManager.ToolBarHolder.Entity.children.Count > 0;
+			}
 			ConnectedViewPort?.Entity?.Destroy();
 			ToggleButton?.Entity?.Dispose();
 			if (PrivateSpaceManager?.UserInterfaceManager?.ToolBarButtons?.Entity is not null) {

@@ -171,8 +171,10 @@ namespace RhuEngine.Components
 		public override void Dispose() {
 			IsDestroying= true;
 			OpennedPorgram(null);
-			lock (PrivateSpaceManager?.UserInterfaceManager.privateSpaceTaskbarItems) {
-				PrivateSpaceManager?.UserInterfaceManager.privateSpaceTaskbarItems.Remove(this);
+			if (PrivateSpaceManager?.UserInterfaceManager?.privateSpaceTaskbarItems is not null) {
+				lock (PrivateSpaceManager?.UserInterfaceManager?.privateSpaceTaskbarItems) {
+					PrivateSpaceManager?.UserInterfaceManager?.privateSpaceTaskbarItems.Remove(this);
+				}
 			}
 			ProgramsUpdate -= UpdateHide;
 			base.Dispose();

@@ -63,7 +63,9 @@ namespace RhuEngine.Components
 		}
 
 		public override void Dispose() {
-			Engine.outputCapture.TextEdied -= OutputCapture_TextEdied;
+			if (Engine is not null) {
+				Engine.outputCapture.TextEdied -= OutputCapture_TextEdied;
+			}
 			base.Dispose();
 		}
 

@@ -54,7 +54,7 @@ namespace RhuEngine.WorldObjects
 			get; private set;
 		}
 
-		public Engine Engine => WorldManager.Engine;
+		public Engine Engine => WorldManager?.Engine;
 
 		public WorldManager WorldManager => World?.worldManager;
 
