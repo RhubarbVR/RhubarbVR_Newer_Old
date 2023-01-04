@@ -71,9 +71,6 @@ namespace RhuEngine.Components
 			if (targetTest == typeof(Type)) {
 				return typeof(TypeEditor);
 			}
-			if (targetTest == typeof(Quaternionf)) {
-				return typeof(QuaternionEditor);
-			}
 			return typeof(PrimitiveEditorBuilder<>).MakeGenericType(targetTest);
 		}
 
@@ -104,6 +101,11 @@ namespace RhuEngine.Components
 					fieldBox.Vertical.Value = false;
 					fieldBox.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 
+				}
+				if(typeof(T) == typeof(Quaternionf)) {
+					var comp = Entity.AddChild("Euler").GetFirstComponentOrAttach<QuaternionEditor>();
+					comp.FieldEdit = FieldEdit;
+					comp.TargetObjectWorld = TargetObjectWorld;
 				}
 				foreach (var item in fields) {
 					var biuldType = GetPrimitiveBuildType(item.FieldType);

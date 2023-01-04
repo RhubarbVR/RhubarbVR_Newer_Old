@@ -28,9 +28,9 @@ namespace RhuEngine.WorldObjects.ECS
 		[OnChanged(nameof(TransValueChange))]
 		public readonly Sync<Vector3f> position;
 		[OnChanged(nameof(TransValueChange))]
-		public readonly Sync<Quaternionf> rotation;
-		[OnChanged(nameof(TransValueChange))]
 		public readonly Sync<Vector3f> scale;
+		[OnChanged(nameof(TransValueChange))]
+		public readonly Sync<Quaternionf> rotation;
 		[OnChanged(nameof(OnOrderOffsetChange))]
 		public readonly Sync<int> orderOffset;
 		public int Offset => orderOffset.Value;

@@ -35,7 +35,7 @@ namespace RhuEngine.Components
 		[Default("•")]
 		public readonly Sync<string> SecretCharacter;
 		public readonly Sync<bool> ExpandToTextLength;
-		[Default(true)]
+		[Default(false)]
 		public readonly Sync<bool> ContextMenuEnabled;
 		[Default(true)]
 		public readonly Sync<bool> VirtualKeyboardEnabled;
@@ -61,7 +61,8 @@ namespace RhuEngine.Components
 		public readonly Sync<string> Language;
 		[Default(true)]
 		public readonly Sync<bool> FocusLossOnEnter;
-
+		[Default(true)]
+		public readonly Sync<bool> SelectAllOnFocus;
 		protected override void Step() {
 			base.Step();
 			if(Engine.KeyboardInteraction == this) {

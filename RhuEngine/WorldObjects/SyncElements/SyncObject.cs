@@ -210,7 +210,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		protected virtual void ClearAllSyncMembers() {
-			var data = GetType().GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+			var data = GetType().FastGetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
 			foreach (var item in data) {
 				if (typeof(SyncObject).IsAssignableFrom(item.FieldType)) {
 					item.SetValue(this, null);
@@ -220,7 +220,7 @@ namespace RhuEngine.WorldObjects
 
 		protected virtual void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer) {
 			try {
-				var data = GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
+				var data = GetType().FastGetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 				foreach (var item in data) {
 					if ((item.Attributes & FieldAttributes.InitOnly) == 0) {
 						continue;
@@ -254,7 +254,7 @@ namespace RhuEngine.WorldObjects
 							//RLog.Info($"Loaded Change Field {GetType().GetFormattedName()} , {item.Name} type {item.FieldType.GetFormattedName()}");
 							var startValue = item.GetCustomAttribute<OnChangedAttribute>();
 							if (startValue != null) {
-								var method = GetType().GetMethod(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+								var method = GetType().FastGetMethods(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault();
 								if (method is null) {
 									throw new Exception($"Method {startValue.Data} not found");
 								}

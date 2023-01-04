@@ -39,7 +39,7 @@ namespace RhuEngine.Components
 			}
 		}
 		[Exposed]
-		public void TextSubmitted() {
+		public void TextEdited() {
 			if (yawEdit.Linked && pitchEdit.Linked && rollEdit.Linked) {
 				try {
 					var converter = TypeDescriptor.GetConverter(typeof(float));
@@ -48,7 +48,9 @@ namespace RhuEngine.Components
 					var z = (float)converter.ConvertFrom(rollEdit.LinkedValue);
 					SetValue(Quaternionf.CreateFromEuler(x, y, z));
 				}
-				catch { }
+				catch {
+					ValueChange();
+				}
 
 			}
 		}
@@ -65,7 +67,9 @@ namespace RhuEngine.Components
 
 				var e = newainBox.Entity.AddChild("LineEdit").AttachComponent<LineEdit>();
 				e.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
-				e.TextSubmitted.Target = TextSubmitted;
+
+				var fe = e.Entity.AttachComponent<UIFocusEvents>();
+				fe.FocusExited.Target = TextEdited;
 				e.Text.Value = "ERROR";
 				return e.Text;
 			}

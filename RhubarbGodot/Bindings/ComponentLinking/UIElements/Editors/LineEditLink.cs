@@ -47,6 +47,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.CaretMidGrapheme.Changed += CaretMidGrapheme_Changed;
 			LinkedComp.TextDir.Changed += TextDir_Changed;
 			LinkedComp.Language.Changed += Language_Changed;
+			LinkedComp.SelectAllOnFocus.Changed += SelectAllOnFocus_Changed;
+			SelectAllOnFocus_Changed(null);
 			Text_Changed(null);
 			PlaceholderText_Changed(null);
 			Alignment_Changed(null);
@@ -73,6 +75,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			Language_Changed(null);
 			node.TextChanged += Node_TextChanged;
 			node.TextSubmitted += Node_TextSubmitted;
+		}
+
+		private void SelectAllOnFocus_Changed(IChangeable obj) {
+			node.SelectAllOnFocus = LinkedComp.SelectAllOnFocus.Value;
 		}
 
 		private void Node_TextSubmitted(string newText) {

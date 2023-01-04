@@ -25,11 +25,17 @@ namespace RhuEngine.Components
 					return;
 				}
 				if (LoadedData is not null) {
-					UnLoadCanvasItem(LoadedData);
+					try {
+						UnLoadCanvasItem(LoadedData);
+					}
+					catch { }
 					LoadedData = null;
 				}
 				if (Entity.CanvasItem is T data) {
-					LoadCanvasItem(data);
+					try {
+						LoadCanvasItem(data);
+					}
+					catch { }
 					LoadedData = data;
 				}
 			});
@@ -42,7 +48,10 @@ namespace RhuEngine.Components
 			base.Dispose();
 			Entity.CanvasItemUpdateEvent -= Entity_CanvasItemUpdateEvent;
 			if (LoadedData is not null) {
-				UnLoadCanvasItem(LoadedData);
+				try {
+					UnLoadCanvasItem(LoadedData);
+				}
+				catch { }
 			}
 			LoadedData = null;
 			GC.SuppressFinalize(this);

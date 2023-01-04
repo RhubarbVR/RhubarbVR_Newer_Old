@@ -41,7 +41,7 @@ namespace RhuEngine.Components
 			if (TargetObject.Target is null) {
 				return;
 			}
-			var members = TargetObject.Target.GetType().GetMembers().OrderBy(x=>x is MethodInfo);
+			var members = TargetObject.Target.GetType().FastGetMembers().OrderBy(x=>x is MethodInfo);
 			foreach (var member in members) {
 				if (member.GetCustomAttribute<NoShowAttribute>() != null) {
 					continue;
@@ -80,15 +80,23 @@ namespace RhuEngine.Components
 
 		}
 
+
+		private void UIUpdate() {
+			CleanUpUI();
+			if (TargetObject.Target is null) { return; }
+			BuildUI();
+		}
 		public void TargetObjectRebuild() {
 			LocalBind();
 			if (LocalUser != MasterUser) {
 				return;
 			}
-
-			CleanUpUI();
-			if (TargetObject.Target is null) { return; }
-			BuildUI();
+			if (Task.CurrentId is null) {
+				Task.Run(UIUpdate);
+			}
+			else {
+				UIUpdate();
+			}
 		}
 	}
 }

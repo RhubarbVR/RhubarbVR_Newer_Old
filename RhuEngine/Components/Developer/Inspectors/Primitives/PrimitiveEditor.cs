@@ -30,7 +30,7 @@ namespace RhuEngine.Components
 		}
 
 		[Exposed]
-		public void TextSubmitted() {
+		public void TextEdited() {
 			if (Target is null) {
 				return;
 			}
@@ -42,7 +42,9 @@ namespace RhuEngine.Components
 					var result = converter.ConvertFrom(current);
 					SetValue(result);
 				}
-				catch { }
+				catch {
+					ValueChange();
+				}
 			}
 		}
 
@@ -56,7 +58,8 @@ namespace RhuEngine.Components
 			}
 			var e = MainBox.Entity.AddChild("LineEdit").AttachComponent<LineEdit>();
 			e.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
-			e.TextSubmitted.Target = TextSubmitted;
+			var fe = e.Entity.AttachComponent<UIFocusEvents>();
+			fe.FocusExited.Target = TextEdited;
 			e.Text.Value = "ERROR";
 			LineEditorValue.Target = e.Text;
 			var value = TargetObject.Target.GetValueType();

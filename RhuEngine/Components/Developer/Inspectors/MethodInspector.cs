@@ -30,7 +30,9 @@ namespace RhuEngine.Components
 			text.FocusMode.Value = RFocusMode.None;
 			text.TextOverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
 			text.MinSize.Value = new Vector2i(18, 18);
-			text.Text.Value = methodInfo.Name;
+			text.Text.Value = methodInfo.ReflectedType.GetFormattedName() + " ";
+
+			text.Text.Value += methodInfo.Name;
 			if (methodInfo.IsGenericMethod) {
 				text.Text.Value += "<";
 				var args = methodInfo.GetGenericMethodDefinition().GetGenericArguments();
@@ -48,7 +50,12 @@ namespace RhuEngine.Components
 				text.Text.Value += prams[i].ParameterType.GetFormattedName() + " ";
 				text.Text.Value += prams[i].Name + " ";
 				if (prams[i].HasDefaultValue) {
-					text.Text.Value += " = " + (prams[i].DefaultValue?.ToString() ?? "null") + " ";
+					var def = prams[i].DefaultValue;
+					var injectString = "null";
+					if (def != null) {
+						injectString = "\"" + def?.ToString() + "\"";
+					}
+					text.Text.Value += " = " + injectString + " ";
 				}
 				text.Text.Value += ",";
 			}
