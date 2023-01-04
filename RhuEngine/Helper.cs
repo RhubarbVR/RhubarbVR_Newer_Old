@@ -11,11 +11,27 @@ using System.Text;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using RhuEngine.Components;
+using System.Linq.Expressions;
 
 namespace RhuEngine
 {
 	public static class Helper
 	{
+		public static Type CreateDelegateType(this MethodInfo methodInfo) {
+			Func<Type[], Type> getType;
+			var isAction = methodInfo.ReturnType.Equals((typeof(void)));
+			var types = methodInfo.GetParameters().Select(p => p.ParameterType);
+
+			if (isAction) {
+				getType = Expression.GetActionType;
+			}
+			else {
+				getType = Expression.GetFuncType;
+				types = types.Concat(new[] { methodInfo.ReturnType });
+			}
+			return getType(types.ToArray());
+		}
+
 		public static (string ProgramName, RTexture2D icon) GetProgramInfo(this Type type) {
 			try {
 				var program = (Program)Activator.CreateInstance(type);

@@ -438,7 +438,7 @@ namespace RhuEngine.GameTests.Tests
 			inttest.Inputs.Add().Target = three;
 
 			inttest.Operators.Value = Components.MultiOperators.Addition;
-			Assert.AreNotEqual(output.Value, new NetPointer(valueone.id + valuetwo.id + valueThree.id));
+			Assert.AreNotEqual(output.Value, new NetPointer(valueone.GetID() + valuetwo.GetID() + valueThree.GetID()));
 
 			tester.RunForSteps();
 			((IDisposable)tester).Dispose();

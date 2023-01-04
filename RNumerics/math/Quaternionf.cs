@@ -699,21 +699,21 @@ namespace RNumerics
 		}
 		public Vector3f GetEuler() {
 			var angles = new Vector3f();
-			// roll / x
+			// roll / Y
 			double sinr_cosp = 2 * ((W * X) + (Y * Z));
 			double cosr_cosp = 1 - (2 * ((X * X) + (Y * Y)));
-			angles.X = (float)Math.Atan2(sinr_cosp, cosr_cosp);
+			angles.y = (float)Math.Atan2(sinr_cosp, cosr_cosp);
 
-			// pitch / y
+			// pitch / x
 			double sinp = 2 * ((W * Y) - (Z * X));
-			angles.Y = Math.Abs(sinp) >= 1 ? (float)Math.CopySign(Math.PI / 2, sinp) : (float)Math.Asin(sinp);
+			angles.X = Math.Abs(sinp) >= 1 ? (float)Math.CopySign(Math.PI / 2, sinp) : (float)Math.Asin(sinp);
 
 			// yaw / z
 			double siny_cosp = 2 * ((W * Z) + (X * Y));
 			double cosy_cosp = 1 - (2 * ((Y * Y) + (Z * Z)));
 			angles.Z = (float)Math.Atan2(siny_cosp, cosy_cosp);
 
-			return angles;
+			return angles * MathUtil.RAD_2_DEGF;
 		}
 
 		public override string ToString() {

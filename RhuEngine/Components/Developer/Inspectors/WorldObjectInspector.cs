@@ -10,8 +10,10 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Inspectors" })]
-	public class WorldObjectInspector : Component
+	public class WorldObjectInspector : BaseInspector<IWorldObject>
 	{
-		public readonly SyncRef<IWorldObject> TargetObject;
+		protected override void BuildUI() {
+			WorldObjectUIBuild();
+		}
 	}
 }

@@ -113,5 +113,8 @@ namespace RhuEngine.WorldObjects
 			base.Dispose();
 			GC.SuppressFinalize(this);
 		}
+
+		public void SetStartingObjectNetworked() {
+		}
 	}
 }

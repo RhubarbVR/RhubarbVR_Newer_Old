@@ -310,7 +310,7 @@ namespace RhuEngine.Components
 			window.IconTexture.Target = iconTex;
 			iconTex.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.List;
 			if (target is Entity targetEntity) {
-				window.Entity.AttachComponent<EntityInspector>().TargetObject.Target = targetEntity;
+				window.Entity.AddChild("Inspect").AttachComponent<EntityInspector>().TargetObject.Target = targetEntity;
 			}
 			else {
 				var scroll = window.Entity.AddChild("Scroll").AttachComponent<ScrollContainer>();

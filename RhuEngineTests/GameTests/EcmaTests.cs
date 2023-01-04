@@ -422,7 +422,7 @@ namespace RhuEngine.GameTests.Tests
 					throw new Exception("Script not loaded");
 				}
 				script.Invoke("RunCode");
-				Assert.AreNotEqual(value.Value.Value.id, value2.Value.Value);
+				Assert.AreNotEqual(value.Value.Value.GetID(), value2.Value.Value);
 				((IDisposable)tester).Dispose();
 			}
 		}
@@ -448,7 +448,7 @@ namespace RhuEngine.GameTests.Tests
 					throw new Exception("Script not loaded");
 				}
 				script.Invoke("RunCode");
-				Assert.AreNotEqual(value.Value.Value.id, value2.Value.Value);
+				Assert.AreNotEqual(value.Value.Value.GetID(), value2.Value.Value);
 				((IDisposable)tester).Dispose();
 			}
 		}

@@ -12,6 +12,8 @@ namespace RhuEngine.WorldObjects
 {
 	public interface ISync : ISyncMember
 	{
+		public void SetStartingObjectNetworked();
+
 		public void SetStartingObject();
 		public void SetValue(object value);
 
@@ -237,6 +239,10 @@ namespace RhuEngine.WorldObjects
 		public void SetStartingObject() {
 			_value = StartingValue;
 			UpdatedValue();
+		}
+
+		public void SetStartingObjectNetworked() {
+			Value = StartingValue;
 		}
 
 		public void SetValue(object data) {

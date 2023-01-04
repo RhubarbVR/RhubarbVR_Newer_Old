@@ -8,20 +8,20 @@ namespace RhuEngine.Datatypes
 	public struct NetPointer : IEquatable<NetPointer>
 	{
 		[Key(0)]
-		public ulong id;
+		public ulong _id;
 
 		public NetPointer(ulong _id) {
-			id = _id;
+			this._id = _id;
 		}
 
 		public ulong GetID() {
-			return id;
+			return _id;
 		}
 		public ushort GetOwnerID() {
-			return (ushort)(id & 0xFFFFuL);
+			return (ushort)(_id & 0xFFFFuL);
 		}
 		public ulong ItemIndex() {
-			return id << 16;
+			return _id << 16;
 		}
 		[IgnoreMember]
 		public bool IsLocal => GetID() == 0;
@@ -33,7 +33,7 @@ namespace RhuEngine.Datatypes
 		public static readonly NetPointer Blank = new();
 		public string HexString() {
 			try {
-				var temp = BitConverter.ToString(BitConverter.GetBytes(id).Reverse().ToArray()).Replace("-", "");
+				var temp = BitConverter.ToString(BitConverter.GetBytes(_id).Reverse().ToArray()).Replace("-", "");
 
 				if (!string.IsNullOrEmpty(temp)) {
 					while (!string.IsNullOrEmpty(temp) && temp.Substring(0, 1) == "0") {
@@ -51,15 +51,15 @@ namespace RhuEngine.Datatypes
 		}
 
 		public bool Equals(NetPointer other) {
-			return other.id == id;
+			return other._id == _id;
 		}
 
 		public override bool Equals(object obj) {
-			return obj is NetPointer pointer ? Equals(pointer) : id.Equals(obj);
+			return obj is NetPointer pointer ? Equals(pointer) : _id.Equals(obj);
 		}
 
 		public override int GetHashCode() {
-			return id.GetHashCode();
+			return _id.GetHashCode();
 		}
 
 		public override string ToString() {

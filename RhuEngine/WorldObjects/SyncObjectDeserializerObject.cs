@@ -36,7 +36,7 @@ namespace RhuEngine.WorldObjects
 			}
 			else {
 				@object.Pointer = ((DataNode<NetPointer>)data.GetValue("Pointer")).Value;
-				if (@object.Pointer.id == new NetPointer(0).id) {
+				if (@object.Pointer._id == new NetPointer(0)._id) {
 					RLog.Warn($"RefID of {@object.GetType().FullName} is null");
 				}
 				else {

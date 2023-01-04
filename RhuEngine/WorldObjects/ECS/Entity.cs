@@ -234,6 +234,17 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		[Exposed]
+		public T GetFirstComponentOrAttach<T>(Type type) where T : class, IComponent {
+			for (var i = 0; i < components.Count; i++) {
+				var item = components[i];
+				if (type.IsAssignableFrom(item.GetType())) {
+					return (T)item;
+				}
+			}
+			return AttachComponent<T>(type);
+		}
+
+		[Exposed]
 		public T GetFirstComponentOrAttach<T>() where T : Component, new() {
 			for (var i = 0; i < components.Count; i++) {
 				var item = components[i];
@@ -634,6 +645,7 @@ namespace RhuEngine.WorldObjects.ECS
 			}
 			base.Dispose();
 		}
+
 
 		[NoShow]
 		[NoSave]

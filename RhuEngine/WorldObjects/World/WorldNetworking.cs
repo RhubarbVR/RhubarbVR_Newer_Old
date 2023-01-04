@@ -717,7 +717,7 @@ namespace RhuEngine.WorldObjects
 				RLog.Info($"using old LocalUser with id{LocalUserID}");
 				var e = from objec in _worldObjects
 						where objec.Key.GetOwnerID() == LocalUserID
-						orderby objec.Key.id descending
+						orderby objec.Key._id descending
 						select objec.Key;
 				ItemIndex = e.First().ItemIndex() + 10;
 				RLog.Info($"Last index is {ItemIndex}");
