@@ -67,7 +67,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			var hittingObject = PrivateSpaceManager.GetLazerHitObject(handed);
-			if(hittingObject is null) {
+			if (hittingObject is null) {
 				if (!MultiSelect) {
 					for (var i = Gizmos.Count - 1; i >= 0; i--) {
 						RemoveGizmo(Gizmos[i].Target);
@@ -75,7 +75,7 @@ namespace RhuEngine.Components
 				}
 				return;
 			}
-			if(hittingObject?.World != World) {
+			if (hittingObject?.World != World) {
 				return;
 			}
 			ActionAddGizmo(hittingObject.Entity);
@@ -95,6 +95,11 @@ namespace RhuEngine.Components
 		}
 
 		public void AddGizmo(Entity targetEntity) {
+			foreach (SyncRef<WorldGizmo3D> item in Gizmos) {
+				if (item.Target?.TargetEntity.Target == targetEntity) {
+					return;
+				}
+			}
 			var gizmo = Entity.AddChild("Gizmo").AttachComponent<WorldGizmo3D>();
 			gizmo.SetUpWithEntity(targetEntity);
 			Gizmos.Add().Target = gizmo;
@@ -189,14 +194,186 @@ namespace RhuEngine.Components
 			}
 		}
 
+
+		public void Window3DInVR(ViewPortProgramWindow viewPortProgramWindow) {
+			if (!Engine.IsInVR) {
+				PrivateSpaceManager.UserInterfaceManager.OpenCloseDash = true;
+				return;
+			}
+			viewPortProgramWindow?.PrivateSpaceWindow?.PopoutIntoWorld();
+			viewPortProgramWindow?.PrivateSpaceWindow?.MinimizeWindow();
+		}
+
+		[Exposed]
+		public void SpawnObject(Spawn.SpawnObject spawnObject) {
+			RLog.Info($"SpawnObject: {spawnObject}");
+			var newEntity = LocalUser?.userRoot.Target?.Entity?.InternalParent?.AddChild(spawnObject.ToString());
+			if (newEntity is null) {
+				CloseWindowWithTag("CreateNEW");
+				return;
+			}
+			newEntity.GlobalTrans = Matrix.T(Vector3f.Forward * 0.5f) * (LocalUser?.userRoot.Target?.head.Target?.GlobalTrans ?? Matrix.Identity);
+			switch (spawnObject) {
+				case Spawn.SpawnObject.cube:
+					newEntity.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
+					newEntity.AttachComponent<BoxShape>();
+					break;
+				case Spawn.SpawnObject.sphere:
+					newEntity.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
+					newEntity.AttachComponent<SphereShape>();
+					break;
+				case Spawn.SpawnObject.arrow:
+					var arrow = newEntity.AttachMeshWithMeshRender<ArrowMesh, UnlitMaterial>();
+					newEntity.AttachComponent<MeshShape>().TargetMesh.Target = arrow.Item1;
+					break;
+				case Spawn.SpawnObject.capsule:
+					newEntity.AttachMeshWithMeshRender<CapsuleMesh, UnlitMaterial>();
+					newEntity.AttachComponent<CapsuleShape>();
+					break;
+				case Spawn.SpawnObject.cone:
+					var cone = newEntity.AttachMeshWithMeshRender<ConeMesh, UnlitMaterial>();
+					newEntity.AttachComponent<MeshShape>().TargetMesh.Target = cone.Item1;
+					break;
+				case Spawn.SpawnObject.cylinder:
+					newEntity.AttachMeshWithMeshRender<CylinderMesh, UnlitMaterial>();
+					newEntity.AttachComponent<CylinderShape>();
+					break;
+				case Spawn.SpawnObject.icosphere:
+					newEntity.AttachMeshWithMeshRender<IcosphereMesh, UnlitMaterial>();
+					newEntity.AttachComponent<SphereShape>();
+					break;
+				case Spawn.SpawnObject.mobiusstrip:
+					var mobiusstrip = newEntity.AttachMeshWithMeshRender<MobiusStripMesh, UnlitMaterial>();
+					newEntity.AttachComponent<MeshShape>().TargetMesh.Target = mobiusstrip.Item1;
+					break;
+				case Spawn.SpawnObject.circle:
+					var circle = newEntity.AttachMeshWithMeshRender<CircleMesh, UnlitMaterial>();
+					newEntity.AttachComponent<MeshShape>().TargetMesh.Target = circle.Item1;
+					break;
+				case Spawn.SpawnObject.rectangle:
+					var rectangle = newEntity.AttachMeshWithMeshRender<RectangleMesh, UnlitMaterial>();
+					newEntity.AttachComponent<MeshShape>().TargetMesh.Target = rectangle.Item1;
+					break;
+				case Spawn.SpawnObject.torus:
+					var torus = newEntity.AttachMeshWithMeshRender<TorusMesh, UnlitMaterial>();
+					newEntity.AttachComponent<MeshShape>().TargetMesh.Target = torus.Item1;
+					break;
+				case Spawn.SpawnObject.triangle:
+					var triangle = newEntity.AttachMeshWithMeshRender<TriangleMesh, UnlitMaterial>();
+					newEntity.AttachComponent<MeshShape>().TargetMesh.Target = triangle.Item1;
+					break;
+				default:
+					break;
+			}
+			AddGizmo(newEntity);
+			OpenInspectorOnObject(newEntity);
+			CloseWindowWithTag("CreateNEW");
+		}
+
+		[Exposed]
+		public void OpenCreateNew() {
+			var window = AddWindow(Engine.localisationManager.GetLocalString("Programs.DevTools.CreateNew.Name"), null, false);
+			window.Tag.Value = "CreateNEW";
+			var iconTex = window.Entity.AttachComponent<SingleIconTex>();
+			window.SizePixels -= new Vector2i(60, 60);
+			window.Pos += new Vector2f(0, 60);
+			iconTex.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.AddObject;
+			window.IconTexture.Target = iconTex;
+			var scrollCon = window.Entity.AddChild("Scroll").AttachComponent<ScrollContainer>();
+			var box = scrollCon.Entity.AddChild().AttachComponent<BoxContainer>();
+			box.Vertical.Value = true;
+			box.VerticalFilling.Value = RFilling.Expand | RFilling.Fill;
+			box.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
+			foreach (Spawn.SpawnObject item in Enum.GetValues(typeof(Spawn.SpawnObject))) {
+				var creteNewButton = box.Entity.AddChild(item.ToString()).AttachComponent<Button>();
+				creteNewButton.Alignment.Value = RButtonAlignment.Center;
+				creteNewButton.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+				creteNewButton.Text.Value = Engine.localisationManager.GetLocalString($"Programs.DevTools.CreateNew.{item}");
+				var eventMan = creteNewButton.Entity.AttachComponent<AddSingleValuePram<Spawn.SpawnObject>>();
+				eventMan.Target.Target = SpawnObject;
+				eventMan.Value.Value = item;
+				creteNewButton.Pressed.Target = eventMan.Call;
+			}
+			Window3DInVR(window);
+		}
+
+		[Exposed]
+		public void OpenInspectorOnObject(ISyncObject target) {
+			if (target is null) {
+				return;
+			}
+			var window = AddWindow(Engine.localisationManager.GetLocalString("Programs.DevTools.Inspector.Name"), null, false);
+			window.Tag.Value = "Inspector";
+			var iconTex = window.Entity.AttachComponent<SingleIconTex>();
+			window.SizePixels -= new Vector2i(0, 60);
+			window.Pos += new Vector2f(0, 60);
+			window.IconTexture.Target = iconTex;
+			iconTex.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.List;
+			if (target is Entity targetEntity) {
+				window.Entity.AttachComponent<EntityInspector>().TargetObject.Target = targetEntity;
+			}
+			else {
+				var scroll = window.Entity.AddChild("Scroll").AttachComponent<ScrollContainer>();
+				scroll.Entity.AddChild("Inspect").AttachComponent<WorldObjectInspector>().TargetObject.Target = target;
+			}
+			Window3DInVR(window);
+		}
+
 		[Exposed]
 		public void OpenInspector() {
+			OpenInspectorOnObject((Gizmos.Cast<SyncRef<WorldGizmo3D>>().FirstOrDefault()?.Target?.TargetEntity.Target) ?? World.RootEntity);
+		}
+
+		public enum DevWindows
+		{
+			Inspector,
+			CreateNew,
+			DevWindow,
 
 		}
 
 		[Exposed]
+		public void SpawnDevWindow(DevWindows windows) {
+			CloseWindowWithTag("devWindows");
+			switch (windows) {
+				case DevWindows.Inspector:
+					OpenInspector();
+					break;
+				case DevWindows.CreateNew:
+					OpenCreateNew();
+					break;
+				case DevWindows.DevWindow:
+					OpenDevWindow();
+					break;
+				default:
+					break;
+			}
+		}
+		[Exposed]
 		public void OpenDevWindow() {
-
+			var window = AddWindow(Engine.localisationManager.GetLocalString("Programs.DevTools.DevWindow.Name"), null, false);
+			window.Tag.Value = "devWindows";
+			var iconTex = window.Entity.AttachComponent<SingleIconTex>();
+			window.SizePixels -= new Vector2i(60, 60);
+			window.Pos += new Vector2f(0, 60);
+			iconTex.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.AddObject;
+			window.IconTexture.Target = iconTex;
+			var scrollCon = window.Entity.AddChild("Scroll").AttachComponent<ScrollContainer>();
+			var box = scrollCon.Entity.AddChild().AttachComponent<BoxContainer>();
+			box.Vertical.Value = true;
+			box.VerticalFilling.Value = RFilling.Expand | RFilling.Fill;
+			box.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
+			foreach (DevWindows item in Enum.GetValues(typeof(DevWindows))) {
+				var creteNewButton = box.Entity.AddChild(item.ToString()).AttachComponent<Button>();
+				creteNewButton.Alignment.Value = RButtonAlignment.Center;
+				creteNewButton.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+				creteNewButton.Text.Value = Engine.localisationManager.GetLocalString($"Programs.DevTools.{item}.Name");
+				var eventMan = creteNewButton.Entity.AttachComponent<AddSingleValuePram<DevWindows>>();
+				eventMan.Target.Target = SpawnDevWindow;
+				eventMan.Value.Value = item;
+				creteNewButton.Pressed.Target = eventMan.Call;
+			}
+			Window3DInVR(window);
 		}
 
 		public override void StartProgram(Stream file = null, string mimetype = null, string ex = null, params object[] args) {
@@ -290,6 +467,18 @@ namespace RhuEngine.Components
 			openDevWindow.ExpandIcon.Value = true;
 			openDevWindow.FocusMode.Value = RFocusMode.None;
 			openDevWindow.Pressed.Target = OpenDevWindow;
+
+
+			var openCreateWindow = boxCon.Entity.AddChild().AttachComponent<Button>();
+			var openCreateWindowTexture = openCreateWindow.Entity.AttachComponent<SingleIconTex>();
+			openCreateWindowTexture.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.AddObject;
+			openCreateWindow.Icon.Target = openCreateWindowTexture;
+			openCreateWindow.MinSize.Value = new Vector2i(55);
+			openCreateWindow.IconAlignment.Value = RButtonAlignment.Center;
+			openCreateWindow.ExpandIcon.Value = true;
+			openCreateWindow.FocusMode.Value = RFocusMode.None;
+			openCreateWindow.Pressed.Target = OpenCreateNew;
+
 
 			boxCon.Entity.AddChild().AttachComponent<Panel>().MinSize.Value = new Vector2i(5, 15);
 

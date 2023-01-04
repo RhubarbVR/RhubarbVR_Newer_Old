@@ -50,6 +50,18 @@ namespace RhuEngine.Components
 			window.IconTexture.Target = nicon;
 			return window;
 		}
+		public ProgramWindow GetWindowWithTag(string tag) {
+			foreach (SyncRef<ProgramWindow> item in programWindows) {
+				if (item.Target?.WindowTag == tag) {
+					return item.Target;
+				}
+			}
+			return null;
+		}
+
+		public void CloseWindowWithTag(string tag) {
+			GetWindowWithTag(tag)?.Close();
+		}
 
 		public ViewPortProgramWindow AddWindow(string name = null, RTexture2D icon = null, bool closeProgramOnWindowClose = true, bool canClose = true) {
 			var window = Entity.AddChild(name ?? ProgramName).AttachComponent<ViewPortProgramWindow>();

@@ -17,6 +17,9 @@ namespace RhuEngine.Components
 		[Default("ViewPort Program Window")]
 		[OnChanged(nameof(UpdateData))]
 		public readonly Sync<string> Title;
+		public readonly Sync<string> Tag;
+		public override string WindowTag => Tag.Value;
+
 		[OnChanged(nameof(ViewportUpdate))]
 		public readonly SyncRef<Viewport> Viewport;
 

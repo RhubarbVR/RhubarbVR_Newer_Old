@@ -15,6 +15,9 @@ namespace RhuEngine.Components
 		[Default(GizmoMode.All)]
 		[OnChanged(nameof(UpdateModeData))]
 		public readonly Sync<GizmoMode> Mode;
+
+		public readonly SyncRef<Entity> TargetEntity;
+
 		[OnChanged(nameof(UpdateModeData))]
 		public readonly SyncRef<Entity> TransformSpace;
 		[OnChanged(nameof(UpdateModeData))]
@@ -45,6 +48,7 @@ namespace RhuEngine.Components
 			Pos.Target = entity.position;
 			Scale.Target = entity.scale;
 			Rot.Target = entity.rotation;
+			TargetEntity.Target = entity;
 			ParentEntity.Target = TransformSpace.Target = entity.InternalParent;
 		}
 

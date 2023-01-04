@@ -289,7 +289,22 @@
     "Programs.SessionsFinder.Error": "Error finding public sessions",
 
     "Programs.DevTools.Name": "Developer Tools",
-
+    "Programs.DevTools.Inspector.Name": "Inspector",
+    "Programs.DevTools.DevWindow.Name": "DevWindows",
+    "Programs.DevTools.CreateNew.Name": "Create New",
+    "Programs.DevTools.CreateNew.cube": "Cube",
+    "Programs.DevTools.CreateNew.none": "Entity",
+    "Programs.DevTools.CreateNew.sphere": "Sphere",
+    "Programs.DevTools.CreateNew.arrow": "Arrow",
+    "Programs.DevTools.CreateNew.capsule": "Capsule",
+    "Programs.DevTools.CreateNew.cone": "Cone",
+    "Programs.DevTools.CreateNew.cylinder": "Cylinder",
+    "Programs.DevTools.CreateNew.icosphere": "Icosphere",
+    "Programs.DevTools.CreateNew.mobiusstrip": "Mobius Strip",
+    "Programs.DevTools.CreateNew.circle": "Circle",
+    "Programs.DevTools.CreateNew.rectangle": "Rectangle",
+    "Programs.DevTools.CreateNew.torus": "Torus",
+    "Programs.DevTools.CreateNew.triangle": "Triangle",
 
     "Start.AllPrograms": "All Programs",
     "Program.OpenBrowser.Name": "Open System Webbrowser",

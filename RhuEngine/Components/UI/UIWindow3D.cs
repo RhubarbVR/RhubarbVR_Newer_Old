@@ -123,7 +123,7 @@ namespace RhuEngine.Components
 
 			private void UpdateButtonColor() {
 				if (ButtonColorLink.Linked) {
-					var lastColor  = ButtonColor.Value;
+					var lastColor = ButtonColor.Value;
 					if (Hover.Value) {
 						lastColor = ButtonHoverColor.Value;
 					}
@@ -198,7 +198,7 @@ namespace RhuEngine.Components
 			if (Width.Linked) {
 				Width.LinkedValue = screenWidth;
 			}
-			var leftOffset = ((HeaderSize.Value + 0.035f) * Buttons.Count);
+			var leftOffset = (HeaderSize.Value + 0.035f) * Buttons.Count;
 			if (HeaderWidth.Linked) {
 				HeaderWidth.LinkedValue = screenWidth - leftOffset;
 			}
@@ -262,7 +262,15 @@ namespace RhuEngine.Components
 			mainPannel.Item2.Transparency.Value = Transparency.Blend;
 			var backGround = Entity.AttachComponent<UnlitMaterial>();
 			mainPannel.Item3.materials.Add().Target = backGround;
-			backGround.Tint.Value = Colorf.RhubarbRed * new Colorf(0.5f, 0.5f, 0.5f, 0.9f);
+			var color = Colorf.RhubarbGreen;
+			if (World.IsPersonalSpace) {
+				color = Colorf.RhubarbRed;
+			}
+			if (World.IsOverlayWorld) {
+				color = Colorf.SelectionGold;
+			}
+			backGround.Tint.Value = color * new Colorf(0.5f, 0.5f, 0.5f, 0.9f);
+
 			backGround.Transparency.Value = Transparency.Blend;
 			backGround.DullSided.Value = true;
 			backGround.RenderPriority.Value = -1;
@@ -303,8 +311,12 @@ namespace RhuEngine.Components
 			closeButton.PressAction.Target = Close;
 			Reslution.Value = new Vector2i(1080, 720);
 		}
+
+		public event Action OnClose;
+
 		[Exposed]
 		public void Close() {
+			OnClose?.Invoke();
 			Entity.Destroy();
 		}
 	}

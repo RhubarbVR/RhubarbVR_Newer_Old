@@ -267,17 +267,30 @@ namespace RhuEngine.Components
 			if (Window.TargetViewport is null) {
 				return;
 			}
+			if (!Minimized) {
+				MinimizeWindow();
+			}
 			var program = Window.Program.Entity.AddChild(Window.Program.Name).AttachComponent<UIWindow3D>();
 			var spawnPos = Matrix.TR(Vector3f.Forward * 0.5f, Quaternionf.Yawed180) * LocalUser.userRoot.Target.head.Target.GlobalTrans;
 			var reslution = program.Entity.AttachComponent<ValueCopy<Vector2i>>();
 			reslution.Target.Target = program.Reslution;
 			reslution.Source.Target = Window.TargetViewport.Size;
 			Window.OnDispose += (ob) => {
-				if (program.IsDestroying | program.IsRemoved) {
+				if ((program?.Entity?.IsDestroying ?? true) | (program?.Entity?.IsRemoved ?? true)) {
 					return;
 				}
-				program.Destroy();
-
+				program.Entity.Destroy();
+			};
+			Window.OnClosedWindow += () => {
+				if ((program?.Entity?.IsDestroying ?? true) | (program?.Entity?.IsRemoved ?? true)) {
+					return;
+				}
+				program.Entity.Destroy();
+			};
+			program.OnClose += () => {
+				if (Minimized) {
+					CloseWindow();
+				}
 			};
 			if (program.MainUI.Target is not null) {
 				program.MainUI.Target.InputInterface.Target = Window.TargetViewport;
