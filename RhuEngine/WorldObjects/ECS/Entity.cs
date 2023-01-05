@@ -221,12 +221,12 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		[Exposed]
-		public T AttachComponent<T>() where T : Component, new() {
+		public T AttachComponent<T>() where T : class, IComponent, new() {
 			var comp = components.Add<T>();
 			comp.RunAttach();
 			return comp;
 		}
-		public T AttachComponent<T>(Action<T> beforeAttach) where T : Component, new() {
+		public T AttachComponent<T>(Action<T> beforeAttach) where T : class, IComponent, new() {
 			var comp = components.Add<T>();
 			beforeAttach.Invoke(comp);
 			comp.RunAttach();
@@ -245,7 +245,7 @@ namespace RhuEngine.WorldObjects.ECS
 		}
 
 		[Exposed]
-		public T GetFirstComponentOrAttach<T>() where T : Component, new() {
+		public T GetFirstComponentOrAttach<T>() where T : class, IComponent, new() {
 			for (var i = 0; i < components.Count; i++) {
 				var item = components[i];
 				if (typeof(T).IsAssignableFrom(item.GetType())) {
@@ -255,7 +255,7 @@ namespace RhuEngine.WorldObjects.ECS
 			return AttachComponent<T>();
 		}
 		[Exposed]
-		public T GetFirstComponent<T>() where T : Component {
+		public T GetFirstComponent<T>() where T : class, IComponent {
 			for (var i = 0; i < components.Count; i++) {
 				var item = components[i];
 				if (typeof(T).IsAssignableFrom(item.GetType())) {
@@ -265,7 +265,7 @@ namespace RhuEngine.WorldObjects.ECS
 			return null;
 		}
 		[Exposed]
-		public IEnumerable<T> GetAllComponents<T>() where T : Component {
+		public IEnumerable<T> GetAllComponents<T>() where T : class, IComponent {
 			for (var i = 0; i < components.Count; i++) {
 				var item = components[i];
 				if (typeof(T).IsAssignableFrom(item.GetType())) {

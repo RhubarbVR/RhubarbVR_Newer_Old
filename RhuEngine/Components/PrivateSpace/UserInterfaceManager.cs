@@ -490,6 +490,9 @@ namespace RhuEngine.Components
 		}
 
 		private void Client_OnLogout() {
+			if(_profileElement is null) {
+				return;
+			}
 			_profileElement.Entity.enabled.Value = false;
 			_profileSideButton.ButtonPressed.Value = false;
 			_profileSideButton.Entity.enabled.Value = false;
