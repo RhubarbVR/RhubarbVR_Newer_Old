@@ -4,7 +4,7 @@ namespace RNumerics
 {
 	// somewhat ported from WildMagic5
 	[MessagePackObject]
-	public sealed class Circle3d
+	public struct Circle3d
 	{
 		// The plane containing the circle is Dot(N,X-C) = 0, where X is any point
 		// in the plane.  Vectors U, V, and N form an orthonormal right-handed set

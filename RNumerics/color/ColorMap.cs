@@ -5,7 +5,7 @@ using MessagePack;
 namespace RNumerics
 {
 	[MessagePackObject]
-	public sealed class ColorMap
+	public struct ColorMap
 	{
 		[MessagePackObject]
 		public struct ColorPoint

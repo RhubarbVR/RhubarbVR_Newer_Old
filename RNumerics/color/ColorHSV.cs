@@ -7,7 +7,7 @@ using MessagePack;
 namespace RNumerics
 {
 	[MessagePackObject]
-	public sealed class ColorHSV 
+	public struct ColorHSV 
 	{
 		[Key(0)]
 		public float h;

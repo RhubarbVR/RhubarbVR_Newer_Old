@@ -5,7 +5,7 @@ namespace RNumerics
 {
 	// some functions ported from WildMagic5 Matrix2
 	[MessagePackObject]
-	public sealed class Matrix2f
+	public struct Matrix2f
 	{
 		[Key(0)]
 		public float m00;
@@ -202,7 +202,7 @@ namespace RNumerics
 		}
 
 
-		public void EigenDecomposition(in Matrix2f rot, in Matrix2f diag)
+		public void EigenDecomposition(ref Matrix2f rot, ref Matrix2f diag)
 		{
 			var sum = Math.Abs(m00) + Math.Abs(m11);
 			if (Math.Abs(m01) + sum == sum)

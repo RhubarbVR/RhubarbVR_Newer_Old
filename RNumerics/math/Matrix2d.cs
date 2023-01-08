@@ -5,7 +5,7 @@ namespace RNumerics
 {
 	// some functions ported from WildMagic5 Matrix2
 	[MessagePackObject]
-	public sealed class Matrix2d
+	public struct Matrix2d
 	{
 		[Key(0)]
 		public double m00;
@@ -201,7 +201,7 @@ namespace RNumerics
 		}
 
 
-		public void EigenDecomposition(in Matrix2d rot, in Matrix2d diag) {
+		public void EigenDecomposition(ref Matrix2d rot, ref Matrix2d diag) {
 			var sum = Math.Abs(m00) + Math.Abs(m11);
 			if (Math.Abs(m01) + sum == sum) {
 				// The matrix M is diagonal (within numerical round-off).
