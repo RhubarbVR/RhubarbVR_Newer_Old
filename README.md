@@ -87,8 +87,8 @@ This is how to run the program and the standard problems you might encounter wit
 ### Playing Normally
 
 You can get a compiled version of RhubarbVR through this GitHub repository or obtain it from Steam.
-But with either of these, you need to the net6 runtime installed.
-[Net6 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0/runtime)
+But with either of these, you need to the net7 runtime installed.
+[Net7 Runtime](https://dotnet.microsoft.com/download/dotnet/7.0/runtime)
 
 ### Compiling Windows
 
@@ -111,7 +111,7 @@ But with either of these, you need to the net6 runtime installed.
    ```sh
    git clone https://github.com/RhubarbVR/RhubarbVR.git
    ```
-2. Install Net6 SDK Ubuntu 21.04 for [OtherDistros](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
+2. Install Net7 SDK Ubuntu 21.04 for [OtherDistros](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
    ```sh
    wget https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
    sudo dpkg -i packages-microsoft-prod.deb
@@ -119,7 +119,7 @@ But with either of these, you need to the net6 runtime installed.
    sudo apt-get update; \
    sudo apt-get install -y apt-transport-https && \
    sudo apt-get update && \
-   sudo apt-get install -y dotnet-sdk-6.0
+   sudo apt-get install -y dotnet-sdk-7.0
    ```
 3. Build
    ```sh
