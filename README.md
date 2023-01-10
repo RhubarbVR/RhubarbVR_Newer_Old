@@ -83,12 +83,15 @@ RhubarbVR is a networked VR game engine. What does this mean? Well, Rhubarb is a
 ## Getting Started
 
 This is how to run the program and the standard problems you might encounter with trying to start or compile Rhubarb VR.
-<!-- 
 ### Playing Normally
 
 You can get a compiled version of RhubarbVR through this GitHub repository or obtain it from Steam.
 But with either of these, you need to the net7 runtime installed.
 [Net7 Runtime](https://dotnet.microsoft.com/download/dotnet/7.0/runtime)
+
+### If you want Rendering
+You will need to get the latest godot 4 Net6 beta from [godot news](https://godotengine.org/news/default/1) you will need both the net 6 sdk and net 7
+Then you add the RhubarbGodot folder as a project in godot then click the play button in godot and it will be running in debug mode.
 
 ### Compiling Windows
 
@@ -103,7 +106,7 @@ But with either of these, you need to the net7 runtime installed.
    ```
 4. Click build at the top
 5. Build solution
-6. In the Platforms/Rhubarb_VR_DotNet/bin/ you will find the compiled binary
+6. In the Rhubarb_VR_HeadLess/bin/ you will find the compiled binary for the headless
 
 ### Compiling Linux
 
@@ -123,9 +126,9 @@ But with either of these, you need to the net7 runtime installed.
    ```
 3. Build
    ```sh
-   dotnet build "Platforms/Rhubarb_VR_DotNet" /p:Configuration=Release
+   dotnet build Rhubarb_VR_HeadLess /p:Configuration=Release
    ```
--->
+
 <!-- USAGE EXAMPLES -->
 
 ## Usage
