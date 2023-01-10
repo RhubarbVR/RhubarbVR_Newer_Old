@@ -13,12 +13,14 @@ namespace RhuEngine.WorldObjects
 {
 	public interface ISyncObjectList : ISyncObject
 	{
-
+		public void AddElementVoid();
 	}
 
 	public interface ISyncObjectList<T> : ISyncObjectList
 	{
 		public T Add(bool networkedObject = false, bool deserialize = false);
+
+		public T AddElement();
 	}
 
 	[GenericTypeConstraint()]
@@ -66,6 +68,12 @@ namespace RhuEngine.WorldObjects
 			AddInternal(newElement);
 			return newElement;
 		}
+
+		[Exposed]
+		public void AddElementVoid() {
+			AddElement();
+		}
+
 		[Exposed]
 		public T AddElement() {
 			return Add();
@@ -107,5 +115,6 @@ namespace RhuEngine.WorldObjects
 		public override IDataNode SaveElement(T val) {
 			return val.Serialize(new SyncObjectSerializerObject(true));
 		}
+
 	}
 }

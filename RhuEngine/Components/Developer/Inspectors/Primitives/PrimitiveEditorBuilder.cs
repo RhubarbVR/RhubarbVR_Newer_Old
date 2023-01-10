@@ -71,6 +71,14 @@ namespace RhuEngine.Components
 			if (targetTest == typeof(Type)) {
 				return typeof(TypeEditor);
 			}
+			if (targetTest.IsEnum) {
+				if (targetTest.GetCustomAttribute<FlagsAttribute>() is null) {
+					return typeof(BasicEnumEditor<>).MakeGenericType(targetTest);
+				}
+				else {
+					//Todo Add Flag enum support
+				}
+			}
 			return typeof(PrimitiveEditorBuilder<>).MakeGenericType(targetTest);
 		}
 
@@ -102,7 +110,7 @@ namespace RhuEngine.Components
 					fieldBox.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 
 				}
-				if(typeof(T) == typeof(Quaternionf)) {
+				if (typeof(T) == typeof(Quaternionf)) {
 					var comp = Entity.AddChild("Euler").GetFirstComponentOrAttach<QuaternionEditor>();
 					comp.FieldEdit = FieldEdit;
 					comp.TargetObjectWorld = TargetObjectWorld;

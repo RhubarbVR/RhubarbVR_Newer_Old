@@ -76,6 +76,9 @@ namespace RhuEngine.WorldObjects
 			if (IsDestroying) {
 				return;
 			}
+			if (Parent is not ISyncList) {
+				return;
+			}
 			IsDestroying = true;
 			Task.Run(() => {
 				try {

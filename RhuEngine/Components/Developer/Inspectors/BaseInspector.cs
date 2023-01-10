@@ -25,6 +25,9 @@ namespace RhuEngine.Components
 		public IWorldObject TargetObjectWorld { get => TargetObject.TargetIWorldObject; set => TargetObject.TargetIWorldObject = value; }
 
 		public static Type GetFiled(Type type) {
+			if (type.IsAssignableTo(typeof(ISyncList))) {
+				return typeof(SyncListInspector<>).MakeGenericType(type);
+			}
 			if (type.IsAssignableTo(typeof(ISync))) {
 				if (type.IsGenericType) {
 					return typeof(PrimitiveEditorBuilder<>).MakeGenericType(type.GetGenericArguments()[0]);
@@ -37,11 +40,30 @@ namespace RhuEngine.Components
 		protected void WorldObjectUIBuild() {
 			var vert = Entity.AttachComponent<BoxContainer>();
 			vert.Vertical.Value = true;
-			vert.HorizontalFilling.Value = RFilling.Expand | RFilling.Expand;
+			vert.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 			if (TargetObject.Target is null) {
 				return;
 			}
-			var members = TargetObject.Target.GetType().FastGetMembers().OrderBy(x=>x is MethodInfo);
+
+			var members = TargetObject.Target.GetType().FastGetMembers().OrderBy(x => x is MethodInfo);
+			var amountOfMethods = members.Where(x => {
+				if (x.GetCustomAttribute<NoShowAttribute>() != null) {
+					return false;
+				}
+				if (x.GetCustomAttribute<ExposedAttribute>() == null) {
+					return false;
+				}
+				if (x is MethodInfo methodInfo) {
+					try {
+						var newType = Helper.CreateDelegateType(methodInfo);
+						var newTypee = typeof(MethodInspector<>).MakeGenericType(newType);
+						return true;
+					}
+					catch { }
+				}
+				return false;
+			}).Count();
+			DropDown delegateMemberDropDown = null;
 			foreach (var member in members) {
 				if (member.GetCustomAttribute<NoShowAttribute>() != null) {
 					continue;
@@ -51,14 +73,26 @@ namespace RhuEngine.Components
 						continue;
 					}
 					try {
-						var newField = Entity.AddChild(method.Name);
 						var newType = Helper.CreateDelegateType(method);
-						newField.AttachComponent<IMethodInspector>(typeof(MethodInspector<>).MakeGenericType(newType)).InitField(method, TargetObject.Target);
-					}
-					catch {
+						var newTypee = typeof(MethodInspector<>).MakeGenericType(newType);
+						if (amountOfMethods == 1) {
+							var newField = Entity.AddChild(method.Name);
+							newField.AttachComponent<IMethodInspector>(newTypee).InitField(method, TargetObject.Target);
+						}
+						else {
+							if (delegateMemberDropDown is null) {
+								delegateMemberDropDown = Entity.AddChild("DropDown").AttachComponent<DropDown>();
+								delegateMemberDropDown.DropDownButton.Target.Text.Value = "Methods";
+								var newBox = delegateMemberDropDown.DropDownData.Target.AttachComponent<BoxContainer>();
+								newBox.Vertical.Value = true;
+								newBox.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
+							}
 
+							var newField = delegateMemberDropDown.DropDownData.Target.AddChild(method.Name);
+							newField.AttachComponent<IMethodInspector>(newTypee).InitField(method, TargetObject.Target);
+						}
 					}
-					//Show method target
+					catch { }
 				}
 				if (member is FieldInfo field) {
 					if (field.FieldType.IsAssignableTo(typeof(IWorldObject))) {
@@ -85,10 +119,11 @@ namespace RhuEngine.Components
 			CleanUpUI();
 			if (TargetObject.Target is null) { return; }
 			BuildUI();
+			LocalBind();
 		}
 		public void TargetObjectRebuild() {
-			LocalBind();
 			if (LocalUser != MasterUser) {
+				LocalBind();
 				return;
 			}
 			if (Task.CurrentId is null) {

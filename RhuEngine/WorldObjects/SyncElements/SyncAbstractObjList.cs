@@ -8,7 +8,11 @@ using RhuEngine.Datatypes;
 
 namespace RhuEngine.WorldObjects
 {
-	public interface IAbstractObjList<T> : ISyncObject
+	public interface IAbstractObjList : ISyncObject {
+
+	}
+
+	public interface IAbstractObjList<T> : IAbstractObjList
 	{
 		T Add(Type type, bool networkedObject = false, bool deserialize = false);
 	}

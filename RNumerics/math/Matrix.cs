@@ -24,7 +24,7 @@ namespace RNumerics
 			get => m;
 			set => m = value;
 		}
-	
+
 		public Matrix() {
 			m = new Matrix4x4();
 		}
@@ -104,6 +104,19 @@ namespace RNumerics
 				return Matrix.TRS(pos, rot, scale);
 			}
 		}
+		[IgnoreMember, JsonIgnore]
+		public bool IsAnyInfinty => float.IsInfinity(m.M11) || float.IsInfinity(m.M12) || float.IsInfinity(m.M13) || float.IsInfinity(m.M14) ||
+						float.IsInfinity(m.M21) || float.IsInfinity(m.M22) || float.IsInfinity(m.M23) || float.IsInfinity(m.M24) ||
+						float.IsInfinity(m.M31) || float.IsInfinity(m.M32) || float.IsInfinity(m.M33) || float.IsInfinity(m.M34) ||
+						float.IsInfinity(m.M41) || float.IsInfinity(m.M42) || float.IsInfinity(m.M43) || float.IsInfinity(m.M44);
+		[IgnoreMember, JsonIgnore]
+		public bool IsAnyNan => float.IsNaN(m.M11) || float.IsNaN(m.M12) || float.IsNaN(m.M13) || float.IsNaN(m.M14) ||
+						float.IsNaN(m.M21) || float.IsNaN(m.M22) || float.IsNaN(m.M23) || float.IsNaN(m.M24) ||
+						float.IsNaN(m.M31) || float.IsNaN(m.M32) || float.IsNaN(m.M33) || float.IsNaN(m.M34) ||
+						float.IsNaN(m.M41) || float.IsNaN(m.M42) || float.IsNaN(m.M43) || float.IsNaN(m.M44);
+
+		[IgnoreMember, JsonIgnore]
+		public bool IsAnyNanOrInfinty => IsAnyNan || IsAnyInfinty;
 
 		/// <summary>Inverts this Matrix! If the matrix takes a point from a
 		/// -> b, then its inverse takes the point from b -> a.</summary>

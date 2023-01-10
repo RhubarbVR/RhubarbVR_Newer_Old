@@ -17,6 +17,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		CanvasItem CanvasItem { get; }
 
 		void Children_OnReorderList();
+		void UpdateParrent();
 	}
 
 	public abstract class CanvasItemNodeLinked<T, T2> : EngineWorldLinkBase<T>, RhuEngine.Components.ICanvasItemLinked, ICanvasItemNodeLinked where T : RhuEngine.Components.CanvasItem, new() where T2 : CanvasItem, new()
@@ -51,18 +52,14 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			node = new T2 {
 				Name = ObjectName
 			};
-			LinkedComp.Entity.ViewportUpdateEvent += NotifyParrentUpdate;
-			LinkedComp.Entity.CanvasItemUpdateEvent += NotifyParrentUpdate;
-			LinkedComp.Entity.children.OnReorderList += Children_OnReorderListUpdate;
-			LinkedComp.Entity.OnParentChanged += NotifyParrentUpdate;
+			LinkedComp.Entity.ViewportUpdateEvent += UpdateParrent;
+			LinkedComp.Entity.CanvasItemUpdateEvent += UpdateParrent;
+			LinkedComp.Entity.children.OnReorderList += Children_OnReorderList;
+			LinkedComp.Entity.OnParentChanged += UpdateParrent;
 			UpdateParrent();
 			LoadCanvasItemLink();
 			StartContinueInit();
-			Children_OnReorderListUpdate();
-		}
-
-		public void Children_OnReorderListUpdate() {
-			RenderThread.ExecuteOnEndOfFrame(Children_OnReorderList);
+			Children_OnReorderList();
 		}
 
 		public void Children_OnReorderList() {
@@ -91,14 +88,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 						canvasItem.CanvasItem?.GetParent()?.RemoveChild(canvasItem.CanvasItem);
 						CanvasItem.AddChild(canvasItem.CanvasItem);
 						canvasItem.CanvasItem.Owner = CanvasItem;
-						node.MoveChild(canvasItem.CanvasItem, -1);
+						CanvasItem.MoveChild(canvasItem.CanvasItem, -1);
 					}
 				}
 			}
-		}
-
-		public void NotifyParrentUpdate() {
-			RenderThread.ExecuteOnStartOfFrame(this, UpdateParrent);
 		}
 
 
@@ -112,25 +105,12 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			if (LinkedComp.IsDestroying | LinkedComp.IsRemoved) {
 				return;
 			}
-			node.GetParent()?.RemoveChild(node);
-			var addToViewPort = false;
-			if (LinkedComp.Entity.InternalParent?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
-				if (canvasItem.CanvasItem != node) {
-					canvasItem.Children_OnReorderList();
-				}
-				else {
-					addToViewPort = true;
-				}
-			}
-			else {
-				addToViewPort = true;
-			}
-			if (addToViewPort) {
-				if (LinkedComp.Entity.Viewport?.WorldLink is ViewportLink ee) {
+			if (node.Owner is null) {
+				if (LinkedComp.Entity.Viewport?.WorldLink is ViewportLink ee && (LinkedComp.Entity?.InternalParent?.CanvasItem is null)) {
 					ee.node.AddChild(node);
 					node.Owner = ee.node;
 				}
-				else if (LinkedComp.Entity.InternalParent?.Viewport?.WorldLink is ViewportLink eee) {
+				else if (LinkedComp.Entity.InternalParent?.Viewport?.WorldLink is ViewportLink eee && (LinkedComp.Entity?.InternalParent?.CanvasItem is null)) {
 					eee.node.AddChild(node);
 					node.Owner = eee.node;
 				}
@@ -145,17 +125,20 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					}
 				}
 			}
+			if (LinkedComp.Entity?.InternalParent?.CanvasItem?.WorldLink is ICanvasItemNodeLinked linked) {
+				linked.Children_OnReorderList();
+			}
 		}
 
 		public abstract void StartContinueInit();
 
 		public override void Remove() {
-			LinkedComp.Entity.ViewportUpdateEvent -= NotifyParrentUpdate;
-			LinkedComp.Entity.CanvasItemUpdateEvent -= NotifyParrentUpdate;
+			LinkedComp.Entity.ViewportUpdateEvent -= UpdateParrent;
+			LinkedComp.Entity.CanvasItemUpdateEvent -= UpdateParrent;
 			if (LinkedComp.Entity.children is not null) {
 				LinkedComp.Entity.children.OnReorderList -= Children_OnReorderList;
 			}
-			LinkedComp.Entity.OnParentChanged -= NotifyParrentUpdate;
+			LinkedComp.Entity.OnParentChanged -= UpdateParrent;
 			node?.QueueFree();
 			node = null;
 		}

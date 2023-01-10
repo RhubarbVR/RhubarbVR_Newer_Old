@@ -174,8 +174,7 @@ namespace RhuEngine.WorldObjects.ECS
 			var oldCanvasItem = CanvasItem;
 			CanvasItem = GetFirstComponent<CanvasItem>();
 			CanvasItem ??= InternalParent?.CanvasItem;
-			//Takes 2 frames for linker to load
-			RenderThread.ExecuteOnStartOfFrame(() => RenderThread.ExecuteOnEndOfFrame(() => CanvasItemUpdateEvent?.Invoke()));
+			CanvasItemUpdateEvent?.Invoke();
 			if (oldCanvasItem != CanvasItem) {
 				for (var i = 0; i < children.Count; i++) {
 					var item = children[i];
@@ -188,8 +187,7 @@ namespace RhuEngine.WorldObjects.ECS
 			var oldViewPort = Viewport;
 			Viewport = GetFirstComponent<Viewport>();
 			Viewport ??= InternalParent?.Viewport;
-			//Takes 2 frames for linker to load
-			RenderThread.ExecuteOnStartOfFrame(() => RenderThread.ExecuteOnEndOfFrame(() => ViewportUpdateEvent?.Invoke()));
+			ViewportUpdateEvent?.Invoke();
 			if (oldViewPort != Viewport) {
 				for (var i = 0; i < children.Count; i++) {
 					var item = children[i];

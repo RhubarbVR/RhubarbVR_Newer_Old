@@ -27,6 +27,14 @@ public partial class ConnectedViewport : TextureRect
 						targetViewport = viewport.node;
 						Texture = viewport.node?.GetTexture();
 					}
+					else {
+						RenderThread.ExecuteOnStartOfFrame(() => {
+							if (_viewport.WorldLink is ViewportLink viewport) {
+								targetViewport = viewport.node;
+								Texture = viewport.node?.GetTexture();
+							}
+						});
+					}
 				}
 				catch {
 				}

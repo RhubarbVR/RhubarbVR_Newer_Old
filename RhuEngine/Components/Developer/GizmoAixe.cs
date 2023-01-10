@@ -275,7 +275,12 @@ namespace RhuEngine.Components
 				}
 			}
 			if (newMatrix != StartPos) {
-				Gizmo3DTarget.Target?.SetMatrix(newMatrix);
+				if (newMatrix.IsAnyNanOrInfinty) {
+					Gizmo3DTarget.Target?.SetMatrix(StartPos);
+				}
+				else {
+					Gizmo3DTarget.Target?.SetMatrix(newMatrix);
+				}
 			}
 		}
 

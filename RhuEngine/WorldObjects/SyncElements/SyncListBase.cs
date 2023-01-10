@@ -159,6 +159,7 @@ namespace RhuEngine.WorldObjects
 				FixAllNames();
 			}
 			Changed?.Invoke(this);
+			OnReorderList?.Invoke();
 		}
 
 		public event Action OnReorderList;
@@ -167,10 +168,8 @@ namespace RhuEngine.WorldObjects
 			if (IsRemoved) {
 				return;
 			}
-			lock (_syncObjects) {
-				var newOrder = from e in _syncObjects.AsParallel()
-							   orderby (typeof(IOffsetableElement).IsAssignableFrom(e.GetType()) ? ((IOffsetableElement)e).Offset : 0) ascending
-							   select e;
+			lock (_syncObjects) {				
+				var newOrder = _syncObjects.OrderBy(x => typeof(IOffsetableElement).IsAssignableFrom(x.GetType()) ? ((IOffsetableElement)x).Offset : 0).ThenBy(x => x.Pointer._id);
 				var index = 0;
 				foreach (var item in newOrder) {
 					item.ChangeName(index.ToString());

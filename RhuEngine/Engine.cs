@@ -347,6 +347,7 @@ namespace RhuEngine
 
 		public void Step() {
 			if (EngineStarting) {
+				RenderThread.RunOnStartOfFrame();
 				if (EngineLink.CanRender) {
 					try {
 						var headMat = IsInVR
@@ -371,6 +372,7 @@ namespace RhuEngine
 						throw;
 					}
 				}
+				RenderThread.RunOnEndOfFrame();
 				return;
 			}
 			RenderThread.RunOnStartOfFrame();
