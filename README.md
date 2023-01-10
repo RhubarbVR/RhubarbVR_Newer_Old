@@ -89,9 +89,9 @@ You can get a compiled version of RhubarbVR through this GitHub repository or ob
 But with either of these, you need to the net7 runtime installed.
 [Net7 Runtime](https://dotnet.microsoft.com/download/dotnet/7.0/runtime)
 
-### If you want Rendering
-You will need to get the latest godot 4 Net6 beta from [godot news](https://godotengine.org/news/default/1) you will need both the net 6 sdk and net 7
-Then you add the RhubarbGodot folder as a project in godot then click the play button in godot and it will be running in debug mode.
+### For Rendering
+You will need to get the latest Godot 4 Net6 beta from [godot news](https://godotengine.org/news/default/1) you will also need both Net6 and Net7 SDKs
+Then in Godot you will add the RhubarbGodot folder as a project. Then click the play button in Godot and Rhubarb will be running in debug mode.
 
 ### Compiling Windows
 
