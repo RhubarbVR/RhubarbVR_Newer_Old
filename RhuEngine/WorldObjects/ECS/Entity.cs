@@ -340,7 +340,7 @@ namespace RhuEngine.WorldObjects.ECS
 		public event Action EnabledChanged;
 
 		private bool _hasUpdatingComponentSave;
-		[Exposed]
+
 		public bool HasUpdatingComponent
 		{
 			get {

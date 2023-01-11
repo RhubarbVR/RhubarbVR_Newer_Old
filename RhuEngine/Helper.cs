@@ -51,19 +51,6 @@ namespace RhuEngine
 			return newglobal * global.Inverse;
 		}
 
-		public static string GetFormattedName(this Type type) {
-			if (type == null) {
-				return "Null";
-			}
-			if (type.IsGenericType) {
-				var genericArguments = type.GetGenericArguments()
-									.Select(x => x.Name)
-									.Aggregate((x1, x2) => $"{x1}, {x2}");
-				return $"{type.Name.Substring(0, type.Name.IndexOf("`"))}"
-					 + $" <{genericArguments}>";
-			}
-			return type.Name;
-		}
 		public static unsafe int GetHashCodeSafe(this string s) {
 			if (s == null) {
 				return int.MinValue;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -7,7 +8,22 @@ namespace RNumerics
 {
 	public static class FamcyTypeParser
 	{
-		public static Type PraseType(in string type, Assembly[] asm = null) {
+		public static string GetFormattedName(this Type type) {
+			if (type == null) {
+				return "Null";
+			}
+			if (type.IsGenericType) {
+				var genericArguments = type.GetGenericArguments()
+									.Select(x => x.Name)
+									.Aggregate((x1, x2) => $"{x1}, {x2}");
+				return $"{type.Name.Substring(0, type.Name.IndexOf("`"))}"
+					 + $" <{genericArguments}>";
+			}
+			return type.Name;
+		}
+
+		public static Type PraseType(string type, Assembly[] asm = null) {
+			type = type.Replace(" ", "");
 			asm ??= AppDomain.CurrentDomain.GetAssemblies();
 			return type.Contains('<') && type.Contains('>') ? PraseGeneric(type,asm) : SingleTypeParse(type,asm);
 		}

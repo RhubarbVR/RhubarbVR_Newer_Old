@@ -81,6 +81,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\OpusDotNet\OpusDotNet.csproj" />
 		<ProjectReference Include="..\RhubarbCloudClient\RhubarbCloudClient.csproj" />
+		<ProjectReference Include="..\RhuScript\RhuScript.csproj" />
 		<ProjectReference Include="..\RNumerics\RNumerics.csproj" />
 		<ProjectReference Include="..\SharedModels\SharedModels.csproj" />
 	</ItemGroup>
