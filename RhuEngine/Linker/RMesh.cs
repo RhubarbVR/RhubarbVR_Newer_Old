@@ -105,12 +105,13 @@ namespace RhuEngine.Linker
 
 		public void Dispose() {
 			IsRemoved = true;
-			Inst?.Dispose();
-			Inst = null;
 			foreach (var item in _rMeshAddons) {
 				item.Dispose();
 			}
 			_rMeshAddons.Clear();
+			Inst?.Dispose();
+			Inst = null;
+			GC.SuppressFinalize(this);
 		}
 	}
 }

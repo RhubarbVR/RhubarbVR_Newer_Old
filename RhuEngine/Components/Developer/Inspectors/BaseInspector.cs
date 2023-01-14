@@ -114,6 +114,12 @@ namespace RhuEngine.Components
 
 		}
 
+		public override void Dispose() {
+			IsDestroying = true;
+			CleanUpUI();
+			LocalBind();
+			base.Dispose();
+		}
 
 		private void UIUpdate() {
 			CleanUpUI();

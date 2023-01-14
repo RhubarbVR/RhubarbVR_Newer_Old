@@ -79,6 +79,9 @@ namespace RhuEngine.Components
 				_lastSync.Changed -= Sync_Changed;
 			}
 			_lastSync = null;
+			if (IsDestroying) {
+				return;
+			}
 			if (TargetObject.Target is IChangeable changeable) {
 				changeable.Changed += Sync_Changed;
 				_lastSync = changeable;

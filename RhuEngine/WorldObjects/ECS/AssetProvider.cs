@@ -20,18 +20,19 @@ namespace RhuEngine.WorldObjects.ECS
 		public virtual bool AutoDisposes => true;
 
 		public void Load(A data) {
-			if(AutoDisposes && Value is IDisposable disposable) {
-				disposable.Dispose();
-			}
+			var cache = Value;
 			Value = data;
 			Loaded = data != null;
 			OnAssetLoaded?.Invoke(data);
+			if (AutoDisposes && cache is IDisposable disposable) {
+				RenderThread.ExecuteOnEndOfFrame(disposable.Dispose);
+			}
 		}
 
 		public bool Loaded { get; private set; } = false;
 
 		public override void Dispose() {
-			IsDestroying= true;
+			IsDestroying = true;
 			Load(null);
 			base.Dispose();
 			GC.SuppressFinalize(this);

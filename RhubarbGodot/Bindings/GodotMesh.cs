@@ -566,7 +566,6 @@ namespace RhubarbVR.Bindings
 				LoadedSkin?.ClearBinds();
 			}
 
-
 			foreach (var item in BlendShapeNames) {
 				LoadedMesh.AddBlendShape(item);
 			}
@@ -579,10 +578,22 @@ namespace RhubarbVR.Bindings
 		}
 
 		public void Dispose() {
-			try {
-				LoadedMesh?.Free();
+			//Todo make mesh CleanUP better
+			LoadedSkin?.ClearBinds();
+			LoadedSkin?.Unreference();
+			LoadedSkin = null;
+			LoadedMesh?.ClearSurfaces();
+			LoadedMesh?.ClearBlendShapes();
+			LoadedMesh?.Unreference();
+			LoadedMesh = null;
+			BlendShapeNames = SArray.Empty<string>();
+			BonePos = SArray.Empty<Matrix>();
+			BlendShapes?.Clear();
+			BlendShapes = null;
+			foreach (var item in subMeshes) {
+				item.Item2?.Clear();
 			}
-			catch { }
+			subMeshes = SArray.Empty<(Mesh.PrimitiveType, Array)>();
 		}
 
 		public GodotMesh() {

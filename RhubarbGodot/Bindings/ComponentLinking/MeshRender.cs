@@ -240,6 +240,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			node.Skin = ((GodotMesh)obj.Inst).LoadedSkin;
 			Materials_Changed(null);
 		}
+
 	}
 
 	public sealed class MeshRenderLink : MeshRenderLinkBase<MeshRender>

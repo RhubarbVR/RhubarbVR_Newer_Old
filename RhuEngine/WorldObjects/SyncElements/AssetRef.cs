@@ -23,7 +23,7 @@ namespace RhuEngine.WorldObjects
 			}
 			base.Target.OnAssetLoaded += LoadedCall;
 			if (base.Target.Loaded) {
-				LoadedCall(Target.Value);
+				RenderThread.ExecuteOnEndOfFrame(() => LoadedCall(Target.Value));
 			}
 		}
 
