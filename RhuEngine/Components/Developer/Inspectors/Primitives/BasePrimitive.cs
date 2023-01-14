@@ -37,17 +37,11 @@ namespace RhuEngine.Components
 		}
 
 		public Type GetFieldType() {
-			if (TargetField.Value is null) {
-				return Target.GetValueType();
-			}
-			return StructEditor.GetFielType(Target.GetValueType(),TargetField.Value);
+			return TargetField.Value is null ? Target.GetValueType() : StructEditor.GetFielType(Target.GetValueType(),TargetField.Value);
 		}
 
 		public object GetValue() {
-			if (TargetField.Value is null) {
-				return Target.GetValue();
-			}
-			return StructEditor.GetFieldValue(Target.GetValue(), TargetField.Value);
+			return TargetField.Value is null ? Target.GetValue() : StructEditor.GetFieldValue(Target.GetValue(), TargetField.Value);
 		}
 
 		public void SetCastedValue(TValue value) {

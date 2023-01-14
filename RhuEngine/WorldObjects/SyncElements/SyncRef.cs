@@ -13,6 +13,8 @@ namespace RhuEngine.WorldObjects
 		NetPointer RawPointer { set; }
 
 		NetPointer NetValue { get; set; }
+
+		IWorldObject TargetIWorldObject { get; set; }
 	}
 
 	public class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, INetworkedObject, IChangeable, ISyncMember where T : class, IWorldObject

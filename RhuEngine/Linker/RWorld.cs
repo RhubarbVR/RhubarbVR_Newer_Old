@@ -7,8 +7,6 @@ namespace RhuEngine.Linker
 {
 	public static class RUpdateManager
 	{
-		public const int MAX_UPDATES = 225;
-
 		public static ulong UpdateCount { get; private set; }
 
 		public static readonly Dictionary<object, Action> StartOfFrameExecute = new();
@@ -47,7 +45,7 @@ namespace RhuEngine.Linker
 		public static void RunOnStartOfUpdate() {
 			lock (StartOfFrameExecute) {
 				isStartOfUpdate = true;
-				var startcountlist = Math.Min(StartOfFrameList.Count, MAX_UPDATES);
+				var startcountlist = StartOfFrameList.Count;
 				for (var i = 0; i < startcountlist; i++) {
 					try {
 						StartOfFrameList[0].Invoke();
@@ -106,7 +104,7 @@ namespace RhuEngine.Linker
 			lock (EndOfFrameExecute) {
 				isEndOfFrame = true;
 				UpdateCount++;
-				var startcountlist = Math.Min(EndOfFrameList.Count, MAX_UPDATES);
+				var startcountlist = EndOfFrameList.Count;
 				for (var i = 0; i < startcountlist; i++) {
 					try {
 						EndOfFrameList[0].Invoke();

@@ -54,13 +54,17 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public readonly Sync<bool> CollisionEnabled;
 
-		[Default(EPhysicsMask.WorldObjects)]
 		[OnChanged(nameof(MaskUpdate))]
 		public readonly Sync<EPhysicsMask> Group;
 
-		[Default(EPhysicsMask.WorldObjects)]
 		[OnChanged(nameof(MaskUpdate))]
 		public readonly Sync<EPhysicsMask> Mask;
+
+		protected override void FirstCreation() {
+			base.FirstCreation();
+			Group.Value = EPhysicsMask.WorldObjects;
+			Mask.Value = EPhysicsMask.WorldObjects;
+		}
 
 		[Default(RCursorShape.Arrow)]
 		public readonly Sync<RCursorShape> CursorShape;

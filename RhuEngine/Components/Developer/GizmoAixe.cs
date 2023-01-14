@@ -33,7 +33,6 @@ namespace RhuEngine.Components
 	{
 		public readonly Sync<GizmoDir> Direction;
 		[OnChanged(nameof(UpdateMeshes))]
-		[Default(GizmoMode.All)]
 		public readonly Sync<GizmoMode> Mode;
 		[OnChanged(nameof(UpdateMeshes))]
 		public readonly Linker<bool> Rotation;
@@ -61,7 +60,10 @@ namespace RhuEngine.Components
 		public readonly SyncRef<PhysicsObject> ScaleColliderTarget;
 		public readonly SyncRef<PhysicsObject> Scale2ColliderTarget;
 		public readonly SyncRef<PhysicsObject> PositionColliderTarget;
-
+		protected override void FirstCreation() {
+			base.FirstCreation();
+			Mode.Value = GizmoMode.All;
+		}
 		public float PosStep => Gizmo3DTarget.Target?.PosStep.Value ?? 0f;
 		public float AngleStep => Gizmo3DTarget.Target?.AngleStep.Value ?? 0f;
 		public float ScaleStep => Gizmo3DTarget.Target?.ScaleStep.Value ?? 0f;

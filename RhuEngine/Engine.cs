@@ -347,6 +347,8 @@ namespace RhuEngine
 
 		public void Step() {
 			if (EngineStarting) {
+				RUpdateManager.RunOnStartOfUpdate();
+				RUpdateManager.RunOnEndOfUpdate();
 				RenderThread.RunOnStartOfFrame();
 				if (EngineLink.CanRender) {
 					try {
@@ -375,8 +377,8 @@ namespace RhuEngine
 				RenderThread.RunOnEndOfFrame();
 				return;
 			}
-			RenderThread.RunOnStartOfFrame();
 			GameStep();
+			RenderThread.RunOnStartOfFrame();
 			RenderStep();
 			RenderThread.RunOnEndOfFrame();
 		}

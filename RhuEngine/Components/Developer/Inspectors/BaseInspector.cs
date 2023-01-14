@@ -34,6 +34,9 @@ namespace RhuEngine.Components
 				}
 				return typeof(PrimitiveEditor);
 			}
+			if (type.IsAssignableTo(typeof(ISyncRef))) {
+				return typeof(SyncRefInspector<>).MakeGenericType(type);
+			}
 			return typeof(WorldObjectInspector);
 		}
 

@@ -12,7 +12,6 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Developer" })]
 	public sealed class WorldGizmo3D : Component
 	{
-		[Default(GizmoMode.All)]
 		[OnChanged(nameof(UpdateModeData))]
 		public readonly Sync<GizmoMode> Mode;
 
@@ -39,7 +38,10 @@ namespace RhuEngine.Components
 		public readonly Sync<float> AngleStep;
 
 		private Gizmo3D _privateGizmo;
-
+		protected override void FirstCreation() {
+			base.FirstCreation();
+			Mode.Value = GizmoMode.All;
+		}
 		[Exposed]
 		public void SetUpWithEntity(Entity entity) {
 			if (entity is null) {

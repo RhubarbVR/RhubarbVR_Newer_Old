@@ -19,7 +19,6 @@ namespace RhuEngine.Components
 		public readonly Sync<GizmoDir> Direction;
 
 		[OnChanged(nameof(UpdateMeshes))]
-		[Default(GizmoMode.All)]
 		public readonly Sync<GizmoMode> Mode;
 		[OnChanged(nameof(UpdateMeshes))]
 		public readonly Linker<bool> Position;
@@ -37,7 +36,10 @@ namespace RhuEngine.Components
 		public Vector3f StartData;
 		public bool isInPos;
 		private Handed _handed;
-
+		protected override void FirstCreation() {
+			base.FirstCreation();
+			Mode.Value = GizmoMode.All;
+		}
 		protected override void Step() {
 			base.Step();
 			if (Gizmo3DTarget.Target?.GetIfOtherIsActive(this) ?? false) {

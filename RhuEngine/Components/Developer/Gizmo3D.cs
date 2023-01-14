@@ -14,7 +14,6 @@ namespace RhuEngine.Components
 	public sealed class Gizmo3D : Component
 	{
 		public const float ALPHA = 0.8f;
-		[Default(GizmoMode.All)]
 		public readonly Sync<GizmoMode> Mode;
 		public readonly Sync<bool> UseLocalRot;
 
@@ -46,6 +45,11 @@ namespace RhuEngine.Components
 
 		[Default(0.15f)]
 		public readonly Sync<float> TargetSize;
+
+		protected override void FirstCreation() {
+			base.FirstCreation();
+			Mode.Value = GizmoMode.All;
+		}
 
 		public bool GetIfOtherIsActive(Component component) {
 			var isActive = false;

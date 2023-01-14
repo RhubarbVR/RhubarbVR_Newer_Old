@@ -2,7 +2,7 @@
   "profiles": {
     "RhubarbPostProcessor": {
       "commandName": "Project",
-      "commandLineArgs": "../../../../RhuEngine/bin/Debug/netstandard2.0/RhuEngineDebug.dll\r\n../../../../Rhubarb_VR_HeadLess/bin/Release/net6.0/"
+      "commandLineArgs": "../../../../RhuEngine/bin/Release/net6.0/RhuEngine.dll\r\n../../../../RhuEngine/bin/Release/net6.0/"
     }
   }
 }

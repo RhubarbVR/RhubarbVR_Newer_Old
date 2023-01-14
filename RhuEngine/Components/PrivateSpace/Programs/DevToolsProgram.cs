@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Assimp;
@@ -50,8 +51,10 @@ namespace RhuEngine.Components
 		public readonly SyncRef<ValueMultiDriver<GizmoMode>> Drive;
 		public readonly SyncRef<Button> _single;
 		public readonly SyncRef<Button> _multi;
-
-		[Default(GizmoMode.All)]
+		protected override void FirstCreation() {
+			base.FirstCreation();
+			Mode.Value = GizmoMode.All;
+		}
 		public readonly Sync<GizmoMode> Mode;
 
 		public readonly Sync<bool> MultiSelect;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 
@@ -16,36 +17,62 @@ namespace RhuPostProcessor
 		}
 
 		public static Instruction GetInstructionForEvaluationStack(this object obj) {
-			if(obj.GetType() == typeof(CustomAttributeArgument)) {
+			if (obj.GetType() == typeof(CustomAttributeArgument)) {
 				obj = ((CustomAttributeArgument)obj).Value;
 			}
-			return obj.GetType() == typeof(int)
-				? Instruction.Create(OpCodes.Ldc_I4,(int)obj)
-				: obj.GetType() == typeof(uint)
-				? Instruction.Create(OpCodes.Ldc_I4_S, (uint)obj)
-				: obj.GetType() == typeof(bool)
-				? (bool)obj ? Instruction.Create(OpCodes.Ldc_I4_1) : Instruction.Create(OpCodes.Ldc_I4_0)
-				: obj.GetType() == typeof(char)
-				? Instruction.Create(OpCodes.Ldc_I4_S,(uint)obj)
-				: obj.GetType() == typeof(string)
-				? Instruction.Create(OpCodes.Ldstr,(string)obj)
-				: obj.GetType() == typeof(float)
-				? Instruction.Create(OpCodes.Ldc_R4,(float)obj)
-				: obj.GetType() == typeof(double)
-				? Instruction.Create(OpCodes.Ldc_R8, (double)obj)
-				: obj.GetType() == typeof(long)
-				? Instruction.Create(OpCodes.Ldc_I8,(long)obj)
-				: obj.GetType() == typeof(ulong)
-				? Instruction.Create(OpCodes.Ldc_I8, (ulong)obj)
-				: obj.GetType() == typeof(byte)
-				? Instruction.Create(OpCodes.Ldc_I4, (int)obj)
-				: obj.GetType() == typeof(sbyte)
-				? Instruction.Create(OpCodes.Ldc_I4_S, (uint)obj)
-				: obj.GetType() == typeof(short)
-				? Instruction.Create(OpCodes.Ldc_I4_S, (uint)obj)
-				: obj.GetType() == typeof(ushort)
-				? Instruction.Create(OpCodes.Ldc_I4, (int)obj)
-				:         throw new Exception($"Type {obj.GetType().Name} is not set up to be added to evaluationStack");
+			Console.WriteLine(obj.GetType().ToString());
+			if (obj.GetType() == typeof(int)) {
+				return Instruction.Create(OpCodes.Ldc_I4, (int)obj);
+			}
+			else {
+				if (obj.GetType() == typeof(uint)) {
+					return Instruction.Create(OpCodes.Ldc_I4_S, (int)obj);
+				}
+				else {
+					if (obj.GetType() == typeof(bool)) {
+						return (bool)obj ? Instruction.Create(OpCodes.Ldc_I4_1) : Instruction.Create(OpCodes.Ldc_I4_0);
+					}
+					else {
+
+						if (obj.GetType() == typeof(string)) {
+							return Instruction.Create(OpCodes.Ldstr, (string)obj);
+						}
+						else {
+							if (obj.GetType() == typeof(float)) {
+								return Instruction.Create(OpCodes.Ldc_R4, (float)obj);
+							}
+							else {
+								if (obj.GetType() == typeof(double)) {
+									return Instruction.Create(OpCodes.Ldc_R8, (double)obj);
+								}
+								else {
+									if (obj.GetType() == typeof(long)) {
+										return Instruction.Create(OpCodes.Ldc_I8, (long)obj);
+									}
+									else {
+										if (obj.GetType() == typeof(ulong)) {
+											return Instruction.Create(OpCodes.Ldc_I8, (long)obj);
+										}
+										else {
+											if (obj.GetType() == typeof(sbyte)) {
+												return Instruction.Create(OpCodes.Ldc_I4, (int)obj);
+											}
+											else {
+												if (obj.GetType() == typeof(short)) {
+													return Instruction.Create(OpCodes.Ldc_I4_S, (int)obj);
+												}
+												else {
+													throw new Exception($"Type {obj.GetType().Name} is not set up to be added to evaluationStack");
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 		public static MethodReference MakeHostInstanceGeneric(this MethodReference self, TypeReference genericType) {
 			var methodReference = new MethodReference(self.Name, self.ReturnType, genericType) {
@@ -61,14 +88,14 @@ namespace RhuPostProcessor
 			}
 			return methodReference;
 		}
-	
+
 		public static IEnumerable<MethodDefinition> GetConstructors(this TypeDefinition self) {
 			return self == null
-				?               throw new ArgumentNullException(nameof(self))
+				? throw new ArgumentNullException(nameof(self))
 				: !self.HasMethods ? (IEnumerable<MethodDefinition>)Array.Empty<MethodDefinition>() : self.Methods.Where((MethodDefinition method) => method.IsConstructor);
 		}
 
-		public static MethodReference GetConstructor(this TypeReference type, ModuleDefinition module, out bool isMethodCall,bool AllowPrams = false) {
+		public static MethodReference GetConstructor(this TypeReference type, ModuleDefinition module, out bool isMethodCall, bool AllowPrams = false) {
 			try {
 				if (type.IsGenericParameter) {
 					MethodReference result = module.ImportReference(typeof(Activator)).Resolve().Methods.First((MethodDefinition m) => m.Name == "CreateInstance" && m.HasGenericParameters && !m.HasParameters).MakeGenericMethodType(type);
@@ -132,7 +159,7 @@ namespace RhuPostProcessor
 			foreach (var item in resolvedSelf.Methods) {
 				yield return item;
 			}
-			if(resolvedSelf.BaseType != null) {
+			if (resolvedSelf.BaseType != null) {
 				foreach (var item in resolvedSelf.BaseType.AllMethods()) {
 					yield return item;
 				}
