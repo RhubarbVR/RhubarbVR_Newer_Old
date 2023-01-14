@@ -86,15 +86,15 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				var id = item.Key;
 
 
-				var buttonMask = MouseButton.None;
+				var buttonMask = (MouseButtonMask)0;
 				if (value.IsClickedPrime) {
-					buttonMask |= MouseButton.MaskLeft;
+					buttonMask |= MouseButtonMask.Left;
 				}
 				if (value.IsClickedSecod) {
-					buttonMask |= MouseButton.MaskRight;
+					buttonMask |= MouseButtonMask.Right;
 				}
 				if (value.IsClickedTur) {
-					buttonMask |= MouseButton.MaskMiddle;
+					buttonMask |= MouseButtonMask.Middle;
 				}
 				var inputMove = new InputEventMouseMotion {
 					Position = new Vector2(value.Pos.x, value.Pos.y),
@@ -164,7 +164,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					var primeinputButton = new InputEventMouseButton {
 						Device = id,
 						ButtonIndex = MouseButton.Left,
-						ButtonMask = MouseButton.MaskLeft,
+						ButtonMask = MouseButtonMask.Left,
 						Pressed = value.IsClickedPrime,
 						DoubleClick = value.IsClickedPrimeTimeStateChange <= TIME_FOR_DOUBLE_CLICK,
 						Position = new Vector2(value.Pos.x, value.Pos.y),
@@ -180,7 +180,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					var secinputButton = new InputEventMouseButton {
 						Device = id,
 						ButtonIndex = MouseButton.Right,
-						ButtonMask = MouseButton.MaskRight,
+						ButtonMask = MouseButtonMask.Right,
 						Pressed = value.IsClickedSecod,
 						DoubleClick = value.IsClickedSecodTimeStateChange <= TIME_FOR_DOUBLE_CLICK,
 						Position = new Vector2(value.Pos.x, value.Pos.y),
@@ -197,7 +197,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					var turinputButton = new InputEventMouseButton {
 						Device = id,
 						ButtonIndex = MouseButton.Middle,
-						ButtonMask = MouseButton.MaskMiddle,
+						ButtonMask = MouseButtonMask.Middle,
 						Pressed = value.IsClickedTur,
 						DoubleClick = value.IsClickedTurTimeStateChange <= TIME_FOR_DOUBLE_CLICK,
 						Position = new Vector2(value.Pos.x, value.Pos.y),

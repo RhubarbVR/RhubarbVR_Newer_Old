@@ -285,7 +285,7 @@ namespace RhuEngine.Components
 					Icon.MinSize.Value = new Vector2i(65);
 					var asset = Icon.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 					Icon.Texture.Target = asset;
-					Icon.IgnoreTextureSize.Value = true;
+					Icon.ExpandedMode.Value = RExpandedMode.IgnoreSize;
 					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
 					asset.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Archive));
 
@@ -357,7 +357,7 @@ namespace RhuEngine.Components
 					Icon.MinSize.Value = new Vector2i(65);
 					var asset = Icon.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 					Icon.Texture.Target = asset;
-					Icon.IgnoreTextureSize.Value = true;
+					Icon.ExpandedMode.Value = RExpandedMode.IgnoreSize;
 					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
 					asset.LoadAsset(item.Texture);
 					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<LineEdit>();
@@ -392,7 +392,7 @@ namespace RhuEngine.Components
 					Icon.MinSize.Value = new Vector2i(65);
 					var asset = Icon.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 					Icon.Texture.Target = asset;
-					Icon.IgnoreTextureSize.Value = true;
+					Icon.ExpandedMode.Value = RExpandedMode.IgnoreSize;
 					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
 					asset.LoadAsset(item.Texture);
 					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<LineEdit>();
@@ -468,7 +468,7 @@ namespace RhuEngine.Components
 					Icon.MinSize.Value = new Vector2i(45);
 					var asset = Icon.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 					Icon.Texture.Target = asset;
-					Icon.IgnoreTextureSize.Value = true;
+					Icon.ExpandedMode.Value = RExpandedMode.IgnoreSize;
 					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
 					asset.LoadAsset(item.Texture);
 					var itemData = boxButtonCon.Entity.AddChild("Name").AttachComponent<LineEdit>();
@@ -516,7 +516,7 @@ namespace RhuEngine.Components
 					Icon.MinSize.Value = new Vector2i(45);
 					var asset = Icon.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 					Icon.Texture.Target = asset;
-					Icon.IgnoreTextureSize.Value = true;
+					Icon.ExpandedMode.Value = RExpandedMode.IgnoreSize;
 					Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
 					asset.LoadAsset(item.Texture);
 

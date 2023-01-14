@@ -44,7 +44,7 @@ public partial class ConnectedViewport : TextureRect
 
 	public override void _Ready() {
 		base._Ready();
-		IgnoreTextureSize = true;
+		ExpandMode = ExpandModeEnum.IgnoreSize;
 		StretchMode = StretchModeEnum.Keep;
 		MouseEntered += ConnectedViewport_MouseEntered;
 		MouseExited += ConnectedViewport_MouseExited;

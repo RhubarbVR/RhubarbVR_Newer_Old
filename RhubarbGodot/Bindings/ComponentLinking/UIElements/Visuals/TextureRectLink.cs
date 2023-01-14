@@ -21,7 +21,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public override void StartContinueInit() {
 
 			LinkedComp.Texture.LoadChange += Texture_LoadChange;
-			LinkedComp.IgnoreTextureSize.Changed += IgnoreTextureSize_Changed;
+			LinkedComp.ExpandedMode.Changed += IgnoreTextureSize_Changed;
 			LinkedComp.StrechMode.Changed += StrechMode_Changed;
 			LinkedComp.FlipVertical.Changed += FlipVertical_Changed;
 			LinkedComp.FlipHorizontal.Changed += FlipHorizontal_Changed;
@@ -57,7 +57,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void IgnoreTextureSize_Changed(IChangeable obj) {
-			node.IgnoreTextureSize = LinkedComp.IgnoreTextureSize.Value;
+			node.ExpandMode = (Godot.TextureRect.ExpandModeEnum)LinkedComp.ExpandedMode.Value;
 		}
 	}
 }

@@ -80,7 +80,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					default:
 						break;
 				}
-				if ((mouse.ButtonMask & node.ButtonMask) == MouseButton.None) {
+				if ((mouse.ButtonMask & node.ButtonMask) == 0) {
 					return;
 				}
 				LinkedComp.LastHanded = GetSideFromMouseID(mouse.Device);
@@ -121,15 +121,15 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void ButtonMask_Changed(IChangeable obj) {
-			var mask = MouseButton.None;
+			var mask = (MouseButtonMask)0;
 			if ((LinkedComp.ButtonMask.Value & RButtonMask.Primary) != RButtonMask.None) {
-				mask |= MouseButton.MaskLeft;
+				mask |= MouseButtonMask.Left;
 			}
 			if ((LinkedComp.ButtonMask.Value & RButtonMask.Secondary) != RButtonMask.None) {
-				mask |= MouseButton.MaskRight;
+				mask |= MouseButtonMask.Right;
 			}
 			if ((LinkedComp.ButtonMask.Value & RButtonMask.Tertiary) != RButtonMask.None) {
-				mask |= MouseButton.MaskMiddle;
+				mask |= MouseButtonMask.Middle;
 			}
 			node.ButtonMask = mask;
 		}

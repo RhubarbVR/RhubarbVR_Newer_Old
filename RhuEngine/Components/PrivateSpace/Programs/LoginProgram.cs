@@ -192,7 +192,7 @@ namespace RhuEngine.Components
 				_loadingImg = boxRoot.AddChild("Img").AttachComponent<TextureRect>();
 				_loadingImg.HorizontalFilling.Value = RFilling.ShrinkCenter | RFilling.Expand;
 				_loadingImg.Texture.Target = _loadingImg.Entity.AttachComponent<RhubarbLogo>();
-				_loadingImg.IgnoreTextureSize.Value = true;
+				_loadingImg.ExpandedMode.Value = RExpandedMode.IgnoreSize;
 				_loadingImg.StrechMode.Value = RStrechMode.KeepAspectCenter;
 				_loadingImg.MinSize.Value = new Vector2i(100);
 				_lastUpdate = 6;
@@ -323,7 +323,7 @@ namespace RhuEngine.Components
 				var loadingImg = boxRoot.AddChild("Img").AttachComponent<TextureRect>();
 				loadingImg.HorizontalFilling.Value = RFilling.ShrinkCenter | RFilling.Expand;
 				loadingImg.Texture.Target = loadingImg.Entity.AttachComponent<RhubarbLogo>();
-				loadingImg.IgnoreTextureSize.Value = true;
+				loadingImg.ExpandedMode.Value = RExpandedMode.IgnoreSize;
 				loadingImg.StrechMode.Value = RStrechMode.KeepAspectCenter;
 				loadingImg.MinSize.Value = new Vector2i(100);
 				_lastUpdate = 6;

@@ -126,7 +126,7 @@ namespace RhuEngine.Components
 			tex.Texture.Target = closeIcon;
 			tex.InputFilter.Value = RInputFilter.Ignore;
 			closeIcon.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Close));
-			tex.IgnoreTextureSize.Value = true;
+			tex.ExpandedMode.Value = RExpandedMode.IgnoreSize;
 			tex.StrechMode.Value = RStrechMode.KeepAspectCenter;
 			tex.MinOffset.Value = new Vector2f(-3);
 			tex.MaxOffset.Value = new Vector2f(3);

@@ -17,11 +17,20 @@ namespace RhuEngine.Components
 		KeepAspectCovered,
 	}
 
+	public enum RExpandedMode {
+		KeepSize,
+		IgnoreSize,
+		FitWidth,
+		FitWidthProportional,
+		FitHeight,
+		FitHeightProportional,
+	}
+
 	[Category("UI/Container/Visuals")]
 	public class TextureRect : UIVisuals
 	{
 		public readonly AssetRef<RTexture2D> Texture;
-		public readonly Sync<bool> IgnoreTextureSize;
+		public readonly Sync<RExpandedMode> ExpandedMode;
 		public readonly Sync<RStrechMode> StrechMode;
 		public readonly Sync<bool> FlipVertical;
 		public readonly Sync<bool> FlipHorizontal;

@@ -110,7 +110,7 @@ namespace RhuEngine.Components
 				sessionelement.MinSize.Value = new Vector2i(250, 220);
 				var Icon = sessionelement.Entity.AddChild("Icon").AttachComponent<TextureRect>();
 				Icon.InputFilter.Value = RInputFilter.Ignore;
-				Icon.IgnoreTextureSize.Value = true;
+				Icon.ExpandedMode.Value = RExpandedMode.IgnoreSize;
 				Icon.StrechMode.Value = RStrechMode.KeepAspectCenter;
 				Icon.MaxOffset.Value = new Vector2f(0, -20);
 				var recture = Icon.Entity.AttachComponent<StaticTexture>();

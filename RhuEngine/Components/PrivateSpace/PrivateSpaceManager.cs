@@ -191,7 +191,7 @@ namespace RhuEngine.Components
 			IconTexRender.Min.Value = new Vector2f(0.5f, 0.5f) - (size / 2);
 			IconTexRender.Max.Value = new Vector2f(0.5f, 0.5f) + (size / 2);
 			IconTexRender.StrechMode.Value = RStrechMode.KeepAspectCenter;
-			IconTexRender.IgnoreTextureSize.Value = true;
+			IconTexRender.ExpandedMode.Value = RExpandedMode.IgnoreSize;
 			Entity.AttachComponent<IsInVR>().isNotVR.Target = screen.enabled;
 			IconTexRender.Texture.Target = CurrsorTexture = IconTexRender.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
 			CursorIcon = RhubarbAtlasSheet.RhubarbIcons.Cursor;

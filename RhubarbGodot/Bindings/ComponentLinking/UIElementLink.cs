@@ -264,11 +264,11 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void VerticalFilling_Changed(IChangeable obj) {
-			node.SizeFlagsVertical = (int)LinkedComp.VerticalFilling.Value;
+			node.SizeFlagsVertical = (SizeFlags)LinkedComp.VerticalFilling.Value;
 		}
 
 		private void HorizontalFilling_Changed(IChangeable obj) {
-			node.SizeFlagsHorizontal = (int)LinkedComp.HorizontalFilling.Value;
+			node.SizeFlagsHorizontal = (SizeFlags)LinkedComp.HorizontalFilling.Value;
 		}
 
 		private void PivotOffset_Changed(IChangeable obj) {

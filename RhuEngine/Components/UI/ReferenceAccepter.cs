@@ -40,7 +40,7 @@ namespace RhuEngine.Components.UI
 			main.ButtonMask.Value = RButtonMask.Primary | RButtonMask.Secondary;
 			main.ButtonUp.Target = OnButtonUp;
 			var Label = main.Entity.AddChild("DropIcon").AttachComponent<TextureRect>();
-			Label.IgnoreTextureSize.Value = true;
+			Label.ExpandedMode.Value = RExpandedMode.IgnoreSize;
 			Label.StrechMode.Value = RStrechMode.KeepAspectCenter;
 			var texture = main.Entity.AttachComponent<SingleIconTex>();
 			texture.Icon.Value = RhubarbAtlasSheet.RhubarbIcons.Plus;
