@@ -90,7 +90,7 @@ namespace RhuEngine.Components
 			if (!Engine.EngineLink.InVR) {
 				return;
 			}
-			RUpdateManager.ExecuteOnStartOfFrame(() => {
+			RUpdateManager.ExecuteOnStartOfUpdate(() => {
 				var pos = InputManager.XRInputSystem.GetHand(Side.Value)?[TrackerPos.Aim];
 				Entity.rotation.Value = pos.Rotation;
 				Entity.position.Value = pos.Position;

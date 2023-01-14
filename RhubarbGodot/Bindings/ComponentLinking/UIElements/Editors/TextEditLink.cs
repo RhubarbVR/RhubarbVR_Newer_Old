@@ -11,6 +11,7 @@ using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
 using static System.Net.Mime.MediaTypeNames;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -89,134 +90,136 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Language_Changed(IChangeable obj) {
-			node.Language = LinkedComp.Language.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Language = LinkedComp.Language.Value);
 		}
 
 		private void TextDir_Changed(IChangeable obj) {
-			node.TextDirection = LinkedComp.TextDir.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextDirection = LinkedComp.TextDir.Value switch {
 				RTextDirection.Auto => TextDirection.Auto,
 				RTextDirection.Ltr => TextDirection.Ltr,
 				RTextDirection.Rtl => TextDirection.Rtl,
 				_ => TextDirection.Inherited,
-			};
+			});
 		}
 
 		private void MidGrapheme_Changed(IChangeable obj) {
-			node.CaretMidGrapheme = LinkedComp.MidGrapheme.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.CaretMidGrapheme = LinkedComp.MidGrapheme.Value);
 		}
 
 		private void MoveOnRightClick_Changed(IChangeable obj) {
-			node.CaretMoveOnRightClick = LinkedComp.MoveOnRightClick.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.CaretMoveOnRightClick = LinkedComp.MoveOnRightClick.Value);
 		}
 
 		private void BlinkInterval_Changed(IChangeable obj) {
-			node.CaretBlinkInterval = LinkedComp.BlinkInterval.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.CaretBlinkInterval = LinkedComp.BlinkInterval.Value);
 		}
 
 		private void CaretBlink_Changed(IChangeable obj) {
-			node.CaretBlink = LinkedComp.CaretBlink.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.CaretBlink = LinkedComp.CaretBlink.Value);
 		}
 
 		private void LineCaret_Changed(IChangeable obj) {
-			node.CaretType = LinkedComp.LineCaret.Value ? Godot.TextEdit.CaretTypeEnum.Line : Godot.TextEdit.CaretTypeEnum.Block;
+			RenderThread.ExecuteOnEndOfFrame(() => node.CaretType = LinkedComp.LineCaret.Value ? Godot.TextEdit.CaretTypeEnum.Line : Godot.TextEdit.CaretTypeEnum.Block);
 		}
 
 		private void MiniMapWidth_Changed(IChangeable obj) {
-			node.MinimapWidth = LinkedComp.MiniMapWidth.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.MinimapWidth = LinkedComp.MiniMapWidth.Value);
 		}
 
 		private void MiniMap_Changed(IChangeable obj) {
-			node.MinimapDraw = LinkedComp.MiniMap.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.MinimapDraw = LinkedComp.MiniMap.Value);
 		}
 
 		private void FitContentHight_Changed(IChangeable obj) {
-			node.ScrollFitContentHeight = LinkedComp.FitContentHight.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollFitContentHeight = LinkedComp.FitContentHight.Value);
 		}
 
 		private void HorizontalScroll_Changed(IChangeable obj) {
-			node.ScrollHorizontal = LinkedComp.HorizontalScroll.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollHorizontal = LinkedComp.HorizontalScroll.Value);
 		}
 
 		private void VerticalScroll_Changed(IChangeable obj) {
-			node.ScrollVertical = LinkedComp.VerticalScroll.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollVertical = LinkedComp.VerticalScroll.Value);
 		}
 
 		private void ScrollPashEndOfFile_Changed(IChangeable obj) {
-			node.ScrollPastEndOfFile = LinkedComp.ScrollPashEndOfFile.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollPastEndOfFile = LinkedComp.ScrollPashEndOfFile.Value);
 		}
 
 		private void VScrollSpeed_Changed(IChangeable obj) {
-			node.ScrollVScrollSpeed = LinkedComp.VScrollSpeed.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollVScrollSpeed = LinkedComp.VScrollSpeed.Value);
 		}
 
 		private void SmoothScroll_Changed(IChangeable obj) {
-			node.ScrollSmooth = LinkedComp.SmoothScroll.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollSmooth = LinkedComp.SmoothScroll.Value);
 		}
 
 		private void DrawSpaces_Changed(IChangeable obj) {
-			node.DrawSpaces = LinkedComp.DrawSpaces.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.DrawSpaces = LinkedComp.DrawSpaces.Value);
 		}
 
 		private void DrawTabs_Changed(IChangeable obj) {
-			node.DrawTabs = LinkedComp.DrawTabs.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.DrawTabs = LinkedComp.DrawTabs.Value);
 		}
 
 		private void DrawControlChars_Changed(IChangeable obj) {
-			node.DrawControlChars = LinkedComp.DrawControlChars.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.DrawControlChars = LinkedComp.DrawControlChars.Value);
 		}
 
 		private void HighlightCurrentLine_Changed(IChangeable obj) {
-			node.HighlightCurrentLine = LinkedComp.HighlightCurrentLine.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.HighlightCurrentLine = LinkedComp.HighlightCurrentLine.Value);
 		}
 
 		private void HighlightAllOccurrences_Changed(IChangeable obj) {
-			node.HighlightAllOccurrences = LinkedComp.HighlightAllOccurrences.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.HighlightAllOccurrences = LinkedComp.HighlightAllOccurrences.Value);
 		}
 
 		private void WrapText_Changed(IChangeable obj) {
-			node.WrapMode = LinkedComp.WrapText ? Godot.TextEdit.LineWrappingMode.None : Godot.TextEdit.LineWrappingMode.Boundary;
+			RenderThread.ExecuteOnEndOfFrame(() => node.WrapMode = LinkedComp.WrapText ? Godot.TextEdit.LineWrappingMode.None : Godot.TextEdit.LineWrappingMode.Boundary);
 		}
 
 		private void MiddleMousePasteEnabled_Changed(IChangeable obj) {
-			node.MiddleMousePasteEnabled = LinkedComp.MiddleMousePasteEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.MiddleMousePasteEnabled = LinkedComp.MiddleMousePasteEnabled.Value);
 		}
 
 		private void VirtualKeyboardEnabled_Changed(IChangeable obj) {
-			node.VirtualKeyboardEnabled = LinkedComp.MiddleMousePasteEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.VirtualKeyboardEnabled = LinkedComp.MiddleMousePasteEnabled.Value);
 		}
 
 		private void DragAndDropSelectionEnabled_Changed(IChangeable obj) {
-			node.DragAndDropSelectionEnabled = LinkedComp.DragAndDropSelectionEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.DragAndDropSelectionEnabled = LinkedComp.DragAndDropSelectionEnabled.Value);
 		}
 
 		private void DeselectingOnFocusLossEnabled_Changed(IChangeable obj) {
-			node.DeselectOnFocusLossEnabled = LinkedComp.DeselectingOnFocusLossEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.DeselectOnFocusLossEnabled = LinkedComp.DeselectingOnFocusLossEnabled.Value);
 		}
 
 		private void SelectingEnabled_Changed(IChangeable obj) {
-			node.SelectingEnabled = LinkedComp.SelectingEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.SelectingEnabled = LinkedComp.SelectingEnabled.Value);
 		}
 
 		private void ShortcutKeysEnabled_Changed(IChangeable obj) {
-			node.ShortcutKeysEnabled = LinkedComp.ShortcutKeysEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ShortcutKeysEnabled = LinkedComp.ShortcutKeysEnabled.Value);
 		}
 
 		private void ContectMenuEnabled_Changed(IChangeable obj) {
-			node.ContextMenuEnabled = LinkedComp.ContectMenuEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ContextMenuEnabled = LinkedComp.ContectMenuEnabled.Value);
 		}
 
 		private void Editable_Changed(IChangeable obj) {
-			node.Editable = LinkedComp.Editable.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Editable = LinkedComp.Editable.Value);
 		}
 
 		private void PlaceHolderText_Changed(IChangeable obj) {
-			node.PlaceholderText = LinkedComp.PlaceHolderText.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.PlaceholderText = LinkedComp.PlaceHolderText.Value);
 		}
 
 		private void Text_Changed(IChangeable obj) {
-			if (node.Text != LinkedComp.Text.Value) {
-				node.Text = LinkedComp.Text.Value;
-			}
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node.Text != LinkedComp.Text.Value) {
+					node.Text = LinkedComp.Text.Value;
+				}
+			});
 		}
 	}
 

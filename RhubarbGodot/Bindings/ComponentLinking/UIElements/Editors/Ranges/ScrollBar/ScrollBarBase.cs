@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking { 
 	public abstract class ScrollBarBase<T, T2> : RangeBase<T, T2> where T : RhuEngine.Components.ScrollBar, new() where T2 : Godot.ScrollBar, new()
@@ -21,7 +22,7 @@ namespace RhubarbVR.Bindings.ComponentLinking {
 		}
 
 		private void CustomStep_Changed(IChangeable obj) {
-			node.CustomStep = LinkedComp.CustomStep.Value;
+			RenderThread.ExecuteOnEndOfFrame(() =>node.CustomStep = LinkedComp.CustomStep.Value);
 		}
 	}
 }

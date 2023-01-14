@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -23,7 +24,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Vertical_Changed(IChangeable obj) {
-			node.Vertical = LinkedComp.Vertical.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Vertical = LinkedComp.Vertical.Value);
 		}
 	}
 }

@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using RhuEngine.Linker;
+
 namespace RhuEngine
 {
 	public static class RenderThread
 	{
+		public const int MAX_UPDATES = 225;
+
 		public static ulong UpdateCount { get; private set; }
 
 		public static readonly Dictionary<object, Action> StartOfFrameExecute = new();
@@ -45,7 +49,7 @@ namespace RhuEngine
 		public static void RunOnStartOfFrame() {
 			lock (StartOfFrameExecute) {
 				isStartOfFrame = true;
-				var startcountlist = StartOfFrameList.Count;
+				var startcountlist = Math.Min(StartOfFrameList.Count, MAX_UPDATES);
 				for (var i = 0; i < startcountlist; i++) {
 					try {
 						StartOfFrameList[0].Invoke();
@@ -104,7 +108,7 @@ namespace RhuEngine
 			lock (EndOfFrameExecute) {
 				isEndOfFrame = true;
 				UpdateCount++;
-				var startcountlist = EndOfFrameList.Count;
+				var startcountlist = Math.Min(EndOfFrameList.Count, MAX_UPDATES);
 				for (var i = 0; i < startcountlist; i++) {
 					try {
 						EndOfFrameList[0].Invoke();

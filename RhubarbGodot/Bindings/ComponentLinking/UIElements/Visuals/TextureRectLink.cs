@@ -11,6 +11,7 @@ using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
 using RhubarbVR.Bindings.TextureBindings;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -33,19 +34,19 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Texture_LoadChange(RTexture2D obj) {
-			node.Texture = LinkedComp.Texture?.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Texture = LinkedComp.Texture?.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null);
 		}
 
 		private void FlipHorizontal_Changed(IChangeable obj) {
-			node.FlipH = LinkedComp.FlipHorizontal.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.FlipH = LinkedComp.FlipHorizontal.Value);
 		}
 
 		private void FlipVertical_Changed(IChangeable obj) {
-			node.FlipV = LinkedComp.FlipVertical.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.FlipV = LinkedComp.FlipVertical.Value);
 		}
 
 		private void StrechMode_Changed(IChangeable obj) {
-			node.StretchMode = LinkedComp.StrechMode.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.StretchMode = LinkedComp.StrechMode.Value switch {
 				RStrechMode.Tile => Godot.TextureRect.StretchModeEnum.Tile,
 				RStrechMode.Keep => Godot.TextureRect.StretchModeEnum.Keep,
 				RStrechMode.KeepCenter => Godot.TextureRect.StretchModeEnum.KeepCentered,
@@ -53,11 +54,11 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				RStrechMode.KeepAspectCenter => Godot.TextureRect.StretchModeEnum.KeepAspectCentered,
 				RStrechMode.KeepAspectCovered => Godot.TextureRect.StretchModeEnum.KeepAspectCovered,
 				_ => Godot.TextureRect.StretchModeEnum.Scale,
-			};
+			});
 		}
 
 		private void IgnoreTextureSize_Changed(IChangeable obj) {
-			node.ExpandMode = (Godot.TextureRect.ExpandModeEnum)LinkedComp.ExpandedMode.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ExpandMode = (Godot.TextureRect.ExpandModeEnum)LinkedComp.ExpandedMode.Value);
 		}
 	}
 }

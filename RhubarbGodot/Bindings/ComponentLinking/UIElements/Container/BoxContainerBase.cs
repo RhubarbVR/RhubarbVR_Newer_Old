@@ -10,10 +10,11 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
-	public abstract class BoxContainerBase<T,T2> : ContainerBase<T,T2> where T : RhuEngine.Components.BoxContainer, new() where T2 : Godot.BoxContainer, new()
+	public abstract class BoxContainerBase<T, T2> : ContainerBase<T, T2> where T : RhuEngine.Components.BoxContainer, new() where T2 : Godot.BoxContainer, new()
 	{
 		public override void Init() {
 			base.Init();
@@ -24,15 +25,15 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Vertical_Changed(IChangeable obj) {
-			node.Vertical = LinkedComp.Vertical.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Vertical = LinkedComp.Vertical.Value);
 		}
 
 		private void Alignment_Changed(IChangeable obj) {
-			node.Alignment = LinkedComp.Alignment.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.Alignment = LinkedComp.Alignment.Value switch {
 				RBoxContainerAlignment.Begin => Godot.BoxContainer.AlignmentMode.Begin,
 				RBoxContainerAlignment.End => Godot.BoxContainer.AlignmentMode.End,
 				_ => Godot.BoxContainer.AlignmentMode.Center,
-			};
+			});
 		}
 	}
 

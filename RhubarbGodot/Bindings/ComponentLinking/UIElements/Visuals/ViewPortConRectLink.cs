@@ -24,7 +24,7 @@ namespace RhubarbVR.Bindings.ComponentLinking {
 
 
 		private void Target_Changed(IChangeable obj) {
-			node.Viewport = LinkedComp?.Target?.Target;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Viewport = LinkedComp?.Target?.Target);
 		}
 	}
 }

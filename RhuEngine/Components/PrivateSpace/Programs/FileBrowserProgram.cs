@@ -44,6 +44,9 @@ namespace RhuEngine.Components
 			if (_gridContainer is null) {
 				return;
 			}
+			if (_gridContainer.IsDestroying | _gridContainer.IsRemoved) {
+				return;
+			}
 			if (MainProgramWindow is null) {
 				return;
 			}
@@ -63,6 +66,7 @@ namespace RhuEngine.Components
 		private Button _backButton;
 		private Button _backDirButton;
 
+		private Button _refreshButton;
 		private Button _changeLayoutButton;
 		private BoxContainer _sideBarVisual;
 		private IFolder CurrentFolder { get; set; }
@@ -128,15 +132,15 @@ namespace RhuEngine.Components
 			_changeLayoutButton.Pressed.Target = ChangeLayout;
 			_changeLayoutButton.Alignment.Value = RButtonAlignment.Center;
 
-			var refreshButton = headerBox.Entity.AddChild("refreshButton").AttachComponent<Button>();
+			_refreshButton = headerBox.Entity.AddChild("refreshButton").AttachComponent<Button>();
 			var refrech = headerBox.Entity.AttachComponent<RawAssetProvider<RTexture2D>>();
-			refreshButton.Icon.Target = refrech;
+			_refreshButton.Icon.Target = refrech;
 			refrech.LoadAsset(Engine.staticResources.IconSheet.GetElement(RhubarbAtlasSheet.RhubarbIcons.Refresh));
-			refreshButton.ExpandIcon.Value = true;
-			refreshButton.IconAlignment.Value = RButtonAlignment.Center;
-			refreshButton.MinSize.Value = new Vector2i(40);
-			refreshButton.Pressed.Target = Refresh;
-			refreshButton.Alignment.Value = RButtonAlignment.Center;
+			_refreshButton.ExpandIcon.Value = true;
+			_refreshButton.IconAlignment.Value = RButtonAlignment.Center;
+			_refreshButton.MinSize.Value = new Vector2i(40);
+			_refreshButton.Pressed.Target = Refresh;
+			_refreshButton.Alignment.Value = RButtonAlignment.Center;
 
 			_backDirButton = headerBox.Entity.AddChild("BackDir").AttachComponent<Button>();
 			_backDirButton.Text.Value = "<-";
@@ -655,16 +659,29 @@ namespace RhuEngine.Components
 		public void Refresh() {
 			Task.Run(RefreshAsync);
 		}
+		
+		private bool _isRefreshing = false;
 
 		private async Task RefreshAsync() {
-			if (CurrentFolder is not null) {
-				await CurrentFolder.Refresh();
+			if(_isRefreshing) {
+				return;
 			}
-			await Engine.fileManager.ReloadAllDrivesAsync();
-			BuildSideBarDataList();
-			UpdateCenterUI();
-			UpdateRedoUndoButtons();
-			PathDataUpdate();
+			try {
+				_isRefreshing = true;
+				_refreshButton.Disabled.Value = true;
+				if (CurrentFolder is not null) {
+					await CurrentFolder.Refresh();
+				}
+				await Engine.fileManager.ReloadAllDrivesAsync();
+				BuildSideBarDataList();
+				UpdateCenterUI();
+				UpdateRedoUndoButtons();
+				PathDataUpdate();
+			}
+			finally {
+				_refreshButton.Disabled.Value = false;
+				_isRefreshing = false;
+			}
 		}
 
 		[Exposed]

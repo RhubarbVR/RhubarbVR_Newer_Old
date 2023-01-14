@@ -11,6 +11,7 @@ using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
 using System.Drawing.Imaging;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -32,33 +33,28 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void ColorPickerShape_Changed(IChangeable obj) {
-			node.PickerShape = LinkedComp.ColorPickerShape.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.PickerShape = LinkedComp.ColorPickerShape.Value switch {
 				RColorPickerShape.HSV_Rect_Wheel => ColorPicker.PickerShapeType.HsvWheel,
 				RColorPickerShape.VHS_Color => ColorPicker.PickerShapeType.VhsCircle,
 				RColorPickerShape.HSL_Circle => ColorPicker.PickerShapeType.OkhslCircle,
 				_ => ColorPicker.PickerShapeType.HsvRectangle,
-			};
+			});
 		}
 
 		private void DeferredMode_Changed(IChangeable obj) {
-			node.DeferredMode = LinkedComp.DeferredMode.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.DeferredMode = LinkedComp.DeferredMode.Value);
 		}
 
 		private void ColorMode_Changed(IChangeable obj) {
-			node.ColorMode = LinkedComp.ColorMode.Value switch {
-				RColorMode.HSV => ColorPicker.ColorModeType.Hsv,
-				RColorMode.HSL => ColorPicker.ColorModeType.Okhsl,
-				RColorMode.RAW => ColorPicker.ColorModeType.Raw,
-				_ => ColorPicker.ColorModeType.Rgb,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.ColorMode = LinkedComp.ColorMode.Value switch { RColorMode.HSV => ColorPicker.ColorModeType.Hsv, RColorMode.HSL => ColorPicker.ColorModeType.Okhsl, RColorMode.RAW => ColorPicker.ColorModeType.Raw, _ => ColorPicker.ColorModeType.Rgb, });
 		}
 
 		private void EditAlpha_Changed(IChangeable obj) {
-			node.EditAlpha = LinkedComp.EditAlpha.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.EditAlpha = LinkedComp.EditAlpha.Value);
 		}
 
 		private void Color_Changed(IChangeable obj) {
-			node.Color = new Color(LinkedComp.Color.Value.r, LinkedComp.Color.Value.g, LinkedComp.Color.Value.b, LinkedComp.Color.Value.a);
+			RenderThread.ExecuteOnEndOfFrame(() => node.Color = new Color(LinkedComp.Color.Value.r, LinkedComp.Color.Value.g, LinkedComp.Color.Value.b, LinkedComp.Color.Value.a));
 		}
 	}
 }

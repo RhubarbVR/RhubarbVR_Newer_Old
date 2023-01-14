@@ -400,7 +400,7 @@ namespace RhuEngine
 
 		public void GameStep() {
 			try {
-				RUpdateManager.RunOnStartOfFrame();
+				RUpdateManager.RunOnStartOfUpdate();
 				foreach (var item in _managers) {
 					try {
 						item.Step();
@@ -410,7 +410,7 @@ namespace RhuEngine
 						throw;
 					}
 				}
-				RUpdateManager.RunOnEndOfFrame();
+				RUpdateManager.RunOnEndOfUpdate();
 			}
 			catch (Exception wa) {
 				RLog.Err("GameStep Error" + wa.ToString());

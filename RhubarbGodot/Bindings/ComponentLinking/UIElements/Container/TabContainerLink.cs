@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -35,31 +36,27 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void UseHiddenTabsForMinSize_Changed(IChangeable obj) {
-			node.UseHiddenTabsForMinSize = LinkedComp.UseHiddenTabsForMinSize.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.UseHiddenTabsForMinSize = LinkedComp.UseHiddenTabsForMinSize.Value);
 		}
 
 		private void RangeGroup_Changed(IChangeable obj) {
-			node.TabsRearrangeGroup = LinkedComp.RangeGroup.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TabsRearrangeGroup = LinkedComp.RangeGroup.Value);
 		}
 
 		private void TabsVisible_Changed(IChangeable obj) {
-			node.TabsVisible = LinkedComp.TabsVisible.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TabsVisible = LinkedComp.TabsVisible.Value);
 		}
 
 		private void ClipTabs_Changed(IChangeable obj) {
-			node.ClipTabs = LinkedComp.TabsVisible.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ClipTabs = LinkedComp.TabsVisible.Value);
 		}
 
 		private void CurrentTab_Changed(IChangeable obj) {
-			node.CurrentTab = LinkedComp.CurrentTab.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.CurrentTab = LinkedComp.CurrentTab.Value);
 		}
 
 		private void TabAlignment_Changed(IChangeable obj) {
-			node.TabAlignment = LinkedComp.TabAlignment.Value switch {
-				RTabAlignment.Left => TabBar.AlignmentMode.Left,
-				RTabAlignment.Right => TabBar.AlignmentMode.Right,
-				_ => TabBar.AlignmentMode.Center,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.TabAlignment = LinkedComp.TabAlignment.Value switch { RTabAlignment.Left => TabBar.AlignmentMode.Left, RTabAlignment.Right => TabBar.AlignmentMode.Right, _ => TabBar.AlignmentMode.Center, });
 		}
 	}
 }

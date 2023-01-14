@@ -61,7 +61,7 @@ namespace RhuEngine.Components
 					if (MainShape.Target.LazerPressForce > 0.5f || MainShape.Target.TouchThisFrame) {
 						Press.Value = true;
 						if (!_pressLast) {
-							RUpdateManager.ExecuteOnEndOfFrame(PressAction.Invoke);
+							RUpdateManager.ExecuteOnEndOfUpdate(PressAction.Invoke);
 						}
 						_pressLast = true;
 					}
@@ -185,7 +185,7 @@ namespace RhuEngine.Components
 		public readonly SyncObjList<HeaderUIButton> Buttons;
 
 		public void MarkUodateMeshes() {
-			RUpdateManager.ExecuteOnEndOfFrame(this, UpdateNow);
+			RUpdateManager.ExecuteOnEndOfUpdate(this, UpdateNow);
 		}
 
 		private void UpdateNow() {

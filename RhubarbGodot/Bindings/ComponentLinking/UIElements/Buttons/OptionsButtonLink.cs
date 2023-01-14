@@ -11,6 +11,7 @@ using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
 using RhubarbVR.Bindings.TextureBindings;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -30,7 +31,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Node_ItemSelected(long index) {
-			LinkedComp.Selected.Value = (int)index;
+			RenderThread.ExecuteOnEndOfFrame(() => LinkedComp.Selected.Value = (int)index);
 		}
 
 		public sealed class LinkedButton
@@ -129,11 +130,11 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void FitLongestItem_Changed(IChangeable obj) {
-			node.FitToLongestItem = LinkedComp.FitLongestItem.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.FitToLongestItem = LinkedComp.FitLongestItem.Value);
 		}
 
 		private void Selected_Changed(IChangeable obj) {
-			node.Selected = LinkedComp.Selected.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Selected = LinkedComp.Selected.Value);
 		}
 	}
 }

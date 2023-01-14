@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -39,46 +40,50 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Node_ValueChanged(double value) {
-			LinkedComp.Value.Value = value;
-			LinkedComp.ValueUpdated.Target?.Invoke();
-		}
-
-		private void AllowLesser_Changed(IChangeable obj) {
-			node.AllowLesser = LinkedComp.AllowLesser.Value;
-		}
-
-		private void AllowGreater_Changed(IChangeable obj) {
-			node.AllowGreater = LinkedComp.AllowGreater.Value;
-		}
-
-		private void Rounded_Changed(IChangeable obj) {
-			node.Rounded = LinkedComp.Rounded.Value;
-		}
-
-		private void ExpEdit_Changed(IChangeable obj) {
-			node.ExpEdit = LinkedComp.ExpEdit.Value;
-		}
-
-		private void Value_Changed(IChangeable obj) {
-			if (node.Value != LinkedComp.Value.Value) {
-				node.Value = LinkedComp.Value.Value;
+			if (LinkedComp.Value.Value != value) {
+				LinkedComp.Value.Value = value;
+				LinkedComp.ValueUpdated.Target?.Invoke();
 			}
 		}
 
+		private void AllowLesser_Changed(IChangeable obj) {
+			RenderThread.ExecuteOnEndOfFrame(() => node.AllowLesser = LinkedComp.AllowLesser.Value);
+		}
+
+		private void AllowGreater_Changed(IChangeable obj) {
+			RenderThread.ExecuteOnEndOfFrame(() => node.AllowGreater = LinkedComp.AllowGreater.Value);
+		}
+
+		private void Rounded_Changed(IChangeable obj) {
+			RenderThread.ExecuteOnEndOfFrame(() => node.Rounded = LinkedComp.Rounded.Value);
+		}
+
+		private void ExpEdit_Changed(IChangeable obj) {
+			RenderThread.ExecuteOnEndOfFrame(() => node.ExpEdit = LinkedComp.ExpEdit.Value);
+		}
+
+		private void Value_Changed(IChangeable obj) {
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node.Value != LinkedComp.Value.Value) {
+					node.Value = LinkedComp.Value.Value;
+				}
+			});
+		}
+
 		private void PageValue_Changed(IChangeable obj) {
-			node.Page = LinkedComp.PageValue.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Page = LinkedComp.PageValue.Value);
 		}
 
 		private void StepValue_Changed(IChangeable obj) {
-			node.Step = LinkedComp.StepValue.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Step = LinkedComp.StepValue.Value);
 		}
 
 		private void MaxValue_Changed(IChangeable obj) {
-			node.MaxValue = LinkedComp.MaxValue.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.MaxValue = LinkedComp.MaxValue.Value);
 		}
 
 		private void MinValue_Changed(IChangeable obj) {
-			node.MinValue = LinkedComp.MinValue.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.MinValue = LinkedComp.MinValue.Value);
 		}
 	}
 

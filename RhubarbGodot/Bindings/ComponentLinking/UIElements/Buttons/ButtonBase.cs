@@ -11,6 +11,7 @@ using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
 using RNumerics;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -94,65 +95,112 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Node_ButtonDown() {
-			SendState();
-			RUpdateManager.ExecuteOnEndOfFrame(LinkedComp.ButtonDown.Invoke);
+			RUpdateManager.ExecuteOnEndOfUpdate(() => {
+				if (LinkedComp is null) {
+					return;
+				}
+				if (LinkedComp.IsDestroying) {
+					return;
+				}
+				if (LinkedComp.IsRemoved) {
+					return;
+				}
+				SendState();
+				RUpdateManager.ExecuteOnEndOfUpdate(LinkedComp.ButtonDown.Invoke);
+			});
 		}
 
 		private void Node_ButtonUp() {
-			SendState();
-			RUpdateManager.ExecuteOnEndOfFrame(LinkedComp.ButtonUp.Invoke);
+			RUpdateManager.ExecuteOnEndOfUpdate(() => {
+				if (LinkedComp is null) {
+					return;
+				}
+				if (LinkedComp.IsDestroying) {
+					return;
+				}
+				if (LinkedComp.IsRemoved) {
+					return;
+				}
+				SendState();
+				LinkedComp.ButtonUp.Invoke();
+			});
 		}
 
 		private void Node_Pressed() {
-			SendState();
-			RUpdateManager.ExecuteOnEndOfFrame(() => {
+			RUpdateManager.ExecuteOnEndOfUpdate(() => {
+				if (LinkedComp is null) {
+					return;
+				}
+				if (LinkedComp.IsDestroying) {
+					return;
+				}
+				if (LinkedComp.IsRemoved) {
+					return;
+				}
+				SendState();
 				LinkedComp?.Pressed?.Invoke();
 				LinkedComp?.SendPressedAction();
 			});
 		}
 
 		private void Node_Toggled(bool buttonPressed) {
-			SendState();
-			RUpdateManager.ExecuteOnEndOfFrame(() => LinkedComp?.Toggled?.Target?.Invoke(buttonPressed));
+			RUpdateManager.ExecuteOnEndOfUpdate(() => {
+				if (LinkedComp is null) {
+					return;
+				}
+				if (LinkedComp.IsDestroying) {
+					return;
+				}
+				if (LinkedComp.IsRemoved) {
+					return;
+				}
+				SendState();
+				LinkedComp?.Toggled?.Target?.Invoke(buttonPressed);
+			});
 		}
 
 		private void KeepPressedOutside_Changed(IChangeable obj) {
-			node.KeepPressedOutside = LinkedComp.KeepPressedOutside.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.KeepPressedOutside = LinkedComp.KeepPressedOutside.Value);
 		}
 
 		private void ButtonMask_Changed(IChangeable obj) {
-			var mask = (MouseButtonMask)0;
-			if ((LinkedComp.ButtonMask.Value & RButtonMask.Primary) != RButtonMask.None) {
-				mask |= MouseButtonMask.Left;
-			}
-			if ((LinkedComp.ButtonMask.Value & RButtonMask.Secondary) != RButtonMask.None) {
-				mask |= MouseButtonMask.Right;
-			}
-			if ((LinkedComp.ButtonMask.Value & RButtonMask.Tertiary) != RButtonMask.None) {
-				mask |= MouseButtonMask.Middle;
-			}
-			node.ButtonMask = mask;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				var mask = (MouseButtonMask)0;
+				if ((LinkedComp.ButtonMask.Value & RButtonMask.Primary) != RButtonMask.None) {
+					mask |= MouseButtonMask.Left;
+				}
+				if ((LinkedComp.ButtonMask.Value & RButtonMask.Secondary) != RButtonMask.None) {
+					mask |= MouseButtonMask.Right;
+				}
+				if ((LinkedComp.ButtonMask.Value & RButtonMask.Tertiary) != RButtonMask.None) {
+					mask |= MouseButtonMask.Middle;
+				}
+				node.ButtonMask = mask;
+			});
 		}
 
 		private void ActionMode_Changed(IChangeable obj) {
-			node.ActionMode = LinkedComp.ActionMode.Value switch {
-				RButtonActionMode.Relases => BaseButton.ActionModeEnum.Release,
-				_ => BaseButton.ActionModeEnum.Press,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() =>
+				node.ActionMode = LinkedComp.ActionMode.Value switch {
+					RButtonActionMode.Relases => BaseButton.ActionModeEnum.Release,
+					_ => BaseButton.ActionModeEnum.Press,
+				});
 		}
 
 		private void ButtonPressed_Changed(IChangeable obj) {
-			if (node.ButtonPressed != LinkedComp.ButtonPressed.Value) {
-				node.ButtonPressed = LinkedComp.ButtonPressed.Value;
-			}
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node.ButtonPressed != LinkedComp.ButtonPressed.Value) {
+					node.ButtonPressed = LinkedComp.ButtonPressed.Value;
+				}
+			});
 		}
 
 		private void ToggleMode_Changed(IChangeable obj) {
-			node.ToggleMode = LinkedComp.ToggleMode.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ToggleMode = LinkedComp.ToggleMode.Value);
 		}
 
 		private void Disabled_Changed(IChangeable obj) {
-			node.Disabled = LinkedComp.Disabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Disabled = LinkedComp.Disabled.Value);
 		}
 	}
 

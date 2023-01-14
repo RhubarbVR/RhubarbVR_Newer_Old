@@ -23,7 +23,7 @@ namespace RhuEngine.Input
 		}
 
 		public void Update() {
-			RUpdateManager.ExecuteOnStartOfFrame(UpdateData);
+			RUpdateManager.ExecuteOnStartOfUpdate(UpdateData);
 		}
 	}
 

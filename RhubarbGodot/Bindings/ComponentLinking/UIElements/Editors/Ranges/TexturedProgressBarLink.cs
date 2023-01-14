@@ -13,6 +13,7 @@ using static Godot.Control;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using RhubarbVR.Bindings.TextureBindings;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -54,72 +55,66 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Under_LoadChange(RTexture2D obj) {
-			node.TextureUnder = LinkedComp.Under.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextureUnder = LinkedComp.Under.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null);
 		}
 
 		private void Over_LoadChange(RTexture2D obj) {
-			node.TextureOver = LinkedComp.Over.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextureOver = LinkedComp.Over.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null);
 		}
 
 		private void Progress_LoadChange(RTexture2D obj) {
-			node.TextureProgress = LinkedComp.Progress.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextureProgress = LinkedComp.Progress.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null);
 		}
 
 		private void CenterOffset_Changed(IChangeable obj) {
-			node.RadialCenterOffset = new Vector2(LinkedComp.CenterOffset.Value.x, LinkedComp.CenterOffset.Value.y);
+			RenderThread.ExecuteOnEndOfFrame(() => node.RadialCenterOffset = new Vector2(LinkedComp.CenterOffset.Value.x, LinkedComp.CenterOffset.Value.y));
 		}
 
 		private void FillDegrees_Changed(IChangeable obj) {
-			node.RadialFillDegrees = LinkedComp.FillDegrees.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.RadialFillDegrees = LinkedComp.FillDegrees.Value);
 		}
 
 		private void InitialAngle_Changed(IChangeable obj) {
-			node.RadialInitialAngle = LinkedComp.InitialAngle.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.RadialInitialAngle = LinkedComp.InitialAngle.Value);
 		}
 
 		private void ProgressOffset_Changed(IChangeable obj) {
-			node.TextureProgressOffset = new Vector2(LinkedComp.ProgressOffset.Value.x, LinkedComp.ProgressOffset.Value.y);
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextureProgressOffset = new Vector2(LinkedComp.ProgressOffset.Value.x, LinkedComp.ProgressOffset.Value.y));
 		}
 
 		private void Progress_Tint_Changed(IChangeable obj) {
-			node.TintProgress = new Color(LinkedComp.Progress_Tint.Value.r, LinkedComp.Progress_Tint.Value.g, LinkedComp.Progress_Tint.Value.b, LinkedComp.Progress_Tint.Value.a);
+			RenderThread.ExecuteOnEndOfFrame(() => node.TintProgress = new Color(LinkedComp.Progress_Tint.Value.r, LinkedComp.Progress_Tint.Value.g, LinkedComp.Progress_Tint.Value.b, LinkedComp.Progress_Tint.Value.a));
 		}
 
 		private void Over_Tint_Changed(IChangeable obj) {
-			node.TintOver = new Color(LinkedComp.Over_Tint.Value.r, LinkedComp.Over_Tint.Value.g, LinkedComp.Over_Tint.Value.b, LinkedComp.Over_Tint.Value.a);
+			RenderThread.ExecuteOnEndOfFrame(() => node.TintOver = new Color(LinkedComp.Over_Tint.Value.r, LinkedComp.Over_Tint.Value.g, LinkedComp.Over_Tint.Value.b, LinkedComp.Over_Tint.Value.a));
 		}
 
 
 		private void Under_Tint_Changed(IChangeable obj) {
-			node.TintUnder = new Color(LinkedComp.Under_Tint.Value.r, LinkedComp.Under_Tint.Value.g, LinkedComp.Under_Tint.Value.b, LinkedComp.Under_Tint.Value.a);
+			RenderThread.ExecuteOnEndOfFrame(() => node.TintUnder = new Color(LinkedComp.Under_Tint.Value.r, LinkedComp.Under_Tint.Value.g, LinkedComp.Under_Tint.Value.b, LinkedComp.Under_Tint.Value.a));
 		}
 
 		private void MinStrech_Changed(IChangeable obj) {
-			node.StretchMarginLeft = LinkedComp.MinStrech.Value.x;
-			node.StretchMarginBottom = LinkedComp.MinStrech.Value.y;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				node.StretchMarginLeft = LinkedComp.MinStrech.Value.x;
+				node.StretchMarginBottom = LinkedComp.MinStrech.Value.y;
+			});
 		}
 
 		private void MaxStrech_Changed(IChangeable obj) {
-			node.StretchMarginRight = LinkedComp.MaxStrech.Value.x;
-			node.StretchMarginTop = LinkedComp.MaxStrech.Value.y;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				node.StretchMarginRight = LinkedComp.MaxStrech.Value.x;
+				node.StretchMarginTop = LinkedComp.MaxStrech.Value.y;
+			});
 		}
 
 		private void NinePatchStrech_Changed(IChangeable obj) {
-			node.NinePatchStretch = LinkedComp.NinePatchStrech.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.NinePatchStretch = LinkedComp.NinePatchStrech.Value);
 		}
 
 		private void FillMode_Changed(IChangeable obj) {
-			node.FillMode = LinkedComp.FillMode.Value switch {
-				RTexturedProgressBarFillMode.Left_To_Right => (int)TextureProgressBar.FillModeEnum.LeftToRight,
-				RTexturedProgressBarFillMode.Right_To_Left => (int)TextureProgressBar.FillModeEnum.RightToLeft,
-				RTexturedProgressBarFillMode.Top_To_Bottom => (int)TextureProgressBar.FillModeEnum.TopToBottom,
-				RTexturedProgressBarFillMode.Bottom_To_Top => (int)TextureProgressBar.FillModeEnum.BottomToTop,
-				RTexturedProgressBarFillMode.ClockWise => (int)TextureProgressBar.FillModeEnum.Clockwise,
-				RTexturedProgressBarFillMode.Counter_ClockWise => (int)TextureProgressBar.FillModeEnum.CounterClockwise,
-				RTexturedProgressBarFillMode.Bilinear_Left_And_Right => (int)TextureProgressBar.FillModeEnum.LeftToRight,
-				RTexturedProgressBarFillMode.Bilinear_Top_And_Bottom => (int)TextureProgressBar.FillModeEnum.BilinearTopAndBottom,
-				_ => (int)TextureProgressBar.FillModeEnum.ClockwiseAndCounterClockwise,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.FillMode = LinkedComp.FillMode.Value switch { RTexturedProgressBarFillMode.Left_To_Right => (int)TextureProgressBar.FillModeEnum.LeftToRight, RTexturedProgressBarFillMode.Right_To_Left => (int)TextureProgressBar.FillModeEnum.RightToLeft, RTexturedProgressBarFillMode.Top_To_Bottom => (int)TextureProgressBar.FillModeEnum.TopToBottom, RTexturedProgressBarFillMode.Bottom_To_Top => (int)TextureProgressBar.FillModeEnum.BottomToTop, RTexturedProgressBarFillMode.ClockWise => (int)TextureProgressBar.FillModeEnum.Clockwise, RTexturedProgressBarFillMode.Counter_ClockWise => (int)TextureProgressBar.FillModeEnum.CounterClockwise, RTexturedProgressBarFillMode.Bilinear_Left_And_Right => (int)TextureProgressBar.FillModeEnum.LeftToRight, RTexturedProgressBarFillMode.Bilinear_Top_And_Bottom => (int)TextureProgressBar.FillModeEnum.BilinearTopAndBottom, _ => (int)TextureProgressBar.FillModeEnum.ClockwiseAndCounterClockwise, });
 		}
 	}
 }

@@ -7,16 +7,18 @@ namespace RhuEngine.Linker
 {
 	public static class RUpdateManager
 	{
+		public const int MAX_UPDATES = 225;
+
 		public static ulong UpdateCount { get; private set; }
 
 		public static readonly Dictionary<object, Action> StartOfFrameExecute = new();
 		public static readonly List<Action> StartOfFrameList = new();
 		[ThreadStatic]
-		public static bool isStartOfFrame;
+		public static bool isStartOfUpdate;
 
-		public static void ExecuteOnStartOfFrame(Action p) {
+		public static void ExecuteOnStartOfUpdate(Action p) {
 			lock (StartOfFrameExecute) {
-				if (isStartOfFrame) {
+				if (isStartOfUpdate) {
 					p();
 				}
 				else {
@@ -25,9 +27,9 @@ namespace RhuEngine.Linker
 			}
 		}
 
-		public static void ExecuteOnStartOfFrame(object target, Action p) {
+		public static void ExecuteOnStartOfUpdate(object target, Action p) {
 			lock (StartOfFrameExecute) {
-				if (isStartOfFrame) {
+				if (isStartOfUpdate) {
 					p();
 				}
 				else {
@@ -42,10 +44,10 @@ namespace RhuEngine.Linker
 			}
 		}
 
-		public static void RunOnStartOfFrame() {
+		public static void RunOnStartOfUpdate() {
 			lock (StartOfFrameExecute) {
-				isStartOfFrame = true;
-				var startcountlist = StartOfFrameList.Count;
+				isStartOfUpdate = true;
+				var startcountlist = Math.Min(StartOfFrameList.Count, MAX_UPDATES);
 				for (var i = 0; i < startcountlist; i++) {
 					try {
 						StartOfFrameList[0].Invoke();
@@ -62,7 +64,7 @@ namespace RhuEngine.Linker
 					catch { }
 					StartOfFrameExecute.Remove(currentobj.Key);
 				}
-				isStartOfFrame = false;
+				isStartOfUpdate = false;
 			}
 		}
 
@@ -72,7 +74,7 @@ namespace RhuEngine.Linker
 		[ThreadStatic]
 		public static bool isEndOfFrame;
 
-		public static void ExecuteOnEndOfFrame(Action p) {
+		public static void ExecuteOnEndOfUpdate(Action p) {
 			lock (EndOfFrameExecute) {
 				if (isEndOfFrame) {
 					p();
@@ -83,7 +85,7 @@ namespace RhuEngine.Linker
 			}
 		}
 
-		public static void ExecuteOnEndOfFrame(object target, Action p) {
+		public static void ExecuteOnEndOfUpdate(object target, Action p) {
 			lock (EndOfFrameExecute) {
 				if (isEndOfFrame) {
 					p();
@@ -100,11 +102,11 @@ namespace RhuEngine.Linker
 			}
 		}
 
-		public static void RunOnEndOfFrame() {
+		public static void RunOnEndOfUpdate() {
 			lock (EndOfFrameExecute) {
 				isEndOfFrame = true;
 				UpdateCount++;
-				var startcountlist = EndOfFrameList.Count;
+				var startcountlist = Math.Min(EndOfFrameList.Count, MAX_UPDATES);
 				for (var i = 0; i < startcountlist; i++) {
 					try {
 						EndOfFrameList[0].Invoke();

@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -29,19 +30,19 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void TickOnBorders_Changed(IChangeable obj) {
-			node.TicksOnBorders = LinkedComp.TickOnBorders.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TicksOnBorders = LinkedComp.TickOnBorders.Value);
 		}
 
 		private void TickCount_Changed(IChangeable obj) {
-			node.TickCount = LinkedComp.TickCount.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TickCount = LinkedComp.TickCount.Value);
 		}
 
 		private void Scrollable_Changed(IChangeable obj) {
-			node.Scrollable = LinkedComp.Scrollable.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Scrollable = LinkedComp.Scrollable.Value);
 		}
 
 		private void Editable_Changed(IChangeable obj) {
-			node.Editable = LinkedComp.Editable.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Editable = LinkedComp.Editable.Value);
 		}
 	}
 }

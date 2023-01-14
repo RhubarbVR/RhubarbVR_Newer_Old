@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -26,12 +27,11 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void EditAlpha_Changed(IChangeable obj) {
-			node.EditAlpha = LinkedComp.EditAlpha.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.EditAlpha = LinkedComp.EditAlpha.Value);
 		}
 
 		private void Color_Changed(IChangeable obj) {
-			node.Color = new Color(LinkedComp.Color.Value.r, LinkedComp.Color.Value.g, LinkedComp.Color.Value.b, LinkedComp.Color.Value.a);
-
+			RenderThread.ExecuteOnEndOfFrame(() => node.Color = new Color(LinkedComp.Color.Value.r, LinkedComp.Color.Value.g, LinkedComp.Color.Value.b, LinkedComp.Color.Value.a));
 		}
 	}
 }

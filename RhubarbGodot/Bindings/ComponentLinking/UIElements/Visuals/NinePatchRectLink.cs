@@ -11,6 +11,7 @@ using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
 using RhubarbVR.Bindings.TextureBindings;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -40,50 +41,49 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Texture_LoadChange(RTexture2D obj) {
-			node.Texture = LinkedComp.Texture.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Texture = LinkedComp.Texture.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null);
 		}
 
 		private void Vertical_Changed(IChangeable obj) {
-			node.AxisStretchVertical = LinkedComp.Vertical.Value switch {
-				RNinePatchRectStretch.Tile => Godot.NinePatchRect.AxisStretchMode.Tile,
-				RNinePatchRectStretch.TileFit => Godot.NinePatchRect.AxisStretchMode.TileFit,
-				_ => Godot.NinePatchRect.AxisStretchMode.Stretch,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.AxisStretchVertical = LinkedComp.Vertical.Value switch { RNinePatchRectStretch.Tile => Godot.NinePatchRect.AxisStretchMode.Tile, RNinePatchRectStretch.TileFit => Godot.NinePatchRect.AxisStretchMode.TileFit, _ => Godot.NinePatchRect.AxisStretchMode.Stretch, });
 		}
 
 		private void Horizontal_Changed(IChangeable obj) {
-			node.AxisStretchHorizontal = LinkedComp.Horizontal.Value switch {
-				RNinePatchRectStretch.Tile => Godot.NinePatchRect.AxisStretchMode.Tile,
-				RNinePatchRectStretch.TileFit => Godot.NinePatchRect.AxisStretchMode.TileFit,
-				_ => Godot.NinePatchRect.AxisStretchMode.Stretch,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.AxisStretchHorizontal = LinkedComp.Horizontal.Value switch { RNinePatchRectStretch.Tile => Godot.NinePatchRect.AxisStretchMode.Tile, RNinePatchRectStretch.TileFit => Godot.NinePatchRect.AxisStretchMode.TileFit, _ => Godot.NinePatchRect.AxisStretchMode.Stretch, });
 		}
 
 		private void MarginMax_Changed(IChangeable obj) {
-			node.PatchMarginTop = LinkedComp.MarginMax.Value.y;
-			node.PatchMarginRight = LinkedComp.MarginMax.Value.x;
-
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				node.PatchMarginTop = LinkedComp.MarginMax.Value.y;
+				node.PatchMarginRight = LinkedComp.MarginMax.Value.x;
+			});
 		}
 
 		private void MarginMin_Changed(IChangeable obj) {
-			node.PatchMarginBottom = LinkedComp.MarginMin.Value.y;
-			node.PatchMarginLeft = LinkedComp.MarginMin.Value.x;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				node.PatchMarginBottom = LinkedComp.MarginMin.Value.y;
+				node.PatchMarginLeft = LinkedComp.MarginMin.Value.x;
+			});
 		}
 
 		private void RegionMax_Changed(IChangeable obj) {
-			var size = LinkedComp.RegionMax.Value - LinkedComp.RegionMin.Value;
-			var pos = LinkedComp.RegionMin.Value - (size / 2);
-			node.RegionRect = new Rect2(pos.x, pos.y, size.x, size.y);
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				var size = LinkedComp.RegionMax.Value - LinkedComp.RegionMin.Value;
+				var pos = LinkedComp.RegionMin.Value - (size / 2);
+				node.RegionRect = new Rect2(pos.x, pos.y, size.x, size.y);
+			});
 		}
 
 		private void RegionMin_Changed(IChangeable obj) {
-			var size = LinkedComp.RegionMax.Value - LinkedComp.RegionMin.Value;
-			var pos = LinkedComp.RegionMin.Value - (size / 2);
-			node.RegionRect = new Rect2(pos.x, pos.y, size.x, size.y);
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				var size = LinkedComp.RegionMax.Value - LinkedComp.RegionMin.Value;
+				var pos = LinkedComp.RegionMin.Value - (size / 2);
+				node.RegionRect = new Rect2(pos.x, pos.y, size.x, size.y);
+			});
 		}
 
 		private void DrawCenter_Changed(IChangeable obj) {
-			node.DrawCenter = LinkedComp.DrawCenter.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.DrawCenter = LinkedComp.DrawCenter.Value);
 		}
 	}
 }

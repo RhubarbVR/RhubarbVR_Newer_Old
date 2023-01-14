@@ -11,6 +11,7 @@ using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
 using static System.Net.Mime.MediaTypeNames;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -30,28 +31,19 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Language_Changed(IChangeable obj) {
-			node.Language = LinkedComp.Language.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Language = LinkedComp.Language.Value);
 		}
 
 		private void TextDir_Changed(IChangeable obj) {
-			node.TextDirection = LinkedComp.TextDir.Value switch {
-				RTextDirection.Auto => TextDirection.Auto,
-				RTextDirection.Ltr => TextDirection.Ltr,
-				RTextDirection.Rtl => TextDirection.Rtl,
-				_ => TextDirection.Inherited,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextDirection = LinkedComp.TextDir.Value switch { RTextDirection.Auto => TextDirection.Auto, RTextDirection.Ltr => TextDirection.Ltr, RTextDirection.Rtl => TextDirection.Rtl, _ => TextDirection.Inherited, });
 		}
 
 		private void UnderLine_Changed(IChangeable obj) {
-			node.Underline = LinkedComp.UnderLine.Value switch {
-				RUnderLine.OnHover => Godot.LinkButton.UnderlineMode.OnHover,
-				RUnderLine.Never => Godot.LinkButton.UnderlineMode.Never,
-				_ => Godot.LinkButton.UnderlineMode.Always,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.Underline = LinkedComp.UnderLine.Value switch { RUnderLine.OnHover => Godot.LinkButton.UnderlineMode.OnHover, RUnderLine.Never => Godot.LinkButton.UnderlineMode.Never, _ => Godot.LinkButton.UnderlineMode.Always, });
 		}
 
 		private void Text_Changed(IChangeable obj) {
-			node.Text = LinkedComp.Text.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Text = LinkedComp.Text.Value);
 		}
 	}
 }

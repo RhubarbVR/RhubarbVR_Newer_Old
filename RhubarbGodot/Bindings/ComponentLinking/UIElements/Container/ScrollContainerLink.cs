@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -34,37 +35,27 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void VerticalScroll_Changed(IChangeable obj) {
-			node.ScrollVertical = LinkedComp.VerticalScroll.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollVertical = LinkedComp.VerticalScroll.Value);
 		}
 
 		private void HorizontalScroll_Changed(IChangeable obj) {
-			node.ScrollHorizontal = LinkedComp.HorizontalScroll.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollHorizontal = LinkedComp.HorizontalScroll.Value);
 		}
 
 		private void ScrollDeadZone_Changed(IChangeable obj) {
-			node.ScrollDeadzone = LinkedComp.ScrollDeadZone.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollDeadzone = LinkedComp.ScrollDeadZone.Value);
 		}
 
 		private void VerticalScrollBar_Changed(IChangeable obj) {
-			node.VerticalScrollMode = LinkedComp.VerticalScrollBar.Value switch {
-				RScrollBarVisibility.Auto => Godot.ScrollContainer.ScrollMode.Auto,
-				RScrollBarVisibility.AlwaysShow => Godot.ScrollContainer.ScrollMode.ShowAlways,
-				RScrollBarVisibility.NeverShow => Godot.ScrollContainer.ScrollMode.ShowNever,
-				_ => Godot.ScrollContainer.ScrollMode.Disabled,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.VerticalScrollMode = LinkedComp.VerticalScrollBar.Value switch { RScrollBarVisibility.Auto => Godot.ScrollContainer.ScrollMode.Auto, RScrollBarVisibility.AlwaysShow => Godot.ScrollContainer.ScrollMode.ShowAlways, RScrollBarVisibility.NeverShow => Godot.ScrollContainer.ScrollMode.ShowNever, _ => Godot.ScrollContainer.ScrollMode.Disabled, });
 		}
 
 		private void HorizontalScrollBar_Changed(IChangeable obj) {
-			node.HorizontalScrollMode = LinkedComp.HorizontalScrollBar.Value switch {
-				RScrollBarVisibility.Auto => Godot.ScrollContainer.ScrollMode.Auto,
-				RScrollBarVisibility.AlwaysShow => Godot.ScrollContainer.ScrollMode.ShowAlways,
-				RScrollBarVisibility.NeverShow => Godot.ScrollContainer.ScrollMode.ShowNever,
-				_ => Godot.ScrollContainer.ScrollMode.Disabled,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.HorizontalScrollMode = LinkedComp.HorizontalScrollBar.Value switch { RScrollBarVisibility.Auto => Godot.ScrollContainer.ScrollMode.Auto, RScrollBarVisibility.AlwaysShow => Godot.ScrollContainer.ScrollMode.ShowAlways, RScrollBarVisibility.NeverShow => Godot.ScrollContainer.ScrollMode.ShowNever, _ => Godot.ScrollContainer.ScrollMode.Disabled, });
 		}
 
 		private void FollowFocus_Changed(IChangeable obj) {
-			node.FollowFocus = LinkedComp.FollowFocus.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.FollowFocus = LinkedComp.FollowFocus.Value);
 		}
 	}
 }

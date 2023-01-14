@@ -11,6 +11,7 @@ using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
 using System.Net.Sockets;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -49,30 +50,27 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void FixedIconSize_Changed(IChangeable obj) {
-			node.FixedIconSize = new Vector2i(LinkedComp.FixedIconSize.Value.x, LinkedComp.FixedIconSize.Value.y);
+			RenderThread.ExecuteOnEndOfFrame(() => node.FixedIconSize = new Vector2i(LinkedComp.FixedIconSize.Value.x, LinkedComp.FixedIconSize.Value.y));
 		}
 
 		private void IconScale_Changed(IChangeable obj) {
-			node.IconScale = LinkedComp.IconScale.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.IconScale = LinkedComp.IconScale.Value);
 		}
 
 		private void IconMode_Changed(IChangeable obj) {
-			node.IconMode = LinkedComp.IconMode.Value switch {
-				RItemListIconMode.Left => Godot.ItemList.IconModeEnum.Left,
-				_ => Godot.ItemList.IconModeEnum.Top,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.IconMode = LinkedComp.IconMode.Value switch { RItemListIconMode.Left => Godot.ItemList.IconModeEnum.Left, _ => Godot.ItemList.IconModeEnum.Top, });
 		}
 
 		private void FixedWidthColumns_Changed(IChangeable obj) {
-			node.FixedColumnWidth = LinkedComp.FixedWidthColumns.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.FixedColumnWidth = LinkedComp.FixedWidthColumns.Value);
 		}
 
 		private void SameWidthColumns_Changed(IChangeable obj) {
-			node.SameColumnWidth = LinkedComp.SameWidthColumns.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.SameColumnWidth = LinkedComp.SameWidthColumns.Value);
 		}
 
 		private void MaxColumns_Changed(IChangeable obj) {
-			node.MaxColumns = LinkedComp.MaxColumns.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.MaxColumns = LinkedComp.MaxColumns.Value);
 		}
 
 		//ToDO finishItems
@@ -80,36 +78,27 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void TextOverrun_Changed(IChangeable obj) {
-			node.TextOverrunBehavior = LinkedComp.TextOverrun.Value switch {
-				ROverrunBehavior.TrimChar => TextServer.OverrunBehavior.TrimChar,
-				ROverrunBehavior.TrimWord => TextServer.OverrunBehavior.TrimWord,
-				ROverrunBehavior.TrimEllipsis => TextServer.OverrunBehavior.TrimEllipsis,
-				ROverrunBehavior.TrimWordEllipsis => TextServer.OverrunBehavior.TrimWordEllipsis,
-				_ => TextServer.OverrunBehavior.NoTrimming,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextOverrunBehavior = LinkedComp.TextOverrun.Value switch { ROverrunBehavior.TrimChar => TextServer.OverrunBehavior.TrimChar, ROverrunBehavior.TrimWord => TextServer.OverrunBehavior.TrimWord, ROverrunBehavior.TrimEllipsis => TextServer.OverrunBehavior.TrimEllipsis, ROverrunBehavior.TrimWordEllipsis => TextServer.OverrunBehavior.TrimWordEllipsis, _ => TextServer.OverrunBehavior.NoTrimming, });
 		}
 
 		private void AutoHeight_Changed(IChangeable obj) {
-			node.AutoHeight = LinkedComp.AutoHeight.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.AutoHeight = LinkedComp.AutoHeight.Value);
 		}
 
 		private void MaxTextLines_Changed(IChangeable obj) {
-			node.MaxTextLines = LinkedComp.MaxTextLines.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.MaxTextLines = LinkedComp.MaxTextLines.Value);
 		}
 
 		private void AllowRMBSelect_Changed(IChangeable obj) {
-			node.AllowRmbSelect = LinkedComp.AllowRMBSelect.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.AllowRmbSelect = LinkedComp.AllowRMBSelect.Value);
 		}
 
 		private void AllowReselect_Changed(IChangeable obj) {
-			node.AllowReselect = LinkedComp.AllowReselect.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.AllowReselect = LinkedComp.AllowReselect.Value);
 		}
 
 		private void SelectMode_Changed(IChangeable obj) {
-			node.SelectMode = LinkedComp.SelectMode.Value switch {
-				RItemListSelectMode.Multi => Godot.ItemList.SelectModeEnum.Multi,
-				_ => Godot.ItemList.SelectModeEnum.Single,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.SelectMode = LinkedComp.SelectMode.Value switch { RItemListSelectMode.Multi => Godot.ItemList.SelectModeEnum.Multi, _ => Godot.ItemList.SelectModeEnum.Single, });
 		}
 	}
 }

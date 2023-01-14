@@ -8,6 +8,7 @@ using Godot;
 
 using RhubarbVR.Bindings.TextureBindings;
 
+using RhuEngine;
 using RhuEngine.Components;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
@@ -58,75 +59,67 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void RenderPriority_Changed(IChangeable obj) {
-			node.RenderPriority = LinkedComp.RenderPriority.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.RenderPriority = LinkedComp.RenderPriority.Value);
 		}
 
 		private void AlphaMode_Changed(IChangeable obj) {
-			node.AlphaCut = LinkedComp.AlphaMode.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.AlphaCut = LinkedComp.AlphaMode.Value switch {
 				RSprite3DAlphaCut.Discard => SpriteBase3D.AlphaCutMode.Discard,
 				RSprite3DAlphaCut.OpaquePrePass => SpriteBase3D.AlphaCutMode.OpaquePrepass,
 				_ => SpriteBase3D.AlphaCutMode.Disabled,
-			};
+			});
 		}
 
 		private void FixedSize_Changed(IChangeable obj) {
-			node.FixedSize = LinkedComp.FixedSize.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.FixedSize = LinkedComp.FixedSize.Value);
 		}
 
 		private void NoDepthTest_Changed(IChangeable obj) {
-			node.NoDepthTest = LinkedComp.NoDepthTest.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.NoDepthTest = LinkedComp.NoDepthTest.Value);
 		}
 
 		private void DoubleSided_Changed(IChangeable obj) {
-			node.DoubleSided = LinkedComp.DoubleSided.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.DoubleSided = LinkedComp.DoubleSided.Value);
 		}
 
 		private void Shaded_Changed(IChangeable obj) {
-			node.Shaded = LinkedComp.Shaded.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Shaded = LinkedComp.Shaded.Value);
 		}
 
 		private void Transparrent_Changed(IChangeable obj) {
-			node.Transparent = LinkedComp.Transparent.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Transparent = LinkedComp.Transparent.Value);
 		}
 
 		private void Billboard_Changed(IChangeable obj) {
-			node.Billboard = LinkedComp.Billboard.Value switch {
-				RBillboardOptions.Enabled => BaseMaterial3D.BillboardModeEnum.Enabled,
-				RBillboardOptions.YBillboard => BaseMaterial3D.BillboardModeEnum.FixedY,
-				_ => BaseMaterial3D.BillboardModeEnum.Disabled,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.Billboard = LinkedComp.Billboard.Value switch { RBillboardOptions.Enabled => BaseMaterial3D.BillboardModeEnum.Enabled, RBillboardOptions.YBillboard => BaseMaterial3D.BillboardModeEnum.FixedY, _ => BaseMaterial3D.BillboardModeEnum.Disabled, });
 		}
 
 		private void Axis_Changed(IChangeable obj) {
-			node.Axis = LinkedComp.Axis.Value switch {
-				RSprite3DDir.Y => Vector3.Axis.Y,
-				RSprite3DDir.Z => Vector3.Axis.Z,
-				_ => Vector3.Axis.X,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.Axis = LinkedComp.Axis.Value switch { RSprite3DDir.Y => Vector3.Axis.Y, RSprite3DDir.Z => Vector3.Axis.Z, _ => Vector3.Axis.X, });
 		}
 
 		private void PixelSize_Changed(IChangeable obj) {
-			node.PixelSize = LinkedComp.PixelSize.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.PixelSize = LinkedComp.PixelSize.Value);
 		}
 
 		private void Moduluate_Changed(IChangeable obj) {
-			node.Modulate = new Color(LinkedComp.Moduluate.Value.r, LinkedComp.Moduluate.Value.g, LinkedComp.Moduluate.Value.b, LinkedComp.Moduluate.Value.a);
+			RenderThread.ExecuteOnEndOfFrame(() => node.Modulate = new Color(LinkedComp.Moduluate.Value.r, LinkedComp.Moduluate.Value.g, LinkedComp.Moduluate.Value.b, LinkedComp.Moduluate.Value.a));
 		}
 
 		private void FlipY_Changed(IChangeable obj) {
-			node.FlipV = LinkedComp.FlipV.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.FlipV = LinkedComp.FlipV.Value);
 		}
 
 		private void FlipH_Changed(IChangeable obj) {
-			node.FlipH = LinkedComp.FlipH.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.FlipH = LinkedComp.FlipH.Value);
 		}
 
 		private void OffsetPos_Changed(IChangeable obj) {
-			node.Offset = new Vector2(LinkedComp.OffsetPos.Value.x, LinkedComp.OffsetPos.Value.y);
+			RenderThread.ExecuteOnEndOfFrame(() => node.Offset = new Vector2(LinkedComp.OffsetPos.Value.x, LinkedComp.OffsetPos.Value.y));
 		}
 
 		private void Centered_Changed(IChangeable obj) {
-			node.Centered = LinkedComp.Centered.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Centered = LinkedComp.Centered.Value);
 		}
 	}
 
@@ -149,7 +142,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Texture_LoadChange(RTexture2D obj) {
-			node.Texture = LinkedComp.texture?.Asset?.Inst is GodotTexture2D texture2D ? texture2D.Texture2D : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Texture = LinkedComp.texture?.Asset?.Inst is GodotTexture2D texture2D ? texture2D.Texture2D : null);
 		}
 
 		private void Rect_Changed(IChangeable obj) {
@@ -157,26 +150,27 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			var max = LinkedComp.MaxRect.Value;
 			var pos = ((min - max) / 2) + min;
 			var size = min - max;
-			node.RegionRect = new Rect2(
+			RenderThread.ExecuteOnEndOfFrame(() => 
+				node.RegionRect = new Rect2(
 				new Vector2(pos.x, pos.y), new Vector2(size.x, size.y)
-			);
+			));
 		}
 
 
 		private void RegionEnabled_Changed(IChangeable obj) {
-			node.RegionEnabled = LinkedComp.RegionEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.RegionEnabled = LinkedComp.RegionEnabled.Value);
 		}
 
 		private void Frame_Changed(IChangeable obj) {
-			node.Frame = LinkedComp.Frame.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Frame = LinkedComp.Frame.Value);
 		}
 
 		private void VFrames_Changed(IChangeable obj) {
-			node.Vframes = LinkedComp.VFrames.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Vframes = LinkedComp.VFrames.Value);
 		}
 
 		private void HFrames_Changed(IChangeable obj) {
-			node.Hframes = LinkedComp.HFrames.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Hframes = LinkedComp.HFrames.Value);
 		}
 	}
 }

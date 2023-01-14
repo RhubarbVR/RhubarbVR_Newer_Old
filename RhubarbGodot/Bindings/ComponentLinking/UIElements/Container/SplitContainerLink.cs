@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -30,23 +31,19 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Vertical_Changed(IChangeable obj) {
-			node.Vertical = LinkedComp.Vertical.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Vertical = LinkedComp.Vertical.Value);
 		}
 
 		private void DraggerVisibillity_Changed(IChangeable obj) {
-			node.DraggerVisibility = LinkedComp.DraggerVisibillity.Value switch {
-				RDraggerVisibillity.Visible => Godot.SplitContainer.DraggerVisibilityEnum.Visible,
-				RDraggerVisibillity.Hidden_Callapsed => Godot.SplitContainer.DraggerVisibilityEnum.HiddenCollapsed,
-				_ => Godot.SplitContainer.DraggerVisibilityEnum.Hidden,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.DraggerVisibility = LinkedComp.DraggerVisibillity.Value switch { RDraggerVisibillity.Visible => Godot.SplitContainer.DraggerVisibilityEnum.Visible, RDraggerVisibillity.Hidden_Callapsed => Godot.SplitContainer.DraggerVisibilityEnum.HiddenCollapsed, _ => Godot.SplitContainer.DraggerVisibilityEnum.Hidden, });
 		}
 
 		private void Collapsed_Changed(IChangeable obj) {
-			node.Collapsed = LinkedComp.Collapsed.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Collapsed = LinkedComp.Collapsed.Value);
 		}
 
 		private void SplitOffset_Changed(IChangeable obj) {
-			node.SplitOffset = LinkedComp.SplitOffset.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.SplitOffset = LinkedComp.SplitOffset.Value);
 		}
 	}
 }

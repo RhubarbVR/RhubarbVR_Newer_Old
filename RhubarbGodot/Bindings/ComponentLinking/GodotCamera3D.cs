@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Godot;
 
+using RhuEngine;
 using RhuEngine.Components;
 
 namespace RhubarbVR.Bindings.ComponentLinking
@@ -43,59 +44,51 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Frustum_Offset_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.FrustumOffset = new Vector2(LinkedComp.Frustum_Offset.Value.x, LinkedComp.Frustum_Offset.Value.y);
+			RenderThread.ExecuteOnEndOfFrame(() => node.FrustumOffset = new Vector2(LinkedComp.Frustum_Offset.Value.x, LinkedComp.Frustum_Offset.Value.y));
 		}
 
 		private void Orthongonal_Frustum_Size_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.Size = LinkedComp.Orthongonal_Frustum_Size.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Size = LinkedComp.Orthongonal_Frustum_Size.Value);
 		}
 
 		private void Perspective_Fov_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.Fov = LinkedComp.Perspective_Fov.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Fov = LinkedComp.Perspective_Fov.Value);
 		}
 
 		private void PRojection_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.Projection = LinkedComp.Projection.Value switch {
-				RProjectionMode.Orthongonal => Godot.Camera3D.ProjectionType.Orthogonal,
-				RProjectionMode.Frustum => Godot.Camera3D.ProjectionType.Frustum,
-				_ => Godot.Camera3D.ProjectionType.Perspective,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.Projection = LinkedComp.Projection.Value switch { RProjectionMode.Orthongonal => Godot.Camera3D.ProjectionType.Orthogonal, RProjectionMode.Frustum => Godot.Camera3D.ProjectionType.Frustum, _ => Godot.Camera3D.ProjectionType.Perspective, });
 		}
 
 		private void Far_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.Far = LinkedComp.Far.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Far = LinkedComp.Far.Value);
 		}
 
 		private void Near_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.Near = LinkedComp.Near.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Near = LinkedComp.Near.Value);
 		}
 
 		private void Current_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.Current = LinkedComp.Current.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Current = LinkedComp.Current.Value);
 		}
 
 		private void DopplerTracking_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.DopplerTracking = LinkedComp.DopplerTracking.Value switch {
-				RDopplerEffect.Idle => Godot.Camera3D.DopplerTrackingEnum.IdleStep,
-				RDopplerEffect.Physics => Godot.Camera3D.DopplerTrackingEnum.PhysicsStep,
-				_ => Godot.Camera3D.DopplerTrackingEnum.Disabled,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.DopplerTracking = LinkedComp.DopplerTracking.Value switch { RDopplerEffect.Idle => Godot.Camera3D.DopplerTrackingEnum.IdleStep, RDopplerEffect.Physics => Godot.Camera3D.DopplerTrackingEnum.PhysicsStep, _ => Godot.Camera3D.DopplerTrackingEnum.Disabled, });
 		}
 
 		private void VOffset_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.VOffset = LinkedComp.VOffset.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.VOffset = LinkedComp.VOffset.Value);
 		}
 
 		private void HOffset_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.HOffset = LinkedComp.HOffset.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.HOffset = LinkedComp.HOffset.Value);
 		}
 
 		private void RenderMask_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.CullMask = (uint)LinkedComp.RenderMask.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.CullMask = (uint)LinkedComp.RenderMask.Value);
 		}
 
 		private void KeepWidth_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			node.KeepAspect = LinkedComp.KeepWidth.Value ? Godot.Camera3D.KeepAspectEnum.Width : Godot.Camera3D.KeepAspectEnum.Height;
+			RenderThread.ExecuteOnEndOfFrame(() => node.KeepAspect = LinkedComp.KeepWidth.Value ? Godot.Camera3D.KeepAspectEnum.Width : Godot.Camera3D.KeepAspectEnum.Height);
 		}
 	}
 }

@@ -12,6 +12,7 @@ using RhuEngine.Components;
 using static Godot.Control;
 using static System.Net.Mime.MediaTypeNames;
 using RhubarbVR.Bindings.TextureBindings;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -42,64 +43,64 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void ExpandIcon_Changed(IChangeable obj) {
-			node.ExpandIcon = LinkedComp.ExpandIcon.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ExpandIcon = LinkedComp.ExpandIcon.Value);
 		}
 
 		private void Icon_LoadChange(RTexture2D obj) {
-			node.Icon = LinkedComp.Icon?.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Icon = LinkedComp.Icon?.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null);
 		}
 
 		private void Language_Changed(IChangeable obj) {
-			node.Language = LinkedComp.Language.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Language = LinkedComp.Language.Value);
 		}
 
 		private void TextDir_Changed(IChangeable obj) {
-			node.TextDirection = LinkedComp.TextDir.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextDirection = LinkedComp.TextDir.Value switch {
 				RTextDirection.Auto => TextDirection.Auto,
 				RTextDirection.Ltr => TextDirection.Ltr,
 				RTextDirection.Rtl => TextDirection.Rtl,
 				_ => TextDirection.Inherited,
-			};
+			});
 		}
 
 		private void IconAlignment_Changed(IChangeable obj) {
-			node.IconAlignment = LinkedComp.IconAlignment.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.IconAlignment = LinkedComp.IconAlignment.Value switch {
 				RButtonAlignment.Left => HorizontalAlignment.Left,
 				RButtonAlignment.Right => HorizontalAlignment.Right,
 				RButtonAlignment.Center => HorizontalAlignment.Center,
 				_ => HorizontalAlignment.Fill,
-			};
+			});
 		}
 
 		private void TextOverrunBehavior_Changed(IChangeable obj) {
-			node.TextOverrunBehavior = LinkedComp.TextOverrunBehavior.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextOverrunBehavior = LinkedComp.TextOverrunBehavior.Value switch {
 				ROverrunBehavior.TrimChar => TextServer.OverrunBehavior.TrimChar,
 				ROverrunBehavior.TrimWord => TextServer.OverrunBehavior.TrimWord,
 				ROverrunBehavior.TrimEllipsis => TextServer.OverrunBehavior.TrimEllipsis,
 				ROverrunBehavior.TrimWordEllipsis => TextServer.OverrunBehavior.TrimWordEllipsis,
 				_ => TextServer.OverrunBehavior.NoTrimming,
-			};
+			});
 		}
 
 		private void Alignment_Changed(IChangeable obj) {
-			node.Alignment = LinkedComp.Alignment.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.Alignment = LinkedComp.Alignment.Value switch {
 				RButtonAlignment.Left => HorizontalAlignment.Left,
 				RButtonAlignment.Center => HorizontalAlignment.Center,
 				RButtonAlignment.Right => HorizontalAlignment.Right,
 				_ => HorizontalAlignment.Fill,
-			};
+			});
 		}
 
 		private void ClipText_Changed(IChangeable obj) {
-			node.ClipText = LinkedComp.ClipText.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ClipText = LinkedComp.ClipText.Value);
 		}
 
 		private void Flat_Changed(IChangeable obj) {
-			node.Flat = LinkedComp.Flat.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Flat = LinkedComp.Flat.Value);
 		}
 
 		private void Text_Changed(IChangeable obj) {
-			node.Text = LinkedComp.Text.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Text = LinkedComp.Text.Value);
 		}
 	}
 

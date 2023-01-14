@@ -63,71 +63,75 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		public void Children_OnReorderList() {
-			if (node is null) {
-				return;
-			}
-			if (LinkedComp is null) {
-				return;
-			}
-			if (LinkedComp.IsDestroying | LinkedComp.IsRemoved) {
-				return;
-			}
-			for (var i = 0; i < LinkedComp.Entity.children.Count; i++) {
-				var item = LinkedComp.Entity.children[i];
-				if (item?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
-					if (canvasItem?.CanvasItem?.GetParent() == CanvasItem) {
-						node.MoveChild(canvasItem.CanvasItem, -1);
-					}
-					else {
-						if (CanvasItem == canvasItem?.CanvasItem) {
-							continue;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node is null) {
+					return;
+				}
+				if (LinkedComp is null) {
+					return;
+				}
+				if (LinkedComp.IsDestroying | LinkedComp.IsRemoved) {
+					return;
+				}
+				for (var i = 0; i < LinkedComp.Entity.children.Count; i++) {
+					var item = LinkedComp.Entity.children[i];
+					if (item?.CanvasItem?.WorldLink is ICanvasItemNodeLinked canvasItem) {
+						if (canvasItem?.CanvasItem?.GetParent() == CanvasItem) {
+							node.MoveChild(canvasItem.CanvasItem, -1);
 						}
-						if (canvasItem.CanvasItem is null) {
-							continue;
+						else {
+							if (CanvasItem == canvasItem?.CanvasItem) {
+								continue;
+							}
+							if (canvasItem.CanvasItem is null) {
+								continue;
+							}
+							canvasItem.CanvasItem?.GetParent()?.RemoveChild(canvasItem.CanvasItem);
+							CanvasItem.AddChild(canvasItem.CanvasItem);
+							canvasItem.CanvasItem.Owner = CanvasItem;
+							CanvasItem.MoveChild(canvasItem.CanvasItem, -1);
 						}
-						canvasItem.CanvasItem?.GetParent()?.RemoveChild(canvasItem.CanvasItem);
-						CanvasItem.AddChild(canvasItem.CanvasItem);
-						canvasItem.CanvasItem.Owner = CanvasItem;
-						CanvasItem.MoveChild(canvasItem.CanvasItem, -1);
 					}
 				}
-			}
+			});
 		}
 
 
 		public virtual void UpdateParrent() {
-			if (node is null) {
-				return;
-			}
-			if (LinkedComp is null) {
-				return;
-			}
-			if (LinkedComp.IsDestroying | LinkedComp.IsRemoved) {
-				return;
-			}
-			if (node.Owner is null) {
-				if (LinkedComp.Entity.Viewport?.WorldLink is ViewportLink ee && (LinkedComp.Entity?.InternalParent?.CanvasItem is null)) {
-					ee.node.AddChild(node);
-					node.Owner = ee.node;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node is null) {
+					return;
 				}
-				else if (LinkedComp.Entity.InternalParent?.Viewport?.WorldLink is ViewportLink eee && (LinkedComp.Entity?.InternalParent?.CanvasItem is null)) {
-					eee.node.AddChild(node);
-					node.Owner = eee.node;
+				if (LinkedComp is null) {
+					return;
 				}
-				else {
-					if (LinkedComp.World.IsPersonalSpace) {
-						EngineRunnerHelpers._.AddChild(node);
-						node.Owner = EngineRunnerHelpers._;
+				if (LinkedComp.IsDestroying | LinkedComp.IsRemoved) {
+					return;
+				}
+				if (node.Owner is null) {
+					if (LinkedComp.Entity.Viewport?.WorldLink is ViewportLink ee && (LinkedComp.Entity?.InternalParent?.CanvasItem is null)) {
+						ee.node.AddChild(node);
+						node.Owner = ee.node;
+					}
+					else if (LinkedComp.Entity.InternalParent?.Viewport?.WorldLink is ViewportLink eee && (LinkedComp.Entity?.InternalParent?.CanvasItem is null)) {
+						eee.node.AddChild(node);
+						node.Owner = eee.node;
 					}
 					else {
-						EngineRunnerHelpers._.ThowAway.AddChild(node);
-						node.Owner = EngineRunnerHelpers._.ThowAway;
+						if (LinkedComp.World.IsPersonalSpace) {
+							EngineRunnerHelpers._.AddChild(node);
+							node.Owner = EngineRunnerHelpers._;
+						}
+						else {
+							EngineRunnerHelpers._.ThowAway.AddChild(node);
+							node.Owner = EngineRunnerHelpers._.ThowAway;
+						}
 					}
 				}
-			}
-			if (LinkedComp.Entity?.InternalParent?.CanvasItem?.WorldLink is ICanvasItemNodeLinked linked) {
-				linked.Children_OnReorderList();
-			}
+				if (LinkedComp.Entity?.InternalParent?.CanvasItem?.WorldLink is ICanvasItemNodeLinked linked) {
+					linked.Children_OnReorderList();
+				}
+			});
 		}
 
 		public abstract void StartContinueInit();
@@ -144,17 +148,21 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		public override void Started() {
-			if (node is null) {
-				return;
-			}
-			node.Visible = true;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node is null) {
+					return;
+				}
+				node.Visible = true;
+			});
 		}
 
 		public override void Stopped() {
-			if (node is null) {
-				return;
-			}
-			node.Visible = false;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node is null) {
+					return;
+				}
+				node.Visible = false;
+			});
 		}
 
 		private void LoadCanvasItemLink() {
@@ -181,56 +189,43 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Material_LoadChange(RMaterial obj) {
-			node.Material = LinkedComp.Material?.Asset?.Target is GodotMaterial godotMaterial ? (godotMaterial?.Material) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Material = LinkedComp.Material?.Asset?.Target is GodotMaterial godotMaterial ? (godotMaterial?.Material) : null);
 		}
 
 		private void UseParentMaterial_Changed(IChangeable obj) {
-			node.UseParentMaterial = LinkedComp.UseParentMaterial.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.UseParentMaterial = LinkedComp.UseParentMaterial.Value);
 		}
 
 		private void Repeat_Changed(IChangeable obj) {
-			node.TextureRepeat = LinkedComp.Repeat.Value switch {
-				RhuEngine.Components.RElementTextureRepeat.Disable => CanvasItem.TextureRepeatEnum.Disabled,
-				RhuEngine.Components.RElementTextureRepeat.Enabled => CanvasItem.TextureRepeatEnum.Enabled,
-				RhuEngine.Components.RElementTextureRepeat.Mirror => CanvasItem.TextureRepeatEnum.Mirror,
-				_ => CanvasItem.TextureRepeatEnum.ParentNode,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextureRepeat = LinkedComp.Repeat.Value switch { RhuEngine.Components.RElementTextureRepeat.Disable => CanvasItem.TextureRepeatEnum.Disabled, RhuEngine.Components.RElementTextureRepeat.Enabled => CanvasItem.TextureRepeatEnum.Enabled, RhuEngine.Components.RElementTextureRepeat.Mirror => CanvasItem.TextureRepeatEnum.Mirror, _ => CanvasItem.TextureRepeatEnum.ParentNode, });
 		}
 
 		private void Filter_Changed(IChangeable obj) {
-			node.TextureFilter = LinkedComp.Filter.Value switch {
-				RhuEngine.Components.RElementTextureFilter.Nearest => CanvasItem.TextureFilterEnum.Nearest,
-				RhuEngine.Components.RElementTextureFilter.Linear => CanvasItem.TextureFilterEnum.Linear,
-				RhuEngine.Components.RElementTextureFilter.LinearMipmap => CanvasItem.TextureFilterEnum.LinearWithMipmaps,
-				RhuEngine.Components.RElementTextureFilter.NearestMipmap => CanvasItem.TextureFilterEnum.NearestWithMipmaps,
-				RhuEngine.Components.RElementTextureFilter.NearestMipmapAnisotropic => CanvasItem.TextureFilterEnum.NearestWithMipmapsAnisotropic,
-				RhuEngine.Components.RElementTextureFilter.LinearMipmapAnisotropic => CanvasItem.TextureFilterEnum.LinearWithMipmapsAnisotropic,
-				_ => CanvasItem.TextureFilterEnum.ParentNode,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextureFilter = LinkedComp.Filter.Value switch { RhuEngine.Components.RElementTextureFilter.Nearest => CanvasItem.TextureFilterEnum.Nearest, RhuEngine.Components.RElementTextureFilter.Linear => CanvasItem.TextureFilterEnum.Linear, RhuEngine.Components.RElementTextureFilter.LinearMipmap => CanvasItem.TextureFilterEnum.LinearWithMipmaps, RhuEngine.Components.RElementTextureFilter.NearestMipmap => CanvasItem.TextureFilterEnum.NearestWithMipmaps, RhuEngine.Components.RElementTextureFilter.NearestMipmapAnisotropic => CanvasItem.TextureFilterEnum.NearestWithMipmapsAnisotropic, RhuEngine.Components.RElementTextureFilter.LinearMipmapAnisotropic => CanvasItem.TextureFilterEnum.LinearWithMipmapsAnisotropic, _ => CanvasItem.TextureFilterEnum.ParentNode, });
 		}
 
 		private void Mask_Changed(IChangeable obj) {
-			node.LightMask = (int)LinkedComp.LightMask.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.LightMask = (int)LinkedComp.LightMask.Value);
 		}
 
 		private void ClipChildren_Changed(IChangeable obj) {
-			node.ClipChildren = (CanvasItem.ClipChildrenMode)LinkedComp.ClipChildren.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ClipChildren = (CanvasItem.ClipChildrenMode)LinkedComp.ClipChildren.Value);
 		}
 
 		private void TopLevel_Changed(IChangeable obj) {
-			node.TopLevel = LinkedComp.TopLevel.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TopLevel = LinkedComp.TopLevel.Value);
 		}
 
 		private void ShowBehindParent_Changed(IChangeable obj) {
-			node.ShowBehindParent = LinkedComp.ShowBehindParent.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ShowBehindParent = LinkedComp.ShowBehindParent.Value);
 		}
 
 		private void ModulateSelf_Changed(IChangeable obj) {
-			node.SelfModulate = new Color(LinkedComp.ModulateSelf.Value.r, LinkedComp.ModulateSelf.Value.g, LinkedComp.ModulateSelf.Value.b, LinkedComp.ModulateSelf.Value.a);
+			RenderThread.ExecuteOnEndOfFrame(() => node.SelfModulate = new Color(LinkedComp.ModulateSelf.Value.r, LinkedComp.ModulateSelf.Value.g, LinkedComp.ModulateSelf.Value.b, LinkedComp.ModulateSelf.Value.a));
 		}
 
 		private void Modulate_Changed(IChangeable obj) {
-			node.Modulate = new Color(LinkedComp.Modulate.Value.r, LinkedComp.Modulate.Value.g, LinkedComp.Modulate.Value.b, LinkedComp.Modulate.Value.a);
+			RenderThread.ExecuteOnEndOfFrame(() => node.Modulate = new Color(LinkedComp.Modulate.Value.r, LinkedComp.Modulate.Value.g, LinkedComp.Modulate.Value.b, LinkedComp.Modulate.Value.a));
 		}
 	}
 
@@ -252,11 +247,24 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		public virtual void Entity_ViewportUpdateEvent() {
-			node.GetParent()?.RemoveChild(node);
-			if (LinkedComp.Entity.Viewport?.WorldLink is ViewportLink ee) {
-				if (LinkedComp.Entity.Viewport != LinkedComp) {
-					ee.node.AddChild(node);
-					node.Owner = ee.node;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				node.GetParent()?.RemoveChild(node);
+				if (LinkedComp.Entity.Viewport?.WorldLink is ViewportLink ee) {
+					if (LinkedComp.Entity.Viewport != LinkedComp) {
+						ee.node.AddChild(node);
+						node.Owner = ee.node;
+					}
+					else {
+						if (GoToEngineRoot) {
+							EngineRunnerHelpers._.AddChild(node);
+							node.Owner = EngineRunnerHelpers._;
+						}
+						else {
+							EngineRunnerHelpers._.ThowAway.AddChild(node);
+							node.Owner = EngineRunnerHelpers._.ThowAway;
+						}
+
+					}
 				}
 				else {
 					if (GoToEngineRoot) {
@@ -267,19 +275,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 						EngineRunnerHelpers._.ThowAway.AddChild(node);
 						node.Owner = EngineRunnerHelpers._.ThowAway;
 					}
-
 				}
-			}
-			else {
-				if (GoToEngineRoot) {
-					EngineRunnerHelpers._.AddChild(node);
-					node.Owner = EngineRunnerHelpers._;
-				}
-				else {
-					EngineRunnerHelpers._.ThowAway.AddChild(node);
-					node.Owner = EngineRunnerHelpers._.ThowAway;
-				}
-			}
+			});
 		}
 
 		public abstract void StartContinueInit();
@@ -312,18 +309,21 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 
 		public override void Started() {
-			if (node is null) {
-				return;
-			}
-
-			node.Visible = true;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node is null) {
+					return;
+				}
+				node.Visible = true;
+			});		
 		}
 
 		public override void Stopped() {
-			if (node is null) {
-				return;
-			}
-			node.Visible = false;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node is null) {
+					return;
+				}
+				node.Visible = false;
+			});
 		}
 
 		public bool UpdatePosThisFrame { get; private set; } = true;

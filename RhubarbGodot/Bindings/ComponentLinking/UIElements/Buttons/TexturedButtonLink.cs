@@ -11,6 +11,7 @@ using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
 using RhubarbVR.Bindings.TextureBindings;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -44,51 +45,43 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		//Todo Add with bitmap support
 		private void Texture_ClickMask_LoadChange(RTexture2D obj) {
 			var texture = LinkedComp.Texture_ClickMask.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
-			
+
 		}
 
 		private void Texture_Focused_LoadChange(RTexture2D obj) {
-			node.TextureFocused = LinkedComp.Texture_Focused.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextureFocused = LinkedComp.Texture_Focused.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null);
 		}
 
 		private void Texture_Disabled_LoadChange(RTexture2D obj) {
-			node.TextureDisabled = LinkedComp.Texture_Disabled.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextureDisabled = LinkedComp.Texture_Disabled.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null);
 		}
 
 		private void Texture_Hover_LoadChange(RTexture2D obj) {
-			node.TextureHover = LinkedComp.Texture_Hover.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextureHover = LinkedComp.Texture_Hover.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null);
 		}
 
 		private void Texture_Press_LoadChange(RTexture2D obj) {
-			node.TexturePressed = LinkedComp.Texture_Press.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TexturePressed = LinkedComp.Texture_Press.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null);
 		}
 
 		private void Texture_Normal_LoadChange(RTexture2D obj) {
-			node.TextureNormal = LinkedComp.Texture_Normal.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextureNormal = LinkedComp.Texture_Normal.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null);
 		}
 
 		private void FlipVertical_Changed(IChangeable obj) {
-			node.FlipV = LinkedComp.FlipVertical.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.FlipV = LinkedComp.FlipVertical.Value);
 		}
 
 		private void FlipHorizontal_Changed(IChangeable obj) {
-			node.FlipH = LinkedComp.FlipHorizontal.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.FlipH = LinkedComp.FlipHorizontal.Value);
 		}
 
 		private void StretchMode_Changed(IChangeable obj) {
-			node.StretchMode = LinkedComp.StretchMode.Value switch {
-				RTexturedButtonStretchMode.Tile => TextureButton.StretchModeEnum.Tile,
-				RTexturedButtonStretchMode.Keep => TextureButton.StretchModeEnum.Keep,
-				RTexturedButtonStretchMode.KeepCenter => TextureButton.StretchModeEnum.KeepCentered,
-				RTexturedButtonStretchMode.KeepAsspect => TextureButton.StretchModeEnum.KeepAspect,
-				RTexturedButtonStretchMode.KeepAsspectCenter => TextureButton.StretchModeEnum.KeepAspectCentered,
-				RTexturedButtonStretchMode.KeepAsspectCovered => TextureButton.StretchModeEnum.KeepAspectCovered,
-				_ => TextureButton.StretchModeEnum.Scale,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.StretchMode = LinkedComp.StretchMode.Value switch { RTexturedButtonStretchMode.Tile => TextureButton.StretchModeEnum.Tile, RTexturedButtonStretchMode.Keep => TextureButton.StretchModeEnum.Keep, RTexturedButtonStretchMode.KeepCenter => TextureButton.StretchModeEnum.KeepCentered, RTexturedButtonStretchMode.KeepAsspect => TextureButton.StretchModeEnum.KeepAspect, RTexturedButtonStretchMode.KeepAsspectCenter => TextureButton.StretchModeEnum.KeepAspectCentered, RTexturedButtonStretchMode.KeepAsspectCovered => TextureButton.StretchModeEnum.KeepAspectCovered, _ => TextureButton.StretchModeEnum.Scale, });
 		}
 
 		private void IgnoreTextureSize_Changed(IChangeable obj) {
-			node.IgnoreTextureSize = LinkedComp.IgnoreTextureSize.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.IgnoreTextureSize = LinkedComp.IgnoreTextureSize.Value);
 		}
 	}
 }

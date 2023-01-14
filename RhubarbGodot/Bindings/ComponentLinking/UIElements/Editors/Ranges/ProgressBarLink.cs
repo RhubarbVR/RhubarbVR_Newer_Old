@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking {
 	public sealed class ProgressBarLink : RangeBase<RhuEngine.Components.ProgressBar, Godot.ProgressBar>
@@ -24,11 +25,11 @@ namespace RhubarbVR.Bindings.ComponentLinking {
 		}
 
 		private void FillMode_Changed(IChangeable obj) {
-			node.FillMode = (int)LinkedComp.FillMode.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.FillMode = (int)LinkedComp.FillMode.Value);
 		}
 
 		private void ShowPerrcentage_Changed(IChangeable obj) {
-			node.ShowPercentage = LinkedComp.ShowPerrcentage.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ShowPercentage = LinkedComp.ShowPerrcentage.Value);
 		}
 	}
 }

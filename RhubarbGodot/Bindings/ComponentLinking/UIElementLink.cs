@@ -11,6 +11,7 @@ using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
 using RhubarbVR.Bindings.FontBindings;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -185,7 +186,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void ToolTipText_Changed(IChangeable obj) {
-			node.TooltipText = LinkedComp.ToolTipText.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TooltipText = LinkedComp.ToolTipText.Value);
 		}
 
 		protected void Node_FocusExited() {
@@ -232,108 +233,104 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void FocusMode_Changed(IChangeable obj) {
-			node.FocusMode = LinkedComp.FocusMode.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.FocusMode = LinkedComp.FocusMode.Value switch {
 				RFocusMode.Click => FocusModeEnum.Click,
 				RFocusMode.All => FocusModeEnum.All,
 				_ => FocusModeEnum.None,
-			};
+			});
 		}
 
 		private void CursorShape_Changed(IChangeable obj) {
-			node.MouseDefaultCursorShape = (CursorShape)LinkedComp.CursorShape.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.MouseDefaultCursorShape = (CursorShape)LinkedComp.CursorShape.Value);
 		}
 
 		private void ForceScrollEventPassing_Changed(IChangeable obj) {
-			node.MouseForcePassScrollEvents = LinkedComp.ForceScrollEventPassing.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.MouseForcePassScrollEvents = LinkedComp.ForceScrollEventPassing.Value);
 		}
 
 		private void InputFilter_Changed(IChangeable obj) {
-			node.MouseFilter = LinkedComp.InputFilter.Value switch {
-				RInputFilter.Pass => MouseFilterEnum.Pass,
-				RInputFilter.Ignore => MouseFilterEnum.Ignore,
-				_ => MouseFilterEnum.Stop,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.MouseFilter = LinkedComp.InputFilter.Value switch { RInputFilter.Pass => MouseFilterEnum.Pass, RInputFilter.Ignore => MouseFilterEnum.Ignore, _ => MouseFilterEnum.Stop, });
 		}
 
 		private void AutoTranslate_Changed(IChangeable obj) {
-			node.AutoTranslate = LinkedComp.AutoTranslate.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.AutoTranslate = LinkedComp.AutoTranslate.Value);
 		}
 
 		private void StretchRatio_Changed(IChangeable obj) {
-			node.SizeFlagsStretchRatio = LinkedComp.StretchRatio.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.SizeFlagsStretchRatio = LinkedComp.StretchRatio.Value);
 		}
 
 		private void VerticalFilling_Changed(IChangeable obj) {
-			node.SizeFlagsVertical = (SizeFlags)LinkedComp.VerticalFilling.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.SizeFlagsVertical = (SizeFlags)LinkedComp.VerticalFilling.Value);
 		}
 
 		private void HorizontalFilling_Changed(IChangeable obj) {
-			node.SizeFlagsHorizontal = (SizeFlags)LinkedComp.HorizontalFilling.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.SizeFlagsHorizontal = (SizeFlags)LinkedComp.HorizontalFilling.Value);
 		}
 
 		private void PivotOffset_Changed(IChangeable obj) {
-			node.PivotOffset = new Vector2(LinkedComp.PivotOffset.Value.x, LinkedComp.PivotOffset.Value.y);
+			RenderThread.ExecuteOnEndOfFrame(() => node.PivotOffset = new Vector2(LinkedComp.PivotOffset.Value.x, LinkedComp.PivotOffset.Value.y));
 		}
 
 		private void Scale_Changed(IChangeable obj) {
-			node.Scale = new Vector2(LinkedComp.Scale.Value.x, LinkedComp.Scale.Value.y);
+			RenderThread.ExecuteOnEndOfFrame(() => node.Scale = new Vector2(LinkedComp.Scale.Value.x, LinkedComp.Scale.Value.y));
 		}
 
 		private void Rotation_Changed(IChangeable obj) {
-			node.Rotation = LinkedComp.Rotation.Value * RNumerics.MathUtil.DEG_2_RADF;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Rotation = LinkedComp.Rotation.Value * RNumerics.MathUtil.DEG_2_RADF);
 		}
 
 		private void GrowVertical_Changed(IChangeable obj) {
-			node.GrowVertical = LinkedComp.GrowVertical.Value switch {
-				RGrowVertical.Top => GrowDirection.Begin,
-				RGrowVertical.Bottom => GrowDirection.End,
-				_ => GrowDirection.Both,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.GrowVertical = LinkedComp.GrowVertical.Value switch { RGrowVertical.Top => GrowDirection.Begin, RGrowVertical.Bottom => GrowDirection.End, _ => GrowDirection.Both, });
 		}
 
 		private void GrowHorizontal_Changed(IChangeable obj) {
-			node.GrowHorizontal = LinkedComp.GrowHorizontal.Value switch {
-				RGrowHorizontal.Left => GrowDirection.Begin,
-				RGrowHorizontal.Right => GrowDirection.End,
-				_ => GrowDirection.Both,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.GrowHorizontal = LinkedComp.GrowHorizontal.Value switch { RGrowHorizontal.Left => GrowDirection.Begin, RGrowHorizontal.Right => GrowDirection.End, _ => GrowDirection.Both, });
 		}
 
 		private void MaxOffset_Changed(IChangeable obj) {
-			node.OffsetBottom = LinkedComp.MaxOffset.Value.y;
-			node.OffsetLeft = LinkedComp.MaxOffset.Value.x;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				node.OffsetBottom = LinkedComp.MaxOffset.Value.y;
+				node.OffsetLeft = LinkedComp.MaxOffset.Value.x;
+			});
 		}
 
 		private void MinOffset_Changed(IChangeable obj) {
-			node.OffsetTop = LinkedComp.MinOffset.Value.y;
-			node.OffsetRight = LinkedComp.MinOffset.Value.x;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				node.OffsetTop = LinkedComp.MinOffset.Value.y;
+				node.OffsetRight = LinkedComp.MinOffset.Value.x;
+			});
 		}
 
 		private void Max_Changed(IChangeable obj) {
-			node.AnchorBottom = LinkedComp.Max.Value.y;
-			node.AnchorRight = LinkedComp.Max.Value.x;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				node.AnchorBottom = LinkedComp.Max.Value.y;
+				node.AnchorRight = LinkedComp.Max.Value.x;
+			});
 		}
 
 		private void Min_Changed(IChangeable obj) {
-			node.AnchorTop = LinkedComp.Min.Value.y;
-			node.AnchorLeft = LinkedComp.Min.Value.x;
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				node.AnchorTop = LinkedComp.Min.Value.y;
+				node.AnchorLeft = LinkedComp.Min.Value.x;
+			});
 		}
 
 		private void LayoutDir_Changed(IChangeable obj) {
-			node.LayoutDirection = LinkedComp.LayoutDir.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.LayoutDirection = LinkedComp.LayoutDir.Value switch {
 				RLayoutDir.Locale => LayoutDirectionEnum.Locale,
 				RLayoutDir.Left_to_Right => LayoutDirectionEnum.Ltr,
 				RLayoutDir.Right_to_Left => LayoutDirectionEnum.Rtl,
 				_ => LayoutDirectionEnum.Inherited,
-			};
+			});
 		}
 
 		private void MinSize_Changed(IChangeable obj) {
-			node.CustomMinimumSize = new Vector2i(LinkedComp.MinSize.Value.x, LinkedComp.MinSize.Value.y);
+			RenderThread.ExecuteOnEndOfFrame(() => node.CustomMinimumSize = new Vector2i(LinkedComp.MinSize.Value.x, LinkedComp.MinSize.Value.y));
 		}
 
 		private void ClipContents_Changed(IChangeable obj) {
-			node.ClipContents = LinkedComp.ClipContents.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ClipContents = LinkedComp.ClipContents.Value);
 		}
 
 		public override void Render() {

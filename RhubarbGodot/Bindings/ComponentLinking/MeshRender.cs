@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Godot;
 
+using RhuEngine;
 using RhuEngine.Components;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
@@ -29,7 +30,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		public override void Render() {
 			base.Render();
-			if(node.Mesh is null) {
+			if (node.Mesh is null) {
 				return;
 			}
 			var currentIndex = 0;
@@ -46,14 +47,16 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 
 		private void Armature_Changed(IChangeable obj) {
-			var target = LinkedComp.Armature.Target?.WorldLink;
-			if (target is null) {
-				node.Skeleton = null;
-				return;
-			}
-			if (target is ArmatureLink armature) {
-				node.Skeleton = armature.node.GetPath();
-			}
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				var target = LinkedComp.Armature.Target?.WorldLink;
+				if (target is null) {
+					node.Skeleton = null;
+					return;
+				}
+				if (target is ArmatureLink armature) {
+					node.Skeleton = armature.node.GetPath();
+				}
+			});
 		}
 	}
 
@@ -180,7 +183,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public List<AssetRef<RMaterial>> BoundTo = new();
 
 		private void AssetUpdate(RMaterial rMaterial) {
-			RUpdateManager.ExecuteOnStartOfFrame(BoundTo, MitReloadAction);
+			RUpdateManager.ExecuteOnStartOfUpdate(BoundTo, MitReloadAction);
 		}
 
 		private void Materials_Changed(IChangeable obj) {
@@ -221,11 +224,11 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void MatUpdate(RhuEngine.WorldObjects.IChangeable obj) {
-			RUpdateManager.ExecuteOnStartOfFrame(BoundTo, MitReloadAction);
+			RUpdateManager.ExecuteOnStartOfUpdate(BoundTo, MitReloadAction);
 		}
 
 		private void Mesh_LoadChange(RhuEngine.Linker.RMesh obj) {
-			if(node is null) {
+			if (node is null) {
 				return;
 			}
 			if (obj is null) {

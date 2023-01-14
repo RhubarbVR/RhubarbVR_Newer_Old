@@ -11,6 +11,7 @@ using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
 using static Godot.TextServer;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -60,96 +61,80 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Language_Changed(IChangeable obj) {
-			node.Language = LinkedComp.Language.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Language = LinkedComp.Language.Value);
 		}
 
 		private void TextDir_Changed(IChangeable obj) {
-			node.TextDirection = LinkedComp.TextDir.Value switch {
-				RTextDirection.Auto => TextDirection.Auto,
-				RTextDirection.Ltr => TextDirection.Ltr,
-				RTextDirection.Rtl => TextDirection.Rtl,
-				_ => TextDirection.Inherited,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextDirection = LinkedComp.TextDir.Value switch { RTextDirection.Auto => TextDirection.Auto, RTextDirection.Ltr => TextDirection.Ltr, RTextDirection.Rtl => TextDirection.Rtl, _ => TextDirection.Inherited, });
 		}
 
 		private void VisibleRatio_Changed(IChangeable obj) {
-			node.VisibleRatio = LinkedComp.VisibleRatio.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.VisibleRatio = LinkedComp.VisibleRatio.Value);
 		}
 
 		private void VisibleCharactersBehavior_Changed(IChangeable obj) {
-			node.VisibleCharactersBehavior = LinkedComp.VisibleCharactersBehavior.Value switch {
-				RhuEngine.Components.RVisibleCharactersBehavior.CharactersBeforeShaping => VisibleCharactersBehavior.CharsBeforeShaping,
-				RhuEngine.Components.RVisibleCharactersBehavior.CharactersAfterShaping => VisibleCharactersBehavior.CharsAfterShaping,
-				RhuEngine.Components.RVisibleCharactersBehavior.GlyphsLayoutDir => VisibleCharactersBehavior.GlyphsAuto,
-				RhuEngine.Components.RVisibleCharactersBehavior.GlyphsLayoutRightToLeft => VisibleCharactersBehavior.GlyphsRtl,
-				_ => VisibleCharactersBehavior.GlyphsLtr,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.VisibleCharactersBehavior = LinkedComp.VisibleCharactersBehavior.Value switch { RhuEngine.Components.RVisibleCharactersBehavior.CharactersBeforeShaping => VisibleCharactersBehavior.CharsBeforeShaping, RhuEngine.Components.RVisibleCharactersBehavior.CharactersAfterShaping => VisibleCharactersBehavior.CharsAfterShaping, RhuEngine.Components.RVisibleCharactersBehavior.GlyphsLayoutDir => VisibleCharactersBehavior.GlyphsAuto, RhuEngine.Components.RVisibleCharactersBehavior.GlyphsLayoutRightToLeft => VisibleCharactersBehavior.GlyphsRtl, _ => VisibleCharactersBehavior.GlyphsLtr, });
 		}
 
 		private void DeselectingOnFocusLossEnabled_Changed(IChangeable obj) {
-			node.DeselectOnFocusLossEnabled = LinkedComp.DeselectingOnFocusLossEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.DeselectOnFocusLossEnabled = LinkedComp.DeselectingOnFocusLossEnabled.Value);
 		}
 
 
 		private void TextSelectionEnabled_Changed(IChangeable obj) {
-			node.SelectionEnabled = LinkedComp.TextSelectionEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.SelectionEnabled = LinkedComp.TextSelectionEnabled.Value);
 		}
 
 		private void ProgressBarDelay_Changed(IChangeable obj) {
-			node.ProgressBarDelay = LinkedComp.ProgressBarDelay.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ProgressBarDelay = LinkedComp.ProgressBarDelay.Value);
 		}
 
 		private void Threading_Changed(IChangeable obj) {
-			node.Threaded = LinkedComp.Threading.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Threaded = LinkedComp.Threading.Value);
 		}
 
 		private void HintUnderline_Changed(IChangeable obj) {
-			node.HintUnderlined = LinkedComp.HintUnderline.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.HintUnderlined = LinkedComp.HintUnderline.Value);
 		}
 
 		private void MetaUnderline_Changed(IChangeable obj) {
-			node.MetaUnderlined = LinkedComp.MetaUnderline.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.MetaUnderlined = LinkedComp.MetaUnderline.Value);
 		}
 
 		private void ShortcutKeysEnabled_Changed(IChangeable obj) {
-			node.ShortcutKeysEnabled = LinkedComp.ShortcutKeysEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ShortcutKeysEnabled = LinkedComp.ShortcutKeysEnabled.Value);
 		}
 
 		private void ContextMenuEnabled_Changed(IChangeable obj) {
-			node.ContextMenuEnabled = LinkedComp.ContextMenuEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ContextMenuEnabled = LinkedComp.ContextMenuEnabled.Value);
 		}
 
 		private void TabSize_Changed(IChangeable obj) {
-			node.TabSize = LinkedComp.TabSize.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.TabSize = LinkedComp.TabSize.Value);
 		}
 
 		private void AutoWrapMode_Changed(IChangeable obj) {
-			node.AutowrapMode = LinkedComp.AutoWrapMode.Value switch {
-				RAutowrapMode.Arbitrary => AutowrapMode.Arbitrary,
-				RAutowrapMode.Word => AutowrapMode.Word,
-				RAutowrapMode.WordSmart => AutowrapMode.WordSmart,
-				_ => AutowrapMode.Off,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.AutowrapMode = LinkedComp.AutoWrapMode.Value switch { RAutowrapMode.Arbitrary => AutowrapMode.Arbitrary, RAutowrapMode.Word => AutowrapMode.Word, RAutowrapMode.WordSmart => AutowrapMode.WordSmart, _ => AutowrapMode.Off, });
 		}
 
 		private void ScrollFollowing_Changed(IChangeable obj) {
-			node.ScrollFollowing = LinkedComp.ScrollFollowing.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollFollowing = LinkedComp.ScrollFollowing.Value);
 		}
 
 		private void ScrollActive_Changed(IChangeable obj) {
-			node.ScrollActive = LinkedComp.ScrollActive.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollActive = LinkedComp.ScrollActive.Value);
 		}
 
 		private void FitContentHeight_Changed(IChangeable obj) {
-			node.FitContentHeight = LinkedComp.FitContentHeight.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.FitContentHeight = LinkedComp.FitContentHeight.Value);
 		}
 
 		private void Text_Changed(IChangeable obj) {
-			node.Text = LinkedComp.Text.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Text = LinkedComp.Text.Value);
 		}
 
 		private void BitcodeEnabled_Changed(IChangeable obj) {
-			node.BbcodeEnabled = LinkedComp.BitcodeEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.BbcodeEnabled = LinkedComp.BitcodeEnabled.Value);
 		}
 	}
 }

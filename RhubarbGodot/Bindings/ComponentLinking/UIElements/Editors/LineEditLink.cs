@@ -12,6 +12,7 @@ using RhuEngine.Components;
 using static Godot.Control;
 using static System.Net.Mime.MediaTypeNames;
 using RhubarbVR.Bindings.TextureBindings;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -78,7 +79,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void SelectAllOnFocus_Changed(IChangeable obj) {
-			node.SelectAllOnFocus = LinkedComp.SelectAllOnFocus.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.SelectAllOnFocus = LinkedComp.SelectAllOnFocus.Value);
 		}
 
 		private void Node_TextSubmitted(string newText) {
@@ -92,121 +93,109 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void RightIcon_LoadChange(RTexture2D obj) {
-			node.RightIcon = LinkedComp.RightIcon.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.RightIcon = LinkedComp.RightIcon.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null);
 		}
 
 		private void Language_Changed(IChangeable obj) {
-			node.Language = LinkedComp.Language.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Language = LinkedComp.Language.Value);
 		}
 
 		private void TextDir_Changed(IChangeable obj) {
-			node.TextDirection = LinkedComp.TextDir.Value switch {
-				RTextDirection.Auto => TextDirection.Auto,
-				RTextDirection.Ltr => TextDirection.Ltr,
-				RTextDirection.Rtl => TextDirection.Rtl,
-				_ => TextDirection.Inherited,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextDirection = LinkedComp.TextDir.Value switch { RTextDirection.Auto => TextDirection.Auto, RTextDirection.Ltr => TextDirection.Ltr, RTextDirection.Rtl => TextDirection.Rtl, _ => TextDirection.Inherited, });
 		}
 
 		private void CaretMidGrapheme_Changed(IChangeable obj) {
-			node.CaretMidGrapheme = LinkedComp.CaretMidGrapheme.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.CaretMidGrapheme = LinkedComp.CaretMidGrapheme.Value);
 		}
 
 		private void CaretForceDisplay_Changed(IChangeable obj) {
-			node.CaretForceDisplayed = LinkedComp.CaretForceDisplay.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.CaretForceDisplayed = LinkedComp.CaretForceDisplay.Value);
 		}
 
 		private void CaretColumn_Changed(IChangeable obj) {
-			node.CaretColumn = LinkedComp.CaretColumn.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.CaretColumn = LinkedComp.CaretColumn.Value);
 		}
 
 		private void CaretBlink_Changed(IChangeable obj) {
-			node.CaretBlink = LinkedComp.CaretBlink.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.CaretBlink = LinkedComp.CaretBlink.Value);
 		}
 
 		private void DrawControlChars_Changed(IChangeable obj) {
-			node.DrawControlChars = LinkedComp.DrawControlChars.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.DrawControlChars = LinkedComp.DrawControlChars.Value);
 		}
 
 		private void Flat_Changed(IChangeable obj) {
-			node.Flat = LinkedComp.Flat.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Flat = LinkedComp.Flat.Value);
 		}
 
 
 		private void DeselectingOnFocusLossEnabled_Changed(IChangeable obj) {
-			node.DeselectOnFocusLossEnabled = LinkedComp.DeselectingOnFocusLossEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.DeselectOnFocusLossEnabled = LinkedComp.DeselectingOnFocusLossEnabled.Value);
 		}
 
 		private void SelectingEnabled_Changed(IChangeable obj) {
-			node.SelectingEnabled = LinkedComp.SelectingEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.SelectingEnabled = LinkedComp.SelectingEnabled.Value);
 		}
 
 		private void MiddleMousePasteEnabled_Changed(IChangeable obj) {
-			node.MiddleMousePasteEnabled = LinkedComp.MiddleMousePasteEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.MiddleMousePasteEnabled = LinkedComp.MiddleMousePasteEnabled.Value);
 		}
 
 		private void ShortcutKeysEnabled_Changed(IChangeable obj) {
-			node.ShortcutKeysEnabled = LinkedComp.ShortcutKeysEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ShortcutKeysEnabled = LinkedComp.ShortcutKeysEnabled.Value);
 		}
 
 		private void ClearButtonEnabled_Changed(IChangeable obj) {
-			node.ClearButtonEnabled = LinkedComp.ClearButtonEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ClearButtonEnabled = LinkedComp.ClearButtonEnabled.Value);
 		}
 
 		private void VirtualKeyboardType_Changed(IChangeable obj) {
-			node.VirtualKeyboardType = LinkedComp.VirtualKeyboardType.Value switch {
-				RVirtualKeyboardType.MultiLine => Godot.LineEdit.VirtualKeyboardTypeEnum.Multiline,
-				RVirtualKeyboardType.Number => Godot.LineEdit.VirtualKeyboardTypeEnum.Number,
-				RVirtualKeyboardType.Decimal => Godot.LineEdit.VirtualKeyboardTypeEnum.NumberDecimal,
-				RVirtualKeyboardType.Phone => Godot.LineEdit.VirtualKeyboardTypeEnum.Phone,
-				RVirtualKeyboardType.Email => Godot.LineEdit.VirtualKeyboardTypeEnum.EmailAddress,
-				RVirtualKeyboardType.Passowrd => Godot.LineEdit.VirtualKeyboardTypeEnum.Password,
-				RVirtualKeyboardType.URL => Godot.LineEdit.VirtualKeyboardTypeEnum.Url,
-				_ => Godot.LineEdit.VirtualKeyboardTypeEnum.Default,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.VirtualKeyboardType = LinkedComp.VirtualKeyboardType.Value switch { RVirtualKeyboardType.MultiLine => Godot.LineEdit.VirtualKeyboardTypeEnum.Multiline, RVirtualKeyboardType.Number => Godot.LineEdit.VirtualKeyboardTypeEnum.Number, RVirtualKeyboardType.Decimal => Godot.LineEdit.VirtualKeyboardTypeEnum.NumberDecimal, RVirtualKeyboardType.Phone => Godot.LineEdit.VirtualKeyboardTypeEnum.Phone, RVirtualKeyboardType.Email => Godot.LineEdit.VirtualKeyboardTypeEnum.EmailAddress, RVirtualKeyboardType.Passowrd => Godot.LineEdit.VirtualKeyboardTypeEnum.Password, RVirtualKeyboardType.URL => Godot.LineEdit.VirtualKeyboardTypeEnum.Url, _ => Godot.LineEdit.VirtualKeyboardTypeEnum.Default, });
 		}
 
 		private void VirtualKeyboardEnabled_Changed(IChangeable obj) {
-			node.VirtualKeyboardEnabled = LinkedComp.VirtualKeyboardEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.VirtualKeyboardEnabled = LinkedComp.VirtualKeyboardEnabled.Value);
 		}
 
 		private void ContextMenuEnabled_Changed(IChangeable obj) {
-			node.ContextMenuEnabled = LinkedComp.ContextMenuEnabled.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ContextMenuEnabled = LinkedComp.ContextMenuEnabled.Value);
 		}
 
 		private void ExpandToTextLength_Changed(IChangeable obj) {
-			node.ExpandToTextLength = LinkedComp.ExpandToTextLength.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ExpandToTextLength = LinkedComp.ExpandToTextLength.Value);
 		}
 
 		private void SecretCharacter_Changed(IChangeable obj) {
-			node.SecretCharacter = LinkedComp.SecretCharacter.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.SecretCharacter = LinkedComp.SecretCharacter.Value);
 		}
 
 		private void Secret_Changed(IChangeable obj) {
-			node.Secret = LinkedComp.Secret.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Secret = LinkedComp.Secret.Value);
 		}
 
 		private void Editable_Changed(IChangeable obj) {
-			node.Editable = LinkedComp.Editable.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Editable = LinkedComp.Editable.Value);
 		}
 
 		private void Alignment_Changed(IChangeable obj) {
-			node.Alignment = LinkedComp.Alignment.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.Alignment = LinkedComp.Alignment.Value switch {
 				RHorizontalAlignment.Left => HorizontalAlignment.Left,
 				RHorizontalAlignment.Center => HorizontalAlignment.Center,
 				RHorizontalAlignment.Right => HorizontalAlignment.Right,
 				_ => HorizontalAlignment.Fill,
-			};
+			});
 		}
 
 		private void PlaceholderText_Changed(IChangeable obj) {
-			node.PlaceholderText = LinkedComp.PlaceholderText.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.PlaceholderText = LinkedComp.PlaceholderText.Value);
 		}
 
 		private void Text_Changed(IChangeable obj) {
-			if(node.Text != LinkedComp.Text.Value) {
-				node.Text = LinkedComp.Text.Value;
-			}
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node.Text != LinkedComp.Text.Value) {
+					node.Text = LinkedComp.Text.Value;
+				}
+			});
 		}
 	}
 

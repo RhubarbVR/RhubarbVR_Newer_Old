@@ -68,7 +68,7 @@ namespace RhuEngine.Components
 		public abstract T CreateShape(ref float speculativeMargin, float? mass, out BodyInertia inertia);
 
 		public void UpdateShape() {
-			RUpdateManager.ExecuteOnEndOfFrame(this, UpdateShapeNow);
+			RUpdateManager.ExecuteOnEndOfUpdate(this, UpdateShapeNow);
 		}
 
 		private readonly bool _isChild;//Todo set true when used is sub body

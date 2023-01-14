@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -33,23 +34,23 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void ArrowStep_Changed(IChangeable obj) {
-			node.CustomArrowStep = LinkedComp.ArrowStep.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.CustomArrowStep = LinkedComp.ArrowStep.Value);
 		}
 
 		private void Suffix_Changed(IChangeable obj) {
-			node.Suffix = LinkedComp.Suffix.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Suffix = LinkedComp.Suffix.Value);
 		}
 
 		private void Prefix_Changed(IChangeable obj) {
-			node.Prefix = LinkedComp.Prefix.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Prefix = LinkedComp.Prefix.Value);
 		}
 
 		private void UpdateOnTextChanged_Changed(IChangeable obj) {
-			node.UpdateOnTextChanged = LinkedComp.UpdateOnTextChanged.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.UpdateOnTextChanged = LinkedComp.UpdateOnTextChanged.Value);
 		}
 
 		private void Editable_Changed(IChangeable obj) {
-			node.Editable = LinkedComp.Editable.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Editable = LinkedComp.Editable.Value);
 		}
 	}
 }

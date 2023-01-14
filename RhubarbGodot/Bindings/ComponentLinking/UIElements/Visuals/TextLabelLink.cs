@@ -13,6 +13,7 @@ using static Godot.Control;
 using static Godot.TextServer;
 using RhubarbVR.Bindings.TextureBindings;
 using RhubarbVR.Bindings.FontBindings;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -69,123 +70,92 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Text_Changed(IChangeable obj) {
-			node.Text = LinkedComp.Text.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => 
+				node.Text = LinkedComp.Text.Value);
 		}
 
 		private void Font_LoadChange(RFont obj) {
-			node.LabelSettings.Font = LinkedComp.Font?.Asset?.Inst is GodotFont font ? (font?.FontFile) : null;
+			RenderThread.ExecuteOnEndOfFrame(() => node.LabelSettings.Font = LinkedComp.Font?.Asset?.Inst is GodotFont font ? (font?.FontFile) : null);
 		}
 
 		private void Language_Changed(IChangeable obj) {
-			node.Language = LinkedComp.Language.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Language = LinkedComp.Language.Value);
 		}
 
 		private void TextDir_Changed(IChangeable obj) {
-			node.TextDirection = LinkedComp.TextDir.Value switch {
-				RTextDirection.Auto => TextDirection.Auto,
-				RTextDirection.Ltr => TextDirection.Ltr,
-				RTextDirection.Rtl => TextDirection.Rtl,
-				_ => TextDirection.Inherited,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextDirection = LinkedComp.TextDir.Value switch { RTextDirection.Auto => TextDirection.Auto, RTextDirection.Ltr => TextDirection.Ltr, RTextDirection.Rtl => TextDirection.Rtl, _ => TextDirection.Inherited, });
 		}
 
 		private void VisibleRatio_Changed(IChangeable obj) {
-			node.VisibleRatio = LinkedComp.VisibleRatio.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.VisibleRatio = LinkedComp.VisibleRatio.Value);
 		}
 
 		private void VisibleCharactersBehavior_Changed(IChangeable obj) {
-			node.VisibleCharactersBehavior = LinkedComp.VisibleCharactersBehavior.Value switch {
-				RhuEngine.Components.RVisibleCharactersBehavior.CharactersBeforeShaping => VisibleCharactersBehavior.CharsBeforeShaping,
-				RhuEngine.Components.RVisibleCharactersBehavior.CharactersAfterShaping => VisibleCharactersBehavior.CharsAfterShaping,
-				RhuEngine.Components.RVisibleCharactersBehavior.GlyphsLayoutDir => VisibleCharactersBehavior.GlyphsAuto,
-				RhuEngine.Components.RVisibleCharactersBehavior.GlyphsLayoutRightToLeft => VisibleCharactersBehavior.GlyphsRtl,
-				_ => VisibleCharactersBehavior.GlyphsLtr,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.VisibleCharactersBehavior = LinkedComp.VisibleCharactersBehavior.Value switch { RhuEngine.Components.RVisibleCharactersBehavior.CharactersBeforeShaping => VisibleCharactersBehavior.CharsBeforeShaping, RhuEngine.Components.RVisibleCharactersBehavior.CharactersAfterShaping => VisibleCharactersBehavior.CharsAfterShaping, RhuEngine.Components.RVisibleCharactersBehavior.GlyphsLayoutDir => VisibleCharactersBehavior.GlyphsAuto, RhuEngine.Components.RVisibleCharactersBehavior.GlyphsLayoutRightToLeft => VisibleCharactersBehavior.GlyphsRtl, _ => VisibleCharactersBehavior.GlyphsLtr, });
 		}
 
 		private void MaxLinesVisible_Changed(IChangeable obj) {
-			node.MaxLinesVisible = LinkedComp.MaxLinesVisible.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.MaxLinesVisible = LinkedComp.MaxLinesVisible.Value);
 		}
 
 		private void LinesSkipped_Changed(IChangeable obj) {
-			node.LinesSkipped = LinkedComp.LinesSkipped.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.LinesSkipped = LinkedComp.LinesSkipped.Value);
 		}
 
 		private void Uppercase_Changed(IChangeable obj) {
-			node.Uppercase = LinkedComp.Uppercase.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Uppercase = LinkedComp.Uppercase.Value);
 		}
 
 		private void OverrunBehavior_Changed(IChangeable obj) {
-			node.TextOverrunBehavior = LinkedComp.OverrunBehavior.Value switch {
-				ROverrunBehavior.TrimChar => OverrunBehavior.TrimChar,
-				ROverrunBehavior.TrimWord => OverrunBehavior.TrimWord,
-				ROverrunBehavior.TrimEllipsis => OverrunBehavior.TrimEllipsis,
-				ROverrunBehavior.TrimWordEllipsis => OverrunBehavior.TrimWordEllipsis,
-				_ => OverrunBehavior.NoTrimming,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.TextOverrunBehavior = LinkedComp.OverrunBehavior.Value switch { ROverrunBehavior.TrimChar => OverrunBehavior.TrimChar, ROverrunBehavior.TrimWord => OverrunBehavior.TrimWord, ROverrunBehavior.TrimEllipsis => OverrunBehavior.TrimEllipsis, ROverrunBehavior.TrimWordEllipsis => OverrunBehavior.TrimWordEllipsis, _ => OverrunBehavior.NoTrimming, });
 		}
 
 		private void ClipText_Changed(IChangeable obj) {
-			node.ClipText = LinkedComp.ClipText.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ClipText = LinkedComp.ClipText.Value);
 		}
 
 		private void AutowrapMode_Changed(IChangeable obj) {
-			node.AutowrapMode = LinkedComp.AutowrapMode.Value switch {
-				RAutowrapMode.Arbitrary => AutowrapMode.Arbitrary,
-				RAutowrapMode.Word => AutowrapMode.Word,
-				RAutowrapMode.WordSmart => AutowrapMode.WordSmart,
-				_ => AutowrapMode.Off,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.AutowrapMode = LinkedComp.AutowrapMode.Value switch { RAutowrapMode.Arbitrary => AutowrapMode.Arbitrary, RAutowrapMode.Word => AutowrapMode.Word, RAutowrapMode.WordSmart => AutowrapMode.WordSmart, _ => AutowrapMode.Off, });
 		}
 
 		private void VerticalAlignment_Changed(IChangeable obj) {
-			node.VerticalAlignment = LinkedComp.VerticalAlignment.Value switch {
-				RVerticalAlignment.Top => VerticalAlignment.Top,
-				RVerticalAlignment.Center => VerticalAlignment.Center,
-				RVerticalAlignment.Bottom => VerticalAlignment.Bottom,
-				_ => VerticalAlignment.Fill,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.VerticalAlignment = LinkedComp.VerticalAlignment.Value switch { RVerticalAlignment.Top => VerticalAlignment.Top, RVerticalAlignment.Center => VerticalAlignment.Center, RVerticalAlignment.Bottom => VerticalAlignment.Bottom, _ => VerticalAlignment.Fill, });
 		}
 
 		private void HorizontalAlignment_Changed(IChangeable obj) {
-			node.HorizontalAlignment = LinkedComp.HorizontalAlignment.Value switch {
-				RHorizontalAlignment.Left => HorizontalAlignment.Left,
-				RHorizontalAlignment.Center => HorizontalAlignment.Center,
-				RHorizontalAlignment.Right => HorizontalAlignment.Right,
-				_ => HorizontalAlignment.Fill,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.HorizontalAlignment = LinkedComp.HorizontalAlignment.Value switch { RHorizontalAlignment.Left => HorizontalAlignment.Left, RHorizontalAlignment.Center => HorizontalAlignment.Center, RHorizontalAlignment.Right => HorizontalAlignment.Right, _ => HorizontalAlignment.Fill, });
 		}
 
 		private void ShadowOffset_Changed(IChangeable obj) {
-			node.LabelSettings.ShadowOffset = new Vector2(LinkedComp.ShadowOffset.Value.x, LinkedComp.ShadowOffset.Value.y);
+			RenderThread.ExecuteOnEndOfFrame(() => node.LabelSettings.ShadowOffset = new Vector2(LinkedComp.ShadowOffset.Value.x, LinkedComp.ShadowOffset.Value.y));
 		}
 
 		private void ShadowColor_Changed(IChangeable obj) {
-			node.LabelSettings.ShadowColor = new Color(LinkedComp.ShadowColor.Value.r, LinkedComp.ShadowColor.Value.g, LinkedComp.ShadowColor.Value.b, LinkedComp.ShadowColor.Value.a);
+			RenderThread.ExecuteOnEndOfFrame(() => node.LabelSettings.ShadowColor = new Color(LinkedComp.ShadowColor.Value.r, LinkedComp.ShadowColor.Value.g, LinkedComp.ShadowColor.Value.b, LinkedComp.ShadowColor.Value.a));
 		}
 
 		private void ShadowSize_Changed(IChangeable obj) {
-			node.LabelSettings.ShadowSize = LinkedComp.ShadowSize.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.LabelSettings.ShadowSize = LinkedComp.ShadowSize.Value);
 		}
 
 		private void OutlineColor_Changed(IChangeable obj) {
-			node.LabelSettings.OutlineColor = new Color(LinkedComp.OutlineColor.Value.r, LinkedComp.OutlineColor.Value.g, LinkedComp.OutlineColor.Value.b, LinkedComp.OutlineColor.Value.a);
+			RenderThread.ExecuteOnEndOfFrame(() => node.LabelSettings.OutlineColor = new Color(LinkedComp.OutlineColor.Value.r, LinkedComp.OutlineColor.Value.g, LinkedComp.OutlineColor.Value.b, LinkedComp.OutlineColor.Value.a));
 		}
 
 		private void OutlineSize_Changed(IChangeable obj) {
-			node.LabelSettings.OutlineSize = LinkedComp.OutlineSize.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.LabelSettings.OutlineSize = LinkedComp.OutlineSize.Value);
 		}
 
 		private void TextColor_Changed(IChangeable obj) {
-			node.LabelSettings.FontColor = new Color(LinkedComp.TextColor.Value.r, LinkedComp.TextColor.Value.g, LinkedComp.TextColor.Value.b, LinkedComp.TextColor.Value.a);
+			RenderThread.ExecuteOnEndOfFrame(() => node.LabelSettings.FontColor = new Color(LinkedComp.TextColor.Value.r, LinkedComp.TextColor.Value.g, LinkedComp.TextColor.Value.b, LinkedComp.TextColor.Value.a));
 		}
 
 		private void TextSize_Changed(IChangeable obj) {
-			node.LabelSettings.FontSize = LinkedComp.TextSize.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.LabelSettings.FontSize = LinkedComp.TextSize.Value);
 		}
 
 		private void LineSpacing_Changed(IChangeable obj) {
-			node.LabelSettings.LineSpacing = LinkedComp.LineSpacing.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.LabelSettings.LineSpacing = LinkedComp.LineSpacing.Value);
 		}
 	}
 }

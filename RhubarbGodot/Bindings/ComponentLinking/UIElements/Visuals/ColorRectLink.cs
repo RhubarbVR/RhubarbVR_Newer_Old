@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking {
 	public sealed class ColorRectLink : UIElementLinkBase<RhuEngine.Components.ColorRect, Godot.ColorRect>
@@ -22,7 +23,7 @@ namespace RhubarbVR.Bindings.ComponentLinking {
 		}
 
 		private void Color_Changed(IChangeable obj) {
-			node.Color = new Color(LinkedComp.Color.Value.r, LinkedComp.Color.Value.g, LinkedComp.Color.Value.b, LinkedComp.Color.Value.a);
+			RenderThread.ExecuteOnEndOfFrame(() => node.Color = new Color(LinkedComp.Color.Value.r, LinkedComp.Color.Value.g, LinkedComp.Color.Value.b, LinkedComp.Color.Value.a));
 		}
 	}
 }

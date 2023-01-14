@@ -10,6 +10,7 @@ using RhuEngine.WorldObjects;
 using Godot;
 using RhuEngine.Components;
 using static Godot.Control;
+using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -29,7 +30,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void SwitchOnHover_Changed(IChangeable obj) {
-			node.SwitchOnHover = LinkedComp.SwitchOnHover.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.SwitchOnHover = LinkedComp.SwitchOnHover.Value);
 		}
 	}
 }
