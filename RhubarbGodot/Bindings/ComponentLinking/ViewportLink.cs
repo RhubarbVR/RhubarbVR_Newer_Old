@@ -348,16 +348,18 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void ClearCalled() {
-			switch (node.RenderTargetClearMode) {
-				case SubViewport.ClearMode.Never:
-					node.RenderTargetClearMode = SubViewport.ClearMode.Once;
-					break;
-				case SubViewport.ClearMode.Once:
-					node.RenderTargetClearMode = SubViewport.ClearMode.Once;
-					break;
-				default:
-					break;
-			}
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				switch (node.RenderTargetClearMode) {
+					case SubViewport.ClearMode.Never:
+						node.RenderTargetClearMode = SubViewport.ClearMode.Once;
+						break;
+					case SubViewport.ClearMode.Once:
+						node.RenderTargetClearMode = SubViewport.ClearMode.Once;
+						break;
+					default:
+						break;
+				}
+			});
 		}
 
 		private void QuadThree_Changed(RhuEngine.WorldObjects.IChangeable obj) {

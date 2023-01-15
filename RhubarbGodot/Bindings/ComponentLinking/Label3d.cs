@@ -25,7 +25,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public override string ObjectName => "TextLabel";
 
 		public override void StartContinueInit() {
-
 			LinkedComp.PixelSize.Changed += PixelSize_Changed;
 			LinkedComp.TextOffset.Changed += TextOffset_Changed;
 			LinkedComp.Billboard.Changed += Billboard_Changed;
@@ -78,7 +77,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			Width_Changed(null);
 			Dir_Changed(null);
 			Language_Changed(null);
-
 		}
 
 		private void Font_LoadChange(RFont obj) {

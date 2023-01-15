@@ -272,8 +272,10 @@ namespace RhuEngine.Components
 		public RCursorShape RCursorShape { get; set; }
 
 		public override void Dispose() {
+			IsDestroying = true;
 			Load(null);
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 
 		public Action<Vector2f, Vector2f, float, Handed, int, bool, bool, bool, bool> SendInputEvent;

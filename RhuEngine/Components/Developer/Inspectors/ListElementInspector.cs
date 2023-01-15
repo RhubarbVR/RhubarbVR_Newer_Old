@@ -15,8 +15,8 @@ namespace RhuEngine.Components
 		protected override void BuildUI() {
 			var box = Entity.AttachComponent<BoxContainer>();
 			box.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
-
-			Entity.AddChild("InData").AttachComponent<WorldObjectInspector>().TargetObject.Target = TargetObject.Target;
+			
+			Entity.AddChild("InData").AttachComponent<IInspector>(GetFiled(TargetObject.Target.GetType())).TargetObjectWorld = TargetObject.Target;
 
 			var deleteButton = Entity.AddChild("Delete").AttachComponent<Button>();
 			deleteButton.Alignment.Value = RButtonAlignment.Center;
