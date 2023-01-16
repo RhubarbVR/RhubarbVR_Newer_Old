@@ -25,6 +25,10 @@ namespace RhuEngine.Linker.MeshAddons
 		public event Action OnDataUpdate;
 
 		public override void Load(IMesh mesh) {
+			if(mesh.TriangleCount <= 0) {
+				Loaded = false;
+				return;
+			}
 			if(mesh is ComplexMesh complex) {
 				if (!complex.IsTriangleMesh) {
 					Loaded = false;

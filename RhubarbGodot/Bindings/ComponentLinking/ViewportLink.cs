@@ -252,6 +252,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.QuadTwo.Changed += QuadTwo_Changed;
 			LinkedComp.QuadThree.Changed += QuadThree_Changed;
 			LinkedComp.GUIDisableInput.Changed += GUIDisableInput_Changed;
+			Children_OnReorderList();
 			GUIDisableInput_Changed(null);
 			Size_Changed(null);
 			Size2DOverride_Changed(null);
@@ -291,7 +292,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LinkedComp.RenderFrameCalled = RenderFrameCalled;
 			LinkedComp.Entity.children.OnReorderList += Children_OnReorderList;
 			node.GuiEmbedSubwindows = true;
-			Children_OnReorderList();
 		}
 
 		private void GUIDisableInput_Changed(RhuEngine.WorldObjects.IChangeable obj) {

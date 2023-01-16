@@ -18,34 +18,26 @@ public partial class ConnectedViewport : TextureRect
 		get => _viewport;
 		set {
 			_viewport = value;
-			RenderThread.ExecuteOnEndOfFrame(() => {
-				try {
-					if(_viewport is null) {
-						return;
-					}
-					if (_viewport.WorldLink is ViewportLink viewport) {
-						targetViewport = viewport.node;
-						Texture = viewport.node?.GetTexture();
-					}
-					else {
+			if (_viewport is null) {
+				targetViewport = null;
+				Texture = null;
+				return;
+			}
+			// This is really bad but fixes a bug with order of operation with threading so ya i think it might stay 
+			RenderThread.ExecuteOnEndOfFrameNoPass(() => {
+				RenderThread.ExecuteOnStartOfFrame(() => {
+					RenderThread.ExecuteOnEndOfFrameNoPass(() => {
 						RenderThread.ExecuteOnStartOfFrame(() => {
+							if (_viewport is null) {
+								return;
+							}
 							if (_viewport.WorldLink is ViewportLink viewport) {
 								targetViewport = viewport.node;
 								Texture = viewport.node?.GetTexture();
 							}
-							else {
-								RenderThread.ExecuteOnEndOfFrame(() => {
-									if (_viewport.WorldLink is ViewportLink viewport) {
-										targetViewport = viewport.node;
-										Texture = viewport.node?.GetTexture();
-									}
-								});
-							}
 						});
-					}
-				}
-				catch {
-				}
+					});
+				});
 			});
 		}
 	}
@@ -69,13 +61,13 @@ public partial class ConnectedViewport : TextureRect
 
 	public override void _Input(InputEvent @event) {
 		base._Input(@event);
-		if(Viewport is null) {
+		if (Viewport is null) {
 			return;
 		}
 		if (Viewport.IsRemoved || Viewport.IsDestroying) {
 			return;
 		}
-		if(@event is InputEventKey) {
+		if (@event is InputEventKey) {
 			return;
 		}
 

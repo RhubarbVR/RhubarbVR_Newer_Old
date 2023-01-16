@@ -264,7 +264,7 @@ namespace RhuEngine.Components
 		public void Load(RTexture2D data) {
 			Value = data;
 			Loaded = data != null;
-			OnAssetLoaded?.Invoke(data);
+			RenderThread.ExecuteOnEndOfFrameNoPass(() => OnAssetLoaded?.Invoke(data));
 		}
 
 		public bool Loaded { get; private set; } = false;

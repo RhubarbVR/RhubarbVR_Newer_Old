@@ -74,6 +74,13 @@ namespace RhuEngine
 		[ThreadStatic]
 		public static bool isEndOfFrame;
 
+
+		public static void ExecuteOnEndOfFrameNoPass(Action p) {
+			lock (EndOfFrameExecute) {
+				EndOfFrameList.Add(p);
+			}
+		}
+
 		public static void ExecuteOnEndOfFrame(Action p) {
 			lock (EndOfFrameExecute) {
 				if (isEndOfFrame) {

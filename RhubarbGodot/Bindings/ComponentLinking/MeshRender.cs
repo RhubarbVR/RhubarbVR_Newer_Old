@@ -89,65 +89,52 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void FadeMode_Changed(IChangeable obj) {
-			node.VisibilityRangeFadeMode = LinkedComp.FadeMode.Value switch {
-				RFadeMode.Self => VisibilityRangeFadeModeEnum.Self,
-				RFadeMode.Dependencies => VisibilityRangeFadeModeEnum.Dependencies,
-				_ => VisibilityRangeFadeModeEnum.Disabled,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.VisibilityRangeFadeMode = LinkedComp.FadeMode.Value switch { RFadeMode.Self => VisibilityRangeFadeModeEnum.Self, RFadeMode.Dependencies => VisibilityRangeFadeModeEnum.Dependencies, _ => VisibilityRangeFadeModeEnum.Disabled, });
 		}
 
 		private void VisibilityEndMargin_Changed(IChangeable obj) {
-			node.VisibilityRangeEndMargin = LinkedComp.VisibilityEndMargin.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.VisibilityRangeEndMargin = LinkedComp.VisibilityEndMargin.Value);
 		}
 
 		private void VisibilityEnd_Changed(IChangeable obj) {
-			node.VisibilityRangeEnd = LinkedComp.VisibilityEnd.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.VisibilityRangeEnd = LinkedComp.VisibilityEnd.Value);
 		}
 
 		private void VisibilityBeginMargin_Changed(IChangeable obj) {
-			node.VisibilityRangeBeginMargin = LinkedComp.VisibilityBeginMargin.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.VisibilityRangeBeginMargin = LinkedComp.VisibilityBeginMargin.Value);
 		}
 
 		private void VisibilityBegin_Changed(IChangeable obj) {
-			node.VisibilityRangeBegin = LinkedComp.VisibilityBegin.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.VisibilityRangeBegin = LinkedComp.VisibilityBegin.Value);
 		}
 
 		private void LightMapScale_Changed(IChangeable obj) {
-			node.GiLightmapScale = LinkedComp.LightMapScale.Value switch {
-				RLightMapScale.TwoX => LightmapScale.Scale2x,
-				RLightMapScale.FourX => LightmapScale.Scale4x,
-				RLightMapScale.EightX => LightmapScale.Scale8x,
-				_ => LightmapScale.Scale1x,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.GiLightmapScale = LinkedComp.LightMapScale.Value switch { RLightMapScale.TwoX => LightmapScale.Scale2x, RLightMapScale.FourX => LightmapScale.Scale4x, RLightMapScale.EightX => LightmapScale.Scale8x, _ => LightmapScale.Scale1x, });
 		}
 
 		private void GlobalIlluminationMode_Changed(IChangeable obj) {
-			node.GiMode = LinkedComp.GlobalIlluminationMode.Value switch {
-				RGlobalIlluminationMode.Static => GIMode.Static,
-				RGlobalIlluminationMode.Dynamic => GIMode.Dynamic,
-				_ => GIMode.Disabled,
-			};
+			RenderThread.ExecuteOnEndOfFrame(() => node.GiMode = LinkedComp.GlobalIlluminationMode.Value switch { RGlobalIlluminationMode.Static => GIMode.Static, RGlobalIlluminationMode.Dynamic => GIMode.Dynamic, _ => GIMode.Disabled, });
 		}
 
 		private void IgnoreOcclusionCulling_Changed(IChangeable obj) {
-			node.IgnoreOcclusionCulling = LinkedComp.IgnoreOcclusionCulling.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.IgnoreOcclusionCulling = LinkedComp.IgnoreOcclusionCulling.Value);
 		}
 
 		private void ExtraCullMargin_Changed(IChangeable obj) {
-			node.ExtraCullMargin = LinkedComp.ExtraCullMargin.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.ExtraCullMargin = LinkedComp.ExtraCullMargin.Value);
 		}
 
 		private void Transparency_Changed(IChangeable obj) {
-			node.Transparency = LinkedComp.Transparency.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Transparency = LinkedComp.Transparency.Value);
 		}
 
 		private void CastShadows_Changed(IChangeable obj) {
-			node.CastShadow = LinkedComp.CastShadows.Value switch {
+			RenderThread.ExecuteOnEndOfFrame(() => node.CastShadow = LinkedComp.CastShadows.Value switch {
 				ShadowCast.On => Godot.GeometryInstance3D.ShadowCastingSetting.On,
 				ShadowCast.TwoSided => Godot.GeometryInstance3D.ShadowCastingSetting.DoubleSided,
 				ShadowCast.ShadowsOnly => Godot.GeometryInstance3D.ShadowCastingSetting.ShadowsOnly,
 				_ => Godot.GeometryInstance3D.ShadowCastingSetting.Off,
-			};
+			});
 		}
 
 
@@ -162,7 +149,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void RenderLayer_Changed(IChangeable obj) {
-			node.Layers = (uint)(int)LinkedComp.renderLayer.Value;
+			RenderThread.ExecuteOnEndOfFrame(() => node.Layers = (uint)(int)LinkedComp.renderLayer.Value);
 		}
 
 	}
@@ -183,7 +170,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public List<AssetRef<RMaterial>> BoundTo = new();
 
 		private void AssetUpdate(RMaterial rMaterial) {
-			RUpdateManager.ExecuteOnStartOfUpdate(BoundTo, MitReloadAction);
+			RenderThread.ExecuteOnEndOfFrameNoPass(MitReloadAction);
 		}
 
 		private void Materials_Changed(IChangeable obj) {
@@ -212,33 +199,37 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			if (LinkedComp.materials.Count == 0) {
 				return;
 			}
-			else if (LinkedComp.materials.Count == 1) {
+			else if (amount == 1) {
 				node.MaterialOverride = ((GodotMaterial)LinkedComp.materials[0].Asset?.Target)?.GetMatarial(LinkedComp.colorLinear.Value);
 			}
 			else {
 				for (var i = 0; i < LinkedComp.materials.Count; i++) {
 					var mat = ((GodotMaterial)LinkedComp.materials[i].Asset?.Target)?.GetMatarial(LinkedComp.colorLinear.Value);
-					node.SetSurfaceOverrideMaterial(i, mat);
+					if(i < amount) {
+						node.SetSurfaceOverrideMaterial(i, mat);
+					}
 				}
 			}
 		}
 
-		private void MatUpdate(RhuEngine.WorldObjects.IChangeable obj) {
-			RUpdateManager.ExecuteOnStartOfUpdate(BoundTo, MitReloadAction);
+		private void MatUpdate(IChangeable obj) {
+			RenderThread.ExecuteOnEndOfFrame(MitReloadAction);
 		}
 
 		private void Mesh_LoadChange(RhuEngine.Linker.RMesh obj) {
-			if (node is null) {
-				return;
-			}
-			if (obj is null) {
-				node.Mesh = null;
-				node.Skin = null;
-				return;
-			}
-			node.Mesh = ((GodotMesh)obj.Inst).LoadedMesh;
-			node.Skin = ((GodotMesh)obj.Inst).LoadedSkin;
-			Materials_Changed(null);
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node is null) {
+					return;
+				}
+				if (obj is null) {
+					node.Mesh = null;
+					node.Skin = null;
+					return;
+				}
+				node.Mesh = ((GodotMesh)obj.Inst).LoadedMesh;
+				node.Skin = ((GodotMesh)obj.Inst).LoadedSkin;
+				Materials_Changed(null);
+			});
 		}
 
 	}
