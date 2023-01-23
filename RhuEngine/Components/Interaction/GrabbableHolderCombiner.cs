@@ -15,7 +15,7 @@ namespace RhuEngine.Components
 		public Handed Source { get; }
 		public WorldManager WorldManager { get; }
 
-		private GrabbableHolder GetGrabbableHolderFromWorld(World world) {
+		public GrabbableHolder GetGrabbableHolderFromWorld(World world) {
 			return Source switch {
 				Handed.Left => world.LeftGrabbableHolder,
 				Handed.Right => world.RightGrabbableHolder,

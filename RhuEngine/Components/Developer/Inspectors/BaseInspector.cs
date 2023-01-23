@@ -24,7 +24,7 @@ namespace RhuEngine.Components
 
 		public IWorldObject TargetObjectWorld { get => TargetObject.TargetIWorldObject; set => TargetObject.TargetIWorldObject = value; }
 
-		public static Type GetFiled(Type type) {
+		public static Type GetFiled(Type type, object targetObject = null) {
 			if (type.IsAssignableTo(typeof(ISyncList))) {
 				return typeof(SyncListInspector<>).MakeGenericType(type);
 			}
@@ -35,7 +35,12 @@ namespace RhuEngine.Components
 				return typeof(PrimitiveEditor);
 			}
 			if (type.IsAssignableTo(typeof(ISyncRef))) {
-				return typeof(SyncRefInspector<>).MakeGenericType(type);
+				if (targetObject is ISyncRef @ref) {
+					return typeof(SyncRefInspector<,>).MakeGenericType(type, @ref?.GetRefType ?? typeof(IWorldObject));
+				}
+				else {
+					return typeof(SyncRefInspector<,>).MakeGenericType(type, typeof(IWorldObject));
+				}
 			}
 			return typeof(WorldObjectInspector);
 		}
@@ -100,7 +105,7 @@ namespace RhuEngine.Components
 				if (member is FieldInfo field) {
 					if (field.FieldType.IsAssignableTo(typeof(IWorldObject))) {
 						var newField = Entity.AddChild(field.Name);
-						var e = typeof(FieldInspector<>).MakeGenericType(GetFiled(field.FieldType));
+						var e = typeof(FieldInspector<>).MakeGenericType(GetFiled(field.FieldType, field.GetValue(TargetObject.Target)));
 						newField.AttachComponent<IFiledInit>(e).InitField(member, (IWorldObject)field.GetValue(TargetObject.Target));
 					}
 				}

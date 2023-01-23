@@ -100,12 +100,13 @@ namespace RhuEngine.Components
 				return false;
 			}
 		}
+
 		public IWorldObject HolderReferen
 		{
 			get {
-				return World.HeadGrabbableHolder != this && World.HeadGrabbableHolder.Referencer.Target is not null
-					? World.HeadGrabbableHolder.Referencer.Target
-					: Referencer.Target;
+				return Referencer.Target is not null
+					? Referencer.Target
+					: World.HeadGrabbableHolder?.Referencer.Target;
 			}
 		}
 
@@ -214,6 +215,11 @@ namespace RhuEngine.Components
 				}
 				gripping = false;
 				PrivateSpaceManager.GetLazer(source.Value).Locked.Value = false;
+				Referencer.Target = null;
+				if(World.HeadGrabbableHolder == this) {
+					World.RightGrabbableHolder.Referencer.Target = null;
+					World.LeftGrabbableHolder.Referencer.Target = null;
+				}
 				UpdateReferencer();
 			}
 			//_overLappingObjects.Clear();

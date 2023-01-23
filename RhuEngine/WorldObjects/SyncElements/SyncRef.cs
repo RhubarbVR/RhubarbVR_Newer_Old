@@ -8,13 +8,15 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public interface ISyncRef : ISyncObject
+	public interface ISyncRef : ISyncObject, IChangeable, INetworkedObject, ISyncMember
 	{
 		NetPointer RawPointer { set; }
 
 		NetPointer NetValue { get; set; }
 
 		IWorldObject TargetIWorldObject { get; set; }
+
+		Type GetRefType { get; }
 	}
 
 	public class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, INetworkedObject, IChangeable, ISyncMember where T : class, IWorldObject
@@ -178,6 +180,8 @@ namespace RhuEngine.WorldObjects
 		public NetPointer LinkedFrom => drivenFromObj.Pointer;
 
 		public bool NoSync { get; set; }
+
+		public Type GetRefType => typeof(T);
 
 		public void KillLink() {
 			drivenFromObj.RemoveLinkLocation();

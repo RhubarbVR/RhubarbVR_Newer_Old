@@ -12,8 +12,26 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Developer/Inspectors" })]
 	public class CompoentInspector : BaseInspector<IComponent>
 	{
+		public readonly SyncRef<Button> TargetButton; 
+
+		[Exposed]
+		public void GetRef()
+		{
+			if (TargetButton.Target is not null) {
+				try {
+					PrivateSpaceManager.GetGrabbableHolder(TargetButton.Target.LastHanded).GetGrabbableHolderFromWorld(World).Referencer.Target = TargetObject.Target;
+				}
+				catch {
+				}
+			}
+		}
+
 		protected override void BuildUI() {
 			var dropDown = Entity.AttachComponent<DropDown>();
+			var button = dropDown.DropDownButton.Target.Entity.AddChild().AttachComponent<Button>();
+			button.InputFilter.Value = RInputFilter.Pass;
+			button.ButtonMask.Value = RButtonMask.Secondary;
+			button.ButtonDown.Target = GetRef;
 			try {
 				dropDown.DropDownButton.Target.Text.Value = TargetObject.Target?.GetType().GetFormattedName();
 				var delete = dropDown.DropDownHeader.Target.AddChild("Delete").AttachComponent<Button>();

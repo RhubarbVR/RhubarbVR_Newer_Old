@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 			var box = Entity.AttachComponent<BoxContainer>();
 			box.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 			
-			Entity.AddChild("InData").AttachComponent<IInspector>(GetFiled(TargetObject.Target.GetType())).TargetObjectWorld = TargetObject.Target;
+			Entity.AddChild("InData").AttachComponent<IInspector>(GetFiled(TargetObject.Target.GetType(), TargetObject.Target)).TargetObjectWorld = TargetObject.Target;
 
 			var deleteButton = Entity.AddChild("Delete").AttachComponent<Button>();
 			deleteButton.Alignment.Value = RButtonAlignment.Center;

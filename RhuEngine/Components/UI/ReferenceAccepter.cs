@@ -8,8 +8,13 @@ using RhuEngine.Input.XRInput;
 
 namespace RhuEngine.Components.UI
 {
+	public interface IReferenceAccepter : IComponent
+	{
+
+	}
+
 	[Category(new string[] { "UI" })]
-	public sealed class ReferenceAccepter<T> : Component where T : class, IWorldObject
+	public sealed class ReferenceAccepter<T> : Component, IReferenceAccepter where T : class, IWorldObject
 	{
 		[OnChanged(nameof(PrivateSpaceManager_OnUpdateHolderReferen))]
 		public readonly Linker<bool> DropVisual;
@@ -34,7 +39,7 @@ namespace RhuEngine.Components.UI
 		protected override void OnAttach() {
 			base.OnAttach();
 			var main = targetButton.Target = Entity.AddChild("DropVisual").AttachComponent<Button>();
-			main.ModulateSelf.Value = new Colorf(98,98,98);
+			main.ModulateSelf.Value = new Colorf(98, 98, 98);
 			main.MinOffset.Value = new Vector2f(-10, 10);
 			main.MaxOffset.Value = new Vector2f(10, -10);
 			main.ButtonMask.Value = RButtonMask.Primary | RButtonMask.Secondary;
@@ -106,7 +111,7 @@ namespace RhuEngine.Components.UI
 		}
 
 		private void PrivateSpaceManager_OnDrop() {
-			if(!_isOver) {
+			if (!_isOver) {
 				return;
 			}
 			OnButtonUp();

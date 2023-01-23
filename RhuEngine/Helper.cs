@@ -247,12 +247,19 @@ namespace RhuEngine
 			return worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null";
 		}
 
+		public static string GetExtendedNameStringWithRef(this IWorldObject worldObject) {
+			return worldObject is null ? "null" : $"{GetExtendedNameString(worldObject)}({worldObject.Pointer})";
+		}
 
 		public static string GetExtendedNameString(this IWorldObject worldObject) {
 			var comp = worldObject.GetClosedComponent();
-			return comp is null || comp == worldObject
-				? worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null"
-				: $"{comp.GetType().GetFormattedName()} attached to " + (worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null");
+			if (comp is null) {
+				return worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null";
+			}
+			if (comp != worldObject) {
+				return GetNameString(worldObject);
+			}
+			return $"{comp.GetType().GetFormattedName()} attached to " + (worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null");
 		}
 
 		public static Type GetHighestAttributeInherit<T>(this Type type) where T : Attribute {
