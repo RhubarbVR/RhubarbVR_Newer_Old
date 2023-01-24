@@ -45,22 +45,22 @@ namespace RhuEngine.Components
 				}
 				return null;
 			}
-			var currentIndex = 0;
+			var currentIndex = 1;
 			foreach (var item in _lastValue.Reverse()) {
 				var targetIn = AnyHas(item);
 				if (targetIn is not null) {
-					targetIn.Entity.orderOffset.Value = currentIndex;
+					targetIn.Entity.orderOffset.Value = -currentIndex;
 					startingInspectors.Remove(targetIn);
 				}
 				else {
-					if(IsCompList) {
+					if (IsCompList) {
 						var dat = Entity.AddChild(item.Name).AttachComponent<CompoentInspector>();
-						dat.Entity.orderOffset.Value = currentIndex;
+						dat.Entity.orderOffset.Value = -currentIndex;
 						dat.TargetObject.Target = (IComponent)item;
 					}
 					else {
 						var dat = Entity.AddChild(item.Name).AttachComponent<ListElementInspector>();
-						dat.Entity.orderOffset.Value = currentIndex;
+						dat.Entity.orderOffset.Value = -currentIndex;
 						dat.TargetObject.Target = item;
 					}
 				}
@@ -79,6 +79,32 @@ namespace RhuEngine.Components
 				}
 				return;
 			}
+			else {
+				if (TargetObject.Target is IAbstractObjList list) {
+					if (Entity.Viewport is not null) {
+						if (Entity.Viewport.Entity.children.Count == 0) {
+							return;
+						}
+						var targetInspector = Entity.Viewport.Entity.children[0].GetFirstComponent<EntityInspector>();
+						var targetBasicInspector = Entity.Viewport.Entity.children[0].GetFirstComponent<ScrollContainer>();
+						if(targetInspector is not null) {
+							if (targetInspector.Entity.children.Count < 2) {
+								return;
+							}
+							targetInspector.Entity.children[1].AddChild().AttachComponent<Panel>();
+							return;
+						}
+						if (targetBasicInspector is not null) {
+							if (targetBasicInspector.Entity.children.Count == 0) {
+								return;
+							}
+							targetBasicInspector.Entity.children[0].AddChild().AttachComponent<Panel>();
+							return;
+						}
+					}
+				}
+				return;
+			}
 		}
 
 		protected override void BuildUI() {
@@ -92,7 +118,7 @@ namespace RhuEngine.Components
 				buttonAdd.Alignment.Value = RButtonAlignment.Center;
 				buttonAdd.Pressed.Target = Add;
 				buttonAdd.Text.Value = "Add";
-				buttonAdd.Entity.orderOffset.Value = -1;
+				buttonAdd.Entity.orderOffset.Value = 1;
 			}
 		}
 	}

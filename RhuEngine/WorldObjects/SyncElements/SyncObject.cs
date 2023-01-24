@@ -301,8 +301,11 @@ namespace RhuEngine.WorldObjects
 		protected virtual void OnLoaded() {
 		}
 
+		public event Action<string> NameChange;
+
 		public void ChangeName(string name) {
 			Name = name;
+			NameChange?.Invoke(name);
 		}
 
 		void ISyncObject.CallFirstCreation() {

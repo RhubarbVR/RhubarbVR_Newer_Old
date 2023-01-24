@@ -65,7 +65,6 @@ namespace RhuEngine.Components
 			var uiElem= e.Entity.AddChild().AttachComponent<UIElement>();
 			uiElem.InputFilter.Value = RInputFilter.Pass;
 			var refer = uiElem.Entity.AttachComponent<ReferenceAccepter<T2>>();
-			refer.TryAndFind.Value = false;
 			refer.Dropped.Target = DropRef;
 			e.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 			e.ActionMode.Value = RButtonActionMode.Press;

@@ -169,12 +169,11 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			lock (_syncObjects) {				
-				var newOrder = _syncObjects.OrderBy(x => typeof(IOffsetableElement).IsAssignableFrom(x.GetType()) ? ((IOffsetableElement)x).Offset : 0).ThenBy(x => x.Pointer._id);
-				var index = 0;
-				foreach (var item in newOrder) {
-					item.ChangeName(index.ToString());
-					_syncObjects.Remove(item);
-					_syncObjects.Insert(index, item);
+				var newOrder = _syncObjects.OrderBy(x => typeof(IOffsetableElement).IsAssignableFrom(x.GetType()) ? ((IOffsetableElement)x).Offset : 0).ThenBy(x => x.Pointer._id).ToArray();
+				for (int i = 0; i < newOrder.Length; i++) {
+					newOrder[i].ChangeName(i.ToString());
+					_syncObjects.Remove(newOrder[i]);
+					_syncObjects.Insert(i, newOrder[i]);
 				}
 			}
 			Changed?.Invoke(this);

@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Developer/Inspectors" })]
 	public class CompoentInspector : BaseInspector<IComponent>
 	{
-		public readonly SyncRef<Button> TargetButton; 
+		public readonly SyncRef<ButtonBase> TargetButton; 
 
 		[Exposed]
 		public void GetRef()
@@ -28,7 +28,8 @@ namespace RhuEngine.Components
 
 		protected override void BuildUI() {
 			var dropDown = Entity.AttachComponent<DropDown>();
-			var button = dropDown.DropDownButton.Target.Entity.AddChild().AttachComponent<Button>();
+			var button = dropDown.DropDownButton.Target.Entity.AddChild().AttachComponent<ButtonBase>();
+			TargetButton.Target = button;
 			button.InputFilter.Value = RInputFilter.Pass;
 			button.ButtonMask.Value = RButtonMask.Secondary;
 			button.ButtonDown.Target = GetRef;

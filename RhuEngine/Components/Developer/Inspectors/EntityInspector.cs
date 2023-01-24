@@ -39,8 +39,10 @@ namespace RhuEngine.Components
 			textLabel.TextSize.Value = 18;
 
 			var comps = worldObject.Entity.AddChild("comps");
-			comps.AttachComponent<SyncListInspector<SyncAbstractObjList<IComponent>>>().TargetObject.Target = TargetObject.Target?.components;
+			var compthing = comps.AttachComponent<SyncListInspector<SyncAbstractObjList<IComponent>>>();
+			compthing.TargetObject.Target = TargetObject.Target?.components;
 			var attachComp = worldObject.Entity.AddChild("comps").AttachComponent<Button>();
+			attachComp.Pressed.Target = compthing.Add;
 			attachComp.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 			attachComp.Alignment.Value = RButtonAlignment.Center;
 			attachComp.Text.Value = Engine.localisationManager.GetLocalString("Editor.AddComponent");
