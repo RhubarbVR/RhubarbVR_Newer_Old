@@ -109,11 +109,11 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void LightMapScale_Changed(IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.GiLightmapScale = LinkedComp.LightMapScale.Value switch { RLightMapScale.TwoX => LightmapScale.Scale2x, RLightMapScale.FourX => LightmapScale.Scale4x, RLightMapScale.EightX => LightmapScale.Scale8x, _ => LightmapScale.Scale1x, });
+			RenderThread.ExecuteOnEndOfFrame(() => node.GILightmapScale = LinkedComp.LightMapScale.Value switch { RLightMapScale.TwoX => LightmapScale.Scale2X, RLightMapScale.FourX => LightmapScale.Scale4X, RLightMapScale.EightX => LightmapScale.Scale8X, _ => LightmapScale.Scale1X, });
 		}
 
 		private void GlobalIlluminationMode_Changed(IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.GiMode = LinkedComp.GlobalIlluminationMode.Value switch { RGlobalIlluminationMode.Static => GIMode.Static, RGlobalIlluminationMode.Dynamic => GIMode.Dynamic, _ => GIMode.Disabled, });
+			RenderThread.ExecuteOnEndOfFrame(() => node.GIMode = LinkedComp.GlobalIlluminationMode.Value switch { RGlobalIlluminationMode.Static => GIModeEnum.Static, RGlobalIlluminationMode.Dynamic => GIModeEnum.Dynamic, _ => GIModeEnum.Disabled, });
 		}
 
 		private void IgnoreOcclusionCulling_Changed(IChangeable obj) {

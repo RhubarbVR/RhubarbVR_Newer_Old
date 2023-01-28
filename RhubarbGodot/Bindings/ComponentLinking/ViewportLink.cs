@@ -307,7 +307,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				inputAction = new InputAction();
 				InputActions.Add(deviceid, inputAction);
 			}
-			inputAction.Pos = new RNumerics.Vector2f(pos.x * node.Size.x, pos.y * node.Size.y);
+			inputAction.Pos = new RNumerics.Vector2f(pos.x * node.Size.X, pos.y * node.Size.Y);
 			inputAction.PressForce = PressForce;
 			inputAction.Tilt = Tilt;
 			inputAction.IsClickedPrime = IsClickedPrime;
@@ -419,11 +419,11 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void SDFScale_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.SdfScale = LinkedComp.SDFScale.Value switch { RSDFSize._100 => Godot.Viewport.SDFScale.Scale100Percent, RSDFSize._50 => Godot.Viewport.SDFScale.Scale50Percent, _ => Godot.Viewport.SDFScale.Scale25Percent, });
+			RenderThread.ExecuteOnEndOfFrame(() => node.SdfScale = LinkedComp.SDFScale.Value switch { RSDFSize._100 => Godot.Viewport.SdfScaleEnum.Scale100Percent, RSDFSize._50 => Godot.Viewport.SdfScaleEnum.Scale50Percent, _ => Godot.Viewport.SdfScaleEnum.Scale25Percent, });
 		}
 
 		private void SDFOversize_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.SdfOversize = LinkedComp.SDFOversize.Value switch { RSDFOversize._120 => Godot.Viewport.SDFOversize.Oversize120Percent, RSDFOversize._150 => Godot.Viewport.SDFOversize.Oversize150Percent, RSDFOversize._200 => Godot.Viewport.SDFOversize.Oversize200Percent, _ => Godot.Viewport.SDFOversize.Oversize100Percent, });
+			RenderThread.ExecuteOnEndOfFrame(() => node.SdfOversize = LinkedComp.SDFOversize.Value switch { RSDFOversize._120 => Godot.Viewport.SdfOversizeEnum.Oversize120Percent, RSDFOversize._150 => Godot.Viewport.SdfOversizeEnum.Oversize150Percent, RSDFOversize._200 => Godot.Viewport.SdfOversizeEnum.Oversize200Percent, _ => Godot.Viewport.SdfOversizeEnum.Oversize100Percent, });
 		}
 
 		private void SnapUIToPixels_Changed(RhuEngine.WorldObjects.IChangeable obj) {
@@ -447,15 +447,15 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Scaling3DScale_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.Scaling3dScale = LinkedComp.Scaling3DScale.Value);
+			RenderThread.ExecuteOnEndOfFrame(() => node.Scaling3DScale = LinkedComp.Scaling3DScale.Value);
 		}
 
 		private void Scaling3DMode_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.Scaling3dMode = LinkedComp.Scaling3DMode.Value switch { RScaling3D.FSR => Godot.Viewport.Scaling3DMode.Fsr, _ => Godot.Viewport.Scaling3DMode.Bilinear, });
+			RenderThread.ExecuteOnEndOfFrame(() => node.Scaling3DMode = LinkedComp.Scaling3DMode.Value switch { RScaling3D.FSR => Godot.Viewport.Scaling3DModeEnum.Fsr, _ => Godot.Viewport.Scaling3DModeEnum.Bilinear, });
 		}
 
 		private void DebugDraw_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.DebugDraw = LinkedComp.DebugDraw.Value switch { RDebugDraw.Unshaded => Godot.Viewport.DebugDrawEnum.Unshaded, RDebugDraw.Lighting => Godot.Viewport.DebugDrawEnum.Lighting, RDebugDraw.Overdraw => Godot.Viewport.DebugDrawEnum.Overdraw, RDebugDraw.Wireframe => Godot.Viewport.DebugDrawEnum.Wireframe, RDebugDraw.NormalBuffer => Godot.Viewport.DebugDrawEnum.NormalBuffer, RDebugDraw.VoxelGiAlbedo => Godot.Viewport.DebugDrawEnum.VoxelGiAlbedo, RDebugDraw.VoxelGiLighting => Godot.Viewport.DebugDrawEnum.VoxelGiLighting, RDebugDraw.VoxelGiEmission => Godot.Viewport.DebugDrawEnum.VoxelGiEmission, RDebugDraw.ShadowAtlas => Godot.Viewport.DebugDrawEnum.ShadowAtlas, RDebugDraw.DirectionalShadowAtlas => Godot.Viewport.DebugDrawEnum.DirectionalShadowAtlas, RDebugDraw.SceneLuminance => Godot.Viewport.DebugDrawEnum.SceneLuminance, RDebugDraw.Ssao => Godot.Viewport.DebugDrawEnum.Ssao, RDebugDraw.Ssil => Godot.Viewport.DebugDrawEnum.Ssil, RDebugDraw.PssmSplits => Godot.Viewport.DebugDrawEnum.PssmSplits, RDebugDraw.DecalAtlas => Godot.Viewport.DebugDrawEnum.DecalAtlas, RDebugDraw.Sdfgi => Godot.Viewport.DebugDrawEnum.Sdfgi, RDebugDraw.SdfgiProbes => Godot.Viewport.DebugDrawEnum.SdfgiProbes, RDebugDraw.GiBuffer => Godot.Viewport.DebugDrawEnum.GiBuffer, RDebugDraw.DisableLod => Godot.Viewport.DebugDrawEnum.DisableLod, RDebugDraw.ClusterOmniLights => Godot.Viewport.DebugDrawEnum.ClusterOmniLights, RDebugDraw.ClusterSpotLights => Godot.Viewport.DebugDrawEnum.ClusterSpotLights, RDebugDraw.ClusterDecals => Godot.Viewport.DebugDrawEnum.ClusterDecals, RDebugDraw.ClusterReflectionProbes => Godot.Viewport.DebugDrawEnum.ClusterReflectionProbes, RDebugDraw.Occluders => Godot.Viewport.DebugDrawEnum.Occluders, RDebugDraw.MotionVectors => Godot.Viewport.DebugDrawEnum.MotionVectors, _ => Godot.Viewport.DebugDrawEnum.Disabled, });
+			RenderThread.ExecuteOnEndOfFrame(() => node.DebugDraw = LinkedComp.DebugDraw.Value switch { RDebugDraw.Unshaded => Godot.Viewport.DebugDrawEnum.Unshaded, RDebugDraw.Lighting => Godot.Viewport.DebugDrawEnum.Lighting, RDebugDraw.Overdraw => Godot.Viewport.DebugDrawEnum.Overdraw, RDebugDraw.Wireframe => Godot.Viewport.DebugDrawEnum.Wireframe, RDebugDraw.NormalBuffer => Godot.Viewport.DebugDrawEnum.NormalBuffer, RDebugDraw.VoxelGiAlbedo => Godot.Viewport.DebugDrawEnum.VoxelGIAlbedo, RDebugDraw.VoxelGiLighting => Godot.Viewport.DebugDrawEnum.VoxelGILighting, RDebugDraw.VoxelGiEmission => Godot.Viewport.DebugDrawEnum.VoxelGIEmission, RDebugDraw.ShadowAtlas => Godot.Viewport.DebugDrawEnum.ShadowAtlas, RDebugDraw.DirectionalShadowAtlas => Godot.Viewport.DebugDrawEnum.DirectionalShadowAtlas, RDebugDraw.SceneLuminance => Godot.Viewport.DebugDrawEnum.SceneLuminance, RDebugDraw.Ssao => Godot.Viewport.DebugDrawEnum.Ssao, RDebugDraw.Ssil => Godot.Viewport.DebugDrawEnum.Ssil, RDebugDraw.PssmSplits => Godot.Viewport.DebugDrawEnum.PssmSplits, RDebugDraw.DecalAtlas => Godot.Viewport.DebugDrawEnum.DecalAtlas, RDebugDraw.Sdfgi => Godot.Viewport.DebugDrawEnum.Sdfgi, RDebugDraw.SdfgiProbes => Godot.Viewport.DebugDrawEnum.SdfgiProbes, RDebugDraw.GiBuffer => Godot.Viewport.DebugDrawEnum.GIBuffer, RDebugDraw.DisableLod => Godot.Viewport.DebugDrawEnum.DisableLod, RDebugDraw.ClusterOmniLights => Godot.Viewport.DebugDrawEnum.ClusterOmniLights, RDebugDraw.ClusterSpotLights => Godot.Viewport.DebugDrawEnum.ClusterSpotLights, RDebugDraw.ClusterDecals => Godot.Viewport.DebugDrawEnum.ClusterDecals, RDebugDraw.ClusterReflectionProbes => Godot.Viewport.DebugDrawEnum.ClusterReflectionProbes, RDebugDraw.Occluders => Godot.Viewport.DebugDrawEnum.Occluders, RDebugDraw.MotionVectors => Godot.Viewport.DebugDrawEnum.MotionVectors, _ => Godot.Viewport.DebugDrawEnum.Disabled, });
 		}
 
 		private void UseOcclusionCulling_Changed(RhuEngine.WorldObjects.IChangeable obj) {
@@ -486,23 +486,23 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void ScreenSpaceAA_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.ScreenSpaceAa = LinkedComp.ScreenSpaceAA.Value switch { RScreenSpaceAA.Fxaa => Godot.Viewport.ScreenSpaceAA.Fxaa, _ => Godot.Viewport.ScreenSpaceAA.Disabled, });
+			RenderThread.ExecuteOnEndOfFrame(() => node.ScreenSpaceAA = LinkedComp.ScreenSpaceAA.Value switch { RScreenSpaceAA.Fxaa => Godot.Viewport.ScreenSpaceAAEnum.Fxaa, _ => Godot.Viewport.ScreenSpaceAAEnum.Disabled, });
 		}
 
 		private void Msaa3D_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.Msaa3d = LinkedComp.Msaa3D.Value switch { RMsaa.TwoX => Godot.Viewport.MSAA.Msaa2x, RMsaa.FourX => Godot.Viewport.MSAA.Msaa4x, RMsaa.EightX => Godot.Viewport.MSAA.Msaa8x, _ => Godot.Viewport.MSAA.Disabled, });
+			RenderThread.ExecuteOnEndOfFrame(() => node.Msaa3D = LinkedComp.Msaa3D.Value switch { RMsaa.TwoX => Godot.Viewport.Msaa.Msaa2X, RMsaa.FourX => Godot.Viewport.Msaa.Msaa4X, RMsaa.EightX => Godot.Viewport.Msaa.Msaa8X, _ => Godot.Viewport.Msaa.Disabled, });
 		}
 
 		private void Msaa2D_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.Msaa2d = LinkedComp.Msaa2D.Value switch { RMsaa.TwoX => Godot.Viewport.MSAA.Msaa2x, RMsaa.FourX => Godot.Viewport.MSAA.Msaa4x, RMsaa.EightX => Godot.Viewport.MSAA.Msaa8x, _ => Godot.Viewport.MSAA.Disabled, });
+			RenderThread.ExecuteOnEndOfFrame(() => node.Msaa2D = LinkedComp.Msaa2D.Value switch { RMsaa.TwoX => Godot.Viewport.Msaa.Msaa2X, RMsaa.FourX => Godot.Viewport.Msaa.Msaa4X, RMsaa.EightX => Godot.Viewport.Msaa.Msaa8X, _ => Godot.Viewport.Msaa.Disabled, });
 		}
 
 		private void Snap2DVerticesToPixels_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.Snap2dVerticesToPixel = LinkedComp.Snap2DVerticesToPixels.Value);
+			RenderThread.ExecuteOnEndOfFrame(() => node.Snap2DVerticesToPixel = LinkedComp.Snap2DVerticesToPixels.Value);
 		}
 
 		private void Snap2DTransformsToPixels_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.Snap2dTransformsToPixel = LinkedComp.Snap2DTransformsToPixels.Value);
+			RenderThread.ExecuteOnEndOfFrame(() => node.Snap2DTransformsToPixel = LinkedComp.Snap2DTransformsToPixels.Value);
 		}
 
 		private void TransparentBG_Changed(RhuEngine.WorldObjects.IChangeable obj) {
@@ -510,11 +510,11 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void OwnWorld3D_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.OwnWorld3d = LinkedComp.OwnWorld3D.Value);
+			RenderThread.ExecuteOnEndOfFrame(() => node.OwnWorld3D = LinkedComp.OwnWorld3D.Value);
 		}
 
 		private void Disable3D_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.Disable3d = LinkedComp.Disable3D.Value);
+			RenderThread.ExecuteOnEndOfFrame(() => node.Disable3D = LinkedComp.Disable3D.Value);
 		}
 
 		private void UseDebanding_Changed(RhuEngine.WorldObjects.IChangeable obj) {
@@ -526,15 +526,15 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Size2DOverrideStretch_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.Size2dOverrideStretch = LinkedComp.Size2DOverrideStretch.Value);
+			RenderThread.ExecuteOnEndOfFrame(() => node.Size2DOverrideStretch = LinkedComp.Size2DOverrideStretch.Value);
 		}
 
 		private void Size2DOverride_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.Size2dOverride = new Vector2i(LinkedComp.Size2DOverride.Value.x, LinkedComp.Size2DOverride.Value.y));
+			RenderThread.ExecuteOnEndOfFrame(() => node.Size2DOverride = new Vector2I(LinkedComp.Size2DOverride.Value.x, LinkedComp.Size2DOverride.Value.y));
 		}
 
 		private void Size_Changed(RhuEngine.WorldObjects.IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.Size = new Vector2i(Math.Max(2, LinkedComp.Size.Value.x), Math.Max(2, LinkedComp.Size.Value.y)));
+			RenderThread.ExecuteOnEndOfFrame(() => node.Size = new Vector2I(Math.Max(2, LinkedComp.Size.Value.x), Math.Max(2, LinkedComp.Size.Value.y)));
 		}
 
 		public override void Started() {

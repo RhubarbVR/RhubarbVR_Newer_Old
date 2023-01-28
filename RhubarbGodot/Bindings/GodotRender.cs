@@ -18,8 +18,8 @@ namespace RhubarbVR.Bindings
 		public static Matrix GetPos(this Node3D node3D) {
 			var pos = node3D.Position;
 			var scale = node3D.Scale;
-			var rot = node3D.Transform.basis.GetRotationQuaternion();
-			return Matrix.TRS(new Vector3f(pos.x, pos.y, pos.z), new Quaternionf(rot.x, rot.y, rot.z, rot.w), new Vector3f(scale.x, scale.y, scale.z));
+			var rot = node3D.Transform.Basis.GetRotationQuaternion();
+			return Matrix.TRS(new Vector3f(pos.X, pos.Y, pos.Z), new Quaternionf(rot.X, rot.Y, rot.Z, rot.W), new Vector3f(scale.X, scale.Y, scale.Z));
 		}
 
 		public static Transform3D CastMatrix(this Matrix matrix) {

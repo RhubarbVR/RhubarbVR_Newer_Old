@@ -152,8 +152,8 @@ public partial class EngineRunner : Node3D, IRTime
 
 	public override void _Input(InputEvent @event) {
 		if (@event is InputEventMouseMotion mouseMotion) {
-			MousePos = new Vector2f(mouseMotion.Position.x, mouseMotion.Position.y);
-			MouseDelta = new Vector2f(mouseMotion.Relative.x, mouseMotion.Relative.y);
+			MousePos = new Vector2f(mouseMotion.Position.X, mouseMotion.Position.Y);
+			MouseDelta = new Vector2f(mouseMotion.Relative.X, mouseMotion.Relative.Y);
 		}
 		if(@event is InputEventMouseButton button) {
 			if(button.ButtonIndex == MouseButton.WheelUp) {

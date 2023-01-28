@@ -43,8 +43,8 @@ namespace RhubarbVR.Bindings.Input
 		{
 			get {
 				if (HasPos) {
-					var location = _tracker.GetPose(GetTrackerPosName(_trackerPos)).Transform.origin;
-					return new Vector3f(location.x, location.y, location.z);
+					var location = _tracker.GetPose(GetTrackerPosName(_trackerPos)).Transform.Origin;
+					return new Vector3f(location.X, location.Y, location.Z);
 				}
 				return Vector3f.Zero;
 			}
@@ -54,8 +54,8 @@ namespace RhubarbVR.Bindings.Input
 		{
 			get {
 				if (HasPos) {
-					var location = _tracker.GetPose(GetTrackerPosName(_trackerPos)).Transform.basis.GetRotationQuaternion();
-					return new Quaternionf(location.x, location.y, location.z, location.w);
+					var location = _tracker.GetPose(GetTrackerPosName(_trackerPos)).Transform.Basis.GetRotationQuaternion();
+					return new Quaternionf(location.X, location.Y, location.Z, location.W);
 				}
 				return Quaternionf.Identity;
 			}
@@ -74,8 +74,8 @@ namespace RhubarbVR.Bindings.Input
 			}
 			Tracker.ButtonPressed += Tracker_ButtonPressed;
 			tracker.ButtonReleased += Tracker_ButtonReleased;
-			tracker.InputAxisChanged += Tracker_InputAxisChanged;
-			tracker.InputValueChanged += Tracker_InputValueChanged;
+			tracker.InputVector2Changed += Tracker_InputAxisChanged;
+			tracker.InputFloatChanged += Tracker_InputValueChanged;
 		}
 
 		private void Tracker_InputValueChanged(string name, double value) {
@@ -89,10 +89,10 @@ namespace RhubarbVR.Bindings.Input
 
 		private void Tracker_InputAxisChanged(string name, Vector2 vector) {
 			if (_vectorinputs.ContainsKey(name)) {
-				_vectorinputs[name] = new Vector2f(vector.x,vector.y);
+				_vectorinputs[name] = new Vector2f(vector.X,vector.Y);
 			}
 			else {
-				_vectorinputs.Add(name, new Vector2f(vector.x, vector.y));
+				_vectorinputs.Add(name, new Vector2f(vector.X, vector.Y));
 			}
 		}
 

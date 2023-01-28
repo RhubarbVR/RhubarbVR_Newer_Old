@@ -326,7 +326,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void MinSize_Changed(IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.CustomMinimumSize = new Vector2i(LinkedComp.MinSize.Value.x, LinkedComp.MinSize.Value.y));
+			RenderThread.ExecuteOnEndOfFrame(() => node.CustomMinimumSize = new Vector2I(LinkedComp.MinSize.Value.x, LinkedComp.MinSize.Value.y));
 		}
 
 		private void ClipContents_Changed(IChangeable obj) {

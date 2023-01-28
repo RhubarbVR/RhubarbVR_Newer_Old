@@ -88,7 +88,7 @@ namespace RhubarbVR.Bindings
 
 		private void VRStateUpdate() {
 			if (XRServer.PrimaryInterface?.IsInitialized() ?? false) {
-				EngineRunner.GetViewport().UseXr = true;
+				EngineRunner.GetViewport().UseXR = true;
 				RLog.Info("Is in VR");
 				InVR = true;
 				LiveVRChange |= InVR;
@@ -96,7 +96,7 @@ namespace RhubarbVR.Bindings
 				Engine.MouseFreeStateUpdate();
 			}
 			else {
-				EngineRunner.GetViewport().UseXr = false;
+				EngineRunner.GetViewport().UseXR = false;
 				RLog.Info("Not in VR");
 				InVR = false;
 				LiveVRChange |= InVR;

@@ -53,16 +53,16 @@ namespace RhubarbVR.Bindings
 			LoadInValue(window);
 		}
 
-		public int Width { get => window.Size.x; set => window.Size = new Godot.Vector2i(value, window.Size.y); }
-		public int Height { get => window.Size.y; set => window.Size = new Godot.Vector2i(window.Size.x, value); }
+		public int Width { get => window.Size.X; set => window.Size = new Godot.Vector2I(value, window.Size.Y); }
+		public int Height { get => window.Size.Y; set => window.Size = new Godot.Vector2I(window.Size.X, value); }
 		public string Title { get => window.Title; set => window.Title = value; }
-		public RNumerics.Vector2i Position { get => new(window.Position.x, window.Position.y); set => window.Position = new Godot.Vector2i(value.x, value.y); }
+		public RNumerics.Vector2i Position { get => new(window.Position.X, window.Position.Y); set => window.Position = new Godot.Vector2I(value.x, value.y); }
 
 		public bool LoadedIn => window is not null;
 
-		public RNumerics.Vector2i Size { get => new(window.Size.x, window.Size.y); set => window.Size = new(value.x, value.y); }
-		public RNumerics.Vector2i MinSize { get => new(window.MinSize.x, window.MinSize.y); set => window.MinSize = new(value.x, value.y); }
-		public RNumerics.Vector2i MaxSize { get => new(window.MaxSize.x, window.MaxSize.y); set => window.MaxSize = new(value.x, value.y); }
+		public RNumerics.Vector2i Size { get => new(window.Size.X, window.Size.Y); set => window.Size = new(value.x, value.y); }
+		public RNumerics.Vector2i MinSize { get => new(window.MinSize.X, window.MinSize.Y); set => window.MinSize = new(value.x, value.y); }
+		public RNumerics.Vector2i MaxSize { get => new(window.MaxSize.X, window.MaxSize.Y); set => window.MaxSize = new(value.x, value.y); }
 		public RWindowModeEnum Mode { get => (RWindowModeEnum)window.Mode; set => window.Mode = (ModeEnum)value; }
 		public int CurrentScreen { get => window.CurrentScreen; set => window.CurrentScreen = value; }
 		public bool Visible { get => window.Visible; set => window.Visible = value; }

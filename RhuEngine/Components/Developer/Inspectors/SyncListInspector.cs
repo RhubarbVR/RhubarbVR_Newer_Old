@@ -85,22 +85,7 @@ namespace RhuEngine.Components
 						if (Entity.Viewport.Entity.children.Count == 0) {
 							return;
 						}
-						var targetInspector = Entity.Viewport.Entity.children[0].GetFirstComponent<EntityInspector>();
-						var targetBasicInspector = Entity.Viewport.Entity.children[0].GetFirstComponent<ScrollContainer>();
-						if(targetInspector is not null) {
-							if (targetInspector.Entity.children.Count < 2) {
-								return;
-							}
-							targetInspector.Entity.children[1].AddChild().AttachComponent<Panel>();
-							return;
-						}
-						if (targetBasicInspector is not null) {
-							if (targetBasicInspector.Entity.children.Count == 0) {
-								return;
-							}
-							targetBasicInspector.Entity.children[0].AddChild().AttachComponent<Panel>();
-							return;
-						}
+						Entity.Viewport.Entity.AddChild("Pannel").AttachComponent<Panel>();
 					}
 				}
 				return;

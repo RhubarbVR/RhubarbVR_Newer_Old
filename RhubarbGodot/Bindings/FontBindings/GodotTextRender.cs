@@ -19,7 +19,7 @@ using static System.Net.Mime.MediaTypeNames;
 using static Godot.Control;
 using static Godot.TextServer;
 
-using Vector2i = Godot.Vector2i;
+using Vector2i = Godot.Vector2I;
 
 namespace RhubarbVR.Bindings.FontBindings
 {

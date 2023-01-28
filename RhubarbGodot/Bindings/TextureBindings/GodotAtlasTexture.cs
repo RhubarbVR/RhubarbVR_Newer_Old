@@ -34,7 +34,7 @@ namespace RhubarbVR.Bindings.TextureBindings
 		{
 			get {
 				var pos = AtlasTexture.Region.Position;
-				return new Vector2f(pos.x, pos.y);
+				return new Vector2f(pos.X, pos.Y);
 			}
 			set {
 				var data = AtlasTexture.Region;
@@ -46,7 +46,7 @@ namespace RhubarbVR.Bindings.TextureBindings
 		{
 			get {
 				var scale = AtlasTexture.Region.Size;
-				return new Vector2f(scale.x, scale.y);
+				return new Vector2f(scale.X, scale.Y);
 			}
 			set {
 				var data = AtlasTexture.Region;
@@ -58,7 +58,7 @@ namespace RhubarbVR.Bindings.TextureBindings
 		{
 			get {
 				var pos = AtlasTexture.Margin.Position;
-				return new Vector2f(pos.x, pos.y);
+				return new Vector2f(pos.X, pos.Y);
 			}
 			set {
 				var data = AtlasTexture.Margin;
@@ -70,7 +70,7 @@ namespace RhubarbVR.Bindings.TextureBindings
 		{
 			get {
 				var scale = AtlasTexture.Margin.Size;
-				return new Vector2f(scale.x, scale.y);
+				return new Vector2f(scale.X, scale.Y);
 			}
 			set {
 				var data = AtlasTexture.Margin;

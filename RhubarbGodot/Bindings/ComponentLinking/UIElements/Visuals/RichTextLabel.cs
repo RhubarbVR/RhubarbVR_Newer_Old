@@ -1,17 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using RhuEngine;
 using RhuEngine.Linker;
-using RhuEngine.WorldObjects.ECS;
 using RhuEngine.WorldObjects;
-using Godot;
-using RhuEngine.Components;
+
 using static Godot.Control;
 using static Godot.TextServer;
-using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
@@ -22,7 +14,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public override void StartContinueInit() {
 			LinkedComp.BitcodeEnabled.Changed += BitcodeEnabled_Changed;
 			LinkedComp.Text.Changed += Text_Changed;
-			LinkedComp.FitContentHeight.Changed += FitContentHeight_Changed;
+			LinkedComp.FitContent.Changed += FitContentHeight_Changed;
 			LinkedComp.ScrollActive.Changed += ScrollActive_Changed;
 			LinkedComp.ScrollFollowing.Changed += ScrollFollowing_Changed;
 			LinkedComp.AutoWrapMode.Changed += AutoWrapMode_Changed;
@@ -126,7 +118,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void FitContentHeight_Changed(IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.FitContentHeight = LinkedComp.FitContentHeight.Value);
+			RenderThread.ExecuteOnEndOfFrame(() => node.FitContent = LinkedComp.FitContent.Value);
 		}
 
 		private void Text_Changed(IChangeable obj) {

@@ -50,7 +50,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void FixedIconSize_Changed(IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.FixedIconSize = new Vector2i(LinkedComp.FixedIconSize.Value.x, LinkedComp.FixedIconSize.Value.y));
+			RenderThread.ExecuteOnEndOfFrame(() => node.FixedIconSize = new Vector2I(LinkedComp.FixedIconSize.Value.x, LinkedComp.FixedIconSize.Value.y));
 		}
 
 		private void IconScale_Changed(IChangeable obj) {

@@ -112,7 +112,7 @@ namespace RhubarbVR.Bindings.TextureBindings
 		}
 
 		public void FillRect(Vector2i rectPos, Vector2i rectSiz, Colorf color) {
-			Image.FillRect(new Rect2i(rectPos.x, rectPos.y, rectSiz.x, rectSiz.y), new Color(color.r, color.g, color.b, color.a));
+			Image.FillRect(new Rect2I(rectPos.x, rectPos.y, rectSiz.x, rectSiz.y), new Color(color.r, color.g, color.b, color.a));
 		}
 
 		public void FixAlphaEdges() {
@@ -137,16 +137,16 @@ namespace RhubarbVR.Bindings.TextureBindings
 
 		public Colorf GetPixel(int x, int y) {
 			var pixel = Image.GetPixel(x, y);
-			return new Colorf(pixel.r, pixel.g, pixel.b, pixel.a);
+			return new Colorf(pixel.R, pixel.G, pixel.B, pixel.A);
 		}
 
 		public IRImage GetRect(Vector2i rectPos, Vector2i rectSiz) {
-			return new GodotImage(Image.GetRegion(new Rect2i(rectPos.x, rectPos.y, rectSiz.x, rectSiz.y)));
+			return new GodotImage(Image.GetRegion(new Rect2I(rectPos.x, rectPos.y, rectSiz.x, rectSiz.y)));
 		}
 
 		public (Vector2i pos, Vector2i size) GetUsedRect() {
 			var rect = Image.GetUsedRect();
-			return (new Vector2i(rect.Position.x, rect.Position.y), new Vector2i(rect.Size.x, rect.Size.y));
+			return (new Vector2i(rect.Position.X, rect.Position.Y), new Vector2i(rect.Size.X, rect.Size.Y));
 		}
 
 		public bool LoadBmp(byte[] data) {

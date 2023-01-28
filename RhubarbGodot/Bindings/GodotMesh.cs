@@ -222,10 +222,10 @@ namespace RhubarbVR.Bindings
 
 
 		private static IEnumerable<float> GetData(Vector4 data) {
-			yield return data.x;
-			yield return data.y;
-			yield return data.z;
-			yield return data.w;
+			yield return data.X;
+			yield return data.Y;
+			yield return data.Z;
+			yield return data.W;
 		}
 
 		public static (Mesh.PrimitiveType, Array) CreateSubmesh(RPrimitiveType rPrimitiveType, Vector3f[][] uvs, int[] indexs, Vector3[] vectors, Vector3[] normals, Color[] color, Vector4[] tangents, int[] bones, float[] wights) {
@@ -258,10 +258,10 @@ namespace RhubarbVR.Bindings
 						array[e] = new Vector2(uvs[i][e].x, uvs[i][e].y);
 					}
 					if (i == 0) {
-						arrays[(int)Mesh.ArrayType.TexUv] = array.AsSpan();
+						arrays[(int)Mesh.ArrayType.TexUV] = array.AsSpan();
 					}
 					else {
-						arrays[(int)Mesh.ArrayType.TexUv2] = array.AsSpan();
+						arrays[(int)Mesh.ArrayType.TexUV2] = array.AsSpan();
 					}
 
 				}
@@ -468,7 +468,7 @@ namespace RhubarbVR.Bindings
 							var smallitsTang = Math.Min(complexMesh.Tangents.Count, complexMesh.VertexCount);
 							for (var i = 0; i < smallitsTang; i++) {
 								var tangent = item.Tangents[i];
-								tangents[i] = new Vector3(tangent.x - ctangents[i].x, tangent.y - ctangents[i].y, tangent.z - ctangents[i].z);
+								tangents[i] = new Vector3(tangent.x - ctangents[i].X, tangent.y - ctangents[i].Y, tangent.z - ctangents[i].Z);
 							}
 							if (ctangents is not null) {
 								shapedata[2] = tangents.AsSpan();

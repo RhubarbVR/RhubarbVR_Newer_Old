@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 	{
 		[Default(true)]public readonly Sync<bool> BitcodeEnabled;
 		public readonly Sync<string> Text;
-		public readonly Sync<bool> FitContentHeight;
+		public readonly Sync<bool> FitContent;
 		[Default(true)]public readonly Sync<bool> ScrollActive;
 		public readonly Sync<bool> ScrollFollowing;
 		public readonly Sync<RAutowrapMode> AutoWrapMode;
