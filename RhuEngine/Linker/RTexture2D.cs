@@ -16,7 +16,7 @@ namespace RhuEngine.Linker
 		long Width { get; }
 		bool HasAlpha { get; }
 
-		bool IsPixelOpaque(long x, long y);
+		bool IsPixelOpaque(int x, int y);
 
 		IRImage GetImage();
 
@@ -52,7 +52,7 @@ namespace RhuEngine.Linker
 		public long Width => Texture2D.Width;
 		public bool HasAlpha => Texture2D.HasAlpha;
 
-		public bool IsPixelOpaque(long x, long y) {
+		public bool IsPixelOpaque(int x, int y) {
 			return Texture2D.IsPixelOpaque(x, y);
 		}
 

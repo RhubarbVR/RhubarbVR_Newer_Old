@@ -91,7 +91,7 @@ public partial class EngineRunner : Node3D, IRTime
 	public Vector2f MouseScrollPos;
 	public Vector2f LastMouseScrollPos;
 
-	public override void _Notification(long what) {
+	public override void _Notification(int what) {
 		if (what == Node.NotificationInternalProcess) {
 			MouseScrollDelta = MouseScrollPos - LastMouseScrollPos;
 			LastMouseScrollPos = MouseScrollPos;

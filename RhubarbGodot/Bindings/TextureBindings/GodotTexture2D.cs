@@ -41,7 +41,7 @@ namespace RhubarbVR.Bindings.TextureBindings
 			}
 		}
 
-		public bool IsPixelOpaque(long x, long y) {
+		public bool IsPixelOpaque(int x, int y) {
 			return Texture2D._IsPixelOpaque(x, y);
 		}
 	}

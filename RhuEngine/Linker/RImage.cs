@@ -268,6 +268,18 @@ namespace RhuEngine.Linker
 		//     Use BPTC compression.
 		Bptc
 	}
+	public enum RAstcFormat : long
+	{
+		//
+		// Summary:
+		//     Hint to indicate that the high quality 4x4 ASTC compression format should be
+		//     used.
+		Format4X4,
+		//
+		// Summary:
+		//     Hint to indicate that the low quality 8x8 ASTC compression format should be used.
+		Format8X8
+	}
 
 	public enum RUsedChannels : long
 	{
@@ -345,8 +357,8 @@ namespace RhuEngine.Linker
 
 		RUsedChannels FetectUsedChannels(RCompressSource source);
 
-		void Compress(RCompressMode rCompressMode, RCompressSource source, float quality);
-		void CompressFromChannels(RCompressMode rCompressMode, RUsedChannels rUsedChannels, float quality);
+		void Compress(RCompressMode rCompressMode, RCompressSource source, RAstcFormat astcFormat);
+		void CompressFromChannels(RCompressMode rCompressMode, RUsedChannels rUsedChannels, RAstcFormat astcFormat);
 
 		void Decompress();
 
@@ -481,11 +493,11 @@ namespace RhuEngine.Linker
 			return Inst.FetectUsedChannels(source);
 		}
 
-		public void Compress(RCompressMode rCompressMode, RCompressSource source = RCompressSource.Generic, float quality = 0.7f) {
-			Inst.Compress(rCompressMode, source, quality);
+		public void Compress(RCompressMode rCompressMode, RCompressSource source = RCompressSource.Generic, RAstcFormat astcFormat = RAstcFormat.Format4X4) {
+			Inst.Compress(rCompressMode, source, astcFormat);
 		}
-		public void CompressFromChannels(RCompressMode rCompressMode, RUsedChannels rUsedChannels, float quality = 0.7f) {
-			Inst.CompressFromChannels(rCompressMode, rUsedChannels, quality);
+		public void CompressFromChannels(RCompressMode rCompressMode, RUsedChannels rUsedChannels, RAstcFormat astcFormat = RAstcFormat.Format4X4) {
+			Inst.CompressFromChannels(rCompressMode, rUsedChannels, astcFormat);
 		}
 
 		public void Decompress() {

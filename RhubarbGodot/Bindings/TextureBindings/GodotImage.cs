@@ -65,12 +65,12 @@ namespace RhubarbVR.Bindings.TextureBindings
 			Image.ClearMipmaps();
 		}
 
-		public void Compress(RCompressMode rCompressMode, RCompressSource source, float quality) {
-			Image.Compress((Image.CompressMode)rCompressMode, (Image.CompressSource)source, quality);
+		public void Compress(RCompressMode rCompressMode, RCompressSource source, RAstcFormat astcFormat) {
+			Image.Compress((Image.CompressMode)rCompressMode, (Image.CompressSource)source, (Image.AstcFormat)astcFormat);
 		}
 
-		public void CompressFromChannels(RCompressMode rCompressMode, RUsedChannels rUsedChannels, float quality) {
-			Image.CompressFromChannels((Image.CompressMode)rCompressMode, (Image.UsedChannels)rUsedChannels, quality);
+		public void CompressFromChannels(RCompressMode rCompressMode, RUsedChannels rUsedChannels, RAstcFormat astcFormat) {
+			Image.CompressFromChannels((Image.CompressMode)rCompressMode, (Image.UsedChannels)rUsedChannels, (Image.AstcFormat)astcFormat);
 		}
 
 		public void Convert(RFormat rFormat) {
