@@ -82,12 +82,11 @@ namespace RhuEngine.Components
 
 		public bool IsAbstract => SubType.IsAbstract | SubType.IsInterface;
 
-		protected override void OnLoaded() {
-			base.OnLoaded();
+		protected override void SaftyChecks() {
+			base.SaftyChecks();
 			if (!IsAbstract) {
-				throw new Exception("Type is not vailed None Vailed");
+				throw new NotVailedGenaric();
 			}
-
 		}
 
 		public static CategoryData<T> categoryData = new();

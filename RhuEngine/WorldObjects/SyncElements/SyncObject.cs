@@ -129,6 +129,8 @@ namespace RhuEngine.WorldObjects
 
 		public bool IsInitialized { get; private set; } = false;
 
+		protected virtual void SaftyChecks() { }
+
 		public void Initialize(World world, IWorldObject parent, string name, bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer = null) {
 			try {
 				if (GetType().GetCustomAttribute<OverlayOnlyAttribute>(true) != null && !(world.IsOverlayWorld || world.IsPersonalSpace)) {
@@ -137,6 +139,7 @@ namespace RhuEngine.WorldObjects
 				if (GetType().GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && !world.IsPersonalSpace) {
 					throw new InvalidOperationException("This SyncObject is PrivateSpaceOnly");
 				}
+				SaftyChecks(); 
 				var arguments = GetType().GetGenericArguments();
 				foreach (var arguiminet in arguments) {
 					var isVailed = false;
@@ -196,7 +199,7 @@ namespace RhuEngine.WorldObjects
 				}
 				IsInitialized = true;
 			}
-			catch {
+			catch(Exception e) {
 				try {
 					Dispose();
 				}
