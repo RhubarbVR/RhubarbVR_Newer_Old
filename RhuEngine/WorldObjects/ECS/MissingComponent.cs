@@ -6,7 +6,7 @@ using RhuEngine.Linker;
 
 namespace RhuEngine.WorldObjects.ECS
 {
-	[Category(new string[] { "Internal" })]
+	[HideCategory]
 	public sealed class MissingComponent : Component
 	{
 		public readonly Sync<string> type;

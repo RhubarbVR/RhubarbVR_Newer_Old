@@ -29,13 +29,11 @@ namespace RhuEngine.WorldObjects.ECS
 			Entity = (Entity)Parent.Parent;
 			var allowedOnWorldRoot = GetType().GetCustomAttribute<AllowedOnWorldRootAttribute>(true);
 			if(allowedOnWorldRoot is null && Entity.IsRoot) {
-				Destroy();
 				throw new Exception("Not Allowed on WorldRoot");
 			}
 			var locke = GetType().GetHighestAttributeInherit<SingleComponentLockAttribute>();
 			if(locke is not null) {
-				if(Entity.components.Where(x => x.GetType().IsAssignableFrom(locke)).Count() >= 2) {
-					Destroy();
+				if(Entity.components.Where(x => x.GetType().IsAssignableTo(locke)).Count() >= 1) {
 					throw new Exception("Single Component Locked");
 				}
 			}

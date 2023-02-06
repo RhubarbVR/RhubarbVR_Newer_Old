@@ -22,6 +22,8 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(TargetObjectRebuild))]
 		public readonly SyncRef<T> TargetObject;
 
+		protected virtual bool MultiThreaded => true;
+
 		public IWorldObject TargetObjectWorld { get => TargetObject.TargetIWorldObject; set => TargetObject.TargetIWorldObject = value; }
 
 		public static Type GetFiled(Type type, object targetObject = null) {
@@ -46,7 +48,7 @@ namespace RhuEngine.Components
 		}
 
 		protected void WorldObjectUIBuild() {
-			var vert = Entity.AttachComponent<BoxContainer>();
+			var vert = Entity.GetFirstComponentOrAttach<BoxContainer>();
 			vert.Vertical.Value = true;
 			vert.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 			if (TargetObject.Target is null) {
@@ -140,7 +142,7 @@ namespace RhuEngine.Components
 				LocalBind();
 				return;
 			}
-			if (Task.CurrentId is null) {
+			if (Task.CurrentId is null & MultiThreaded) {
 				Task.Run(UIUpdate);
 			}
 			else {

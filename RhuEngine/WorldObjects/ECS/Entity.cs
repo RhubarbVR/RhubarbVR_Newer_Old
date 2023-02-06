@@ -139,7 +139,7 @@ namespace RhuEngine.WorldObjects.ECS
 				children[i].GlobalTransMark(false);
 			}
 		}
-
+		[Exposed]
 		public override void Destroy() {
 			if (IsRoot) {
 				return;

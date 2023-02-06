@@ -5,6 +5,7 @@ using NAudio.Wave;
 
 namespace RhuEngine.Components
 {
+	[Category("Audio")]
 	public sealed class SoundSource : LinkedWorldComponent
 	{
 		public readonly AssetRef<IWaveProvider> sound;

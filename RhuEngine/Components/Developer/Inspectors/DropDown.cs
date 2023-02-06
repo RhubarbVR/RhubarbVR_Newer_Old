@@ -23,7 +23,7 @@ namespace RhuEngine.Components
 
 		protected override void OnAttach() {
 			base.OnAttach();
-			var box = Entity.AttachComponent<BoxContainer>();
+			var box = Entity.GetFirstComponentOrAttach<BoxContainer>();
 			box.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
 			box.Vertical.Value = true;
 			var top = Entity.AddChild().AttachComponent<BoxContainer>();

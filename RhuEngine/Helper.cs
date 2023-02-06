@@ -263,7 +263,7 @@ namespace RhuEngine
 		}
 
 		public static Type GetHighestAttributeInherit<T>(this Type type) where T : Attribute {
-			return type.GetCustomAttribute<T>() is not null
+			return type.GetCustomAttribute<T>(false) is not null
 				? type
 				: type.GetCustomAttribute<T>(true) is null ? null : (type.BaseType?.GetHighestAttributeInherit<T>());
 		}

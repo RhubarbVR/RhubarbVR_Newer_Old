@@ -20,6 +20,21 @@ namespace RhuEngine.Components
 
 		public bool IsAbstract => typeof(T).IsAssignableTo(typeof(IAbstractObjList));
 
+		public Type IAbstractType
+		{
+			get {
+				foreach (var item in typeof(T).GetInterfaces()) {
+					if (!item.IsAssignableTo(typeof(IAbstractObjList))) {
+						continue;
+					}
+					if (item.IsGenericType) {
+						return item.GenericTypeArguments[0];
+					}
+				}
+				return null;
+			}
+		}
+
 		public override void LocalBind() {
 			base.LocalBind();
 			if (_lastValue is not null) {
@@ -85,7 +100,15 @@ namespace RhuEngine.Components
 						if (Entity.Viewport.Entity.children.Count == 0) {
 							return;
 						}
-						Entity.Viewport.Entity.AddChild("Pannel").AttachComponent<Panel>();
+						var targetType = IAbstractType;
+						if(targetType is null) {
+							return;
+						}
+						var entityTrain = Entity.Viewport.Entity.AddChild("Pannel");
+						entityTrain.AttachComponent<Panel>();
+						var currentType = typeof(ListAttacher<>).MakeGenericType(targetType);
+						entityTrain.AttachComponent<IListAttacher>(currentType).SetTarget(TargetObject.Target); 
+						
 					}
 				}
 				return;
