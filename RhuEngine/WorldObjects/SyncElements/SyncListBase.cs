@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
@@ -44,16 +45,23 @@ namespace RhuEngine.WorldObjects
 		public T GetValue(int index) {
 			return _syncObjects[index];
 		}
-		[Exposed]
+
 		public void Clear() {
-			var sendData = new DataNodeGroup();
-			sendData.SetValue("type", new DataNode<int>(3));
-			World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
-			foreach (var item in _syncObjects.ToArray()) {
-				item.Dispose();
+			var toBeRemoved = _syncObjects.ToArray();
+			if (Task.CurrentId is null) {
+				Task.Run(() => {
+					foreach (var item in toBeRemoved) {
+						item.Destroy();
+					}
+				});
 			}
-			_syncObjects.Clear();
+			else {
+				foreach (var item in toBeRemoved) {
+					item.Destroy();
+				}
+			}
 		}
+
 		[Exposed]
 		public T this[int i] => _syncObjects[i];
 
@@ -170,7 +178,7 @@ namespace RhuEngine.WorldObjects
 			}
 			lock (_syncObjects) {				
 				var newOrder = _syncObjects.OrderBy(x => typeof(IOffsetableElement).IsAssignableFrom(x.GetType()) ? ((IOffsetableElement)x).Offset : 0).ThenBy(x => x.Pointer._id).ToArray();
-				for (int i = 0; i < newOrder.Length; i++) {
+				for (var i = 0; i < newOrder.Length; i++) {
 					newOrder[i].ChangeName(i.ToString());
 					_syncObjects.Remove(newOrder[i]);
 					_syncObjects.Insert(i, newOrder[i]);
@@ -188,7 +196,7 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			var sendData = new DataNodeGroup();
-			sendData.SetValue("type", new DataNode<int>(1));
+			sendData.SetValue("type", new DataNode<byte>(1));
 			sendData.SetValue("ElementData", SaveElement(data));
 			World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
 		}
@@ -201,7 +209,7 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			var sendData = new DataNodeGroup();
-			sendData.SetValue("type", new DataNode<int>(2));
+			sendData.SetValue("type", new DataNode<byte>(2));
 			sendData.SetValue("ref", new DataNode<NetPointer>(data.Pointer));
 			World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
 		}
@@ -215,7 +223,7 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			var nodeGroup = (DataNodeGroup)data;
-			switch (((DataNode<int>)nodeGroup.GetValue("type")).Value) {
+			switch (((DataNode<byte>)nodeGroup.GetValue("type")).Value) {
 				case 1:
 					AddInternal(LoadElement(nodeGroup["ElementData"]));
 					break;
@@ -237,15 +245,6 @@ namespace RhuEngine.WorldObjects
 						RLog.Info($"Removed net ID:{targetID}");
 						RemoveInternal(objecte);
 						objecte.Destroy();
-					}
-					break;
-				case 3:
-					lock (_syncObjects) {
-						var startAmount = _syncObjects.Count;
-						for (var i = 0; i < startAmount; i++) {
-							_syncObjects[0].IsDestroying = true;
-							_syncObjects[0].Dispose();
-						}
 					}
 					break;
 				default:

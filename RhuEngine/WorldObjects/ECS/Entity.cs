@@ -4,6 +4,7 @@ using System.Linq;
 using RNumerics;
 using RhuEngine.Linker;
 using RhuEngine.Components;
+using System.Threading.Tasks;
 
 namespace RhuEngine.WorldObjects.ECS
 {
@@ -90,7 +91,7 @@ namespace RhuEngine.WorldObjects.ECS
 
 
 		public void DestroyChildren() {
-			children.Clear();
+			Task.Run(children.Clear);
 		}
 
 

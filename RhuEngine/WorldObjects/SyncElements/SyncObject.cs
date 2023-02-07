@@ -80,14 +80,24 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			IsDestroying = true;
-			Task.Run(() => {
+			if (Task.CurrentId is null) {
+				Task.Run(() => {
+					try {
+						Dispose();
+					}
+					catch (Exception e) {
+						RLog.Err($"Error When Destroying {Name} {Pointer} type:{GetType().GetFormattedName()} Error:{e}");
+					}
+				});
+			}
+			else {
 				try {
 					Dispose();
 				}
 				catch (Exception e) {
 					RLog.Err($"Error When Destroying {Name} {Pointer} type:{GetType().GetFormattedName()} Error:{e}");
 				}
-			});
+			}
 		}
 
 		public virtual void Dispose() {
@@ -139,7 +149,7 @@ namespace RhuEngine.WorldObjects
 				if (GetType().GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) != null && !world.IsPersonalSpace) {
 					throw new InvalidOperationException("This SyncObject is PrivateSpaceOnly");
 				}
-				SaftyChecks(); 
+				SaftyChecks();
 				var arguments = GetType().GetGenericArguments();
 				foreach (var arguiminet in arguments) {
 					var isVailed = false;
@@ -199,7 +209,7 @@ namespace RhuEngine.WorldObjects
 				}
 				IsInitialized = true;
 			}
-			catch(Exception e) {
+			catch (Exception e) {
 				try {
 					Dispose();
 				}

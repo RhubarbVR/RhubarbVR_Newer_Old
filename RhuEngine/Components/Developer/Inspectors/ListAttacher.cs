@@ -36,6 +36,22 @@ namespace RhuEngine.Components
 				LoadTypes();
 			}
 		}
+		public IEnumerable<(string formatedName, Type type)> SearchForTypes(string targetString, int limit = 25, int maxDest = 4) {
+			return (from type in from a in AppDomain.CurrentDomain.GetAssemblies()
+								 from type in a.GetTypes()
+								 where type.IsAssignableTo(typeof(T))
+								 where !type.IsAbstract & type.IsClass
+								 where type.GetCustomAttribute<HideCategoryAttribute>() is null
+								 let at = type.GetCustomAttribute<CategoryAttribute>()
+								 where (type.GetCustomAttribute<PrivateSpaceOnlyAttribute>() is null) & (type.GetCustomAttribute<OverlayOnlyAttribute>() is null)
+								 orderby (at?.Paths.Length ?? 0) ascending
+								 select (at, type)
+					let formatedName = type.type.GetFormattedName()
+					let distance = formatedName.CommonStringDistances(targetString)
+					where distance <= maxDest
+					orderby distance ascending
+					select (formatedName, type.type)).LimitSelect(limit);
+		}
 
 		public void LoadTypes() {
 			var allTypes = (from a in AppDomain.CurrentDomain.GetAssemblies()
@@ -78,6 +94,8 @@ namespace RhuEngine.Components
 	{
 		public readonly SyncRef<IAbstractObjList<T>> TargetAddingObject;
 		public readonly SyncRef<BoxContainer> MainBox;
+		public readonly SyncRef<IValueSource<string>> SearchField;
+
 		public Type SubType => typeof(T);
 
 		public bool IsAbstract => SubType.IsAbstract | SubType.IsInterface;
@@ -87,6 +105,27 @@ namespace RhuEngine.Components
 			if (!IsAbstract) {
 				throw new NotVailedGenaric();
 			}
+		}
+
+		[Exposed]
+		public void Search() {
+			if (SearchField.Target is null) {
+				return;
+			}
+			if (string.IsNullOrWhiteSpace(SearchField.Target.Value)) {
+				LoadUI("/");
+				return;
+			}
+			Task.Run(() => {
+				foreach (var item in MainBox.Target.Entity.children.Skip(2).Cast<Entity>().ToArray()) {
+					item.Destroy();
+				}
+			});
+			var search = categoryData.SearchForTypes(SearchField.Target.Value).ToArray();
+			foreach (var item in search) {
+				AddButtonStringPram(item.formatedName, Colorf.Blue, item.type.FullName).Target.Target = AddData;
+			}
+
 		}
 
 		public static CategoryData<T> categoryData = new();
@@ -99,6 +138,25 @@ namespace RhuEngine.Components
 			MainBox.Target.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
 			MainBox.Target.Vertical.Value = true;
 			LoadUI("/");
+		}
+
+		private LineEdit AddTextEdit(Action clickevent, string placeHolder, RhubarbAtlasSheet.RhubarbIcons rhubarbIcons) {
+			var boxContainer = MainBox.Target.Entity.AddChild("TextEdit").AttachComponent<BoxContainer>();
+			boxContainer.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+			var lineEdit = boxContainer.Entity.AddChild("Edit").AttachComponent<LineEdit>();
+			lineEdit.Alignment.Value = RHorizontalAlignment.Center;
+			lineEdit.TextSubmitted.Target = clickevent;
+			lineEdit.PlaceholderText.Value = placeHolder;
+			lineEdit.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
+			var buttonSearch = boxContainer.Entity.AddChild("Button").AttachComponent<Button>();
+			buttonSearch.MinSize.Value = new Vector2i(45);
+			buttonSearch.Pressed.Target = clickevent;
+			var singleIcon = buttonSearch.Entity.AttachComponent<SingleIconTex>();
+			singleIcon.Icon.Value = rhubarbIcons;
+			buttonSearch.IconAlignment.Value = RButtonAlignment.Center;
+			buttonSearch.ExpandIcon.Value = true;
+			buttonSearch.Icon.Target = singleIcon;
+			return lineEdit;
 		}
 
 		private Button AddButton(string buttonName, Colorf tint) {
@@ -128,6 +186,8 @@ namespace RhuEngine.Components
 			}
 			MainBox.Target.Entity.DestroyChildren();
 			if (path == "/") {
+				var lineEditor = AddTextEdit(Search, Engine.localisationManager.GetLocalString("Common.Search"), RhubarbAtlasSheet.RhubarbIcons.Search);
+				SearchField.Target = lineEditor.Text;
 				AddButton("Close", Colorf.Red).Pressed.Target = Close;
 			}
 			else {
@@ -150,12 +210,7 @@ namespace RhuEngine.Components
 				AddButtonStringPram(item.CurrentPath, Colorf.RhubarbGreen, item.FullPath).Target.Target = NavToPath;
 			}
 			foreach (var item in targetCat.currentTypes) {
-				if (item.IsGenericType) {
-					AddButtonStringPram(item.GetFormattedName(), Colorf.DarkBlue, item.FullName).Target.Target = AddData;
-				}
-				else {
-					AddButtonStringPram(item.GetFormattedName(), Colorf.Blue, item.FullName).Target.Target = AddData;
-				}
+				AddButtonStringPram(item.GetFormattedName(), Colorf.Blue, item.FullName).Target.Target = AddData;
 			}
 		}
 
@@ -195,7 +250,7 @@ namespace RhuEngine.Components
 					TargetAddingObject.Target.Add(t);
 				}
 			}
-			catch(Exception e) {
+			catch (Exception e) {
 				RLog.Err($"Error when list attaching on type {t} Error: {e}");
 			}
 			finally {

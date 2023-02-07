@@ -23,10 +23,6 @@ namespace RNumerics.Tests
 			Assert.AreEqual(2, "fogeeks".DamerauLevenshteinDistance("geeks"));
 			Assert.AreEqual(3, "forgeeks".DamerauLevenshteinDistance("geeks"));
 			Assert.AreEqual(15, "urgduihgiudrh".DamerauLevenshteinDistance("fesmcvlksnmvieo"));
-			Assert.AreEqual(1, "A".CommonStringDistances("a"));
-			Assert.AreEqual(1, "Astronaut".CommonStringDistances("astronaut"));
-			Assert.AreEqual(1, "AstRonaut".CommonStringDistances("astronaut"));
-			Assert.AreEqual(1, "AstRonaut".CommonStringDistances("astroNAut"));
 		}
 	}
 }

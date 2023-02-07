@@ -26,9 +26,7 @@ namespace RNumerics
 		}
 
 		public static int CommonStringDistances(this string firstText, string secondText) {
-			var noCase = DamerauLevenshteinDistance(firstText.ToLower(), secondText.ToLower());
-			var withCase = DamerauLevenshteinDistance(firstText, secondText);
-			return noCase < withCase ? (noCase * 2) + 1 : withCase;
+			return DamerauLevenshteinDistance(firstText.ToLower(), secondText.ToLower()) - (firstText.ToLower().Contains(secondText.ToLower()) ? 10 : 0) - (secondText.ToLower().Contains(firstText.ToLower()) ? 2 : 0);
 		}
 
 		public static int DamerauLevenshteinDistance(this string firstText, string secondText) {
