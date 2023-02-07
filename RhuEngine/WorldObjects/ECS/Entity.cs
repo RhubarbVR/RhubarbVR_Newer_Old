@@ -91,7 +91,7 @@ namespace RhuEngine.WorldObjects.ECS
 
 
 		public void DestroyChildren() {
-			Task.Run(children.Clear);
+			children.Clear();
 		}
 
 

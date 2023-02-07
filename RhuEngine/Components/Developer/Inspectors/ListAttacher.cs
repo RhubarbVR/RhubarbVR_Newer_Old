@@ -229,7 +229,7 @@ namespace RhuEngine.Components
 				Close();
 				return;
 			}
-			if (t.IsGenericType & !t.IsGenericTypeDefinition) {
+			if (t.IsGenericType & t.IsGenericTypeDefinition) {
 				//Build looking for generic UI
 				Close(); //Timp
 				return;
