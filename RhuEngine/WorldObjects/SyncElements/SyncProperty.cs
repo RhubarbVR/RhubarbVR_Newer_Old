@@ -56,6 +56,7 @@ namespace RhuEngine.WorldObjects
 		public ILinker linkedFromObj;
 
 		public event Action<IChangeable> Changed;
+		public event Action<ILinker> OnLinked;
 
 		public NetPointer LinkedFrom => linkedFromObj.Pointer;
 
@@ -64,6 +65,7 @@ namespace RhuEngine.WorldObjects
 		public void KillLink() {
 			linkedFromObj.RemoveLinkLocation();
 			IsLinkedTo = false;
+			OnLinked?.Invoke(null);
 		}
 
 		public void Link(ILinker value) {
@@ -78,6 +80,7 @@ namespace RhuEngine.WorldObjects
 			value.SetLinkLocation(this);
 			linkedFromObj = value;
 			IsLinkedTo = true;
+			OnLinked?.Invoke(value);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

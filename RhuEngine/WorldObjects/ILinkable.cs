@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 using RhuEngine.Datatypes;
 
 namespace RhuEngine.WorldObjects
@@ -9,6 +11,7 @@ namespace RhuEngine.WorldObjects
 		void Link(ILinker source);
 		void ForceLink(ILinker source);
 
+		event Action<ILinker> OnLinked;
 		bool IsLinkedTo { get; }
 		NetPointer LinkedFrom { get; }
 

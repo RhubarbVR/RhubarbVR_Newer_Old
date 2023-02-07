@@ -141,6 +141,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public event Action<IChangeable> Changed;
+		public event Action<ILinker> OnLinked;
 
 		public void SetValueForce(object value) {
 			lock (_locker) {
@@ -220,6 +221,7 @@ namespace RhuEngine.WorldObjects
 		public void KillLink() {
 			linkedFromObj?.RemoveLinkLocation();
 			IsLinkedTo = false;
+			OnLinked?.Invoke(null);
 		}
 
 		public void Link(ILinker value) {
@@ -234,6 +236,7 @@ namespace RhuEngine.WorldObjects
 			value.SetLinkLocation(this);
 			linkedFromObj = value;
 			IsLinkedTo = true;
+			OnLinked?.Invoke(value);
 		}
 
 		public void SetStartingObject() {

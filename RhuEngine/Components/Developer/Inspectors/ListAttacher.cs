@@ -43,7 +43,7 @@ namespace RhuEngine.Components
 								 where !type.IsAbstract & type.IsClass
 								 where type.GetCustomAttribute<HideCategoryAttribute>() is null
 								 let at = type.GetCustomAttribute<CategoryAttribute>()
-								 where (type.GetCustomAttribute<PrivateSpaceOnlyAttribute>() is null) & (type.GetCustomAttribute<OverlayOnlyAttribute>() is null)
+								 where (type.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) is null) & (type.GetCustomAttribute<OverlayOnlyAttribute>(true) is null)
 								 orderby (at?.Paths.Length ?? 0) ascending
 								 select (at, type)
 					let formatedName = type.type.GetFormattedName()
@@ -60,7 +60,7 @@ namespace RhuEngine.Components
 							where !type.IsAbstract & type.IsClass
 							where type.GetCustomAttribute<HideCategoryAttribute>() is null
 							let at = type.GetCustomAttribute<CategoryAttribute>()
-							where (type.GetCustomAttribute<PrivateSpaceOnlyAttribute>() is null) & (type.GetCustomAttribute<OverlayOnlyAttribute>() is null)
+							where (type.GetCustomAttribute<PrivateSpaceOnlyAttribute>(true) is null) & (type.GetCustomAttribute<OverlayOnlyAttribute>(true) is null)
 							orderby (at?.Paths.Length ?? 0) ascending
 							select (at, type)).ToArray();
 			LoadSubTypes(allTypes);
@@ -123,7 +123,7 @@ namespace RhuEngine.Components
 			});
 			var search = categoryData.SearchForTypes(SearchField.Target.Value).ToArray();
 			foreach (var item in search) {
-				AddButtonStringPram(item.formatedName, Colorf.Blue, item.type.FullName).Target.Target = AddData;
+				AddButtonStringPram(item.formatedName, Colorf.White, item.type.FullName).Target.Target = AddData;
 			}
 
 		}
@@ -210,7 +210,7 @@ namespace RhuEngine.Components
 				AddButtonStringPram(item.CurrentPath, Colorf.RhubarbGreen, item.FullPath).Target.Target = NavToPath;
 			}
 			foreach (var item in targetCat.currentTypes) {
-				AddButtonStringPram(item.GetFormattedName(), Colorf.Blue, item.FullName).Target.Target = AddData;
+				AddButtonStringPram(item.GetFormattedName(), Colorf.White, item.FullName).Target.Target = AddData;
 			}
 		}
 

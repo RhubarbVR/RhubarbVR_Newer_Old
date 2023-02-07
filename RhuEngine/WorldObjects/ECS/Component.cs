@@ -27,6 +27,9 @@ namespace RhuEngine.WorldObjects.ECS
 		protected override void OnInitialize() {
 			base.OnInitialize();
 			Entity = (Entity)Parent.Parent;
+			if(Entity is null) {
+				throw new Exception("Component Failed to bind to entity");
+			}
 			var allowedOnWorldRoot = GetType().GetCustomAttribute<AllowedOnWorldRootAttribute>(true);
 			if(allowedOnWorldRoot is null && Entity.IsRoot) {
 				throw new Exception("Not Allowed on WorldRoot");

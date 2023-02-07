@@ -20,15 +20,7 @@
 		public bool Linked => _linked != null;
 
 		public void SetLinkLocation(ILinkable val) {
-			if (Target == val) {
-				_linked = val;
-			}
-			else {
-				if (Linked) {
-					Unlink();
-				}
-				_linked = val;
-			}
+			_linked = val;
 		}
 		public void RemoveLinkLocation() {
 			_linked = null;
@@ -37,19 +29,16 @@
 			base.Target = Target;
 		}
 		public override void Bind() {
-			if (Target != null) {
-				Link();
-			}
+			Link();
 		}
 
 		private void Link() {
-			if (Linked) {
-				Unlink();
-			}
-			Target.Link(this);
+			Unlink();
+			Target?.Link(this);
 		}
 		private void Unlink() {
 			_linked?.KillLink();
+			_linked = null;
 		}
 
 		public override void Dispose() {

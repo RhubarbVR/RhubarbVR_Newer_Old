@@ -30,9 +30,6 @@ namespace RhuEngine.Components
 				newval.Decompose(out _, out var newrotation, out _);
 				driver.LinkedValue = newrotation;
 			}
-			else {
-				driver.Target = Entity.rotation;
-			}
 		}
 	}
 }

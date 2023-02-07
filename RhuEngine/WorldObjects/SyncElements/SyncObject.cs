@@ -209,7 +209,7 @@ namespace RhuEngine.WorldObjects
 				}
 				IsInitialized = true;
 			}
-			catch (Exception e) {
+			catch {
 				try {
 					Dispose();
 				}

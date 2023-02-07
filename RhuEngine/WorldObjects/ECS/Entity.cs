@@ -21,7 +21,7 @@ namespace RhuEngine.WorldObjects.ECS
 		[Default("Entity")]
 		[OnChanged(nameof(NameChange))]
 		public readonly Sync<string> name;
-		private void NameChange() {
+		private new void NameChange() {
 			Changed?.Invoke(this);
 		}
 		public override string Name => name.Value;

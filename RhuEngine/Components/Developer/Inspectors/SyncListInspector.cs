@@ -106,7 +106,7 @@ namespace RhuEngine.Components
 						}
 						var entityTrain = Entity.Viewport.Entity.AddChild("Pannel");
 						var mod = entityTrain.AttachComponent<Panel>();
-						mod.ModulateSelf.Value = new Colorf(1, 1, 1, 1.25f);
+						mod.ModulateSelf.Value = new Colorf(1, 1, 1, 1.45f);
 						var currentType = typeof(ListAttacher<>).MakeGenericType(targetType);
 						entityTrain.AttachComponent<IListAttacher>(currentType).SetTarget(TargetObject.Target); 
 						

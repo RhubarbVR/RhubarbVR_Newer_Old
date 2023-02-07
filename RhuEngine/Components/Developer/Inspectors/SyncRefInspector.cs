@@ -35,9 +35,22 @@ namespace RhuEngine.Components
 			}
 		}
 
+		private void UpdateText(IChangeable changeable = null) {
+			TargetButton.Target.Text.Value = TargetObject.Target?.TargetIWorldObject?.GetExtendedNameStringWithRef() ?? "NULL";
+
+		}
+		private Entity _lastClose;
 		private void Target_Changed(IChangeable obj) {
+			if(_lastClose is not null) {
+				_lastClose.Changed -= UpdateText;
+				_lastClose = null;
+			}
 			if (TargetButton.Target is not null) {
-				TargetButton.Target.Text.Value = TargetObject.Target?.TargetIWorldObject?.GetExtendedNameStringWithRef() ?? "NULL";
+				if(TargetObject.Target?.TargetIWorldObject is not null) {
+					_lastClose = TargetObject.Target.TargetIWorldObject.GetClosedEntity();
+					_lastClose.Changed += UpdateText;
+				}
+				UpdateText();
 			}
 		}
 

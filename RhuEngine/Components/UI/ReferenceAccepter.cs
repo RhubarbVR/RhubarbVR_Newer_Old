@@ -40,8 +40,8 @@ namespace RhuEngine.Components.UI
 			base.OnAttach();
 			var main = targetButton.Target = Entity.AddChild("DropVisual").AttachComponent<Button>();
 			main.ModulateSelf.Value = new Colorf(98, 98, 98);
-			main.MinOffset.Value = new Vector2f(-10, 10);
-			main.MaxOffset.Value = new Vector2f(10, -10);
+			main.MinOffset.Value = new Vector2f(-5, 5);
+			main.MaxOffset.Value = new Vector2f(5, -5);
 			main.ButtonMask.Value = RButtonMask.Primary | RButtonMask.Secondary;
 			main.ButtonUp.Target = OnButtonUp;
 			var Label = main.Entity.AddChild("DropIcon").AttachComponent<TextureRect>();
