@@ -1,1 +1,0 @@
-RhubarbVR.exe --xr-mode off

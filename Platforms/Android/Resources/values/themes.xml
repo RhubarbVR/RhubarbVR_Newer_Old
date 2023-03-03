@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<style name="LibGodotAppMainTheme" parent="@android:style/Theme.Black.NoTitleBar"/>
+
+	<style name="LibGodotAppSplashTheme" parent="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+		<item name="android:windowBackground">@drawable/main_splash_drawable</item>
+		<item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+	</style>
+</resources>
