@@ -36,6 +36,10 @@ project/assembly_name="RhubarbVR"
 import/blender/enabled=false
 import/fbx/enabled=false
 
+[rendering]
+
+driver/threads/thread_model=2
+
 [xr]
 
 shaders/enabled=true
