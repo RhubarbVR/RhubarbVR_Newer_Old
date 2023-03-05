@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Reflection;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RhuEngine.WorldObjects.ECS
 {
@@ -25,10 +26,14 @@ namespace RhuEngine.WorldObjects.ECS
 				if (GetType().GetCustomAttribute<NotLinkedRenderingComponentAttribute>() is not null) {
 					return;
 				}
+				var data = (Assembly a) => {
+					try { return a.GetTypes(); }
+					catch { return Array.Empty<Type>(); }
+				};
 				if (!LinkedWorldComponentHelpers.loadedCasts.TryGetValue(GetType(), out var linker)) {
 					var generic = typeof(IWorldLink<>).MakeGenericType(GetType());
 					var types = from a in AppDomain.CurrentDomain.GetAssemblies()
-								from t in a.GetTypes()
+								from t in data(a)
 								where !t.IsAbstract && t.IsClass
 								where generic.IsAssignableFrom(t)
 								select t;

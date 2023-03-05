@@ -18,12 +18,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="LibGodotSharp.Desktop" Version="4.0.4" />
 		<ProjectReference Include="..\..\RhubarbVR\RhubarbVRApplication.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<MauiIcon Include="icon.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="LibGodotSharp.Desktop" Version="4.0.6" />
 	</ItemGroup>
 
 	<ItemGroup>

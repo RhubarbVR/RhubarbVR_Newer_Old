@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RhubarbVR_Desktop": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

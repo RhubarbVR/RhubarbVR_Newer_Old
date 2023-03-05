@@ -178,7 +178,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			if(LinkedComp.IsRemoved | LinkedComp.IsDestroying) {
 				return;
 			}
-			_focusEntered.Invoke();
+			_focusEntered?.Invoke();
 			if (FreeKeyboard & (LinkedComp.Entity.Viewport?.TakeKeyboardFocus?.Value ?? true)) {
 				LinkedComp.Engine.KeyboardInteractionBind(LinkedComp);
 			}
@@ -269,15 +269,15 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		private void Max_Changed(IChangeable obj) {
 			RenderThread.ExecuteOnEndOfFrame(() => {
-				node.SetAnchor(Side.Bottom, LinkedComp.Max.Value.y, true, false);
-				node.SetAnchor(Side.Right, LinkedComp.Max.Value.x, true, false);
+				node.SetAnchor(Side.Bottom, LinkedComp.Max.Value.y);
+				node.SetAnchor(Side.Right, LinkedComp.Max.Value.x);
 			});
 		}
 
 		private void Min_Changed(IChangeable obj) {
 			RenderThread.ExecuteOnEndOfFrame(() => {
-				node.SetAnchor(Side.Top, LinkedComp.Min.Value.y, true, false);
-				node.SetAnchor(Side.Left, LinkedComp.Min.Value.x, true, false);
+				node.SetAnchor(Side.Top, LinkedComp.Min.Value.y);
+				node.SetAnchor(Side.Left, LinkedComp.Min.Value.x);
 			});
 		}
 

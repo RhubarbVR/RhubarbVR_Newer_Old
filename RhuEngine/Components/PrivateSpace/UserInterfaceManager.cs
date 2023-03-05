@@ -20,6 +20,7 @@ using RhuEngine.Components.UI;
 using System.IO;
 using System.Reflection;
 using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RhuEngine.Components
 {
@@ -233,7 +234,11 @@ namespace RhuEngine.Components
 
 
 		private void BuildAllPrograms() {
-			var e = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).Where(x => !x.IsAbstract).Where(x => x.IsAssignableTo(typeof(Program))).Where(x => x.GetCustomAttribute<ProgramHideAttribute>(true) is null);
+			var data = (Assembly a) => {
+				try { return a.GetTypes(); }
+				catch { return Array.Empty<Type>(); }
+			};
+			var e = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => data(x)).Where(x => !x.IsAbstract).Where(x => x.IsAssignableTo(typeof(Program))).Where(x => x.GetCustomAttribute<ProgramHideAttribute>(true) is null);
 			foreach (var type in e) {
 				var (ProgramName, icon) = type.GetProgramInfo();
 				var button = _startListBoxAllPrograms.Entity.AddChild(type.Name).AttachComponent<Button>();

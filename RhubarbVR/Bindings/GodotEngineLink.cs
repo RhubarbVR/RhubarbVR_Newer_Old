@@ -44,7 +44,8 @@ namespace RhubarbVR.Bindings
 
 		public override bool RenderSettingsUpdate() {
 			GDExtension.Engine.Singleton.MaxFps = MaxFrameRate;
-			var oldValue = (int)GDExtension.ProjectSettings.GetSetting("display/window/vsync/vsync_mode");
+			var data = GDExtension.ProjectSettings.GetSetting("display/window/vsync/vsync_mode");
+			var oldValue = 0;
 			if ((int)VSync != oldValue) {
 				GDExtension.ProjectSettings.SetSetting("display/window/vsync/vsync_mode", (int)VSync);
 				GDExtension.ProjectSettings.Save();

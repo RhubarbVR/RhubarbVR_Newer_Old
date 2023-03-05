@@ -212,7 +212,7 @@ namespace RhubarbVR.Bindings
 
 		public string Name;
 
-		public Array<GDExtension.Array> BlendShapes;
+		public Array<Array> BlendShapes;
 
 		public string[] BlendShapeNames = SArray.Empty<string>();
 
@@ -572,7 +572,15 @@ namespace RhubarbVR.Bindings
 
 			foreach (var item in subMeshes) {
 				if (item.Item2 is not null) {
-					LoadedMesh.AddSurfaceFromArrays(item.Item1, item.Item2, BlendShapes);
+					if (item.Item2.Length != (int)Mesh.ArrayType.Max) {
+						throw new Exception("Mesh Bad");
+					}
+					if (BlendShapes is null) {
+						//LoadedMesh.AddSurfaceFromArrays(item.Item1, item.Item2);
+					}
+					else {
+						//LoadedMesh.AddSurfaceFromArrays(item.Item1, item.Item2, BlendShapes);
+					}
 				}
 			}
 		}

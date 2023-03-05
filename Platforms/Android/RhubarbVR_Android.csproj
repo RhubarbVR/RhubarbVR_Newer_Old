@@ -16,7 +16,9 @@
 	  <Debugger>Xamarin</Debugger>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="LibGodotSharp.Android" Version="4.0.4" />
+	  <PackageReference Include="LibGodotSharp.Android" Version="4.0.6" />
+	</ItemGroup>
+	<ItemGroup>
 		<ProjectReference Include="..\..\RhubarbVR\RhubarbVRApplication.csproj" />
 	</ItemGroup>
 </Project>

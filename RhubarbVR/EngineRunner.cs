@@ -52,7 +52,9 @@ public partial class EngineRunner : Node3D, IRTime
 
 	[Notify(NotificationReady)]
 	public void ReadyMain() {
+		EngineRunnerHelpers._ = this;
 		SetProcessInternal(true);
+		SetProcess(true);
 		if (RLog.Instance == null) {
 			RLog.Instance = new GodotLogs();
 		}
@@ -69,7 +71,6 @@ public partial class EngineRunner : Node3D, IRTime
 			}
 			Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
 			_isMainThread = true;
-			EngineRunnerHelpers._ = this;
 		}
 		outputCapture = new OutputCapture();
 		link = new GodotEngineLink(this);
@@ -100,6 +101,17 @@ public partial class EngineRunner : Node3D, IRTime
 	}
 	[Notify(NotificationProcess)]
 	public void Process() {
+		var childInfo = "";
+		foreach (var item in GetChildren()) {
+			childInfo += $"{(string)item.Name} {item.GetType()}\n";
+			foreach (var itemnest in item.GetChildren()) {
+				childInfo += $"\t{(string)itemnest.Name} {itemnest.GetType()}\n";
+				foreach (var itemnestTo in itemnest.GetChildren()) {
+					childInfo += $"\t\t{(string)itemnestTo.Name} {itemnestTo.GetType()}\n";
+				}
+			}
+		}
+
 		lock (_runOnMainThread) {
 			foreach (var item in _runOnMainThread) {
 				item?.Invoke();

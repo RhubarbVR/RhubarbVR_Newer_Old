@@ -50,7 +50,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			RenderThread.ExecuteOnEndOfFrame(() => {
 				var target = LinkedComp.Armature.Target?.WorldLink;
 				if (target is null) {
-					node.Skeleton = null;
+					node.Skeleton = new NodePath();
 					return;
 				}
 				if (target is ArmatureLink armature) {
