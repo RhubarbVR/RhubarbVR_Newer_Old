@@ -46,6 +46,7 @@ namespace RhuEngine.Components
 			_richText = _scroll.Entity.AddChild("Top").AttachComponent<RichTextLabel>();
 			_richText.TextSelectionEnabled.Value = true;
 			_richText.ContextMenuEnabled.Value = true;
+			_richText.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
 			_richText.FitContent.Value = true;
 			_richText.ScrollActive.Value = false;
 			_richText.AutoWrapMode.Value = RAutowrapMode.WordSmart;

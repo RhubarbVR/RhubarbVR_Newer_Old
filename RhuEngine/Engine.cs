@@ -54,9 +54,6 @@ namespace RhuEngine
 			this.PassErrors = PassErrors;
 			EngineLink = _EngineLink;
 			commandManager = new CommandManager();
-			if (_EngineLink.ForceLibLoad) {
-				OpusDotNet.NativeLib.ForceLoad();
-			}
 			_EngineLink.BindEngine(this);
 			RLog.Info($"Platform Information OSArc: {RuntimeInformation.OSArchitecture} Framework: {RuntimeInformation.FrameworkDescription} OS: {RuntimeInformation.OSDescription} ProcessArc: {RuntimeInformation.ProcessArchitecture}");
 			EngineLink.LoadStatics();

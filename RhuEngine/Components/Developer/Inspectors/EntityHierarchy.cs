@@ -55,8 +55,8 @@ namespace RhuEngine.Components
 		}
 
 		private void Entity_OnDispose(object obj) {
-			if ((TargetObject.Target?.IsDestroying ?? true) | (TargetObject.Target?.IsRemoved ?? true)) {
-				Entity.Destroy();
+			if ((TargetObject?.Target?.IsDestroying ?? true) | (TargetObject?.Target?.IsRemoved ?? true)) {
+				Entity?.Destroy();
 			}
 		}
 		public readonly SyncRef<ButtonBase> TargetButton;

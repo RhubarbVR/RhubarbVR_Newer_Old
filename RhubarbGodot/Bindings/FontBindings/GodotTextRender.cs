@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Esprima.Ast;
-
 using Godot;
 
 using RhubarbVR.Bindings.TextureBindings;

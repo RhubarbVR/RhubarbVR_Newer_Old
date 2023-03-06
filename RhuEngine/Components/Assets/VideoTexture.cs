@@ -10,7 +10,6 @@ using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
 using RhuEngine.Linker;
-using NAudio.Wave;
 using NYoutubeDL;
 using NYoutubeDL.Models;
 using System.Linq;
@@ -19,7 +18,7 @@ using System.Runtime.InteropServices;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets" })]
-	public sealed class VideoTexture : StaticAsset<RTexture2D>, IAssetProvider<IWaveProvider>
+	public sealed class VideoTexture : StaticAsset<RTexture2D>
 	{
 		public VlcVideoSourceProvider vlcVideoSourceProvider = null;
 
@@ -119,7 +118,6 @@ namespace RhuEngine.Components
 		private void VlcVideoSourceProvider_RelaodTex() {
 			Load(null);
 			Load(vlcVideoSourceProvider.VideoSource);
-			LoadAudio(vlcVideoSourceProvider.Audio);
 		}
 
 		public bool StopLoad = false;//Stops a asset loading over each other
@@ -258,25 +256,6 @@ namespace RhuEngine.Components
 			}
 		}
 
-		private Action<IWaveProvider> _audioaction;
-
-		event Action<IWaveProvider> IAssetProvider<IWaveProvider>.OnAssetLoaded
-		{
-			add => _audioaction += value;
-			remove => _audioaction -= value;
-		}
-
-		bool _audioLoaded;
-		IWaveProvider _waveProvider;
-		bool IAssetProvider<IWaveProvider>.Loaded => _audioLoaded;
-
-
-		IWaveProvider IAssetProvider<IWaveProvider>.Value => _waveProvider;
-		public void LoadAudio(IWaveProvider data) {
-			_waveProvider = data;
-			_audioLoaded = data != null;
-			_audioaction?.Invoke(data);
-		}
 
 		public override void LoadAsset(byte[] data) {
 			StartLoadAsset();

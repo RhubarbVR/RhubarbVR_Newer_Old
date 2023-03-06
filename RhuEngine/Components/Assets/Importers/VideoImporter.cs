@@ -27,7 +27,7 @@ namespace RhuEngine.Components
 				scaler.scale.SetLinkerTarget(pmesh.Dimensions);
 				scaler.scaleMultiplier.Value = 0.5f;
 				var textur = Entity.AttachComponent<VideoTexture>();
-				Entity.AttachComponent<SoundSource>().sound.Target = textur;
+				//Entity.AttachComponent<SoundSource>().sound.Target = textur;
 				textur.url.Value = data;
 				scaler.texture.Target = textur;
 				mit.MainTexture.Target = textur;

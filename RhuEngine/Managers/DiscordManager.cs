@@ -16,10 +16,8 @@ using SharedModels.GameSpecific;
 using RNumerics;
 using RhuEngine.Linker;
 using DataModel.Enums;
-using Esprima;
 using DiscordRPC;
 using DiscordRPC.Logging;
-using Jint;
 
 namespace RhuEngine.Managers
 {

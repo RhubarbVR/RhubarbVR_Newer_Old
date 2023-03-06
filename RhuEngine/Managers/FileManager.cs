@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-using Jint;
-
 using RhuEngine.Linker;
 
 namespace RhuEngine.Managers

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Reflection.Emit;
 using System.Text;
 
-using Esprima.Ast;
-
 using RhuEngine.Components.PrivateSpace;
 using RhuEngine.Linker;
 using RhuEngine.WorldObjects;

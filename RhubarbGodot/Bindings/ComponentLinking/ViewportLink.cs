@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 using Godot;
 
-using NAudio.CoreAudioApi;
 
 using RhubarbVR.Bindings.Input;
 using RhubarbVR.Bindings.TextureBindings;

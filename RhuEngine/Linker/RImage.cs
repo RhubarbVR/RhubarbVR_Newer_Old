@@ -569,7 +569,7 @@ namespace RhuEngine.Linker
 			Inst.AdjustBcs(brightness, contrast, saturation);
 		}
 
-		public bool Load(Stream data,string FileEX = "png") {
+		public bool Load(Stream data, string FileEX = "png") {
 			var temp = Path.GetTempFileName() + "." + FileEX;
 			var fileStream = File.OpenWrite(temp);
 			TempFiles.AddTempFile(temp);
@@ -626,6 +626,15 @@ namespace RhuEngine.Linker
 				}
 			}
 		}
+
+		public unsafe void SetColors(int width, int height, byte[] colors, bool RebuildMipmaps = true) {
+			var newData = new Colorb[colors.Length / 3];
+			for (var i = 0; i < colors.Length; i += 3) {
+				newData[i / 3] = new Colorb(colors[i], colors[i + 1], colors[i + 2], 255);
+			}
+			SetColors(width, height, newData, RebuildMipmaps);
+		}
+
 		public void SetColors(int width, int height, Colorb[] colors, bool RebuildMipmaps = true) {
 			if (width * height != colors.Length) {
 				throw new InvalidOperationException("Colors have to many or to little");

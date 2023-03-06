@@ -410,7 +410,6 @@ namespace RhuEngine.GameTests.Tests
 				entity.AttachComponent<MeshRender>();
 				entity.AttachComponent<Grabbable>();
 				entity.AttachComponent<Spinner>();
-				entity.AttachComponent<RawECMAScript>();
 			}
 			rootEntity.Dispose();
 			Assert.AreEqual(amountatstart, testWorld.WorldObjectsCount);

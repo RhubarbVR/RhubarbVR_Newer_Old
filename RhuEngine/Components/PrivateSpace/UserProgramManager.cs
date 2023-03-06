@@ -13,7 +13,6 @@ using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
 using System.IO;
 using System.Reflection;
-using Esprima.Ast;
 
 namespace RhuEngine.Components
 {

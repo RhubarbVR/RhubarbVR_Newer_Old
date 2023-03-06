@@ -9,14 +9,14 @@ using System.Runtime.InteropServices;
 using System.ComponentModel;
 using RhuEngine.Linker;
 using LibVLCSharp.Shared;
-using NAudio.Wave;
 
 namespace RhuEngine.VLC
 {
 	public sealed class VlcVideoSourceProvider : INotifyPropertyChanged, IDisposable
 	{
 		public VlcVideoSourceProvider() {
-			VideoSource = new RTexture2D(null);
+			VideoImage = new RImage(null);
+			VideoSource = new RImageTexture2D(VideoImage);
 		}
 		/// <summary>
 		/// The memory mapped file that contains the picture data
@@ -34,6 +34,7 @@ namespace RhuEngine.VLC
 		public MediaPlayer MediaPlayer { get; private set; }
 
 		public event Action RelaodTex;
+		public RImage VideoImage { get; private set; }
 
 		public RTexture2D VideoSource { get; private set; }
 
@@ -50,25 +51,25 @@ namespace RhuEngine.VLC
 			MediaPlayer.SetVideoFormatCallbacks(VideoFormat, null);
 			MediaPlayer.SetVideoCallbacks(LockVideo, null, DisplayVideo);
 			MediaPlayer.SetAudioFormat("S16L",48000,ChannelCount);
-			_bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(48000, 16, (int)ChannelCount)) {
-				DiscardOnBufferOverflow = true
-			};
+			//_bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(48000, 16, (int)ChannelCount)) {
+			//	DiscardOnBufferOverflow = true
+			//};
 			mediaPlayer.SetAudioCallbacks(PlayAudio, null, null, null, null);
 		}
 
-		BufferedWaveProvider _bufferedWaveProvider;
+		//BufferedWaveProvider _bufferedWaveProvider;
 
-		public IWaveProvider Audio => _bufferedWaveProvider;
+		//public IWaveProvider Audio => _bufferedWaveProvider;
 
 
 		public unsafe void PlayAudio(IntPtr data, IntPtr samples, uint count, long pts) {
-			if (_bufferedWaveProvider is null) {
-				return;
-			}
-			var amount = count * 2;
-			var buffer = new byte[amount];
-			Marshal.Copy(samples, buffer, 0, (int)amount);
-			_bufferedWaveProvider.AddSamples(buffer, 0, (int)amount);
+			//if (_bufferedWaveProvider is null) {
+			//	return;
+			//}
+			//var amount = count * 2;
+			//var buffer = new byte[amount];
+			//Marshal.Copy(samples, buffer, 0, (int)amount);
+			//_bufferedWaveProvider.AddSamples(buffer, 0, (int)amount);
 		}
 
 		/// <summary>
@@ -168,7 +169,7 @@ namespace RhuEngine.VLC
 				if (rgbaData.Length < VideoSource.Width * VideoSource.Height) {
 					return;
 				}
-				//RUpdateManager.ExecuteOnStartOfFrame(this, () => VideoSource.SetColors(VideoSource.Width, VideoSource.Height, rgbaData));
+				VideoImage.SetColors((int)VideoSource.Width, (int)VideoSource.Height, rgbaData, false);
 			}
 		}
 		#endregion

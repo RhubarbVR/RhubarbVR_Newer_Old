@@ -12,7 +12,6 @@ using System.Xml.Linq;
 using Godot.Collections;
 using Array = Godot.Collections.Array;
 using SArray = System.Array;
-using NAudio.Wave;
 using RhuEngine;
 namespace RhubarbVR.Bindings
 {

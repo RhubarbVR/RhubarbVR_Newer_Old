@@ -23,8 +23,8 @@ namespace RNumerics
 			a = 0;
 		}
 
-		public Colorb(in byte greylevel, byte a = 1) { r = g = b = greylevel; this.a = a; }
-		public Colorb(in byte r, in byte g, in byte b, in byte a = 1) { this.r = r; this.g = g; this.b = b; this.a = a; }
+		public Colorb(in byte greylevel, byte a = 255) { r = g = b = greylevel; this.a = a; }
+		public Colorb(in byte r, in byte g, in byte b, in byte a = 255) { this.r = r; this.g = g; this.b = b; this.a = a; }
 		public Colorb(in float r, in float g, in float b, in float a = 1.0f)
 		{
 			this.r = (byte)MathUtil.Clamp((int)(r * 255.0f), 0, 255);
