@@ -1,19 +1,27 @@
 ﻿using System;
-
-using MessagePack;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Colorb
+	public struct Colorb : ISerlize<Colorb>
 	{
-		[Key(0)]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(r);
+			binaryWriter.Write(g);
+			binaryWriter.Write(b);
+			binaryWriter.Write(a);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			r = binaryReader.ReadByte();
+			g = binaryReader.ReadByte();
+			b = binaryReader.ReadByte();
+			a = binaryReader.ReadByte();
+		}
+
 		public byte r;
-		[Key(1)]
 		public byte g;
-		[Key(2)]
 		public byte b;
-		[Key(3)]
 		public byte a;
 
 		public Colorb() {
@@ -25,8 +33,7 @@ namespace RNumerics
 
 		public Colorb(in byte greylevel, byte a = 255) { r = g = b = greylevel; this.a = a; }
 		public Colorb(in byte r, in byte g, in byte b, in byte a = 255) { this.r = r; this.g = g; this.b = b; this.a = a; }
-		public Colorb(in float r, in float g, in float b, in float a = 1.0f)
-		{
+		public Colorb(in float r, in float g, in float b, in float a = 1.0f) {
 			this.r = (byte)MathUtil.Clamp((int)(r * 255.0f), 0, 255);
 			this.g = (byte)MathUtil.Clamp((int)(g * 255.0f), 0, 255);
 			this.b = (byte)MathUtil.Clamp((int)(b * 255.0f), 0, 255);
@@ -36,7 +43,6 @@ namespace RNumerics
 		public Colorb(in Colorb copy) { r = copy.r; g = copy.g; b = copy.b; a = copy.a; }
 		public Colorb(in Colorb copy, in byte newAlpha) { r = copy.r; g = copy.g; b = copy.b; a = newAlpha; }
 
-		[IgnoreMember]
 		public byte this[in int key]
 		{
 			get => key == 0 ? r : key == 1 ? g : key == 2 ? b : a;
@@ -57,6 +63,5 @@ namespace RNumerics
 				}
 			}
 		}
-
 	}
 }

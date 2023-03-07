@@ -1,34 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
-using MessagePack;
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Triangle2d
+	public struct Triangle2d : ISerlize<Triangle2d>
 	{
-		[Key(0)]
 		public Vector2d v0;
-		[Key(1)]
 		public Vector2d v1;
-		[Key(2)]
 		public Vector2d v2;
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			v0.Serlize(binaryWriter);
+			v1.Serlize(binaryWriter);
+			v2.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			v0.DeSerlize(binaryReader);
+			v1.DeSerlize(binaryReader);
+			v2.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector2d V0
 		{
 			get => v0;
 			set => v0 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2d V1
 		{
 			get => v1;
 			set => v1 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2d V2
 		{
 			get => v2;
@@ -72,15 +81,23 @@ namespace RNumerics
 	}
 
 
-	[MessagePackObject]
-	public struct Triangle2f
+	public struct Triangle2f : ISerlize<Triangle2f>
 	{
-		[Key(0)]
 		public Vector2f V0;
-		[Key(1)]
 		public Vector2f V1;
-		[Key(2)]
 		public Vector2f V2;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			V0.Serlize(binaryWriter);
+			V1.Serlize(binaryWriter);
+			V2.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			V0.DeSerlize(binaryReader);
+			V1.DeSerlize(binaryReader);
+			V2.DeSerlize(binaryReader);
+		}
 
 		public Triangle2f(in Vector2f v0, in Vector2f v1, in Vector2f v2) {
 			V0 = v0;

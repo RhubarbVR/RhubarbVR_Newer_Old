@@ -1,24 +1,31 @@
 ﻿using System;
+using System.IO;
 
-using MessagePack;
 namespace RNumerics
 {
 	//3D plane, based on WildMagic5 Wm5Plane3 class
-	[MessagePackObject]
-	public struct Plane3d
+	public struct Plane3d: ISerlize<Plane3d>
 	{
-		[Key(0)]
 		public Vector3d normal;
-		[Key(1)]
 		public double constant;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			normal.Serlize(binaryWriter);
+			binaryWriter.Write(constant);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			normal.DeSerlize(binaryReader);
+			constant = binaryReader.ReadDouble();
+		}
+
+		[Exposed]
 		public Vector3d Normal
 		{
 			get => normal;
 			set => normal = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double Constant
 		{
 			get => constant;
@@ -83,21 +90,28 @@ namespace RNumerics
 
 
 
-	[MessagePackObject]
-	public struct Plane3f
+	public struct Plane3f : ISerlize<Plane3d>
 	{
-		[Key(0)]
 		public Vector3f normal;
-		[Key(1)]
 		public float constant;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			normal.Serlize(binaryWriter);
+			binaryWriter.Write(constant);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			normal.DeSerlize(binaryReader);
+			constant = binaryReader.ReadSingle();
+		}
+
+		[Exposed]
 		public Vector3f Normal
 		{
 			get => normal;
 			set => normal = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public float Constant
 		{
 			get => constant;

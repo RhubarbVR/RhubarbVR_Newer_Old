@@ -2,27 +2,34 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
-using MessagePack;
 using System.Numerics;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Vector2f : IComparable<Vector2f>, IEquatable<Vector2f>
+	public struct Vector2f : IComparable<Vector2f>, IEquatable<Vector2f>, ISerlize<Vector2f>
 	{
-		[Key(0)]
 		public float x;
-		[Key(1)]
 		public float y;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadSingle();
+			y = binaryReader.ReadSingle();
+		}
+
+		[Exposed]
 		public float X
 		{
 			get => x;
 			set => x = value;
 		}
 
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public float Y
 		{
 			get => y;
@@ -44,21 +51,21 @@ namespace RNumerics
 
 		public static explicit operator Vector2f(in Vector2i v) => new(v.x, v.y);
 
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2f Zero = new(0.0f, 0.0f);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2f Inf = new(float.PositiveInfinity, float.PositiveInfinity);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2f NInf = new(float.NegativeInfinity, float.NegativeInfinity);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2f One = new(1.0f, 1.0f);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2f AxisX = new(1.0f, 0.0f);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2f AxisY = new(0.0f, 1.0f);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2f MaxValue = new(float.MaxValue, float.MaxValue);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2f MinValue = new(float.MinValue, float.MinValue);
 		public bool IsInBox(in Vector2f min, in Vector2f check) {
 			return check.y >= min.y && check.y <= y && check.x >= min.x && check.x <= x;
@@ -66,7 +73,7 @@ namespace RNumerics
 		public bool IsInBox(in Vector2f min, in Vector2d check) {
 			return check.y >= min.y && check.y <= y && check.x >= min.x && check.x <= x;
 		}
-		[IgnoreMember]
+		
 		public float this[in int key]
 		{
 			get => (key == 0) ? x : y;
@@ -79,31 +86,31 @@ namespace RNumerics
 		}
 
 
-		[IgnoreMember]
+		
 #pragma warning disable IDE1006 // Naming Styles
 		public Vector3f _Y_ => new(0, y,0);
 #pragma warning restore IDE1006 // Naming Styles
 
-		[IgnoreMember]
+		
 		public Vector3f XY_ => new(x,y);
 
-		[IgnoreMember]
+		
 		public Vector3f X__ => new(x,0,0);
 
-		[IgnoreMember]
+		
 		public Vector2f YX => new(y, x);
 
-		[IgnoreMember]
+		
 		public float LengthSquared => (x * x) + (y * y);
-		[IgnoreMember]
+		
 		public float Length => (float)Math.Sqrt(LengthSquared);
-		[IgnoreMember]
+		
 		public float YAngleD => AngleD(AxisY);
-		[IgnoreMember]
+		
 		public float YAngleR => AngleR(AxisY);
-		[IgnoreMember]
+		
 		public float XAngleD => AngleD(AxisX);
-		[IgnoreMember]
+		
 		public float XAngleR => AngleR(AxisX);
 		public float Normalize(in float epsilon = MathUtil.EPSILONF) {
 			var length = Length;
@@ -118,7 +125,7 @@ namespace RNumerics
 			}
 			return length;
 		}
-		[IgnoreMember]
+		
 		public Vector2f Normalized
 		{
 			get {
@@ -133,12 +140,12 @@ namespace RNumerics
 			}
 		}
 
-		[IgnoreMember]
+		
 		public Vector2f Clean => new (float.IsNaN(x)?0f:x, float.IsNaN(y) ? 0f : y);
 
-		[IgnoreMember]
+		
 		public bool IsNormalized => Math.Abs((x * x) + (y * y) - 1) < MathUtil.ZERO_TOLERANCEF;
-		[IgnoreMember]
+		
 		public bool IsFinite
 		{
 			get { var f = x + y; return !float.IsNaN(f) && !float.IsInfinity(f); }
@@ -157,14 +164,14 @@ namespace RNumerics
 			return (x * v2.y) - (y * v2.x);
 		}
 
-		[IgnoreMember]
+		
 		public Vector2f Perp => new(y, -x);
 
 		public bool IsWithIn(in Vector2f min, in Vector2f max) {
 			return MathUtil.Clamp(this, min, max) == this;
 		}
 
-		[IgnoreMember]
+		
 		public Vector2f UnitPerp => new Vector2f(y, -x).Normalized;
 
 		public float DotPerp(in Vector2f v2) {

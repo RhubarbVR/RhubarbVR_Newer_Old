@@ -1,24 +1,32 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
-using MessagePack;
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct AxisAlignedBox2d
+	public struct AxisAlignedBox2d : ISerlize<AxisAlignedBox2d>
 	{
-		[Key(0)]
+
 		public Vector2d min = new(double.MaxValue, double.MaxValue);
-		[Key(1)]
 		public Vector2d max = new(double.MinValue, double.MinValue);
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			min.Serlize(binaryWriter);
+			max.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			min.DeSerlize(binaryReader);
+			max.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector2d Min
 		{
 			get => min;
 			set => min = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2d Max
 		{
 			get => max;
@@ -29,13 +37,13 @@ namespace RNumerics
 
 		}
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox2d Empty = new();
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox2d Zero = new(0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox2d UnitPositive = new(1);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox2d Infinite = new(double.MinValue, double.MinValue, double.MaxValue, double.MaxValue);
 
 		public AxisAlignedBox2d(in double xmin, in double ymin, in double xmax, in double ymax) {
@@ -76,27 +84,27 @@ namespace RNumerics
 			min = new Vector2d(o.min);
 			max = new Vector2d(o.max);
 		}
-		[IgnoreMember]
+		
 		public double Width => Math.Max(max.x - min.x, 0);
-		[IgnoreMember]
+		
 		public double Height => Math.Max(max.y - min.y, 0);
-		[IgnoreMember]
+		
 		public double Area => Width * Height;
-		[IgnoreMember]
+		
 		public double DiagonalLength => (double)Math.Sqrt(((max.x - min.x) * (max.x - min.x)) + ((max.y - min.y) * (max.y - min.y)));
-		[IgnoreMember]
+		
 		public double MaxDim => Math.Max(Width, Height);
-		[IgnoreMember]
+		
 		public double MinDim => Math.Min(Width, Height);
 
 		/// <summary>
 		/// returns absolute value of largest min/max x/y coordinate (ie max axis distance to origin)
 		/// </summary>
-		[IgnoreMember]
+		
 		public double MaxUnsignedCoordinate => Math.Max(Math.Max(Math.Abs(min.x), Math.Abs(max.x)), Math.Max(Math.Abs(min.y), Math.Abs(max.y)));
-		[IgnoreMember]
+		
 		public Vector2d Diagonal => new(max.x - min.x, max.y - min.y);
-		[IgnoreMember]
+		
 		public Vector2d Center => new(0.5f * (min.x + max.x), 0.5f * (min.y + max.y));
 
 		//! 0 == bottom-left, 1 = bottom-right, 2 == top-right, 3 == top-left

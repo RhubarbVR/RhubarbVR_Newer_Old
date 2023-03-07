@@ -1,24 +1,31 @@
-﻿using MessagePack;
-
-using System;
+﻿using System;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Vector2i : IComparable<Vector2i>, IEquatable<Vector2i>
+	public struct Vector2i : IComparable<Vector2i>, IEquatable<Vector2i>, ISerlize<Vector2i>
 	{
-		[Key(0)]
 		public int x;
-		[Key(1)]
 		public int y;
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadInt32();
+			y = binaryReader.ReadInt32();
+		}
+
+		[Exposed]
 		public int X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public int Y
 		{
 			get => y;
@@ -36,16 +43,16 @@ namespace RNumerics
 		public Vector2i(float x, float y) : this((int)x, (int)y) {
 		}
 
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public static readonly Vector2i Zero = new(0, 0);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2i One = new(1, 1);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2i AxisX = new(1, 0);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2i AxisY = new(0, 1);
 
-		[IgnoreMember]
+		
 		public int this[in int key]
 		{
 			get => (key == 0) ? x : y;
@@ -57,13 +64,13 @@ namespace RNumerics
 			}
 		}
 
-		[IgnoreMember]
+		
 		public int[] Array => new int[] { x, y };
 
 		public void Add(in int s) { x += s; y += s; }
 
 
-		[IgnoreMember]
+		
 		public int LengthSquared => (x * x) + (y * y);
 
 
@@ -130,31 +137,38 @@ namespace RNumerics
 
 
 
-	[MessagePackObject]
-	public struct Vector2l : IComparable<Vector2l>, IEquatable<Vector2l>
+	public struct Vector2l : IComparable<Vector2l>, IEquatable<Vector2l>, ISerlize<Vector2l>
 	{
-		[Key(0)]
 		public long x;
-		[Key(1)]
 		public long y;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadInt64();
+			y = binaryReader.ReadInt64();
+		}
+
 		public Vector2l() {
-			x
-				= 0;
+			x = 0;
 			y = 0;
 		}
 		public Vector2l(long f) { x = y = f; }
 		public Vector2l(long x, long y) { this.x = x; this.y = y; }
 		public Vector2l(long[] v2) { x = v2[0]; y = v2[1]; }
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2l Zero = new(0, 0);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2l One = new(1, 1);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2l AxisX = new(1, 0);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2l AxisY = new(0, 1);
 
-		[IgnoreMember]
+		
 		public long this[long key]
 		{
 			get => (key == 0) ? x : y;
@@ -166,7 +180,7 @@ namespace RNumerics
 			}
 		}
 
-		[IgnoreMember]
+		
 		public long[] Array => new long[] { x, y };
 
 		public void Add(long s) { x += s; y += s; }

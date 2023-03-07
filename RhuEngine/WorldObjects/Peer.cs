@@ -1,16 +1,21 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.IO;
+
+using DiscordRPC;
 
 using LiteNetLib;
 
 using RhubarbCloudClient.Model;
 
+using RhuEngine.DataStructure;
 using RhuEngine.Linker;
 
 using SharedModels;
 using SharedModels.GameSpecific;
 
+using static RhuEngine.WorldObjects.World;
 
 namespace RhuEngine.WorldObjects
 {
@@ -33,7 +38,10 @@ namespace RhuEngine.WorldObjects
 		public Peer LoadNewPeer(ConnectToUser user) {
 			var newpeer = new Peer(NetPeer, user.UserID, (ushort)(peers.Count + 1));
 			peers.Add(newpeer);
-			NetPeer.Send(Serializer.Save(new ConnectToAnotherUser(user.UserID.ToString())), 2, DeliveryMethod.ReliableSequenced);
+			using var memstream = new MemoryStream();
+			using var reader = new BinaryWriter(memstream);
+			RelayNetPacked.Serlize(reader, new ConnectToAnotherUser(user.UserID.ToString()));
+			NetPeer.Send(memstream.ToArray(), 2, DeliveryMethod.ReliableSequenced);
 			World.ProcessUserConnection(newpeer);
 			return newpeer;
 		}
@@ -83,7 +91,10 @@ namespace RhuEngine.WorldObjects
 				NetPeer.Send(data, 0, reliableOrdered);
 			}
 			else {
-				NetPeer.Send(Serializer.Save<IRelayNetPacked>(new DataPacked(data, ID)), 0, reliableOrdered);
+				using var memstream = new MemoryStream();
+				using var reader = new BinaryWriter(memstream);
+				RelayNetPacked.Serlize(reader, new DataPacked(data, ID));
+				NetPeer.Send(memstream.ToArray(), 0, reliableOrdered);
 			}
 		}
 
@@ -96,7 +107,10 @@ namespace RhuEngine.WorldObjects
 				NetPeer.Send(data, 2, reliableOrdered);
 			}
 			else {
-				NetPeer.Send(Serializer.Save(new DataPacked(data, ID)), 2, reliableOrdered);
+				using var memstream = new MemoryStream();
+				using var reader = new BinaryWriter(memstream);
+				RelayNetPacked.Serlize(reader, new DataPacked(data, ID));
+				NetPeer.Send(memstream.ToArray(), 2, reliableOrdered);
 			}
 		}
 	}

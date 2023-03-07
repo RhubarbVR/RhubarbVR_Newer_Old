@@ -58,7 +58,10 @@ namespace RhuEngine.WorldObjects
 		public readonly HashSet<Uri> WaitingOnAssets = new();
 		public void RequestAsset(Uri target) {
 			WaitingOnAssets.Add(target);
-			_netManager.SendToAll(Serializer.Save<INetPacked>(new RequestAsset { URL = target.ToString() }), 2, ASSET_DELIVERY_METHOD);
+			using var memstream = new MemoryStream();
+			using var reader = new BinaryWriter(memstream);
+			NetPacked.Serlize(reader, new RequestAsset { URL = target.ToString() });
+			_netManager.SendToAll(memstream.ToArray(), 2, ASSET_DELIVERY_METHOD);
 		}
 
 		public async Task PremoteAssetAsync(Uri target, Guid? arreay) {
@@ -79,7 +82,10 @@ namespace RhuEngine.WorldObjects
 			var createdrec = returndata.Data;
 			var newUrl = new Uri($"rdb://{createdrec.RecordID}");
 			Engine.assetManager.PremoteAsset(target, newUrl);
-			_netManager.SendToAll(Serializer.Save<INetPacked>(new PremoteAsset { URL = target.ToString(), NewURL = newUrl.ToString() }), 2, ASSET_DELIVERY_METHOD);
+			using var memstream = new MemoryStream();
+			using var reader = new BinaryWriter(memstream);
+			NetPacked.Serlize(reader, new PremoteAsset { URL = target.ToString(), NewURL = newUrl.ToString() });
+			_netManager.SendToAll(memstream.ToArray(), 2, ASSET_DELIVERY_METHOD);
 			OnPremoteLocalAssets?.Invoke(target, newUrl);
 		}
 
@@ -104,7 +110,10 @@ namespace RhuEngine.WorldObjects
 				}
 				var data = Engine.assetManager.GetCached(dataUrl);
 				if (data is null || !AssetMimeType.TryGetValue(dataUrl, out var dataMime)) {
-					tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, PartBytes = null, MimeType = null }), ASSET_DELIVERY_METHOD);
+					using var memstream = new MemoryStream();
+					using var reader = new BinaryWriter(memstream);
+					NetPacked.Serlize(reader, new AssetResponse { URL = assetRequest.URL, PartBytes = null, MimeType = null });
+					tag.SendAsset(memstream.ToArray(), ASSET_DELIVERY_METHOD);
 					return;
 				}
 				var size = data.LongLength;
@@ -116,7 +125,10 @@ namespace RhuEngine.WorldObjects
 						partData = new byte[SizeOfEachPart - lastSize];
 					}
 					Array.Copy(data, i * SizeOfEachPart, partData, 0, partData.Length);
-					tag.SendAsset(Serializer.Save<INetPacked>(new AssetResponse { URL = assetRequest.URL, PartBytes = partData, MimeType = dataMime, CurrentPart = i, SizeOfData = size, SizeOfPart = SizeOfEachPart }), ASSET_DELIVERY_METHOD);
+					using var memstream = new MemoryStream();
+					using var reader = new BinaryWriter(memstream);
+					NetPacked.Serlize(reader, new AssetResponse { URL = assetRequest.URL, PartBytes = partData, MimeType = dataMime, CurrentPart = i, SizeOfData = size, SizeOfPart = SizeOfEachPart });
+					tag.SendAsset(memstream.ToArray(), ASSET_DELIVERY_METHOD);
 				}
 				RLog.VerBoseInfo($"Asset Sent to {tag.User.ID} PartAmount:{amountOfSections} Size:{size}");
 				return;
@@ -142,7 +154,7 @@ namespace RhuEngine.WorldObjects
 					data.Item2.Position = assetData.CurrentPart * assetData.SizeOfPart;
 					data.Item2.Write(assetData.PartBytes, 0, assetData.PartBytes.Length);
 					assetSaving[dataUrl] = data;
-					
+
 					if (data.Item1 == ((assetData.SizeOfData / assetData.SizeOfPart) + ((assetData.SizeOfData % assetData.SizeOfPart == 0) ? 0 : 1))) {
 						RLog.VerBoseInfo($"Stream asset ALL Asset Resived from {tag.User.ID} Part:{assetData.CurrentPart} SizeOfData:{assetData.SizeOfData} MimeType:{assetData.MimeType}");
 						var buffer = data.Item2.GetBuffer();

@@ -1,22 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
-using MessagePack;
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct ColorHSV 
+	public struct ColorHSV : ISerlize<ColorHSV>
 	{
-		[Key(0)]
 		public float h;
-		[Key(1)]
 		public float s;
-		[Key(2)]
 		public float v;
-		[Key(3)]
 		public float a;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(h);
+			binaryWriter.Write(s);
+			binaryWriter.Write(v);
+			binaryWriter.Write(a);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			h = binaryReader.ReadSingle();
+			s = binaryReader.ReadSingle();
+			v = binaryReader.ReadSingle();
+			a = binaryReader.ReadSingle();
+		}
 
 		public ColorHSV() {
 
@@ -31,7 +40,7 @@ namespace RNumerics
 			var newh = (h + val) % 360f;
 			return new ColorHSV(newh, s, v, a);
 		}
-		[IgnoreMember]
+
 		public Colorf RGBA
 		{
 			get => ConvertToRGB();

@@ -1,38 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-
-using MessagePack;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct AxisAlignedBox2i : IComparable<AxisAlignedBox2i>, IEquatable<AxisAlignedBox2i>
+	public struct AxisAlignedBox2i : IComparable<AxisAlignedBox2i>, IEquatable<AxisAlignedBox2i>, ISerlize<AxisAlignedBox2i>
 	{
-		[Key(0)]
+
 		public Vector2i min = new(int.MaxValue, int.MaxValue);
-		[Key(1)]
 		public Vector2i max = new(int.MinValue, int.MinValue);
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			min.Serlize(binaryWriter);
+			max.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			min.DeSerlize(binaryReader);
+			max.DeSerlize(binaryReader);
+		}
+
+
+		[Exposed]
 		public Vector2i Min
 		{
 			get => min;
 			set => min = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2i Max
 		{
 			get => max;
 			set => max = value;
 		}
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox2i Empty = new();
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox2i Zero = new(0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox2i UnitPositive = new(1);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox2i Infinite =
 			new(int.MinValue, int.MinValue, int.MaxValue, int.MaxValue);
 
@@ -71,24 +80,24 @@ namespace RNumerics
 		public AxisAlignedBox2i(in Vector2i vCenter) {
 			min = max = vCenter;
 		}
-		[IgnoreMember]
+		
 		public int Width => Math.Max(max.x - min.x, 0);
-		[IgnoreMember]
+		
 		public int Height => Math.Max(max.y - min.y, 0);
 
 
-		[IgnoreMember]
+		
 		public int Area => Width * Height;
-		[IgnoreMember]
+		
 		public int DiagonalLength => (int)Math.Sqrt(((max.x - min.x) * (max.x - min.x)) + ((max.y - min.y) * (max.y - min.y)));
-		[IgnoreMember]
+		
 		public int MaxDim => Math.Max(Width, Height);
 
-		[IgnoreMember]
+		
 		public Vector2i Diagonal => new(max.x - min.x, max.y - min.y);
-		[IgnoreMember]
+		
 		public Vector2i Extents => new((max.x - min.x) / 2, (max.y - min.y) / 2);
-		[IgnoreMember]
+		
 		public Vector2i Center => new((min.x + max.x) / 2, (min.y + max.y) / 2);
 
 

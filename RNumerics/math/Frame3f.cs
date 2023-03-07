@@ -3,33 +3,44 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using RNumerics;
-using MessagePack;
+using System.IO;
+using System.Xml.Linq;
+
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Frame3f
+	public struct Frame3f : ISerlize<Frame3f>
 	{
-		[Key(0)]
 		Quaternionf _rotation;
-		[Key(1)]
 		Vector3f _origin;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			_rotation.Serlize(binaryWriter);
+			_origin.Serlize(binaryWriter);
+
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			_rotation.DeSerlize(binaryReader);
+			_origin.DeSerlize(binaryReader);
+		}
+
+
+		[Exposed]
 		public Quaternionf Rotation
 		{
 			get => _rotation;
 			set => _rotation = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3f Origin
 		{
 			get => _origin;
 			set => _origin = value;
 		}
+
+
+
 		
-
-
-		[IgnoreMember]
 		static readonly public Frame3f Identity = new(Vector3f.Zero, Quaternionf.Identity);
 
 		public Frame3f() {
@@ -82,13 +93,13 @@ namespace RNumerics
 		}
 
 
-		
 
-		[IgnoreMember]
+
+		
 		public Vector3f X => _rotation.AxisX;
-		[IgnoreMember]
+		
 		public Vector3f Y => _rotation.AxisY;
-		[IgnoreMember]
+		
 		public Vector3f Z => _rotation.AxisZ;
 
 		public Vector3f GetAxis(in int nAxis) {

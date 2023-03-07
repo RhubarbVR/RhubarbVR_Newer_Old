@@ -2,33 +2,57 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
-using MessagePack;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Vector3b : IComparable<Vector3b>, IEquatable<Vector3b>
+	public struct Vector3b : IComparable<Vector3b>, IEquatable<Vector3b>, ISerlize<Vector3b>
 	{
-		[Key(0)]
 		public bool x;
-		[Key(1)]
 		public bool y;
-		[Key(2)]
 		public bool z;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			byte data = 0;
+			if (x) {
+				data |= 1;
+			}
+			if (y) {
+				data |= 2;
+			}
+			if (z) {
+				data |= 4;
+			}
+			binaryWriter.Write(data);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			var data = binaryReader.ReadByte();
+			if ((data & 1) != 0) {
+				x = true;
+			}
+			if ((data & 2) != 0) {
+				y = true;
+			}
+			if ((data & 4) != 0) {
+				z = true;
+			}
+		}
+
+
+		[Exposed]
 		public bool X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public bool Y
 		{
 			get => y;
 			set => y = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public bool Z
 		{
 			get => z;
@@ -44,11 +68,11 @@ namespace RNumerics
 		public Vector3b(in bool x, in bool y, in bool z) { this.x = x; this.y = y; this.z = z; }
 		public Vector3b(in bool[] v3) { x = v3[0]; y = v3[1]; z = v3[2]; }
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3b True = new(true, true, true);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3b False = new(false, false, false);
-		[IgnoreMember]
+
 		public bool this[in int key]
 		{
 			get => (key == 0) ? x : y;

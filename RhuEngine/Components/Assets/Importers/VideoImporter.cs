@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 	public sealed class VideoImporter : Importer
 	{
 		public override Task ImportAsset() {
-			return Task.Run(() => ImportAsync(_importData.url_path, _importData.isUrl, _importData.rawData));
+			return Task.Run(async () => await ImportAsync(_importData.url_path, _importData.isUrl, _importData.rawData));
 		}
 
 		public async Task ImportAsync(string data, bool wasUri, Stream rawdata) {
@@ -31,7 +31,7 @@ namespace RhuEngine.Components
 				textur.url.Value = data;
 				scaler.texture.Target = textur;
 				mit.MainTexture.Target = textur;
-				Destroy();
+				textur.Playback.Play();
 			}
 			else {
 				if (rawdata == null) {

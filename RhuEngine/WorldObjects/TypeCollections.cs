@@ -39,8 +39,6 @@ namespace RhuEngine.WorldObjects
 			typeof(Colorb),
 			typeof(Colorf),
 			typeof(ColorHSV),
-			typeof(ColorMap),
-			typeof(ColorMap.ColorPoint),
 			typeof(AxisAlignedBox2d),
 			typeof(AxisAlignedBox2f),
 			typeof(AxisAlignedBox2i),

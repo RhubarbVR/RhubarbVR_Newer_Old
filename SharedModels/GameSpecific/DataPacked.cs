@@ -1,24 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
-using MessagePack;
-using MessagePack.Formatters;
 
 namespace SharedModels.GameSpecific
 {
-	[Formatter]
-	public sealed class DataPackedFormatter : IMessagePackFormatter<DataPacked>
-	{
-		public void Serialize(ref MessagePackWriter writer, DataPacked value, MessagePackSerializerOptions options) {
-			options.Resolver.GetFormatterWithVerify<(byte[],ushort)>().Serialize(ref writer, (value.Data,value.Id), options);
-		}
-
-		public DataPacked Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-			var (data,id) = options.Resolver.GetFormatterWithVerify<(byte[], ushort)>().Deserialize(ref reader, options);
-			return new DataPacked(data,id);
-		}
-	}
 	public struct DataPacked : IRelayNetPacked
 	{
 		public byte[] Data;
@@ -26,6 +13,18 @@ namespace SharedModels.GameSpecific
 		public DataPacked(byte[] data, ushort id) : this() {
 			Data = data;
 			Id = id;
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			var length = binaryReader.ReadInt32();
+			Data = binaryReader.ReadBytes(length);
+			Id = binaryReader.ReadUInt16();
+		}
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(Data.Length);
+			binaryWriter.Write(Data);
+			binaryWriter.Write(Id);
 		}
 	}
 }

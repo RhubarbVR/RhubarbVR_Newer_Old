@@ -1,24 +1,30 @@
-﻿using MessagePack;
-
-using System;
+﻿using System;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Vector2u : IComparable<Vector2u>, IEquatable<Vector2u>
+	public struct Vector2u : IComparable<Vector2u>, IEquatable<Vector2u>, ISerlize<Vector2u>
 	{
-		[Key(0)]
 		public uint x;
-		[Key(1)]
 		public uint y;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadUInt32();
+			y = binaryReader.ReadUInt32();
+		}
+
+		[Exposed]
 		public uint X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public uint Y
 		{
 			get => y;
@@ -32,15 +38,15 @@ namespace RNumerics
 		public Vector2u(in uint f) { x = y = f; }
 		public Vector2u(in uint x, in uint y) { this.x = x; this.y = y; }
 		public Vector2u(in uint[] v2) { x = v2[0]; y = v2[1]; }
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector2u Zero = new(0, 0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector2u One = new(1, 1);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector2u AxisX = new(1, 0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector2u AxisY = new(0, 1);
-		[IgnoreMember]
+		
 		public uint this[in uint key]
 		{
 			get => (key == 0) ? x : y;
@@ -51,12 +57,12 @@ namespace RNumerics
 				}
 			}
 		}
-		[IgnoreMember]
+		
 		public uint[] Array => new uint[] { x, y };
 
 		public void Add(in uint s) { x += s; y += s; }
 
-		[IgnoreMember]
+		
 		public uint LengthSquared => (x * x) + (y * y);
 
 

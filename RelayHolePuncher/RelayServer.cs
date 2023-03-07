@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 using LiteNetLib;
@@ -39,7 +40,10 @@ namespace RelayHolePuncher
 				nee.otherConnection = userConnection;
 				userConnection.otherConnection = nee;
 				foreach (var item in userConnection.waitingData) {
-					nee.Peer.Send(Serializer.Save(new DataPacked(item, userConnection.index)), DeliveryMethod.ReliableOrdered);
+					using var memstream = new MemoryStream();
+					using var reader = new BinaryWriter(memstream);
+					RelayNetPacked.Serlize(reader, new DataPacked(item, userConnection.index));
+					nee.Peer.Send(memstream.ToArray(), DeliveryMethod.ReliableOrdered);
 				}
 				nee.waitingData = null;
 				userConnection.waitingData = null;
@@ -114,7 +118,10 @@ namespace RelayHolePuncher
 			try {
 				var data = reader.GetRemainingBytes();
 				if (peer.Tag is List<UserConnection> userconections) {
-					if (Serializer.TryToRead<IRelayNetPacked>(data, out var relayPacked)) {
+					using var memstream = new MemoryStream();
+					using var readere = new BinaryReader(memstream);
+					var relayPacked = RelayNetPacked.DeSerlize(readere);
+					if (relayPacked is not null) {
 						if (relayPacked is ConnectToAnotherUser connectToAnotherUser) {
 							ProcessConnection(peer, connectToAnotherUser.Key);
 						}
@@ -126,14 +133,20 @@ namespace RelayHolePuncher
 									}
 								}
 								else {
-									userconections[packed.Id - 1].otherConnection.Peer.Send(Serializer.Save<IRelayNetPacked>(new DataPacked(packed.Data, userconections[packed.Id - 1].otherConnection.index)), 2, deliveryMethod);
+									using var memstreame = new MemoryStream();
+									using var wtiter = new BinaryWriter(memstreame);
+									RelayNetPacked.Serlize(wtiter, new DataPacked(packed.Data, userconections[packed.Id - 1].otherConnection.index));
+									userconections[packed.Id - 1].otherConnection.Peer.Send(memstreame.ToArray(), 2, deliveryMethod);
 								}
 							}
 						}
 						else if (relayPacked is StreamDataPacked streampacked) {
 							foreach (var item in userconections) {
 								try {
-									item.otherConnection?.Peer.Send(Serializer.Save<IRelayNetPacked>(new DataPacked(data, item.otherConnection.index)), 1, deliveryMethod);
+									using var memstreamr = new MemoryStream();
+									using var wtiter = new BinaryWriter(memstreamr);
+									RelayNetPacked.Serlize(wtiter, new DataPacked(data, item.otherConnection.index));
+									item.otherConnection?.Peer.Send(memstreamr.ToArray(), 1, deliveryMethod);
 								}
 								catch (Exception e) {
 									Console.WriteLine("Failed to send to user" + e.ToString());
@@ -150,7 +163,10 @@ namespace RelayHolePuncher
 									}
 								}
 								else {
-									item.otherConnection.Peer.Send(Serializer.Save<IRelayNetPacked>(new DataPacked(data, item.otherConnection.index)), 0, deliveryMethod);
+									using var memstreama = new MemoryStream();
+									using var wtiter = new BinaryWriter(memstreama);
+									RelayNetPacked.Serlize(wtiter, new DataPacked(data, item.otherConnection.index));
+									item.otherConnection.Peer.Send(memstreama.ToArray(), 0, deliveryMethod);
 								}
 							}
 							catch (Exception e) {

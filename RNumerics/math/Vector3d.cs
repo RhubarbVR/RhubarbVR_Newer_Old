@@ -1,34 +1,42 @@
-﻿using MessagePack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Vector3d : IComparable<Vector3d>, IEquatable<Vector3d>
+	public struct Vector3d : IComparable<Vector3d>, IEquatable<Vector3d>, ISerlize<Vector3d>
 	{
-		[Key(0)]
 		public double x;
-		[Key(1)]
 		public double y;
-		[Key(2)]
 		public double z;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+			binaryWriter.Write(z);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadDouble();
+			y = binaryReader.ReadDouble();
+			z = binaryReader.ReadDouble();
+		}
+
+		[Exposed]
 		public double X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double Y
 		{
 			get => y;
 			set => y = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double Z
 		{
 			get => z;
@@ -40,7 +48,7 @@ namespace RNumerics
 			z = 0;
 		}
 
-		[IgnoreMember]
+		
 		public double Magnitude => Math.Sqrt((x * x) + (y * y) + (z * z));
 
 		public static implicit operator Vector3(Vector3d v) => new((float)v.x, (float)v.y, (float)v.z);
@@ -50,21 +58,21 @@ namespace RNumerics
 		public Vector3d(in double[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; }
 		public Vector3d(in Vector3d copy) { x = copy.x; y = copy.y; z = copy.z; }
 		public Vector3d(in Vector3f copy) { x = copy.x; y = copy.y; z = copy.z; }
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3d Zero = new(0.0f, 0.0f, 0.0f);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3d One = new(1.0f, 1.0f, 1.0f);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3d AxisX = new(1.0f, 0.0f, 0.0f);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3d AxisY = new(0.0f, 1.0f, 0.0f);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3d AxisZ = new(0.0f, 0.0f, 1.0f);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3d MaxValue = new(double.MaxValue, double.MaxValue, double.MaxValue);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3d MinValue = new(double.MinValue, double.MinValue, double.MinValue);
-		[IgnoreMember]
+		
 		public double this[in int key]
 		{
 			get => (key == 0) ? x : (key == 1) ? y : z;
@@ -78,33 +86,33 @@ namespace RNumerics
 				}
 			}
 		}
-		[IgnoreMember]
+		
 		public Vector2d Xy
 		{
 			get => new(x, y);
 			set { x = value.x; y = value.y; }
 		}
-		[IgnoreMember]
+		
 		public Vector2d Xz
 		{
 			get => new(x, z);
 			set { x = value.x; z = value.y; }
 		}
-		[IgnoreMember]
+		
 		public Vector2d Yz
 		{
 			get => new(y, z);
 			set { y = value.x; z = value.y; }
 		}
-		[IgnoreMember]
+		
 		public double LengthSquared => (x * x) + (y * y) + (z * z);
-		[IgnoreMember]
+		
 		public double Length => Math.Sqrt(LengthSquared);
-		[IgnoreMember]
+		
 		public double LengthL1 => Math.Abs(x) + Math.Abs(y) + Math.Abs(z);
-		[IgnoreMember]
+		
 		public double Max => Math.Max(x, Math.Max(y, z));
-		[IgnoreMember]
+		
 		public double Min => Math.Min(x, Math.Min(y, z));
 		public static Vector3d Bezier(in Vector3d a, in Vector3d b, in Vector3d c, in Vector3d d, in float t) {
 			var it = Lerp(b, c, t);
@@ -112,11 +120,11 @@ namespace RNumerics
 		}
 
 
-		[IgnoreMember]
+		
 		public double MaxAbs => Math.Max(Math.Abs(x), Math.Max(Math.Abs(y), Math.Abs(z)));
-		[IgnoreMember]
+		
 		public double MinAbs => Math.Min(Math.Abs(x), Math.Min(Math.Abs(y), Math.Abs(z)));
-		[IgnoreMember]
+		
 		public Vector3d Abs => new(Math.Abs(x), Math.Abs(y), Math.Abs(z));
 
 		public double Normalize(in double epsilon = MathUtil.EPSILON) {
@@ -133,7 +141,7 @@ namespace RNumerics
 			}
 			return length;
 		}
-		[IgnoreMember]
+		
 		public Vector3d Normalized
 		{
 			get {
@@ -147,9 +155,9 @@ namespace RNumerics
 				}
 			}
 		}
-		[IgnoreMember]
+		
 		public bool IsNormalized => Math.Abs((x * x) + (y * y) + (z * z) - 1) < MathUtil.ZERO_TOLERANCE;
-		[IgnoreMember]
+		
 		public bool IsFinite
 		{
 			get { var f = x + y + z; return double.IsNaN(f) == false && double.IsInfinity(f) == false; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
@@ -12,8 +13,6 @@ using LibVLCSharp.Shared;
 
 using LiteNetLib;
 
-using MessagePack;
-
 using Newtonsoft.Json;
 
 using RhubarbCloudClient.Model;
@@ -23,6 +22,8 @@ using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 using RhuEngine.Linker;
 using RhuEngine.Managers;
+
+using RNumerics;
 
 using SharedModels;
 using SharedModels.GameSpecific;
@@ -366,13 +367,56 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		[Union(0, typeof(BlockStore))]
-		[Union(1, typeof(RequestAsset))]
-		[Union(2, typeof(AssetResponse))]
-		[Union(3, typeof(PremoteAsset))]
-		public interface INetPacked
+		public interface INetPacked : IRelayNetPacked
 		{
 		}
+
+		public static class NetPacked
+		{
+			public static void Serlize(BinaryWriter binaryWriter, INetPacked netPacked) {
+				if (netPacked is BlockStore) {
+					binaryWriter.Write((byte)11);
+				}
+				else if (netPacked is RequestAsset) {
+					binaryWriter.Write((byte)12);
+				}
+				else if (netPacked is AssetResponse) {
+					binaryWriter.Write((byte)13);
+				}
+				else if (netPacked is PremoteAsset) {
+					binaryWriter.Write((byte)14);
+				}
+				else {
+					throw new Exception("Don't know");
+				}
+				netPacked.Serlize(binaryWriter);
+			}
+			public static IRelayNetPacked DeSerlize(BinaryReader binaryReader) {
+				var type = binaryReader.ReadByte();
+				if (type <= 10) {
+					return RelayNetPacked.DeSerlize(binaryReader, type);
+				}
+				INetPacked netPacked;
+				if (type == 11) {
+					netPacked = new BlockStore();
+				}
+				else if (type == 12) {
+					netPacked = new RequestAsset();
+				}
+				else if (type == 13) {
+					netPacked = new AssetResponse();
+				}
+				else if (type == 14) {
+					netPacked = new PremoteAsset();
+				}
+				else {
+					throw new Exception("Don't know");
+				}
+				netPacked.DeSerlize(binaryReader);
+				return netPacked;
+			}
+		}
+
 
 		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod) {
 			if (IsDisposed) {
@@ -384,13 +428,16 @@ namespace RhuEngine.WorldObjects
 					PeerConnected(peer);
 				}
 				var data = reader.GetRemainingBytes();
+				using var memStream = new MemoryStream(data);
+				using var readere = new BinaryReader(memStream);
+				var packed = NetPacked.DeSerlize(readere);
 				if (peer.Tag is Peer) {
 					var tag = peer.Tag as Peer;
 					if (deliveryMethod == DeliveryMethod.Unreliable) {
-						if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
+						if (packed is StreamDataPacked streamDataPacked) {
 							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
 						}
-						else if (Serializer.TryToRead<INetPacked>(data, out var rawDataPacked)) {
+						else if (packed is INetPacked rawDataPacked) {
 							if (rawDataPacked is BlockStore keyValuePairs) {
 								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
 							}
@@ -406,7 +453,7 @@ namespace RhuEngine.WorldObjects
 						}
 					}
 					else {
-						if (Serializer.TryToRead<INetPacked>(data, out var rawDataPacked)) {
+						if (packed is INetPacked rawDataPacked) {
 							if (rawDataPacked is BlockStore keyValuePairs) {
 								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
 							}
@@ -417,7 +464,7 @@ namespace RhuEngine.WorldObjects
 								throw new Exception($"Not none {rawDataPacked?.GetType()?.GetFormattedName()}");
 							}
 						}
-						else if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
+						else if (packed is StreamDataPacked streamDataPacked) {
 							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
 						}
 						else {
@@ -428,54 +475,53 @@ namespace RhuEngine.WorldObjects
 				}
 				else if (peer.Tag is RelayPeer) {
 					var tag = peer.Tag as RelayPeer;
-					if (Serializer.TryToRead<IRelayNetPacked>(data, out var packede)) {
-						if (packede is DataPacked packed) {
-							if (deliveryMethod == DeliveryMethod.Unreliable) {
-								if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
-									ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
+					if (packed is DataPacked packede) {
+						using var memStreame = new MemoryStream(packede.Data);
+						using var readeree = new BinaryReader(memStreame);
+						var packeder = NetPacked.DeSerlize(readeree);
+						if (deliveryMethod == DeliveryMethod.Unreliable) {
+							if (packeder is StreamDataPacked streamDataPacked) {
+								ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packede.Id]);
+							}
+							else if (packeder is INetPacked rawDataPacked) {
+								if (rawDataPacked is BlockStore keyValuePairs) {
+									ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packede.Id]);
 								}
-								else if (Serializer.TryToRead<INetPacked>(data, out var rawDataPacked)) {
-									if (rawDataPacked is BlockStore keyValuePairs) {
-										ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
-									}
-									else if (rawDataPacked is IAssetRequest assetRequest) {
-										AssetResponses(assetRequest, tag[packed.Id]);
-									}
-								}
-								else {
-									throw new Exception("Uknown Data from relay");
+								else if (rawDataPacked is IAssetRequest assetRequest) {
+									AssetResponses(assetRequest, tag[packede.Id]);
 								}
 							}
 							else {
-								if (Serializer.TryToRead<INetPacked>(data, out var rawDataPacked)) {
-									if (rawDataPacked is BlockStore keyValuePairs) {
-										ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packed.Id]);
-									}
-									else if (rawDataPacked is IAssetRequest assetRequest) {
-										AssetResponses(assetRequest, tag[packed.Id]);
-									}
-								}
-								if (Serializer.TryToRead<IRelayNetPacked>(data, out var rawPacked) && rawPacked is StreamDataPacked streamDataPacked) {
-									ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packed.Id]);
-								}
-								else {
-									throw new Exception("Uknown Data from relay");
-								}
+								throw new Exception("Uknown Data from relay");
 							}
 						}
-						else if (packede is OtherUserLeft otherUserLeft) {
-							var rpeer = tag.peers[otherUserLeft.id];
-							tag.peers.Remove(rpeer);
-							rpeer.KillRelayConnection();
-							PeerDisconect(rpeer);
-						}
 						else {
-							throw new Exception("realy packed not known");
+							if (packeder is INetPacked rawDataPacked) {
+								if (rawDataPacked is BlockStore keyValuePairs) {
+									ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packede.Id]);
+								}
+								else if (rawDataPacked is IAssetRequest assetRequest) {
+									AssetResponses(assetRequest, tag[packede.Id]);
+								}
+							}
+							if (packeder is StreamDataPacked streamDataPacked) {
+								ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packede.Id]);
+							}
+							else {
+								throw new Exception("Uknown Data from relay");
+							}
 						}
+					}
+					else if (packed is OtherUserLeft otherUserLeft) {
+						var rpeer = tag.peers[otherUserLeft.id];
+						tag.peers.Remove(rpeer);
+						rpeer.KillRelayConnection();
+						PeerDisconect(rpeer);
 					}
 					else {
-						throw new Exception("data packed could not be read");
+						throw new Exception("realy packed not known");
 					}
+
 				}
 				else {
 					throw new Exception("Peer is not known");
@@ -496,7 +542,10 @@ namespace RhuEngine.WorldObjects
 				RLog.Info("Sending initial world state to a new user");
 				var dataGroup = new DataNodeGroup();
 				dataGroup.SetValue("WorldData", Serialize(new SyncObjectSerializerObject(true)));
-				peer.Send(Serializer.Save<INetPacked>(new DataSaver(dataGroup).Store), DeliveryMethod.ReliableOrdered);
+				using var memstream = new MemoryStream();
+				using var reader = new BinaryWriter(memstream);
+				NetPacked.Serlize(reader, new DataSaver(dataGroup).Store);
+				peer.Send(memstream.ToArray(), DeliveryMethod.ReliableOrdered);
 			}
 			LoadUserIn(peer);
 			FindNewMaster();
@@ -673,7 +722,10 @@ namespace RhuEngine.WorldObjects
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			_netManager.SendToAll(Serializer.Save<INetPacked>(new DataSaver(netData).Store), 0, deliveryMethod);
+			using var memstream = new MemoryStream();
+			using var reader = new BinaryWriter(memstream);
+			NetPacked.Serlize(reader, new DataSaver(netData).Store);
+			_netManager.SendToAll(memstream.ToArray(), 0, deliveryMethod);
 		}
 
 		public void BroadcastDataToAllStream(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
@@ -693,7 +745,10 @@ namespace RhuEngine.WorldObjects
 			var netData = new DataNodeGroup();
 			netData.SetValue("Data", data);
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			_netManager.SendToAll(Serializer.Save<IRelayNetPacked>(new StreamDataPacked(new DataSaver(netData).SaveStore())), 1, deliveryMethod);
+			using var memstream = new MemoryStream();
+			using var reader = new BinaryWriter(memstream);
+			RelayNetPacked.Serlize(reader, new StreamDataPacked(new DataSaver(netData).SaveStore()));
+			_netManager.SendToAll(memstream.ToArray(), 1, deliveryMethod);
 		}
 
 

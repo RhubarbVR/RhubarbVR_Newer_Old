@@ -1,26 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-
-using MessagePack;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct AxisAlignedBox3i : IComparable<AxisAlignedBox3i>, IEquatable<AxisAlignedBox3i>
+	public struct AxisAlignedBox3i : IComparable<AxisAlignedBox3i>, IEquatable<AxisAlignedBox3i>, ISerlize<AxisAlignedBox3i>
 	{
-		[Key(0)]
+
 		public Vector3i min = new(int.MaxValue, int.MaxValue, int.MaxValue);
-		[Key(1)]
 		public Vector3i max = new(int.MinValue, int.MinValue, int.MinValue);
 
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			min.Serlize(binaryWriter);
+			max.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			min.DeSerlize(binaryReader);
+			max.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector3i Min
 		{
 			get => min;
 			set => min = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3i Max
 		{
 			get => max;
@@ -29,13 +36,13 @@ namespace RNumerics
 
 
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3i Empty = new();
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3i Zero = new(0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3i UnitPositive = new(1);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3i Infinite =
 			new(int.MinValue, int.MinValue, int.MinValue, int.MaxValue, int.MaxValue, int.MaxValue);
 
@@ -75,16 +82,16 @@ namespace RNumerics
 			min = max = vCenter;
 		}
 
-		[IgnoreMember]
+		
 		public int Width => Math.Max(max.x - min.x, 0);
-		[IgnoreMember]
+		
 		public int Height => Math.Max(max.y - min.y, 0);
-		[IgnoreMember]
+		
 		public int Depth => Math.Max(max.z - min.z, 0);
 
-		[IgnoreMember]
+		
 		public int Volume => Width * Height * Depth;
-		[IgnoreMember]
+		
 		public int DiagonalLength
 		{
 			get {
@@ -92,14 +99,14 @@ namespace RNumerics
 					+ ((max.y - min.y) * (max.y - min.y)) + ((max.z - min.z) * (max.z - min.z)));
 			}
 		}
-		[IgnoreMember]
+		
 		public int MaxDim => Math.Max(Width, Math.Max(Height, Depth));
 
-		[IgnoreMember]
+		
 		public Vector3i Diagonal => new(max.x - min.x, max.y - min.y, max.z - min.z);
-		[IgnoreMember]
+		
 		public Vector3i Extents => new((max.x - min.x) / 2, (max.y - min.y) / 2, (max.z - min.z) / 2);
-		[IgnoreMember]
+		
 		public Vector3i Center => new((min.x + max.x) / 2, (min.y + max.y) / 2, (min.z + max.z) / 2);
 
 

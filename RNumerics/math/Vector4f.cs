@@ -1,42 +1,51 @@
-﻿using MessagePack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Vector4f : IComparable<Vector4f>, IEquatable<Vector4f>
+	public struct Vector4f : IComparable<Vector4f>, IEquatable<Vector4f>, ISerlize<Vector4f>
 	{
-		[Key(0)]
 		public float x;
-		[Key(1)]
 		public float y;
-		[Key(2)]
 		public float z;
-		[Key(3)]
 		public float w;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+			binaryWriter.Write(z);
+			binaryWriter.Write(w);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadSingle();
+			y = binaryReader.ReadSingle();
+			z = binaryReader.ReadSingle();
+			w = binaryReader.ReadSingle();
+		}
+
+		[Exposed]
 		public float X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public float Y
 		{
 			get => y;
 			set => y = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public float Z
 		{
 			get => z;
 			set => z = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public float W
 		{
 			get => w;
@@ -58,12 +67,12 @@ namespace RNumerics
 		public Vector4f(in float x, in float y, in float z, in float w) { this.x = x; this.y = y; this.z = z; this.w = w; }
 		public Vector4f(in float[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
 		public Vector4f(in Vector4f copy) { x = copy.x; y = copy.y; z = copy.z; w = copy.w; }
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Vector4f Zero = new(0.0f, 0.0f, 0.0f, 0.0f);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Vector4f One = new(1.0f, 1.0f, 1.0f, 1.0f);
 
-		[IgnoreMember]
+		
 		public float this[in int key]
 		{
 			get => (key < 2) ? ((key == 0) ? x : y) : ((key == 2) ? z : w);
@@ -83,12 +92,12 @@ namespace RNumerics
 			}
 		}
 
-		[IgnoreMember]
+		
 		public float LengthSquared => (x * x) + (y * y) + (z * z) + (w * w);
-		[IgnoreMember]
+		
 		public float Length => (float)Math.Sqrt(LengthSquared);
 
-		[IgnoreMember]
+		
 		public float LengthL1 => Math.Abs(x) + Math.Abs(y) + Math.Abs(z) + Math.Abs(w);
 
 
@@ -107,7 +116,7 @@ namespace RNumerics
 			}
 			return length;
 		}
-		[IgnoreMember]
+		
 		public Vector4f Normalized
 		{
 			get {
@@ -122,11 +131,11 @@ namespace RNumerics
 			}
 		}
 
-		[IgnoreMember]
+		
 		public bool IsNormalized => Math.Abs((x * x) + (y * y) + (z * z) + (w * w) - 1) < MathUtil.ZERO_TOLERANCE;
 
 
-		[IgnoreMember]
+		
 		public bool IsFinite
 		{
 			get { var f = x + y + z + w; return float.IsNaN(f) == false && float.IsInfinity(f) == false; }

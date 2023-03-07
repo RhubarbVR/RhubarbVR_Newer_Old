@@ -1,33 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
-using MessagePack;
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Matrix3d
+	public struct Matrix3d : ISerlize<Matrix3d>
 	{
-		[Key(0)]
 		public Vector3d row0;
-		[Key(1)]
 		public Vector3d row1;
-		[Key(2)]
 		public Vector3d row2;
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			row0.Serlize(binaryWriter);
+			row1.Serlize(binaryWriter);
+			row2.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			row0.DeSerlize(binaryReader);
+			row1.DeSerlize(binaryReader);
+			row2.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector3d Row0
 		{
 			get => row0;
 			set => row0 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3d Row1
 		{
 			get => row1;
 			set => row1 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3d Row2
 		{
 			get => row2;
@@ -115,14 +124,14 @@ namespace RNumerics
 			row2 = new Vector3d(u.z * v.x, u.z * v.y, u.z * v.z);
 		}
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Matrix3d Identity = new(true);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Matrix3d Zero = new(false);
 
 
 
-		[IgnoreMember]
+		
 		public double this[in int r, in int c]
 		{
 			get => (r == 0) ? row0[c] : ((r == 1) ? row1[c] : row2[c]);
@@ -140,7 +149,7 @@ namespace RNumerics
 		}
 
 
-		[IgnoreMember]
+		
 		public double this[in int i]
 		{
 			get => (i > 5) ? row2[i % 3] : ((i > 2) ? row1[i % 3] : row0[i % 3]);

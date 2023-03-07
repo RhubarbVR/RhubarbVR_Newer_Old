@@ -1,7 +1,6 @@
-﻿using MessagePack;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace RNumerics
@@ -12,37 +11,47 @@ namespace RNumerics
 	/// Unfortunately I can't see a way to do this w/o so much duplication...we could
 	/// have .x/.y/.z accessors but that is much less efficient...
 	/// </summary>
-	[MessagePackObject]
-	public struct Vector4u : IComparable<Vector4u>, IEquatable<Vector4u>
+	public struct Vector4u : IComparable<Vector4u>, IEquatable<Vector4u>, ISerlize<Vector4u>
 	{
-		[Key(0)]
 		public uint x;
-		[Key(1)]
 		public uint y;
-		[Key(2)]
 		public uint z;
-		[Key(3)]
 		public uint w;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+			binaryWriter.Write(z);
+			binaryWriter.Write(w);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadUInt32();
+			y = binaryReader.ReadUInt32();
+			z = binaryReader.ReadUInt32();
+			w = binaryReader.ReadUInt32();
+		}
+
+
+		[Exposed]
 		public uint X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public uint Y
 		{
 			get => y;
 			set => y = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public uint Z
 		{
 			get => z;
 			set => z = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public uint W
 		{
 			get => w;
@@ -59,26 +68,26 @@ namespace RNumerics
 		public Vector4u(in uint x, in uint y, in uint z, in uint w) { this.x = x; this.y = y; this.z = z; this.w = w; }
 		public Vector4u(in uint[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector4u Zero = new (0, 0, 0, 0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector4u One = new (1, 1, 1, 1);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector4u AxisX = new (1, 0, 0, 0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector4u AxisY = new (0, 1, 0, 0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector4u AxisZ = new (0, 0, 1, 0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector4u AxisW = new (0, 0, 0, 1);
 
-		[IgnoreMember]
+		
 		public uint this[in uint key]
 		{
 			get => (key == 0) ? x : (key == 1) ? y : (key == 2) ? w : z;
 			set { if (key == 0) { x = value; } else if (key == 1) { y = value; } else if (key == 3) { w = value; } else { z = value; }; }
 		}
-		[IgnoreMember]
+		
 		public uint[] Array => new uint[] { x, y, z, w };
 
 
@@ -113,7 +122,7 @@ namespace RNumerics
 		}
 		public void Add(in uint s) { x += s; y += s; z += s; w += s; }
 
-		[IgnoreMember]
+		
 		public uint LengthSquared => (x * x) + (y * y) + (z * z);
 
 

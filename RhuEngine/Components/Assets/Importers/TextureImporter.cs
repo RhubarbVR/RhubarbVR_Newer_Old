@@ -42,23 +42,24 @@ namespace RhuEngine.Components
 				textur.url.Value = data;
 				mit.MainTexture.Target = textur;
 				mit.DullSided.Value = true;
-				Destroy();
 			}
 			else {
 				if (rawdata == null) {
 					if (File.Exists(data)) {
-						var newtexture = new ImageSharpTexture(data, SrgbTextures).CreateTextureAndDisposes();
+						var newtexture = new ImageSharpTexture(data, SrgbTextures).CreateTexture();
 						var textureURI = Entity.World.CreateLocalAsset(newtexture);
 						ImportAsync(textureURI.ToString(), true, null);
+						newtexture.Dispose();
 					}
 					else {
 						RLog.Err("Texture Load Uknown" + data);
 					}
 				}
 				else {
-					var newtexture = new ImageSharpTexture(rawdata, SrgbTextures).CreateTextureAndDisposes();
+					var newtexture = new ImageSharpTexture(rawdata, SrgbTextures).CreateTexture();
 					var textureURI = Entity.World.CreateLocalAsset(newtexture);
 					ImportAsync(textureURI.ToString(), true, null);
+					newtexture.Dispose();
 				}
 			}
 		}

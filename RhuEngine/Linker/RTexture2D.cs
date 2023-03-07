@@ -48,9 +48,10 @@ namespace RhuEngine.Linker
 			}
 		}
 
-		public long Height => Texture2D.Height;
-		public long Width => Texture2D.Width;
-		public bool HasAlpha => Texture2D.HasAlpha;
+
+		public long Height => Texture2D?.Height ?? 0;
+		public long Width => Texture2D?.Width ?? 0;
+		public bool HasAlpha => Texture2D?.HasAlpha ?? false;
 
 		public bool IsPixelOpaque(int x, int y) {
 			return Texture2D.IsPixelOpaque(x, y);

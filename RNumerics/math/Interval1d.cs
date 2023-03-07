@@ -1,25 +1,32 @@
 using System;
+using System.IO;
 
-using MessagePack;
 namespace RNumerics
 {
 	// interval [a,b] on Real line. 
 	//   TODO: should check that a <= b !!
-	[MessagePackObject]
-	public struct Interval1d
+	public struct Interval1d : ISerlize<Interval1d>
 	{
-		[Key(0)]
 		public double a;
-		[Key(1)]
 		public double b;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(a);
+			binaryWriter.Write(b);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			a = binaryReader.ReadDouble();
+			b = binaryReader.ReadDouble();
+		}
+
+		[Exposed]
 		public double A
 		{
 			get => a;
 			set => a = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double B
 		{
 			get => b;
@@ -33,11 +40,11 @@ namespace RNumerics
 		public Interval1d(in float[] v2) { a = v2[0]; b = v2[1]; }
 		public Interval1d(in Interval1d copy) { a = copy.a; b = copy.b; }
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Interval1d Zero = new(0.0f, 0.0f);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Interval1d Empty = new(double.MaxValue, -double.MaxValue);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Interval1d Infinite = new(-double.MaxValue, double.MaxValue);
 
 
@@ -45,7 +52,7 @@ namespace RNumerics
 			return (x < y) ? new Interval1d(x, y) : new Interval1d(y, x);
 		}
 
-		[IgnoreMember]
+
 		public double this[in int key]
 		{
 			get => (key == 0) ? a : b;
@@ -58,14 +65,14 @@ namespace RNumerics
 		}
 
 
-		[IgnoreMember]
+
 		public double LengthSquared => (a - b) * (a - b);
-		[IgnoreMember]
+
 		public double Length => b - a;
-		[IgnoreMember]
+
 		public bool IsConstant => b == a;
 
-		[IgnoreMember]
+
 		public double Center => (b + a) * 0.5;
 
 		public void Contain(in double d) {

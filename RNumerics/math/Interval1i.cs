@@ -1,8 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
-using MessagePack;
+using System.IO;
 
 namespace RNumerics
 {
@@ -11,21 +10,28 @@ namespace RNumerics
 	//  enumerate over the range of values (inclusive!!)
 	//
 	//   TODO: should check that a <= b !!
-	[MessagePackObject]
-	public struct Interval1i : IEnumerable<int>
+	public struct Interval1i : IEnumerable<int>, ISerlize<Interval1i>
 	{
-		[Key(0)]
 		public int a;
-		[Key(1)]
 		public int b;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(a);
+			binaryWriter.Write(b);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			a = binaryReader.ReadInt32();
+			b = binaryReader.ReadInt32();
+		}
+
+		[Exposed]
 		public int A
 		{
 			get => a;
 			set => a = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public int B
 		{
 			get => b;
@@ -37,29 +43,29 @@ namespace RNumerics
 		public Interval1i(in Interval1i copy) { a = copy.a; b = copy.b; }
 
 
-		[Exposed,IgnoreMember]
-		static public readonly Interval1i Zero = new (0, 0);
-		[Exposed,IgnoreMember]
-		static public readonly Interval1i Empty = new (int.MaxValue, -int.MaxValue);
-		[Exposed,IgnoreMember]
-		static public readonly Interval1i Infinite = new (-int.MaxValue, int.MaxValue);
+		[Exposed]
+		static public readonly Interval1i Zero = new(0, 0);
+		[Exposed]
+		static public readonly Interval1i Empty = new(int.MaxValue, -int.MaxValue);
+		[Exposed]
+		static public readonly Interval1i Infinite = new(-int.MaxValue, int.MaxValue);
 
 		/// <summary> construct interval [0, N-1] </summary>
-		static public Interval1i Range(in int N) { return new (0, N - 1); }
+		static public Interval1i Range(in int N) { return new(0, N - 1); }
 
 		/// <summary> construct interval [0, N-1] </summary>
-		static public Interval1i RangeInclusive(in int N) { return new (0, N); }
+		static public Interval1i RangeInclusive(in int N) { return new(0, N); }
 
 		/// <summary> construct interval [start, start+N-1] </summary>
-		static public Interval1i Range(in int start, in int N) { return new (start, start + N - 1); }
+		static public Interval1i Range(in int start, in int N) { return new(start, start + N - 1); }
 
 
 		/// <summary> construct interval [a, b] </summary>
-		static public Interval1i FromToInclusive(in int a, in int b) { return new (a, b); }
+		static public Interval1i FromToInclusive(in int a, in int b) { return new(a, b); }
 
 
 
-		[IgnoreMember]
+
 		public int this[in int key]
 		{
 			get => (key == 0) ? a : b;
@@ -72,12 +78,12 @@ namespace RNumerics
 		}
 
 
-		[IgnoreMember]
+
 		public int LengthSquared => (a - b) * (a - b);
-		[IgnoreMember]
+
 		public int Length => b - a;
 
-		[IgnoreMember]
+
 		public int Center => (b + a) / 2;
 
 		public void Contain(in int d) {

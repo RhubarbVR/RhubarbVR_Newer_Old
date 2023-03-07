@@ -1,35 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
-using MessagePack;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Matrix3f
+	public struct Matrix3f : ISerlize<Matrix3f>
 	{
-		[Key(0)]
 		public Vector3f row0;
-		[Key(1)]
 		public Vector3f row1;
-		[Key(2)]
 		public Vector3f row2;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			row0.Serlize(binaryWriter);
+			row1.Serlize(binaryWriter);
+			row2.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			row0.DeSerlize(binaryReader);
+			row1.DeSerlize(binaryReader);
+			row2.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector3f Row0
 		{
 			get => row0;
 			set => row0 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3f Row1
 		{
 			get => row1;
 			set => row1 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3f Row2
 		{
 			get => row2;
@@ -113,7 +121,7 @@ namespace RNumerics
 
 
 
-		[IgnoreMember]
+		
 		public float this[in int r, in int c]
 		{
 			get => (r == 0) ? row0[c] : ((r == 1) ? row1[c] : row2[c]);

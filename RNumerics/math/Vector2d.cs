@@ -2,25 +2,32 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
-using MessagePack;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Vector2d : IComparable<Vector2d>, IEquatable<Vector2d>
+	public struct Vector2d : IComparable<Vector2d>, IEquatable<Vector2d>, ISerlize<Vector2b>
 	{
-		[Key(0)]
 		public double x;
-		[Key(1)]
 		public double y;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadDouble();
+			y = binaryReader.ReadDouble();
+		}
+
+		[Exposed]
 		public double X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double Y
 		{
 			get => y;
@@ -36,7 +43,7 @@ namespace RNumerics
 		public override int GetHashCode() {
 			return HashCode.Combine(x, y);
 		}
-		[IgnoreMember]
+		
 		public Vector2d Clean => new(double.IsNaN(x)?0:x, double.IsNaN(y) ? 0 : y);
 
 		public Vector2d(in double f) { x = y = f; }
@@ -47,17 +54,17 @@ namespace RNumerics
 		public Vector2d(in float[] v2) { x = v2[0]; y = v2[1]; }
 		public Vector2d(in Vector2d copy) { x = copy.x; y = copy.y; }
 		public Vector2d(in Vector2f copy) { x = copy.x; y = copy.y; }
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2d Zero = new(0.0f, 0.0f);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2d One = new(1.0f, 1.0f);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2d AxisX = new(1.0f, 0.0f);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2d AxisY = new(0.0f, 1.0f);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2d MaxValue = new(double.MaxValue, double.MaxValue);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Vector2d MinValue = new(double.MinValue, double.MinValue);
 
 		public static Vector2d FromAngleRad(in double angle) {
@@ -69,7 +76,7 @@ namespace RNumerics
 		}
 
 
-		[IgnoreMember]
+		
 		public double this[in int key]
 		{
 			get => (key == 0) ? x : y;
@@ -82,9 +89,9 @@ namespace RNumerics
 		}
 
 
-		[IgnoreMember]
+		
 		public double LengthSquared => (x * x) + (y * y);
-		[IgnoreMember]
+		
 		public double Length => (double)Math.Sqrt(LengthSquared);
 
 		public double Normalize(in double epsilon = MathUtil.EPSILON) {
@@ -100,7 +107,7 @@ namespace RNumerics
 			}
 			return length;
 		}
-		[IgnoreMember]
+		
 		public Vector2d Normalized
 		{
 			get {
@@ -115,10 +122,10 @@ namespace RNumerics
 			}
 		}
 
-		[IgnoreMember]
+		
 		public bool IsNormalized => Math.Abs((x * x) + (y * y) - 1) < MathUtil.ZERO_TOLERANCE;
 
-		[IgnoreMember]
+		
 		public bool IsFinite
 		{
 			get { var f = x + y; return double.IsNaN(f) == false && double.IsInfinity(f) == false; }
@@ -146,13 +153,13 @@ namespace RNumerics
 		/// <summary>
 		/// returns right-perp vector, ie rotated 90 degrees to the right
 		/// </summary>
-		[IgnoreMember]
+		
 		public Vector2d Perp => new(y, -x);
 
 		/// <summary>
 		/// returns right-perp vector, ie rotated 90 degrees to the right
 		/// </summary>
-		[IgnoreMember]
+		
 		public Vector2d UnitPerp => new Vector2d(y, -x).Normalized;
 
 		/// <summary>

@@ -1,45 +1,56 @@
 ﻿using System;
+using System.IO;
 
-using MessagePack;
 namespace RNumerics
 {
 
 	// partially based on WildMagic5 Box2
-	[MessagePackObject]
-	public struct Box2d
+	public struct Box2d : ISerlize<Box2d>
 	{
 		// A box has center C, axis directions U[0] and U[1] (perpendicular and
 		// unit-length vectors), and extents e[0] and e[1] (nonnegative numbers).
 		// A/ point X = C+y[0]*U[0]+y[1]*U[1] is inside or on the box whenever
 		// |y[i]| <= e[i] for all i.
-		[Key(0)]
 		public Vector2d center;
-		[Key(1)]
 		public Vector2d axisX;
-		[Key(2)]
 		public Vector2d axisY;
-		[Key(3)]
 		public Vector2d extent;
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			center.Serlize(binaryWriter);
+			axisX.Serlize(binaryWriter);
+			axisY.Serlize(binaryWriter);
+			extent.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			center.DeSerlize(binaryReader);
+			axisX.DeSerlize(binaryReader);
+			axisY.DeSerlize(binaryReader);
+			extent.DeSerlize(binaryReader);
+		}
+
+
+		[Exposed]
 		public Vector2d Center
 		{
 			get => center;
 			set => center = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2d AxisX
 		{
 			get => axisX;
 			set => axisX = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2d AxisY
 		{
 			get => axisY;
 			set => axisY = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2d Extent
 		{
 			get => extent;
@@ -84,7 +95,7 @@ namespace RNumerics
 			extent = new Vector2d(seg.Extent, 0);
 		}
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Box2d Empty = new(Vector2d.Zero);
 
 
@@ -117,11 +128,11 @@ namespace RNumerics
 
 
 		// RNumerics extensions
-		[IgnoreMember]
+		
 		public double MaxExtent => Math.Max(extent.x, extent.y);
-		[IgnoreMember]
+		
 		public double MinExtent => Math.Min(extent.x, extent.y);
-		[IgnoreMember]
+		
 		public Vector2d Diagonal
 		{
 			get {
@@ -129,7 +140,7 @@ namespace RNumerics
 			  ((-extent.x * axisX) - (extent.y * axisY));
 			}
 		}
-		[IgnoreMember]
+		
 		public double Area => 2 * extent.x * 2 * extent.y;
 
 		public void Contain(in Vector2d v) {
@@ -353,42 +364,52 @@ namespace RNumerics
 
 
 
-	[MessagePackObject]
 	// partially based on WildMagic5 Box3
-	public struct Box2f
+	public struct Box2f: ISerlize<Box2f>
 	{
 		// A box has center C, axis directions U[0] and U[1] (perpendicular and
 		// unit-length vectors), and extents e[0] and e[1] (nonnegative numbers).
 		// A/ point X = C+y[0]*U[0]+y[1]*U[1] is inside or on the box whenever
 		// |y[i]| <= e[i] for all i.
-		[Key(0)]
 		public Vector2f center;
-		[Key(1)]
 		public Vector2f axisX;
-		[Key(2)]
 		public Vector2f axisY;
-		[Key(3)]
 		public Vector2f extent;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			center.Serlize(binaryWriter);
+			axisX.Serlize(binaryWriter);
+			axisY.Serlize(binaryWriter);
+			extent.Serlize(binaryWriter);
+
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			center.DeSerlize(binaryReader);
+			axisX.DeSerlize(binaryReader);
+			axisY.DeSerlize(binaryReader);
+			extent.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector2f Center
 		{
 			get => center;
 			set => center = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2f AxisX
 		{
 			get => axisX;
 			set => axisX = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2f AxisY
 		{
 			get => axisY;
 			set => axisY = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2f Extent
 		{
 			get => extent;
@@ -419,7 +440,7 @@ namespace RNumerics
 			axisY = Vector2f.AxisY;
 		}
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Box2f Empty = new(Vector2f.Zero);
 
 
@@ -444,11 +465,11 @@ namespace RNumerics
 
 
 		// RNumerics extensions
-		[IgnoreMember]
+		
 		public double MaxExtent => Math.Max(extent.x, extent.y);
-		[IgnoreMember]
+		
 		public double MinExtent => Math.Min(extent.x, extent.y);
-		[IgnoreMember]
+		
 		public Vector2f Diagonal
 		{
 			get {
@@ -456,7 +477,7 @@ namespace RNumerics
 			  ((-extent.x * axisX) - (extent.y * axisY));
 			}
 		}
-		[IgnoreMember]
+		
 		public double Area => 2 * extent.x * 2 * extent.y;
 
 		public void Contain(in Vector2f v) {

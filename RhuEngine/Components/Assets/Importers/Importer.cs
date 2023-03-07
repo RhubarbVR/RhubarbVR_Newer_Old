@@ -60,6 +60,7 @@ namespace RhuEngine.Components
 					ImportButton.Target.Disabled.Value = false;
 				}
 				ImporterProgram.Target?.CloseProgram();
+				Destroy();
 			});
 		}
 	}

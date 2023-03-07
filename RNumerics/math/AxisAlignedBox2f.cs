@@ -1,38 +1,44 @@
 using System;
-
-using MessagePack;
-
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct AxisAlignedBox2f
+	public struct AxisAlignedBox2f : ISerlize<AxisAlignedBox2f>
 	{
-		[Key(0)]
 		public Vector2f min = new(float.MaxValue, float.MaxValue);
-		[Key(1)]
 		public Vector2f max = new(float.MinValue, float.MinValue);
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			min.Serlize(binaryWriter);
+			max.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			min.DeSerlize(binaryReader);
+			max.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector2f Min
 		{
 			get => min;
 			set => min = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2f Max
 		{
 			get => max;
 			set => max = value;
 		}
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox2f Empty = new();
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox2f Zero = new(0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox2f UnitPositive = new(1);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox2f Infinite = new(float.MinValue, float.MinValue, float.MaxValue, float.MaxValue);
 		public AxisAlignedBox2f() {
 
@@ -74,36 +80,36 @@ namespace RNumerics
 			min = new Vector2f(o.min);
 			max = new Vector2f(o.max);
 		}
-		[IgnoreMember]
+		
 		public float Width => Math.Max(max.x - min.x, 0);
-		[IgnoreMember]
+		
 		public float Height => Math.Max(max.y - min.y, 0);
-		[IgnoreMember]
+		
 		public float Area => Width * Height;
-		[IgnoreMember]
+		
 		public float DiagonalLength => (float)Math.Sqrt(((max.x - min.x) * (max.x - min.x)) + ((max.y - min.y) * (max.y - min.y)));
-		[IgnoreMember]
+		
 		public float MaxDim => Math.Max(Width, Height);
-		[IgnoreMember]
+		
 		public Vector2f Diagonal => new(max.x - min.x, max.y - min.y);
-		[IgnoreMember]
+		
 		public Vector2f Center => new(0.5f * (min.x + max.x), 0.5f * (min.y + max.y));
-		[IgnoreMember]
+		
 		public Vector2f BottomLeft => min;
-		[IgnoreMember]
+		
 		public Vector2f BottomRight => new(max.x, min.y);
-		[IgnoreMember]
+		
 		public Vector2f TopLeft => new(min.x, max.y);
-		[IgnoreMember]
+		
 		public Vector2f TopRight => max;
 
-		[IgnoreMember]
+		
 		public Vector2f CenterLeft => new(min.x, (min.y + max.y) * 0.5f);
-		[IgnoreMember]
+		
 		public Vector2f CenterRight => new(max.x, (min.y + max.y) * 0.5f);
-		[IgnoreMember]
+		
 		public Vector2f CenterTop => new((min.x + max.x) * 0.5f, max.y);
-		[IgnoreMember]
+		
 		public Vector2f CenterBottom => new((min.x + max.x) * 0.5f, min.y);
 
 

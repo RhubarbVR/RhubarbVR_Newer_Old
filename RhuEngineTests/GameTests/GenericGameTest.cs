@@ -6,8 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using RhuEngine.Physics;
-using MessagePack;
-using MessagePack.Resolvers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -69,10 +67,6 @@ namespace RhuEngine.GameTests.Tests
 
 		[TestMethod()]
 		public void WorldSaveTestNoSync() {
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-				//Mac os is having a problem where to much is a session and its stack is to small
-				return;
-			}
 			SetUpForNormalTest();
 			var localWorld = tester.app.worldManager.LocalWorld;
 			var data = localWorld.Serialize(new SyncObjectSerializerObject(false));
@@ -84,10 +78,6 @@ namespace RhuEngine.GameTests.Tests
 
 		[TestMethod()]
 		public void WorldSaveTestSync() {
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-				//Mac os is having a problem where to much is a session and its stack is to small
-				return;
-			}
 			SetUpForNormalTest();
 			var localWorld = tester.app.worldManager.LocalWorld;
 			var data = localWorld.Serialize(new SyncObjectSerializerObject(true));

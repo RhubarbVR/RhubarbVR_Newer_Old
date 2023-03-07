@@ -2,42 +2,50 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
-using MessagePack;
 using Assimp;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Vector3f : IComparable<Vector3f>, IEquatable<Vector3f>
+	public struct Vector3f : IComparable<Vector3f>, IEquatable<Vector3f>, ISerlize<Vector3f>
 	{
-		[Key(0)]
 		public float x;
-		[Key(1)]
 		public float y;
-		[Key(2)]
 		public float z;
 
-		[Exposed, IgnoreMember, JsonIgnore]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+			binaryWriter.Write(z);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadSingle();
+			y = binaryReader.ReadSingle();
+			z = binaryReader.ReadSingle();
+		}
+
+		[Exposed, JsonIgnore]
 		public float X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		public float Y
 		{
 			get => y;
 			set => y = value;
 		}
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		public float Z
 		{
 			get => z;
 			set => z = value;
 		}
 
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public float Magnitude => (float)Math.Sqrt((x * x) + (y * y) + (z * z));
 
 		public Vector3f() {
@@ -62,49 +70,49 @@ namespace RNumerics
 		}
 
 		public Vector3f(in Vector3d copy) { x = (float)copy.x; y = (float)copy.y; z = (float)copy.z; }
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		public static readonly Vector3f Zero = new(0.0f, 0.0f, 0.0f);
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		static public readonly Vector3f One = new(1.0f, 1.0f, 1.0f);
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		static public readonly Vector3f OneNormalized = new Vector3f(1.0f, 1.0f, 1.0f).Normalized;
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		static public readonly Vector3f Invalid = new(float.MaxValue, float.MaxValue, float.MaxValue);
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		static public readonly Vector3f AxisX = new(1.0f, 0.0f, 0.0f);
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		static public readonly Vector3f AxisY = new(0.0f, 1.0f, 0.0f);
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		static public readonly Vector3f AxisZ = new(0.0f, 0.0f, 1.0f);
 
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		static public readonly Vector3f AxisXY = new(1.0f, 1.0f, 0.0f);
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		static public readonly Vector3f AxisYZ = new(0.0f, 1.0f, 1.0f);
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		static public readonly Vector3f AxisZX = new(1.0f, 0.0f, 1.0f);
 
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		static public readonly Vector3f MaxValue = new(float.MaxValue, float.MaxValue, float.MaxValue);
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		static public readonly Vector3f MinValue = new(float.MinValue, float.MinValue, float.MinValue);
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		/// <summary>A vector representing the up axis. In StereoKit, this is
 		/// the same as `new Vec3(0,1,0)`.</summary>
 		public static readonly Vector3f Up = new(0, 1, 0);
 
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		/// <summary>StereoKit uses a right-handed coordinate system, which
 		/// means that forward is looking down the -Z axis! This value is the
 		/// same as `new Vec3(0,0,-1)`. This is NOT the same as UnitZ!
 		/// </summary>
 		public static readonly Vector3f Forward = new(0, 0, -1);
-		[Exposed, IgnoreMember, JsonIgnore]
+		[Exposed, JsonIgnore]
 		/// <summary>When looking forward, this is the direction to the 
 		/// right! In StereoKit, this is the same as `new Vec3(1,0,0)`
 		/// </summary>
 		public static readonly Vector3f Right = new(1, 0, 0);
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public float this[in int key]
 		{
 			get => (key == 0) ? x : (key == 1) ? y : z;
@@ -116,47 +124,47 @@ namespace RNumerics
 				}
 			}
 		}
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public Vector2f Xy
 		{
 			get => new(x, y);
 			set { x = value.x; y = value.y; }
 		}
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public Vector2f Xz
 		{
 			get => new(x, z);
 			set { x = value.x; z = value.y; }
 		}
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public Vector2f Yz
 		{
 			get => new(y, z);
 			set { y = value.x; z = value.y; }
 		}
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 
 		public float LengthSquared => (x * x) + (y * y) + (z * z);
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public float Length => (float)Math.Sqrt(LengthSquared);
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public float LengthL1 => Math.Abs(x) + Math.Abs(y) + Math.Abs(z);
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public float Max => Math.Max(x, Math.Max(y, z));
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public float Min => Math.Min(x, Math.Min(y, z));
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public float MaxAbs => Math.Max(Math.Abs(x), Math.Max(Math.Abs(y), Math.Abs(z)));
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public float MinAbs => Math.Min(Math.Abs(x), Math.Min(Math.Abs(y), Math.Abs(z)));
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool IsAnyNan => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z);
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool IsAnyInfinity => float.IsInfinity(x) || float.IsInfinity(y) || float.IsInfinity(z);
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool IsAnyNanOrInfinity => IsAnyNan || IsAnyInfinity;
 
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public Vector3f Clean => IsAnyNanOrInfinity ? Zero : this;
 
 		public float Normalize(in float epsilon = MathUtil.EPSILONF) {
@@ -173,7 +181,7 @@ namespace RNumerics
 			}
 			return length;
 		}
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public Vector3f Normalized
 		{
 			get {
@@ -187,17 +195,17 @@ namespace RNumerics
 				}
 			}
 		}
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool IsNormalized => Math.Abs((x * x) + (y * y) + (z * z) - 1) < MathUtil.ZERO_TOLERANCEF;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 
 		public bool IsFinite
 		{
 			get { var f = x + y + z; return float.IsNaN(f) == false && float.IsInfinity(f) == false; }
 		}
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public float SqrMagnitude => (x * x) + (y * y) + (z * z);
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public float MinComponent => MathUtil.Min(x, y, z);
 
 		public Vector3f RmoveSmallest() {

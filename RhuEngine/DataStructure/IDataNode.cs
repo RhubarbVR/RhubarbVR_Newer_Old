@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-
-using MessagePack;
+using System.IO;
+using System.Reflection;
 
 using RhuEngine.Datatypes;
 
@@ -13,118 +13,243 @@ using static RhuEngine.WorldObjects.World;
 
 namespace RhuEngine.DataStructure
 {
-	[Union(0, typeof(DataNodeList))]
-	[Union(1, typeof(DataNodeGroup))]
-	[Union(2, typeof(DataNode<int>))]
-	[Union(3, typeof(DataNode<uint>))]
-	[Union(4, typeof(DataNode<bool>))]
-	[Union(5, typeof(DataNode<char>))]
-	[Union(6, typeof(DataNode<string>))]
-	[Union(7, typeof(DataNode<float>))]
-	[Union(8, typeof(DataNode<double>))]
-	[Union(9, typeof(DataNode<string[]>))]
-	[Union(10, typeof(DataNode<long>))]
-	[Union(11, typeof(DataNode<ulong>))]
-	[Union(12, typeof(DataNode<byte>))]
-	[Union(13, typeof(DataNode<sbyte>))]
-	[Union(14, typeof(DataNode<short>))]
-	[Union(15, typeof(DataNode<decimal>))]
-	[Union(16, typeof(DataNode<byte[]>))]
-	[Union(17, typeof(DataNode<NetPointer>))]
-	[Union(18, typeof(DataNode<DateTime>))]
-	[Union(19, typeof(DataNode<Playback>))]
-	[Union(20, typeof(DataNode<float[]>))]
-	[Union(21, typeof(DataNode<int[]>))]
-	[Union(30, typeof(DataNode<Colorb>))]
-	[Union(31, typeof(DataNode<Colorf>))]
-	[Union(32, typeof(DataNode<ColorHSV>))]
-	[Union(33, typeof(DataNode<ColorMap>))]
-	[Union(34, typeof(DataNode<ColorMap.ColorPoint>))]
-	[Union(35, typeof(DataNode<AxisAlignedBox2d>))]
-	[Union(36, typeof(DataNode<AxisAlignedBox2f>))]
-	[Union(37, typeof(DataNode<AxisAlignedBox2i>))]
-	[Union(38, typeof(DataNode<AxisAlignedBox3d>))]
-	[Union(39, typeof(DataNode<AxisAlignedBox3f>))]
-	[Union(40, typeof(DataNode<AxisAlignedBox3i>))]
-	[Union(41, typeof(DataNode<Box2d>))]
-	[Union(42, typeof(DataNode<Box2f>))]
-	[Union(43, typeof(DataNode<Box3d>))]
-	[Union(45, typeof(DataNode<Box3f>))]
-	[Union(46, typeof(DataNode<Frame3f>))]
-	[Union(47, typeof(DataNode<Index3i>))]
-	[Union(48, typeof(DataNode<Index2i>))]
-	[Union(49, typeof(DataNode<Index4i>))]
-	[Union(50, typeof(DataNode<Interval1d>))]
-	[Union(51, typeof(DataNode<Interval1i>))]
-	[Union(52, typeof(DataNode<Line2d>))]
-	[Union(53, typeof(DataNode<Line2f>))]
-	[Union(54, typeof(DataNode<Line3d>))]
-	[Union(55, typeof(DataNode<Line3f>))]
-	[Union(56, typeof(DataNode<Matrix2d>))]
-	[Union(57, typeof(DataNode<Matrix2f>))]
-	[Union(58, typeof(DataNode<Matrix3d>))]
-	[Union(59, typeof(DataNode<Matrix3f>))]
-	[Union(60, typeof(DataNode<Plane3d>))]
-	[Union(61, typeof(DataNode<Plane3f>))]
-	[Union(62, typeof(DataNode<Quaterniond>))]
-	[Union(63, typeof(DataNode<Quaternionf>))]
-	[Union(64, typeof(DataNode<Ray3d>))]
-	[Union(65, typeof(DataNode<Ray3f>))]
-	[Union(66, typeof(DataNode<Segment3d>))]
-	[Union(67, typeof(DataNode<Segment3f>))]
-	[Union(68, typeof(DataNode<Triangle2d>))]
-	[Union(69, typeof(DataNode<Triangle2f>))]
-	[Union(70, typeof(DataNode<Triangle3d>))]
-	[Union(71, typeof(DataNode<Triangle3f>))]
-	[Union(72, typeof(DataNode<Vector2b>))]
-	[Union(73, typeof(DataNode<Vector2d>))]
-	[Union(74, typeof(DataNode<Vector2f>))]
-	[Union(75, typeof(DataNode<Vector2i>))]
-	[Union(76, typeof(DataNode<Vector2l>))]
-	[Union(77, typeof(DataNode<Vector2u>))]
-	[Union(78, typeof(DataNode<Vector3b>))]
-	[Union(79, typeof(DataNode<Vector3d>))]
-	[Union(80, typeof(DataNode<Vector3f>))]
-	[Union(81, typeof(DataNode<Vector3i>))]
-	[Union(82, typeof(DataNode<Vector3u>))]
-	[Union(83, typeof(DataNode<Vector4b>))]
-	[Union(84, typeof(DataNode<Vector4d>))]
-	[Union(85, typeof(DataNode<Vector4f>))]
-	[Union(86, typeof(DataNode<Vector4i>))]
-	[Union(87, typeof(DataNode<Vector4u>))]
-	[Union(88, typeof(DataNode<Vector3dTuple2>))]
-	[Union(89, typeof(DataNode<Vector3dTuple3>))]
-	[Union(90, typeof(DataNode<Vector3fTuple3>))]
-	[Union(91, typeof(DataNode<Vector2dTuple2>))]
-	[Union(92, typeof(DataNode<Vector2dTuple3>))]
-	[Union(93, typeof(DataNode<Vector2dTuple4>))]
-	[Union(94, typeof(DataNode<Circle3d>))]
-	[Union(95, typeof(DataNode<Cylinder3d>))]
-	[Union(96, typeof(DataNode<ushort>))]
-	[Union(97, typeof(DataNode<Matrix>))]
-	[Union(100, typeof(DataNode<object>))]
 
-	public interface IDataNode
+	public interface IDataNode : ISerlize<IDataNode>
 	{
 		public abstract void InitData();
 		public abstract void ReadChildEnd(IDataNode child);
 		public abstract void SaveAction(DataSaver DataSaver);
 	}
 
-	[MessagePackObject]
-	public sealed class DataNodeHolder
+	public static class DataNode
 	{
-		[Key(0)]
+		public static IDataNode DeSerlize(BinaryReader binaryReader) {
+			var targetByte = binaryReader.ReadByte();
+			IDataNode dataNode = targetByte switch {
+				0 => new DataNodeList(),
+				1 => new DataNodeGroup(),
+				2 => new DataNode<int>(),
+				3 => new DataNode<uint>(),
+				4 => new DataNode<bool>(),
+				5 => new DataNode<char>(),
+				6 => new DataNode<string>(),
+				7 => new DataNode<float>(),
+				8 => new DataNode<double>(),
+				9 => new DataNode<string[]>(),
+				10 => new DataNode<long>(),
+				11 => new DataNode<ulong>(),
+				12 => new DataNode<byte>(),
+				13 => new DataNode<sbyte>(),
+				14 => new DataNode<short>(),
+				15 => new DataNode<decimal>(),
+				16 => new DataNode<byte[]>(),
+				17 => new DataNode<NetPointer>(),
+				18 => new DataNode<DateTime>(),
+				19 => new DataNode<Playback>(),
+				20 => new DataNode<float[]>(),
+				21 => new DataNode<int[]>(),
+				22 => new DataNode<Colorb>(),
+				23 => new DataNode<Colorf>(),
+				24 => new DataNode<ColorHSV>(),
+				25 => new DataNode<AxisAlignedBox2d>(),
+				26 => new DataNode<AxisAlignedBox2f>(),
+				27 => new DataNode<AxisAlignedBox2i>(),
+				28 => new DataNode<AxisAlignedBox3d>(),
+				29 => new DataNode<AxisAlignedBox3f>(),
+				30 => new DataNode<AxisAlignedBox3i>(),
+				31 => new DataNode<Box2d>(),
+				32 => new DataNode<Box2f>(),
+				33 => new DataNode<Box3d>(),
+				34 => new DataNode<Box3f>(),
+				35 => new DataNode<Frame3f>(),
+				36 => new DataNode<Index3i>(),
+				37 => new DataNode<Index2i>(),
+				38 => new DataNode<Index4i>(),
+				39 => new DataNode<Interval1d>(),
+				40 => new DataNode<Interval1i>(),
+				41 => new DataNode<Line2d>(),
+				42 => new DataNode<Line2f>(),
+				43 => new DataNode<Line3d>(),
+				44 => new DataNode<Line3f>(),
+				45 => new DataNode<Matrix2d>(),
+				46 => new DataNode<Matrix2f>(),
+				47 => new DataNode<Matrix3d>(),
+				48 => new DataNode<Matrix3f>(),
+				49 => new DataNode<Plane3d>(),
+				50 => new DataNode<Plane3f>(),
+				51 => new DataNode<Quaterniond>(),
+				52 => new DataNode<Quaternionf>(),
+				53 => new DataNode<Ray3d>(),
+				54 => new DataNode<Ray3f>(),
+				55 => new DataNode<Segment3d>(),
+				56 => new DataNode<Segment3f>(),
+				57 => new DataNode<Triangle2d>(),
+				58 => new DataNode<Triangle2f>(),
+				59 => new DataNode<Triangle3d>(),
+				60 => new DataNode<Triangle3f>(),
+				61 => new DataNode<Vector2b>(),
+				62 => new DataNode<Vector2d>(),
+				63 => new DataNode<Vector2f>(),
+				64 => new DataNode<Vector2i>(),
+				65 => new DataNode<Vector2l>(),
+				66 => new DataNode<Vector2u>(),
+				67 => new DataNode<Vector3b>(),
+				68 => new DataNode<Vector3d>(),
+				69 => new DataNode<Vector3f>(),
+				70 => new DataNode<Vector3i>(),
+				71 => new DataNode<Vector3u>(),
+				72 => new DataNode<Vector4b>(),
+				73 => new DataNode<Vector4d>(),
+				74 => new DataNode<Vector4f>(),
+				75 => new DataNode<Vector4i>(),
+				76 => new DataNode<Vector4u>(),
+				77 => new DataNode<Vector3dTuple2>(),
+				78 => new DataNode<Vector3dTuple3>(),
+				79 => new DataNode<Vector3fTuple3>(),
+				80 => new DataNode<Vector2dTuple2>(),
+				81 => new DataNode<Vector2dTuple3>(),
+				82 => new DataNode<Vector2dTuple4>(),
+				83 => new DataNode<Circle3d>(),
+				84 => new DataNode<Cylinder3d>(),
+				85 => new DataNode<ushort>(),
+				86 => new DataNode<Matrix>(),
+				_ => null,
+			};
+			dataNode.DeSerlize(binaryReader);
+			return dataNode;
+		}
+
+		private static readonly Type[] _typeArray = new Type[87] {
+			typeof(DataNodeList),
+			typeof(DataNodeGroup),
+			typeof(DataNode<int>),
+			typeof(DataNode<uint>),
+			typeof(DataNode<bool>),
+			typeof(DataNode<char>),
+			typeof(DataNode<string>),
+			typeof(DataNode<float>),
+			typeof(DataNode<double>),
+			typeof(DataNode<string[]>),
+			typeof(DataNode<long>),
+			typeof(DataNode<ulong>),
+			typeof(DataNode<byte>),
+			typeof(DataNode<sbyte>),
+			typeof(DataNode<short>),
+			typeof(DataNode<decimal>),
+			typeof(DataNode<byte[]>),
+			typeof(DataNode<NetPointer>),
+			typeof(DataNode<DateTime>),
+			typeof(DataNode<Playback>),
+			typeof(DataNode<float[]>),
+			typeof(DataNode<int[]>),
+			typeof(DataNode<Colorb>),
+			typeof(DataNode<Colorf>),
+			typeof(DataNode<ColorHSV>),
+			typeof(DataNode<AxisAlignedBox2d>),
+			typeof(DataNode<AxisAlignedBox2f>),
+			typeof(DataNode<AxisAlignedBox2i>),
+			typeof(DataNode<AxisAlignedBox3d>),
+			typeof(DataNode<AxisAlignedBox3f>),
+			typeof(DataNode<AxisAlignedBox3i>),
+			typeof(DataNode<Box2d>),
+			typeof(DataNode<Box2f>),
+			typeof(DataNode<Box3d>),
+			typeof(DataNode<Box3f>),
+			typeof(DataNode<Frame3f>),
+			typeof(DataNode<Index3i>),
+			typeof(DataNode<Index2i>),
+			typeof(DataNode<Index4i>),
+			typeof(DataNode<Interval1d>),
+			typeof(DataNode<Interval1i>),
+			typeof(DataNode<Line2d>),
+			typeof(DataNode<Line2f>),
+			typeof(DataNode<Line3d>),
+			typeof(DataNode<Line3f>),
+			typeof(DataNode<Matrix2d>),
+			typeof(DataNode<Matrix2f>),
+			typeof(DataNode<Matrix3d>),
+			typeof(DataNode<Matrix3f>),
+			typeof(DataNode<Plane3d>),
+			typeof(DataNode<Plane3f>),
+			typeof(DataNode<Quaterniond>),
+			typeof(DataNode<Quaternionf>),
+			typeof(DataNode<Ray3d>),
+			typeof(DataNode<Ray3f>),
+			typeof(DataNode<Segment3d>),
+			typeof(DataNode<Segment3f>),
+			typeof(DataNode<Triangle2d>),
+			typeof(DataNode<Triangle2f>),
+			typeof(DataNode<Triangle3d>),
+			typeof(DataNode<Triangle3f>),
+			typeof(DataNode<Vector2b>),
+			typeof(DataNode<Vector2d>),
+			typeof(DataNode<Vector2f>),
+			typeof(DataNode<Vector2i>),
+			typeof(DataNode<Vector2l>),
+			typeof(DataNode<Vector2u>),
+			typeof(DataNode<Vector3b>),
+			typeof(DataNode<Vector3d>),
+			typeof(DataNode<Vector3f>),
+			typeof(DataNode<Vector3i>),
+			typeof(DataNode<Vector3u>),
+			typeof(DataNode<Vector4b>),
+			typeof(DataNode<Vector4d>),
+			typeof(DataNode<Vector4f>),
+			typeof(DataNode<Vector4i>),
+			typeof(DataNode<Vector4u>),
+			typeof(DataNode<Vector3dTuple2>),
+			typeof(DataNode<Vector3dTuple3>),
+			typeof(DataNode<Vector3fTuple3>),
+			typeof(DataNode<Vector2dTuple2>),
+			typeof(DataNode<Vector2dTuple3>),
+			typeof(DataNode<Vector2dTuple4>),
+			typeof(DataNode<Circle3d>),
+			typeof(DataNode<Cylinder3d>),
+			typeof(DataNode<ushort>),
+			typeof(DataNode<Matrix>),
+		};
+
+		public static void Serlize(BinaryWriter binaryWriter, IDataNode dataNode) {
+			var checkType = dataNode.GetType();
+			var targetType = (byte)Array.IndexOf(_typeArray, checkType);
+			binaryWriter.Write(targetType);
+			dataNode.Serlize(binaryWriter);
+		}
+	}
+	public sealed class DataNodeHolder : ISerlize<DataNodeHolder>
+	{
 		public int index;
-		[Key(1)]
 		public IDataNode dataNode;
+		public void DeSerlize(BinaryReader binaryReader) {
+			index = binaryReader.ReadInt32();
+			dataNode = DataNode.DeSerlize(binaryReader);
+		}
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(index);
+			DataNode.Serlize(binaryWriter, dataNode);
+		}
 	}
 
-	[MessagePackObject]
-	public sealed class BlockStore : INetPacked
+	public sealed class BlockStore : INetPacked, ISerlize<BlockStore>
 	{
-		[Key(0)]
 		public List<DataNodeHolder> dataNodes = new();
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			var size = binaryReader.ReadInt32();
+			for (var i = 0; i < size; i++) {
+				var dataNode = new DataNodeHolder();
+				dataNode.DeSerlize(binaryReader);
+				dataNodes.Add(dataNode);
+			}
+		}
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(dataNodes.Count);
+			for (var i = 0; i < dataNodes.Count; i++) {
+				dataNodes[i].Serlize(binaryWriter);
+			}
+		}
 	}
 
 
@@ -132,7 +257,9 @@ namespace RhuEngine.DataStructure
 	{
 		public BlockStore Store = new();
 		public DataReader(byte[] data) {
-			Store = Serializer.Read<BlockStore>(data);
+			Store = new();
+			var reader = new BinaryReader(new MemoryStream(data));
+			Store.DeSerlize(reader);
 			ReadData();
 		}
 		public DataReader(BlockStore storeData) {
@@ -144,7 +271,7 @@ namespace RhuEngine.DataStructure
 
 		private void ReadData() {
 			for (var i = Store.dataNodes.Count - 1; i >= 0; i--) {
-				if(i == 0) {
+				if (i == 0) {
 					Data = Store.dataNodes[0].dataNode;
 					Store.dataNodes[0].dataNode.InitData();
 					Store = null;
@@ -178,7 +305,10 @@ namespace RhuEngine.DataStructure
 		}
 
 		public byte[] SaveStore() {
-			return Serializer.Save(Store);
+			using var stream = new MemoryStream();
+			var dataNodes = new BinaryWriter(stream);
+			Store.Serlize(dataNodes);
+			return stream.ToArray();
 		}
 	}
 }

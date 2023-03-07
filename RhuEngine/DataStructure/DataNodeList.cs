@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
-
-using MessagePack;
+using System.IO;
 
 using SharedModels;
 using SharedModels.GameSpecific;
 
 namespace RhuEngine.DataStructure
 {
-	[MessagePackObject]
 	public sealed class DataNodeList : IDataNode
 	{
 		public void SaveAction(DataSaver DataSaver) {
@@ -16,7 +14,6 @@ namespace RhuEngine.DataStructure
 			}
 		}
 
-		[IgnoreMember]
 		public List<IDataNode> _nodeGroup = new();
 
 		public IEnumerator<IDataNode> GetEnumerator() {
@@ -24,7 +21,6 @@ namespace RhuEngine.DataStructure
 				yield return this[i];
 			}
 		}
-		[IgnoreMember]
 		public IDataNode this[int i]
 		{
 			get => _nodeGroup[i];
@@ -40,6 +36,12 @@ namespace RhuEngine.DataStructure
 
 		public void ReadChildEnd(IDataNode child) {
 			_nodeGroup.Insert(0, child);
+		}
+
+		public void Serlize(BinaryWriter binaryWriter) {
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
 		}
 
 		public DataNodeList() {

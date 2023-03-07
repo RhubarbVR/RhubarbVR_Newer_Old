@@ -1,31 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
-using MessagePack;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Line2d
+	public struct Line2d : ISerlize<Line2d>
 	{
-		[Key(0)]
 		public Vector2d origin;
-		[Key(1)]
 		public Vector2d direction;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			origin.Serlize(binaryWriter);
+			direction.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			origin.DeSerlize(binaryReader);
+			direction.DeSerlize(binaryReader);
+		}
+
 		public Line2d() {
 			origin = Vector2d.Zero;
 			direction = Vector2d.Zero;
 		}
 
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2d Origin
 		{
 			get => origin;
 			set => origin = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector2d Direction
 		{
 			get => direction;
@@ -106,13 +114,20 @@ namespace RNumerics
 
 	}
 
-	[MessagePackObject]
-	public struct Line2f
+	public struct Line2f : ISerlize<Line2f>
 	{
-		[Key(0)]
 		public Vector2f Origin;
-		[Key(1)]
 		public Vector2f Direction;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			Origin.Serlize(binaryWriter);
+			Direction.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			Origin.DeSerlize(binaryReader);
+			Direction.DeSerlize(binaryReader);
+		}
 
 		public Line2f(in Vector2f origin, in Vector2f direction) {
 			Origin = origin;

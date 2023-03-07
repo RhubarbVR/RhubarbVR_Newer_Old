@@ -1,26 +1,33 @@
 ﻿using System;
+using System.IO;
 
-using MessagePack;
 namespace RNumerics
 {
 	// These are convenience classes used in place of local stack arrays
 	// (which C# does not support, but is common in C++ code)
 
-	[MessagePackObject]
-	public struct Vector3dTuple2
+	public struct Vector3dTuple2 : ISerlize<Vector3dTuple2>
 	{
-		[Key(0)]
 		public Vector3d v0;
-		[Key(1)]
 		public Vector3d v1;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			v0.Serlize(binaryWriter);
+			v1.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			v0.DeSerlize(binaryReader);
+			v1.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector3d V0
 		{
 			get => v0;
 			set => v0 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3d V1
 		{
 			get => v1;
@@ -49,15 +56,25 @@ namespace RNumerics
 		}
 	}
 
-	[MessagePackObject]
-	public struct Vector3dTuple3
+	public struct Vector3dTuple3 : ISerlize<Vector3dTuple3>
 	{
-		[Key(0)]
 		public Vector3d V0;
-		[Key(1)]
 		public Vector3d V1;
-		[Key(2)]
 		public Vector3d V2;
+
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			V0.Serlize(binaryWriter);
+			V1.Serlize(binaryWriter);
+			V2.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			V0.DeSerlize(binaryReader);
+			V1.DeSerlize(binaryReader);
+			V2.DeSerlize(binaryReader);
+		}
+
 		public Vector3dTuple3() {
 			V0 = new Vector3d(0, 0, 0);
 			V1 = new Vector3d(0, 0, 0);
@@ -84,15 +101,25 @@ namespace RNumerics
 	}
 
 
-	[MessagePackObject]
-	public struct Vector3fTuple3
+	public struct Vector3fTuple3 : ISerlize<Vector3fTuple3>
 	{
-		[Key(0)]
 		public Vector3f V0;
-		[Key(1)]
 		public Vector3f V1;
-		[Key(2)]
 		public Vector3f V2;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			V0.Serlize(binaryWriter);
+			V1.Serlize(binaryWriter);
+			V2.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			V0.DeSerlize(binaryReader);
+			V1.DeSerlize(binaryReader);
+			V2.DeSerlize(binaryReader);
+		}
+
+
 		public Vector3fTuple3() {
 			V0 = new Vector3f(0, 0, 0);
 			V1 = new Vector3f(0, 0, 0);
@@ -119,13 +146,22 @@ namespace RNumerics
 
 
 
-	[MessagePackObject]
-	public struct Vector2dTuple2
+	public struct Vector2dTuple2 : ISerlize<Vector2dTuple2>
 	{
-		[Key(0)]
 		public Vector2d V0;
-		[Key(1)]
 		public Vector2d V1;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			V0.Serlize(binaryWriter);
+			V1.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			V0.DeSerlize(binaryReader);
+			V1.DeSerlize(binaryReader);
+		}
+
+
 		public Vector2dTuple2() {
 			V0 = new Vector2d(0, 0);
 			V1 = new Vector2d(0, 0);
@@ -147,15 +183,25 @@ namespace RNumerics
 		}
 	}
 
-	[MessagePackObject]
-	public struct Vector2dTuple3
+	public struct Vector2dTuple3 : ISerlize<Vector2dTuple3>
 	{
-		[Key(0)]
 		public Vector2d V0;
-		[Key(1)]
 		public Vector2d V1;
-		[Key(2)]
 		public Vector2d V2;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			V0.Serlize(binaryWriter);
+			V1.Serlize(binaryWriter);
+			V2.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			V0.DeSerlize(binaryReader);
+			V1.DeSerlize(binaryReader);
+			V2.DeSerlize(binaryReader);
+		}
+
+
 		public Vector2dTuple3() {
 			V0 = new Vector2d(0, 0);
 			V1 = new Vector2d(0, 0);
@@ -180,17 +226,27 @@ namespace RNumerics
 		}
 	}
 
-	[MessagePackObject]
-	public struct Vector2dTuple4
+	public struct Vector2dTuple4 : ISerlize<Vector2dTuple4>
 	{
-		[Key(0)]
 		public Vector2d V0;
-		[Key(1)]
 		public Vector2d V1;
-		[Key(2)]
 		public Vector2d V2;
-		[Key(3)]
 		public Vector2d V3;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			V0.Serlize(binaryWriter);
+			V1.Serlize(binaryWriter);
+			V2.Serlize(binaryWriter);
+			V3.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			V0.DeSerlize(binaryReader);
+			V1.DeSerlize(binaryReader);
+			V2.DeSerlize(binaryReader);
+			V3.DeSerlize(binaryReader);
+		}
+
 		public Vector2dTuple4() {
 			V0 = new Vector2d(0, 0);
 			V1 = new Vector2d(0, 0);

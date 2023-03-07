@@ -3,10 +3,9 @@ using RhuEngine.DataStructure;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using MessagePack;
-using MessagePack.Resolvers;
 using RNumerics;
 using SharedModels.GameSpecific;
+using RhuEngine.Datatypes;
 
 namespace RhuEngine.DataStructure.Tests
 {
@@ -44,6 +43,38 @@ namespace RhuEngine.DataStructure.Tests
 			Assert.AreEqual("Trains", ((DataNode<string>)((DataNodeGroup)loaded.Data).GetValue("Name")).Value);
 			Assert.AreEqual("Trains2", ((DataNode<string>)((DataNodeGroup)((DataNodeGroup)loaded.Data).GetValue("ew")).GetValue("Name")).Value);
 			Assert.AreEqual(1, ((DataNode<int>)((DataNodeList)((DataNodeGroup)((DataNodeGroup)loaded.Data).GetValue("ew")).GetValue("testlist"))[0]).Value);
+		}
+
+
+		[TestMethod()]
+		public void TestNetDataNodes() {
+
+			var dataNodeGroup = new DataNodeGroup();
+			dataNodeGroup.SetValue("ID", new DataNode<NetPointer>(new NetPointer(10)));
+
+			var saver = new DataSaver(dataNodeGroup);
+			var data = saver.SaveStore();
+			var loaded = new DataReader(data);
+			if (loaded.Data is null) {
+				throw new Exception("Failed to load data at all");
+			}
+			Assert.AreEqual(((DataNode<NetPointer>)(dataNodeGroup).GetValue("ID")).Value, ((DataNode<NetPointer>)((DataNodeGroup)loaded.Data).GetValue("ID")).Value);
+		}
+
+
+		[TestMethod()]
+		public void TestVectorDataNodes() {
+
+			var dataNodeGroup = new DataNodeGroup();
+			dataNodeGroup.SetValue("ID", new DataNode<Vector2f>(Vector2f.AxisY));
+
+			var saver = new DataSaver(dataNodeGroup);
+			var data = saver.SaveStore();
+			var loaded = new DataReader(data);
+			if (loaded.Data is null) {
+				throw new Exception("Failed to load data at all");
+			}
+			Assert.AreEqual(((DataNode<Vector2f>)(dataNodeGroup).GetValue("ID")).Value, ((DataNode<Vector2f>)((DataNodeGroup)loaded.Data).GetValue("ID")).Value);
 		}
 	}
 }

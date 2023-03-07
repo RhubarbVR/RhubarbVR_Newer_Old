@@ -4,9 +4,6 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
-using MessagePack;
-using MessagePack.Resolvers;
-
 using NullContext;
 
 using RhuEngine.Linker;
@@ -18,7 +15,7 @@ using SharedModels.GameSpecific;
 namespace RhuEngine.GameTests.Tests
 {
 
-	public class GenericGameTester:IDisposable
+	public class GenericGameTester : IDisposable
 	{
 		public OutputCapture cap;
 		public NullLinker rhu;

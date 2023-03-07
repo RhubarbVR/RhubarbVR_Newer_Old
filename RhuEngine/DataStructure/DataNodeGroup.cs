@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
-using MessagePack;
+using RhuSettings;
 
 using SharedModels;
 using SharedModels.GameSpecific;
 
 namespace RhuEngine.DataStructure
 {
-
-	[MessagePackObject]
-	public sealed class DataNodeGroup : IDataNode,IMessagePackSerializationCallbackReceiver
+	public sealed class DataNodeGroup : IDataNode
 	{
 		public void SaveAction(DataSaver DataSaver) {
 			foreach (var item in _nodeGroup) {
 				DataSaver.RunChildAction(item.Value);
 			}
 		}
-		[IgnoreMember]
 		public List<IDataNode> _TempGroup = new();
 
 		public void InitData() {
@@ -29,17 +27,34 @@ namespace RhuEngine.DataStructure
 			_TempGroup.Clear();
 		}
 
-		[Key(0)]
 		public string[] Keys;
 
-		[IgnoreMember]
 		public Dictionary<string, IDataNode> _nodeGroup = new();
 
-		public void OnBeforeSerialize() {
+
+		public void Serlize(BinaryWriter binaryWriter) {
 			Keys = _nodeGroup.Keys.ToArray();
+			binaryWriter.Write(Keys.Length);
+			binaryWriter.Write(_TempGroup.Count);
+			foreach (var key in Keys) {
+				binaryWriter.Write(key);
+			}
+			foreach (var dataNode in _TempGroup) {
+				DataNode.Serlize(binaryWriter, dataNode);
+			}
 		}
 
-		public void OnAfterDeserialize() {
+		public void DeSerlize(BinaryReader binaryReader) {
+			var lenth = binaryReader.ReadInt32();
+			var count = binaryReader.ReadInt32();
+			Keys = new string[lenth];
+			for (var i = 0; i < lenth; i++) {
+				Keys[i] = binaryReader.ReadString();
+			}
+			_TempGroup.Clear();
+			for (var i = 0; i < count; i++) {
+				_TempGroup.Add(DataNode.DeSerlize(binaryReader));
+			}
 		}
 
 		public IDataNode this[string key]
@@ -48,7 +63,7 @@ namespace RhuEngine.DataStructure
 			set => SetValue(key, value);
 		}
 
-	
+
 		public IDataNode GetValue(string key) {
 			return _nodeGroup.TryGetValue(key, out var value) ? value : null;
 		}
@@ -66,6 +81,7 @@ namespace RhuEngine.DataStructure
 		public void ReadChildEnd(IDataNode child) {
 			_TempGroup.Insert(0, child);
 		}
+
 
 		public DataNodeGroup() {
 		}

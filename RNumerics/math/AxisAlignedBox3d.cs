@@ -1,39 +1,48 @@
 using System;
+using System.IO;
 
-using MessagePack;
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct AxisAlignedBox3d : IComparable<AxisAlignedBox3d>, IEquatable<AxisAlignedBox3d>
+	public struct AxisAlignedBox3d : IComparable<AxisAlignedBox3d>, IEquatable<AxisAlignedBox3d>, ISerlize<AxisAlignedBox3d>
 	{
-		[Key(0)]
+
 		public Vector3d min = new(double.MaxValue, double.MaxValue, double.MaxValue);
-		[Key(1)]
 		public Vector3d max = new(double.MinValue, double.MinValue, double.MinValue);
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			min.Serlize(binaryWriter);
+			max.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			min.DeSerlize(binaryReader);
+			max.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector3d Min
 		{
 			get => min;
 			set => min = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3d Max
 		{
 			get => max;
 			set => max = value;
 		}
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3d Empty = new();
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3d Zero = new(0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3d UnitPositive = new(1);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3d Infinite =
 			new(double.MinValue, double.MinValue, double.MinValue, double.MaxValue, double.MaxValue, double.MaxValue);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3d CenterZero =
 			new(Vector3d.Zero, 0);
 
@@ -81,26 +90,26 @@ namespace RNumerics
 			min = max = vCenter;
 		}
 
-		[IgnoreMember]
+		
 		public double Width => Math.Max(max.x - min.x, 0);
-		[IgnoreMember]
+		
 		public double Height => Math.Max(max.y - min.y, 0);
-		[IgnoreMember]
+		
 		public double Depth => Math.Max(max.z - min.z, 0);
 
-		[IgnoreMember]
+		
 		public double Volume => Width * Height * Depth;
-		[IgnoreMember]
+		
 		public double DiagonalLength
 		=> (double)Math.Sqrt(((max.x - min.x) * (max.x - min.x)) + ((max.y - min.y) * (max.y - min.y)) + ((max.z - min.z) * (max.z - min.z)));
-		[IgnoreMember]
+		
 		public double MaxDim => Math.Max(Width, Math.Max(Height, Depth));
 
-		[IgnoreMember]
+		
 		public Vector3d Diagonal => new(max.x - min.x, max.y - min.y, max.z - min.z);
-		[IgnoreMember]
+		
 		public Vector3d Extents => new((max.x - min.x) * 0.5, (max.y - min.y) * 0.5, (max.z - min.z) * 0.5);
-		[IgnoreMember]
+		
 		public Vector3d Center => new(0.5 * (min.x + max.x), 0.5 * (min.y + max.y), 0.5 * (min.z + max.z));
 
 

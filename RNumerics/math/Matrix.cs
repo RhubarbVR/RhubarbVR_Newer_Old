@@ -2,23 +2,59 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
-using MessagePack;
-using MessagePack.Formatters;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Matrix
+	public struct Matrix : ISerlize<Matrix>
 	{
 		/// <summary>The internal, wrapped System.Numerics type. This can be
 		/// nice to have around so you can pass its fields as 'ref', which you
 		/// can't do with properties. You won't often need this, as implicit
 		/// conversions to System.Numerics types are also provided.</summary>
-		[Key(0)]
 		public Matrix4x4 m;
 
-		[Exposed, IgnoreMember, JsonIgnore]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(m.M11);
+			binaryWriter.Write(m.M12);
+			binaryWriter.Write(m.M13);
+			binaryWriter.Write(m.M14);
+			binaryWriter.Write(m.M21);
+			binaryWriter.Write(m.M22);
+			binaryWriter.Write(m.M23);
+			binaryWriter.Write(m.M24);
+			binaryWriter.Write(m.M31);
+			binaryWriter.Write(m.M32);
+			binaryWriter.Write(m.M33);
+			binaryWriter.Write(m.M34);
+			binaryWriter.Write(m.M41);
+			binaryWriter.Write(m.M42);
+			binaryWriter.Write(m.M43);
+			binaryWriter.Write(m.M44);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			m.M11 = binaryReader.ReadSingle();
+			m.M12 = binaryReader.ReadSingle();
+			m.M13 = binaryReader.ReadSingle();
+			m.M14 = binaryReader.ReadSingle();
+			m.M21 = binaryReader.ReadSingle();
+			m.M22 = binaryReader.ReadSingle();
+			m.M23 = binaryReader.ReadSingle();
+			m.M24 = binaryReader.ReadSingle();
+			m.M31 = binaryReader.ReadSingle();
+			m.M32 = binaryReader.ReadSingle();
+			m.M33 = binaryReader.ReadSingle();
+			m.M34 = binaryReader.ReadSingle();
+			m.M41 = binaryReader.ReadSingle();
+			m.M42 = binaryReader.ReadSingle();
+			m.M43 = binaryReader.ReadSingle();
+			m.M44 = binaryReader.ReadSingle();
+		}
+
+
+		[Exposed, JsonIgnore]
 		public Matrix4x4 M
 		{
 			get => m;
@@ -57,17 +93,17 @@ namespace RNumerics
 		/// <summary>An identity Matrix is the matrix equivalent of '1'! 
 		/// Transforming anything by this will leave it at the exact same
 		/// place.</summary>
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public static Matrix Identity => Matrix4x4.Identity;
 
 		/// <summary>A fast Property that will return or set the translation
 		/// component embedded in this transform matrix.</summary>
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public Vector3f Translation { get => m.Translation; set => m.Translation = value; }
 		/// <summary>Returns the scale embedded in this transform matrix. Not
 		/// exactly cheap, requires 3 sqrt calls, but is cheaper than calling
 		/// Decompose.</summary>
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public Vector3f Scale
 		{
 			get {
@@ -79,7 +115,7 @@ namespace RNumerics
 		/// embedded in this transform matrix. This is backed by Decompose,
 		/// so if you need any additional info, it's better to just call
 		/// Decompose instead.</summary>
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public Quaternionf Rotation
 		{
 			get {
@@ -93,9 +129,9 @@ namespace RNumerics
 		/// from a -> b, then its inverse takes the point from b -> a.
 		/// </summary>
 		/// <returns>An inverse matrix of the current one.</returns>
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public Matrix Inverse { get { Matrix4x4.Invert(m, out var result); return result; } }
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public Matrix InvScale
 		{
 			get {
@@ -104,18 +140,18 @@ namespace RNumerics
 				return Matrix.TRS(pos, rot, scale);
 			}
 		}
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool IsAnyInfinty => float.IsInfinity(m.M11) || float.IsInfinity(m.M12) || float.IsInfinity(m.M13) || float.IsInfinity(m.M14) ||
 						float.IsInfinity(m.M21) || float.IsInfinity(m.M22) || float.IsInfinity(m.M23) || float.IsInfinity(m.M24) ||
 						float.IsInfinity(m.M31) || float.IsInfinity(m.M32) || float.IsInfinity(m.M33) || float.IsInfinity(m.M34) ||
 						float.IsInfinity(m.M41) || float.IsInfinity(m.M42) || float.IsInfinity(m.M43) || float.IsInfinity(m.M44);
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool IsAnyNan => float.IsNaN(m.M11) || float.IsNaN(m.M12) || float.IsNaN(m.M13) || float.IsNaN(m.M14) ||
 						float.IsNaN(m.M21) || float.IsNaN(m.M22) || float.IsNaN(m.M23) || float.IsNaN(m.M24) ||
 						float.IsNaN(m.M31) || float.IsNaN(m.M32) || float.IsNaN(m.M33) || float.IsNaN(m.M34) ||
 						float.IsNaN(m.M41) || float.IsNaN(m.M42) || float.IsNaN(m.M43) || float.IsNaN(m.M44);
 
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool IsAnyNanOrInfinty => IsAnyNan || IsAnyInfinty;
 
 		/// <summary>Inverts this Matrix! If the matrix takes a point from a

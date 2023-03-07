@@ -7,24 +7,17 @@ using System.Text;
 
 using Assimp;
 
-using MessagePack;
-
 using Newtonsoft.Json;
 
 namespace RNumerics
 {
-	[MessagePackObject]
 	public struct RSubMesh : ISubMesh
 	{
-		[Key(0)]
 		public RPrimitiveType rPrimitiveType;
-		[IgnoreMember]
 		public RPrimitiveType PrimitiveType => rPrimitiveType;
-		[Key(1)]
 		public List<RFace> rFaces;
-		[Key(2)]
 		public int rCount;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public int Count => rFaces.Count;
 
 		public RSubMesh() {
@@ -42,7 +35,7 @@ namespace RNumerics
 			rFaces = faces;
 			rCount = count;
 		}
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public IEnumerable<IFace> Faces
 		{
 			get {
@@ -53,20 +46,18 @@ namespace RNumerics
 		}
 	}
 
-	[MessagePackObject]
+
 	public struct RVertexWeight : IVertexWeight
 	{
 		/// <summary>
 		///  Index of the vertex which is influenced by the bone.
 		/// </summary>
-		[Key(0)]
 		public int VertexID;
 
 		/// <summary>
 		/// Strength of the influence in range of (0...1). All influences from all bones
 		/// at one vertex amounts to 1.
 		/// </summary>
-		[Key(1)]
 		public float Weight;
 
 		public RVertexWeight(in VertexWeight vertexWeight) {
@@ -83,35 +74,32 @@ namespace RNumerics
 			Weight = 0;
 		}
 
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		int IVertexWeight.VertexID => VertexID;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		float IVertexWeight.Weight => Weight;
 	}
 
-	[MessagePackObject]
+
 	public sealed class RBone : IBone
 	{
 
-		[Key(0)]
 		public Matrix OffsetMatrix = Matrix.Identity;
 
-		[Key(1)]
 		public List<RVertexWeight> VertexWeights = new();
 
-		[Key(2)]
 		public string BoneName;
 
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool HasVertexWeights => VertexWeights.Count > 0;
 
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public int VertexWeightCount => VertexWeights.Count;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public string Name => BoneName;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		Matrix IBone.OffsetMatrix => OffsetMatrix;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		IEnumerable<IVertexWeight> IBone.VertexWeights
 		{
 			get {
@@ -148,12 +136,11 @@ namespace RNumerics
 
 		}
 	}
-	[MessagePackObject]
+
 	public sealed class RFace : IFace
 	{
-		[Key(0)]
 		public List<int> Indices = new();
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<int> IFace.Indices => Indices;
 
 		public RFace(params int[] face) {
@@ -207,40 +194,33 @@ namespace RNumerics
 		All = Point | Line | Triangle | Polygon,
 	}
 
-	[MessagePackObject]
+
 	public sealed class RAnimationAttachment : IAnimationAttachment
 	{
-		[Key(0)]
+
 		public string Name = "Unknown";
-		[Key(1)]
 		public List<Vector3f> Vertices = new();
-		[Key(2)]
 		public List<Vector3f> Normals = new();
-		[Key(3)]
 		public List<Vector3f> Tangents = new();
-		[Key(4)]
 		public List<Vector3f> BiTangents = new();
-		[Key(5)]
 		public List<Colorf>[] Colors = Array.Empty<List<Colorf>>();
-		[Key(6)]
 		public List<Vector3f>[] TexCoords = Array.Empty<List<Vector3f>>();
-		[Key(7)]
 		public float Weight;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		float IAnimationAttachment.Weight => Weight;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.Vertices => Vertices;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.Normals => Normals;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.Tangents => Tangents;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.BiTangents => BiTangents;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<Colorf>[] IRawComplexMeshData.Colors => Colors;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<Vector3f>[] IRawComplexMeshData.TexCoords => TexCoords;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		string IAnimationAttachment.Name => Name;
 
 		public RAnimationAttachment(in MeshAnimationAttachment meshAnimationAttachment) {
@@ -302,10 +282,18 @@ namespace RNumerics
 		NOTSetFour = 0x8000,
 	}
 
-	[MessagePackObject]
-	public sealed class ComplexMesh : IComplexMesh, IMesh
+
+	public sealed class ComplexMesh : IComplexMesh, IMesh, ISerlize<ComplexMesh>
 	{
 		public const byte MESH_VERSION = 0;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			WriteData(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			ReadData(binaryReader);
+		}
 
 		public void WriteData(BinaryWriter binaryWriter) {
 			binaryWriter.Write(MESH_VERSION);
@@ -967,41 +955,41 @@ namespace RNumerics
 
 
 
-		[Key(0)]
+
 		public string MeshName;
-		[Key(1)]
+
 		public RPrimitiveType PrimitiveType;
-		[Key(12)]
+
 		public RMeshMorphingMethod MorphingMethod = RMeshMorphingMethod.None;
-		[Key(2)]
+
 		public List<Vector3f> Vertices = new();
-		[Key(3)]
+
 		public List<Vector3f> Normals = new();
-		[Key(4)]
+
 		public List<Vector3f> Tangents = new();
-		[Key(5)]
+
 		public List<Vector3f> BiTangents = new();
-		[Key(6)]
+
 		public List<RFace> Faces = new();
-		[Key(7)]
+
 		public List<Colorf>[] Colors = Array.Empty<List<Colorf>>();
-		[Key(8)]
+
 		public List<Vector3f>[] TexCoords = Array.Empty<List<Vector3f>>();
-		[Key(9)]
+
 		public int[] TexComponentCount = Array.Empty<int>();
-		[Key(10)]
+
 		public List<RBone> Bones = new();
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public int BonesCount => Bones.Count;
-		[Key(11)]
+
 		public List<RAnimationAttachment> MeshAttachments = new();
-		[Key(13)]
+
 		public List<RSubMesh> SubMeshes = new();
 
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		bool IComplexMesh.HasSubMeshs => SubMeshes.Count > 0;
 
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		IEnumerable<ISubMesh> IComplexMesh.SubMeshes
 		{
 			get {
@@ -1142,11 +1130,11 @@ namespace RNumerics
 			return SubMeshes.Count - 1;
 		}
 
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool IsTriangleMesh => PrimitiveType == RPrimitiveType.Triangle;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public int TriangleCount => Faces.Count + SubMeshTriangleCount;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public int SubMeshTriangleCount
 		{
 			get {
@@ -1157,27 +1145,27 @@ namespace RNumerics
 				return amount;
 			}
 		}
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public int MaxTriangleID => Faces.Count;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool HasVertexUVs => (TexCoords.Length > 0) & TexCoords[0].Count > 0;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool HasTriangleGroups => PrimitiveType == RPrimitiveType.Triangle;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public int VertexCount => Vertices.Count;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public int MaxVertexID => Vertices.Count;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool HasVertexNormals => Normals.Count > 0;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool HasVertexColors => Colors.Length != 0;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public int Timestamp => int.MaxValue;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		string IComplexMesh.MeshName => MeshName;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		RPrimitiveType IComplexMesh.PrimitiveType => PrimitiveType;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		IEnumerable<IBone> IComplexMesh.Bones
 		{
 			get {
@@ -1186,7 +1174,7 @@ namespace RNumerics
 				}
 			}
 		}
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		IEnumerable<IFace> IComplexMesh.Faces
 		{
 			get {
@@ -1195,9 +1183,9 @@ namespace RNumerics
 				}
 			}
 		}
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		int[] IComplexMesh.TexComponentCount => TexComponentCount;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		IEnumerable<IAnimationAttachment> IComplexMesh.MeshAttachments
 		{
 			get {
@@ -1207,25 +1195,25 @@ namespace RNumerics
 			}
 		}
 
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		RMeshMorphingMethod IComplexMesh.MorphingMethod => MorphingMethod;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.Vertices => Vertices;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.Normals => Normals;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.Tangents => Tangents;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<Vector3f> IRawComplexMeshData.BiTangents => BiTangents;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<Colorf>[] IRawComplexMeshData.Colors => Colors;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		List<Vector3f>[] IRawComplexMeshData.TexCoords => TexCoords;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool HasBones => Bones.Count > 0;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool HasMeshAttachments => MeshAttachments.Count > 0;
-		[IgnoreMember, JsonIgnore]
+		[JsonIgnore]
 		public bool IsBasicMesh => !(HasBones || HasMeshAttachments);
 
 		public Vector2f GetVertexUV(in int i, in int channel = 1) {
@@ -1270,10 +1258,10 @@ namespace RNumerics
 		}
 
 		public Index3i GetTriangle(in int i) {
-			if(i >= Faces.Count) {
+			if (i >= Faces.Count) {
 				var faceIndex = i - Faces.Count;
 				foreach (var item in SubMeshes) {
-					if(faceIndex < item.rFaces.Count) {
+					if (faceIndex < item.rFaces.Count) {
 						return new Index3i(item.rFaces[faceIndex].Indices[0], item.rFaces[faceIndex].Indices[1], item.rFaces[faceIndex].Indices[2]);
 					}
 					faceIndex -= item.rFaces.Count;

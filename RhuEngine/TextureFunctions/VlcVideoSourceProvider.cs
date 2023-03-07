@@ -16,6 +16,7 @@ namespace RhuEngine.VLC
 	{
 		public VlcVideoSourceProvider() {
 			VideoImage = new RImage(null);
+			VideoImage.Create(1920, 1080, false, RFormat.Rgb8);
 			VideoSource = new RImageTexture2D(VideoImage);
 		}
 		/// <summary>
@@ -50,7 +51,7 @@ namespace RhuEngine.VLC
 			MediaPlayer.EnableHardwareDecoding = true;
 			MediaPlayer.SetVideoFormatCallbacks(VideoFormat, null);
 			MediaPlayer.SetVideoCallbacks(LockVideo, null, DisplayVideo);
-			MediaPlayer.SetAudioFormat("S16L",48000,ChannelCount);
+			MediaPlayer.SetAudioFormat("S16L", 48000, ChannelCount);
 			//_bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(48000, 16, (int)ChannelCount)) {
 			//	DiscardOnBufferOverflow = true
 			//};
@@ -133,7 +134,7 @@ namespace RhuEngine.VLC
 		public byte[] rgbaData = null;
 
 		unsafe void Convert(int pixelCount, IntPtr rgbData) {
-			if ((rgbaData?.Length ?? 0) != pixelCount * sizeof(uint)) {
+			if ((rgbaData?.Length ?? -1) != pixelCount * sizeof(uint)) {
 				rgbaData = new byte[pixelCount * sizeof(uint)];
 			}
 			fixed (byte* rgbaP = &rgbaData[0]) {
@@ -169,7 +170,10 @@ namespace RhuEngine.VLC
 				if (rgbaData.Length < VideoSource.Width * VideoSource.Height) {
 					return;
 				}
-				VideoImage.SetColors((int)VideoSource.Width, (int)VideoSource.Height, rgbaData, false);
+				RenderThread.ExecuteOnEndOfFrame(this, () => {
+					Console.WriteLine("Render Frame");
+					VideoImage.SetColors((int)VideoSource.Width, (int)VideoSource.Height, rgbaData, false);
+				});
 			}
 		}
 		#endregion

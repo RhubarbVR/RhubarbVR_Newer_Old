@@ -1,42 +1,50 @@
 ﻿using System;
+using System.IO;
 
-using MessagePack;
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct AxisAlignedBox3f : IComparable<AxisAlignedBox3f>, IEquatable<AxisAlignedBox3f>
+	public struct AxisAlignedBox3f : IComparable<AxisAlignedBox3f>, IEquatable<AxisAlignedBox3f>, ISerlize<AxisAlignedBox3f>
 	{
-		[Key(0)]
+
 		public Vector3f min = new(float.MaxValue, float.MaxValue, float.MaxValue);
-		[Key(1)]
 		public Vector3f max = new(float.MinValue, float.MinValue, float.MinValue);
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			min.Serlize(binaryWriter);
+			max.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			min.DeSerlize(binaryReader);
+			max.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector3f Min
 		{
 			get => min;
 			set => min = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3f Max
 		{
 			get => max;
 			set => max = value;
 		}
 
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3f Empty = new();
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3f Zero = new(0);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3f UnitPositive = new(1);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3f Infinite =
 			new(float.MinValue, float.MinValue, float.MinValue, float.MaxValue, float.MaxValue, float.MaxValue);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3f CenterZero =
 			new(Vector3f.Zero, 0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly AxisAlignedBox3f CenterOne =
 	new(Vector3f.One, 0);
 
@@ -85,16 +93,16 @@ namespace RNumerics
 			min = max = vCenter;
 		}
 
-		[IgnoreMember]
+		
 		public float Width => Math.Max(max.x - min.x, 0);
-		[IgnoreMember]
+		
 		public float Height => Math.Max(max.y - min.y, 0);
-		[IgnoreMember]
+		
 		public float Depth => Math.Max(max.z - min.z, 0);
 
-		[IgnoreMember]
+		
 		public float Volume => Width * Height * Depth;
-		[IgnoreMember]
+		
 		public float DiagonalLength
 		{
 			get {
@@ -105,14 +113,14 @@ namespace RNumerics
 
 		
 
-		[IgnoreMember]
+		
 		public float MaxDim => Math.Max(Width, Math.Max(Height, Depth));
 
-		[IgnoreMember]
+		
 		public Vector3f Diagonal => new(max.x - min.x, max.y - min.y, max.z - min.z);
-		[IgnoreMember]
+		
 		public Vector3f Extents => new((max.x - min.x) * 0.5, (max.y - min.y) * 0.5, (max.z - min.z) * 0.5);
-		[IgnoreMember]
+		
 		public Vector3f Center => new(0.5 * (min.x + max.x), 0.5 * (min.y + max.y), 0.5 * (min.z + max.z));
 
 

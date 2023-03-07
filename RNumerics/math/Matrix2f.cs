@@ -1,40 +1,49 @@
 ﻿using System;
+using System.IO;
 
-using MessagePack;
 namespace RNumerics
 {
 	// some functions ported from WildMagic5 Matrix2
-	[MessagePackObject]
-	public struct Matrix2f
+	public struct Matrix2f : ISerlize<Matrix2f>
 	{
-		[Key(0)]
 		public float m00;
-		[Key(1)]
 		public float m01;
-		[Key(2)]
 		public float m10;
-		[Key(3)]
 		public float m11;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(m00);
+			binaryWriter.Write(m01);
+			binaryWriter.Write(m10);
+			binaryWriter.Write(m11);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			m00 = binaryReader.ReadSingle();
+			m01 = binaryReader.ReadSingle();
+			m10 = binaryReader.ReadSingle();
+			m11 = binaryReader.ReadSingle();
+		}
+
+		[Exposed]
 		public float M00
 		{
 			get => m00;
 			set => m00 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public float M01
 		{
 			get => m01;
 			set => m01 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public float M10
 		{
 			get => m10;
 			set => m10 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public float M11
 		{
 			get => m11;
@@ -43,11 +52,11 @@ namespace RNumerics
 
 		public Matrix2f() {
 		}
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Matrix2f Identity = new (true);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Matrix2f Zero = new (false);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Matrix2f One = new (1, 1, 1, 1);
 
 
@@ -162,7 +171,6 @@ namespace RNumerics
 		{
 			return new (m11, -m01, -m10, m00);
 		}
-		[IgnoreMember]
 		public float Determinant => (m00 * m11) - (m01 * m10);
 
 

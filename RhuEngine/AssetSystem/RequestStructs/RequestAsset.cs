@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
-
-using MessagePack;
 
 namespace RhuEngine.AssetSystem.RequestStructs
 {
-	[MessagePackObject]
 	public class RequestAsset : IAssetRequest
 	{
 
-		[Key(0)]
 		public string URL { get; set; }
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			URL = binaryReader.ReadString();
+		}
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(URL);
+		}
 	}
 }

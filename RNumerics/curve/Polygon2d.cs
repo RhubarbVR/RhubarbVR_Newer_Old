@@ -758,17 +758,6 @@ namespace RNumerics
 
 
 
-
-		/// <summary>
-		/// Return minimal bounding box of vertices, computed to epsilon tolerance
-		/// </summary>
-		public Box2d MinimalBoundingBox(in double epsilon) {
-			var box2 = new ContMinBox2(vertices, epsilon, QueryNumberType.QT_DOUBLE, false);
-			return box2.MinBox;
-		}
-
-
-
 		static public Polygon2d MakeRectangle(in Vector2d center, in double width, in double height) {
 			var vertices = new VectorArray2d(4);
 			vertices.Set(0, center.x - (width / 2), center.y - (height / 2));

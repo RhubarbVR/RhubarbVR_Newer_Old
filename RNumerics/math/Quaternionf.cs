@@ -1,6 +1,5 @@
-﻿using MessagePack;
-
-using System;
+﻿using System;
+using System.IO;
 using System.Numerics;
 
 
@@ -9,38 +8,47 @@ using System.Numerics;
 namespace RNumerics
 {
 	// mostly ported from WildMagic5 Wm5Quaternion, from geometrictools.com
-	[MessagePackObject]
-	public struct Quaternionf : IComparable<Quaternionf>, IEquatable<Quaternionf>
+	public struct Quaternionf : IComparable<Quaternionf>, IEquatable<Quaternionf>, ISerlize<Quaternionf>
 	{
 
-		[Key(1)]
 		public float x;
-		[Key(2)]
 		public float y;
-		[Key(3)]
 		public float z;
-		[Key(0)]
 		public float w;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+			binaryWriter.Write(z);
+			binaryWriter.Write(w);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadSingle();
+			y = binaryReader.ReadSingle();
+			z = binaryReader.ReadSingle();
+			w = binaryReader.ReadSingle();
+		}
+
+		[Exposed]
 		public float X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public float Y
 		{
 			get => y;
 			set => y = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public float Z
 		{
 			get => z;
 			set => z = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public float W
 		{
 			get => w;
@@ -91,23 +99,23 @@ namespace RNumerics
 			w = 1;
 			SetFromRotationMatrix(mat);
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Quaternionf Zero = new(0.0f, 0.0f, 0.0f, 0.0f);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Quaternionf Identity = new(0.0f, 0.0f, 0.0f, 1.0f);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Quaternionf Pitched = CreateFromEuler(0, 90, 0);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Quaternionf Pitched180 = CreateFromEuler(0, 180, 0);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Quaternionf Yawed = CreateFromEuler(90, 0, 0);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Quaternionf Yawed180 = CreateFromEuler(180, 0, 0);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Quaternionf Rolled = CreateFromEuler(0, 0, 90);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Quaternionf Rolled180 = CreateFromEuler(0, 0, 180);
-		[IgnoreMember]
+		
 		public float this[in int key]
 		{
 			get => key != 0 ? key == 1 ? y : key == 2 ? z : w : x;
@@ -122,9 +130,9 @@ namespace RNumerics
 
 		}
 
-		[IgnoreMember]
+		
 		public float LengthSquared => (x * x) + (y * y) + (z * z) + (w * w);
-		[IgnoreMember]
+		
 		public float Length => (float)Math.Sqrt((x * x) + (y * y) + (z * z) + (w * w));
 
 		public float Normalize(in float epsilon = 0) {
@@ -142,7 +150,7 @@ namespace RNumerics
 			}
 			return length;
 		}
-		[IgnoreMember]
+		
 		public Quaternionf Normalized
 		{
 			get { var q = new Quaternionf(this); q.Normalize(); return q; }
@@ -274,7 +282,7 @@ namespace RNumerics
 
 		// these multiply quaternion by (1,0,0), (0,1,0), (0,0,1), respectively.
 		// faster than full multiply, because of all the zeros
-		[IgnoreMember]
+		
 		public Vector3f AxisX
 		{
 			get {
@@ -289,7 +297,7 @@ namespace RNumerics
 				return new Vector3f(1 - (twoYY + twoZZ), twoXY + twoWZ, twoXZ - twoWY);
 			}
 		}
-		[IgnoreMember]
+		
 		public Vector3f AxisY
 		{
 			get {
@@ -305,7 +313,7 @@ namespace RNumerics
 				return new Vector3f(twoXY - twoWZ, 1 - (twoXX + twoZZ), twoYZ + twoWX);
 			}
 		}
-		[IgnoreMember]
+		
 		public Vector3f AxisZ
 		{
 			get {
@@ -321,7 +329,7 @@ namespace RNumerics
 				return new Vector3f(twoXZ + twoWY, twoYZ - twoWX, 1 - (twoXX + twoYY));
 			}
 		}
-		[IgnoreMember]
+		
 		public Quaternionf Inverse
 		{
 			get {
@@ -336,13 +344,13 @@ namespace RNumerics
 				}
 			}
 		}
-		[IgnoreMember]
+		
 		public bool IsAnyNan => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z);
-		[IgnoreMember]
+		
 		public bool IsAnyInfinity => float.IsInfinity(x) || float.IsInfinity(y) || float.IsInfinity(z);
-		[IgnoreMember]
+		
 		public bool IsAnyNanOrInfinity => IsAnyNan || IsAnyInfinity;
-		[IgnoreMember]
+		
 		public Quaternionf Clean => IsAnyNanOrInfinity ? Identity : this;
 
 		public float Angle(in Quaternionf e) {

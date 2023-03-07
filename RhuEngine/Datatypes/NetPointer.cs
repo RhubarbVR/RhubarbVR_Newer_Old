@@ -1,14 +1,22 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
-using MessagePack;
+
+using RNumerics;
 
 namespace RhuEngine.Datatypes
 {
-	[MessagePackObject]
-	public struct NetPointer : IEquatable<NetPointer>
+	public struct NetPointer : IEquatable<NetPointer>, ISerlize<NetPointer>
 	{
-		[Key(0)]
 		public ulong _id;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(_id);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			_id = binaryReader.ReadUInt64();
+		}
 
 		public NetPointer(ulong _id) {
 			this._id = _id;
@@ -23,13 +31,11 @@ namespace RhuEngine.Datatypes
 		public ulong ItemIndex() {
 			return _id << 16;
 		}
-		[IgnoreMember]
 		public bool IsLocal => GetID() == 0;
 
 		public static NetPointer BuildID(ulong position, ushort user) {
 			return new NetPointer((position << 16) | (user & 0xFFFFuL));
 		}
-		[IgnoreMember]
 		public static readonly NetPointer Blank = new();
 		public string HexString() {
 			try {

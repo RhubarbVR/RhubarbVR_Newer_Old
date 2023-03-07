@@ -1,35 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
-using MessagePack;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Triangle3d
+	public struct Triangle3d : ISerlize<Triangle3d>
 	{
-		[Key(0)]
 		public Vector3d v0;
-		[Key(1)]
 		public Vector3d v1;
-		[Key(2)]
 		public Vector3d v2;
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			v0.Serlize(binaryWriter);
+			v1.Serlize(binaryWriter);
+			v2.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			v0.DeSerlize(binaryReader);
+			v1.DeSerlize(binaryReader);
+			v2.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector3d V0
 		{
 			get => v0;
 			set => v0 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3d V1
 		{
 			get => v1;
 			set => v1 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3d V2
 		{
 			get => v2;
@@ -59,11 +68,11 @@ namespace RNumerics
 				}
 			}
 		}
-		[IgnoreMember]
+		
 		public Vector3d Normal => MathUtil.Normal(v0, v1, v2);
-		[IgnoreMember]
+		
 		public double Area => MathUtil.Area(v0, v1, v2);
-		[IgnoreMember]
+		
 		public double AspectRatio => MathUtil.AspectRatio( v0,  v1,  v2);
 
 		public Vector3d PointAt(in double bary0, in double bary1, in double bary2) {
@@ -83,15 +92,24 @@ namespace RNumerics
 	}
 
 
-	[MessagePackObject]
-	public struct Triangle3f
+	public struct Triangle3f : ISerlize<Triangle3f>
 	{
-		[Key(0)]
 		public Vector3f V0;
-		[Key(1)]
 		public Vector3f V1;
-		[Key(2)]
 		public Vector3f V2;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			V0.Serlize(binaryWriter);
+			V1.Serlize(binaryWriter);
+			V2.Serlize(binaryWriter);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			V0.DeSerlize(binaryReader);
+			V1.DeSerlize(binaryReader);
+			V2.DeSerlize(binaryReader);
+		}
+
 
 		public Triangle3f(in Vector3f v0, in Vector3f v1, in Vector3f v2) {
 			V0 = v0;

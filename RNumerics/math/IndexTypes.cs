@@ -1,32 +1,43 @@
-﻿using MessagePack;
+﻿using Assimp;
+
 
 using System;
+using System.IO;
+
 namespace RNumerics
 {
 
-	[MessagePackObject]
-	public struct Index3i : IComparable<Index3i>, IEquatable<Index3i>
+	public struct Index3i : IComparable<Index3i>, IEquatable<Index3i>, ISerlize<Index3i>
 	{
-		[Key(0)]
 		public int a;
-		[Key(1)]
 		public int b;
-		[Key(2)]
 		public int c;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(a);
+			binaryWriter.Write(b);
+			binaryWriter.Write(c);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			a = binaryReader.ReadInt32();
+			b = binaryReader.ReadInt32();
+			c = binaryReader.ReadInt32();
+		}
+
+		[Exposed]
 		public int A
 		{
 			get => a;
 			set => a = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public int B
 		{
 			get => b;
 			set => b = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public int C
 		{
 			get => c;
@@ -51,17 +62,17 @@ namespace RNumerics
 			else { b = jj; c = kk; }
 		}
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Index3i Zero = new(0, 0, 0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Index3i One = new(1, 1, 1);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Index3i Max = new(int.MaxValue, int.MaxValue, int.MaxValue);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Index3i Min = new(int.MinValue, int.MinValue, int.MinValue);
 
 
-		[IgnoreMember]
+
 		public int this[in int key]
 		{
 			get => (key == 0) ? a : (key == 1) ? b : c;
@@ -74,13 +85,13 @@ namespace RNumerics
 			}
 		}
 
-		[IgnoreMember]
+
 		public int[] Array => new int[] { a, b, c };
 
 
-		[IgnoreMember]
+
 		public int LengthSquared => (a * a) + (b * b) + (c * c);
-		[IgnoreMember]
+
 		public int Length => (int)Math.Sqrt(LengthSquared);
 
 
@@ -157,13 +168,23 @@ namespace RNumerics
 
 
 
-	[MessagePackObject]
-	public struct Index2i : IComparable<Index2i>, IEquatable<Index2i>
+	public struct Index2i : IComparable<Index2i>, IEquatable<Index2i>, ISerlize<Index2i>
 	{
-		[Key(0)]
 		public int a;
-		[Key(1)]
 		public int b;
+
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(a);
+			binaryWriter.Write(b);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			a = binaryReader.ReadInt32();
+			b = binaryReader.ReadInt32();
+		}
+
+
 		public Index2i() {
 			a = 0;
 			b = 0;
@@ -172,16 +193,16 @@ namespace RNumerics
 		public Index2i(in int ii, in int jj) { a = ii; b = jj; }
 		public Index2i(in int[] i2) { a = i2[0]; b = i2[1]; }
 		public Index2i(in Index2i copy) { a = copy.a; b = copy.b; }
-		[IgnoreMember]
+
 		static public readonly Index2i Zero = new(0, 0);
-		[IgnoreMember]
+
 		static public readonly Index2i One = new(1, 1);
-		[IgnoreMember]
+
 		static public readonly Index2i Max = new(int.MaxValue, int.MaxValue);
-		[IgnoreMember]
+
 		static public readonly Index2i Min = new(int.MinValue, int.MinValue);
 
-		[IgnoreMember]
+
 		public int this[in int key]
 		{
 			get => (key == 0) ? a : b;
@@ -192,12 +213,12 @@ namespace RNumerics
 				}
 			}
 		}
-		[IgnoreMember]
+
 		public int[] Array => new int[] { a, b };
 
-		[IgnoreMember]
+
 		public int LengthSquared => (a * a) + (b * b);
-		[IgnoreMember]
+
 		public int Length => (int)Math.Sqrt(LengthSquared);
 
 
@@ -270,17 +291,28 @@ namespace RNumerics
 
 
 
-	[MessagePackObject]
-	public struct Index4i
+	public struct Index4i : ISerlize<Index4i>
 	{
-		[Key(0)]
 		public int a;
-		[Key(1)]
 		public int b;
-		[Key(2)]
 		public int c;
-		[Key(3)]
 		public int d;
+
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(a);
+			binaryWriter.Write(b);
+			binaryWriter.Write(c);
+			binaryWriter.Write(d);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			a = binaryReader.ReadInt32();
+			b = binaryReader.ReadInt32();
+			c = binaryReader.ReadInt32();
+			d = binaryReader.ReadInt32();
+		}
+
 		public Index4i() {
 			a = 0;
 			b = 0;
@@ -292,15 +324,15 @@ namespace RNumerics
 		public Index4i(in int[] i2) { a = i2[0]; b = i2[1]; c = i2[2]; d = i2[3]; }
 		public Index4i(in Index4i copy) { a = copy.a; b = copy.b; c = copy.b; d = copy.d; }
 
-		[IgnoreMember]
+
 		static public readonly Index4i Zero = new(0, 0, 0, 0);
-		[IgnoreMember]
+
 		static public readonly Index4i One = new(1, 1, 1, 1);
-		[IgnoreMember]
+
 		static public readonly Index4i Max = new(int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue);
 
 
-		[IgnoreMember]
+
 		public int this[in int key]
 		{
 			get => (key == 0) ? a : (key == 1) ? b : (key == 2) ? c : d;
@@ -314,13 +346,13 @@ namespace RNumerics
 			}
 		}
 
-		[IgnoreMember]
+
 		public int[] Array => new int[4] { a, b, c, d };
 
 
-		[IgnoreMember]
+
 		public int LengthSquared => (a * a) + (b * b) + (c * c) + (d * d);
-		[IgnoreMember]
+
 		public int Length => (int)Math.Sqrt(LengthSquared);
 
 

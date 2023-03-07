@@ -1,55 +1,65 @@
 ﻿using System;
 using System.Collections.Generic;
-
-using MessagePack;
+using System.IO;
 
 namespace RNumerics
 {
 
 	// partially based on WildMagic5 Box3
-	[MessagePackObject]
-	public struct Box3d
+	public struct Box3d : ISerlize<Box3d>
 	{
 		// A box has center C, axis directions U[0], U[1], and U[2] (mutually
 		// perpendicular unit-length vectors), and extents e[0], e[1], and e[2]
 		// (all nonnegative numbers).  A point X = C+y[0]*U[0]+y[1]*U[1]+y[2]*U[2]
 		// is inside or on the box whenever |y[i]| <= e[i] for all i.
-		[Key(0)]
 		public Vector3d center;
-		[Key(1)]
 		public Vector3d axisX;
-		[Key(2)]
 		public Vector3d axisY;
-		[Key(3)]
 		public Vector3d axisZ;
-		[Key(4)]
 		public Vector3d extent;
 
-		[Exposed, IgnoreMember]
+		public void Serlize(BinaryWriter binaryWriter) {
+			center.Serlize(binaryWriter);
+			axisX.Serlize(binaryWriter);
+			axisY.Serlize(binaryWriter);
+			axisZ.Serlize(binaryWriter);
+			extent.Serlize(binaryWriter);
+
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			center.DeSerlize(binaryReader);
+			axisX.DeSerlize(binaryReader);
+			axisY.DeSerlize(binaryReader);
+			axisZ.DeSerlize(binaryReader);
+			extent.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector3d Center
 		{
 			get => center;
 			set => center = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3d AxisX
 		{
 			get => axisX;
 			set => axisX = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3d AxisY
 		{
 			get => axisY;
 			set => axisY = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3d AxisZ
 		{
 			get => axisZ;
 			set => axisZ = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3d Extent
 		{
 			get => extent;
@@ -108,11 +118,11 @@ namespace RNumerics
 			extent = new Vector3d(0, 0, seg.extent);
 		}
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Box3d Empty = new(Vector3d.Zero);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Box3d UnitZeroCentered = new(Vector3d.Zero, 0.5 * Vector3d.One);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Box3d UnitPositive = new(0.5 * Vector3d.One, 0.5 * Vector3d.One);
 
 
@@ -197,11 +207,11 @@ namespace RNumerics
 
 
 		// RNumerics extensions
-		[IgnoreMember]
+		
 		public double MaxExtent => Math.Max(extent.x, Math.Max(extent.y, extent.z));
-		[IgnoreMember]
+		
 		public double MinExtent => Math.Min(extent.x, Math.Max(extent.y, extent.z));
-		[IgnoreMember]
+		
 		public Vector3d Diagonal
 		{
 			get {
@@ -209,7 +219,7 @@ namespace RNumerics
 			  ((-extent.x * axisX) - (extent.y * axisY) - (extent.z * axisZ));
 			}
 		}
-		[IgnoreMember]
+		
 		public double Volume => 2 * extent.x * 2 * extent.y * 2 * extent.z;
 
 		public void Contain(in Vector3d v) {
@@ -503,50 +513,62 @@ namespace RNumerics
 
 
 
-	[MessagePackObject]
 	// partially based on WildMagic5 Box3
-	public struct Box3f
+	public struct Box3f: ISerlize<Box3f>
 	{
 		// A box has center C, axis directions U[0], U[1], and U[2] (mutually
 		// perpendicular unit-length vectors), and extents e[0], e[1], and e[2]
 		// (all nonnegative numbers).  A point X = C+y[0]*U[0]+y[1]*U[1]+y[2]*U[2]
 		// is inside or on the box whenever |y[i]| <= e[i] for all i.
-		[Key(0)]
 		public Vector3f center;
-		[Key(1)]
 		public Vector3f axisX;
-		[Key(2)]
 		public Vector3f axisY;
-		[Key(3)]
 		public Vector3f axisZ;
-		[Key(4)]
 		public Vector3f extent;
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			center.Serlize(binaryWriter);
+			axisX.Serlize(binaryWriter);
+			axisY.Serlize(binaryWriter);
+			axisZ.Serlize(binaryWriter);
+			extent.Serlize(binaryWriter);
+
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			center.DeSerlize(binaryReader);
+			axisX.DeSerlize(binaryReader);
+			axisY.DeSerlize(binaryReader);
+			axisZ.DeSerlize(binaryReader);
+			extent.DeSerlize(binaryReader);
+		}
+
+		[Exposed]
 		public Vector3f Center
 		{
 			get => center;
 			set => center = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3f AxisX
 		{
 			get => axisX;
 			set => axisX = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3f AxisY
 		{
 			get => axisY;
 			set => axisY = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3f AxisZ
 		{
 			get => axisZ;
 			set => axisZ = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3f Extent
 		{
 			get => extent;
@@ -584,7 +606,7 @@ namespace RNumerics
 			axisZ = Vector3f.AxisZ;
 		}
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Box3f Empty = new(Vector3f.Zero);
 
 
@@ -648,11 +670,11 @@ namespace RNumerics
 
 
 		// RNumerics extensions
-		[IgnoreMember]
+		
 		public double MaxExtent => Math.Max(extent.x, Math.Max(extent.y, extent.z));
-		[IgnoreMember]
+		
 		public double MinExtent => Math.Min(extent.x, Math.Max(extent.y, extent.z));
-		[IgnoreMember]
+		
 		public Vector3f Diagonal
 		{
 			get {
@@ -660,7 +682,7 @@ namespace RNumerics
 			  ((-extent.x * axisX) - (extent.y * axisY) - (extent.z * axisZ));
 			}
 		}
-		[IgnoreMember]
+		
 		public double Volume => 2 * extent.x * 2 * extent.y * 2 * extent.z;
 
 		public void Contain(in Vector3f v) {

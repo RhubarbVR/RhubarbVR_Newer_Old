@@ -1,45 +1,53 @@
-﻿using MessagePack;
-
+﻿
 using System;
-
-
+using System.IO;
 
 namespace RNumerics
 {
 	// mostly ported from WildMagic5 Wm5Quaternion, from geometrictools.com
-	[MessagePackObject]
-	public struct Quaterniond
+	public struct Quaterniond : ISerlize<Quaterniond>
 	{
 		// note: in Wm5 version, this is a 4-element array stored in order (w,x,y,z).
 
-		[Key(0)]
 		public double x;
-		[Key(1)]
 		public double y;
-		[Key(2)]
 		public double z;
-		[Key(3)]
 		public double w;
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+			binaryWriter.Write(z);
+			binaryWriter.Write(w);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadDouble();
+			y = binaryReader.ReadDouble();
+			z = binaryReader.ReadDouble();
+			w = binaryReader.ReadDouble();
+		}
+
+		[Exposed]
 		public double X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double Y
 		{
 			get => y;
 			set => y = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double Z
 		{
 			get => z;
 			set => z = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double W
 		{
 			get => w;
@@ -76,9 +84,9 @@ namespace RNumerics
 			w = 1;
 			SetFromRotationMatrix(mat);
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Quaterniond Zero = new(0.0, 0.0, 0.0, 0.0);
-		[Exposed, IgnoreMember]
+		[Exposed]
 		static public readonly Quaterniond Identity = new(0.0, 0.0, 0.0, 1.0);
 
 		public double this[in int key]
@@ -95,9 +103,9 @@ namespace RNumerics
 
 		}
 
-		[IgnoreMember]
+		
 		public double LengthSquared => (x * x) + (y * y) + (z * z) + (w * w);
-		[IgnoreMember]
+		
 		public double Length => (double)Math.Sqrt((x * x) + (y * y) + (z * z) + (w * w));
 
 		public double Normalize(in double epsilon = 0) {
@@ -115,7 +123,7 @@ namespace RNumerics
 			}
 			return length;
 		}
-		[IgnoreMember]
+		
 		public Quaterniond Normalized
 		{
 			get { var q = new Quaterniond(this); q.Normalize(); return q; }
@@ -167,7 +175,7 @@ namespace RNumerics
 
 		// these multiply quaternion by (1,0,0), (0,1,0), (0,0,1), respectively.
 		// faster than full multiply, because of all the zeros
-		[IgnoreMember]
+		
 		public Vector3d AxisX
 		{
 			get {
@@ -182,7 +190,7 @@ namespace RNumerics
 				return new Vector3d(1 - (twoYY + twoZZ), twoXY + twoWZ, twoXZ - twoWY);
 			}
 		}
-		[IgnoreMember]
+		
 		public Vector3d AxisY
 		{
 			get {
@@ -198,7 +206,7 @@ namespace RNumerics
 				return new Vector3d(twoXY - twoWZ, 1 - (twoXX + twoZZ), twoYZ + twoWX);
 			}
 		}
-		[IgnoreMember]
+		
 		public Vector3d AxisZ
 		{
 			get {

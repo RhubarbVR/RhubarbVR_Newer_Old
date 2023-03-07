@@ -1,52 +1,60 @@
 ﻿using System;
+using System.IO;
 
-using MessagePack;
 namespace RNumerics
 {
 	// some functions ported from WildMagic5 Matrix2
-	[MessagePackObject]
-	public struct Matrix2d
+	public struct Matrix2d : ISerlize<Matrix2d>
 	{
-		[Key(0)]
 		public double m00;
-		[Key(1)]
 		public double m01;
-		[Key(2)]
 		public double m10;
-		[Key(3)]
 		public double m11;
 
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(m00);
+			binaryWriter.Write(m01);
+			binaryWriter.Write(m10);
+			binaryWriter.Write(m11);
+		}
 
-		[Exposed, IgnoreMember]
+		public void DeSerlize(BinaryReader binaryReader) {
+			m00 = binaryReader.ReadDouble();
+			m01 = binaryReader.ReadDouble();
+			m10 = binaryReader.ReadDouble();
+			m11 = binaryReader.ReadDouble();
+		}
+
+		[Exposed]
 		public double M00
 		{
 			get => m00;
 			set => m00 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double M01
 		{
 			get => m01;
 			set => m01 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double M10
 		{
 			get => m10;
 			set => m10 = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double M11
 		{
 			get => m11;
 			set => m11 = value;
 		}
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Matrix2d Identity = new(true);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Matrix2d Zero = new(false);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		public static readonly Matrix2d One = new(1, 1, 1, 1);
 		public Matrix2d() {
 		}
@@ -110,7 +118,7 @@ namespace RNumerics
 
 
 
-		[IgnoreMember]
+		
 		public double this[in int r, in int c] => (r == 0) ? ((c == 0) ? m00 : m01) : ((c == 0) ? m10 : m11);
 
 
@@ -155,7 +163,7 @@ namespace RNumerics
 		public Matrix2d Adjoint() {
 			return new(m11, -m01, -m10, m00);
 		}
-		[IgnoreMember]
+		
 		public double Determinant => (m00 * m11) - (m01 * m10);
 
 

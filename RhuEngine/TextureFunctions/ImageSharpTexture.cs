@@ -44,7 +44,7 @@ namespace RhuEngine
 			hanndel.Free();
 			RImage = new RImage(null);
 			RImage.Create(Width, Height, true, RFormat.Rgba8);
-			RImage.SetColors(Width, Height, colors);
+			RImage.SetColors(Width, Height, colors, true);
 			Texture2D = new RImageTexture2D(RImage);
 			return Texture2D;
 		}

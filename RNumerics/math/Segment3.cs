@@ -1,37 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
-using MessagePack;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Segment3d : IParametricCurve3d
+	public struct Segment3d : IParametricCurve3d, ISerlize<Segment3d>
 	{
 		// Center-direction-extent representation.
 		// Extent is half length of segment
-		[Key(0)]
 		public Vector3d center;
-		[Key(1)]
 		public Vector3d direction;
-		[Key(2)]
 		public double extent;
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			center.Serlize(binaryWriter);
+			direction.Serlize(binaryWriter);
+			binaryWriter.Write(extent);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			center.DeSerlize(binaryReader);
+			direction.DeSerlize(binaryReader);
+			extent = binaryReader.ReadDouble();
+		}
+
+		[Exposed]
 		public Vector3d Center
 		{
 			get => center;
 			set => center = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public Vector3d Direction
 		{
 			get => direction;
 			set => direction = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double Extent
 		{
 			get => extent;
@@ -57,19 +67,19 @@ namespace RNumerics
 			Update_from_endpoints(p0, p1);
 		}
 
-		[IgnoreMember]
+		
 		public Vector3d P0
 		{
 			get => center - (extent * direction);
 			set => Update_from_endpoints(value, P1);
 		}
-		[IgnoreMember]
+		
 		public Vector3d P1
 		{
 			get => center + (extent * direction);
 			set => Update_from_endpoints(P0, value);
 		}
-		[IgnoreMember]
+		
 		public double Length => 2 * extent;
 
 		// parameter is signed distance from center in direction
@@ -141,10 +151,10 @@ namespace RNumerics
 
 		// IParametricCurve3d interface
 
-		[IgnoreMember]
+		
 		public bool IsClosed => false;
 
-		[IgnoreMember]
+		
 		public double ParamLength => 1.0f;
 
 		// t in range[0,1] spans arc
@@ -158,9 +168,9 @@ namespace RNumerics
 			return direction;
 		}
 
-		[IgnoreMember]
+		
 		public bool HasArcLength => true;
-		[IgnoreMember]
+		
 		public double ArcLength => 2 * extent;
 
 		public Vector3d SampleArcLength(in double a)
@@ -182,17 +192,25 @@ namespace RNumerics
 	}
 
 
-	[MessagePackObject]
-	public struct Segment3f
+	public struct Segment3f : ISerlize<Segment3f>
 	{
 		// Center-direction-extent representation.
 		// Extent is half length of segment
-		[Key(0)]
 		public Vector3f Center;
-		[Key(1)]
 		public Vector3f Direction;
-		[Key(2)]
 		public float Extent;
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			Center.Serlize(binaryWriter);
+			Direction.Serlize(binaryWriter);
+			binaryWriter.Write(Extent);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			Center.DeSerlize(binaryReader);
+			Direction.DeSerlize(binaryReader);
+			Extent = binaryReader.ReadSingle();
+		}
 
 		public Segment3f(in Vector3f p0, in Vector3f p1)
 		{
@@ -215,13 +233,13 @@ namespace RNumerics
 		}
 
 
-		[IgnoreMember]
+		
 		public Vector3f P0
 		{
 			get => Center - (Extent * Direction);
 			set => Update_from_endpoints(value, P1);
 		}
-		[IgnoreMember]
+		
 		public Vector3f P1
 		{
 			get => Center + (Extent * Direction);

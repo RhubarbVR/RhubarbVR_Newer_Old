@@ -1,42 +1,51 @@
-﻿using MessagePack;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Vector4d : IComparable<Vector4d>, IEquatable<Vector4d>
+	public struct Vector4d : IComparable<Vector4d>, IEquatable<Vector4d>, ISerlize<Vector4d>
 	{
-		[Key(0)]
 		public double x;
-		[Key(1)]
 		public double y;
-		[Key(2)]
 		public double z;
-		[Key(3)]
 		public double w;
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+			binaryWriter.Write(z);
+			binaryWriter.Write(w);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadDouble();
+			y = binaryReader.ReadDouble();
+			z = binaryReader.ReadDouble();
+			w = binaryReader.ReadDouble();
+		}
+
+		[Exposed]
 		public double X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double Y
 		{
 			get => y;
 			set => y = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double Z
 		{
 			get => z;
 			set => z = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public double W
 		{
 			get => w;
@@ -53,12 +62,12 @@ namespace RNumerics
 		public Vector4d(in double x, in double y, in double z, in double w) { this.x = x; this.y = y; this.z = z; this.w = w; }
 		public Vector4d(in double[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; w = v2[3]; }
 		public Vector4d(in Vector4d copy) { x = copy.x; y = copy.y; z = copy.z; w = copy.w; }
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector4d Zero = new(0.0f, 0.0f, 0.0f, 0.0f);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector4d One = new(1.0f, 1.0f, 1.0f, 1.0f);
 
-		[IgnoreMember]
+		
 		public double this[in int key]
 		{
 			get => (key < 2) ? ((key == 0) ? x : y) : ((key == 2) ? z : w);
@@ -78,12 +87,12 @@ namespace RNumerics
 			}
 		}
 
-		[IgnoreMember]
+		
 		public double LengthSquared => (x * x) + (y * y) + (z * z) + (w * w);
-		[IgnoreMember]
+		
 		public double Length => Math.Sqrt(LengthSquared);
 
-		[IgnoreMember]
+		
 		public double LengthL1 => Math.Abs(x) + Math.Abs(y) + Math.Abs(z) + Math.Abs(w);
 
 

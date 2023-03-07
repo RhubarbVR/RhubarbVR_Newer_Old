@@ -1,7 +1,6 @@
-﻿using MessagePack;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace RNumerics
@@ -12,29 +11,38 @@ namespace RNumerics
 	/// Unfortunately I can't see a way to do this w/o so much duplication...we could
 	/// have .x/.y/.z accessors but that is much less efficient...
 	/// </summary>
-	[MessagePackObject]
-	public struct Vector3i : IComparable<Vector3i>, IEquatable<Vector3i>
+	public struct Vector3i : IComparable<Vector3i>, IEquatable<Vector3i>, ISerlize<Vector3i>
 	{
-		[Key(0)]
 		public int x;
-		[Key(1)]
 		public int y;
-		[Key(2)]
 		public int z;
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(x);
+			binaryWriter.Write(y);
+			binaryWriter.Write(z);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			x = binaryReader.ReadInt32();
+			y = binaryReader.ReadInt32();
+			z = binaryReader.ReadInt32();
+		}
+
+		[Exposed]
 		public int X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public int Y
 		{
 			get => y;
 			set => y = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public int Z
 		{
 			get => z;
@@ -49,18 +57,18 @@ namespace RNumerics
 		public Vector3i(in int f) { x = y = z = f; }
 		public Vector3i(in int x, in int y, in int z) { this.x = x; this.y = y; this.z = z; }
 		public Vector3i(in int[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; }
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3i Zero = new(0, 0, 0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3i One = new(1, 1, 1);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3i AxisX = new(1, 0, 0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3i AxisY = new(0, 1, 0);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector3i AxisZ = new(0, 0, 1);
 
-		[IgnoreMember]
+		
 		public int this[in int key]
 		{
 			get => (key == 0) ? x : (key == 1) ? y : z;
@@ -73,7 +81,7 @@ namespace RNumerics
 			}
 		}
 
-		[IgnoreMember]
+		
 		public int[] Array => new int[] { x, y, z };
 
 
@@ -101,7 +109,7 @@ namespace RNumerics
 		public void Add(in int s) { x += s; y += s; z += s; }
 
 
-		[IgnoreMember]
+		
 		public int LengthSquared => (x * x) + (y * y) + (z * z);
 
 

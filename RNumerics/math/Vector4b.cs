@@ -2,41 +2,70 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
-using MessagePack;
+using System.IO;
 
 namespace RNumerics
 {
-	[MessagePackObject]
-	public struct Vector4b : IComparable<Vector4b>, IEquatable<Vector4b>
+	public struct Vector4b : IComparable<Vector4b>, IEquatable<Vector4b>, ISerlize<Vector4b>
 	{
-		[Key(0)]
 		public bool x;
-		[Key(1)]
 		public bool y;
-		[Key(2)]
 		public bool z;
-		[Key(3)]
 		public bool w;
 
-		[Exposed, IgnoreMember]
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			byte data = 0;
+			if (x) {
+				data |= 1;
+			}
+			if (y) {
+				data |= 2;
+			}
+			if (z) {
+				data |= 4;
+			}
+			if (w) {
+				data |= 8;
+			}
+			binaryWriter.Write(data);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			var data = binaryReader.ReadByte();
+			if ((data & 1) != 0) {
+				x = true;
+			}
+			if ((data & 2) != 0) {
+				y = true;
+			}
+			if ((data & 4) != 0) {
+				z = true;
+			}
+			if ((data & 8) != 0) {
+				w = true;
+			}
+		}
+
+		[Exposed]
 		public bool X
 		{
 			get => x;
 			set => x = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public bool Y
 		{
 			get => y;
 			set => y = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public bool Z
 		{
 			get => z;
 			set => z = value;
 		}
-		[Exposed, IgnoreMember]
+		[Exposed]
 		public bool W
 		{
 			get => w;
@@ -54,12 +83,12 @@ namespace RNumerics
 		public Vector4b(in bool x, in bool y, in bool z, in bool w) { this.x = x; this.y = y; this.z = z; this.w = w; }
 		public Vector4b(in bool[] v4) { x = v4[0]; y = v4[1]; z = v4[2]; w = v4[3]; }
 
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector4b True = new(true, true, true, true);
-		[Exposed,IgnoreMember]
+		[Exposed]
 		static public readonly Vector4b False = new(false, false, false, false);
 
-		[IgnoreMember]
+		
 		public bool this[in int key]
 		{
 			get => (key == 0) ? x : y;

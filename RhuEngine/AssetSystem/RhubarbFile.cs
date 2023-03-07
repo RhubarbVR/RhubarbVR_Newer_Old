@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
-using MessagePack;
+using RNumerics;
 
 namespace RhuEngine.AssetSystem
 {
@@ -15,27 +16,40 @@ namespace RhuEngine.AssetSystem
 		Avatar,
 	}
 
-	public enum FileCompressionType : byte 
+	public enum FileCompressionType : byte
 	{
 		Uncompressed,
 		DeflateStream,
 		DeflateStreamFast,
 	}
 
-	[MessagePackObject]
-	public sealed class RhubarbFile
+	public sealed class RhubarbFile : ISerlize<RhubarbFile>
 	{
-		[Key(0)]
 		public FileType FileType { get; set; }
-		[Key(1)]
 		public FileCompressionType CompressionType { get; set; }
-		[Key(3)]
 		public DateTimeOffset CreationData { get; set; }
-		[Key(4)]
 		public Guid Creator { get; set; }
-		[Key(5)]
 		public string Name { get; set; }
-		[Key(6)]
 		public byte[] Data { get; set; }
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			Name = binaryReader.ReadString();
+			Creator = new Guid(binaryReader.ReadBytes(16));
+			FileType = (FileType)binaryReader.ReadByte();
+			CompressionType = (FileCompressionType)binaryReader.ReadByte();
+			CreationData = DateTimeOffset.FromUnixTimeMilliseconds(binaryReader.ReadInt64());
+			var length = binaryReader.ReadInt32();
+			Data = binaryReader.ReadBytes(length);
+		}
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(Name);
+			binaryWriter.Write(Creator.ToByteArray());
+			binaryWriter.Write((byte)FileType);
+			binaryWriter.Write((byte)CompressionType);
+			binaryWriter.Write(CreationData.ToUnixTimeMilliseconds());
+			binaryWriter.Write(Data.Length);
+			binaryWriter.Write(Data);
+		}
 	}
 }

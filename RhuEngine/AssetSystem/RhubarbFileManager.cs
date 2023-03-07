@@ -52,11 +52,6 @@ namespace RhuEngine.AssetSystem
 			return file;
 		}
 
-		public static (T, RhubarbFile) ReadFile<T>(byte[] data) {
-			var file = ReadFile(data);
-			return (Serializer.Read<T>(file.Data), file);
-		}
-
 		public static byte[] DeflateStreamCompress(byte[] data, CompressionLevel compressionLevel) {
 			var output = new MemoryStream();
 			using (var dstream = new DeflateStream(output, compressionLevel)) {

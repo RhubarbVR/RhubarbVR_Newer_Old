@@ -1,17 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
-using MessagePack;
+using RNumerics;
 
 namespace RhuEngine.AssetSystem.RequestStructs
 {
-	[MessagePackObject]
-	public class PremoteAsset : IAssetRequest
+	public class PremoteAsset : IAssetRequest, ISerlize<PremoteAsset>
 	{
-		[Key(0)]
 		public string URL { get; set; }
-		[Key(1)]
 		public string NewURL { get; set; }
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			URL = binaryReader.ReadString();
+			NewURL = binaryReader.ReadString();
+		}
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(URL);
+			binaryWriter.Write(NewURL);
+		}
 	}
 }

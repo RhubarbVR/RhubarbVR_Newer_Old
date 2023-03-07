@@ -1,30 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
-
-using MessagePack;
-using MessagePack.Formatters;
 
 namespace SharedModels.GameSpecific
 {
 
-	[Formatter]
-	public sealed class OtherUserLeftFormatter : IMessagePackFormatter<OtherUserLeft>
-	{
-		public void Serialize(ref MessagePackWriter writer, OtherUserLeft value, MessagePackSerializerOptions options) {
-			options.Resolver.GetFormatterWithVerify<ushort>().Serialize(ref writer,value.id, options);
-		}
-
-		public OtherUserLeft Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-			var id = options.Resolver.GetFormatterWithVerify<ushort>().Deserialize(ref reader, options);
-			return new OtherUserLeft(id);
-		}
-	}
 	public struct OtherUserLeft : IRelayNetPacked
 	{
 		public ushort id;
 		public OtherUserLeft(ushort id) : this() {
 			this.id = id;
+		}
+		public void DeSerlize(BinaryReader binaryReader) {
+			id = binaryReader.ReadUInt16();
+		}
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			binaryWriter.Write(id);
 		}
 	}
 }
