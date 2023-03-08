@@ -72,7 +72,7 @@ namespace RhuEngine.GameTests.Tests
 			var data = localWorld.Serialize(new SyncObjectSerializerObject(false));
 			var savedData = new DataSaver(data).SaveStore();
 			var dataRead = new DataReader(savedData).Data;
-			var testThread = new Thread(() => AssertDataNodeAreTheSame(data, dataRead), 1000000);
+			var testThread = new Thread(() => AssertDataNodeAreTheSame(data, dataRead), 10000000);
 			testThread.Start();
 			testThread.Join();
 			((IDisposable)tester).Dispose();
@@ -85,7 +85,7 @@ namespace RhuEngine.GameTests.Tests
 			var data = localWorld.Serialize(new SyncObjectSerializerObject(true));
 			var savedData = new DataSaver(data).SaveStore();
 			var dataRead = new DataReader(savedData).Data;
-			var testThread = new Thread(() => AssertDataNodeAreTheSame(data, dataRead), 1000000);
+			var testThread = new Thread(() => AssertDataNodeAreTheSame(data, dataRead), 10000000);
 			testThread.Start();
 			testThread.Join();
 			((IDisposable)tester).Dispose();
