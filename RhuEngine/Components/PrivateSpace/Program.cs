@@ -11,7 +11,7 @@ using RNumerics;
 
 namespace RhuEngine.Components
 {
-	public abstract class Program : Component
+	public abstract partial class Program : Component
 	{
 		public readonly SyncObjList<SyncRef<ProgramToolBar>> programToolBars;
 

@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
 	[UpdateLevel(UpdateEnum.Movement)]
-	public sealed class RigidBody : Component
+	public sealed partial class RigidBody : Component
 	{
 		public readonly Linker<Vector3f> Position;
 

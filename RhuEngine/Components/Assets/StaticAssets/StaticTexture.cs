@@ -11,7 +11,7 @@ using RhuEngine.Linker;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/StaticAssets" })]
-	public sealed class StaticTexture : StaticAsset<RTexture2D>, IRImageProvider
+	public sealed partial class StaticTexture : StaticAsset<RTexture2D>, IRImageProvider
 	{
 		public RImage Image => Value?.Image;
 

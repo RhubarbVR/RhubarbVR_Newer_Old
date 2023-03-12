@@ -12,7 +12,7 @@ using RNumerics;
 namespace RhuEngine.Components.PrivateSpace.Programs.OverlayDialogues
 {
 	[PrivateSpaceOnly]
-	public sealed class PreAlphaDialogue : OverlayDialogue
+	public sealed partial class PreAlphaDialogue : OverlayDialogue
 	{
 		public void BuildUI() {
 			var scrollArray = programWindow.Entity.AddChild().AttachComponent<ScrollContainer>();

@@ -10,7 +10,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Inspectors" })]
-	public class EntityInspector : BaseInspector<Entity>
+	public sealed partial class EntityInspector : BaseInspector<Entity>
 	{
 		[OnChanged(nameof(Name_Changed))]
 		public readonly Linker<string> TopName;

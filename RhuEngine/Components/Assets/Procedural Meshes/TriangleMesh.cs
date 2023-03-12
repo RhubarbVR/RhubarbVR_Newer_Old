@@ -6,7 +6,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class TriangleMesh : ProceduralMesh
+	public sealed partial class TriangleMesh : ProceduralMesh
 	{
 		public readonly SyncObjList<Triangle> listOfTris;
 		protected override void OnAttach() {
@@ -43,7 +43,7 @@ namespace RhuEngine.Components
 			GenMesh(mesh);
 		}
 
-		public class Triangle : SyncObject
+		public sealed partial class Triangle : SyncObject
 		{
 			public readonly Vertex a;
 			public readonly Vertex b;
@@ -57,7 +57,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public class Vertex : SyncObject
+		public sealed partial class Vertex : SyncObject
 		{
 			[OnChanged(nameof(UpdateMesh))]
 			public readonly Sync<Vector3d> ver;

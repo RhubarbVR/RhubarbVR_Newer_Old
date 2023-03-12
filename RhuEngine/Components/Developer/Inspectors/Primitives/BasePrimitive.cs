@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "Developer/Inspectors/Primitives" })]
-	public abstract class BasePrimitive<T, TValue> : BaseInspector<ISync>, IBasePrimitive where T : class, ISync
+	public abstract partial class BasePrimitive<T, TValue> : BaseInspector<ISync>, IBasePrimitive where T : class, ISync
 	{
 		[OnChanged(nameof(ValueChange))]
 		public readonly Sync<string> TargetField;

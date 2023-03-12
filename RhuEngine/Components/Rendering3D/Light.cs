@@ -21,7 +21,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "Rendering3D" })]
-	public sealed class Light : LinkedWorldComponent
+	public sealed partial class Light : LinkedWorldComponent
 	{
 		[Default(RLightType.Point)]
 		public readonly Sync<RLightType> LightType;

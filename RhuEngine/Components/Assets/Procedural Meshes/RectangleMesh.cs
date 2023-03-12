@@ -7,7 +7,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class RectangleMesh : ProceduralMesh
+	public sealed partial class RectangleMesh : ProceduralMesh
 	{
 
 		[OnChanged(nameof(LoadMesh))]

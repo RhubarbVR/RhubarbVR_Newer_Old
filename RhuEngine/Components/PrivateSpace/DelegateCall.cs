@@ -11,7 +11,7 @@ namespace RhuEngine.Components.PrivateSpace
 {
 
 	[PrivateSpaceOnly]
-	public sealed class DelegateCall : Component
+	public sealed partial class DelegateCall : Component
 	{
 		public Action action;
 

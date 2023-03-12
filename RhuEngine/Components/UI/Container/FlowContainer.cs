@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Container/FlowContainer")]
-	public class FlowContainer : Container
+	public partial class FlowContainer : Container
 	{
 		public readonly Sync<bool> Vertical;
 	}

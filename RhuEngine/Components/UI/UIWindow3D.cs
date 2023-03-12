@@ -13,7 +13,7 @@ namespace RhuEngine.Components
 {
 	[Category("UI")]
 	[UpdateLevel(UpdateEnum.PlayerInput)]
-	public sealed class UIWindow3D : Component
+	public sealed partial class UIWindow3D : Component
 	{
 		[OnChanged(nameof(MarkUodateMeshes))]
 		public readonly Sync<Vector2i> Reslution;
@@ -46,7 +46,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public sealed class HeaderUIButton : SyncObject
+		public sealed partial class HeaderUIButton : SyncObject
 		{
 			private bool _hoveredLast;
 			private bool _pressLast;

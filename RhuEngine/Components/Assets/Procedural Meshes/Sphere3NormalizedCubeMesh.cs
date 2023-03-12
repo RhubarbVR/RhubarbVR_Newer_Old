@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class Sphere3NormalizedCubeMesh : ProceduralMesh
+	public sealed partial class Sphere3NormalizedCubeMesh : ProceduralMesh
 	{
 		[Default(0.5f)]
 		[OnChanged(nameof(LoadMesh))]

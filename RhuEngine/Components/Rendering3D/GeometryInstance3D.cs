@@ -31,7 +31,7 @@ namespace RhuEngine.Components
 		Dependencies,
 	}
 
-	public abstract class GeometryInstance3D : VisualInstance3D
+	public abstract partial class GeometryInstance3D : VisualInstance3D
 	{
 		[Default(ShadowCast.Off)]
 		public readonly Sync<ShadowCast> CastShadows;

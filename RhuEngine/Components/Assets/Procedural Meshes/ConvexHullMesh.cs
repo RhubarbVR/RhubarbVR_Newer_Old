@@ -10,10 +10,10 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class ConvexHullMesh : ProceduralMesh
+	public sealed partial class ConvexHullMesh : ProceduralMesh
 	{
 		[OnChanged(nameof(LoadMesh))]
-		public readonly SyncValueList<Vector3f> points = new();
+		public readonly SyncValueList<Vector3f> points;
 
 		[Default(true)]
 		[OnChanged(nameof(LoadMesh))]

@@ -21,7 +21,7 @@ namespace RhuEngine.WorldObjects
 		LeftController,
 		RightController,
 	}
-	public class User : SyncObject
+	public sealed partial class User : SyncObject
 	{
 		public Matrix GetBodyNodeTrans(BodyNode bodyNode) {
 			return bodyNode == BodyNode.None

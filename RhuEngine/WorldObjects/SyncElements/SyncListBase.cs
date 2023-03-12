@@ -22,7 +22,7 @@ namespace RhuEngine.WorldObjects
 		void DestroyAtIndex(int index);
 		void DisposeAtIndex(int index);
 	}
-	public abstract class SyncListBase<T> : SyncObject, ISyncList, INetworkedObject, IEnumerable<ISyncObject>, IChangeable, ISyncMember where T : class, ISyncObject
+	public abstract partial class SyncListBase<T> : SyncObject, ISyncList, INetworkedObject, IEnumerable<ISyncObject>, IChangeable, ISyncMember where T : class, ISyncObject
 	{
 		private readonly List<T> _syncObjects = new(5);
 

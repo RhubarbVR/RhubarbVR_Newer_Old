@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Container")]
-	public class AspectRatioContainer : Container
+	public partial class AspectRatioContainer : Container
 	{
 		[Default(1f)]
 		public readonly Sync<float> Ratio;

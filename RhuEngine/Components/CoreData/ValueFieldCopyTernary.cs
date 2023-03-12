@@ -5,7 +5,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreData" })]
 	[GenericTypeConstraint()]
-	public sealed class ValueFieldCopyTernary<T> : Component
+	public sealed partial class ValueFieldCopyTernary<T> : Component
 	{
 		[OnChanged(nameof(ConditionChange))]
 		public readonly Linker<T> Target;

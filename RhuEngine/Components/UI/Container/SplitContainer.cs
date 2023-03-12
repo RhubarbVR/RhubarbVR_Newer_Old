@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Container/SplitContainer")]
-	public class SplitContainer : Container
+	public partial class SplitContainer : Container
 	{
 		public readonly Sync<int> SplitOffset;
 		public readonly Sync<bool> Collapsed;

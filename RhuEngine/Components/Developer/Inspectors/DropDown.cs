@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 
 
 	[Category(new string[] { "Developer/Inspectors" })]
-	public sealed class DropDown : Component
+	public sealed partial class DropDown : Component
 	{
 		public readonly SyncRef<Entity> DropDownData;
 

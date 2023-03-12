@@ -17,7 +17,7 @@ using System.Reflection;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	public sealed class UserProgramManager : Component
+	public sealed partial class UserProgramManager : Component
 	{
 
 		public OverlayProgram OverlayProgram { get; private set; }

@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Container")]
-	public class ScrollContainer : Container
+	public partial class ScrollContainer : Container
 	{
 		[Default(true)] 
 		public readonly Sync<bool> FollowFocus;

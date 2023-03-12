@@ -21,7 +21,7 @@ namespace RhuEngine.Components
 		HSL_Circle,
 	}
 	[Category("UI/Container/BoxContainer")]
-	public class ColorPickerContainer : BoxContainer
+	public partial class ColorPickerContainer : BoxContainer
 	{
 		public readonly Sync<Colorf> Color;
 		public readonly Sync<bool> EditAlpha;

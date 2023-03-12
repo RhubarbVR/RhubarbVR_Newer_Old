@@ -6,7 +6,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/ConstAssets" })]
 	[AllowedOnWorldRoot]
-	public sealed class GridTex : AssetProvider<RTexture2D>
+	public sealed partial class GridTex : AssetProvider<RTexture2D>
 	{
 		public override bool AutoDisposes => false;
 

@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Container/Separator")]
-	public class HorizontalSeparator : Separator
+	public partial class HorizontalSeparator : Separator
 	{
 		
 	}

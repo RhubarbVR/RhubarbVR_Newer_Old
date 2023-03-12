@@ -31,8 +31,8 @@ namespace RhuEngine.WorldObjects
 		public Engine Engine => worldManager.Engine;
 
 		public PhysicsSimulation PhysicsSimulation { get; private set; }
-
-		public World(WorldManager worldManager) {
+		//constructor is added at code Gen
+		public World(WorldManager worldManager) : this() {
 			this.worldManager = worldManager;
 		}
 
@@ -49,69 +49,8 @@ namespace RhuEngine.WorldObjects
 				throw;
 			}
 			try {
-				var data = typeof(World).GetFields(BindingFlags.Public | BindingFlags.Instance);
-				var disposeables = new HashSet<IDisposable>();
-				foreach (var item in data) {
-					if ((item.Attributes & FieldAttributes.InitOnly) == 0) {
-						continue;
-					}
-					if ((item.GetCustomAttribute<NoLoadAttribute>() == null) && typeof(SyncObject).IsAssignableFrom(item.FieldType) && !((item.GetCustomAttribute<NoSaveAttribute>() != null) && (item.GetCustomAttribute<NoSyncAttribute>() != null))) {
-						var instance = (SyncObject)Activator.CreateInstance(item.FieldType);
-						instance.Initialize(this, this, item.Name, networkedObject, deserialize, null);
-						disposeables.Add(instance);
-						if (typeof(ISyncProperty).IsAssignableFrom(item.FieldType)) {
-							var startValue = item.GetCustomAttribute<BindPropertyAttribute>();
-							if (startValue != null) {
-								((ISyncProperty)instance).Bind(startValue.Data, this);
-							}
-						}
-						if (typeof(ISync).IsAssignableFrom(item.FieldType)) {
-							var startValue = item.GetCustomAttribute<DefaultAttribute>();
-							if (startValue != null) {
-								((ISync)instance).SetValueForce(startValue.Data);
-							}
-							else {
-								((ISync)instance).SetStartingObject();
-							}
-						}
-						if (typeof(IAssetRef).IsAssignableFrom(item.FieldType)) {
-							var startValue = item.GetCustomAttribute<OnAssetLoadedAttribute>();
-							if (startValue != null) {
-								((IAssetRef)instance).BindMethod(startValue.Data, this);
-							}
-						}
-						if (typeof(IChangeable).IsAssignableFrom(item.FieldType)) {
-							//RLog.Info($"Loaded Change Field {GetType().GetFormattedName()} , {item.Name} type {item.FieldType.GetFormattedName()}");
-							var startValue = item.GetCustomAttribute<OnChangedAttribute>();
-							if (startValue != null) {
-								var method = GetType().GetMethod(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-								if (method is null) {
-									throw new Exception($"Method {startValue.Data} not found");
-								}
-								else {
-									var prams = method.GetParameters();
-									if (prams.Length == 0) {
-										((IChangeable)instance).Changed += (obj) => method.Invoke(this, Array.Empty<object>());
-									}
-									else if (prams[0].ParameterType == typeof(IChangeable)) {
-										((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[1] { obj });
-									}
-									else {
-										throw new Exception($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
-									}
-								}
-							}
-						}
-						if (typeof(INetworkedObject).IsAssignableFrom(item.FieldType)) {
-							var startValue = item.GetCustomAttribute<NoSyncUpdateAttribute>();
-							if (startValue != null) {
-								((INetworkedObject)instance).NoSync = true;
-							}
-						}
-						item.SetValue(this, instance);
-					}
-				}
-				_disposables = disposeables.ToArray();
+				//Method added at code Gen
+				InitializeMembers(networkedObject, deserialize, null);
 			}
 			catch (Exception ex) {
 				RLog.Err("Failed to InitializeMembers" + ex.ToString());
@@ -222,6 +161,10 @@ namespace RhuEngine.WorldObjects
 		public readonly Sync<DateTime> StartTime;
 
 		public readonly Sync<Vector3f> WorldGravity;
+
+		[NoSyncUpdate]
+		[NoSave]
+		public readonly SyncObjList<User> Users;
 
 		public double WorldTime => (DateTime.UtcNow - StartTime).TotalSeconds;
 
@@ -362,7 +305,14 @@ namespace RhuEngine.WorldObjects
 		public bool IsDisposed { get; private set; }
 		public bool HasError { get; internal set; }
 
-		internal IDisposable[] _disposables = Array.Empty<IDisposable>();
+		private IDisposable[] _disposables = Array.Empty<IDisposable>();
+
+		public void AddDisposable(IDisposable disposable) {
+			lock (disposable) {
+				Array.Resize(ref _disposables, _disposables.Length + 1);
+				_disposables[_disposables.Length - 1] = disposable;
+			}
+		}
 
 		public void Dispose() {
 			if (IsDisposed) {
@@ -373,7 +323,10 @@ namespace RhuEngine.WorldObjects
 			Task.Run(async () => {
 				PhysicsSimulation?.Dispose();
 				PhysicsSimulation = null;
-				foreach (var item in _disposables) {
+				foreach (var item in _disposables.ToArray()) {
+					if (item is SyncObject @object) {
+						@object.IsDestroying = true;
+					}
 					item?.Dispose();
 				}
 				_disposables = Array.Empty<IDisposable>();

@@ -9,7 +9,7 @@ using static System.Net.Mime.MediaTypeNames;
 namespace RhuEngine.Components
 {
 	[Category("UI/Events")]
-	public sealed class UIInputEvents : ElementEvent<UIElement>
+	public sealed partial class UIInputEvents : ElementEvent<UIElement>
 	{
 		public readonly SyncDelegate InputEntered;
 		public readonly SyncDelegate InputExited;

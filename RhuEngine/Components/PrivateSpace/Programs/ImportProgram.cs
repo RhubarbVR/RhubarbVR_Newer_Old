@@ -25,7 +25,7 @@ namespace RhuEngine.Components
 	[ProgramOpenWith("*")]
 	[Category(new string[] { "Assets/Importers" })]
 	[ProgramHide]
-	public sealed class ImportProgram : Program
+	public sealed partial class ImportProgram : Program
 	{
 
 		public static RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.AddFile;

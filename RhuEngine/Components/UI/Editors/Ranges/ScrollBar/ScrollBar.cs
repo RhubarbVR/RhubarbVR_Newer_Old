@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Editors/Ranges/ScrollBar")]
-	public abstract class ScrollBar : Range
+	public abstract partial class ScrollBar : Range
 	{
 		public readonly Sync<int> CustomStep;
 

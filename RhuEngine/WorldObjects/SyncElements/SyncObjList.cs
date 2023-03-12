@@ -24,7 +24,7 @@ namespace RhuEngine.WorldObjects
 	}
 
 	[GenericTypeConstraint()]
-	public sealed class SyncValueList<T> : SyncObjList<Sync<T>>, ISyncMember
+	public sealed partial class SyncValueList<T> : SyncObjList<Sync<T>>, ISyncMember
 	{
 		[Exposed]
 		public new T this[int index]
@@ -60,7 +60,7 @@ namespace RhuEngine.WorldObjects
 		public static implicit operator T[](SyncValueList<T> data) => data.ToArray().Select((objec) => ((Sync<T>)objec).Value).ToArray();
 	}
 
-	public class SyncObjList<T> : SyncListBase<T>, ISyncObjectList<T>, INetworkedObject, IEnumerable<ISyncObject> where T : class, ISyncObject, new()
+	public partial class SyncObjList<T> : SyncListBase<T>, ISyncObjectList<T>, INetworkedObject, IEnumerable<ISyncObject> where T : class, ISyncObject, new()
 	{
 		public T AddWithCustomRefIds(bool networkedObject = false, bool deserialize = false, NetPointerUpdateDelegate func = null) {
 			var newElement = new T();

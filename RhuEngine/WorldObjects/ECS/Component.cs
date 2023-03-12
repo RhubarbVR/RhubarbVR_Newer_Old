@@ -13,7 +13,7 @@ namespace RhuEngine.WorldObjects.ECS
 		void RunAttach();
 	}
 
-	public abstract class Component : SyncObject, IComponent, IOffsetableElement
+	public abstract partial class Component : SyncObject, IComponent, IOffsetableElement
 	{
 		[NoSave]
 		[NoShow]

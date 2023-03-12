@@ -19,7 +19,7 @@ namespace RhuEngine.Components
 		Physics,
 	}
 	[Category(new string[] { "Rendering3D" })]
-	public class Camera3D : LinkedWorldComponent
+	public sealed partial class Camera3D : LinkedWorldComponent
 	{
 		public readonly Sync<bool> KeepWidth;
 		[Default(RenderLayer.MainCam)]

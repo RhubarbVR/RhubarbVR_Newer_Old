@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category("Math")]
-	public sealed class MultiOperators<In> : AbMultiOperation<In, In> where In : struct
+	public sealed partial class MultiOperators<In> : AbMultiOperation<In, In> where In : struct
 	{
 		public readonly Sync<bool> Unchecked;
 

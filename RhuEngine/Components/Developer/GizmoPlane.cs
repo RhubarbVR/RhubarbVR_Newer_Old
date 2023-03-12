@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 
 	[UpdateLevel(UpdateEnum.Normal)]
 	[OverlayOnly]
-	public sealed class GizmoPlane : Component
+	public sealed partial class GizmoPlane : Component
 	{
 		public readonly SyncRef<Gizmo3D> Gizmo3DTarget;
 

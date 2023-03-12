@@ -9,7 +9,7 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components.PrivateSpace.Programs.OverlayDialogues
 {
 	[PrivateSpaceOnly]
-	public sealed class Batch_Open_WithDialogue : OverlayDialogue
+	public sealed partial class Batch_Open_WithDialogue : OverlayDialogue
 	{
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]

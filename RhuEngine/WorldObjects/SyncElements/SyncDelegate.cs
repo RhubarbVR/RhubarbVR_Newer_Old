@@ -11,14 +11,14 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public sealed class SyncDelegate : SyncDelegate<Action>
+	public sealed partial class SyncDelegate : SyncDelegate<Action>
 	{
 		public void Invoke() {
 			Target?.Invoke();
 		}
 	}
 
-	public class SyncDelegate<T> : SyncRef<IWorldObject>, ISyncMember where T : Delegate
+	public partial class SyncDelegate<T> : SyncRef<IWorldObject>, ISyncMember where T : Delegate
 	{
 		private Type _type;
 		private string _method;

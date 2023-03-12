@@ -7,15 +7,15 @@ using System.Linq;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Rendering3D" })]
-	public sealed class Armature : LinkedWorldComponent
+	public sealed partial class Armature : LinkedWorldComponent
 	{
 		public readonly SyncObjList<SyncRef<Entity>> ArmatureEntitys;
 	}
 
 	[Category(new string[] { "Rendering3D" })]
-	public sealed class SkinnedMeshRender : MeshRender
+	public sealed partial class SkinnedMeshRender : MeshRender
 	{
-		public class BlendShape : SyncObject
+		public sealed partial class BlendShape : SyncObject
 		{
 			[Default("Unknown")]
 			public readonly Sync<string> BlendName;

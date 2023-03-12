@@ -14,7 +14,7 @@ using BepuPhysics.Trees;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public class MeshShape : PhysicsMeshShape<Mesh, PhysicsMeshAddon>
+	public partial class MeshShape : PhysicsMeshShape<Mesh, PhysicsMeshAddon>
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		protected override Mesh CreateEmpty(ref float speculativeMargin, float? mass, out BodyInertia inertia) {

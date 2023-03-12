@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Editors/Ranges")]
-	public class TexturedProgressBar : Range
+	public partial class TexturedProgressBar : Range
 	{
 		public readonly Sync<RTexturedProgressBarFillMode> FillMode;
 		public readonly Sync<bool> NinePatchStrech;
@@ -34,7 +34,7 @@ namespace RhuEngine.Components
 		public readonly Sync<Colorf> Progress_Tint;
 		public readonly Sync<Vector2i> ProgressOffset;
 		public readonly Sync<float> InitialAngle;
-		[Default(360.0)]public readonly Sync<float> FillDegrees;
+		[Default(360.0f)]public readonly Sync<float> FillDegrees;
 		public readonly Sync<Vector2f> CenterOffset;
 
 	}

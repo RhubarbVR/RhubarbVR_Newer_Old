@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 {
 	[GenericTypeConstraint()]
 	[Category(new string[] { "CoreEvents" })]
-	public sealed class AddSingleValuePram<T> : Component
+	public sealed partial class AddSingleValuePram<T> : Component
 	{
 		public readonly Sync<T> Value;
 

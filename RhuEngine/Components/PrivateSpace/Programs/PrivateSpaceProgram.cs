@@ -12,7 +12,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	public abstract class PrivateSpaceProgram : Program
+	public abstract partial class PrivateSpaceProgram : Program
 	{
 		public abstract RhubarbAtlasSheet.RhubarbIcons IconFind { get; }
 

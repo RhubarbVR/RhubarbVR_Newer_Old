@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Editors/Ranges")]
-	public class Range : UIElement
+	public partial class Range : UIElement
 	{
 		[Default(0.0)]public readonly Sync<double> MinValue;
 		[Default(100.0)]public readonly Sync<double> MaxValue;

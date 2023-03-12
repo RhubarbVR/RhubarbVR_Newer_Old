@@ -14,12 +14,12 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Button")]
-	public class MenuButton : Button
+	public partial class MenuButton : Button
 	{
 		public readonly Sync<bool> SwitchOnHover;
 		public readonly SyncObjList<MenuButtonItem> Items;
 		
-		public class MenuButtonItem : SyncObject {
+		public sealed partial class MenuButtonItem : SyncObject {
 			public readonly Sync<string> Text;
 			public readonly AssetRef<RTexture2D> Icon;
 			public readonly Sync<RMenuButtonCheckableState> Checkable;

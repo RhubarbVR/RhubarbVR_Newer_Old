@@ -14,7 +14,7 @@ namespace RhuEngine.Components.UI
 	}
 
 	[Category(new string[] { "UI" })]
-	public sealed class ReferenceAccepter<T> : Component, IReferenceAccepter where T : class, IWorldObject
+	public sealed partial class ReferenceAccepter<T> : Component, IReferenceAccepter where T : class, IWorldObject
 	{
 		[OnChanged(nameof(PrivateSpaceManager_OnUpdateHolderReferen))]
 		public readonly Linker<bool> DropVisual;

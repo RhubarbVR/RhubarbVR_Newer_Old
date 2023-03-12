@@ -10,7 +10,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Inspectors" })]
-	public class WorldObjectInspector : BaseInspector<IWorldObject>
+	public sealed partial class WorldObjectInspector : BaseInspector<IWorldObject>
 	{
 		protected override void BuildUI() {
 			WorldObjectUIBuild();

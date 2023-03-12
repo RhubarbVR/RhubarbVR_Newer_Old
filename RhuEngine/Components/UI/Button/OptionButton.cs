@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Button")]
-	public class OptionButton : Button
+	public partial class OptionButton : Button
 	{
 		protected override bool AddToUpdateList => true;
 
@@ -19,7 +19,7 @@ namespace RhuEngine.Components
 
 		public readonly SyncObjList<MenuButtonItem> Items;
 
-		public class MenuButtonItem : SyncObject
+		public sealed partial class MenuButtonItem : SyncObject
 		{
 			public readonly Sync<string> Text;
 			public readonly Sync<string> ToolTip;

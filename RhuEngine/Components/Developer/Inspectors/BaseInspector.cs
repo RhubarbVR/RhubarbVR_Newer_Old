@@ -17,7 +17,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "Developer/Inspectors" })]
-	public abstract class BaseInspector<T> : Component, IInspector where T : class, IWorldObject
+	public abstract partial class BaseInspector<T> : Component, IInspector where T : class, IWorldObject
 	{
 		[OnChanged(nameof(TargetObjectRebuild))]
 		public readonly SyncRef<T> TargetObject;

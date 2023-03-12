@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets" })]
-	public sealed class VideoTexture : StaticAsset<RTexture2D>
+	public sealed partial class VideoTexture : StaticAsset<RTexture2D>
 	{
 		public VlcVideoSourceProvider vlcVideoSourceProvider = null;
 

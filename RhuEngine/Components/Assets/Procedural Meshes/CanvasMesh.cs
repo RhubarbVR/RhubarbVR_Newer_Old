@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class CanvasMesh : ProceduralMesh
+	public sealed partial class CanvasMesh : ProceduralMesh
 	{
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<Vector2i> Resolution;

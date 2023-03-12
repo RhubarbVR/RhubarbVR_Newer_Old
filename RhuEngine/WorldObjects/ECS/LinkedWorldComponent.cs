@@ -12,7 +12,7 @@ namespace RhuEngine.WorldObjects.ECS
 
 	}
 
-	public abstract class LinkedWorldComponent : Component
+	public abstract partial class LinkedWorldComponent : Component
 	{
 		protected virtual bool AddToUpdateList => true;
 		public IWorldLink WorldLink { get; set; }

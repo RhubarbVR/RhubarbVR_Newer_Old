@@ -1,6 +1,6 @@
 ﻿namespace RhuEngine.WorldObjects
 {
-	public sealed class DynamicLinker : SyncRef<ILinkable>, ILinker, ISyncMember
+	public sealed partial class DynamicLinker : SyncRef<ILinkable>, ILinker, ISyncMember
 	{
 		public DynamicLinker() { }
 

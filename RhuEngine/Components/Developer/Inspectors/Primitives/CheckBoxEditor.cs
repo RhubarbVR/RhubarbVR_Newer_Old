@@ -14,7 +14,7 @@ using CategoryAttribute = RhuEngine.WorldObjects.ECS.CategoryAttribute;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Inspectors/Primitives" })]
-	public sealed class CheckBoxEditor : BasePrimitive<Sync<bool>, bool>
+	public sealed partial class CheckBoxEditor : BasePrimitive<Sync<bool>, bool>
 	{
 		[OnChanged(nameof(ValueChange))]
 		public readonly Linker<bool> LineEditorValue;

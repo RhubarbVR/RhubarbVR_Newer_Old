@@ -13,7 +13,7 @@ using System.Linq;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Importers" })]
-	public sealed class AssimpImporter : Importer
+	public sealed partial class AssimpImporter : Importer
 	{
 		AssimpContext _assimpContext;
 

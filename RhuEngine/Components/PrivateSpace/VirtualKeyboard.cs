@@ -13,7 +13,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "Local" })]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public sealed class VirtualKeyboard : Component
+	public sealed partial class VirtualKeyboard : Component
 	{
 		[OnChanged(nameof(UpdateLayer))]
 		public readonly Sync<int> Layer;
@@ -27,9 +27,9 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public sealed class KeyboardButton : SyncObject
+		public sealed partial class KeyboardButton : SyncObject
 		{
-			public sealed class LayerValue : SyncObject
+			public sealed partial class LayerValue : SyncObject
 			{
 				[OnChanged(nameof(UpdateLabel))]
 				public readonly Sync<string> Label;

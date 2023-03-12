@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public sealed class ConvexMeshShape : PhysicsMeshShape<ConvexHull, PhysicsConvexHullAddon>
+	public sealed partial class ConvexMeshShape : PhysicsMeshShape<ConvexHull, PhysicsConvexHullAddon>
 	{
 		protected override void CleanUpShapeData() {
 			GetShape?.Dispose(World.PhysicsSimulation.BufferPool);

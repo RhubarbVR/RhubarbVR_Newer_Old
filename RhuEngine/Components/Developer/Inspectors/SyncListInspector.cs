@@ -11,7 +11,7 @@ using System.Linq;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Inspectors" })]
-	public class SyncListInspector<T> : BaseInspector<T> where T : class, ISyncList
+	public sealed partial class SyncListInspector<T> : BaseInspector<T> where T : class, ISyncList
 	{
 
 		public bool IsCompList => typeof(T) == typeof(SyncAbstractObjList<IComponent>);

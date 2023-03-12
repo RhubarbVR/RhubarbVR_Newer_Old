@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Container")]
-	public class GridContainer : Container
+	public partial class GridContainer : Container
 	{
 		[Default(1)]
 		public readonly Sync<int> Columns;

@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class CapsuleMesh : ProceduralMesh
+	public sealed partial class CapsuleMesh : ProceduralMesh
 	{
 		[Default(32)]
 		[OnChanged(nameof(LoadMesh))]

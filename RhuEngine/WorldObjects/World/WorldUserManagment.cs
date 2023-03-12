@@ -15,10 +15,6 @@ namespace RhuEngine.WorldObjects
 	{
 		public ushort LocalUserID { get; private set; } = 1;
 
-		[NoSyncUpdate]
-		[NoSave]
-		public readonly SyncObjList<User> Users;
-
 		public User GetUserFromID(Guid id) {
 			for (var i = 0; i < Users.Count; i++) {
 				if (Users[i].userID.Value == id.ToString()) {
@@ -84,7 +80,7 @@ namespace RhuEngine.WorldObjects
 			return Users is null ? null : LocalUserID <= 0 ? null : (LocalUserID - 1) < Users.Count ? Users[LocalUserID - 1] : null;
 		}
 		[PrivateSpaceOnly]
-		public class RawMeshAsset : ProceduralMesh
+		public sealed partial class RawMeshAsset : ProceduralMesh
 		{
 
 			public override void ComputeMesh() {

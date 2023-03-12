@@ -10,7 +10,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public sealed class CapsuleShape : BasicPhysicsShape<Capsule>
+	public sealed partial class CapsuleShape : BasicPhysicsShape<Capsule>
 	{
 		[Default(0.5f)]
 		[OnChanged(nameof(UpdateShape))]

@@ -14,7 +14,7 @@ using CategoryAttribute = RhuEngine.WorldObjects.ECS.CategoryAttribute;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Inspectors/Primitives" })]
-	public sealed class BasicEnumEditor<T> : BasePrimitive<Sync<T>, T> where T : Enum
+	public sealed partial class BasicEnumEditor<T> : BasePrimitive<Sync<T>, T> where T : Enum
 	{
 		public Array enums;
 

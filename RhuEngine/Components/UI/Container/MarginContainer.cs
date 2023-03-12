@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Container")]
-	public class MarginContainer : Container
+	public partial class MarginContainer : Container
 	{
 		
 	}

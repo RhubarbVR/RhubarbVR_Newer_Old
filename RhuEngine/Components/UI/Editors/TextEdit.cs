@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 {
 	[Category("UI/Editors")]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public class TextEdit : UIElement
+	public partial class TextEdit : UIElement
 	{
 		public override string EditString => Text.Value;
 

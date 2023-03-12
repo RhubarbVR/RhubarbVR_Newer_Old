@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.Normal)]
 	[OverlayOnly]
-	public sealed class Gizmo3D : Component
+	public sealed partial class Gizmo3D : Component
 	{
 		public const float ALPHA = 0.8f;
 		public readonly Sync<GizmoMode> Mode;

@@ -13,7 +13,7 @@ namespace RhuEngine.Components
 	[SingleComponentLock]
 	[Category(new string[] { "Visuals" })]
 	[UpdateLevel(UpdateEnum.Rendering)]
-	public sealed class UIMeshShape : MeshShape
+	public sealed partial class UIMeshShape : MeshShape
 	{
 		[Default(true)]
 		public readonly Sync<bool> Laserable;

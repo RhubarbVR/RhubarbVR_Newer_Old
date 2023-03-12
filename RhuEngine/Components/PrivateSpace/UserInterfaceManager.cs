@@ -26,7 +26,7 @@ namespace RhuEngine.Components
 
 	[PrivateSpaceOnly]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public sealed class UserInterfaceManager : Component
+	public sealed partial class UserInterfaceManager : Component
 	{
 		[NoSave]
 		[NoSync]

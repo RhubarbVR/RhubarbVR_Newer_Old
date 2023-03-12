@@ -9,7 +9,7 @@ using static System.Net.Mime.MediaTypeNames;
 namespace RhuEngine.Components
 {
 	[Category("UI/Events")]
-	public sealed class UILinkOpen : ElementEvent<ButtonBase>
+	public sealed partial class UILinkOpen : ElementEvent<ButtonBase>
 	{
 		public readonly Sync<Uri> TargetUri;
 

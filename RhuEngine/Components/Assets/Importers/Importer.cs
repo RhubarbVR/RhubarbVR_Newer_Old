@@ -10,7 +10,7 @@ using RNumerics;
 
 namespace RhuEngine.Components
 {
-	public abstract class Importer : Component
+	public abstract partial class Importer : Component
 	{
 		public readonly SyncRef<ImportProgram> ImporterProgram;
 

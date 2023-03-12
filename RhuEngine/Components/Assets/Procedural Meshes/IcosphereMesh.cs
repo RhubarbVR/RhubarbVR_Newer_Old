@@ -10,7 +10,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class IcosphereMesh : ProceduralMesh
+	public sealed partial class IcosphereMesh : ProceduralMesh
 	{
 		[Default(8)]
 		[OnChanged(nameof(LoadMesh))]

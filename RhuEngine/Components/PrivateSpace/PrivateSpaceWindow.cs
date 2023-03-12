@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public sealed class PrivateSpaceWindow : Component
+	public sealed partial class PrivateSpaceWindow : Component
 	{
 		public ButtonBase MoveButon { get; set; }
 		public ButtonBase ResizeButon { get; set; }

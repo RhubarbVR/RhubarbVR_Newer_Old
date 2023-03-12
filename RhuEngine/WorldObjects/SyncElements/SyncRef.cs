@@ -19,7 +19,7 @@ namespace RhuEngine.WorldObjects
 		Type GetRefType { get; }
 	}
 
-	public class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, INetworkedObject, IChangeable, ISyncMember where T : class, IWorldObject
+	public partial class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, INetworkedObject, IChangeable, ISyncMember where T : class, IWorldObject
 	{
 		public object Object { get => Value; set => Value = (NetPointer)value; }
 

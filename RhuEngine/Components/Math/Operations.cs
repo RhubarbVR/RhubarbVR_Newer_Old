@@ -40,7 +40,7 @@ namespace RhuEngine.Components
 	}
 
 
-	public abstract class AbMultiOperation<Out,In> : Component where Out : struct where In : struct
+	public abstract partial class AbMultiOperation<Out,In> : Component where Out : struct where In : struct
 	{
 		public readonly Linker<Out> Output;
 
@@ -69,7 +69,7 @@ namespace RhuEngine.Components
 		public abstract Out Compute(In[] ins);
 	}
 
-	public abstract class AbDualOperation<Out, In> : Component where Out : struct where In : struct
+	public abstract partial class AbDualOperation<Out, In> : Component where Out : struct where In : struct
 	{
 		public readonly Linker<Out> Output;
 
@@ -118,7 +118,7 @@ namespace RhuEngine.Components
 		protected abstract Out Compute(In a, In b);
 	}
 
-	public abstract class AbTripleOperation<Out, In> : Component where Out : struct where In : struct
+	public abstract partial class AbTripleOperation<Out, In> : Component where Out : struct where In : struct
 	{
 		public readonly Linker<Out> Output;
 
@@ -184,7 +184,7 @@ namespace RhuEngine.Components
 
 
 
-	public abstract class AbSingleOperation<Out, In> : Component where Out : struct where In : struct
+	public abstract partial class AbSingleOperation<Out, In> : Component where Out : struct where In : struct
 	{
 		public readonly Linker<Out> Output;
 

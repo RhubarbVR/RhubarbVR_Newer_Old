@@ -5,7 +5,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/ConstAssets" })]
 	[AllowedOnWorldRoot]
-	public sealed class MainFont : AssetProvider<RFont>
+	public sealed partial class MainFont : AssetProvider<RFont>
 	{
 		public override bool AutoDisposes => false;
 

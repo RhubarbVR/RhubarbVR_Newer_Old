@@ -23,7 +23,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Button")]
-	public class ButtonBase : UIElement
+	public partial class ButtonBase : UIElement
 	{
 		public readonly Sync<bool> Disabled;
 		public readonly Sync<bool> ToggleMode;

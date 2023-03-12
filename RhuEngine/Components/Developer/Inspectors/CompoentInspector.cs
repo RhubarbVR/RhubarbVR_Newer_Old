@@ -10,7 +10,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Inspectors" })]
-	public class CompoentInspector : BaseInspector<IComponent>
+	public sealed partial class CompoentInspector : BaseInspector<IComponent>
 	{
 		public readonly SyncRef<ButtonBase> TargetButton; 
 

@@ -43,7 +43,7 @@ namespace RhuEngine.Components
 		}
 	}
 
-	public abstract class PhysicsObject : Component
+	public abstract partial class PhysicsObject : Component
 	{
 		public const float SPECULATIVE_MARGIN = 0.1f;
 		public const float COMMON_MAX = 1000000f;

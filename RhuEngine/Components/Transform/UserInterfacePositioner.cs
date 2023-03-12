@@ -8,7 +8,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Transform" })]
-	public sealed class UserInterfacePositioner : Component
+	public sealed partial class UserInterfacePositioner : Component
 	{
 		public readonly SyncRef<User> targetUser;
 		[Default(true)]

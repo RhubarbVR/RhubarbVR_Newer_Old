@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Importers" })]
-	public sealed class VideoImporter : Importer
+	public sealed partial class VideoImporter : Importer
 	{
 		public override Task ImportAsset() {
 			return Task.Run(async () => await ImportAsync(_importData.url_path, _importData.isUrl, _importData.rawData));

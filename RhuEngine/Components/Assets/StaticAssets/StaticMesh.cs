@@ -14,7 +14,7 @@ using RhuEngine.AssetSystem;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/StaticAssets" })]
-	public sealed class StaticMesh : StaticAsset<RMesh>
+	public sealed partial class StaticMesh : StaticAsset<RMesh>
 	{
 		public override void LoadAsset(byte[] data) {
 			try {

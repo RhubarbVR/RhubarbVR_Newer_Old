@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Container/Visuals")]
-	public abstract class UIVisuals : Container
+	public abstract partial class UIVisuals : Container
 	{
 		
 	}

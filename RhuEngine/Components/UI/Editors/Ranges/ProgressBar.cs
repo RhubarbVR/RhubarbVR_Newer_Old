@@ -15,7 +15,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Editors/Ranges")]
-	public class ProgressBar : Range
+	public partial class ProgressBar : Range
 	{
 		[Default(true)]
 		public readonly Sync<bool> ShowPerrcentage;

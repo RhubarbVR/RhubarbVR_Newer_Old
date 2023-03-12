@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 
 	[Category("UI/Editors")]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public class LineEdit : UIElement
+	public partial class LineEdit : UIElement
 	{
 		public override string EditString => Text.Value;
 

@@ -15,7 +15,7 @@ using RhuEngine.WorldObjects;
 namespace RhuEngine.Components
 {
 	[OverlayOnly]
-	public sealed class OverlayWorldManager : Component
+	public sealed partial class OverlayWorldManager : Component
 	{
 		
 	}

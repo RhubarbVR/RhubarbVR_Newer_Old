@@ -8,7 +8,7 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public class SyncPlayback : Sync<Playback>, ISyncMember
+	public sealed partial class SyncPlayback : Sync<Playback>, ISyncMember
 	{
 
 		public event Func<double> StateChange;

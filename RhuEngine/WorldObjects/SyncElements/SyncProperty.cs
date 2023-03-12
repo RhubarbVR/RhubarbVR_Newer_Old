@@ -13,19 +13,24 @@ namespace RhuEngine.WorldObjects
 	{
 		void Bind(string value, object from);
 	}
-	public sealed class SyncProperty<T> : SyncObject, ILinkerMember<T>,ISyncProperty, ISyncMember
+	public sealed partial class SyncProperty<T> : SyncObject, ILinkerMember<T>,ISyncProperty, ISyncMember
 	{
 		public Action<T> SetValue;
 		public Func<T> GetValue;
 
+		// Todo: could be removed for more performance
 		public void Bind(string value,object from) {
 			var property = from.GetType().GetProperty(value);
 			if (property.PropertyType != typeof(T)) {
 				throw new Exception($"Not vailed Property Type {value}");
 			}
 			if (property != null) {
-				SetValue = (v) => property.SetValue(from, v);
-				GetValue = () => (T)property.GetValue(from);
+				if (property.CanWrite) {
+					SetValue = (v) => property.SetValue(from, v);
+				}
+				if (property.CanRead) {
+					GetValue = () => (T)property.GetValue(from);
+				}
 			}
 		}
 

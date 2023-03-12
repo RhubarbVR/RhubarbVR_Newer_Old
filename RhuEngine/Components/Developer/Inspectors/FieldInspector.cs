@@ -17,7 +17,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "Developer/Inspectors" })]
-	public sealed class FieldInspector<T> : Component, IFiledInit where T : Component, IInspector, new()
+	public sealed partial class FieldInspector<T> : Component, IFiledInit where T : Component, IInspector, new()
 	{
 		[OnChanged(nameof(TargetLoad))]
 		public readonly SyncRef<IWorldObject> TargetObject;

@@ -14,7 +14,7 @@ using CategoryAttribute = RhuEngine.WorldObjects.ECS.CategoryAttribute;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Inspectors/Primitives" })]
-	public sealed class QuaternionEditor : BasePrimitive<Sync<Quaternionf>, Quaternionf>
+	public sealed partial class QuaternionEditor : BasePrimitive<Sync<Quaternionf>, Quaternionf>
 	{
 
 		[OnChanged(nameof(ValueChange))]

@@ -6,7 +6,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[AllowedOnWorldRoot]
-	public abstract class ProceduralMesh : AssetProvider<RMesh>
+	public abstract partial class ProceduralMesh : AssetProvider<RMesh>
 	{
 		public SimpleMesh LoadedSimpleMesh { get; private set; }
 

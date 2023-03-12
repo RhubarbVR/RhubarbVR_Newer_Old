@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "Interaction" })]
 	[SingleComponentLock]
-	public sealed class Grabbable : Component
+	public sealed partial class Grabbable : Component
 	{
 		public readonly SyncRef<Entity> lastParent;
 

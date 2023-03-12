@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Editors/Ranges/Slider")]
-	public abstract class Slider : Range
+	public abstract partial class Slider : Range
 	{
 		[Default(true)]
 		public readonly Sync<bool> Editable;

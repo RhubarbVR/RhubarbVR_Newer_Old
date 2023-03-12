@@ -10,7 +10,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer" })]
-	public sealed class WorldGizmo3D : Component
+	public sealed partial class WorldGizmo3D : Component
 	{
 		[OnChanged(nameof(UpdateModeData))]
 		public readonly Sync<GizmoMode> Mode;

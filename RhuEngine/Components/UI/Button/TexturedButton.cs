@@ -19,7 +19,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Button")]
-	public class TexturedButton : ButtonBase
+	public partial class TexturedButton : ButtonBase
 	{
 		public readonly Sync<bool> IgnoreTextureSize;
 		public readonly Sync<RTexturedButtonStretchMode> StretchMode;

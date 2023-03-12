@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "Developer/Inspectors" })]
-	public sealed class MethodInspector<T> : Component, IMethodInspector where T : Delegate
+	public sealed partial class MethodInspector<T> : Component, IMethodInspector where T : Delegate
 	{
 		public readonly SyncDelegate<T> TargetMethod;
 

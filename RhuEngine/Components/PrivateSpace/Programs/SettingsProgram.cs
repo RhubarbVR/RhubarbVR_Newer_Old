@@ -22,7 +22,7 @@ using TextCopy;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	public sealed class SettingsProgram : PrivateSpaceProgram
+	public sealed partial class SettingsProgram : PrivateSpaceProgram
 	{
 		public override RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.Settings;
 

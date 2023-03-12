@@ -168,7 +168,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI")]
-	public class UIElement : CanvasItem, IKeyboardInteraction
+	public partial class UIElement : CanvasItem, IKeyboardInteraction
 	{
 		public Matrix WorldPos => Entity.GlobalTrans;
 

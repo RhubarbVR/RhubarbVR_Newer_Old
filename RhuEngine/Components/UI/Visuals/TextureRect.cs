@@ -27,7 +27,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Container/Visuals")]
-	public class TextureRect : UIVisuals
+	public partial class TextureRect : UIVisuals
 	{
 		public readonly AssetRef<RTexture2D> Texture;
 		public readonly Sync<RExpandedMode> ExpandedMode;

@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Editors/Ranges/Slider")]
-	public class HorizontalSlider : Slider
+	public partial class HorizontalSlider : Slider
 	{
 		
 	}

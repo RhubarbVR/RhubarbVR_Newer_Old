@@ -7,7 +7,7 @@ using RhuEngine.WorldObjects.ECS;
 
 namespace RhuEngine.WorldObjects
 {
-	public sealed class AssetRef<T> : SyncRef<IAssetProvider<T>>, IAssetRef, IWorldObject where T : class
+	public sealed partial class AssetRef<T> : SyncRef<IAssetProvider<T>>, IAssetRef, IWorldObject where T : class
 	{
 		public T Asset => base.Target?.Value;
 

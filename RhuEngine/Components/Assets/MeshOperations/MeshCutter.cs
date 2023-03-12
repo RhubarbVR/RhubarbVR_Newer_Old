@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Mesh Operations" })]
-	public sealed class MeshCutter : ProceduralMesh
+	public sealed partial class MeshCutter : ProceduralMesh
 	{
 		[OnAssetLoaded(nameof(ComputeMesh))]
 		public readonly AssetRef<RMesh> TargetMesh;
@@ -18,6 +18,11 @@ namespace RhuEngine.Components
 		public readonly Sync<bool> RemoveSide;
 		[OnChanged(nameof(LoadMesh))]
 		public readonly Sync<bool> Cap;
+
+		private void ComputeMesh(RMesh _) {
+			ComputeMesh();
+		}
+
 		public override void ComputeMesh() {
 			if (!Engine.EngineLink.CanRender) {
 				return;

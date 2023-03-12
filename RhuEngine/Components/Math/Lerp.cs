@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 	[GenericTypeConstraint()]
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Math" })]
-	public sealed class Lerp<T> : Component
+	public sealed partial class Lerp<T> : Component
 	{
 		public readonly Linker<T> driver;
 		public readonly Sync<T> from;

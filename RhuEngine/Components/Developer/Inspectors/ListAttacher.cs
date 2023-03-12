@@ -90,7 +90,7 @@ namespace RhuEngine.Components
 
 
 	[Category(new string[] { "Developer/Inspectors" })]
-	public sealed class ListAttacher<T> : Component, IListAttacher where T : ISyncObject
+	public sealed partial class ListAttacher<T> : Component, IListAttacher where T : ISyncObject
 	{
 		public readonly SyncRef<IAbstractObjList<T>> TargetAddingObject;
 		public readonly SyncRef<BoxContainer> MainBox;

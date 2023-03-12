@@ -9,7 +9,7 @@ using static System.Net.Mime.MediaTypeNames;
 namespace RhuEngine.Components
 {
 	[Category("UI/Events")]
-	public sealed class UISizeEvents : ElementEvent<UIElement>
+	public sealed partial class UISizeEvents : ElementEvent<UIElement>
 	{
 		public readonly SyncDelegate Resized;
 		public readonly SyncDelegate SizeFlagsChanged;

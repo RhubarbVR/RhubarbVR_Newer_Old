@@ -9,7 +9,7 @@ namespace RhuEngine.Components
 
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "User" })]
-	public sealed class LocomotionManager : Component
+	public sealed partial class LocomotionManager : Component
 	{
 		public readonly SyncRef<User> user;
 

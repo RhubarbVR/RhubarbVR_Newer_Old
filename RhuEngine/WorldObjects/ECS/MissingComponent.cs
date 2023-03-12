@@ -7,7 +7,7 @@ using RhuEngine.Linker;
 namespace RhuEngine.WorldObjects.ECS
 {
 	[HideCategory]
-	public sealed class MissingComponent : Component
+	public sealed partial class MissingComponent : Component
 	{
 		public readonly Sync<string> type;
 

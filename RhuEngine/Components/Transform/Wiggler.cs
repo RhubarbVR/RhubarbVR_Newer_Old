@@ -7,7 +7,7 @@ namespace RhuEngine.Components
 {
 	[UpdateLevel(UpdateEnum.Movement)]
 	[Category(new string[] { "Transform" })]
-	public sealed class Wiggler: Component
+	public sealed partial class Wiggler: Component
 	{
 		public readonly Linker<Quaternionf> driver;
 

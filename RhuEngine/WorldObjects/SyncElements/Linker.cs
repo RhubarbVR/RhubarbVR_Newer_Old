@@ -1,6 +1,6 @@
 ﻿namespace RhuEngine.WorldObjects
 {
-	public sealed class Linker<T> : SyncRef<ILinkerMember<T>>, ILinker, ISyncMember, IChangeable
+	public sealed partial class Linker<T> : SyncRef<ILinkerMember<T>>, ILinker, ISyncMember, IChangeable
 	{
 		public Linker() { }
 

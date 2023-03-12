@@ -10,7 +10,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Textures" })]
-	public sealed class EdgeTexture : ProceduralTexture
+	public sealed partial class EdgeTexture : ProceduralTexture
 	{
 		[Default(1)]
 		[OnChanged(nameof(ComputeTexture))]

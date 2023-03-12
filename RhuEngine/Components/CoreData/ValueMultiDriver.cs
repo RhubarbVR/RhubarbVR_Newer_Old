@@ -7,7 +7,7 @@ namespace RhuEngine.Components
 {
 	[UpdatingComponent]
 	[Category(new string[] { "CoreData" })]
-	public sealed class ValueMultiDriver<T> : Component
+	public sealed partial class ValueMultiDriver<T> : Component
 	{
 		public readonly SyncObjList<Linker<T>> drivers;
 

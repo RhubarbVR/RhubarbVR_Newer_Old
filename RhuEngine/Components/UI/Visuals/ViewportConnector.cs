@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Container/Visuals")]
-	public class ViewportConnector : UIVisuals
+	public partial class ViewportConnector : UIVisuals
 	{
 		[OnChanged(nameof(LinkToViewport))]
 		public readonly SyncRef<Viewport> Target;

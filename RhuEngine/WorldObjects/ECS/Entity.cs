@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RhuEngine.WorldObjects.ECS
 {
-	public sealed class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox, IChangeable
+	public sealed partial class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox, IChangeable
 	{
 		private uint CompDepth => (InternalParent?.Depth + 1) ?? 0;
 
@@ -659,7 +659,6 @@ namespace RhuEngine.WorldObjects.ECS
 		[NoLoad]
 		[UnExsposed]
 		public CanvasItem CanvasItem { get; private set; }
-		public Entity() {
-		}
+
 	}
 }

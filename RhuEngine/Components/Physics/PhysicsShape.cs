@@ -18,7 +18,7 @@ using System.Reflection.Metadata;
 
 namespace RhuEngine.Components
 {
-	public abstract class PhysicsShape<T> : PhysicsObject where T : unmanaged, IShape
+	public abstract partial class PhysicsShape<T> : PhysicsObject where T : unmanaged, IShape
 	{
 		[Default(1f)]
 		[OnChanged(nameof(UpdateShape))]

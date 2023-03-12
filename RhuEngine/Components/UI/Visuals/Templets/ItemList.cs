@@ -17,7 +17,7 @@ namespace RhuEngine.Components
 		Top,
 	}
 	[Category("UI/Container/Visuals/Templets")]
-	public class ItemList : UITemplet
+	public sealed partial class ItemList : UITemplet
 	{
 		public readonly Sync<RItemListSelectMode> SelectMode;
 		public readonly Sync<bool> AllowReselect;
@@ -33,7 +33,7 @@ namespace RhuEngine.Components
 		[Default(1f)]public readonly Sync<float> IconScale;
 		public readonly Sync<Vector2i> FixedIconSize;
 
-		public class ItemListItem : SyncObject
+		public sealed partial class ItemListItem : SyncObject
 		{
 			public readonly Sync<string> Text;
 			public readonly AssetRef<RTexture2D> Icon;

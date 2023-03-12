@@ -12,9 +12,9 @@ namespace RhuEngine.WorldObjects
 {
 	public interface ISync : ISyncMember
 	{
-		public void SetStartingObjectNetworked();
+		public void SetStartingValueNetworked();
 
-		public void SetStartingObject();
+		public void SetStartingValue();
 		public void SetValue(object value);
 
 		public void SetValueForce(object value);
@@ -23,7 +23,7 @@ namespace RhuEngine.WorldObjects
 		public Type GetValueType();
 	}
 	[GenericTypeConstraint()]
-	public class Sync<T> : SyncObject, ILinkerMember<T>, ISync, INetworkedObject, IChangeable, ISyncMember
+	public partial class Sync<T> : SyncObject, ILinkerMember<T>, ISync, INetworkedObject, IChangeable, ISyncMember
 	{
 		private readonly object _locker = new();
 
@@ -216,7 +216,13 @@ namespace RhuEngine.WorldObjects
 
 		public bool NoSync { get; set; }
 
-		public virtual T StartingValue => default;
+		private T _starting_value = default;
+
+		internal void ChangeStartingValue(T value) {
+			_starting_value = value;
+		}
+
+		public virtual T StartingValue => _starting_value;
 
 		public void KillLink() {
 			linkedFromObj?.RemoveLinkLocation();
@@ -239,12 +245,12 @@ namespace RhuEngine.WorldObjects
 			OnLinked?.Invoke(value);
 		}
 
-		public void SetStartingObject() {
+		public void SetStartingValue() {
 			_value = StartingValue;
 			UpdatedValue();
 		}
 
-		public void SetStartingObjectNetworked() {
+		public void SetStartingValueNetworked() {
 			Value = StartingValue;
 		}
 

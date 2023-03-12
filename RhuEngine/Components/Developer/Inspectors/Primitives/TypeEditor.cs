@@ -14,7 +14,7 @@ using CategoryAttribute = RhuEngine.WorldObjects.ECS.CategoryAttribute;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Inspectors/Primitives" })]
-	public sealed class TypeEditor : BasePrimitive<ISync, Type>
+	public sealed partial class TypeEditor : BasePrimitive<ISync, Type>
 	{
 		[OnChanged(nameof(ValueChange))]
 		public readonly Linker<string> LineEditorValue;

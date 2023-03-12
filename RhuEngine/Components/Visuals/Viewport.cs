@@ -171,7 +171,7 @@ namespace RhuEngine.Components
 
 	[SingleComponentLock]
 	[Category(new string[] { "Visuals" })]
-	public sealed class Viewport : LinkedWorldComponent, IAssetProvider<RTexture2D>, IInputInterface
+	public sealed partial class Viewport : LinkedWorldComponent, IAssetProvider<RTexture2D>, IInputInterface
 	{
 		public readonly Sync<Vector2i> Size;
 		public readonly Sync<Vector2i> Size2DOverride;

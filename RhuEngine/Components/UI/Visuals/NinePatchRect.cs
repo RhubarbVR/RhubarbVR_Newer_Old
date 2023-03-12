@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Container/Visuals")]
-	public class NinePatchRect : UIVisuals
+	public partial class NinePatchRect : UIVisuals
 	{
 		public readonly AssetRef<RTexture2D> Texture;
 		[Default(true)]public readonly Sync<bool> DrawCenter;

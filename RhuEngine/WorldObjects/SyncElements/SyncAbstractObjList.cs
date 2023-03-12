@@ -16,7 +16,7 @@ namespace RhuEngine.WorldObjects
 	{
 		T Add(Type type, bool networkedObject = false, bool deserialize = false);
 	}
-	public sealed class SyncAbstractObjList<T> : SyncListBase<T>, IAbstractObjList<T>, INetworkedObject, IEnumerable<ISyncObject>, ISyncMember where T : class, ISyncObject
+	public sealed partial class SyncAbstractObjList<T> : SyncListBase<T>, IAbstractObjList<T>, INetworkedObject, IEnumerable<ISyncObject>, ISyncMember where T : class, ISyncObject
 	{
 		public W Add<W>(bool networkedObject = false, bool deserialize = false) where W : T, new() {
 			return (W)Add(typeof(W), networkedObject, deserialize);

@@ -6,7 +6,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/ConstAssets" })]
 	[AllowedOnWorldRoot]
-	public sealed class RhubarbLogo : AssetProvider<RTexture2D>
+	public sealed partial class RhubarbLogo : AssetProvider<RTexture2D>
 	{
 		[OnChanged(nameof(LoadTexture))]
 		public readonly Sync<bool> Filled;

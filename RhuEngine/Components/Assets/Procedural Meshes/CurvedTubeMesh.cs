@@ -10,7 +10,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class CurvedTubeMesh : ProceduralMesh
+	public sealed partial class CurvedTubeMesh : ProceduralMesh
 	{
 		[Default(0.005)]
 		[OnChanged(nameof(LoadMesh))]

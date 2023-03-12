@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Editors/Ranges/ScrollBar")]
-	public class VerticalScrollBar : ScrollBar
+	public partial class VerticalScrollBar : ScrollBar
 	{
 	}
 }

@@ -29,7 +29,7 @@ namespace RhuEngine.Components
 
 	[UpdateLevel(UpdateEnum.Normal)]
 	[OverlayOnly]
-	public sealed class GizmoAixe : Component
+	public sealed partial class GizmoAixe : Component
 	{
 		public readonly Sync<GizmoDir> Direction;
 		[OnChanged(nameof(UpdateMeshes))]

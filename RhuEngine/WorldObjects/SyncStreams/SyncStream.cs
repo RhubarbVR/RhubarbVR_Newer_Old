@@ -3,7 +3,7 @@ using RhuEngine.DataStructure;
 
 namespace RhuEngine.WorldObjects
 {
-	public abstract class SyncStream : SyncObject, INetworkedObject
+	public abstract partial class SyncStream : SyncObject, INetworkedObject
 	{
 		public readonly Sync<string> name;
 

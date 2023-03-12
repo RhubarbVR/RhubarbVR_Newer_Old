@@ -8,7 +8,7 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components.PrivateSpace.Programs.OverlayDialogues
 {
 	[PrivateSpaceOnly]
-	public abstract class OverlayDialogue: Component
+	public abstract partial class OverlayDialogue: Component
 	{
 		[NoSave]
 		[NoShow]

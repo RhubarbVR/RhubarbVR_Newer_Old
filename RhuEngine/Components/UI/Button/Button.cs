@@ -27,7 +27,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Button")]
-	public class Button : ButtonBase
+	public partial class Button : ButtonBase
 	{
 		public readonly Sync<string> Text;
 		public readonly AssetRef<RTexture2D> Icon;

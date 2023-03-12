@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public sealed class PrivateSpaceToolBar : Component
+	public sealed partial class PrivateSpaceToolBar : Component
 	{
 		public ProgramToolBar Tool { get; set; }
 

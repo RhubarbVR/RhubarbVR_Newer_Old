@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace RhuEngine.Components
 {
-	public abstract class BodyPhysicsObject : PhysicsObject
+	public abstract partial class BodyPhysicsObject : PhysicsObject
 	{
 
 	}

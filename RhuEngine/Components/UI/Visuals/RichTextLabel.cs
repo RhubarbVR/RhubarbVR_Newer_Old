@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Container/Visuals")]
-	public class RichTextLabel : UIVisuals
+	public partial class RichTextLabel : UIVisuals
 	{
 		[Default(true)]public readonly Sync<bool> BitcodeEnabled;
 		public readonly Sync<string> Text;

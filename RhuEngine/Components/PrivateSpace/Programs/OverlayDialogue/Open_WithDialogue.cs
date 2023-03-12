@@ -12,7 +12,7 @@ using RNumerics;
 namespace RhuEngine.Components.PrivateSpace.Programs.OverlayDialogues
 {
 	[PrivateSpaceOnly]
-	public sealed class Open_WithDialogue : OverlayDialogue
+	public sealed partial class Open_WithDialogue : OverlayDialogue
 	{
 		public void LoadImport(string file, Stream stream, string mimeType, string ex, object[] args = null) {
 			var scrollArray = programWindow.Entity.AddChild().AttachComponent<ScrollContainer>();

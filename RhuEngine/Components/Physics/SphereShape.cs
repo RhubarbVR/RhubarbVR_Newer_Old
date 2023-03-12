@@ -11,7 +11,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public sealed class SphereShape : BasicPhysicsShape<Sphere>
+	public sealed partial class SphereShape : BasicPhysicsShape<Sphere>
 	{
 		[Default(0.5f)]
 		[OnChanged(nameof(UpdateShape))]

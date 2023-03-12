@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Container/Visuals")]
-	public sealed class Panel : UIVisuals
+	public sealed partial class Panel : UIVisuals
 	{
 
 	}

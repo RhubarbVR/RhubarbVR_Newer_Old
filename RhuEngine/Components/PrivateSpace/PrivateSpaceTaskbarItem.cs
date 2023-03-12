@@ -12,7 +12,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	public sealed class PrivateSpaceTaskbarItem : Component
+	public sealed partial class PrivateSpaceTaskbarItem : Component
 	{
 		private RawAssetProvider<RTexture2D> _iconProvider;
 

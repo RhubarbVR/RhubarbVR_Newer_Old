@@ -11,7 +11,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public sealed class BoxShape : BasicPhysicsShape<Box>
+	public sealed partial class BoxShape : BasicPhysicsShape<Box>
 	{
 		[OnChanged(nameof(UpdateShape))]
 		public readonly Sync<Vector3f> Size;

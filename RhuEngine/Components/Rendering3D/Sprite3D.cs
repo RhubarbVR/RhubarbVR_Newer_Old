@@ -7,7 +7,7 @@ using System.Linq;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Rendering3D" })]
-	public sealed class Sprite3D : Sprite3DBase
+	public sealed partial class Sprite3D : Sprite3DBase
 	{
 		public readonly AssetRef<RTexture2D> texture;
 		[Default(1)]
@@ -49,7 +49,7 @@ namespace RhuEngine.Components
 		OpaquePrePass,
 	}
 	[Category(new string[] { "Rendering3D" })]
-	public abstract class Sprite3DBase : GeometryInstance3D, IWorldBoundingBox
+	public abstract partial class Sprite3DBase : GeometryInstance3D, IWorldBoundingBox
 	{
 		public abstract Vector2f SizeOfElement { get; }
 

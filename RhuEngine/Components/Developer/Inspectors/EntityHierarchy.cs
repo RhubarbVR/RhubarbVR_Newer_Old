@@ -13,7 +13,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Inspectors" })]
 	[UpdatingComponent]
-	public class EntityHierarchy : BaseInspector<Entity>
+	public sealed partial class EntityHierarchy : BaseInspector<Entity>
 	{
 		protected override bool MultiThreaded => false;
 

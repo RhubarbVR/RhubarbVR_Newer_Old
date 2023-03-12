@@ -11,7 +11,7 @@ namespace RhuEngine.Components
 
 	[UpdateLevel(UpdateEnum.PlayerInput)]
 	[Category(new string[] { "Interaction" })]
-	public sealed class GrabbableHolder : Component
+	public sealed partial class GrabbableHolder : Component
 	{
 		public readonly Linker<Vector3f> LazerScaleLinker;
 		public readonly Linker<Vector3f> LazerPosLinker;

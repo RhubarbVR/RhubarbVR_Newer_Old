@@ -8,7 +8,7 @@ namespace RhuEngine.Components
 {
 
 	[Category(new string[] { "Localisation" })]
-	public sealed class StandardLocale : Component
+	public sealed partial class StandardLocale : Component
 	{
 		[OnChanged(nameof(LoadLocale))]
 		public readonly Sync<string> Key;

@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class PointCloudMesh : ProceduralMesh {
+	public sealed partial class PointCloudMesh : ProceduralMesh {
 
 		public readonly SyncValueList<int> iList;
 

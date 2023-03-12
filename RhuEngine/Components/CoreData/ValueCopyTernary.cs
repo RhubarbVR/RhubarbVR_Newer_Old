@@ -4,7 +4,7 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "CoreData" })]
-	public sealed class ValueCopyTernary<T> : Component
+	public sealed partial class ValueCopyTernary<T> : Component
 	{
 		[OnChanged(nameof(OnChanged))]
 		public readonly Linker<T> Target;

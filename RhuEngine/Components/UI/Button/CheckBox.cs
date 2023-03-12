@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Button")]
-	public class CheckBox : Button
+	public partial class CheckBox : Button
 	{
 		protected override void OnAttach() {
 			base.OnAttach();

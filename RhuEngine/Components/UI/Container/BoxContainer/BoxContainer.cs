@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Container/BoxContainer")]
-	public class BoxContainer : Container
+	public partial class BoxContainer : Container
 	{
 		public readonly Sync<RBoxContainerAlignment> Alignment;
 		public readonly Sync<bool> Vertical;

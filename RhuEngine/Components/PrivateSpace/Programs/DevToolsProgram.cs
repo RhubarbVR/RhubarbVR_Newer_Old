@@ -33,7 +33,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer" })]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public sealed class DevToolsProgram : Program
+	public sealed partial class DevToolsProgram : Program
 	{
 		public readonly SyncObjList<SyncRef<WorldGizmo3D>> Gizmos;
 

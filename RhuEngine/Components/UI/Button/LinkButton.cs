@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Button")]
-	public class LinkButton : ButtonBase
+	public partial class LinkButton : ButtonBase
 	{
 		public readonly Sync<string> Text;
 		public readonly Sync<RUnderLine> UnderLine;

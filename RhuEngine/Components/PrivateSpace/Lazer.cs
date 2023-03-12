@@ -21,7 +21,7 @@ namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public sealed class LazerVisual : Component
+	public sealed partial class LazerVisual : Component
 	{
 		public bool HitPrivate;
 		public bool HitOverlay;

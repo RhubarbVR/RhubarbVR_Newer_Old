@@ -12,12 +12,16 @@ using System.Runtime.CompilerServices;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public abstract class PhysicsMeshShape<T, T2> : PhysicsShape<T> where T : unmanaged, IShape where T2 : PhysicsAddon, new()
+	public abstract partial class PhysicsMeshShape<T, T2> : PhysicsShape<T> where T : unmanaged, IShape where T2 : PhysicsAddon, new()
 	{
 		[OnAssetLoaded(nameof(TargetMeshUpdate))]
 		public readonly AssetRef<RMesh> TargetMesh;
 
 		protected RMesh _last;
+
+		private void TargetMeshUpdate(RMesh _) {
+			TargetMeshUpdate();
+		}
 
 		protected void TargetMeshUpdate() {
 			if (_last == TargetMesh.Asset) {

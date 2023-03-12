@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 {
 	[Category("UI/Editors/Ranges")]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public class SpinBox : Range
+	public partial class SpinBox : Range
 	{
 		[Default(true)]
 		public readonly Sync<bool> Editable;

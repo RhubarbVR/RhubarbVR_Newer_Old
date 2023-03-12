@@ -9,7 +9,7 @@ using RhuEngine.WorldObjects;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class UIPanelMesh : ProceduralMesh
+	public sealed partial class UIPanelMesh : ProceduralMesh
 	{
 		[Default(1f)]
 		[OnChanged(nameof(LoadMesh))]

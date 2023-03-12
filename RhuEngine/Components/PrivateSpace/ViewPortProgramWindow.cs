@@ -12,7 +12,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Local" })]
-	public sealed class ViewPortProgramWindow : ProgramWindow
+	public sealed partial class ViewPortProgramWindow : ProgramWindow
 	{
 		[Default("ViewPort Program Window")]
 		[OnChanged(nameof(UpdateData))]
@@ -29,6 +29,11 @@ namespace RhuEngine.Components
 
 		[OnAssetLoaded(nameof(UpdateData))]
 		public readonly AssetRef<RTexture2D> IconTexture;
+
+		private void UpdateData(RTexture2D _) {
+			UpdateData();
+		}
+
 		[OnChanged(nameof(SizePosUpdate))]
 		public readonly Linker<Vector2i> ViewPortSizeLink;
 		[OnChanged(nameof(SizePosUpdate))]

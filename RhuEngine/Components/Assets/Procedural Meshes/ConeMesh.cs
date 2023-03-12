@@ -6,7 +6,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class ConeMesh : ProceduralMesh
+	public sealed partial class ConeMesh : ProceduralMesh
 	{
 
 		[Default(1.0f)]

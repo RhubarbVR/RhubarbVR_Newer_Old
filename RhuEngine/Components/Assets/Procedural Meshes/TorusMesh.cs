@@ -6,7 +6,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Meshes" })]
-	public sealed class TorusMesh : ProceduralMesh
+	public sealed partial class TorusMesh : ProceduralMesh
 	{
 		[Default(2.0f)]
 		[OnChanged(nameof(LoadMesh))]

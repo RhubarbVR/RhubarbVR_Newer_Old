@@ -7,7 +7,7 @@ using DiscordRPC;
 
 namespace RhuEngine.Components
 {
-	public abstract class LocomotionModule : Component
+	public abstract partial class LocomotionModule : Component
 	{
 		public readonly AssetRef<RTexture2D> icon;
 

@@ -16,7 +16,7 @@ using System.Runtime.CompilerServices;
 
 namespace RhuEngine.Components
 {
-	public abstract class BasicPhysicsShape<T> : PhysicsShape<T> where T : unmanaged, IShape
+	public abstract partial class BasicPhysicsShape<T> : PhysicsShape<T> where T : unmanaged, IShape
 	{
 		public override void RemoveShape() {
 			if(ShapeIndex is not null) {

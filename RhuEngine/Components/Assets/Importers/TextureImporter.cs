@@ -9,7 +9,7 @@ using static Assimp.Metadata;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Importers" })]
-	public sealed class TextureImporter : Importer
+	public sealed partial class TextureImporter : Importer
 	{
 		public readonly SyncRef<IValueSource<bool>> srgbTextures;
 

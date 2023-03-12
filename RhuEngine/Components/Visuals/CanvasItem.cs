@@ -56,7 +56,7 @@ namespace RhuEngine.Components
 
 
 	[SingleComponentLock]
-	public abstract class CanvasItem : LinkedWorldComponent
+	public abstract partial class CanvasItem : LinkedWorldComponent
 	{
 		protected override bool AddToUpdateList => false;
 

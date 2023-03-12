@@ -11,7 +11,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Physics" })]
-	public sealed class CylinderShape : BasicPhysicsShape<Cylinder>
+	public sealed partial class CylinderShape : BasicPhysicsShape<Cylinder>
 	{
 		[Default(0.5f)]
 		[OnChanged(nameof(UpdateShape))]

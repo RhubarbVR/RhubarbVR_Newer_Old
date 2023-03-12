@@ -9,7 +9,7 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Textures" })]
-	public sealed class VoronoiTexture : ProceduralTexture
+	public sealed partial class VoronoiTexture : ProceduralTexture
 	{
 
 		[Default(12)]

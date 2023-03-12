@@ -9,7 +9,7 @@ using static System.Net.Mime.MediaTypeNames;
 namespace RhuEngine.Components
 {
 	[Category("UI/Events")]
-	public sealed class CanvasItemEvents : ElementEvent<CanvasItem>
+	public sealed partial class CanvasItemEvents : ElementEvent<CanvasItem>
 	{
 		public readonly SyncDelegate VisibilityChanged;
 		public readonly SyncDelegate Hidden;

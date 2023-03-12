@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Container")]
-	public class CenterContainer : Container
+	public partial class CenterContainer : Container
 	{
 		public readonly Sync<bool> UseTopLeft;
 	}

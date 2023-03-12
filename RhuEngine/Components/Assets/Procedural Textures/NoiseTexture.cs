@@ -9,7 +9,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Textures" })]
-	public sealed class NoiseTexture : ProceduralTexture
+	public sealed partial class NoiseTexture : ProceduralTexture
 	{
 		[Default(FastNoiseLite.NoiseType.OpenSimplex2)]
 		[OnChanged(nameof(ComputeTexture))]

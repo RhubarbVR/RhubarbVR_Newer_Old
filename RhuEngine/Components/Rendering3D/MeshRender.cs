@@ -15,7 +15,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "Rendering3D" })]
-	public class MeshRender : GeometryInstance3D, IWorldBoundingBox
+	public partial class MeshRender : GeometryInstance3D, IWorldBoundingBox
 	{
 		public readonly AssetRef<RMesh> mesh;
 

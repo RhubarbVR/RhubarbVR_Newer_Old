@@ -6,7 +6,7 @@ using RhuEngine.WorldObjects.ECS;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Procedural Textures" })]
-	public sealed class CheckerboardTexture : ProceduralTexture
+	public sealed partial class CheckerboardTexture : ProceduralTexture
 	{
 		[Default(10.0f)]
 		[OnChanged(nameof(ComputeTexture))]

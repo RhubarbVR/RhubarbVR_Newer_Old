@@ -17,7 +17,7 @@ namespace RhuEngine.WorldObjects
 {
 	public delegate NetPointer NetPointerUpdateDelegate();
 
-	public abstract class SyncObject : ISyncObject
+	public abstract partial class SyncObject : ISyncObject
 	{
 		private IDisposable[] _disposables = Array.Empty<IDisposable>();
 
@@ -120,7 +120,7 @@ namespace RhuEngine.WorldObjects
 			World?.UnRegisterWorldObject(this);
 			OnDispose = null;
 			Parent = null;
-			ClearAllSyncMembers();
+			//ClearAllSyncMembers(); Todo this forces memory clean up but currently uses reflection might not be needed anymore if all sync fields empty themselves
 			GC.SuppressFinalize(this);
 		}
 
@@ -235,73 +235,75 @@ namespace RhuEngine.WorldObjects
 		}
 
 		protected virtual void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer) {
-			try {
-				var data = GetType().FastGetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-				foreach (var item in data) {
-					if ((item.Attributes & FieldAttributes.InitOnly) == 0) {
-						continue;
-					}
-					if ((item.GetCustomAttribute<NoLoadAttribute>() == null) && typeof(SyncObject).IsAssignableFrom(item.FieldType) && !((item.GetCustomAttribute<NoSaveAttribute>() != null) && (item.GetCustomAttribute<NoSyncAttribute>() != null))) {
-						var instance = (SyncObject)Activator.CreateInstance(item.FieldType);
-						instance.Initialize(World, this, item.Name, networkedObject, deserialize, netPointer);
-						AddDisposable(instance);
-						if (typeof(ISyncProperty).IsAssignableFrom(item.FieldType)) {
-							var startValue = item.GetCustomAttribute<BindPropertyAttribute>();
-							if (startValue != null) {
-								((ISyncProperty)instance).Bind(startValue.Data, this);
-							}
-						}
-						if (typeof(ISync).IsAssignableFrom(item.FieldType)) {
-							var startValue = item.GetCustomAttribute<DefaultAttribute>();
-							if (startValue != null) {
-								((ISync)instance).SetValueForce(startValue.Data);
-							}
-							else {
-								((ISync)instance).SetStartingObject();
-							}
-						}
-						if (typeof(IAssetRef).IsAssignableFrom(item.FieldType)) {
-							var startValue = item.GetCustomAttribute<OnAssetLoadedAttribute>();
-							if (startValue != null) {
-								((IAssetRef)instance).BindMethod(startValue.Data, this);
-							}
-						}
-						if (typeof(IChangeable).IsAssignableFrom(item.FieldType)) {
-							//RLog.Info($"Loaded Change Field {GetType().GetFormattedName()} , {item.Name} type {item.FieldType.GetFormattedName()}");
-							var startValue = item.GetCustomAttribute<OnChangedAttribute>();
-							if (startValue != null) {
-								var method = GetType().FastGetMethods(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault();
-								if (method is null) {
-									throw new Exception($"Method {startValue.Data} not found");
-								}
-								else {
-									var prams = method.GetParameters();
-									if (prams.Length == 0) {
-										((IChangeable)instance).Changed += (obj) => method.Invoke(this, Array.Empty<object>());
-									}
-									else if (prams[0].ParameterType == typeof(IChangeable)) {
-										((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[1] { obj });
-									}
-									else {
-										throw new Exception($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
-									}
-								}
-							}
-						}
-						if (typeof(INetworkedObject).IsAssignableFrom(item.FieldType)) {
-							var startValue = item.GetCustomAttribute<NoSyncUpdateAttribute>();
-							if (startValue != null) {
-								((INetworkedObject)instance).NoSync = true;
-							}
-						}
-						item.SetValue(this, instance);
-					}
-				}
-			}
-			catch (Exception ex) {
-				RLog.Err("Failed to InitializeMembers" + ex.ToString());
-				throw new Exception("Failed to InitializeMembers", ex);
-			}
+			throw new Exception("Is using code Gen Now");
+			// Todo Remove after code gen is fully implemented
+			//try {
+			//	var data = GetType().FastGetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+			//	foreach (var item in data) {
+			//		if ((item.Attributes & FieldAttributes.InitOnly) == 0) {
+			//			continue;
+			//		}
+			//		if ((item.GetCustomAttribute<NoLoadAttribute>() == null) && typeof(SyncObject).IsAssignableFrom(item.FieldType) && !((item.GetCustomAttribute<NoSaveAttribute>() != null) && (item.GetCustomAttribute<NoSyncAttribute>() != null))) {
+			//			var instance = (SyncObject)Activator.CreateInstance(item.FieldType);
+			//			instance.Initialize(World, this, item.Name, networkedObject, deserialize, netPointer);
+			//			AddDisposable(instance);
+			//			if (typeof(ISyncProperty).IsAssignableFrom(item.FieldType)) {
+			//				var startValue = item.GetCustomAttribute<BindPropertyAttribute>();
+			//				if (startValue != null) {
+			//					((ISyncProperty)instance).Bind(startValue.Data, this);
+			//				}
+			//			}
+			//			if (typeof(ISync).IsAssignableFrom(item.FieldType)) {
+			//				var startValue = item.GetCustomAttribute<DefaultAttribute>();
+			//				if (startValue != null) {
+			//					((ISync)instance).SetValueForce(startValue.Data);
+			//				}
+			//				else {
+			//					((ISync)instance).SetStartingObject();
+			//				}
+			//			}
+			//			if (typeof(IAssetRef).IsAssignableFrom(item.FieldType)) {
+			//				var startValue = item.GetCustomAttribute<OnAssetLoadedAttribute>();
+			//				if (startValue != null) {
+			//					((IAssetRef)instance).BindMethod(startValue.Data, this);
+			//				}
+			//			}
+			//			if (typeof(IChangeable).IsAssignableFrom(item.FieldType)) {
+			//				//RLog.Info($"Loaded Change Field {GetType().GetFormattedName()} , {item.Name} type {item.FieldType.GetFormattedName()}");
+			//				var startValue = item.GetCustomAttribute<OnChangedAttribute>();
+			//				if (startValue != null) {
+			//					var method = GetType().FastGetMethods(startValue.Data, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault();
+			//					if (method is null) {
+			//						throw new Exception($"Method {startValue.Data} not found");
+			//					}
+			//					else {
+			//						var prams = method.GetParameters();
+			//						if (prams.Length == 0) {
+			//							((IChangeable)instance).Changed += (obj) => method.Invoke(this, Array.Empty<object>());
+			//						}
+			//						else if (prams[0].ParameterType == typeof(IChangeable)) {
+			//							((IChangeable)instance).Changed += (obj) => method.Invoke(this, new object[1] { obj });
+			//						}
+			//						else {
+			//							throw new Exception($"Cannot call method {startValue.Data} on type {GetType().GetFormattedName()}");
+			//						}
+			//					}
+			//				}
+			//			}
+			//			if (typeof(INetworkedObject).IsAssignableFrom(item.FieldType)) {
+			//				var startValue = item.GetCustomAttribute<NoSyncUpdateAttribute>();
+			//				if (startValue != null) {
+			//					((INetworkedObject)instance).NoSync = true;
+			//				}
+			//			}
+			//			item.SetValue(this, instance);
+			//		}
+			//	}
+			//}
+			//catch (Exception ex) {
+			//	RLog.Err("Failed to InitializeMembers" + ex.ToString());
+			//	throw new Exception("Failed to InitializeMembers", ex);
+			//}
 		}
 		public virtual IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
 			return syncObjectSerializerObject.CommonWorkerSerialize(this);

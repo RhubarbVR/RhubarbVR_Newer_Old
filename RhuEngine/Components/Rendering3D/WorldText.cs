@@ -37,7 +37,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "Rendering3D" })]
-	public sealed class TextLabel3D : GeometryInstance3D
+	public sealed partial class TextLabel3D : GeometryInstance3D
 	{
 		[Default(0.005f)]
 		public readonly Sync<float> PixelSize;

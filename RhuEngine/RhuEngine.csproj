@@ -13,8 +13,10 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>bin\$(TargetFramework)\Generated</CompilerGeneratedFilesOutputPath>
 	</PropertyGroup>
-
+	
 	<!-- Hide platform project folders from the solution explorer -->
 	<ItemGroup>
 		<Compile Remove="ImguiVeldrid\**" />
@@ -39,14 +41,15 @@
 		<PackageReference Include="LiteNetLib" Version="0.9.5.2" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="MimeTypes" Version="2.4.1">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
 		<PackageReference Include="NYoutubeDL" Version="0.11.2" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.0.0" />
 		<PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
+		<PackageReference Include="WebAssembly" Version="1.2.1" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -71,6 +74,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\RhubarbCloudClient\RhubarbCloudClient.csproj" />
+		<ProjectReference Include="..\RhubarbSourceGen\RhubarbSourceGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 		<ProjectReference Include="..\RNumerics\RNumerics.csproj" />
 		<ProjectReference Include="..\SharedModels\SharedModels.csproj" />
 	</ItemGroup>

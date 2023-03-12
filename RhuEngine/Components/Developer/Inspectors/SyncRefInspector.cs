@@ -12,7 +12,7 @@ using RhuEngine.Components.UI;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Developer/Inspectors" })]
-	public class SyncRefInspector<T, T2> : BaseInspector<T> where T : class, ISyncRef where T2 : class, IWorldObject
+	public sealed partial class SyncRefInspector<T, T2> : BaseInspector<T> where T : class, ISyncRef where T2 : class, IWorldObject
 	{
 		[Exposed]
 		public void SetNull() {

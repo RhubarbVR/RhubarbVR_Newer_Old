@@ -12,7 +12,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Local" })]
-	public sealed class ViewPortProgramToolBar : ProgramToolBar
+	public sealed partial class ViewPortProgramToolBar : ProgramToolBar
 	{
 		[OnChanged(nameof(ViewportUpdate))]
 		public readonly SyncRef<Viewport> Viewport;
@@ -36,6 +36,11 @@ namespace RhuEngine.Components
 
 		[OnAssetLoaded(nameof(UpdateData))]
 		public readonly AssetRef<RTexture2D> IconTexture;
+
+		private void UpdateData(RTexture2D _) {
+			UpdateData();
+		}
+
 		public override RTexture2D Icon => IconTexture.Asset;
 
 		public override event Action OnUpdateScale;

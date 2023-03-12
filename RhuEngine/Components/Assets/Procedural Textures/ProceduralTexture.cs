@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RhuEngine.Components
 {
-	public abstract class ProceduralTexture : ImageTexture
+	public abstract partial class ProceduralTexture : ImageTexture
 	{
 		protected RImageTexture2D RImageTexture2D;
 

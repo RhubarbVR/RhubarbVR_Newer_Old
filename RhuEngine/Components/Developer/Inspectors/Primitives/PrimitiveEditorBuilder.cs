@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category(new string[] { "Developer/Inspectors/Primitives" })]
-	public sealed class PrimitiveEditorBuilder<T> : BasePrimitive<Sync<T>, T>, IPrimitiveEditorBuilder
+	public sealed partial class PrimitiveEditorBuilder<T> : BasePrimitive<Sync<T>, T>, IPrimitiveEditorBuilder
 	{
 		public static Type GetPrimitiveBuildType(Type targetTest) {
 			if (targetTest == typeof(string)) {

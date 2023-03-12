@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Materials" })]
 	[AllowedOnWorldRoot]
-	public sealed class DynamicMaterial : AssetProvider<RMaterial>
+	public sealed partial class DynamicMaterial : AssetProvider<RMaterial>
 	{
 		[OnAssetLoaded(nameof(LoadMaterial))]
 		public readonly AssetRef<RShader> shader;
@@ -42,7 +42,7 @@ namespace RhuEngine.Components
 			catch { }
 		}
 
-		public abstract class PramInfo : SyncObject
+		public abstract partial class PramInfo : SyncObject
 		{
 			public readonly Sync<string> name;
 			public abstract object GetData();
@@ -62,7 +62,7 @@ namespace RhuEngine.Components
 			}
 		}
 		[GenericTypeConstraint()]
-		public class ValuePramInfo<T> : PramInfo
+		public sealed partial class ValuePramInfo<T> : PramInfo
 		{
 			[OnChanged(nameof(OnValueChangeed))]
 			public readonly Sync<T> value;
@@ -80,10 +80,14 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public class TexPramInfo : PramInfo
+		public sealed partial class TexPramInfo : PramInfo
 		{
 			[OnAssetLoaded(nameof(OnValueChangeed))]
 			public readonly AssetRef<RTexture2D> value;
+
+			private void OnValueChangeed(RTexture2D _) {
+				OnValueChangeed();
+			}
 
 			public override void SetValue(object newValue) {
 				try {
@@ -129,7 +133,7 @@ namespace RhuEngine.Components
 			get => (bool)GetParam("WIREFRAME_RHUBARB_CUSTOM").Item1.GetData();
 			set => TrySet("WIREFRAME_RHUBARB_CUSTOM", value);
 		}
-		private static void LoadMaterial() {
+		private static void LoadMaterial(RShader rShader) {
 			//if (!Engine.EngineLink.CanRender) {
 			//	return;
 			//}
@@ -366,7 +370,7 @@ namespace RhuEngine.Components
 
 		protected override void OnLoaded() {
 			base.OnLoaded();
-			LoadMaterial();
+			LoadMaterial(shader.Asset);
 		}
 	}
 }

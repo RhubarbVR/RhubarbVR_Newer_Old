@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "RhubarbPostProcessor": {
-      "commandName": "Project",
-      "commandLineArgs": "../../../../RhuEngine/bin/Release/net6.0/RhuEngine.dll\r\n../../../../RhuEngine/bin/Release/net6.0/"
-    }
-  }
-}

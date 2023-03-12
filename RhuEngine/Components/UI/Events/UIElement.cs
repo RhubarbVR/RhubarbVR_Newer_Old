@@ -9,7 +9,7 @@ using static System.Net.Mime.MediaTypeNames;
 namespace RhuEngine.Components
 {
 	[Category("UI/Events")]
-	public abstract class ElementEvent<T> : Component where T : CanvasItem
+	public abstract partial class ElementEvent<T> : Component where T : CanvasItem
 	{
 		protected override void OnLoaded() {
 			base.OnLoaded();

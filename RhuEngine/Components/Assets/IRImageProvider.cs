@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 	}
 
 
-	public abstract class ImageTexture : AssetProvider<RTexture2D>, IRImageProvider
+	public abstract partial class ImageTexture : AssetProvider<RTexture2D>, IRImageProvider
 	{
 		protected RImage _image;
 

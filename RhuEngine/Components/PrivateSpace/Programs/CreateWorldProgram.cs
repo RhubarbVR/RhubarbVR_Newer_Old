@@ -28,7 +28,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	public sealed class CreateWorldProgram : PrivateSpaceProgram
+	public sealed partial class CreateWorldProgram : PrivateSpaceProgram
 	{
 		private OptionButton _optionsAccess;
 

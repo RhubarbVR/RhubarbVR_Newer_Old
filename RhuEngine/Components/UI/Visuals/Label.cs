@@ -16,7 +16,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Container/Visuals")]
-	public class TextLabel : UIVisuals
+	public partial class TextLabel : UIVisuals
 	{
 		public readonly Sync<string> Text;
 		public readonly Sync<int> LineSpacing;

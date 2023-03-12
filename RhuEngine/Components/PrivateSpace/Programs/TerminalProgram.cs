@@ -28,7 +28,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	public sealed class TerminalProgram : PrivateSpaceProgram
+	public sealed partial class TerminalProgram : PrivateSpaceProgram
 	{
 		public override RhubarbAtlasSheet.RhubarbIcons IconFind => RhubarbAtlasSheet.RhubarbIcons.Terminal;
 

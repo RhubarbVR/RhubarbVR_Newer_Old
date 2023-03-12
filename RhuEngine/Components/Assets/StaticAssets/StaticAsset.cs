@@ -13,7 +13,7 @@ using System.IO;
 
 namespace RhuEngine.Components
 {
-	public abstract class StaticAsset<T> : AssetProvider<T> where T : class
+	public abstract partial class StaticAsset<T> : AssetProvider<T> where T : class
 	{
 		[OnChanged(nameof(StartLoadAsset))]
 		public readonly Sync<string> url;

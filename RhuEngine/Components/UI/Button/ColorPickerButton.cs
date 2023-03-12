@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Button")]
-	public class ColorPickerButton : Button
+	public partial class ColorPickerButton : Button
 	{
 		public readonly Sync<Colorf> Color;
 		public readonly Sync<bool> EditAlpha;

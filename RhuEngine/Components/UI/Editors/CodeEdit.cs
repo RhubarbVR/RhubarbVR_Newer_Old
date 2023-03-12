@@ -8,7 +8,7 @@ using System;
 namespace RhuEngine.Components
 {
 	[Category("UI/Editors")]
-	public class CodeEdit : TextEdit
+	public partial class CodeEdit : TextEdit
 	{
 		
 	}

@@ -11,7 +11,7 @@ namespace RhuEngine.WorldObjects.ECS
 		public bool Loaded { get; }
 
 	}
-	public abstract class AssetProvider<A> : Component, IAssetProvider<A> where A : class
+	public abstract partial class AssetProvider<A> : Component, IAssetProvider<A> where A : class
 	{
 		public event Action<A> OnAssetLoaded;
 

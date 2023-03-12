@@ -12,7 +12,7 @@ namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
 	[UpdateLevel(UpdateEnum.Normal)]
-	public sealed class PrivateSpaceManager : Component
+	public sealed partial class PrivateSpaceManager : Component
 	{
 
 		[NoSave]

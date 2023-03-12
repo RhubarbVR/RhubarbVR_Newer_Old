@@ -28,7 +28,7 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	public sealed class SessionsFinderProgram : PrivateSpaceProgram
+	public sealed partial class SessionsFinderProgram : PrivateSpaceProgram
 	{
 		private UIElement _element;
 

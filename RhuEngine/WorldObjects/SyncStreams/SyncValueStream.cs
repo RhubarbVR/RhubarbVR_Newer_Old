@@ -7,7 +7,7 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public class SyncValueStream<T> : SyncStream, ILinkerMember<T>, ISync, INetworkedObject, IChangeable
+	public partial class SyncValueStream<T> : SyncStream, ILinkerMember<T>, ISync, INetworkedObject, IChangeable
 	{
 		private readonly object _locker = new();
 
@@ -95,7 +95,7 @@ namespace RhuEngine.WorldObjects
 			OnLinked?.Invoke(value);
 		}
 
-		public void SetStartingObject() {
+		public void SetStartingValue() {
 		}
 		public virtual T OnSave(SyncObjectSerializerObject serializerObject) {
 			return _value;
@@ -117,7 +117,7 @@ namespace RhuEngine.WorldObjects
 			GC.SuppressFinalize(this);
 		}
 
-		public void SetStartingObjectNetworked() {
+		public void SetStartingValueNetworked() {
 		}
 	}
 }

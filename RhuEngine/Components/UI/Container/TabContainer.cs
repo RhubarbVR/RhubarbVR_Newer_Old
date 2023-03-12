@@ -14,7 +14,7 @@ namespace RhuEngine.Components
 	}
 
 	[Category("UI/Container")]
-	public class TabContainer : Container
+	public partial class TabContainer : Container
 	{
 		public readonly Sync<RTabAlignment> TabAlignment;
 		public readonly Sync<int> CurrentTab;

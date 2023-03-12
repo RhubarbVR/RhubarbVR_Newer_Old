@@ -10,7 +10,7 @@ using RNumerics;
 
 namespace RhuEngine.Components
 {
-	public abstract class ProgramToolBar : Component
+	public abstract partial class ProgramToolBar : Component
 	{
 		public abstract Viewport TargetViewport { get; }
 
