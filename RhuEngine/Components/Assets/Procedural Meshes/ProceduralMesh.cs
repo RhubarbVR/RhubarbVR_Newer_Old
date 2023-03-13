@@ -2,6 +2,7 @@
 using RNumerics;
 using RhuEngine.Linker;
 using System;
+using RhuEngine.WorldObjects;
 
 namespace RhuEngine.Components
 {
@@ -18,6 +19,10 @@ namespace RhuEngine.Components
 			else {
 				Value.LoadMesh(mesh);
 			}
+		}
+
+		protected void LoadMesh(IChangeable _) {
+			LoadMesh();
 		}
 
 		public void LoadMesh() {

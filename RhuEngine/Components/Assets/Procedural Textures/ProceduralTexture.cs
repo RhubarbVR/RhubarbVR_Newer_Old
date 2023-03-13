@@ -87,6 +87,10 @@ namespace RhuEngine.Components
 			}
 		}
 
+		protected void ComputeTexture(IChangeable _) {
+			ComputeTexture();
+		}
+
 		protected void ComputeTexture() {
 			if (!Engine.EngineLink.CanRender) {
 				return;

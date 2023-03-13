@@ -242,9 +242,19 @@ namespace RhuEngine.GameTests.Tests
 			public SyncObject GetObject();
 		}
 
-		public class TestSyncObject<T> : Component, ITestSyncObject where T : SyncObject
+		public class TestSyncObject<T> : Component, ITestSyncObject where T : SyncObject, new()
 		{
+			public TestSyncObject() {
+				SyncObject = new T();
+			}
+
 			public readonly T SyncObject;
+
+			protected override void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate netPointer) {
+				SyncObject.Initialize(World, this, nameof(SyncObject), networkedObject, deserialize, netPointer);
+				AddDisposable(SyncObject);
+				base.InitializeMembers(networkedObject, deserialize, netPointer);
+			}
 
 			public SyncObject GetObject() {
 				return SyncObject;
@@ -275,7 +285,7 @@ namespace RhuEngine.GameTests.Tests
 							}
 						}
 						catch (Exception normalex) {
-							if (normalex.InnerException.GetType() != typeof(SyncObject.NotVailedGenaric)) {
+							if (normalex.GetType() != typeof(SyncObject.NotVailedGenaric)) {
 								throw;
 							}
 							RLog.Warn("used Invailed Genaric Type");
@@ -373,7 +383,7 @@ namespace RhuEngine.GameTests.Tests
 		//}
 
 
-	
+
 		[TestMethod]
 		public void ParentChildToSelf() {
 			var testWorld = StartNewTestWorld();

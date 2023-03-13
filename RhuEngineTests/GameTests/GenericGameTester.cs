@@ -28,10 +28,12 @@ namespace RhuEngine.GameTests.Tests
 		}
 
 		public void Step() {
-			EngineStopWatch.Start();
-			app.Step();
 			rhu.Elapsed = EngineStopWatch.ElapsedMilliseconds;
+			if(rhu.Elapsed == 0) {
+				rhu.Elapsed = 1;
+			}
 			EngineStopWatch.Restart();
+			app.Step();
 			var wait = (int)((1000 / 120) - rhu.Elapsed);
 			if (wait > 0) {
 				Thread.Sleep(wait);
@@ -40,6 +42,7 @@ namespace RhuEngine.GameTests.Tests
 
 		public void Start(string[] args) {
 			Console.WriteLine("Starting Rhubarb Test!");
+			EngineStopWatch.Start();
 			cap = new OutputCapture();
 			rhu = new NullLinker();
 			var dir = AppDomain.CurrentDomain.BaseDirectory + $"\\Tests\\Test{DateTime.Now:yyyy-dd-M--HH-mm-ss}_{Guid.NewGuid()}\\";

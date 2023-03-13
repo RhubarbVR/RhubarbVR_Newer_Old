@@ -52,7 +52,11 @@ namespace RhuEngine.Components
 			Inputs.ChildChanged += Inputs_ChildChanged;
 		}
 
-		internal void Inputs_ChildChanged(IChangeable obj) {
+		internal void Inputs_ChildChanged(IChangeable _) {
+			ComputeOutput();
+		}
+
+		protected void ComputeOutput(IChangeable _) {
 			ComputeOutput();
 		}
 
@@ -102,6 +106,10 @@ namespace RhuEngine.Components
 				Compute(null);
 			}
 			_lastInputTwo = InputTwo.Target;
+		}
+
+		protected void ComputeOutput(IChangeable _) {
+			Compute(null);
 		}
 
 		protected void ComputeOutput() {
@@ -203,9 +211,15 @@ namespace RhuEngine.Components
 			}
 			_lastInput = Input.Target;
 		}
+		
+		protected void ComputeOutput(IChangeable changeable) {
+			Compute(changeable);
+		}
+
 		protected void ComputeOutput() {
 			Compute(null);
 		}
+		
 		internal void Compute(IChangeable changeable) {
 			if (Output.Linked) {
 				if(Input.Target is not null) {

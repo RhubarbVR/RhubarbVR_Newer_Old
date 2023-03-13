@@ -18,7 +18,7 @@ namespace RhuEngine.Components
 		[OnChanged(nameof(TintUpdate))]
 		public readonly Sync<Colorf> Tint;
 
-		[OnChanged(nameof (DullSidedUpdate))]
+		[OnChanged(nameof(DullSidedUpdate))]
 		public readonly Sync<bool> DullSided;
 
 		[OnAssetLoaded(nameof(TextureUpdate))]

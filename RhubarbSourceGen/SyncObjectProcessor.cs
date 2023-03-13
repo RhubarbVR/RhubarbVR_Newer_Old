@@ -57,59 +57,6 @@ namespace RhubarbSourceGen
 					}
 					initializeMembersMethod.AppendLine($"\tAddDisposable({field.Declaration.Variables});");
 
-					var isIChangeable = context.GetHasClassOrIterface(context.GetType(field.Declaration.Type.ToString()), "IChangeable");
-					if (isIChangeable) {
-						var onChangedAttribute = field.GetAtrubute("OnChangedAttribute");
-						if (onChangedAttribute is not null) {
-							var targetMethodName = onChangedAttribute.ArgumentList.Arguments.First().ToString();
-							if (targetMethodName.StartsWith("nameof(")) {
-								targetMethodName = targetMethodName.Substring(7);
-								targetMethodName = targetMethodName.Remove(targetMethodName.Length - 1);
-							}
-							void AddMethod(MethodDeclarationSyntax methodDeclarationSyntax) {
-								var hasPram = methodDeclarationSyntax.ParameterList.Parameters.Count == 1;
-								if (hasPram) {
-									initializeMembersMethod.AppendLine($"\t{field.Declaration.Variables}.Changed += {targetMethodName};");
-								}
-								else {
-									if (!addedGenMethods.Contains(targetMethodName)) {
-										addedInnerClassData.AppendLine($"\tprivate void {targetMethodName}_AddedPram_Gen(IChangeable change) {{\n\t\t{targetMethodName}();\n\t}}");
-										addedGenMethods.Add(targetMethodName);
-									}
-									initializeMembersMethod.AppendLine($"\t{field.Declaration.Variables}.Changed += {targetMethodName}_AddedPram_Gen;");
-								}
-							}
-							var targetMethods = syncObject.Members.Where(x => x is MethodDeclarationSyntax).Cast<MethodDeclarationSyntax>().Where(x => x.Identifier.ToString() == targetMethodName).Where(x => x.ParameterList.Parameters.Count <= 1).ToList();
-							if (targetMethods.Count == 1) {
-								AddMethod(targetMethods.First());
-							}
-							else if (targetMethods.Count > 2) {
-								MethodDeclarationSyntax bestOption = null;
-								foreach (var item in targetMethods) {
-									if (bestOption is null) {
-										bestOption = item;
-										continue;
-									}
-									if (item.ParameterList.Parameters.Count == 1 && bestOption.ParameterList.Parameters.Count == 0) {
-										if (item.ParameterList.Parameters[0].Type.ToString() == "IChangeable") {
-											bestOption = item;
-											continue;
-										}
-									}
-									if (bestOption.ParameterList.Parameters.Count == 1 && item.ParameterList.Parameters.Count == 0) {
-										if (bestOption.ParameterList.Parameters[0].Type.ToString() == "IChangeable") {
-											continue;
-										}
-										else {
-											bestOption = item;
-										}
-									}
-								}
-								AddMethod(bestOption);
-							}
-
-						}
-					}
 					var isISyncProperty = context.GetHasClassOrIterface(context.GetType(field.Declaration.Type.ToString()), "ISyncProperty");
 					if (isISyncProperty) {
 						var bindPropertyAttribute = field.GetAtrubute("BindPropertyAttribute");
@@ -143,7 +90,63 @@ namespace RhubarbSourceGen
 							initializeMembersMethod.AppendLine($"\t{field.Declaration.Variables}.NoSync = true;");
 						}
 					}
+					var isIChangeable = context.GetHasClassOrIterface(context.GetType(field.Declaration.Type.ToString()), "IChangeable");
+					if (isIChangeable) {
+						var onChangedAttribute = field.GetAtrubute("OnChangedAttribute");
+						if (onChangedAttribute is not null) {
+							var targetMethodName = onChangedAttribute.ArgumentList.Arguments.First().ToString();
+							if (targetMethodName.StartsWith("nameof(")) {
+								targetMethodName = targetMethodName.Substring(7);
+								targetMethodName = targetMethodName.Remove(targetMethodName.Length - 1);
+							}
+							void AddMethod(MethodDeclarationSyntax methodDeclarationSyntax) {
+								var hasPram = methodDeclarationSyntax.ParameterList.Parameters.Count == 1;
+								if (hasPram) {
+									initializeMembersMethod.AppendLine($"\t{field.Declaration.Variables}.Changed += {targetMethodName};");
+								}
+								else {
+									if (!addedGenMethods.Contains(targetMethodName)) {
+										addedInnerClassData.AppendLine($"\tprivate void {targetMethodName}_AddedPram_Gen(IChangeable change) {{\n\t\t{targetMethodName}();\n\t}}");
+										addedGenMethods.Add(targetMethodName);
+									}
+									initializeMembersMethod.AppendLine($"\t{field.Declaration.Variables}.Changed += {targetMethodName}_AddedPram_Gen;");
+								}
+							}
+							var targetMethods = syncObject.Members.Where(x => x is MethodDeclarationSyntax).Cast<MethodDeclarationSyntax>().Where(x => x.Identifier.ToString() == targetMethodName).Where(x => x.ParameterList.Parameters.Count <= 1).ToList();
+							if (targetMethods.Count == 0) {
+								Debug.WriteLine($"Method {targetMethodName} not part of this class so using it plane needs to have pram");
+								initializeMembersMethod.AppendLine($"\t{field.Declaration.Variables}.Changed += {targetMethodName};");
+							}
+							else if (targetMethods.Count == 1) {
+								AddMethod(targetMethods.First());
+							}
+							else if (targetMethods.Count > 2) {
+								MethodDeclarationSyntax bestOption = null;
+								foreach (var item in targetMethods) {
+									if (bestOption is null) {
+										bestOption = item;
+										continue;
+									}
+									if (item.ParameterList.Parameters.Count == 1 && bestOption.ParameterList.Parameters.Count == 0) {
+										if (item.ParameterList.Parameters[0].Type.ToString() == "IChangeable") {
+											bestOption = item;
+											continue;
+										}
+									}
+									if (bestOption.ParameterList.Parameters.Count == 1 && item.ParameterList.Parameters.Count == 0) {
+										if (bestOption.ParameterList.Parameters[0].Type.ToString() == "IChangeable") {
+											continue;
+										}
+										else {
+											bestOption = item;
+										}
+									}
+								}
+								AddMethod(bestOption);
+							}
 
+						}
+					}
 					hasAnyLoadClasses = true;
 				}
 				if (!syncObject.BaseList.Types.Any(x => x.Type.ToString() == "SyncObject")) {

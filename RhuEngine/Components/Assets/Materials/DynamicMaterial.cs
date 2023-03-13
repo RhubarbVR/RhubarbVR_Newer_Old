@@ -47,6 +47,14 @@ namespace RhuEngine.Components
 			public readonly Sync<string> name;
 			public abstract object GetData();
 
+			protected void OnValueChangeed(IChangeable _) {
+				OnValueChangeed();
+			}
+
+			protected void OnValueChangeed(RTexture2D _) {
+				OnValueChangeed();
+			}
+
 			public void OnValueChangeed() {
 				MaterialLoaded();
 			}

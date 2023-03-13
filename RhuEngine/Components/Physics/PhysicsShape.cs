@@ -67,6 +67,10 @@ namespace RhuEngine.Components
 
 		public abstract T CreateShape(ref float speculativeMargin, float? mass, out BodyInertia inertia);
 
+		protected void UpdateShape(IChangeable changeable) {
+			UpdateShape();
+		}
+
 		public void UpdateShape() {
 			RUpdateManager.ExecuteOnEndOfUpdate(this, UpdateShapeNow);
 		}
@@ -149,7 +153,7 @@ namespace RhuEngine.Components
 
 		public void RemoveBody() {
 			if (_staticHandle is not null) {
-				Simulation.UnRegisterPhysicsObject(_staticHandle.Value);
+				Simulation?.UnRegisterPhysicsObject(_staticHandle.Value);
 				_staticHandle = default;
 			}
 		}
