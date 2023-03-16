@@ -154,10 +154,9 @@
 
     "Fact.Rhubarb.webclient": "Rhubarb má webového klienta",
     "Fact.Rhubarb.RhuEngine": "Rhubarb je poháněn RhuEngine",
-    "Fact.Rhubarb.BackEnds": "Rhubarb má mnoho renderovacích backendů",
+    "Fact.Rhubarb.PoweredByGodot": "Rhubarb je poháněna Godotem",
     "Fact.Rhubarb.SkinMeshes": "Rhubarb má skin meshe",
-    "Fact.Rhubarb.EcmaScipt": "Rhubarb podporuje EcmaScipt scriptování",
-    "Fact.Rhubarb.JavaScript": "Rhubarb nemá rád nazývání EcmaSciptu JavaScriptem",
+    "Fact.Rhubarb.WASM": "Rhubarb podporuje WASM scriptování",
     "Fact.Rhubarb.2": "Rhubarb2 nebude nikdy existovat",
     "Fact.Rhubarb.vegetable": "Rhubarb(rebarbora) je zelenina",
     "Fact.Rhubarb": ".-. .... ..- -... .- .-. -...",
