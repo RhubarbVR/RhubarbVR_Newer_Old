@@ -23,8 +23,13 @@ extern RhuString create_UTF8_string(char* data);
 //Makes a string that can then be used with methods with utf32
 extern RhuString create_UTF32_string(int* data);
 
+#if defined(__cplusplus)
 //Gets a Delegate that can be used to then call a method
 extern RhuDelegate method_bind(RhuString targetType, RhuString methodName, int argumentCount, int methodHash, RhuString genericDefinition = NULLRhuID);
+#else
+//Gets a Delegate that can be used to then call a method
+extern RhuDelegate method_bind(RhuString targetType, RhuString methodName, int argumentCount, int methodHash, RhuString genericDefinition);
+#endif
 
 //Gets a Delegate that takes target object and returns data in that field
 extern RhuDelegate field_bind(RhuString targetType, RhuString fieldName);
