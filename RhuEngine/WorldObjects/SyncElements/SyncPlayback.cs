@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using RhuEngine.DataStructure;
+using RhuEngine.Datatypes;
 
 using RNumerics;
 

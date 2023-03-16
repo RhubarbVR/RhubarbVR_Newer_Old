@@ -206,6 +206,8 @@ namespace RhuEngine
 
 		public NetApiManager netApiManager;
 
+		public WasmManager wasmManager = new();
+
 		public WindowManager windowManager = new();
 
 		public WorldManager worldManager = new();
@@ -274,7 +276,7 @@ namespace RhuEngine
 				netApiManager = new NetApiManager((_userDataPathOverRide ?? EngineHelpers.BaseDir) + "/rhuCookie");
 				IntMsg = "Building AssetManager";
 				assetManager = new AssetManager(_cachePathOverRide);
-				_managers = new IManager[] { discordManager, windowManager, fileManager, localisationManager, inputManager, netApiManager, assetManager, worldManager };
+				_managers = new IManager[] { discordManager, windowManager, fileManager, localisationManager, inputManager, netApiManager, assetManager, wasmManager, worldManager };
 				foreach (var item in _managers) {
 					IntMsg = $"Starting {item.GetType().Name}";
 					try {

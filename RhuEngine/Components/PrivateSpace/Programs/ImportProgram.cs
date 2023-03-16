@@ -85,6 +85,12 @@ namespace RhuEngine.Components
 			grid.Columns.Value = 2;
 			var root = grid.Entity;
 			var gettype = ImportStatics.GetFileTypes(path, mimetype);
+			if ((gettype & ImportStatics.FileTypes.Binary) != ImportStatics.FileTypes.None) {
+				var button = AddSelectionButton(root, "Binary", OpenBinary);
+				if (gettype == ImportStatics.FileTypes.Binary) {
+					button.Item2?.Invoke();
+				}
+			}
 			if ((gettype & ImportStatics.FileTypes.Text) != ImportStatics.FileTypes.None) {
 				var button = AddSelectionButton(root, "Text", OpenText);
 				if (gettype == ImportStatics.FileTypes.Text) {
@@ -136,6 +142,16 @@ namespace RhuEngine.Components
 			box.Vertical.Value = true;
 			import.BuildUI(box.Entity);
 			return import;
+		}
+
+		[Exposed]
+		public void OpenBinary() {
+			if (!_hasImportData) { return; }
+			if (scroll.Target is null) {
+				return;
+			}
+			scroll.Target.Entity.DestroyChildren();
+			BuildAttachEntity<BinaryImporter>();
 		}
 
 		[Exposed]

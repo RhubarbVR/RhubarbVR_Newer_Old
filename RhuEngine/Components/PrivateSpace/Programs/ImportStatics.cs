@@ -25,7 +25,7 @@ namespace RhuEngine.Components
 	{
 		public enum FileTypes
 		{
-			Unknown = Image | Mesh | Video | Audio | Text | Font,
+			Unknown = Image | Mesh | Video | Audio | Text | Font | Binary,
 			None = 0,
 			Image = 1,
 			Mesh = 2,
@@ -33,6 +33,7 @@ namespace RhuEngine.Components
 			Audio = 8,
 			Text = 16,
 			Font = 32,
+			Binary = 64
 		}
 
 		public static FileTypes GetFileTypes(string fileName, string mimeType) {
@@ -42,27 +43,41 @@ namespace RhuEngine.Components
 			var fileTypes = FileTypes.None;
 			if (IsTextImport(fileName, mimeType)) {
 				fileTypes |= FileTypes.Text;
+				fileTypes |= FileTypes.Binary;
 			}
 			if (IsAudioImport(fileName, mimeType)) {
 				fileTypes |= FileTypes.Audio;
+				fileTypes |= FileTypes.Binary;
 			}
 			if (IsVideoImport(fileName, mimeType)) {
 				fileTypes |= FileTypes.Video;
+				fileTypes |= FileTypes.Binary;
 			}
 			if (IsMeshImport(fileName, mimeType)) {
 				fileTypes |= FileTypes.Mesh;
+				fileTypes |= FileTypes.Binary;
 			}
 			if (IsTextureImport(fileName, mimeType)) {
 				fileTypes |= FileTypes.Image;
+				fileTypes |= FileTypes.Binary;
 			}
 			if (IsFontImport(fileName, mimeType)) {
 				fileTypes |= FileTypes.Font;
+				fileTypes |= FileTypes.Binary;
+			}
+			if (IsBinaryImport(fileName, mimeType)) {
+				fileTypes |= FileTypes.Binary;
 			}
 			return fileTypes == FileTypes.None ? FileTypes.Unknown : fileTypes;
 		}
 
 		public static bool ChechMimeType(string mimeType, string target) {
 			return "application/octet-stream" == mimeType || (mimeType?.Contains(target) ?? false);
+		}
+
+
+		public static bool IsBinaryImport(string fileName, string mimeType) {
+			return ChechMimeType(mimeType, "application/octet-stream") || ChechMimeType(mimeType, "application/wasm") || ChechMimeType(mimeType, "application/wat") || ChechMimeType(mimeType, "wasm") || (fileName?.EndsWith(".wasm") ?? false) || (fileName?.EndsWith(".wat") ?? false);
 		}
 
 		public static bool IsTextImport(string fileName, string mimeType) {

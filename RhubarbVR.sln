@@ -46,7 +46,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Networking", "Networking", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{1A6B5F9A-EEFA-4E81-B2AC-062094930C71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RhubarbSourceGen", "RhubarbSourceGen\RhubarbSourceGen.csproj", "{1F4B73EA-374E-4DC8-B22E-B7CDFBDFE65C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RhubarbSourceGen", "RhubarbSourceGen\RhubarbSourceGen.csproj", "{1F4B73EA-374E-4DC8-B22E-B7CDFBDFE65C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WasmStuff", "WasmStuff", "{DA819E95-FBC4-46A9-9908-A6025786AA15}"
+	ProjectSection(SolutionItems) = preProject
+		WasmStuff\README.md = WasmStuff\README.md
+		WasmStuff\RhubarbLink.h = WasmStuff\RhubarbLink.h
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -609,6 +615,7 @@ Global
 		{23695E97-042B-4598-B4C5-D718F119DD92} = {0DB81108-8D98-46C4-9F2F-CE7F6E43CD80}
 		{4216FBAE-F218-47CE-AE49-8104C5F15E14} = {22090651-387D-4E47-BF87-4B854DCE5DB1}
 		{1F4B73EA-374E-4DC8-B22E-B7CDFBDFE65C} = {1C348BE5-DAE6-427E-8656-AFE4C04E71FE}
+		{DA819E95-FBC4-46A9-9908-A6025786AA15} = {0CECEEEE-3BDA-4123-9510-99BA1B1D55F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7DB834FE-21C4-4AE7-B612-2D0EB7EF458F}

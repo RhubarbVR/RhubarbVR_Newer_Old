@@ -195,42 +195,49 @@ namespace RNumerics
 		}
 
 
-
+		[Exposed]
 		public float DistanceSquared(in Vector2f v2) {
 			float dx = v2.x - x, dy = v2.y - y;
 			return (dx * dx) + (dy * dy);
 		}
+		[Exposed]
 		public float Distance(in Vector2f v2) {
 			float dx = v2.x - x, dy = v2.y - y;
 			return (float)Math.Sqrt((dx * dx) + (dy * dy));
 		}
+		[Exposed]
 		public float Distance(in Vector2d v2) {
 			return Distance((Vector2f)v2);
 		}
-
+		[Exposed]
 		public void Set(in Vector2f o) {
 			x = o.x;
 			y = o.y;
 		}
+		[Exposed]
 		public void Set(in float fX, in float fY) {
 			x = fX;
 			y = fY;
 		}
+		[Exposed]
 		public void Add(in Vector2f o) {
 			x += o.x;
 			y += o.y;
 		}
+		[Exposed]
 		public void Subtract(in Vector2f o) {
 			x -= o.x;
 			y -= o.y;
 		}
+		[Exposed]
 		public static Vector2f MinMaxIntersect(in Vector2d point, in Vector2f min, in Vector2f max) {
 			return MinMaxIntersect((Vector2f)point, min, max);
 		}
+		[Exposed]
 		public static Vector2f MinMaxIntersect(in Vector2f point, in Vector2f min, in Vector2f max) {
 			return new Vector2f(Math.Max(Math.Min(point.x,max.x),min.x), Math.Max(Math.Min(point.y, max.y), min.y));
 		}
-
+		[Exposed]
 		public static Vector2f? Intersect(in Vector2d line1V1, in Vector2d line1V2, in Vector2f line2V1, in Vector2f line2V2) {
 			var A1 = line1V2.y - line1V1.y;
 			var B1 = line1V1.x - line1V2.x;
@@ -248,6 +255,7 @@ namespace RNumerics
 				return new Vector2f(x, y);
 			}
 		}
+		[Exposed]
 		public static Vector2f? Intersect(in Vector2f line1V1, in Vector2f line1V2, in Vector2f line2V1, in Vector2f line2V2) {
 			var A1 = line1V2.y - line1V1.y;
 			var B1 = line1V1.x - line1V2.x;
@@ -293,7 +301,7 @@ namespace RNumerics
 		public override int GetHashCode() {
 			return HashCode.Combine(x, y);
 		}
-
+		[Exposed]
 		public Vector2f ClosestPointOnLine(in Vector2f first, in Vector2f next) {
 			var thisfirst = this - first;
 			var nextfitst = next - first;
@@ -345,7 +353,7 @@ namespace RNumerics
 				return *(Vector2f*)vector3f;
 			}
 		}
-
+		[Exposed]
 		public static Vector2f GetUVPosOnTry(in Vector3d p1, in Vector2f p1uv, in Vector3d p2, in Vector2f p2uv, in Vector3d p3, in Vector2f p3uv, in Vector3d point) {
 			// calculate vectors from point f to vertices p1, p2 and p3:
 			var f1 = p1 - point;

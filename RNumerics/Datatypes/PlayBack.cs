@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using RNumerics;
 
-namespace RhuEngine.DataStructure
+namespace RhuEngine.Datatypes
 {
 	public struct Playback : ISerlize<Playback>
 	{

@@ -118,6 +118,9 @@ namespace RhubarbSourceGen
 
 
 		public static bool GetHasClassOrIterface(this GeneratorExecutionContext context, TypeDeclarationSyntax typeDeclaration, string classOrInterfaceName) {
+			if(typeDeclaration is null) {
+				return false;
+			}
 			var stacks = new Stack<TypeDeclarationSyntax>();
 			stacks.Push(typeDeclaration);
 			while (stacks.Count > 0) {
@@ -190,7 +193,11 @@ namespace RhubarbSourceGen
 				.Where(x => x is ClassDeclarationSyntax)
 				.Cast<ClassDeclarationSyntax>();
 		}
-
+		public static IEnumerable<TypeDeclarationSyntax> GetAllTypes(this GeneratorExecutionContext context) {
+			return context.Compilation.SyntaxTrees.SelectMany((x) => x.GetRoot().DescendantNodes())
+				.Where(x => x is TypeDeclarationSyntax)
+				.Cast<TypeDeclarationSyntax>();
+		}
 		public static IEnumerable<StructDeclarationSyntax> GetAllStructs(this GeneratorExecutionContext context) {
 			return context.Compilation.SyntaxTrees.SelectMany((x) => x.GetRoot().DescendantNodes())
 				.Where(x => x is StructDeclarationSyntax)

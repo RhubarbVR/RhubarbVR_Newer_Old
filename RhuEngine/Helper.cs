@@ -17,19 +17,29 @@ namespace RhuEngine
 {
 	public static class Helper
 	{
-		public static Type CreateDelegateType(this MethodInfo methodInfo) {
-			Func<Type[], Type> getType;
-			var isAction = methodInfo.ReturnType.Equals((typeof(void)));
+		public static Type CreateDelegateTypeWithObject(this MethodInfo methodInfo) {
 			var types = methodInfo.GetParameters().Select(p => p.ParameterType);
-
-			if (isAction) {
-				getType = Expression.GetActionType;
+			if (!methodInfo.IsStatic) {
+				types = types.Prepend(methodInfo.DeclaringType);
+			}
+			if (methodInfo.ReturnType == typeof(void)) {
+				return Expression.GetActionType(types.ToArray());
 			}
 			else {
-				getType = Expression.GetFuncType;
-				types = types.Concat(new[] { methodInfo.ReturnType });
+				types.Append(methodInfo.ReturnType);
+				return Expression.GetFuncType(types.ToArray());
 			}
-			return getType(types.ToArray());
+		}
+
+		public static Type CreateDelegateType(this MethodInfo methodInfo) {
+			var types = methodInfo.GetParameters().Select(p => p.ParameterType);
+			if (methodInfo.ReturnType == typeof(void)) {
+				return Expression.GetActionType(types.ToArray());
+			}
+			else {
+				types.Append(methodInfo.ReturnType);
+				return Expression.GetFuncType(types.ToArray());
+			}
 		}
 
 		public static (string ProgramName, RTexture2D icon) GetProgramInfo(this Type type) {
