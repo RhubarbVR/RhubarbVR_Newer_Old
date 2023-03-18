@@ -47,22 +47,29 @@ namespace RNumerics
 
 		[JsonIgnore]
 		public float Magnitude => (float)Math.Sqrt((x * x) + (y * y) + (z * z));
-
+		[Exposed]
 		public Vector3f() {
 			x = 0f;
 			y = 0f;
 			z = 0f;
 		}
-
+		[Exposed]
 		public Vector3f(in float f) { x = y = z = f; }
+		[Exposed]
 		public Vector3f(in float x, in float y, in float z) { this.x = x; this.y = y; this.z = z; }
-		public Vector3f(in float x, in float y) { this.x = x; this.y = y; z = 0f; }
-		public Vector3f(in float[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; }
-		public Vector3f(in Vector3f copy) { x = copy.x; y = copy.y; z = copy.z; }
+		[Exposed]
+        public Vector3f(in float x, in float y) { this.x = x; this.y = y; z = 0f; }
+		[Exposed]
+        public Vector3f(in float[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; }
+		[Exposed]
+        public Vector3f(in Vector3f copy) { x = copy.x; y = copy.y; z = copy.z; }
 
-		public Vector3f(in double f) { x = y = z = (float)f; }
-		public Vector3f(in double x, in double y, in double z) { this.x = (float)x; this.y = (float)y; this.z = (float)z; }
-		public Vector3f(in double[] v2) { x = (float)v2[0]; y = (float)v2[1]; z = (float)v2[2]; }
+		[Exposed]
+        public Vector3f(in double f) { x = y = z = (float)f; }
+		[Exposed]
+        public Vector3f(in double x, in double y, in double z) { this.x = (float)x; this.y = (float)y; this.z = (float)z; }
+		[Exposed]
+        public Vector3f(in double[] v2) { x = (float)v2[0]; y = (float)v2[1]; z = (float)v2[2]; }
 
 		public float Distance(in Vector3 v2) {
 			float dx = v2.X - x, dy = v2.Y - y, dz = v2.Z - z;

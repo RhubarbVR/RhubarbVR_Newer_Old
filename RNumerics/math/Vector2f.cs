@@ -35,19 +35,28 @@ namespace RNumerics
 			get => y;
 			set => y = value;
 		}
-
+		[Exposed]
 		public Vector2f() {
 			x = 0f;
 			y = 0f;
 		}
+		[Exposed]
 		public Vector2f(in float f) { x = y = f; }
+
+		[Exposed]
 		public Vector2f(in float x, in float y) { this.x = x; this.y = y; }
-		public Vector2f(in float[] v2) { x = v2[0]; y = v2[1]; }
-		public Vector2f(in double f) { x = y = (float)f; }
-		public Vector2f(in double x, in double y) { this.x = (float)x; this.y = (float)y; }
-		public Vector2f(in double[] v2) { x = (float)v2[0]; y = (float)v2[1]; }
-		public Vector2f(in Vector2f copy) { x = copy[0]; y = copy[1]; }
-		public Vector2f(in Vector2d copy) { x = (float)copy[0]; y = (float)copy[1]; }
+		[Exposed]
+        public Vector2f(in float[] v2) { x = v2[0]; y = v2[1]; }
+		[Exposed]
+        public Vector2f(in double f) { x = y = (float)f; }
+		[Exposed]
+        public Vector2f(in double x, in double y) { this.x = (float)x; this.y = (float)y; }
+		[Exposed]
+        public Vector2f(in double[] v2) { x = (float)v2[0]; y = (float)v2[1]; }
+		[Exposed]
+        public Vector2f(in Vector2f copy) { x = copy[0]; y = copy[1]; }
+		[Exposed]
+        public Vector2f(in Vector2d copy) { x = (float)copy[0]; y = (float)copy[1]; }
 
 		public static explicit operator Vector2f(in Vector2i v) => new(v.x, v.y);
 

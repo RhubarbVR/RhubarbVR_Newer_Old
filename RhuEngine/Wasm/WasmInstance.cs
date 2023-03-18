@@ -19,6 +19,7 @@ using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using RNumerics;
 using RhuEngine.WorldObjects;
+using System.Reflection.Emit;
 
 namespace RhuEngine.Wasm
 {
@@ -36,6 +37,105 @@ namespace RhuEngine.Wasm
 
 		private readonly ConcurrentStack<int> _deadRefs = new();
 		private readonly List<object> _refs = new();
+
+
+		private long MakePrem(object target) {
+			return target is int @int
+				? BitConverter.ToInt64(BitConverter.GetBytes(@int).Concat(new byte[4]).ToArray())
+				: target is float @float
+				? BitConverter.ToInt64(BitConverter.GetBytes(@float).Concat(new byte[4]).ToArray())
+				: target is long @long
+				? @long
+				: target is double @double
+				? BitConverter.ToInt64(BitConverter.GetBytes(@double))
+				: throw new Exception("Not supported Type");
+		}
+
+		private object ReadData(int readingAdress, Type type) {
+			var adress = ReadInt64(readingAdress);
+			if (type == typeof(int)) {
+				return BitConverter.ToInt32(BitConverter.GetBytes(adress));
+			}
+			else if (type == typeof(uint)) {
+				return BitConverter.ToUInt32(BitConverter.GetBytes(adress));
+			}
+			else if (type == typeof(bool)) {
+				return BitConverter.ToBoolean(BitConverter.GetBytes(adress));
+			}
+			else if (type == typeof(byte)) {
+				return BitConverter.GetBytes(adress)[0];
+			}
+			else if (type == typeof(sbyte)) {
+				return unchecked((sbyte)BitConverter.GetBytes(adress)[0]);
+			}
+			else if (type == typeof(short)) {
+				return BitConverter.ToInt16(BitConverter.GetBytes(adress));
+			}
+			else if (type == typeof(ushort)) {
+				return BitConverter.ToUInt16(BitConverter.GetBytes(adress));
+			}
+			else if (type == typeof(char)) {
+				return BitConverter.ToChar(BitConverter.GetBytes(adress));
+			}
+			else if (type == typeof(float)) {
+				return BitConverter.ToSingle(BitConverter.GetBytes(adress));
+			}
+			else if (type == typeof(long)) {
+				return BitConverter.ToInt64(BitConverter.GetBytes(adress));
+			}
+			else if (type == typeof(ulong)) {
+				return BitConverter.ToUInt64(BitConverter.GetBytes(adress));
+			}
+			else if (type == typeof(double)) {
+				return BitConverter.ToDouble(BitConverter.GetBytes(adress));
+			}
+			return GetObjectRef(BitConverter.ToInt32(BitConverter.GetBytes(adress)));
+		}
+
+		public static int MakeHash(MethodBase methodInfo) {
+			HashCode hash = new();
+			foreach (var item in methodInfo.GetParameters()) {
+				hash.Add(item.ParameterType.Name);
+			}
+			return hash.ToHashCode();
+		}
+
+		private string GetUTF8String(int targetAdress) {
+			if (CompiledScript?.Exports is null) {
+				return null;
+			}
+			var list = new List<byte>();
+			for (var i = 0; i < CompiledScript.Exports.memory.Size - targetAdress; i++) {
+				var currentData = ReadByte(targetAdress + i);
+				if (currentData == 0) {
+					list.Add(currentData);
+					return Encoding.UTF8.GetString(list.ToArray());
+				}
+				else {
+					list.Add(currentData);
+				}
+			}
+			return null;
+		}
+
+		public void WriteBytes(int adress, byte[] data) {
+			if (adress + data.Length > CompiledScript.Exports.memory.Size) {
+				return;
+			}
+			Marshal.Copy(data, 0, CompiledScript.Exports.memory.Start, data.Length);
+		}
+		public void WriteBytes(int adress, byte[] data, int offset, int size) {
+			if (adress + (size - offset) > CompiledScript.Exports.memory.Size) {
+				return;
+			}
+			Marshal.Copy(data, offset, CompiledScript.Exports.memory.Start, size);
+		}
+		public void WriteBytes(int adress, byte[] data, int size) {
+			if (adress + size > CompiledScript.Exports.memory.Size) {
+				return;
+			}
+			Marshal.Copy(data, 0, CompiledScript.Exports.memory.Start, size);
+		}
 
 		public int ReadInt(int adress) {
 			return adress > CompiledScript.Exports.memory.Size ? 0 : Marshal.ReadInt32(CompiledScript.Exports.memory.Start, adress);
@@ -102,21 +202,7 @@ namespace RhuEngine.Wasm
 		/// </summary>
 		/// <param name="target"></param>
 		public unsafe int CreateUTF8String(int targetAdress) {
-			if (CompiledScript?.Exports is null) {
-				return -1;
-			}
-			var list = new List<byte>();
-			for (var i = 0; i < CompiledScript.Exports.memory.Size - targetAdress; i++) {
-				var currentData = ReadByte(targetAdress + i);
-				if (currentData == 0) {
-					list.Add(currentData);
-					return MakeRef(Encoding.UTF8.GetString(list.ToArray()));
-				}
-				else {
-					list.Add(currentData);
-				}
-			}
-			return -1;
+			return MakeRef(GetUTF8String(targetAdress));
 		}
 
 		/// <summary>
@@ -141,30 +227,20 @@ namespace RhuEngine.Wasm
 			return -1;
 		}
 
-		public static int MakeHash(MethodInfo methodInfo) {
-			HashCode hash = new();
-			foreach (var item in methodInfo.GetParameters()) {
-				hash.Add(item.ParameterType.Name);
-			}
-			return hash.ToHashCode();
-		}
-
 		/// <summary>
 		/// Gets method to been called
 		/// </summary>
-		/// <param name="typeName"></param>
-		/// <param name="methodName"></param>
-		/// <param name="argumentCount"></param>
-		/// <param name="makeHash"></param>
-		/// <param name="genericTypes"></param>
 		/// <returns></returns>
-		public int GetMethod(int typeName, int methodName, int argumentCount, int makeHash, int genericTypes) {
+		public int GetMethod(int typeName, int methodName, int argumentCount, int makeHash, int genericTypes, int amount) {
 			if (CompiledScript?.Exports is null) {
 				return -1;
 			}
-			var typeNameString = GetObjectRef<string>(typeName);
-			var methodNameString = GetObjectRef<string>(methodName);
-			var genericTypesString = GetObjectRef<string>(genericTypes);
+			var typeNameString = GetUTF8String(typeName);
+			var methodNameString = GetUTF8String(methodName);
+			var genericTypestrings = new string[amount];
+			for (var i = 0; i < amount; i++) {
+				genericTypestrings[i] = GetUTF8String(genericTypes + i);
+			}
 			var targetType = FamcyTypeParser.PraseType(typeNameString);
 			if (targetType is null) {
 				return -1;
@@ -175,13 +251,13 @@ namespace RhuEngine.Wasm
 				.Where(x => x.GetCustomAttribute<ExposedAttribute>(true) is not null)
 				.Where(x => x.GetCustomAttribute<UnExsposedAttribute>(true) is null)
 				.Where(x => (MakeHash(x) == makeHash) || makeHash == -1)
-				.Where(x => x.IsGenericMethod ? genericTypesString is not null : genericTypesString is null)
+				.Where(x => x.IsGenericMethod ? genericTypestrings.Length >= 1 : genericTypestrings.Length == 0)
 				.FirstOrDefault();
 			if (targetMethod is null) {
 				return -1;
 			}
-			if (genericTypesString is not null) {
-				var types = genericTypesString.Split(',').Select(x => FamcyTypeParser.PraseType(x)).ToArray();
+			if (genericTypestrings.Length >= 1) {
+				var types = genericTypestrings.Select(x => FamcyTypeParser.PraseType(x)).ToArray();
 				try {
 					targetMethod = targetMethod.MakeGenericMethod(types);
 				}
@@ -191,6 +267,56 @@ namespace RhuEngine.Wasm
 			}
 			return MakeRef(Delegate.CreateDelegate(targetMethod.CreateDelegateTypeWithObject(), targetMethod));
 		}
+
+
+		/// <summary>
+		/// Gets Constructor to been called
+		/// </summary>
+		/// <returns></returns>
+		public int GetConstructor(int typeName, int argumentCount, int makeHash) {
+			if (CompiledScript?.Exports is null) {
+				return -1;
+			}
+			var typeNameString = GetUTF8String(typeName);
+			var targetType = FamcyTypeParser.PraseType(typeNameString);
+			if (targetType is null) {
+				return -1;
+			}
+			var targetConstructor = targetType.GetConstructors()
+				.Where(x => x.IsPublic).Where(x => x.GetParameters().Length == argumentCount)
+				.Where(x => x.GetCustomAttribute<ExposedAttribute>(true) is not null)
+				.Where(x => x.GetCustomAttribute<UnExsposedAttribute>(true) is null)
+				.Where(x => (MakeHash(x) == makeHash) || makeHash == -1)
+				.FirstOrDefault();
+			if (targetConstructor is null) {
+				return -1;
+			}
+			var pramTypes = targetConstructor.GetParameters().Select(x => x.ParameterType).ToArray();
+			// Todo cash this step
+			var dynamic = new DynamicMethod(string.Empty, targetType, pramTypes, targetType);
+			var il = dynamic.GetILGenerator();
+			il.DeclareLocal(targetType);
+			for (var i = 0; i < pramTypes.Length; i++) {
+				if (i == 0) {
+					il.Emit(OpCodes.Ldarg_1);
+				}
+				else if (i == 1) {
+					il.Emit(OpCodes.Ldarg_2);
+				}
+				else if (i == 2) {
+					il.Emit(OpCodes.Ldarg_3, 0);
+				}
+				else {
+					il.Emit(OpCodes.Ldarg, i - 1);
+				}
+			}
+			il.Emit(OpCodes.Newobj, targetConstructor);
+			il.Emit(OpCodes.Stloc_0);
+			il.Emit(OpCodes.Ldloc_0);
+			il.Emit(OpCodes.Ret);
+			return MakeRef(Delegate.CreateDelegate(dynamic.CreateDelegateTypeWithObject(), dynamic));
+		}
+
 
 		/// <summary>
 		/// Gets field to that is callable
@@ -202,12 +328,12 @@ namespace RhuEngine.Wasm
 			if (CompiledScript?.Exports is null) {
 				return -1;
 			}
-			var typeNameString = GetObjectRef<string>(typeName);
+			var typeNameString = GetUTF8String(typeName);
 			var targetType = FamcyTypeParser.PraseType(typeNameString);
 			if (targetType is null) {
 				return -1;
 			}
-			var fieldNameString = GetObjectRef<string>(fieldName);
+			var fieldNameString = GetUTF8String(fieldName);
 			var targetField = targetType.GetFields()
 				.Where(x => x.Name == fieldNameString)
 				.Where(x => (x.GetCustomAttribute<ExposedAttribute>(true) is not null) || x.FieldType.IsAssignableTo(typeof(IWorldObject)))
@@ -229,12 +355,12 @@ namespace RhuEngine.Wasm
 			if (CompiledScript?.Exports is null) {
 				return -1;
 			}
-			var typeNameString = GetObjectRef<string>(typeName);
+			var typeNameString = GetUTF8String(typeName);
 			var targetType = FamcyTypeParser.PraseType(typeNameString);
 			if (targetType is null) {
 				return -1;
 			}
-			var fieldNameString = GetObjectRef<string>(fieldName);
+			var fieldNameString = GetUTF8String(fieldName);
 			var targetProperty = targetType.GetProperties()
 				.Where(x => x.Name == fieldNameString)
 				.Where(x => x.GetCustomAttribute<ExposedAttribute>(true) is not null)
@@ -259,68 +385,10 @@ namespace RhuEngine.Wasm
 			if (getMethod is null) { return -1; }
 			var prams = getMethod.Method.GetParameters();
 			var data = new object[prams.Length];
-			var addedOffset = 0;
-			for (var i = 0; i < prams.Length; i++) {
-				var targetType = prams[i].ParameterType;
-				data[i] = ReadData(argments + i + addedOffset, targetType);
-				if (targetType == typeof(long) || targetType == typeof(ulong) || targetType == typeof(double)) {
-					addedOffset++;
-				}
+			for (var i = 0; i < prams.Length; i += 2) {
+				data[i] = ReadData(argments + i, prams[i].ParameterType);
 			}
 			return MakePrem(ConvertType(getMethod.DynamicInvoke(data)));
-		}
-
-		private long MakePrem(object target) {
-			return target is int @int
-				? (long)@int
-				: target is float @float
-				? BitConverter.ToInt32(BitConverter.GetBytes(@float))
-				: target is long @long
-				? @long
-				: target is double @double
-				? BitConverter.ToInt64(BitConverter.GetBytes(@double)) 
-				: throw new Exception("Not supported Type");
-		}
-
-		private object ReadData(int readingAdress, Type type) {
-			var adress = ReadInt(readingAdress);
-			if (type == typeof(int)) {
-				return (object)adress;
-			}
-			else if (type == typeof(uint)) {
-				return (object)(uint)adress;
-			}
-			else if (type == typeof(bool)) {
-				return adress == 1;
-			}
-			else if (type == typeof(byte)) {
-				return (byte)adress;
-			}
-			else if (type == typeof(sbyte)) {
-				return (sbyte)adress;
-			}
-			else if (type == typeof(short)) {
-				return (short)adress;
-			}
-			else if (type == typeof(ushort)) {
-				return (ushort)adress;
-			}
-			else if (type == typeof(char)) {
-				return (char)adress;
-			}
-			else if (type == typeof(float)) {
-				return BitConverter.ToSingle(BitConverter.GetBytes(adress));
-			}
-			else if (type == typeof(long)) {
-				return ReadInt64(readingAdress);
-			}
-			else if (type == typeof(ulong)) {
-				return (ulong)ReadInt64(readingAdress);
-			}
-			else if (type == typeof(double)) {
-				return (ulong)BitConverter.ToDouble(BitConverter.GetBytes(ReadInt64(readingAdress)));
-			}
-			return GetObjectRef(adress);
 		}
 
 		/// <summary>
@@ -353,6 +421,83 @@ namespace RhuEngine.Wasm
 			return MakeRef(Delegate.CreateDelegate(targetProperty.SetMethod.CreateDelegateTypeWithObject(), targetProperty.SetMethod));
 		}
 
+		/// <summary>
+		/// Gets type of object
+		/// </summary>
+		/// <param name="target"></param>
+		/// <returns></returns>
+		public int GetCsharpType(int target) {
+			return MakeRef(GetObjectRef(target)?.GetType());
+		}
+
+		/// <summary>
+		/// Returns string of to string
+		/// </summary>
+		/// <param name="target"></param>
+		/// <returns></returns>
+		public int CsharpToString(int target) {
+			return MakeRef(GetObjectRef(target)?.ToString());
+		}
+
+		public int CsharpParsType(int target) {
+			return MakeRef(FamcyTypeParser.PraseType(GetObjectRef<string>(target)));
+		}
+
+		public int CsharpParsTypeUtf8(int target) {
+			return MakeRef(FamcyTypeParser.PraseType(GetUTF8String(target)));
+		}
+
+		public int GetRunner() {
+			return MakeRef(wasmRunner);
+		}
+
+		public int ArrayLength(int array) {
+			return GetObjectRef<Array>(array)?.Length ?? -1;
+		}
+
+		public long ArrayGetValue(int array, int index) {
+			return MakePrem(ConvertType(GetObjectRef<Array>(array).GetValue(index)));
+		}
+
+		public int StringLength(int target) {
+			return GetObjectRef<string>(target)?.Length ?? -1;
+		}
+
+		public int StringAppend(int a, int b) {
+			return MakeRef(GetObjectRef<string>(a) + GetObjectRef<string>(b));
+		}
+
+		public int StringEqual(int a, int b) {
+			return (GetObjectRef<string>(a) == GetObjectRef<string>(b)) ? 1 : 0;
+		}
+
+		public int StringGetChar(int target, int index) {
+			return BitConverter.ToInt32(BitConverter.GetBytes(GetObjectRef<string>(target)[index]).Concat(new byte[2]).ToArray());
+		}
+
+		/// <summary>
+		/// Puts CSharp String in wasm
+		/// </summary>
+		/// <returns></returns>
+		public int StringToNative(int targetString, int targetAdress, int size) {
+			if (CompiledScript?.Exports is null) {
+				return -1;
+			}
+			var stringTarget = GetObjectRef<string>(targetString);
+			var asciBYtes = Encoding.ASCII.GetBytes(stringTarget);
+			var extraSize = asciBYtes.Length - size;
+			var min = Math.Min(asciBYtes.Length, size);
+			if (min == 0) {
+				return extraSize;
+			}
+			var bytesToAdd = new byte[min];
+			for (var i = 0; i < min; i++) {
+				bytesToAdd[i] = asciBYtes[i];
+			}
+			WriteBytes(targetAdress, bytesToAdd);
+			return extraSize;
+		}
+
 		public T GetObjectRef<T>(int target) {
 			return (T)(GetObjectRef(target) ?? default(T));
 		}
@@ -378,27 +523,27 @@ namespace RhuEngine.Wasm
 		public object ConvertType(object data) {
 			var currentType = data.GetType();
 			return currentType == typeof(int)
-				? data
+				? (int)data
 				: currentType == typeof(float)
-				? data
+				? BitConverter.ToInt32(BitConverter.GetBytes((float)data))
 				: currentType == typeof(long)
-				? data
+				? (long)data
 				: currentType == typeof(double)
-				? data
+				? BitConverter.ToInt64(BitConverter.GetBytes((double)data))
 				: currentType == typeof(char)
-				? (int)(char)data
+				? BitConverter.ToInt32(BitConverter.GetBytes((char)data).Concat(new byte[2]).ToArray())
 				: currentType == typeof(byte)
-				? (int)(byte)data
+				? BitConverter.ToInt32((new byte[1] { (byte)data }).Concat(new byte[3]).ToArray())
 				: currentType == typeof(sbyte)
-				? (int)(sbyte)data
+				? BitConverter.ToInt32((new byte[1] { unchecked((byte)(sbyte)data) }).Concat(new byte[3]).ToArray())
 				: currentType == typeof(uint)
-				? (int)(uint)data
+				? BitConverter.ToInt32(BitConverter.GetBytes((uint)data))
 				: currentType == typeof(short)
-				? (int)(short)data
+				? BitConverter.ToInt32(BitConverter.GetBytes((short)data).Concat(new byte[2]).ToArray())
 				: currentType == typeof(ushort)
-				? (int)(ushort)data
+				? BitConverter.ToInt32(BitConverter.GetBytes((ushort)data).Concat(new byte[2]).ToArray())
 				: currentType == typeof(ulong)
-				? (long)(ulong)data
+				? BitConverter.ToInt64(BitConverter.GetBytes((ulong)data))
 				: MakeRef(data);
 		}
 
@@ -423,11 +568,24 @@ namespace RhuEngine.Wasm
 						{ "create_ascii_string", new FunctionImport(CreateAsciiString) },
 						{ "create_UTF8_string", new FunctionImport(CreateUTF8String) },
 						{ "create_UTF32_string", new FunctionImport(CreateUTF32String) },
+						{ "to_native", new FunctionImport(StringToNative) },
 						{ "method_bind", new FunctionImport(GetMethod) },
+						{ "constructor_bind", new FunctionImport(GetConstructor) },
 						{ "field_bind", new FunctionImport(GetField) },
 						{ "property_get_bind", new FunctionImport(GetPropertyGetter) },
 						{ "property_set_bind", new FunctionImport(GetPropertySetter) },
 						{ "call_method", new FunctionImport(CallMethod) },
+						{ "get_type", new FunctionImport(GetCsharpType) },
+						{ "to_string", new FunctionImport(CsharpToString) },
+						{ "parse_type_utf8", new FunctionImport(CsharpParsTypeUtf8) },
+						{ "parse_type", new FunctionImport(CsharpParsType) },
+						{ "get_runner", new FunctionImport(GetRunner) },
+						{ "array_length", new FunctionImport(ArrayLength) },
+						{ "array_get_value", new FunctionImport(ArrayGetValue) },
+						{ "string_length", new FunctionImport(StringLength) },
+						{ "string_append", new FunctionImport(StringAppend) },
+						{ "string_equal", new FunctionImport(StringEqual) },
+						{ "string_get_char", new FunctionImport(StringGetChar) },
 					}
 				}
 			};

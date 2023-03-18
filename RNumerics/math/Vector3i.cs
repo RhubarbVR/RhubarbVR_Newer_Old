@@ -48,14 +48,18 @@ namespace RNumerics
 			get => z;
 			set => z = value;
 		}
+		[Exposed]
 		public Vector3i() {
 			x = 0;
 			y = 0;
 			z = 0;
 		}
 
+		[Exposed]
 		public Vector3i(in int f) { x = y = z = f; }
+		[Exposed]
 		public Vector3i(in int x, in int y, in int z) { this.x = x; this.y = y; this.z = z; }
+		[Exposed]
 		public Vector3i(in int[] v2) { x = v2[0]; y = v2[1]; z = v2[2]; }
 		[Exposed]
 		static public readonly Vector3i Zero = new(0, 0, 0);
@@ -68,7 +72,8 @@ namespace RNumerics
 		[Exposed]
 		static public readonly Vector3i AxisZ = new(0, 0, 1);
 
-		
+
+		[Exposed]
 		public int this[in int key]
 		{
 			get => (key == 0) ? x : (key == 1) ? y : z;
@@ -81,7 +86,8 @@ namespace RNumerics
 			}
 		}
 
-		
+
+		[Exposed]
 		public int[] Array => new int[] { x, y, z };
 
 

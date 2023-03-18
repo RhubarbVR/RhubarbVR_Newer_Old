@@ -33,10 +33,12 @@ namespace RNumerics
 			get => direction;
 			set => direction = value;
 		}
+		[Exposed]
 		public Line3d() {
 			origin = Vector3d.Zero;
 			direction = Vector3d.Zero;
 		}
+		[Exposed]
 		public Line3d(in Vector3d origin, in Vector3d direction) {
 			this.origin = origin;
 			this.direction = direction;
@@ -83,7 +85,12 @@ namespace RNumerics
 			Origin.DeSerlize(binaryReader);
 			Direction.DeSerlize(binaryReader);
 		}
+		[Exposed]
+		public Line3f() {
 
+		}
+
+		[Exposed]
 		public Line3f(in Vector3f origin, in Vector3f direction) {
 			Origin = origin;
 			Direction = direction;
