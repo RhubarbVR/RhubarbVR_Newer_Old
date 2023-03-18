@@ -30,7 +30,6 @@ UserID {Manager.Engine.netApiManager.Client.User?.Id ?? new Guid()}
 worldManager stepTime {Manager.Engine.worldManager.TotalStepTime * 1000f:f3}ms
 FPS {1 / RTime.Elapsed:f3}
 Worlds Open {Manager.Engine.worldManager.worlds.Count}
-Main Mic {Manager.Engine.MainMic ?? "System Default"}
 LastFocusChange {Manager.Engine.worldManager.FocusedWorld?.LastFocusChange}
 =====-----------------------=====");
 					break;

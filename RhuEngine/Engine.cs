@@ -190,17 +190,6 @@ namespace RhuEngine
 			UpdateSettings();
 		}
 
-		public string MainMic
-		{
-			get => MainSettings.MainMic;
-			set {
-				MainSettings.MainMic = value;
-				MicChanged?.Invoke(value);
-			}
-		}
-
-		public Action<string> MicChanged;
-
 		public bool IsCloseing { get; set; }
 		public bool DebugVisuals { get; private set; }
 

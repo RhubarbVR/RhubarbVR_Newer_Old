@@ -28,7 +28,8 @@ namespace RhuEngine.Settings
 
 		[SettingsField("Three Letter Language Name")]
 		public string ThreeLetterLanguageName = null;
+
 		[SettingsField()]
-		public string MainMic = null;
+		public string TargetAPI = null;
 	}
 }

@@ -34,7 +34,7 @@ namespace RhubarbCloudClient
 			};
 			HttpClient = new HttpClient(HttpClientHandler) {
 				BaseAddress = baseAdress,
-				Timeout = TimeSpan.FromSeconds(90) 
+				Timeout = TimeSpan.FromSeconds(10000) 
 			};
 			OnWrite = onWrite;
 			UpdateCheckForInternetConnection();
@@ -64,6 +64,10 @@ namespace RhubarbCloudClient
 			}
 			HttpClient.Timeout = TimeSpan.FromMilliseconds(10000);
 			UpdateCheckForInternetConnection();
+		}
+
+		public void ChangeApi(Uri targetUri) {
+			HttpClient.BaseAddress = targetUri;
 		}
 
 		public void Dispose() {

@@ -55,8 +55,25 @@ namespace RhuEngine.Managers
 				SessionErrorBind = SessionError,
 				SessionIDBind = SessionIDupdate,
 			};
+			if (WorldManager.Engine.MainSettings.TargetAPI is not null) {
+				Client.ChangeApi(new Uri(WorldManager.Engine.MainSettings.TargetAPI));
+			}
 #endif
 		}
+
+		public void ChangeTargetApi(Uri targetAPI) {
+			if(targetAPI.Host == "rhubarbvr") {
+				WorldManager.Engine.MainSettings.TargetAPI = null;
+				Client.ChangeApi(new Uri("https://api.rhubarbvr.net/"));
+			}
+			else {
+				var uriBuilder = new UriBuilder(targetAPI);
+				uriBuilder.Host = "rhubarbapi." + uriBuilder.Host;
+				Client.ChangeApi(uriBuilder.Uri);
+			}
+
+		}
+
 		/// <summary>
 		/// Called when the api returns an error from the session
 		/// </summary>
