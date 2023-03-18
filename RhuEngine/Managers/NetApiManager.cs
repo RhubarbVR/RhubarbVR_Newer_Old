@@ -55,9 +55,6 @@ namespace RhuEngine.Managers
 				SessionErrorBind = SessionError,
 				SessionIDBind = SessionIDupdate,
 			};
-			if (WorldManager.Engine.MainSettings.TargetAPI is not null) {
-				Client.ChangeApi(new Uri(WorldManager.Engine.MainSettings.TargetAPI));
-			}
 #endif
 		}
 
@@ -130,6 +127,9 @@ namespace RhuEngine.Managers
 			UpdateHash();
 			Client.ClientVersion = engine.version.ToString();
 			Task.Run(Client.Check);
+			if (WorldManager.Engine.MainSettings.TargetAPI is not null) {
+				Client.ChangeApi(new Uri(WorldManager.Engine.MainSettings.TargetAPI));
+			}
 		}
 
 
