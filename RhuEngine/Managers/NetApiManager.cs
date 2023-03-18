@@ -127,8 +127,8 @@ namespace RhuEngine.Managers
 			UpdateHash();
 			Client.ClientVersion = engine.version.ToString();
 			Task.Run(Client.Check);
-			if (WorldManager.Engine.MainSettings.TargetAPI is not null) {
-				Client.ChangeApi(new Uri(WorldManager.Engine.MainSettings.TargetAPI));
+			if (engine.MainSettings.TargetAPI is not null) {
+				Client.ChangeApi(new Uri(engine.MainSettings.TargetAPI));
 			}
 		}
 
