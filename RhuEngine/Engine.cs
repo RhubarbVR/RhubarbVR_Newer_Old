@@ -57,6 +57,12 @@ namespace RhuEngine
 			_EngineLink.BindEngine(this);
 			RLog.Info($"Platform Information OSArc: {RuntimeInformation.OSArchitecture} Framework: {RuntimeInformation.FrameworkDescription} OS: {RuntimeInformation.OSDescription} ProcessArc: {RuntimeInformation.ProcessArchitecture}");
 			EngineLink.LoadStatics();
+			if (EngineLink.CanAudio) {
+				RAudio.Initialize(this);
+				if (EngineLink.ForceLibLoad) {
+					OpusDotNet.NativeLib.ForceLoad();
+				}
+			}
 			EngineHelpers.MainEngine = this;
 			string error = null;
 			DebugVisuals = arg.Any((v) => v.ToLower() == "--debug-visuals") | arg.Any((v) => v.ToLower() == "-debug-visuals") | arg.Any((v) => v.ToLower() == "-debugvisuals");

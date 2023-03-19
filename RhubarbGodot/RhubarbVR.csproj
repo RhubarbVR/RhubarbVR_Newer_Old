@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <None Include="RhubarbVR-NoVR.bat">
@@ -18,9 +19,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.17.4" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.18" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OpusDotNet\OpusDotNet.csproj" />
     <ProjectReference Include="..\RhuEngine\RhuEngine.csproj" />
   </ItemGroup>
 </Project>

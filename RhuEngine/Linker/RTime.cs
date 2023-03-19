@@ -8,7 +8,7 @@ namespace RhuEngine.Linker
 	{
 		public double Elapsed { get; }
 	}
-	public class RTime
+	public static class RTime
 	{
 		public static IRTime Instance { get; set; }
 		public static double Elapsed => Instance.Elapsed;

@@ -58,12 +58,13 @@ namespace RhuEngine.Components
 					mesh.Height.Value = 0.1f;
 					mesh.BaseRadius.Value = 0.05f;
 					mesh.TopRadius.Value = 0.05f;
-					//var opus = user.FindOrCreateSyncStream<OpusStream>("MainOpusStream");
-					//var audioPlayer = head.AttachComponent<SoundSource>();
-					//audioPlayer.volume.Value = 0f;
-					//audioPlayer.sound.Target = opus;
-					//head.AttachComponent<UserAudioManager>().audioVolume.SetLinkerTarget(audioPlayer.volume);
-					//opus.LoadInput();
+					var opus = user.FindOrCreateSyncStream<OpusStream>("MainOpusStream");
+					opus.LoadMainInput();
+					var audioPlayer = head.AttachComponent<AudioSource3D>();
+					audioPlayer.Enabled.Value = true;
+					audioPlayer.AudioStream.Target = opus;
+					audioPlayer.AudioBus.Value = AudioSourceBase.TargetBus.Voice;
+					//head.AttachComponent<UserAudioManager>().audioMute.SetLinkerTarget(audioPlayer.Enabled);
 				}
 				userRoot.head.Target = head;
 				userRoot.user.Target = World.GetLocalUser();

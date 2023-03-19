@@ -41,8 +41,14 @@ namespace RhuEngine.WorldObjects.ECS
 				}
 				WorldLink = (IWorldLink)Activator.CreateInstance(linker);
 				WorldLink.LinkCompGen = this;
-				if(!(IsRemoved || IsDestroying)) { 
-					WorldLink.Init();
+				if (!(IsRemoved || IsDestroying)) {
+					try {
+						WorldLink.Init();
+					}
+					catch (Exception e) {
+						RLog.Err("Render Link Init Error:" + e.ToString());
+						throw new Exception("Render Link Init Error", e);
+					}
 					World_FoucusChanged();
 				}
 			});
@@ -63,7 +69,7 @@ namespace RhuEngine.WorldObjects.ECS
 				WorldLink?.Stopped();
 			}
 			else {
-				if (Entity.IsEnabled && (Enabled?.Value??false)) {
+				if (Entity.IsEnabled && (Enabled?.Value ?? false)) {
 					WorldLink?.Started();
 				}
 				else {

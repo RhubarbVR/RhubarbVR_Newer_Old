@@ -85,9 +85,6 @@ namespace RhuEngine.Components
 					return;
 				}
 				Task.Run(async () => {
-					if (_email.Text.Value.Contains('@')) {
-						Engine.netApiManager.Client.ChangeApi(new Uri(_email.Text.Value.Substring(_email.Text.Value.IndexOf('@'))));
-					}
 					var res = await Engine.netApiManager.Client.Login(_email.Text.Value, _password.Text.Value, _twoFA.Text.Value);
 					Error(res.MSG);
 				});
@@ -102,9 +99,6 @@ namespace RhuEngine.Components
 					return;
 				}
 				Task.Run(async () => {
-					if (_email.Text.Value.Contains('@')) {
-						Engine.netApiManager.Client.ChangeApi(new Uri(_email.Text.Value.Substring(_email.Text.Value.IndexOf('@'))));
-					}
 					var res = await Engine.netApiManager.Client.RegisterAccount(_username.Text.Value, _password.Text.Value, _email.Text.Value);
 					if (res.Data == "Programs.Login.Code") {
 						TwoFaLoad();

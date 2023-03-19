@@ -7,6 +7,8 @@ namespace RhuEngine.WorldObjects
 	{
 		public readonly Sync<string> name;
 
+		public User Owner => (User)Parent.Parent;
+
 		public bool NoSync { get; set; }
 
 		public abstract void Received(Peer sender, IDataNode data);

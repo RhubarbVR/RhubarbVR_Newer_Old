@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 	{
 		public readonly SyncRef<User> user;
 
-		public readonly Linker<float> audioVolume;
+		public readonly Linker<bool> audioMute;
 
 		protected override void OnAttach() {
 			user.Target = World.GetLocalUser();
@@ -20,7 +20,7 @@ namespace RhuEngine.Components
 			if (user.Target is null) {
 				return;
 			}
-			audioVolume.LinkedValue = user.Target == World.GetLocalUser() ? 0f : 1f;
+			audioMute.LinkedValue = user.Target != World.GetLocalUser();
 		}
 	}
 }

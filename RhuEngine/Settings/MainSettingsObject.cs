@@ -31,5 +31,17 @@ namespace RhuEngine.Settings
 
 		[SettingsField()]
 		public string TargetAPI = null;
+
+		[SettingsField("Master Volume in Audio DB")]
+		public float MasterVolumeDB = 0;
+		
+		[SettingsField("Enviroment Volume in Audio DB")]
+		public float WorldVolumeDB = 0;
+
+		[SettingsField("Media Volume in Audio DB")]
+		public float MediaVolumeDB = 0;
+
+		[SettingsField("Voice Volume in Audio DB")]
+		public float VoiceVolumeDB = 0;
 	}
 }

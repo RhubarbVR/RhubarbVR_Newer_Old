@@ -64,7 +64,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		protected void SessionInfoChanged(IChangeable _) {
+		private void SessionInfoChanged(IChangeable _) {
 			SessionInfoChanged();
 		}
 

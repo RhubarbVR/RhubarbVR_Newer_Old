@@ -52,6 +52,8 @@ public partial class EngineRunner : Node3D, IRTime
 		}
 	}
 
+	private Thread _audioThread;
+
 	public override void _Ready() {
 		SetProcessInternal(true);
 		if (RLog.Instance == null) {
@@ -82,7 +84,13 @@ public partial class EngineRunner : Node3D, IRTime
 		RLog.Info("App Path: " + appPath);
 		engine = new Engine(link, args.ToArray(), outputCapture, appPath);
 		engine.OnCloseEngine += () => GetTree().Quit();
+		_audioThread = new Thread(AudioThreadUpdate) {
+			Name = "RhubarbAudio",
+			Priority = System.Threading.ThreadPriority.Normal
+		};
+		_audioThread.Start();
 		engine.Init();
+
 	}
 
 	public string Typer;
@@ -90,6 +98,21 @@ public partial class EngineRunner : Node3D, IRTime
 	public Vector2f MouseScrollDelta;
 	public Vector2f MouseScrollPos;
 	public Vector2f LastMouseScrollPos;
+
+	private void AudioThreadUpdate() {
+		while (!engine.IsCloseing) {
+			AudioServer.Lock();
+			try {
+				link.GodotAudio.Update();
+				RAudio.UpdataAudioSystem();
+			}
+			catch(Exception e) {
+				RLog.Err("Audio Error:" + e);
+			}
+			AudioServer.Unlock();
+			Thread.Sleep((int)AudioServer.GetOutputLatency() / 2);
+		}
+	}
 
 	public override void _Notification(int what) {
 		if (what == Node.NotificationInternalProcess) {

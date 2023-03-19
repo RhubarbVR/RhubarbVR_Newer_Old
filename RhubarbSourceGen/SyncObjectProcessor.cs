@@ -156,7 +156,7 @@ namespace RhubarbSourceGen
 				}
 				initializeMembersMethod.AppendLine("}");
 				var fileBuilder = new StringBuilder();
-				fileBuilder.AppendLine($"using System;\nusing System.Linq;\nusing System.Net.WebSockets;\nusing System.Reflection;\nusing System.Threading;\nusing RhuEngine.Managers;\nusing RhuEngine.WorldObjects.ECS;\nusing RhuEngine.Linker;\nusing RNumerics;\nusing System.Threading.Tasks;\nusing System.Collections.Generic;\nusing RhuEngine.Datatypes;\nusing RhuEngine.Components;\nusing BepuPhysics;\nusing BepuUtilities.Memory;\nusing RhuEngine.Physics;\nusing System.Numerics;\nusing RhuEngine;\nusing RhuEngine.WorldObjects;");
+				fileBuilder.AppendLine($"using System;\nusing System.Linq;\nusing System.Net.WebSockets;\nusing System.Reflection;\nusing System.Threading;\nusing RhuEngine.Managers;\nusing RhuEngine.WorldObjects.ECS;\nusing RhuEngine.Linker;\nusing RNumerics;\nusing System.Threading.Tasks;\nusing System.Collections.Generic;\nusing RhuEngine.Datatypes;\nusing RhuEngine.Components;\nusing BepuPhysics;\nusing BepuUtilities.Memory;\nusing RhuEngine.Physics;\nusing System.Numerics;\nusing RhuEngine;\nusing RhuEngine.WorldObjects;\nusing OpusDotNet;");
 				var classInerData = new StringBuilder();
 				classInerData.AppendLine($"{syncObject.Modifiers} class {syncObject.Identifier}{syncObject.TypeParameterList} {{");
 				if (!syncObject.Members.Where(x => x is MethodDeclarationSyntax).Cast<MethodDeclarationSyntax>().Any(x => x.Identifier.Text == "InitializeMembers" && x.TypeParameterList is null && x.ParameterList.Parameters.Count == 3)) {

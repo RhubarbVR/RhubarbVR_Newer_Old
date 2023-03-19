@@ -72,7 +72,7 @@ namespace RhubarbVR.Bindings
 
 		public bool CanInput => true;
 
-		public string BackendID => "Godot1.0.0";
+		public string BackendID => "Godot4.0.0";
 
 		public bool InVR { get; set; }
 
@@ -187,6 +187,8 @@ namespace RhubarbVR.Bindings
 			manager.LoadInputDriver<GodotMouse>();
 		}
 
+		public GodotAudio GodotAudio { get; private set; }
+
 		public void LoadStatics() {
 			RTime.Instance = EngineRunner;
 			RFont.Instance = typeof(GodotFont);
@@ -200,6 +202,7 @@ namespace RhubarbVR.Bindings
 			RRenderer.Instance = new GodotRender(EngineRunner);
 			RMaterial.Instance = new GoMat();
 			StaticMaterialManager.Instanances = new GodotStaticMats();
+			RAudio.Inst = GodotAudio = new GodotAudio();
 			var image = new RImage(null);
 			image.Create(2, 2, false, RFormat.Rgb8);
 			RTexture2D.White = new RImageTexture2D(image);

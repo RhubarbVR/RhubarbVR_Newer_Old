@@ -93,7 +93,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 							canvasItem.CanvasItem?.GetParent()?.RemoveChild(canvasItem.CanvasItem);
 							canvasItem.ParrentUpdate = true;
 							canvasItem.CanvasItem.Visible = canvasItem.ParrentUpdate & canvasItem.Visable;
- 							CanvasItem.AddChild(canvasItem.CanvasItem);
+							CanvasItem.AddChild(canvasItem.CanvasItem);
 							canvasItem.CanvasItem.Owner = CanvasItem;
 							CanvasItem.MoveChild(canvasItem.CanvasItem, -1);
 						}
@@ -261,23 +261,45 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		public virtual void Entity_ViewportUpdateEvent() {
-			RenderThread.ExecuteOnEndOfFrameNoPass(() => {
+			RenderThread.ExecuteOnEndOfFrame(() => {
 				node.GetParent()?.RemoveChild(node);
-				if (LinkedComp.Entity.Viewport?.WorldLink is ViewportLink ee) {
-					if (LinkedComp.Entity.Viewport != LinkedComp) {
-						ee.node.AddChild(node);
-						node.Owner = ee.node;
-					}
-					else {
-						if (GoToEngineRoot) {
-							EngineRunnerHelpers._.AddChild(node);
-							node.Owner = EngineRunnerHelpers._;
+				if (LinkedComp.Entity.Viewport is not null) {
+					if (LinkedComp.Entity.Viewport?.WorldLink is ViewportLink ee) {
+						if (LinkedComp.Entity.Viewport != LinkedComp) {
+							ee.node.AddChild(node);
+							node.Owner = ee.node;
 						}
 						else {
-							EngineRunnerHelpers._.ThowAway.AddChild(node);
-							node.Owner = EngineRunnerHelpers._.ThowAway;
-						}
+							if (GoToEngineRoot) {
+								EngineRunnerHelpers._.AddChild(node);
+								node.Owner = EngineRunnerHelpers._;
+							}
+							else {
+								EngineRunnerHelpers._.ThowAway.AddChild(node);
+								node.Owner = EngineRunnerHelpers._.ThowAway;
+							}
 
+						}
+					}
+					else {
+						RenderThread.ExecuteOnEndOfFrameNoPass(() => {
+							if (LinkedComp.Entity.Viewport?.WorldLink is ViewportLink ee) {
+								if (LinkedComp.Entity.Viewport != LinkedComp) {
+									ee.node.AddChild(node);
+									node.Owner = ee.node;
+								}
+								else {
+									if (GoToEngineRoot) {
+										EngineRunnerHelpers._.AddChild(node);
+										node.Owner = EngineRunnerHelpers._;
+									}
+									else {
+										EngineRunnerHelpers._.ThowAway.AddChild(node);
+										node.Owner = EngineRunnerHelpers._.ThowAway;
+									}
+								}
+							}
+						});
 					}
 				}
 				else {
