@@ -138,38 +138,28 @@ namespace RhuEngine.WorldObjects
 			OnAssetLoaded?.Invoke(Value);
 		}
 
-		public int BufferMilliseconds
-		{
-			get => BufferSize.Value switch {
-				FrameSize.time_2_5ms => 2,
-				FrameSize.time_5ms => 5,
-				FrameSize.time_10ms => 10,
-				FrameSize.time_20ms => 20,
-				FrameSize.time_40ms => 40,
-				_ => 60,
-			};
-		}
+		public int BufferMilliseconds => BufferSize.Value switch { FrameSize.time_2_5ms => 2, FrameSize.time_5ms => 5, FrameSize.time_10ms => 10, FrameSize.time_20ms => 20, FrameSize.time_40ms => 40, _ => 60, } / 2;
 
 		public void LoadMainInput() {
 			//Wave in
-			var e = new WaveInEvent {
-				WaveFormat = WaveFormat,
-				BufferMilliseconds = BufferMilliseconds,
-				DeviceNumber = 1
-			};
-			LoadAudioInput(e);
+			//var e = new WaveInEvent {
+			//	WaveFormat = WaveFormat,
+			//	BufferMilliseconds = BufferMilliseconds,
+			//	DeviceNumber = 1
+			//};
+			//LoadAudioInput(e);
 
 			// Todo fix bugs with godot input
 			//Godot 
-			//var inputDevices = RAudio.Inst.EngineAudioInputDevices();
-			//foreach (var item in inputDevices) {
-			//	RLog.Info("Mic input" + item);
-			//	if(item.Contains("Line In")) {
-			//		RAudio.Inst.CurrentAudioInputDevice = item;
-			//	}
-			//}
-			//RAudio.Inst.EngineInputAudio.BufferSizeMilliseconds = BufferMilliseconds;
-			//LoadAudioInput(RAudio.Inst.EngineInputAudio);
+			var inputDevices = RAudio.Inst.EngineAudioInputDevices();
+			foreach (var item in inputDevices) {
+				RLog.Info("Mic input" + item);
+				if (item.Contains("Line In")) {
+					RAudio.Inst.CurrentAudioInputDevice = item;
+				}
+			}
+			RAudio.Inst.EngineInputAudio.BufferSizeMilliseconds = BufferMilliseconds;
+			LoadAudioInput(RAudio.Inst.EngineInputAudio);
 		}
 
 		private IWaveIn _waveIn;

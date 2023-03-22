@@ -86,11 +86,11 @@ namespace RhubarbVR.Bindings
 				return;
 			}
 			var audioBuffer = _audioEffectCapture.GetBuffer(FrameAmount);
-			var bytes = new byte[audioBuffer.Length * sizeof(float)];
+			var bytes = new byte[audioBuffer.Length * sizeof(float) / 2];
 			fixed (byte* byteData = bytes) {
 				var castedPointer = (float*)byteData;
-				for (var i = 0; i < audioBuffer.Length; i++) {
-					castedPointer[i] = (audioBuffer[i].X + audioBuffer[i].Y) / 2;
+				for (var i = 0; i < audioBuffer.Length / 2; i++) {
+					castedPointer[i] = (audioBuffer[i * 2].X + audioBuffer[i * 2].Y + audioBuffer[(i * 2) + 1].X + audioBuffer[(i * 2) + 1].Y) / 4;
 				}
 			}
 			DataAvailable?.Invoke(this, new WaveInEventArgs(bytes, bytes.Length));
