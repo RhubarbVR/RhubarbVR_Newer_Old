@@ -63,7 +63,7 @@ namespace RhubarbCloudClient
 		private async Task<int> CheckForInternetConnection() {
 			try {
 				var sw = Stopwatch.StartNew();
-				var req = await HttpClient.GetAsync("/");
+				var req = await HttpClient.GetAsync("/index.html");
 				sw.Stop();
 				return (int)sw.ElapsedMilliseconds;
 			}
