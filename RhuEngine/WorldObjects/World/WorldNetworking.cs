@@ -113,10 +113,17 @@ namespace RhuEngine.WorldObjects
 					if ((e?.Status ?? IPStatus.Unknown) == IPStatus.Success) {
 						Pings.Add(item, (int)e.RoundtripTime);
 					}
+					else {
+						Pings.Add(item, 99999);
+					}
+				}
+				foreach (var item in Pings) {
+					RLog.Info($"Server {item.Key} Ping:{item.Value}");
 				}
 				if (!Guid.TryParse(ThumNail.Value, out var thumNail)) {
 					thumNail = Guid.Empty;
 				}
+
 				////TODO: add support for changeing on connection info 
 				var userConnection = new UserConnectionInfo {
 					ConnectionType = ConnectionType.HolePunch,
@@ -297,10 +304,7 @@ namespace RhuEngine.WorldObjects
 				}
 				LoadMsg = "Waiting For World Start State";
 				try {
-					var worldData = dataGroup.GetValue("WorldData");
-					if (worldData == null) {
-						throw new Exception();
-					}
+					var worldData = dataGroup.GetValue("WorldData") ?? throw new Exception();
 					if (_waitingForUsers) {
 						return;
 					}
