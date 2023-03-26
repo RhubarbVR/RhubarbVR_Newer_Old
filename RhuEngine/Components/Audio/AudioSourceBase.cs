@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 {
 	public abstract partial class AudioSourceBase : LinkedWorldComponent
 	{
-		public enum TargetBus:byte
+		public enum TargetBus : byte
 		{
 			World,
 			Media,
