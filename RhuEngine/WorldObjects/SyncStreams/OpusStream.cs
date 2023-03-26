@@ -142,24 +142,23 @@ namespace RhuEngine.WorldObjects
 
 		public void LoadMainInput() {
 			//Wave in
-			//var e = new WaveInEvent {
-			//	WaveFormat = WaveFormat,
-			//	BufferMilliseconds = BufferMilliseconds,
-			//	DeviceNumber = 1
-			//};
-			//LoadAudioInput(e);
+			var e = new WaveInEvent {
+				WaveFormat = WaveFormat,
+				BufferMilliseconds = BufferMilliseconds,
+			};
+			LoadAudioInput(e);
 
 			// Todo fix bugs with godot input
 			//Godot 
-			var inputDevices = RAudio.Inst.EngineAudioInputDevices();
-			foreach (var item in inputDevices) {
-				RLog.Info("Mic input" + item);
-				if (item.Contains("Line In")) {
-					RAudio.Inst.CurrentAudioInputDevice = item;
-				}
-			}
-			RAudio.Inst.EngineInputAudio.BufferSizeMilliseconds = BufferMilliseconds;
-			LoadAudioInput(RAudio.Inst.EngineInputAudio);
+			//var inputDevices = RAudio.Inst.EngineAudioInputDevices();
+			//foreach (var item in inputDevices) {
+			//	RLog.Info("Mic input" + item);
+			//	if (item.Contains("Line In")) {
+			//		RAudio.Inst.CurrentAudioInputDevice = item;
+			//	}
+			//}
+			//RAudio.Inst.EngineInputAudio.BufferSizeMilliseconds = BufferMilliseconds;
+			//LoadAudioInput(RAudio.Inst.EngineInputAudio);
 		}
 
 		private IWaveIn _waveIn;

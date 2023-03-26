@@ -64,7 +64,7 @@ namespace RhuEngine.Components
 					audioPlayer.Enabled.Value = true;
 					audioPlayer.AudioStream.Target = opus;
 					audioPlayer.AudioBus.Value = AudioSourceBase.TargetBus.Voice;
-					//head.AttachComponent<UserAudioManager>().audioMute.SetLinkerTarget(audioPlayer.Enabled);
+					head.AttachComponent<UserAudioManager>().audioMute.SetLinkerTarget(audioPlayer.Enabled);
 				}
 				userRoot.head.Target = head;
 				userRoot.user.Target = World.GetLocalUser();
