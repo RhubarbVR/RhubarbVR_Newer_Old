@@ -693,7 +693,9 @@ namespace RhuEngine.WorldObjects
 			RLog.Info("Trying Relay Connect Client");
 			try {
 				var peer = _netManager.Connect(user.Server, 7857, user.Data);
-				RLog.Info($"Relay Connect Status {peer.ConnectionState}");
+				while (peer.ConnectionState == ConnectionState.Outgoing) {
+					Thread.Sleep(10);
+				}
 				if (peer.ConnectionState.HasFlag(ConnectionState.Disconnected)) {
 					RLog.Err(LoadMsg = "Relay Connect Failed Trying Local Relay");
 					peer = _netManager.Connect("192.168.0.97", 7857, user.Data);
