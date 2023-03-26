@@ -102,9 +102,6 @@ namespace RelayHolePuncher
 			_relay.DisconnectTimeout = 60000;
 			_relay.ReuseAddress = true;
 			_relay.UpdateTime = 25;
-			_relay.UnsyncedDeliveryEvent = true;
-			_relay.UnsyncedEvents = true;
-			_relay.UnsyncedReceiveEvent = true;
 			_relay.AutoRecycle = true;
 			Console.WriteLine($"Started Relay Server on port {port}");
 		}
