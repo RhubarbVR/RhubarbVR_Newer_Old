@@ -25,7 +25,7 @@ namespace RelayHolePuncher
 		public UserConnection otherConnection;
 	}
 
-	public class RelayServer : INetworkingServer
+	public class RelayServer : INetworkingServer, INetLogger
 	{
 		public NetManager _relay;
 
@@ -75,7 +75,10 @@ namespace RelayHolePuncher
 					var peer = request.Accept();
 					peer.Tag = data;
 					Console.WriteLine("PeerConnected to Relay server: " + peer.EndPoint + " Tag " + peer.Tag);
-					Task.Run(() => {
+					Task.Run(async () => {
+						while(peer.ConnectionState != ConnectionState.Connected) {
+							await Task.Delay(10);
+						}
 						try {
 							ProcessConnection(peer, (string)peer.Tag);
 						}
@@ -94,15 +97,15 @@ namespace RelayHolePuncher
 			};
 
 			_relay = new NetManager(clientListener) {
-				IPv6Mode = IPv6Mode.DualMode
+				IPv6Mode = IPv6Mode.DualMode,
+				MaxConnectAttempts = 64,
+				ChannelsCount = 3,
+				DisconnectTimeout = 60000,
+				ReuseAddress = true,
+				UpdateTime = 25,
+				AutoRecycle = true
 			};
 			_relay.Start(port);
-			_relay.MaxConnectAttempts = 64;
-			_relay.ChannelsCount = 3;
-			_relay.DisconnectTimeout = 60000;
-			_relay.ReuseAddress = true;
-			_relay.UpdateTime = 25;
-			_relay.AutoRecycle = true;
 			Console.WriteLine($"Started Relay Server on port {port}");
 		}
 
@@ -138,10 +141,13 @@ namespace RelayHolePuncher
 						else if (relayPacked is StreamDataPacked streampacked) {
 							foreach (var item in userconections) {
 								try {
+									if(item.otherConnection?.Peer?.ConnectionState != ConnectionState.Connected) {
+										continue;
+									}
 									using var memstreamr = new MemoryStream();
 									using var wtiter = new BinaryWriter(memstreamr);
 									RelayNetPacked.Serlize(wtiter, new DataPacked(data, item.otherConnection.index));
-									item.otherConnection?.Peer.Send(memstreamr.ToArray(), channel, deliveryMethod);
+									item.otherConnection.Peer.Send(memstreamr.ToArray(), channel, deliveryMethod);
 								}
 								catch (Exception e) {
 									Console.WriteLine("Failed to send to user" + e.ToString());
@@ -174,6 +180,10 @@ namespace RelayHolePuncher
 			catch (Exception ex) {
 				Console.WriteLine("error with relay resive error:" + ex.ToString());
 			}
+		}
+
+		public void WriteNet(NetLogLevel level, string str, params object[] args) {
+			Console.WriteLine($"{level}: {str} " + string.Join(", ", args));
 		}
 	}
 }

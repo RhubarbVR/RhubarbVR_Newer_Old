@@ -274,6 +274,7 @@ namespace RhuEngine.WorldObjects
 				IPv6Mode = IPv6Mode.DualMode,
 				NatPunchEnabled = true
 			};
+
 			_netManager.NatPunchModule.Init(_natPunchListener);
 			_netManager.EnableStatistics = true;
 			_netManager.MaxConnectAttempts = 64;

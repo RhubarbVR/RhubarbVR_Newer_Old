@@ -10,15 +10,18 @@ namespace RelayHolePuncher
 	{
 		public void Initialize(int port);
 	}
-	public sealed class LiteNetLibService
+	public sealed class LiteNetLibService : INetLogger
 	{
 		public HolePunchServer punchServer;
 
 		public RelayServer relayServer;
 
 		public Thread updateThread;
-
+		public void WriteNet(NetLogLevel level, string str, params object[] args) {
+			Console.WriteLine($"{level}: {str} " + string.Join(", ", args));
+		}
 		public void Initialize() {
+			NetDebug.Logger = this;
 			punchServer = new HolePunchServer();
 			relayServer = new RelayServer();
 			punchServer.Initialize(7856);

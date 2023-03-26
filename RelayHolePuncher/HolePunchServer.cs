@@ -59,23 +59,20 @@ namespace RelayHolePuncher
 
 			_puncher = new NetManager(clientListener) {
 				IPv6Mode = IPv6Mode.DualMode,
-				NatPunchEnabled = true
+				NatPunchEnabled = true,
+				MaxConnectAttempts = 64,
+				DisconnectTimeout = 60000,
+				ReuseAddress = true,
+				UpdateTime = 25,
 			};
 			Console.WriteLine($"Started HolePunchServer on port {port}");
 			_puncher.Start(port);
-			_puncher.MaxConnectAttempts = 64;
-			_puncher.DisconnectTimeout = 60000;
-			_puncher.ReuseAddress = true;
-			_puncher.UpdateTime = 25;
-			_puncher.UnsyncedDeliveryEvent = true;
-			_puncher.UnsyncedEvents = true;
-			_puncher.UnsyncedReceiveEvent = true;
 			_puncher.NatPunchModule.Init(this);
 		}
 
 		public void Kill() {
 			_puncher.Stop();
 		}
-
+		
 	}
 }

@@ -16,6 +16,7 @@ using RNumerics;
 using System.Threading;
 using RhuEngine.Components;
 using System.Runtime;
+using LiteNetLib;
 
 namespace RhuEngine
 {
@@ -24,7 +25,7 @@ namespace RhuEngine
 		public RhuException(string data) : base(data) { }
 	}
 
-	public sealed class Engine : IDisposable
+	public sealed class Engine : IDisposable , INetLogger
 	{
 		public bool PassErrors { get; private set; }
 		public IEngineLink EngineLink { get; private set; }
@@ -244,6 +245,9 @@ namespace RhuEngine
 			commandManager.Init(this);
 			IntMsg = $"Engine started Can Render {EngineLink.CanRender} Can Audio {EngineLink.CanAudio} Can input {EngineLink.CanInput}";
 			RLog.Info(IntMsg);
+#if DEBUG
+			NetDebug.Logger = this;
+#endif
 			if (EngineLink.CanRender) {
 				if (RRenderer.PassthroughSupport) {
 					RLog.Info("Passthrough Supported");
@@ -442,6 +446,24 @@ namespace RhuEngine
 				}
 			}
 
+		}
+
+		public void WriteNet(NetLogLevel level, string str, params object[] args) {
+			var outputString = string.Format(str, args);
+			switch (level) {
+				case NetLogLevel.Warning:
+					RLog.Warn("Networking: " + outputString);
+					break;
+				case NetLogLevel.Error:
+					RLog.Err("Networking: " + outputString);
+					break;
+				case NetLogLevel.Trace:
+					RLog.Err("Networking: "+"Trace" + outputString);
+					break;
+				default:
+					RLog.Info("Networking: " + outputString);
+					break;
+			}
 		}
 	}
 }
