@@ -21,8 +21,11 @@ namespace RhuEngine.WorldObjects
 {
 	public sealed class RelayPeer
 	{
+		internal string _connectionData = null;
+		internal bool _hasUsedFallback = false;
+
 		public int latency = 0;
-		public NetPeer NetPeer { get; private set; }
+		public NetPeer NetPeer { get; internal set; }
 		public World World { get; }
 
 		private Guid StartingPeerID { get; }
@@ -46,7 +49,9 @@ namespace RhuEngine.WorldObjects
 			return newpeer;
 		}
 		public void OnConnect() {
-			RLog.Info("PeerServerConnected");
+			RLog.Info("Peer Server Connected");
+			_connectionData = null;
+			_hasUsedFallback = true;
 			peers.Clear();
 			//first peer is loading in key
 			RLog.Info("Loading First Relay Peer");

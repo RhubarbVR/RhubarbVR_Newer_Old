@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using DiscordRPC;
+
 using LibVLCSharp.Shared;
 
 using LiteNetLib;
@@ -247,12 +249,21 @@ namespace RhuEngine.WorldObjects
 					PeerDisconect(rpeer);
 				}
 				else if (peer.Tag is RelayPeer repeer) {
+					if(disconnectInfo.Reason == DisconnectReason.ConnectionFailed) {
+						if (!repeer._hasUsedFallback) {
+							repeer._hasUsedFallback = true;
+							RLog.Info($"Relay Failed trying local connection");
+							var newpeer = repeer.NetPeer = _netManager.Connect("192.168.0.97", 7857, repeer._connectionData);
+							newpeer.Tag = repeer;
+							return;
+						}
+					}
 					relayServers.Remove(repeer);
 					foreach (var item in repeer.peers) {
 						PeerDisconect(item);
 					}
 				}
-				RLog.Info("PeerDisconnected");
+				RLog.Info($"PeerDisconnected Type {peer}");
 				RLog.Info($"PeerDisconnected: " + disconnectInfo.Reason);
 				if (disconnectInfo.AdditionalData.AvailableBytes > 0) {
 					RLog.Info("Disconnect data: " + disconnectInfo.AdditionalData.GetInt());
@@ -695,13 +706,6 @@ namespace RhuEngine.WorldObjects
 			RLog.Info($"Trying Relay Server {user.Server}");
 			try {
 				var peer = _netManager.Connect(user.Server, 7857, user.Data);
-				//if (peer.ConnectionState.HasFlag(ConnectionState.Disconnected)) {
-				//	RLog.Err(LoadMsg = "Relay Connect Failed Trying Local Relay");
-				//	peer = _netManager.Connect("192.168.0.97", 7857, user.Data);
-				//	if (peer.ConnectionState.HasFlag(ConnectionState.Disconnected)) {
-				//		throw new Exception("Relay Connect Failed with Local fallback");
-				//	}
-				//}
 				if (peer.Tag is not null) {
 					RLog.Info(LoadMsg = "Adding another Relay Client");
 					var relay = peer.Tag as RelayPeer;
@@ -710,6 +714,7 @@ namespace RhuEngine.WorldObjects
 				else {
 					RLog.Info(LoadMsg = "Start New Relay Server");
 					var relay = new RelayPeer(peer, this, user.UserID);
+					relay._connectionData = user.Data;
 					peer.Tag = relay;
 				}
 			}
