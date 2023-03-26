@@ -63,10 +63,10 @@ namespace RelayHolePuncher
 			};
 			Console.WriteLine($"Started HolePunchServer on port {port}");
 			_puncher.Start(port);
-			_puncher.MaxConnectAttempts = 15;
+			_puncher.MaxConnectAttempts = 64;
 			_puncher.DisconnectTimeout = 60000;
 			_puncher.ReuseAddress = true;
-			_puncher.UpdateTime = 30;
+			_puncher.UpdateTime = 25;
 			_puncher.UnsyncedDeliveryEvent = true;
 			_puncher.UnsyncedEvents = true;
 			_puncher.UnsyncedReceiveEvent = true;

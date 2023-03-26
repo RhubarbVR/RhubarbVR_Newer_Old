@@ -265,7 +265,7 @@ namespace RhuEngine.WorldObjects
 			};
 			_netManager.NatPunchModule.Init(_natPunchListener);
 			_netManager.EnableStatistics = true;
-			_netManager.MaxConnectAttempts = 15;
+			_netManager.MaxConnectAttempts = 64;
 			_netManager.DisconnectTimeout = 60000;
 			_netManager.UpdateTime = 33;
 			_netManager.ChannelsCount = 3;
@@ -275,6 +275,7 @@ namespace RhuEngine.WorldObjects
 			_netManager.UnsyncedDeliveryEvent = true;
 			_netManager.UnsyncedEvents = true;
 			_netManager.UnsyncedReceiveEvent = true;
+
 			//0 is main
 			//1 is syncStreams
 			//2 is assetPackeds

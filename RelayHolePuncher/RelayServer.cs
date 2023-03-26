@@ -71,16 +71,18 @@ namespace RelayHolePuncher
 					request.Reject();
 				}
 				else {
-					Console.WriteLine($"Connection Relay Accept Tag{data}");
+					Console.WriteLine($"Connection Relay Accept Tag {data}");
 					var peer = request.Accept();
 					peer.Tag = data;
 					Console.WriteLine("PeerConnected to Relay server: " + peer.EndPoint + " Tag " + peer.Tag);
-					try {
-						ProcessConnection(peer, (string)peer.Tag);
-					}
-					catch (Exception e) {
-						Console.WriteLine($"Error with relay connection {e}");
-					}
+					Task.Run(() => {
+						try {
+							ProcessConnection(peer, (string)peer.Tag);
+						}
+						catch (Exception e) {
+							Console.WriteLine($"Error with relay connection {e}");
+						}
+					});
 				}
 			};
 
@@ -95,11 +97,11 @@ namespace RelayHolePuncher
 				IPv6Enabled = IPv6Mode.DualMode
 			};
 			_relay.Start(port);
-			_relay.MaxConnectAttempts = 15;
+			_relay.MaxConnectAttempts = 64;
 			_relay.ChannelsCount = 3;
 			_relay.DisconnectTimeout = 60000;
 			_relay.ReuseAddress = true;
-			_relay.UpdateTime = 30;
+			_relay.UpdateTime = 25;
 			_relay.UnsyncedDeliveryEvent = true;
 			_relay.UnsyncedEvents = true;
 			_relay.UnsyncedReceiveEvent = true;
