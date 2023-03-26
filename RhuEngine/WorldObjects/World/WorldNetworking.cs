@@ -38,7 +38,7 @@ namespace RhuEngine.WorldObjects
 		public bool IsLoadingNet { get; internal set; } = true;
 		public bool WaitingForWorldStartState { get; internal set; } = true;
 
-		public ushort MasterUser { get; set; } = 1;
+		public ushort MasterUser { get; set; } = 0;
 
 		public ushort ConnectedUserCount => (ushort)Users?.Where(x => ((User)x).IsConnected || ((User)x).IsLocalUser).Count();
 
@@ -307,7 +307,7 @@ namespace RhuEngine.WorldObjects
 				}
 				LoadMsg = "Waiting For World Start State";
 				var worldData = dataGroup.GetValue("WorldData");
-				if(worldData is null) {
+				if (worldData is null) {
 					return;
 				}
 				else {
@@ -690,9 +690,17 @@ namespace RhuEngine.WorldObjects
 		}
 
 		private void RelayConnect(ConnectToUser user) {
-			RLog.Info("Relay Connect Client");
+			RLog.Info("Trying Relay Connect Client");
 			try {
 				var peer = _netManager.Connect(user.Server, 7857, user.Data);
+				RLog.Info($"Relay Connect Status {peer.ConnectionState}");
+				if (peer.ConnectionState.HasFlag(ConnectionState.Disconnected)) {
+					RLog.Err(LoadMsg = "Relay Connect Failed Trying Local Relay");
+					peer = _netManager.Connect("192.168.0.97", 7857, user.Data);
+					if (peer.ConnectionState.HasFlag(ConnectionState.Disconnected)) {
+						throw new Exception("Relay Connect Failed with Local fallback");
+					}
+				}
 				if (peer.Tag is not null) {
 					RLog.Info(LoadMsg = "Adding another Relay Client");
 					var relay = peer.Tag as RelayPeer;
