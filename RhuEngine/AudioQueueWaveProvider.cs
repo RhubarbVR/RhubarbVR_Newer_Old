@@ -36,11 +36,14 @@ namespace RhuEngine
 
 		public int Read(byte[] buffer, int offset, int count) {
 			var totalAmountRead = 0;
-
+			if (_audioQueue.Count == 0) {
+				Array.Clear(buffer, offset, count);
+				return Count;
+			}
 			while (totalAmountRead < count && _audioQueue.TryPeek(out var pcmData)) {
 				var amountRead = Math.Min(count - totalAmountRead, pcmData.Length - lastReadAmount);
 				Buffer.BlockCopy(pcmData, lastReadAmount, buffer, offset + totalAmountRead, amountRead);
-				if(amountRead == pcmData.Length) {
+				if (amountRead == pcmData.Length) {
 					_audioQueue.TryDequeue(out _);
 					lastReadAmount = 0;
 				}

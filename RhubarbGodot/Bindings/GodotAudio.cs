@@ -86,7 +86,7 @@ namespace RhubarbVR.Bindings
 				return;
 			}
 			var audioBuffer = _audioEffectCapture.GetBuffer(FrameAmount);
-			var bytes = new byte[audioBuffer.Length * sizeof(float) / 2];
+			var bytes = new byte[audioBuffer.Length / 2 * sizeof(float)];
 			fixed (byte* byteData = bytes) {
 				var castedPointer = (float*)byteData;
 				for (var i = 0; i < audioBuffer.Length / 2; i++) {
