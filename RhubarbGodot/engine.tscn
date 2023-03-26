@@ -6,7 +6,7 @@
 background_mode = 1
 background_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
 
-[node name="Engine" type="Node3D" node_paths=PackedStringArray("ThowAway", "Camera", "Rigin", "AudioListener")]
+[node name="RhubarbEngine" type="Node3D" node_paths=PackedStringArray("ThowAway", "Camera", "Rigin", "AudioListener")]
 script = ExtResource("1_p4nju")
 ThowAway = NodePath("ThrowAway")
 Camera = NodePath("XrOrigin3d/XrCamera3d")
