@@ -25,7 +25,7 @@ namespace RelayHolePuncher
 		public UserConnection otherConnection;
 	}
 
-	public class RelayServer : INetworkingServer, INetLogger
+	public class RelayServer : INetworkingServer
 	{
 		public NetManager _relay;
 
@@ -180,10 +180,6 @@ namespace RelayHolePuncher
 			catch (Exception ex) {
 				Console.WriteLine("error with relay resive error:" + ex.ToString());
 			}
-		}
-
-		public void WriteNet(NetLogLevel level, string str, params object[] args) {
-			Console.WriteLine($"{level}: {str} " + string.Join(", ", args));
 		}
 	}
 }

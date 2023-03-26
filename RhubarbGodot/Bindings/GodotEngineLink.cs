@@ -35,6 +35,7 @@ namespace RhubarbVR.Bindings
 		}
 
 		[SettingsField("VSync")]
+		[NeedsRebootAttribute]
 		public VsyncMode VSync = VsyncMode.Enabled;
 
 		[SettingsField("MaxFrameRate")]

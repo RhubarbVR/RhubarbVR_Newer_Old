@@ -68,7 +68,7 @@ namespace RhuSettings
 		public static SettingsObject LoadSettingsObjectInternal(SettingsObject obj, DataList startList) {
 			var fields = obj.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
 			foreach (var field in fields) {
-				var argfield = field.GetCustomAttribute<SettingsField>();
+				var argfield = field.GetCustomAttribute<SettingsFieldAttribute>();
 				if (argfield != null) {
 					var value = field.GetValue(obj);
 					var help = argfield.help;
@@ -123,7 +123,7 @@ namespace RhuSettings
 		public static DataList GetDataListFromSettingsObject(SettingsObject obj, DataList startlist) {
 			var fields = obj.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
 			foreach (var field in fields) {
-				var argfield = field.GetCustomAttribute<SettingsField>();
+				var argfield = field.GetCustomAttribute<SettingsFieldAttribute>();
 				if (argfield != null) {
 					var value = field.GetValue(obj);
 					var help = argfield.help;

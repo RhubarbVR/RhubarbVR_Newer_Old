@@ -126,12 +126,16 @@ namespace RhuEngine.WorldObjects
 					thumNail = Guid.Empty;
 				}
 
-				////TODO: add support for changeing on connection info 
 				var userConnection = new UserConnectionInfo {
-					ConnectionType = ConnectionType.HolePunch,
+					ConnectionType = Engine.MainSettings.NetworkingSettings.PreferredConnectionType,
 					ServerPingLevels = Pings,
 					Data = null
 				};
+				if(userConnection.ConnectionType == ConnectionType.Direct) {
+					userConnection.Data = $"{Engine.MainSettings.NetworkingSettings.PublicIP}:{_netManager.LocalPort}";
+				}
+
+
 				if (!joiningSession) {
 					var newGUId = Guid.NewGuid();
 					SessionID.Value = newGUId.ToString();
@@ -186,7 +190,7 @@ namespace RhuEngine.WorldObjects
 			FindNewMaster();
 		}
 
-		private void LoadNatManager() {
+		private bool LoadNatManager() {
 			_natPunchListener.NatIntroductionSuccess += (point, addrType, token) => {
 				RLog.Info($"NatIntroductionSuccess {point}  {addrType}  {token}");
 				NatIntroductionSuccessIsGood[token] = true;
@@ -273,7 +277,7 @@ namespace RhuEngine.WorldObjects
 			_netManager = new NetManager(_clientListener) {
 				IPv6Mode = IPv6Mode.DualMode,
 				NatPunchEnabled = true,
-				ReconnectDelay = 10,
+				ReconnectDelay = 1000,
 				EnableStatistics = true,
 				MaxConnectAttempts = 5,
 				DisconnectTimeout = 60000,
@@ -289,10 +293,32 @@ namespace RhuEngine.WorldObjects
 				UnsyncedReceiveEvent = true
 			};
 			_netManager.NatPunchModule.Init(_natPunchListener);
-			if (!_netManager.Start()) {
-				RLog.Err(LoadMsg = "Failed to start world networking");
+			var targetPort = 0;
+			if (Engine.MainSettings.NetworkingSettings.PreferredConnectionType == ConnectionType.Direct) {
+				targetPort = Engine.MainSettings.NetworkingSettings.StartPortRange;
+				if(Engine.MainSettings.NetworkingSettings.EndPortRange <= Engine.MainSettings.NetworkingSettings.StartPortRange) {
+					RLog.Err(LoadMsg = "End Port Range needs to be more than StartPortRange");
+					return false;
+				}
 			}
+			if(targetPort != 0) {
+				while(targetPort <= Engine.MainSettings.NetworkingSettings.StartPortRange) {
+					RLog.Info(LoadMsg = $"Trying to start world networking Port {targetPort}");
+					if (_netManager.Start(targetPort)) {
+						RLog.Info(LoadMsg = $"World networking Port {targetPort}");
+						break;
+					}
+				}
+				return _netManager.IsRunning;
+			}
+			else {
+				if (!_netManager.Start(targetPort)) {
+					RLog.Err(LoadMsg = "Failed to start world networking");
+					return false;
+				}
 
+			}
+			return true;
 		}
 
 		private void ClientListener_NetworkLatencyUpdateEvent(NetPeer peer, int latency) {

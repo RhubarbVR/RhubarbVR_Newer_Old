@@ -5,7 +5,13 @@ using System.Text;
 namespace RhuSettings
 {
 	[AttributeUsage(AttributeTargets.Field)]
-	public class SettingsField : Attribute
+	public sealed class NeedsRebootAttribute : Attribute
+	{
+
+	}
+
+	[AttributeUsage(AttributeTargets.Field)]
+	public sealed class SettingsFieldAttribute : Attribute
 	{
 		public string Path = "/";
 
@@ -13,10 +19,10 @@ namespace RhuSettings
 
 		public string[] oldFields;
 
-		public SettingsField(string[] _oldFields, string _help = "", string path = "/") : this(_help, path) {
+		public SettingsFieldAttribute(string[] _oldFields, string _help = "", string path = "/") : this(_help, path) {
 			oldFields = _oldFields;
 		}
-		public SettingsField(string _help = "", string path = "/") {
+		public SettingsFieldAttribute(string _help = "", string path = "/") {
 			help = _help;
 			Path = path;
 		}

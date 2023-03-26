@@ -176,29 +176,47 @@ namespace RhuEngine.Components
 		private void LoadTaskBarAndStart() {
 			if (Engine.netApiManager.Client.IsLogin) {
 				ClearStart();
-				ClearTaskBar();
-				foreach (var item in _startTypes) {
-					AddStartProgram(item);
-				}
-				foreach (var item in _taskBarTypes) {
-					AddTaskBarItemProgram(item);
+				lock (_taskBarItems) {
+					ClearTaskBarNoLock();
+					foreach (var item in _startTypes) {
+						AddStartProgram(item);
+					}
+					foreach (var item in _taskBarTypes) {
+						AddTaskBarItemProgramNoLock(item);
+					}
 				}
 				_offlineStart = false;
 			}
 			else if (!_offlineStart) {
 				ClearStart();
-				ClearTaskBar();
-				foreach (var item in _startTypes) {
-					AddStartProgram(item);
-				}
-				foreach (var item in _taskBarTypes) {
-					AddTaskBarItemProgram(item);
+				lock (_taskBarItems) {
+					ClearTaskBarNoLock();
+					foreach (var item in _startTypes) {
+						AddStartProgram(item);
+					}
+					foreach (var item in _taskBarTypes) {
+						AddTaskBarItemProgramNoLock(item);
+					}
 				}
 				_offlineStart = true;
 			}
 		}
 
 		private readonly List<PrivateSpaceTaskbarItem> _taskBarItems = new();
+
+		private void ClearTaskBarNoLock() {
+			foreach (var privateSpaceTaskbarItem in _taskBarItems) {
+				privateSpaceTaskbarItem.Entity.Destroy();
+			}
+			lock (privateSpaceTaskbarItems) {
+				foreach (var item in privateSpaceTaskbarItems) {
+					if (item.Entity.orderOffset.Value < 500) {
+						item.Entity.orderOffset.Value = 0;
+					}
+				}
+			}
+			_taskBarItems.Clear();
+		}
 
 		private void ClearTaskBar() {
 			lock (_taskBarItems) {
@@ -302,6 +320,14 @@ namespace RhuEngine.Components
 			}
 		}
 
+		private void AddTaskBarItemProgramNoLock(Type type) {
+			if (type is null) {
+				return;
+			}
+			var newItem = PrivateSpaceManager.UserInterfaceManager._taskbarElementHolder?.Entity?.AddChild(type.Name)?.AttachComponent<PrivateSpaceTaskbarItem>();
+			newItem.SetUpProgramOpen(type, _taskBarItems.Count);
+			_taskBarItems.Add(newItem);
+		}
 
 		internal void LoadInterface() {
 			if (!Engine.EngineLink.CanRender) {
@@ -490,7 +516,7 @@ namespace RhuEngine.Components
 		}
 
 		private void Client_OnLogout() {
-			if(_profileElement is null) {
+			if (_profileElement is null) {
 				return;
 			}
 			_profileElement.Entity.enabled.Value = false;

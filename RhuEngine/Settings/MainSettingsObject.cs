@@ -22,6 +22,8 @@ namespace RhuEngine.Settings
 
 		[SettingsField("Input Settings")]
 		public InputSettingsObject InputSettings = new();
+		[SettingsField("Networking Settings")]
+		public NetworkingSettingsObject NetworkingSettings = new();
 
 		[SettingsField("Desktop Fov")]
 		public float Fov = 90;
@@ -30,6 +32,7 @@ namespace RhuEngine.Settings
 		public string ThreeLetterLanguageName = null;
 
 		[SettingsField()]
+		[NeedsReboot]
 		public string TargetAPI = null;
 
 		[SettingsField("Master Volume in Audio DB")]
