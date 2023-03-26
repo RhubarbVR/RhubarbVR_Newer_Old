@@ -94,7 +94,7 @@ namespace RelayHolePuncher
 			};
 
 			_relay = new NetManager(clientListener) {
-				IPv6Enabled = IPv6Mode.DualMode
+				IPv6Mode = IPv6Mode.DualMode
 			};
 			_relay.Start(port);
 			_relay.MaxConnectAttempts = 64;
@@ -112,8 +112,7 @@ namespace RelayHolePuncher
 		public void Kill() {
 			_relay.Stop();
 		}
-
-		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod) {
+		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod) {
 			try {
 				var data = reader.GetRemainingBytes();
 				if (peer.Tag is List<UserConnection> userconections) {
@@ -135,7 +134,7 @@ namespace RelayHolePuncher
 									using var memstreame = new MemoryStream();
 									using var wtiter = new BinaryWriter(memstreame);
 									RelayNetPacked.Serlize(wtiter, new DataPacked(packed.Data, userconections[packed.Id - 1].otherConnection.index));
-									userconections[packed.Id - 1].otherConnection.Peer.Send(memstreame.ToArray(), 2, deliveryMethod);
+									userconections[packed.Id - 1].otherConnection.Peer.Send(memstreame.ToArray(), channel, deliveryMethod);
 								}
 							}
 						}
@@ -145,7 +144,7 @@ namespace RelayHolePuncher
 									using var memstreamr = new MemoryStream();
 									using var wtiter = new BinaryWriter(memstreamr);
 									RelayNetPacked.Serlize(wtiter, new DataPacked(data, item.otherConnection.index));
-									item.otherConnection?.Peer.Send(memstreamr.ToArray(), 1, deliveryMethod);
+									item.otherConnection?.Peer.Send(memstreamr.ToArray(), channel, deliveryMethod);
 								}
 								catch (Exception e) {
 									Console.WriteLine("Failed to send to user" + e.ToString());
@@ -165,7 +164,7 @@ namespace RelayHolePuncher
 									using var memstreama = new MemoryStream();
 									using var wtiter = new BinaryWriter(memstreama);
 									RelayNetPacked.Serlize(wtiter, new DataPacked(data, item.otherConnection.index));
-									item.otherConnection.Peer.Send(memstreama.ToArray(), 0, deliveryMethod);
+									item.otherConnection.Peer.Send(memstreama.ToArray(), channel, deliveryMethod);
 								}
 							}
 							catch (Exception e) {

@@ -58,7 +58,7 @@ namespace RelayHolePuncher
 			};
 
 			_puncher = new NetManager(clientListener) {
-				IPv6Enabled = IPv6Mode.DualMode,
+				IPv6Mode = IPv6Mode.DualMode,
 				NatPunchEnabled = true
 			};
 			Console.WriteLine($"Started HolePunchServer on port {port}");

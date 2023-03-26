@@ -263,7 +263,7 @@ namespace RhuEngine.WorldObjects
 						PeerDisconect(item);
 					}
 				}
-				RLog.Info($"PeerDisconnected Type {peer}");
+				RLog.Info($"PeerDisconnected Type {peer.Tag}");
 				RLog.Info($"PeerDisconnected: " + disconnectInfo.Reason);
 				if (disconnectInfo.AdditionalData.AvailableBytes > 0) {
 					RLog.Info("Disconnect data: " + disconnectInfo.AdditionalData.GetInt());
@@ -271,7 +271,7 @@ namespace RhuEngine.WorldObjects
 			};
 
 			_netManager = new NetManager(_clientListener) {
-				IPv6Enabled = IPv6Mode.DualMode,
+				IPv6Mode = IPv6Mode.DualMode,
 				NatPunchEnabled = true
 			};
 			_netManager.NatPunchModule.Init(_natPunchListener);
@@ -291,8 +291,7 @@ namespace RhuEngine.WorldObjects
 			//1 is syncStreams
 			//2 is assetPackeds
 			if (!_netManager.Start()) {
-				LoadMsg = "Failed to start world networking";
-				RLog.Err("Failed to start world networking");
+				RLog.Err(LoadMsg = "Failed to start world networking");
 			}
 
 		}
@@ -436,7 +435,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 
-		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod) {
+		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader,byte channel, DeliveryMethod deliveryMethod) {
 			if (IsDisposed) {
 				return;
 			}
@@ -713,8 +712,9 @@ namespace RhuEngine.WorldObjects
 				}
 				else {
 					RLog.Info(LoadMsg = "Start New Relay Server");
-					var relay = new RelayPeer(peer, this, user.UserID);
-					relay._connectionData = user.Data;
+					var relay = new RelayPeer(peer, this, user.UserID) {
+						_connectionData = user.Data
+					};
 					peer.Tag = relay;
 				}
 			}
