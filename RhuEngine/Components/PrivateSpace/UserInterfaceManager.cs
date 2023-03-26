@@ -174,9 +174,9 @@ namespace RhuEngine.Components
 		};
 
 		private void LoadTaskBarAndStart() {
-			if (Engine.netApiManager.Client.IsLogin) {
-				ClearStart();
-				lock (_taskBarItems) {
+			lock (_taskBarItems) {
+				if (Engine.netApiManager.Client.IsLogin) {
+					ClearStart();
 					ClearTaskBarNoLock();
 					foreach (var item in _startTypes) {
 						AddStartProgram(item);
@@ -184,12 +184,10 @@ namespace RhuEngine.Components
 					foreach (var item in _taskBarTypes) {
 						AddTaskBarItemProgramNoLock(item);
 					}
+					_offlineStart = false;
 				}
-				_offlineStart = false;
-			}
-			else if (!_offlineStart) {
-				ClearStart();
-				lock (_taskBarItems) {
+				else if (!_offlineStart) {
+					ClearStart();
 					ClearTaskBarNoLock();
 					foreach (var item in _startTypes) {
 						AddStartProgram(item);
@@ -197,8 +195,8 @@ namespace RhuEngine.Components
 					foreach (var item in _taskBarTypes) {
 						AddTaskBarItemProgramNoLock(item);
 					}
+					_offlineStart = true;
 				}
-				_offlineStart = true;
 			}
 		}
 
