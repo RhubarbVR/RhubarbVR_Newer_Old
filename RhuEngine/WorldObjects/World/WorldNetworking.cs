@@ -272,25 +272,23 @@ namespace RhuEngine.WorldObjects
 
 			_netManager = new NetManager(_clientListener) {
 				IPv6Mode = IPv6Mode.DualMode,
-				NatPunchEnabled = true
+				NatPunchEnabled = true,
+				ReconnectDelay = 10,
+				EnableStatistics = true,
+				MaxConnectAttempts = 5,
+				DisconnectTimeout = 60000,
+				UpdateTime = 33,
+				//0 is main
+				//1 is syncStreams
+				//2 is assetPackeds
+				ChannelsCount = 3,
+				AutoRecycle = true,
+				//Made unsync to make run faster
+				UnsyncedDeliveryEvent = true,
+				UnsyncedEvents = true,
+				UnsyncedReceiveEvent = true
 			};
-
 			_netManager.NatPunchModule.Init(_natPunchListener);
-			_netManager.EnableStatistics = true;
-			_netManager.MaxConnectAttempts = 64;
-			_netManager.DisconnectTimeout = 60000;
-			_netManager.UpdateTime = 33;
-			_netManager.ChannelsCount = 3;
-			_netManager.AutoRecycle = true;
-
-			//Made unsync to make run faster
-			_netManager.UnsyncedDeliveryEvent = true;
-			_netManager.UnsyncedEvents = true;
-			_netManager.UnsyncedReceiveEvent = true;
-
-			//0 is main
-			//1 is syncStreams
-			//2 is assetPackeds
 			if (!_netManager.Start()) {
 				RLog.Err(LoadMsg = "Failed to start world networking");
 			}

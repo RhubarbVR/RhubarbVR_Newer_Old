@@ -245,9 +245,7 @@ namespace RhuEngine
 			commandManager.Init(this);
 			IntMsg = $"Engine started Can Render {EngineLink.CanRender} Can Audio {EngineLink.CanAudio} Can input {EngineLink.CanInput}";
 			RLog.Info(IntMsg);
-#if DEBUG
 			NetDebug.Logger = this;
-#endif
 			if (EngineLink.CanRender) {
 				if (RRenderer.PassthroughSupport) {
 					RLog.Info("Passthrough Supported");
