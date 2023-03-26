@@ -252,9 +252,10 @@ namespace RhuEngine.WorldObjects
 						PeerDisconect(item);
 					}
 				}
-				Console.WriteLine($"PeerDisconnected: " + disconnectInfo.Reason);
+				RLog.Info("PeerDisconnected");
+				RLog.Info($"PeerDisconnected: " + disconnectInfo.Reason);
 				if (disconnectInfo.AdditionalData.AvailableBytes > 0) {
-					Console.WriteLine("Disconnect data: " + disconnectInfo.AdditionalData.GetInt());
+					RLog.Info("Disconnect data: " + disconnectInfo.AdditionalData.GetInt());
 				}
 			};
 
@@ -690,19 +691,16 @@ namespace RhuEngine.WorldObjects
 		}
 
 		private void RelayConnect(ConnectToUser user) {
-			RLog.Info("Trying Relay Connect Client");
+			RLog.Info($"Trying Relay Server {user.Server}");
 			try {
 				var peer = _netManager.Connect(user.Server, 7857, user.Data);
-				while (peer.ConnectionState == ConnectionState.Outgoing) {
-					Thread.Sleep(10);
-				}
-				if (peer.ConnectionState.HasFlag(ConnectionState.Disconnected)) {
-					RLog.Err(LoadMsg = "Relay Connect Failed Trying Local Relay");
-					peer = _netManager.Connect("192.168.0.97", 7857, user.Data);
-					if (peer.ConnectionState.HasFlag(ConnectionState.Disconnected)) {
-						throw new Exception("Relay Connect Failed with Local fallback");
-					}
-				}
+				//if (peer.ConnectionState.HasFlag(ConnectionState.Disconnected)) {
+				//	RLog.Err(LoadMsg = "Relay Connect Failed Trying Local Relay");
+				//	peer = _netManager.Connect("192.168.0.97", 7857, user.Data);
+				//	if (peer.ConnectionState.HasFlag(ConnectionState.Disconnected)) {
+				//		throw new Exception("Relay Connect Failed with Local fallback");
+				//	}
+				//}
 				if (peer.Tag is not null) {
 					RLog.Info(LoadMsg = "Adding another Relay Client");
 					var relay = peer.Tag as RelayPeer;
