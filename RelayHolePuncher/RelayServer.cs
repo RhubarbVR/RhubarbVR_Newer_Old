@@ -61,16 +61,6 @@ namespace RelayHolePuncher
 
 			clientListener.NetworkReceiveEvent += ClientListener_NetworkReceiveEvent;
 
-			clientListener.PeerConnectedEvent += peer => {
-				Console.WriteLine("PeerConnected to Relay server: " + peer.EndPoint + " Tag " + peer.Tag);
-				try {
-					ProcessConnection(peer, (string)peer.Tag);
-				}
-				catch (Exception e) {
-					Console.WriteLine($"Error with relay connection {e}");
-				}
-			};
-
 			clientListener.ConnectionRequestEvent += request => {
 				if (!request.Data.TryGetString(out var data)) {
 					Console.WriteLine("Connection Relay Rejected not string");
@@ -84,6 +74,13 @@ namespace RelayHolePuncher
 					Console.WriteLine($"Connection Relay Accept Tag{data}");
 					var peer = request.Accept();
 					peer.Tag = data;
+					Console.WriteLine("PeerConnected to Relay server: " + peer.EndPoint + " Tag " + peer.Tag);
+					try {
+						ProcessConnection(peer, (string)peer.Tag);
+					}
+					catch (Exception e) {
+						Console.WriteLine($"Error with relay connection {e}");
+					}
 				}
 			};
 
@@ -95,7 +92,7 @@ namespace RelayHolePuncher
 			};
 
 			_relay = new NetManager(clientListener) {
-				IPv6Enabled = IPv6Mode.SeparateSocket
+				IPv6Enabled = IPv6Mode.DualMode
 			};
 			_relay.Start(port);
 			_relay.MaxConnectAttempts = 15;

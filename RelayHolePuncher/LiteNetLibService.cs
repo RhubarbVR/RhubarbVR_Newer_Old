@@ -22,8 +22,7 @@ namespace RelayHolePuncher
 			punchServer = new HolePunchServer();
 			relayServer = new RelayServer();
 			punchServer.Initialize(7856);
-			relayServer.Initialize(7857
-				);
+			relayServer.Initialize(7857);
 		}
 
 		public async Task StartUpdateLoop() {

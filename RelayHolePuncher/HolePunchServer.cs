@@ -46,24 +46,30 @@ namespace RelayHolePuncher
 		public void Initialize(int port) {
 			var clientListener = new EventBasedNetListener();
 
-			clientListener.PeerConnectedEvent += peer => Console.WriteLine("PeerConnected to server: " + peer.EndPoint);
+			clientListener.PeerConnectedEvent += peer => Console.WriteLine("HolePunch PeerConnected to server: " + peer.EndPoint);
 
 			clientListener.ConnectionRequestEvent += request => request.Accept();
 
 			clientListener.PeerDisconnectedEvent += (peer, disconnectInfo) => {
-				Console.WriteLine("PeerDisconnected from server: " + disconnectInfo.Reason);
+				Console.WriteLine("HolePunch PeerDisconnected from server: " + disconnectInfo.Reason);
 				if (disconnectInfo.AdditionalData.AvailableBytes > 0) {
-					Console.WriteLine("Disconnect data: " + disconnectInfo.AdditionalData.GetInt());
+					Console.WriteLine("HolePunch Disconnect data: " + disconnectInfo.AdditionalData.GetInt());
 				}
 			};
 
 			_puncher = new NetManager(clientListener) {
-				IPv6Enabled = IPv6Mode.SeparateSocket,
+				IPv6Enabled = IPv6Mode.DualMode,
 				NatPunchEnabled = true
 			};
 			Console.WriteLine($"Started HolePunchServer on port {port}");
 			_puncher.Start(port);
 			_puncher.MaxConnectAttempts = 15;
+			_puncher.DisconnectTimeout = 60000;
+			_puncher.ReuseAddress = true;
+			_puncher.UpdateTime = 30;
+			_puncher.UnsyncedDeliveryEvent = true;
+			_puncher.UnsyncedEvents = true;
+			_puncher.UnsyncedReceiveEvent = true;
 			_puncher.NatPunchModule.Init(this);
 		}
 
