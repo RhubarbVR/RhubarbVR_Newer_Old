@@ -56,6 +56,22 @@ public partial class EngineRunner : Node3D, IRTime
 
 	public override void _Ready() {
 		SetProcessInternal(true);
+		ThowAway ??= GetChild<SubViewport>(1);
+		if(ThowAway is null) {
+			throw new NullReferenceException(nameof(ThowAway));
+		}
+		Rigin ??= GetChild<XROrigin3D>(0);
+		if (Rigin is null) {
+			throw new NullReferenceException(nameof(Rigin));
+		}
+		Camera ??= Rigin.GetChild<XRCamera3D>(0);
+		if (Camera is null) {
+			throw new NullReferenceException(nameof(Camera));
+		}
+		AudioListener ??= Camera.GetChild<AudioListener3D>(0);
+		if (AudioListener is null) {
+			throw new NullReferenceException(nameof(AudioListener));
+		}
 		if (RLog.Instance == null) {
 			RLog.Instance = new GodotLogs();
 		}
