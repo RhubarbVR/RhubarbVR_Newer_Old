@@ -116,7 +116,7 @@ namespace RelayHolePuncher
 			try {
 				var data = reader.GetRemainingBytes();
 				if (peer.Tag is List<UserConnection> userconections) {
-					using var memstream = new MemoryStream();
+					using var memstream = new MemoryStream(data);
 					using var readere = new BinaryReader(memstream);
 					var relayPacked = RelayNetPacked.DeSerlize(readere);
 					if (relayPacked is not null) {
