@@ -40,7 +40,7 @@ namespace RhubarbEasyBuild
 
 		public static string WindowsExeGodotPath => Path.Combine(GodotPath, "Godot_v4.0.1-stable_mono_win64", "Godot_v4.0.1-stable_mono_win64.exe");
 		public static string LinuxGodotPath => Path.Combine(GodotPath, "Godot_v4.0.1-stable_mono_linux_x86_64", "Godot_v4.0.1-stable_mono_linux.x86_64");
-		public static string OSXGodotPath => Path.Combine(GodotPath, "Godot_mono.app", "MacOS", "Godot");
+		public static string OSXGodotPath => Path.Combine(GodotPath, "Godot_mono.app", "Contents", "MacOS", "Godot");
 
 		public static string GetExePath(RunningPlatform runningPlatform) {
 			return runningPlatform switch {
