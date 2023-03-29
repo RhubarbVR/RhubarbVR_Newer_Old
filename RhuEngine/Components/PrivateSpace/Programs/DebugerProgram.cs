@@ -45,6 +45,8 @@ namespace RhuEngine.Components
 			_scroll.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
 			_scroll.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
 			_richText = _scroll.Entity.AddChild("Top").AttachComponent<RichTextLabel>();
+			_richText.VerticalFilling.Value = RFilling.Fill | RFilling.Expand;
+			_richText.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
 			_richText.TextSelectionEnabled.Value = true;
 			_richText.ContextMenuEnabled.Value = true;
 			_richText.Threading.Value = false;
