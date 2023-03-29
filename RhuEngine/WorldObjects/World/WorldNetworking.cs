@@ -40,7 +40,7 @@ namespace RhuEngine.WorldObjects
 		public bool IsLoadingNet { get; internal set; } = true;
 		public bool WaitingForWorldStartState { get; internal set; } = true;
 
-		public ushort MasterUser { get; set; } = 0;
+		public ushort MasterUser { get; set; } = 1;
 
 		public ushort ConnectedUserCount => (ushort)Users?.Where(x => ((User)x).IsConnected || ((User)x).IsLocalUser).Count();
 
@@ -588,6 +588,9 @@ namespace RhuEngine.WorldObjects
 				using var reader = new BinaryWriter(memstream);
 				NetPacked.Serlize(reader, new DataSaver(dataGroup).Store);
 				peer.Send(memstream.ToArray(), DeliveryMethod.ReliableOrdered);
+			}
+			else {
+				RLog.Info($"Local Was {LocalUserID} {MasterUser}");
 			}
 			LoadUserIn(peer);
 			FindNewMaster();
