@@ -115,7 +115,8 @@ namespace RhuEngine.Components
 			source.Value = _source;
 			if (_source != Handed.Max) {
 				var shape = Entity.AttachComponent<SphereShape>();
-				shape.Radius.Value = 0.05f / 2;
+				shape.RayCastEnabled.Value = false;
+				shape.Radius.Value = 0.05f;
 			}
 			switch (_source) {
 				case Handed.Left:

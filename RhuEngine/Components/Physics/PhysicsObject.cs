@@ -54,6 +54,10 @@ namespace RhuEngine.Components
 		[Default(true)]
 		public readonly Sync<bool> CollisionEnabled;
 
+
+		[Default(true)]
+		public readonly Sync<bool> RayCastEnabled;
+
 		[OnChanged(nameof(MaskUpdate))]
 		public readonly Sync<EPhysicsMask> Group;
 
