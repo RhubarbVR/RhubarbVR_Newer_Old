@@ -38,7 +38,7 @@ namespace SharedModels.GameSpecific
 				2 => new ConnectToAnotherUser(),
 				_ => null,
 			};
-			relayNet.DeSerlize(binaryReader);
+			relayNet?.DeSerlize(binaryReader);
 			return relayNet;
 		}
 	}
