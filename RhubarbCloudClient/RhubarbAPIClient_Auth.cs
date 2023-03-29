@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.SignalR.Client;
@@ -29,7 +30,7 @@ namespace RhubarbCloudClient
 
 		public event Action OnLogout;
 		private async Task LogInPros(PrivateUser privateUser) {
-			if(User == privateUser) {
+			if (User == privateUser) {
 				return;
 			}
 			User = privateUser;
@@ -47,10 +48,16 @@ namespace RhubarbCloudClient
 		}
 
 		HubConnection _hub;
+
+		private readonly Semaphore _semaphore = new(1, 1);
+
 		private async Task InitSignlR() {
-			Console.WriteLine("Starting SignelR");
+			Console.WriteLine($"Waiting to start SignelR");
+			_semaphore.WaitOne();
+			Console.WriteLine($"Starting SignelR {_hub?.State ?? HubConnectionState.Disconnected}");
 			if (_hub is not null) {
 				await _hub.StopAsync();
+				await _hub.DisposeAsync();
 				_hub = null;
 			}
 			try {
@@ -60,7 +67,6 @@ namespace RhubarbCloudClient
 					.Build();
 			}
 			catch {
-				await _hub.StopAsync();
 				_hub = new HubConnectionBuilder()
 					.WithUrl(new Uri(HttpClient.BaseAddress, "hub"))
 					.WithAutomaticReconnect()
@@ -76,6 +82,7 @@ namespace RhubarbCloudClient
 			_hub.Closed += Hub_Closed;
 			await _hub.StartAsync();
 			Console.WriteLine("SignelR started");
+			_semaphore.Release();
 		}
 
 		private Task Hub_Closed(Exception arg) {
