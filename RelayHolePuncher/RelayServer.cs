@@ -97,7 +97,7 @@ namespace RelayHolePuncher
 			};
 
 			_relay = new NetManager(clientListener) {
-				IPv6Mode = IPv6Mode.DualMode,
+				IPv6Mode = IPv6Mode.SeparateSocket,
 				MaxConnectAttempts = 64,
 				ChannelsCount = 3,
 				DisconnectTimeout = 60000,

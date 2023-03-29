@@ -58,7 +58,7 @@ namespace RelayHolePuncher
 			};
 
 			_puncher = new NetManager(clientListener) {
-				IPv6Mode = IPv6Mode.DualMode,
+				IPv6Mode = IPv6Mode.SeparateSocket,
 				NatPunchEnabled = true,
 				MaxConnectAttempts = 64,
 				DisconnectTimeout = 60000,

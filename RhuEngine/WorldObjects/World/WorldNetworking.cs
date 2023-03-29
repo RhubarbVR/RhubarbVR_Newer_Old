@@ -275,7 +275,7 @@ namespace RhuEngine.WorldObjects
 			};
 
 			_netManager = new NetManager(_clientListener) {
-				IPv6Mode = IPv6Mode.DualMode,
+				IPv6Mode = IPv6Mode.SeparateSocket,
 				NatPunchEnabled = true,
 				ReconnectDelay = 1000,
 				EnableStatistics = true,
