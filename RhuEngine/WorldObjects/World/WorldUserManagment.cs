@@ -53,7 +53,9 @@ namespace RhuEngine.WorldObjects
 					}
 					if ((user.CurrentPeer?.NetPeer?.ConnectionState ?? LiteNetLib.ConnectionState.Disconnected) == LiteNetLib.ConnectionState.Connected) {
 						RLog.Err("User already loaded can only join a world once");
-						peer.NetPeer.Disconnect();
+						if (!peer.IsRelay) { 
+							peer.NetPeer.Disconnect();
+						}
 					}
 					else {
 						user.CurrentPeer = peer;

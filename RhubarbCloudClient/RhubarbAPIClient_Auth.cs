@@ -29,6 +29,9 @@ namespace RhubarbCloudClient
 
 		public event Action OnLogout;
 		private async Task LogInPros(PrivateUser privateUser) {
+			if(User == privateUser) {
+				return;
+			}
 			User = privateUser;
 			if (IsLogin) {
 				OnLogin?.Invoke(User);
@@ -46,6 +49,10 @@ namespace RhubarbCloudClient
 		HubConnection _hub;
 		private async Task InitSignlR() {
 			Console.WriteLine("Starting SignelR");
+			if (_hub is not null) {
+				await _hub.StopAsync();
+				_hub = null;
+			}
 			try {
 				_hub = new HubConnectionBuilder()
 					.WithUrl(new Uri(HttpClient.BaseAddress, "hub"), (x) => x.Cookies = Cookies)
@@ -53,6 +60,7 @@ namespace RhubarbCloudClient
 					.Build();
 			}
 			catch {
+				await _hub.StopAsync();
 				_hub = new HubConnectionBuilder()
 					.WithUrl(new Uri(HttpClient.BaseAddress, "hub"))
 					.WithAutomaticReconnect()
@@ -61,8 +69,8 @@ namespace RhubarbCloudClient
 			//_hub.On(nameof(MessageNotify), MessageNotify);
 			_hub.On<UserDM.MSG>(nameof(ReceivedMsg), ReceivedMsg);
 			_hub.On<PrivateUserStatus>(nameof(LoadInStatusInfo), LoadInStatusInfo);
-			_hub.On<Guid,bool>(nameof(UserDataUpdate), UserDataUpdate);
-			_hub.On<string,Guid>(nameof(SessionError), SessionError);
+			_hub.On<Guid, bool>(nameof(UserDataUpdate), UserDataUpdate);
+			_hub.On<string, Guid>(nameof(SessionError), SessionError);
 			_hub.On<ConnectToUser, Guid>(nameof(UserConnection), UserConnection);
 			_hub.On<Guid, Guid>(nameof(SessionIDupdate), SessionIDupdate);
 			_hub.Closed += Hub_Closed;
@@ -71,7 +79,7 @@ namespace RhubarbCloudClient
 		}
 
 		private Task Hub_Closed(Exception arg) {
-			Console.WriteLine($"SignelR Closed {arg?.Message??"null"}");
+			Console.WriteLine($"SignelR Closed {arg?.Message ?? "null"}");
 			CheckForInternetConnectionLoop().ConfigureAwait(false);
 			return Task.CompletedTask;
 		}
@@ -97,7 +105,7 @@ namespace RhubarbCloudClient
 		private async Task LoadInStatusInfo(PrivateUserStatus status) {
 			Console.WriteLine("User Status Loaded");
 			Status = status;
-			status.ClientVersion = ClientVersion + "_NET" + Environment.Version.ToString() ;
+			status.ClientVersion = ClientVersion + "_NET" + Environment.Version.ToString();
 			status.Device = Environment.OSVersion.Platform.ToString();
 			status.ClientCompatibility = ClientCompatibility;
 			await UpdateUserStatus(status);

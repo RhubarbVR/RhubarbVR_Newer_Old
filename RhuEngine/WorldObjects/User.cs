@@ -134,10 +134,7 @@ namespace RhuEngine.WorldObjects
 		public T FindOrCreateSyncStream<T>(string name) where T : SyncStream, new() {
 			var thing = FindSyncStream<T>(name);
 			if (thing == null) {
-				var stream = syncStreams.Add<T>();
-				if (stream is null) {
-					throw new Exception("Stream is null");
-				}
+				var stream = syncStreams.Add<T>() ?? throw new Exception("Stream is null");
 				stream.name.Value = name;
 				return stream;
 			}
