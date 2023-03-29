@@ -6,9 +6,10 @@ namespace RhubarbEasyBuild
 	{
 		public static string RhubarbDir;
 
-		public static string[] Options = new string[] {
+		static readonly string[] _options = new string[] {
 			"-run-debug",
 			"-build-debug",
+			"-build-headless"
 		};
 
 		static bool IsRhubarbDir(string path) {
@@ -35,8 +36,8 @@ namespace RhubarbEasyBuild
 			string selectedOption;
 			if (args.Length == 0) {
 				Console.WriteLine("Choose what you want to do!");
-				for (var i = 0; i < Options.Length; i++) {
-					Console.WriteLine($"{i}: {Options[i]}");
+				for (var i = 0; i < _options.Length; i++) {
+					Console.WriteLine($"{i}: {_options[i]}");
 				}
 			choose:
 				Console.Write("Choose:");
@@ -45,21 +46,25 @@ namespace RhubarbEasyBuild
 					Console.WriteLine("Put in a number");
 					goto choose;
 				}
-				if (selectedIndex >= Options.Length) {
+				if (selectedIndex >= _options.Length) {
 					Console.WriteLine($"{selectedIndex} is Not valid option");
 					goto choose;
 				}
-				selectedOption = Options[selectedIndex];
+				selectedOption = _options[selectedIndex];
 			}
 			else {
 				selectedOption = args[0];
 			}
+			selectedOption = selectedOption.ToLower();
 			Console.WriteLine($"Selected {selectedOption}");
 			if (selectedOption.Contains("run-debug")) {
 				await RunDebug();
 			}
 			else if (selectedOption.Contains("build-debug")) {
 				await BuildDebug();
+			}
+			else if (selectedOption.Contains("build-headless")) {
+				await BuildHeadLess();
 			}
 			else {
 				Console.WriteLine("Command Not known");
@@ -98,6 +103,16 @@ namespace RhubarbEasyBuild
 			}
 
 
+		}
+
+		static async Task BuildHeadLess() {
+			var process = Process.Start(new ProcessStartInfo {
+				Arguments = "build ./Rhubarb_VR_HeadLess/Rhubarb_VR_HeadLess.csproj",
+				FileName = "dotnet",
+				WorkingDirectory = Program.RhubarbDir
+			});
+			await process.WaitForExitAsync();
+			process.Dispose();
 		}
 
 		static async Task RunDebug() {

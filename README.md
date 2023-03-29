@@ -71,7 +71,10 @@ RhubarbVR is a networked VR game engine. What does this mean? Well, Rhubarb is a
 
 - [Godot](https://github.com/godotengine/godot)
 - [LiteNetLib](https://github.com/RevenantX/LiteNetLib)
-- [MessagePack](https://github.com/neuecc/MessagePack-CSharp)
+- [Assimp](https://bitbucket.org/Starnick/assimpnet/src/master/)
+- [BepuPhysics](https://github.com/bepu/bepuphysics2)
+- [LibVLCSharp](https://www.nuget.org/packages/LibVLCSharp/3.6.8?_src=template)
+- [NAudio](https://github.com/naudio/NAudio)
 - [ImageSharp](https://github.com/SixLabors/ImageSharp)
 
 ## Preview
@@ -86,27 +89,21 @@ This is how to run the program and the standard problems you might encounter wit
 ### Playing Normally
 
 You can get a compiled version of RhubarbVR through this GitHub repository or obtain it from Steam.
-But with either of these, you need to the net7 runtime installed.
-[Net7 Runtime](https://dotnet.microsoft.com/download/dotnet/7.0/runtime)
-
-### For Rendering
-You will need to get the latest Godot 4 Net6 beta from [godot news](https://godotengine.org/news/default/1) you will also need both Net6 and Net7 SDKs
-Then in Godot you will add the RhubarbGodot folder as a project. Then click the play button in Godot and Rhubarb will be running in debug mode.
+But with either of these, you need to the net6 runtime installed.
+[Net6 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0/runtime)
 
 ### Compiling Windows
 
-1. You will need to download and install [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) or Visual Studio 2022 .Net desktop development Component Group.
+1. You will need to download and install both [Net6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-6.0.407-windows-x64-installer) and [Net7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-7.0.202-windows-x64-installer)
 2. Clone the repo
    ```sh
    git clone https://github.com/RhubarbVR/RhubarbVR.git
    ```
-3. Open The solution file
+3. Run Build Helper
    ```
-   RhubarbVR.sln
+   cd RhubarbVR
+   Build.bat
    ```
-4. Click build at the top
-5. Build solution
-6. In the Rhubarb_VR_HeadLess/bin/ you will find the compiled binary for the headless
 
 ### Compiling Linux
 
@@ -114,7 +111,7 @@ Then in Godot you will add the RhubarbGodot folder as a project. Then click the 
    ```sh
    git clone https://github.com/RhubarbVR/RhubarbVR.git
    ```
-2. Install Net7 SDK Ubuntu 21.04 for [OtherDistros](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
+2. Install Net6 SDK Ubuntu 21.04 for [OtherDistros](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
    ```sh
    wget https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
    sudo dpkg -i packages-microsoft-prod.deb
@@ -124,9 +121,20 @@ Then in Godot you will add the RhubarbGodot folder as a project. Then click the 
    sudo apt-get update && \
    sudo apt-get install -y dotnet-sdk-7.0
    ```
-3. Build
+3. Install Net7 SDK Ubuntu 21.04 for [OtherDistros](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
    ```sh
-   dotnet build Rhubarb_VR_HeadLess /p:Configuration=Release
+   wget https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+   sudo dpkg -i packages-microsoft-prod.deb
+   rm packages-microsoft-prod.deb
+   sudo apt-get update; \
+   sudo apt-get install -y apt-transport-https && \
+   sudo apt-get update && \
+   sudo apt-get install -y dotnet-sdk-7.0
+   ```
+4. Run Build Helper
+   ```sh
+   cd RhubarbVR
+   Build.sh
    ```
 
 <!-- USAGE EXAMPLES -->
