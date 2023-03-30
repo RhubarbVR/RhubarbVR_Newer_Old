@@ -69,15 +69,26 @@ namespace RhuEngine.WorldObjects
 		public readonly SyncProperty<Colorb> UserColorProp;
 		public void UserIDLoad() {
 			Task.Run(async () => {
-				if (string.IsNullOrEmpty(userID.Value)) { return; }
-				if (Guid.TryParse(userID, out var id)) {
-					var e = await Engine.netApiManager.Client.GetUser(id);
-					e?.BindDataUpdate((userdata) => {
-						UserName = userdata.UserName;
-						NormalizedUserName = userdata.NormalizedUserName;
-						var (r, g, b, a) = userdata.IconColor.GetColor();
-						UserColor = new Colorb(r, g, b, a);
-					});
+				try {
+					if (string.IsNullOrEmpty(userID.Value)) { return; }
+					if (Guid.TryParse(userID, out var id)) {
+						var e = await Engine.netApiManager.Client.GetUser(id);
+						e?.BindDataUpdate((userdata) => {
+							UserName = userdata.UserName;
+							NormalizedUserName = userdata.NormalizedUserName;
+							var (r, g, b, a) = userdata.IconColor.GetColor();
+							UserColor = new Colorb(r, g, b, a);
+						});
+						if(e is null) {
+							RLog.Info($"Did not get user info for User ID {userID.Value}");
+						}
+					}
+					else {
+						RLog.Err($"User ID {userID.Value} Failed to parse");
+					}
+				}
+				catch(Exception e) {
+					RLog.Err($"User ID {userID.Value} Load Error:{e}");
 				}
 			});
 		}

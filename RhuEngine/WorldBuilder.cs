@@ -70,6 +70,7 @@ namespace RhuEngine
 
 			var SubviewPortCame = DebugStuff.AddChild("Camera");
 			SubviewPortCame.position.Value = new Vector3f(4f, 2f, -2f);
+			SubviewPortCame.rotation.Value = Quaternionf.Yawed180;
 			var subViewPOrtdatae = SubviewPortCame.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
 			var SubviewPorte = SubviewPortCame.AddChild("SubviewPort");
 			var viewporte = SubviewPorte.AttachComponent<Viewport>();
@@ -77,8 +78,6 @@ namespace RhuEngine
 			viewporte.Size.Value *= 2;
 			subViewPOrtdatae.Item2.MainTexture.Target = viewporte;
 			var cameras = SubviewPorte.AddChild("Camera").AttachComponent<Camera3D>();
-			cameras.Entity.rotation.Value = Quaternionf.Yawed180 * Quaternionf.Rolled180;
-
 
 			var SubviewPortCam = DebugStuff.AddChild("Camera");
 			SubviewPortCam.position.Value = new Vector3f(-1f, 1f, 1f);

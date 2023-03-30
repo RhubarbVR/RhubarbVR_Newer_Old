@@ -65,6 +65,16 @@ namespace RhuEngine.Components
 					audioPlayer.AudioStream.Target = opus;
 					audioPlayer.AudioBus.Value = AudioSourceBase.TargetBus.Voice;
 					head.AttachComponent<UserAudioManager>().audioMute.SetLinkerTarget(audioPlayer.Enabled);
+
+					var nameTag = userEntity.AddChild("NameTag").AttachComponent<TextLabel3D>();
+					nameTag.Billboard.Value = RBillboardOptions.YBillboard;
+					var copyer = nameTag.Entity.AttachComponent<ValueDriver<string>>();
+					copyer.driver.Target = nameTag.Text;
+					copyer.source.Target = LocalUser.Username;
+					var bodyFallow = nameTag.Entity.AttachComponent<UserBodyNodeTransform>();
+					bodyFallow.TargetUser.Target = LocalUser;
+					bodyFallow.OffsetPos.Value = new Vector3f(0, 0.125f, 0);
+					bodyFallow.OffsetScale.Value = new Vector3f(0.2f);
 				}
 				userRoot.head.Target = head;
 				userRoot.user.Target = World.GetLocalUser();

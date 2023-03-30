@@ -28,7 +28,7 @@ namespace RhubarbCloudClient
 		public class ManagedUser
 		{
 			private readonly RhubarbAPIClient _client;
-			public Guid UserID => UserData?.Id ?? Guid.Empty;
+			public Guid UserID { get; private set; }
 
 			public UserRelation Relation { get; private set; }
 
@@ -42,12 +42,18 @@ namespace RhubarbCloudClient
 					UserData = data.Data;
 					UserDataChanged?.Invoke(UserData);
 				}
+				else {
+					Console.WriteLine($"API Error Getting user data ID {UserID} MSG:{data.MSG}");
+				}
 			}
 			public async Task UpdateUserStatus() {
 				var data = await _client.SendGetServerResponses<PublicUserStatus>(API_PATH + USERINFOPATH + UserID + "/Status");
 				if (!data.Error) {
 					UserStatus = data.Data;
 					UserStatusChanged?.Invoke(UserStatus);
+				}
+				else {
+					Console.WriteLine($"API Error Getting user status ID {UserID} MSG:{data.MSG}");
 				}
 			}
 			public async Task UpdateUserRelation() {
@@ -56,6 +62,9 @@ namespace RhubarbCloudClient
 					Relation = data.Data;
 					UserRelationChanged?.Invoke(Relation);
 				}
+				else {
+					Console.WriteLine($"API Error Getting user ID {UserID} relation MSG:{data.MSG}");
+				}
 			}
 
 			public async Task SetUserRelation(UserRelation userRelation) {
@@ -63,6 +72,9 @@ namespace RhubarbCloudClient
 				if (!data.Error) {
 					Relation = data.Data;
 					UserRelationChanged?.Invoke(Relation);
+				}
+				else {
+					Console.WriteLine($"API Error Setting user ID {UserID} relation MSG:{data.MSG}");
 				}
 			}
 
@@ -89,11 +101,13 @@ namespace RhubarbCloudClient
 			public event Action<PublicUser> UserDataChanged;
 			public event Action<PublicUserStatus> UserStatusChanged;
 
-			internal ManagedUser(UserRelation userRelation, RhubarbAPIClient client) {
+			internal ManagedUser(Guid id, UserRelation userRelation, RhubarbAPIClient client) {
+				UserID = id;
 				Relation = userRelation;
 				_client = client;
 			}
-			internal ManagedUser(RhubarbAPIClient client) {
+			internal ManagedUser(Guid id, RhubarbAPIClient client) {
+				UserID = id;
 				_client = client;
 			}
 		}
@@ -107,7 +121,7 @@ namespace RhubarbCloudClient
 			var friends = (await SendGetServerResponses<Guid[]>(API_PATH + PRIVATEPATH + "GetFriend")).Data ?? Array.Empty<Guid>();
 			var blocked = (await SendGetServerResponses<Guid[]>(API_PATH + PRIVATEPATH + "GetBlocked")).Data ?? Array.Empty<Guid>();
 			foreach (var item in following) {
-				var newData = new ManagedUser(UserRelation.Follower, this);
+				var newData = new ManagedUser(item, UserRelation.Follower, this);
 				_loadedUsers.Add(item, newData);
 				await newData.UpdateUserStatus();
 				await newData.UpdateUserData();
@@ -125,7 +139,7 @@ namespace RhubarbCloudClient
 					return managedUser;
 				}
 				else {
-					managedUser = new ManagedUser(UserRelation.None, this);
+					managedUser = new ManagedUser(userID, UserRelation.None, this);
 					_loadedUsers.Add(userID, managedUser);
 				}
 			}
