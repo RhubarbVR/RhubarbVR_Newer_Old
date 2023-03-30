@@ -7,7 +7,8 @@ namespace RhubarbEasyBuild
 		public static string RhubarbDir;
 
 		static readonly string[] _options = new string[] {
-			"-run-debug",
+			"-run-debug-novr",
+			"-run-debug-vr",
 			"-build-debug",
 			"-build-headless"
 		};
@@ -57,8 +58,11 @@ namespace RhubarbEasyBuild
 			}
 			selectedOption = selectedOption.ToLower();
 			Console.WriteLine($"Selected {selectedOption}");
-			if (selectedOption.Contains("run-debug")) {
-				await RunDebug();
+			if (selectedOption.Contains("run-debug-novr")) {
+				await RunDebug(false);
+			}
+			else if (selectedOption.Contains("run-debug-vr")) {
+				await RunDebug(true);
 			}
 			else if (selectedOption.Contains("build-debug")) {
 				await BuildDebug();
@@ -115,9 +119,10 @@ namespace RhubarbEasyBuild
 			process.Dispose();
 		}
 
-		static async Task RunDebug() {
+		static async Task RunDebug(bool vr) {
 			await BuildDebug();
-			var process = GodotRunner.RunGodot("--path " + BaseCommand);
+			var runInVRCommand = vr ? " --xr-mode on" : ""; 
+			var process = GodotRunner.RunGodot("--path " + BaseCommand + runInVRCommand);
 			await process.WaitForExitAsync();
 			process.Dispose();
 		}

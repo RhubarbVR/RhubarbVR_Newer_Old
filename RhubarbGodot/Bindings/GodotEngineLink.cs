@@ -45,7 +45,9 @@ namespace RhubarbVR.Bindings
 			Godot.Engine.MaxFps = MaxFrameRate;
 			var oldValue = (int)Godot.ProjectSettings.GetSetting("display/window/vsync/vsync_mode");
 			if ((int)VSync != oldValue) {
-				Godot.ProjectSettings.SetSetting("display/window/vsync/vsync_mode", (int)VSync);
+				if (!(XRServer.PrimaryInterface?.IsInitialized()??false)) {
+					Godot.ProjectSettings.SetSetting("display/window/vsync/vsync_mode", (int)VSync);
+				}
 				Godot.ProjectSettings.Save();
 				return true;
 			}
@@ -91,6 +93,8 @@ namespace RhubarbVR.Bindings
 			if (XRServer.PrimaryInterface?.IsInitialized() ?? false) {
 				EngineRunner.GetViewport().UseXR = true;
 				RLog.Info("Is in VR");
+				Godot.ProjectSettings.SetSetting("display/window/vsync/vsync_mode", 0);
+				Godot.ProjectSettings.Save();
 				InVR = true;
 				LiveVRChange |= InVR;
 				VRChange?.Invoke(true);
