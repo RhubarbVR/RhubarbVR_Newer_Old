@@ -179,7 +179,7 @@ namespace RhuEngine.WorldObjects
 			for (var i = 0; i < Users.Count; i++) {
 				var user = Users[i];
 				if (user.IsConnected || user.IsLocalUser) {
-					MasterUser = (ushort)i;
+					MasterUser = (ushort)(i + 1);
 					break;
 				}
 			}
@@ -599,6 +599,9 @@ namespace RhuEngine.WorldObjects
 				RLog.Info($"Local Was {LocalUserID} {MasterUser}");
 			}
 			LoadUserIn(peer);
+			if(IsLoading || WaitingForWorldStartState) {
+				return;
+			}
 			FindNewMaster();
 		}
 
