@@ -21,7 +21,7 @@ namespace RhuEngine.WorldObjects
 
 		private readonly HashSet<Entity> _updatingEntities = new();
 
-		private readonly List<LinkedWorldComponent> _worldLinkComponents = new();
+		private readonly HashSet<LinkedWorldComponent> _worldLinkComponents = new();
 
 		private readonly HashSet<IGlobalStepable> _globalStepables = new();
 
