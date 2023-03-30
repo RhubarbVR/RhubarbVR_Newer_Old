@@ -29,6 +29,7 @@ namespace RhuEngine.AssetSystem.RequestStructs
 		public void Serlize(BinaryWriter binaryWriter) {
 			binaryWriter.Write(URL);
 			binaryWriter.Write(MimeType);
+			binaryWriter.Write(CurrentPart);
 			binaryWriter.Write(SizeOfPart);
 			binaryWriter.Write(SizeOfData);
 			binaryWriter.Write(PartBytes.Length);
