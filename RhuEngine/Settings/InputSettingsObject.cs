@@ -24,8 +24,13 @@ namespace RhuEngine.Settings
 
 	public class MovmentSettings : SettingsObject
 	{
-		[SettingsField("Head Movemnet use head as bases of movemnt")]
+		[SettingsField("Head Movement use head as bases of movemnt")]
 		public bool HeadBasedMovement = false;
+
+		[SettingsField("Snap Movement")]
+		public bool SnapTurn = false;
+		[SettingsField("Snap Amount")]
+		public float SnapAmount = 1;
 	}
 
 	public class InputSettingsObject : SettingsObject
