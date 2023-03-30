@@ -532,9 +532,12 @@ namespace RhuEngine.WorldObjects
 								else if (rawDataPacked is IAssetRequest assetRequest) {
 									AssetResponses(assetRequest, tag[packede.Id]);
 								}
+								else {
+									throw new Exception($"Uknown Data from relay Unreliable {packeder} {packeder?.GetType()}");
+								}
 							}
 							else {
-								throw new Exception("Uknown Data from relay");
+								throw new Exception($"Uknown Data from relay Unreliable {packeder} {packeder?.GetType()}");
 							}
 						}
 						else {
@@ -545,12 +548,15 @@ namespace RhuEngine.WorldObjects
 								else if (rawDataPacked is IAssetRequest assetRequest) {
 									AssetResponses(assetRequest, tag[packede.Id]);
 								}
+								else {
+									throw new Exception($"Uknown Data from relay Reliable {packeder} {packeder?.GetType()}");
+								}
 							}
-							if (packeder is StreamDataPacked streamDataPacked) {
+							else if (packeder is StreamDataPacked streamDataPacked) {
 								ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packede.Id]);
 							}
 							else {
-								throw new Exception("Uknown Data from relay");
+								throw new Exception($"Uknown Data from relay Reliable {packeder} {packeder?.GetType()}");
 							}
 						}
 					}
