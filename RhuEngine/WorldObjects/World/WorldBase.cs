@@ -321,50 +321,63 @@ namespace RhuEngine.WorldObjects
 			IsDisposed = true;
 			IsDisposeing?.Invoke(this);
 			Task.Run(async () => {
-				PhysicsSimulation?.Dispose();
-				PhysicsSimulation = null;
-				foreach (var item in _disposables.ToArray()) {
-					if (item is SyncObject @object) {
-						@object.IsDestroying = true;
+				RLog.Info($"Closeing Session");
+				try {
+					foreach (var item in _disposables.ToArray()) {
+						if (item is SyncObject @object) {
+							@object.IsDestroying = true;
+						}
+						item?.Dispose();
 					}
-					item?.Dispose();
-				}
-				_disposables = Array.Empty<IDisposable>();
-				try {
-					worldManager.RemoveWorld(this);
-				}
-				catch { }
-				try {
-					if (!IsLoading) {
-						GetLocalUser()?.userRoot.Target?.Entity.Dispose();
-						if (_netManager is not null) {
-							for (var i = 0; i < 10; i++) {
-								_netManager.PollEvents();
-								await Task.Delay(100);
+					_disposables = Array.Empty<IDisposable>();
+					try {
+						if (!IsLoading) {
+							GetLocalUser()?.userRoot.Target?.Entity.Dispose();
+							if (_netManager is not null) {
+								for (var i = 0; i < 10; i++) {
+									_netManager.PollEvents();
+									await Task.Delay(100);
+								}
 							}
 						}
 					}
-				}
-				catch { }
-				if (IsNetworked) {
-					if (!HasError) {
+					catch (Exception e) {
+						RLog.Err($"Failed to CleanUP User On leave Session Error:{e}");
+					}
+					if (IsNetworked) {
 						try {
 							await Engine.netApiManager.Client.LeaveSession(Guid.Parse(SessionID.Value));
 						}
-						catch { }
+						catch (Exception e) {
+							RLog.Err($"Failed to leave Session Error:{e}");
+						}
+						try {
+							_netManager?.DisconnectAll();
+							_netManager?.Stop();
+							_netManager = null;
+						}
+						catch (Exception e) {
+							RLog.Err($"Failed to CleanUp Nat Error:{e}");
+						}
 					}
-				}
-				try {
-					_netManager?.DisconnectAll();
-				}
-				catch { }
-				var data = GetType().GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
-				foreach (var item in data) {
-					if (typeof(SyncObject).IsAssignableFrom(item.FieldType)) {
-						item.SetValue(this, null);
+					try {
+						worldManager.RemoveWorld(this);
 					}
+					catch { }
+					var data = GetType().GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+					foreach (var item in data) {
+						if (typeof(SyncObject).IsAssignableFrom(item.FieldType)) {
+							item.SetValue(this, null);
+						}
+					}
+					PhysicsSimulation?.Dispose();
+					PhysicsSimulation = null;
+					GC.Collect();
+					RLog.Info($"Session Closed");
 				}
-				GC.Collect();
+				catch (Exception e) {
+					RLog.Err($"Session Failed to Close Error:{e}");
+				}
 			});
 		}
 	}
