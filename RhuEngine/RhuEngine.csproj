@@ -10,7 +10,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<Configurations>Debug;Release</Configurations>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>

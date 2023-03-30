@@ -90,11 +90,11 @@ This is how to run the program and the standard problems you might encounter wit
 
 You can get a compiled version of RhubarbVR through this GitHub repository or obtain it from Steam.
 But with either of these, you need to the net6 runtime installed.
-[Net6 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0/runtime)
+[Net7 Runtime](https://dotnet.microsoft.com/download/dotnet/7.0/runtime)
 
 ### Compiling Windows
 
-1. You will need to download and install both [Net6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-6.0.407-windows-x64-installer) and [Net7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-7.0.202-windows-x64-installer)
+1. You will need to download and install [Net7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-7.0.202-windows-x64-installer)
 2. Clone the repo
    ```sh
    git clone https://github.com/RhubarbVR/RhubarbVR.git
@@ -111,7 +111,7 @@ But with either of these, you need to the net6 runtime installed.
    ```sh
    git clone https://github.com/RhubarbVR/RhubarbVR.git
    ```
-2. Install Net6 SDK Ubuntu 21.04 for [OtherDistros](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
+2. Install Net7 SDK Ubuntu 21.04 for [OtherDistros](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
    ```sh
    wget https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
    sudo dpkg -i packages-microsoft-prod.deb
@@ -121,17 +121,7 @@ But with either of these, you need to the net6 runtime installed.
    sudo apt-get update && \
    sudo apt-get install -y dotnet-sdk-7.0
    ```
-3. Install Net7 SDK Ubuntu 21.04 for [OtherDistros](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
-   ```sh
-   wget https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-   sudo dpkg -i packages-microsoft-prod.deb
-   rm packages-microsoft-prod.deb
-   sudo apt-get update; \
-   sudo apt-get install -y apt-transport-https && \
-   sudo apt-get update && \
-   sudo apt-get install -y dotnet-sdk-7.0
-   ```
-4. Run Build Helper
+3. Run Build Helper
    ```sh
    cd RhubarbVR
    Build.sh
