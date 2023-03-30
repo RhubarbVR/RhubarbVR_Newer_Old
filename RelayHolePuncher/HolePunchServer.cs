@@ -60,10 +60,9 @@ namespace RelayHolePuncher
 			_puncher = new NetManager(clientListener) {
 				IPv6Mode = IPv6Mode.SeparateSocket,
 				NatPunchEnabled = true,
-				MaxConnectAttempts = 64,
-				DisconnectTimeout = 60000,
+				DisconnectTimeout = 30000,
 				ReuseAddress = true,
-				UpdateTime = 25,
+				UpdateTime = 4,
 			};
 			Console.WriteLine($"Started HolePunchServer on port {port}");
 			_puncher.Start(port);

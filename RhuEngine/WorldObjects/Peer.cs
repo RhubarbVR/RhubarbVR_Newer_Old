@@ -60,6 +60,13 @@ namespace RhuEngine.WorldObjects
 			World.ProcessUserConnection(firstpeer);
 
 		}
+
+		internal void UpdateLatency(int latency) {
+			this.latency = latency;
+			foreach (var item in peers) {
+				item.latency = latency;
+			}
+		}
 	}
 
 	public sealed class Peer

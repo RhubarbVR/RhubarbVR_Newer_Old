@@ -277,20 +277,16 @@ namespace RhuEngine.WorldObjects
 			_netManager = new NetManager(_clientListener) {
 				IPv6Mode = IPv6Mode.SeparateSocket,
 				NatPunchEnabled = true,
-				ReconnectDelay = 1000,
 				EnableStatistics = true,
-				MaxConnectAttempts = 5,
-				DisconnectTimeout = 60000,
-				UpdateTime = 33,
+				DisconnectTimeout = 30000,
+				UpdateTime = 4,
 				//0 is main
 				//1 is syncStreams
 				//2 is assetPackeds
 				ChannelsCount = 3,
 				AutoRecycle = true,
 				//Made unsync to make run faster
-				UnsyncedDeliveryEvent = true,
 				UnsyncedEvents = true,
-				UnsyncedReceiveEvent = true
 			};
 			_netManager.NatPunchModule.Init(_natPunchListener);
 			var targetPort = 0;
@@ -326,7 +322,7 @@ namespace RhuEngine.WorldObjects
 				rupeer.latency = latency;
 			}
 			else if (peer.Tag is RelayPeer repeer) {
-				repeer.latency = latency;
+				repeer.UpdateLatency(latency);
 			}
 		}
 

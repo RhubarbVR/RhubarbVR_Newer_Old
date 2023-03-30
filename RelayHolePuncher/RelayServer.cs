@@ -98,12 +98,12 @@ namespace RelayHolePuncher
 
 			_relay = new NetManager(clientListener) {
 				IPv6Mode = IPv6Mode.SeparateSocket,
-				MaxConnectAttempts = 64,
 				ChannelsCount = 3,
-				DisconnectTimeout = 60000,
+				DisconnectTimeout = 30000,
 				ReuseAddress = true,
-				UpdateTime = 25,
-				AutoRecycle = true
+				UpdateTime = 4,
+				AutoRecycle = true,
+				UnsyncedEvents = true,
 			};
 			_relay.Start(port);
 			Console.WriteLine($"Started Relay Server on port {port}");
