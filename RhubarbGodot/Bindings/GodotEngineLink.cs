@@ -205,8 +205,7 @@ namespace RhubarbVR.Bindings
 			RImageTexture2D.Instance = typeof(GodotImageTexture2D);
 			RImage.Instance = typeof(GodotImage);
 			RRenderer.Instance = new GodotRender(EngineRunner);
-			RMaterial.Instance = new GoMat();
-			StaticMaterialManager.Instanances = new GodotStaticMats();
+			RUnlitMaterial.Instance = typeof(GodotUnlit);
 			RAudio.Inst = GodotAudio = new GodotAudio();
 			var image = new RImage(null);
 			image.Create(2, 2, false, RFormat.Rgb8);

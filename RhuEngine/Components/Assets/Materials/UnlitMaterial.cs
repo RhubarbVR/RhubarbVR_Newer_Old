@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Materials" })]
 	[AllowedOnWorldRoot]
-	public sealed partial class UnlitMaterial : MaterialBase<IUnlitMaterial>
+	public sealed partial class UnlitMaterial : MaterialBase<RUnlitMaterial>
 	{
 		[OnChanged(nameof(TransparencyUpdate))]
 		public readonly Sync<Transparency> Transparency;
@@ -43,7 +43,6 @@ namespace RhuEngine.Components
 					return;
 				}
 				_material.DullSided = DullSided.Value;
-				_material.Material?.UpdatePrams();
 			});
 		}
 
@@ -57,7 +56,6 @@ namespace RhuEngine.Components
 					return;
 				}
 				_material.Texture = MainTexture.Asset;
-				_material.Material?.UpdatePrams();
 			});
 		}
 		private void TintUpdate() {
@@ -66,7 +64,6 @@ namespace RhuEngine.Components
 					return;
 				}
 				_material.Tint = Tint;
-				_material.Material?.UpdatePrams();
 			});
 		}
 		private void TransparencyUpdate() {
@@ -75,7 +72,6 @@ namespace RhuEngine.Components
 					return;
 				}
 				_material.Transparency = Transparency;
-				_material.Material?.UpdatePrams();
 			});
 		}
 	}

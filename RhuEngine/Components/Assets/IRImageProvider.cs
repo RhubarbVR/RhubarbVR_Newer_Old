@@ -12,10 +12,18 @@ namespace RhuEngine.Components
 	}
 
 
-	public abstract partial class ImageTexture : AssetProvider<RTexture2D>, IRImageProvider
+	public abstract partial class ImageTexture : AssetProvider<RTexture2D>, IAssetProvider<RTexture>, IRImageProvider
 	{
 		protected RImage _image;
 
 		public RImage Image => _image;
+
+		RTexture IAssetProvider<RTexture>.Value => Value;
+
+		event Action<RTexture> IAssetProvider<RTexture>.OnAssetLoaded
+		{
+			add => OnAssetLoaded += value;
+			remove => OnAssetLoaded -= value;
+		}
 	}
 }

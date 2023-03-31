@@ -21,8 +21,6 @@ namespace RhuEngine.Components
 
 		public readonly SyncObjList<AssetRef<RMaterial>> materials;
 
-		public readonly Sync<Colorf> colorLinear;
-
 		[Default(false)]
 		public readonly Sync<bool> RecevieShadows;
 
@@ -33,9 +31,5 @@ namespace RhuEngine.Components
 		public readonly Sync<bool> LightProbs;
 
 		public AxisAlignedBox3f Bounds => mesh.Asset?.BoundingBox??AxisAlignedBox3f.CenterZero;
-		protected override void FirstCreation() {
-			base.FirstCreation();
-			colorLinear.Value = Colorf.White;
-		}
 	}
 }

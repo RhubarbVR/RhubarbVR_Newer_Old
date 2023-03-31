@@ -100,7 +100,7 @@ namespace RhuEngine.WorldObjects
 					}
 					var debugcube = RootEntity.AddChild("DebugCube");
 					var meshrender = debugcube.AttachComponent<MeshRender>();
-					meshrender.colorLinear.Value = colorf;
+					comp.Tint.Value = colorf;
 					meshrender.materials.Add().Target = comp;
 					meshrender.mesh.Target = mesh;
 					mesh.GenMesh(mesha);
@@ -128,7 +128,7 @@ namespace RhuEngine.WorldObjects
 					}
 					var debugcube = RootEntity.AddChild("DebugCube");
 					var meshrender = debugcube.AttachComponent<MeshRender>();
-					meshrender.colorLinear.Value = colorf;
+					comp.Tint.Value = colorf;
 					meshrender.materials.Add().Target = comp;
 					meshrender.mesh.Target = mesh;
 					meshrender.Entity.GlobalTrans = Matrix.TS(pos, scale * 2.01f) * matrix;
@@ -178,7 +178,7 @@ namespace RhuEngine.WorldObjects
 					}
 					var debugcube = worldManager.PrivateOverlay.RootEntity.AddChild("DebugCube");
 					var meshrender = debugcube.AttachComponent<MeshRender>();
-					meshrender.colorLinear.Value = colorf;
+					comp.Tint.Value = colorf;
 					meshrender.materials.Add().Target = comp;
 					meshrender.mesh.Target = mesh;
 					meshrender.Entity.GlobalTrans = Matrix.TS(pos, scale * 2.01f) * matrix;

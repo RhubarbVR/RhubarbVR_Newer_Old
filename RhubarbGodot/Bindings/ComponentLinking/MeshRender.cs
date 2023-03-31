@@ -161,7 +161,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public override void StartContinueInit() {
 			LinkedComp.mesh.LoadChange += Mesh_LoadChange;
 			LinkedComp.materials.Changed += Materials_Changed;
-			LinkedComp.colorLinear.Changed += MatUpdate;
 			Materials_Changed(null);
 			MatUpdate(null);
 			Mesh_LoadChange(LinkedComp.mesh.Asset);
@@ -200,11 +199,11 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				return;
 			}
 			else if (amount == 1) {
-				node.MaterialOverride = ((GodotMaterial)LinkedComp.materials[0].Asset?.Target)?.GetMatarial(LinkedComp.colorLinear.Value);
+				node.MaterialOverride = ((GodotMaterial)LinkedComp.materials[0].Asset?.Inst)?.Material;
 			}
 			else {
 				for (var i = 0; i < LinkedComp.materials.Count; i++) {
-					var mat = ((GodotMaterial)LinkedComp.materials[i].Asset?.Target)?.GetMatarial(LinkedComp.colorLinear.Value);
+					var mat = ((GodotMaterial)LinkedComp.materials[i].Asset?.Inst)?.Material;
 					if(i < amount) {
 						node.SetSurfaceOverrideMaterial(i, mat);
 					}

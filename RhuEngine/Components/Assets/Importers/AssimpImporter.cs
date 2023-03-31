@@ -244,14 +244,15 @@ namespace RhuEngine.Components
 			var lights = entity.AddChild("Lights");
 			foreach (var item in scene.scene.Lights) {
 				var ligh = scene.Nodes.ContainsKey(item.Name) ? scene.Nodes[item.Name] : lights.AddChild(item.Name);
-				var lightcomp = ligh.AttachComponent<Light>();
-				lightcomp.LightType.Value = item.LightType switch {
-					LightSourceType.Directional => RLightType.Directional,
-					LightSourceType.Spot => RLightType.Spot,
-					_ => RLightType.Point,
-				};
-				lightcomp.SpotAngle.Value = item.AngleInnerCone;
-				lightcomp.Color.Value = new RNumerics.Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, 1);
+				//Todo Fix light with model import
+				//var lightcomp = ligh.AttachComponent<Light>();
+				//lightcomp.LightType.Value = item.LightType switch {
+				//	LightSourceType.Directional => RLightType.Directional,
+				//	LightSourceType.Spot => RLightType.Spot,
+				//	_ => RLightType.Point,
+				//};
+				//lightcomp.SpotAngle.Value = item.AngleInnerCone;
+				//lightcomp.Color.Value = new RNumerics.Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, 1);
 			}
 		}
 		private void LoadTextures(Entity entity, AssimpHolder scene) {

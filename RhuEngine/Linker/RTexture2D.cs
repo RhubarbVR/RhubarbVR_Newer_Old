@@ -34,7 +34,7 @@ namespace RhuEngine.Linker
 		public RTexture2D(IRTexture2D tex) : base(tex) {
 			if (typeof(RTexture2D) == GetType()) {
 				Inst = tex ?? (IRTexture2D)Activator.CreateInstance(Instance);
-				((IRTexture2D)Inst).Init(this);
+				Texture2D.Init(this);
 			}
 		}
 

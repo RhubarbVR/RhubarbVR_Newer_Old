@@ -203,7 +203,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Material_LoadChange(RMaterial obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.Material = LinkedComp.Material?.Asset?.Target is GodotMaterial godotMaterial ? (godotMaterial?.Material) : null);
+			RenderThread.ExecuteOnEndOfFrame(() => node.Material = LinkedComp.Material?.Asset?.Inst is GodotMaterial godotMaterial ? (godotMaterial?.Material) : null);
 		}
 
 		private void UseParentMaterial_Changed(IChangeable obj) {

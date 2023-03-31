@@ -1,14 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using BepuPhysics.Trees;
 
 using Godot;
 
 using NAudio.Wave;
 
+using Newtonsoft.Json.Linq;
+
 using RhuEngine.Linker;
+
+using WebAssembly.Instructions;
 
 namespace RhubarbVR.Bindings
 {
@@ -31,14 +38,16 @@ namespace RhubarbVR.Bindings
 			AudioServer.AddBus(1);
 			AudioServer.SetBusName(1, MIC_BUS);
 			AudioServer.SetBusMute(1, true);
-			_audioEffectCapture = new() {
-				BufferLength = 0.5f
+			AudioServer.SetBusSolo(1, true);
+			_audioEffectCapture = new AudioEffectCapture {
+				BufferLength = 0.5f,
 			};
 			AudioServer.AddBusEffect(1, _audioEffectCapture);
-			_streamPlayer = new() {
+			_streamPlayer = new AudioStreamPlayer {
 				Stream = new AudioStreamMicrophone(),
 				Playing = false,
-				Bus = MIC_BUS
+				Bus = MIC_BUS,
+				MixTarget = AudioStreamPlayer.MixTargetEnum.Stereo,
 			};
 			EngineRunnerHelpers._.AddChild(_streamPlayer);
 		}
@@ -70,27 +79,29 @@ namespace RhubarbVR.Bindings
 
 		private bool _ranLastFrame = false;
 
-		public int FrameAmount => (int)(AudioServer.GetMixRate() * (BufferSizeMilliseconds / 1000f));
+		public int FrameAmount => (int)(AudioServer.GetMixRate() / 1000f * BufferSizeMilliseconds);
 
 		public unsafe void Update() {
 			if (!_streamPlayer.Playing) {
 				_ranLastFrame = false;
 				return;
 			}
+
 			if (!_ranLastFrame) {
 				_audioEffectCapture.ClearBuffer();
 			}
 			_ranLastFrame = true;
-			var audioFrames = _audioEffectCapture.GetFramesAvailable();
-			if (audioFrames <= FrameAmount) {
+
+			if (!_audioEffectCapture.CanGetBuffer(FrameAmount)) {
 				return;
 			}
+
 			var audioBuffer = _audioEffectCapture.GetBuffer(FrameAmount);
-			var bytes = new byte[audioBuffer.Length / 2 * sizeof(float)];
+			var bytes = new byte[audioBuffer.Length * sizeof(float)];
 			fixed (byte* byteData = bytes) {
 				var castedPointer = (float*)byteData;
-				for (var i = 0; i < audioBuffer.Length / 2; i++) {
-					castedPointer[i] = (audioBuffer[i * 2].X + audioBuffer[i * 2].Y + audioBuffer[(i * 2) + 1].X + audioBuffer[(i * 2) + 1].Y) / 4;
+				for (var i = 0; i < audioBuffer.Length; i++) {
+					castedPointer[i] = (audioBuffer[i].X + audioBuffer[i].Y) / 2;
 				}
 			}
 			DataAvailable?.Invoke(this, new WaveInEventArgs(bytes, bytes.Length));

@@ -78,7 +78,7 @@ namespace RhuEngine.Components
 				RenderThread.ExecuteOnEndOfFrame(() => {
 					RenderThread.ExecuteOnStartOfFrame(() => {
 						data.Item2._material.NoDepthTest = true;
-						data.Item2._material.Material.RenderPriority += 100;
+						data.Item2._material.RenderPriority += 100;
 					});
 				});
 			});

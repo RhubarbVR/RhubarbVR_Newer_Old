@@ -46,7 +46,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public override void StartContinueInit() {
 			audioSource = new();
 			audioSource.SetUpAudio(LinkedComp);
-			node.Stream = audioSource.audio;
+			node.Stream = audioSource.Audio;
 			PlayAudio();
 			LinkedComp.Volume.Changed += Volume_Changed;
 			LinkedComp.PitchScale.Changed += PitchScale_Changed;

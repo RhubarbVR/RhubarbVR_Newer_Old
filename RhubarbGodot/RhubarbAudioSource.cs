@@ -1,76 +1,84 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
-
 using Godot;
-
 using NAudio.Wave;
-
-using RhubarbVR.Bindings.ComponentLinking;
-
-using RhuEngine;
 using RhuEngine.Components;
 using RhuEngine.Linker;
 
 public sealed class RhubarbAudioSource : IDisposable
 {
+	public AudioStreamGenerator Audio;
+	private AudioStreamGeneratorPlayback _audioPlayBack;
+	private AudioSourceBase _audioPlayer;
+	private MediaFoundationResampler _waveProvider;
+
 	public RhubarbAudioSource() {
-		audio = new AudioStreamGenerator {
+		Audio = new AudioStreamGenerator {
 			BufferLength = 0.2f,
 			MixRate = RAudio.Inst.WaveFormat.SampleRate,
 		};
 		RAudio.UpateAudioSystems += Update;
 	}
 
-
 	public void SetUpAudio(AudioSourceBase audioSourceBase) {
-		audioPlayer = audioSourceBase;
+		if (audioSourceBase == null) {
+			throw new ArgumentNullException(nameof(audioSourceBase));
+		}
+
+		_audioPlayer = audioSourceBase;
 		Link();
 	}
 
 	public void Instansiate(AudioStreamPlayback audioStreamPlayback) {
-		audioPlayBack = (AudioStreamGeneratorPlayback)audioStreamPlayback;
+		_audioPlayBack = (AudioStreamGeneratorPlayback)audioStreamPlayback;
 	}
-
-	public AudioSourceBase audioPlayer;
 
 	private void Link() {
-		audioPlayer.AudioStream.LoadChange += AudioStream_LoadChange;
-		AudioStream_LoadChange(audioPlayer.AudioStream.Asset);
+		_audioPlayer.AudioStream.LoadChange += AudioStream_LoadChange;
+		AudioStream_LoadChange(_audioPlayer.AudioStream.Asset);
 	}
 
-	private void AudioStream_LoadChange(NAudio.Wave.IWaveProvider obj) {
-		if (waveProvider is not null) {
-			waveProvider.Dispose();
-			waveProvider = null;
-		}
-		if (obj is null) {
+	private void AudioStream_LoadChange(IWaveProvider obj) {
+		if (obj == null) {
 			return;
 		}
-		waveProvider = new MediaFoundationResampler(obj, RAudio.Inst.WaveFormat);
+
+		if (_waveProvider != null && _waveProvider.WaveFormat.Equals(obj.WaveFormat)) {
+			// Reuse existing resampler if input wave format is the same
+			return;
+		}
+
+		// Dispose of existing resampler if it exists
+		_waveProvider?.Dispose();
+
+		try {
+			// Create new resampler
+			_waveProvider = new MediaFoundationResampler(obj, RAudio.Inst.WaveFormat);
+		}
+		catch (Exception ex) {
+			// Log error and return if resampler creation fails
+			GD.PrintErr($"Error creating MediaFoundationResampler: {ex.Message}");
+			return;
+		}
 	}
 
-	public MediaFoundationResampler waveProvider;
-	public AudioStreamGenerator audio;
-	public AudioStreamGeneratorPlayback audioPlayBack;
-
-	public unsafe void Update() {
-		if (waveProvider is null) {
+	private unsafe void ReadAudio() {
+		if(_audioPlayBack is null) {
 			return;
 		}
-		if (audioPlayBack is null) {
+		if (_waveProvider is null) {
+			_audioPlayBack.PushBuffer(new Vector2[_audioPlayBack.GetFramesAvailable()]);
 			return;
 		}
-		var audioFrames = audioPlayBack.GetFramesAvailable();
+		var audioFrames = _audioPlayBack.GetFramesAvailable();
 		if (audioFrames <= 0) {
 			return;
 		}
+
 		var bytes = new byte[audioFrames * sizeof(Vector2)];
 		try {
-			var readAmount = waveProvider.Read(bytes, 0, bytes.Length) / sizeof(Vector2);
+			var readAmount = _waveProvider.Read(bytes, 0, bytes.Length) / sizeof(Vector2);
 
 			var audioBuffer = new Vector2[readAmount];
 			fixed (byte* byteData = bytes) {
@@ -79,16 +87,24 @@ public sealed class RhubarbAudioSource : IDisposable
 					audioBuffer[i] = castedPointer[i];
 				}
 			}
-			audioPlayBack.PushBuffer(audioBuffer);
+			_audioPlayBack.PushBuffer(audioBuffer);
 		}
-		catch (InvalidComObjectException) { }
+		catch (Exception ex) {
+			// Log error and return if audio reading fails
+			GD.PrintErr($"Error reading audio: {ex.Message}");
+			return;
+		}
 	}
 
 	public void Dispose() {
 		RAudio.UpateAudioSystems -= Update;
-		audio?.Free();
-		audio = null;
-		waveProvider?.Dispose();
-		waveProvider = null;
+		Audio?.Free();
+		Audio = null;
+		_waveProvider?.Dispose();
+		_waveProvider = null;
+	}
+
+	private void Update() {
+		ReadAudio();
 	}
 }

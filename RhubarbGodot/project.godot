@@ -25,7 +25,6 @@ driver/mix_rate=48000
 
 [display]
 
-window/vsync/vsync_mode=0
 window/subwindows/embed_subwindows=false
 
 [dotnet]

@@ -11,8 +11,16 @@ using RhuEngine.Linker;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/StaticAssets" })]
-	public sealed partial class StaticTexture : StaticAsset<RTexture2D>, IRImageProvider
+	public sealed partial class StaticTexture : StaticAsset<RTexture2D>, IAssetProvider<RTexture>, IRImageProvider
 	{
+		RTexture IAssetProvider<RTexture>.Value => Value;
+
+		event Action<RTexture> IAssetProvider<RTexture>.OnAssetLoaded
+		{
+			add => OnAssetLoaded += value;
+			remove => OnAssetLoaded -= value;
+		}
+
 		public RImage Image => Value?.Image;
 
 		protected override void OnLoaded() {

@@ -9,15 +9,11 @@ using RNumerics;
 namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Materials" })]
-	public abstract partial class MaterialBase<T> : AssetProvider<RMaterial> where T : IStaticMaterial
+	public abstract partial class MaterialBase<T> : AssetProvider<RMaterial> where T : RMaterial, new()
 	{
 		public T _material;
 
 		public readonly Sync<int> RenderPriority;
-
-		public virtual T GetMaterialFromLinker() {
-			return StaticMaterialManager.GetMaterial<T>();
-		}
 
 		protected abstract void UpdateAll();
 
@@ -28,18 +24,18 @@ namespace RhuEngine.Components
 				return;
 			}
 			RenderThread.ExecuteOnEndOfFrame(() => {
-				_material = GetMaterialFromLinker();
-				Load(_material.Material);
+				_material = new T();
+				Load(_material);
 				UpdateAll();
 				var newVal = Math.Min(RenderPriority.Value, short.MaxValue) - _oldRenderOrder;
 				_oldRenderOrder = newVal;
-				_material.Material.RenderPriority += newVal;
+				_material.RenderPriority += newVal;
 			});
 		}
 
 		public override void Dispose() {
 			_material?.Dispose();
-			_material = default;
+			_material = null;
 			base.Dispose();
 			GC.SuppressFinalize(this);
 		}

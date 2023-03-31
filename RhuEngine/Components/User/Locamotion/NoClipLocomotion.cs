@@ -99,11 +99,11 @@ namespace RhuEngine.Components
 
 		private void ProcessHeadBased() {
 			var speed = AllowMultiplier ? MathUtil.Lerp(MovementSpeed, MaxSprintSpeed, MoveSpeed) : MovementSpeed;
-			var left = (Engine.inputManager.GetInputAction(InputTypes.Left).LeftRawValue() + Engine.inputManager.GetInputAction(InputTypes.Left).RightRawValue()) * RTime.ElapsedF;
+			var left = (Engine.inputManager.GetInputAction(InputTypes.Left).LeftRawValue() + Engine.inputManager.GetInputAction(InputTypes.Left).OtherRawValue()) * RTime.ElapsedF;
 			var right = (Engine.inputManager.GetInputAction(InputTypes.Right).LeftRawValue() + Engine.inputManager.GetInputAction(InputTypes.Right).OtherRawValue()) * RTime.ElapsedF;
 			var pos = new Vector3f(right - left, FlyUp - FlyDown, Back - Forward) * speed;
 			var Rotspeed = AllowMultiplier ? MathUtil.Lerp(RotationSpeed, MaxSprintRotationSpeed, MoveSpeed) : RotationSpeed;
-			var rotateLeft = (Engine.inputManager.GetInputAction(InputTypes.RotateLeft).RightRawValue() + Engine.inputManager.GetInputAction(InputTypes.RotateLeft).RightRawValue());
+			var rotateLeft = (Engine.inputManager.GetInputAction(InputTypes.RotateLeft).RightRawValue() + Engine.inputManager.GetInputAction(InputTypes.RotateLeft).OtherRawValue());
 			var rotateRight = (Engine.inputManager.GetInputAction(InputTypes.RotateRight).RightRawValue() + Engine.inputManager.GetInputAction(InputTypes.RotateRight).OtherRawValue());
 			if (Engine.MainSettings.InputSettings.MovmentSettings.SnapTurn) {
 				var snaped = (rotateLeft > 0.6) || (rotateRight > 0.6);

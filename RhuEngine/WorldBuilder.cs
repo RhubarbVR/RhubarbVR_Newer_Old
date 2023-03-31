@@ -116,7 +116,7 @@ namespace RhuEngine
 
 			var TempComps = DebugStuff.AddChild("RenderComps");
 			TempComps.position.Value = new Vector3f(0f, 3f, 4f);
-			TempComps.AttachComponent<Light>();
+			TempComps.AttachComponent<PointLight3D>();
 			TempComps.AttachComponent<MeshRender>();
 			TempComps.AttachComponent<Armature>();
 			TempComps.AttachComponent<SkinnedMeshRender>();
@@ -137,38 +137,36 @@ namespace RhuEngine
 			var pointLight = lights.AddChild("PointLight");
 			var pointLightmesh = pointLight.AttachMeshWithMeshRender<IcosphereMesh, UnlitMaterial>();
 			pointLightmesh.Item1.Radius.Value = 0.05f;
-			pointLightmesh.Item3.colorLinear.Value = Colorf.Plum;
+			pointLightmesh.Item2.Tint.Value = Colorf.Plum;
 			pointLight.AttachComponent<Grabbable>();
 			pointLight.AttachComponent<SphereShape>().Radius.Value = 0.05f;
 			var plight = pointLight.AddChild("Light");
 			plight.position.Value = new Vector3f(0f, 0f, 0.1f);
-			plight.AttachComponent<Light>().LightType.Value = RLightType.Point;
+			plight.AttachComponent<PointLight3D>();
 
 			var dirLight = lights.AddChild("DirLight");
 			dirLight.position.Value = new Vector3f(1f, 0f, 0f);
 			var dirLightmesh = dirLight.AttachMeshWithMeshRender<IcosphereMesh, UnlitMaterial>();
 			dirLightmesh.Item1.Radius.Value = 0.05f;
-			dirLightmesh.Item3.colorLinear.Value = Colorf.Violet;
+			dirLightmesh.Item2.Tint.Value = Colorf.Violet;
 			dirLight.AttachComponent<Grabbable>();
 			dirLight.AttachComponent<SphereShape>().Radius.Value = 0.05f;
 			var dlight = dirLight.AddChild("Light");
 			dlight.position.Value = new Vector3f(0f, 0f, 0.1f);
-			dlight.AttachComponent<Light>().LightType.Value = RLightType.Directional;
+			dlight.AttachComponent<DirectionalLight3D>();
 
 			var spotLight = lights.AddChild("SpotLight");
 			spotLight.position.Value = new Vector3f(2f, 0f, 0f);
 			var spotLightmesh = spotLight.AttachMeshWithMeshRender<IcosphereMesh, UnlitMaterial>();
 			spotLightmesh.Item1.Radius.Value = 0.05f;
-			spotLightmesh.Item3.colorLinear.Value = Colorf.Beige;
+			spotLightmesh.Item2.Tint.Value = Colorf.Beige;
 			spotLight.AttachComponent<Grabbable>();
 			spotLight.AttachComponent<SphereShape>().Radius.Value = 0.05f;
 			var slight = spotLight.AddChild("Light");
 			slight.position.Value = new Vector3f(0f, 0f, 0.1f);
-			slight.AttachComponent<Light>().LightType.Value = RLightType.Spot;
+			slight.AttachComponent<SpotLight3D>();
 
-			var box = floor.AttachComponent<TrivialBox3Mesh>();
-			var noTrans = floor.AttachComponent<UnlitMaterial>();
-			noTrans.Transparency.Value = Transparency.None;
+			var box = floor.AttachComponent<TrivialBox3Mesh>();			
 			var size = 10;
 			Entity LastpowerCube = null;
 			for (var y = 0; y < size; y++) {
@@ -180,7 +178,7 @@ namespace RhuEngine
 						if (LastpowerCube is not null) {
 							PowerCube.SetParent(LastpowerCube);
 						}
-						AttachRender(box, noTrans, PowerCube, Colorf.RandomHue());
+						AttachRender(box, PowerCube, Colorf.RandomHue());
 						PowerCube.AttachComponent<BoxShape>();
 						PowerCube.AttachComponent<Grabbable>();
 						LastpowerCube = PowerCube;
@@ -302,36 +300,37 @@ namespace RhuEngine
 
 			var boxMesh = root.AttachComponent<TrivialBox3Mesh>();
 			boxMesh.Extent.Value = new Vector3f(0.4f, 0.4f, 0.4f);
-			var mit = root.AttachComponent<UnlitMaterial>();
-			BuildGroup(boxMesh, mit, group1, Colorf.RhubarbGreen);
-			BuildGroup(boxMesh, mit, group2, Colorf.RhubarbRed);
-			BuildGroup(boxMesh, mit, group3, Colorf.RhubarbGreen);
-			BuildGroup(boxMesh, mit, group4, Colorf.RhubarbRed);
-			BuildGroup(boxMesh, mit, group5, Colorf.RhubarbGreen);
-			BuildGroup(boxMesh, mit, group6, Colorf.RhubarbRed);
-			BuildGroup(boxMesh, mit, group11, Colorf.RhubarbGreen);
-			BuildGroup(boxMesh, mit, group21, Colorf.RhubarbRed);
-			BuildGroup(boxMesh, mit, group31, Colorf.RhubarbGreen);
-			BuildGroup(boxMesh, mit, group41, Colorf.RhubarbRed);
-			BuildGroup(boxMesh, mit, group51, Colorf.RhubarbGreen);
-			BuildGroup(boxMesh, mit, group61, Colorf.RhubarbRed);
+			BuildGroup(boxMesh, group1, Colorf.RhubarbGreen);
+			BuildGroup(boxMesh, group2, Colorf.RhubarbRed);
+			BuildGroup(boxMesh, group3, Colorf.RhubarbGreen);
+			BuildGroup(boxMesh, group4, Colorf.RhubarbRed);
+			BuildGroup(boxMesh, group5, Colorf.RhubarbGreen);
+			BuildGroup(boxMesh, group6, Colorf.RhubarbRed);
+			BuildGroup(boxMesh, group11, Colorf.RhubarbGreen);
+			BuildGroup(boxMesh, group21, Colorf.RhubarbRed);
+			BuildGroup(boxMesh, group31, Colorf.RhubarbGreen);
+			BuildGroup(boxMesh, group41, Colorf.RhubarbRed);
+			BuildGroup(boxMesh, group51, Colorf.RhubarbGreen);
+			BuildGroup(boxMesh, group61, Colorf.RhubarbRed);
 
 		}
 
-		public static void BuildGroup(TrivialBox3Mesh boxMesh, UnlitMaterial mit, Entity entity, Colorf color) {
+		public static void BuildGroup(TrivialBox3Mesh boxMesh, Entity entity, Colorf color) {
 			for (var i = 0; i < 6; i++) {
 				var cubeHolder = entity.AddChild("CubeHolder");
 				cubeHolder.rotation.Value = Quaternionf.CreateFromEuler(NextFloat() * 180, NextFloat() * 180, NextFloat() * 180);
 				var cube = cubeHolder.AddChild("Cube");
 				cube.position.Value = new Vector3f(0, 6, 0);
 				cube.scale.Value = new Vector3f(0.5f, 0.5f, 0.5f);
-				AttachRender(boxMesh, mit, cube, color);
+				AttachRender(boxMesh, cube, color);
 			}
 		}
 
-		public static void AttachRender(TrivialBox3Mesh boxMesh, UnlitMaterial mit, Entity entity, Colorf color) {
+		public static void AttachRender(TrivialBox3Mesh boxMesh, Entity entity, Colorf color) {
 			var meshRender = entity.AttachComponent<MeshRender>();
-			meshRender.colorLinear.Value = color;
+			var mit = entity.AttachComponent<UnlitMaterial>();
+			mit.Transparency.Value = Transparency.None;
+			mit.Tint.Value = color;
 			meshRender.materials.Add().Target = mit;
 			meshRender.mesh.Target = boxMesh;
 		}

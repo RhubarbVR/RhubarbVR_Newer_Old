@@ -230,7 +230,7 @@ namespace RhuEngine
 
 		public bool EngineStarting = true;
 
-		public IUnlitMaterial LoadingLogo;
+		public RUnlitMaterial LoadingLogo;
 
 		public Thread startingthread;
 
@@ -262,11 +262,12 @@ namespace RhuEngine
 				};
 				RRenderer.EnableSky = false;
 				StartingLogo = new RTempQuad();
-				LoadingLogo = StaticMaterialManager.GetMaterial<IUnlitMaterial>();
-				LoadingLogo.Transparency = Transparency.Blend;
-				LoadingLogo.DullSided = true;
-				LoadingLogo.Texture = staticResources.RhubarbLogoV2;
-				StartingLogo.Material = LoadingLogo.Material;
+				LoadingLogo = new RUnlitMaterial {
+					Transparency = Transparency.Blend,
+					DullSided = true,
+					Texture = staticResources.RhubarbLogoV2
+				};
+				StartingLogo.Material = LoadingLogo;
 			}
 			var startcode = () => {
 				IntMsg = "Building NetApiManager";

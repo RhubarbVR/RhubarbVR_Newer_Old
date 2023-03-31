@@ -64,7 +64,7 @@ namespace RhubarbVR.Bindings
 		{
 			get => _targetRhubarbMit; set {
 				_targetRhubarbMit = value;
-				if (_targetRhubarbMit.Target is GodotMaterial godotMaterial) {
+				if (_targetRhubarbMit.Inst is GodotMaterial godotMaterial) {
 					instance3D.MaterialOverride = godotMaterial.Material;
 				}
 			}
