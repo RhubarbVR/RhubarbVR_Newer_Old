@@ -11,13 +11,37 @@ namespace RhuEngine.Components
 	[Category(new string[] { "Assets/Materials" })]
 	public abstract partial class MaterialBase<T> : AssetProvider<RMaterial> where T : RMaterial, new()
 	{
-		public T _material;
+		internal T _material;
 
+		[OnAssetLoaded(nameof(NextPassLoaded))]
+		public readonly AssetRef<RMaterial> NextPass;
+
+		[OnChanged(nameof(RenderPriorityChange))]
 		public readonly Sync<int> RenderPriority;
+
+		private void NextPassLoaded(RMaterial _) {
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				_material.NextPass = NextPass.Asset;
+			});
+		}
+
+		private void RenderPriorityChange(IChangeable _) {
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (_material is null) {
+					return;
+				}
+				var newVal = Math.Min(RenderPriority.Value, short.MaxValue) - _oldRenderOrder;
+				_oldRenderOrder = newVal;
+				_material.RenderPriority += newVal;
+			});
+		}
 
 		protected abstract void UpdateAll();
 
-		int _oldRenderOrder = 0; 
+		private int _oldRenderOrder = 0;
 
 		protected void LoadMaterial() {
 			if (!Engine.EngineLink.CanRender) {
@@ -27,9 +51,8 @@ namespace RhuEngine.Components
 				_material = new T();
 				Load(_material);
 				UpdateAll();
-				var newVal = Math.Min(RenderPriority.Value, short.MaxValue) - _oldRenderOrder;
-				_oldRenderOrder = newVal;
-				_material.RenderPriority += newVal;
+				RenderPriorityChange(null);
+				NextPassLoaded(null);
 			});
 		}
 

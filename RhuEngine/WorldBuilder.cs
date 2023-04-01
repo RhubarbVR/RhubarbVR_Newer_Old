@@ -124,12 +124,30 @@ namespace RhuEngine
 			var Mits = DebugStuff.AddChild("DebugStuff");
 			Mits.position.Value = new Vector3f(2f, 3f, -2f);
 			Mits.scale.Value = new Vector3f(0.25f);
+
 			var unlitmit = Mits.AddChild("Unlit");
 			var (_, _, unliotRender) = unlitmit.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, UnlitMaterial>();
 			unliotRender.CastShadows.Value = ShadowCast.On;
 			unliotRender.RecevieShadows.Value = true;
 			unlitmit.AttachComponent<Grabbable>();
 			unlitmit.AttachComponent<SphereShape>();
+
+			var StandaredMaterial = Mits.AddChild("StandaredMaterial");
+			StandaredMaterial.position.Value = new Vector3f(5f, 0, 0);
+			var (_, _, StandaredMaterialRenderer) = StandaredMaterial.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, StandardMaterial>();
+			StandaredMaterialRenderer.CastShadows.Value = ShadowCast.On;
+			StandaredMaterialRenderer.RecevieShadows.Value = true;
+			StandaredMaterial.AttachComponent<Grabbable>();
+			StandaredMaterial.AttachComponent<SphereShape>();
+
+			var ORMMaterial = Mits.AddChild("ORMMaterial");
+			ORMMaterial.position.Value = new Vector3f(10f, 0, 0);
+			var (_, _, ORMMaterialRenderer) = ORMMaterial.AttachMeshWithMeshRender<Sphere3NormalizedCubeMesh, ORMMaterial>();
+			ORMMaterialRenderer.CastShadows.Value = ShadowCast.On;
+			ORMMaterialRenderer.RecevieShadows.Value = true;
+			ORMMaterial.AttachComponent<Grabbable>();
+			ORMMaterial.AttachComponent<SphereShape>();
+
 
 			var lights = DebugStuff.AddChild("Lights");
 			lights.position.Value = new Vector3f(2f, 4f, -2f);
@@ -166,7 +184,7 @@ namespace RhuEngine
 			slight.position.Value = new Vector3f(0f, 0f, 0.1f);
 			slight.AttachComponent<SpotLight3D>();
 
-			var box = floor.AttachComponent<TrivialBox3Mesh>();			
+			var box = floor.AttachComponent<TrivialBox3Mesh>();
 			var size = 10;
 			Entity LastpowerCube = null;
 			for (var y = 0; y < size; y++) {
@@ -208,13 +226,6 @@ namespace RhuEngine
 			text8.position.Value = new Vector3f(1, 0, 0);
 			text8.AttachComponent<TextLabel3D>().Text.Value = "<color=red>Wa<colorblue>Trains<size=50>Trains";
 			var textureStuff = testCubes.AddChild("Texture Stuff");
-			var dfg = textureStuff.AddChild("DFG-Noise");
-			dfg.position.Value = new Vector3f(2, 0, 0);
-			var (dfgMesh, dfgMat, dfgRender) = dfg.AttachMeshWithMeshRender<TrivialBox3Mesh, UnlitMaterial>();
-			var noiseComp = dfg.AttachComponent<NoiseTexture>();
-			dfgMat.MainTexture.Target = noiseComp;
-			dfg.AttachComponent<Grabbable>();
-			dfg.AttachComponent<BoxShape>();
 
 
 			var dfg2 = textureStuff.AddChild("DFG-Checker");

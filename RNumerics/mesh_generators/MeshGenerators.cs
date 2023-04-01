@@ -15,7 +15,7 @@ namespace RNumerics
 		public bool WantNormals = true;
 		public bool WantGroups = true;
 
-		public bool Clockwise = false;
+		public bool Clockwise = true;
 
 
 
