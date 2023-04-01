@@ -115,7 +115,7 @@ namespace RNumerics
 		static public readonly Quaternionf Rolled = CreateFromEuler(0, 0, 90);
 		[Exposed]
 		static public readonly Quaternionf Rolled180 = CreateFromEuler(0, 0, 180);
-		
+
 		public float this[in int key]
 		{
 			get => key != 0 ? key == 1 ? y : key == 2 ? z : w : x;
@@ -130,9 +130,9 @@ namespace RNumerics
 
 		}
 
-		
+
 		public float LengthSquared => (x * x) + (y * y) + (z * z) + (w * w);
-		
+
 		public float Length => (float)Math.Sqrt((x * x) + (y * y) + (z * z) + (w * w));
 
 		public float Normalize(in float epsilon = 0) {
@@ -150,7 +150,7 @@ namespace RNumerics
 			}
 			return length;
 		}
-		
+
 		public Quaternionf Normalized
 		{
 			get { var q = new Quaternionf(this); q.Normalize(); return q; }
@@ -282,7 +282,7 @@ namespace RNumerics
 
 		// these multiply quaternion by (1,0,0), (0,1,0), (0,0,1), respectively.
 		// faster than full multiply, because of all the zeros
-		
+
 		public Vector3f AxisX
 		{
 			get {
@@ -297,7 +297,7 @@ namespace RNumerics
 				return new Vector3f(1 - (twoYY + twoZZ), twoXY + twoWZ, twoXZ - twoWY);
 			}
 		}
-		
+
 		public Vector3f AxisY
 		{
 			get {
@@ -313,7 +313,7 @@ namespace RNumerics
 				return new Vector3f(twoXY - twoWZ, 1 - (twoXX + twoZZ), twoYZ + twoWX);
 			}
 		}
-		
+
 		public Vector3f AxisZ
 		{
 			get {
@@ -329,7 +329,7 @@ namespace RNumerics
 				return new Vector3f(twoXZ + twoWY, twoYZ - twoWX, 1 - (twoXX + twoYY));
 			}
 		}
-		
+
 		public Quaternionf Inverse
 		{
 			get {
@@ -344,13 +344,13 @@ namespace RNumerics
 				}
 			}
 		}
-		
+
 		public bool IsAnyNan => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z);
-		
+
 		public bool IsAnyInfinity => float.IsInfinity(x) || float.IsInfinity(y) || float.IsInfinity(z);
-		
+
 		public bool IsAnyNanOrInfinity => IsAnyNan || IsAnyInfinity;
-		
+
 		public Quaternionf Clean => IsAnyNanOrInfinity ? Identity : this;
 
 		public float Angle(in Quaternionf e) {
@@ -638,6 +638,24 @@ namespace RNumerics
 		}
 
 
+		public static Quaternionf LookRotation(in Vector3f forward, Vector3f up, in Vector3f defaultUp) {
+			// Ensure forward and up vectors are not zero vectors
+			if (forward.SqrMagnitude == 0f) {
+				return Quaternionf.Identity;
+			}
+
+			if (up.SqrMagnitude == 0f) {
+				up = defaultUp;
+			}
+
+			// Calculate rotation matrix
+			var right = Vector3.Cross(up, forward);
+			up = Vector3.Cross(forward, right);
+			var rotation = LookRotation(forward, up);
+
+			return rotation;
+		}
+
 
 		public static Quaternionf LookRotation(in Vector3f forward, in Vector3f up) {
 			var b = Vector3f.Zero;
@@ -734,6 +752,11 @@ namespace RNumerics
 		public Quaternionf Snap(float angleStep) {
 			var startData = GetEuler();
 			return CreateFromEuler(new Vector3f(startData.x - MathUtil.Clean(startData.x % angleStep), startData.y - MathUtil.Clean(startData.y % angleStep), startData.z - MathUtil.Clean(startData.z % angleStep)));
+		}
+
+		internal void ToAngleAxis(out float angle, out Vector3f axis) {
+			angle = 2.0f * MathF.Acos(w);
+			axis = new Vector3f(x, y, z).Normalized;
 		}
 	}
 }
