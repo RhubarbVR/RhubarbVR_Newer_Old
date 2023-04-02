@@ -23,12 +23,12 @@ namespace RhuEngine.Components
 		}
 
 		private bool _hasData = false;
-		protected (string url_path, bool isUrl, Stream rawData) _importData;
+		protected (string url_path, bool isUrl, Stream rawData, string ex) _importData;
 
-		public virtual void LoadImportData(string url_path, bool isUrl, Stream rawData,ImportProgram importProgram) {
+		public virtual void LoadImportData(string url_path, bool isUrl, Stream rawData, string ex, ImportProgram importProgram) {
 			ImporterProgram.Target = importProgram;
 			_hasData = true;
-			_importData = (url_path, isUrl, rawData);
+			_importData = (url_path, isUrl, rawData, ex);
 		}
 
 		public abstract Task ImportAsset();
@@ -36,7 +36,7 @@ namespace RhuEngine.Components
 
 		[Exposed]
 		public virtual void Import() {
-			if(!_hasData ) {
+			if (!_hasData) {
 				return;
 			}
 			if (ImportButton.Target is null) {
@@ -52,7 +52,7 @@ namespace RhuEngine.Components
 				try {
 					await ImportAsset();
 				}
-				catch(Exception e) {
+				catch (Exception e) {
 					RLog.Err("Failed to import asset Error:" + e.ToString());
 				}
 				_importData.rawData?.Dispose();

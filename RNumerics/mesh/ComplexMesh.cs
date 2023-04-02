@@ -905,6 +905,12 @@ namespace RNumerics
 						if (hasBit && Bits.Contains(i)) {
 							attachment.BiTangents.Add(BiTangents[i]);
 						}
+						if (hasColor) {
+							attachment.Colors = new List<Colorf>[Colors.Length];
+							for (var c = 0; c < Colors.Length; c++) {
+								attachment.Colors[c] = new List<Colorf>();
+							}
+						}
 						if (hasColor && !_Colors.Contains(i)) {
 							for (var currentColor = 0; currentColor < Colors.Length; currentColor++) {
 								var coler = attachment.Colors[currentColor];
@@ -914,6 +920,12 @@ namespace RNumerics
 						if (hasColor && _Colors.Contains(i)) {
 							for (var currentColor = 0; currentColor < Colors.Length; currentColor++) {
 								attachment.Colors[currentColor].Add(Colors[currentColor][i]);
+							}
+						}
+						if (hasUV) {
+							attachment.TexCoords = new List<Vector3f>[TexCoords.Length];
+							for (var t = 0; t < TexCoords.Length; t++) {
+								attachment.TexCoords[t] = new List<Vector3f>();
 							}
 						}
 						if (hasUV && !UVs.Contains(i)) {
@@ -1158,7 +1170,17 @@ namespace RNumerics
 		[JsonIgnore]
 		public bool HasVertexNormals => Normals.Count > 0;
 		[JsonIgnore]
-		public bool HasVertexColors => Colors.Length != 0;
+		public bool HasVertexColors
+		{
+			get {
+				for (var i = 0; i < Colors.Length; i++) {
+					if (Colors[i].Count > 0) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}
 		[JsonIgnore]
 		public int Timestamp => int.MaxValue;
 		[JsonIgnore]

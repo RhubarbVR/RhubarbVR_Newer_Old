@@ -47,7 +47,7 @@ namespace RhuEngine.Components
 
 		private bool _hasImportData = false;
 
-		private (string url_path, bool isUrl, Stream rawData) _importData;
+		private (string url_path, bool isUrl, Stream rawData, string ex) _importData;
 
 		public readonly SyncRef<BoxContainer> scroll;
 
@@ -61,7 +61,7 @@ namespace RhuEngine.Components
 			if (isUri && uri.Scheme == "file") {
 				isUri = false;
 			}
-			_importData = (path, isUri, file);
+			_importData = (path, isUri, file, ex);
 			var window = AddWindowWithIcon(IconFind);
 			window.SizePixels = new Vector2i(320, 350);
 			window.CenterWindowIntoView();
@@ -136,7 +136,7 @@ namespace RhuEngine.Components
 			if (LocalUser is not null) {
 				newEntity.GlobalTrans = Matrix.TR(Vector3f.Forward * 0.35f, Quaternionf.Pitched) * LocalUser.userRoot.Target?.head.Target?.GlobalTrans ?? Matrix.Identity;
 			}
-			import.LoadImportData(_importData.url_path, _importData.isUrl, _importData.rawData, this);
+			import.LoadImportData(_importData.url_path, _importData.isUrl, _importData.rawData, _importData.ex, this);
 			var box = scroll.Target.Entity.AddChild().AttachComponent<BoxContainer>();
 			box.Alignment.Value = RBoxContainerAlignment.Center;
 			box.Vertical.Value = true;

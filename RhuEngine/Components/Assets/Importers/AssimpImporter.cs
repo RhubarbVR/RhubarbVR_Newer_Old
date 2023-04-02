@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using RNumerics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using Assimp.Unmanaged;
 
 namespace RhuEngine.Components
 {
@@ -19,14 +21,136 @@ namespace RhuEngine.Components
 
 		public readonly SyncRef<IValueSource<bool>> srgbTextures;
 
+		public readonly SyncRef<IValueSource<bool>> joinIdenticalVertices;
+		public readonly SyncRef<IValueSource<bool>> makeLeftHanded;
+		public readonly SyncRef<IValueSource<bool>> triangulate;
+		public readonly SyncRef<IValueSource<bool>> generateNormals;
+		public readonly SyncRef<IValueSource<bool>> generateSmoothNormals;
+		public readonly SyncRef<IValueSource<bool>> splitLargeMeshes;
+		public readonly SyncRef<IValueSource<bool>> preTransformVertices;
+		public readonly SyncRef<IValueSource<bool>> limitBoneWeights;
+		public readonly SyncRef<IValueSource<bool>> validateDataStructure;
+		public readonly SyncRef<IValueSource<bool>> improveCacheLocality;
+		public readonly SyncRef<IValueSource<bool>> removeRedundantMaterials;
+		public readonly SyncRef<IValueSource<bool>> fixInFacingNormals;
+		public readonly SyncRef<IValueSource<bool>> sortByPrimitiveType;
+		public readonly SyncRef<IValueSource<bool>> findDegenerates;
+		public readonly SyncRef<IValueSource<bool>> findInvalidData;
+		public readonly SyncRef<IValueSource<bool>> generateUVCoords;
+		public readonly SyncRef<IValueSource<bool>> transformUVCoords;
+		public readonly SyncRef<IValueSource<bool>> findInstances;
+		public readonly SyncRef<IValueSource<bool>> optimizeMeshes;
+		public readonly SyncRef<IValueSource<bool>> optimizeGraph;
+		public readonly SyncRef<IValueSource<bool>> flipUVs;
+		public readonly SyncRef<IValueSource<bool>> flipWindingOrder;
+		public readonly SyncRef<IValueSource<bool>> debone;
+		public readonly SyncRef<IValueSource<bool>> forceGenerateNormals;
+		public readonly SyncRef<IValueSource<bool>> dropNormals;
+
+		public readonly SyncRef<IValueSource<bool>> removeNone;
+		public readonly SyncRef<IValueSource<bool>> removeNormals;
+		public readonly SyncRef<IValueSource<bool>> removeTangentBasis;
+		public readonly SyncRef<IValueSource<bool>> removeColors;
+		public readonly SyncRef<IValueSource<bool>> removeTexCoords;
+		public readonly SyncRef<IValueSource<bool>> removeBoneweights;
+		public readonly SyncRef<IValueSource<bool>> removeAnimations;
+		public readonly SyncRef<IValueSource<bool>> removeTextures;
+		public readonly SyncRef<IValueSource<bool>> removeLights;
+		public readonly SyncRef<IValueSource<bool>> removeCameras;
+		public readonly SyncRef<IValueSource<bool>> removeMeshes;
+		public readonly SyncRef<IValueSource<bool>> removeMaterials;
+
+		private bool RemoveNone => removeNone.Target?.Value ?? false;
+		private bool RemoveNormals => removeNormals.Target?.Value ?? false;
+		private bool RemoveTangentBasis => removeTangentBasis.Target?.Value ?? false;
+		private bool RemoveColors => removeColors.Target?.Value ?? false;
+		private bool RemoveTexCoords => removeTexCoords.Target?.Value ?? false;
+		private bool RemoveBoneweights => removeBoneweights.Target?.Value ?? false;
+		private bool RemoveAnimations => removeAnimations.Target?.Value ?? false;
+		private bool RemoveTextures => removeTextures.Target?.Value ?? false;
+		private bool RemoveLights => removeLights.Target?.Value ?? false;
+		private bool RemoveCameras => removeCameras.Target?.Value ?? false;
+		private bool RemoveMeshes => removeMeshes.Target?.Value ?? false;
+		private bool RemoveMaterials => removeMaterials.Target?.Value ?? false;
+
 		private bool SrgbTextures => srgbTextures.Target?.Value ?? false;
+		private bool JoinIdenticalVertices => joinIdenticalVertices.Target?.Value ?? false;
+		private bool MakeLeftHanded => makeLeftHanded.Target?.Value ?? false;
+		private bool Triangulate => triangulate.Target?.Value ?? false;
+		private bool GenerateNormals => generateNormals.Target?.Value ?? false;
+		private bool GenerateSmoothNormals => generateSmoothNormals.Target?.Value ?? false;
+		private bool SplitLargeMeshes => splitLargeMeshes.Target?.Value ?? false;
+		private bool PreTransformVertices => preTransformVertices.Target?.Value ?? false;
+		private bool LimitBoneWeights => limitBoneWeights.Target?.Value ?? false;
+		private bool ValidateDataStructure => validateDataStructure.Target?.Value ?? false;
+		private bool ImproveCacheLocality => improveCacheLocality.Target?.Value ?? false;
+		private bool RemoveRedundantMaterials => removeRedundantMaterials.Target?.Value ?? false;
+		private bool FixInFacingNormals => fixInFacingNormals.Target?.Value ?? false;
+		private bool SortByPrimitiveType => sortByPrimitiveType.Target?.Value ?? false;
+		private bool FindDegenerates => findDegenerates.Target?.Value ?? false;
+		private bool FindInvalidData => findInvalidData.Target?.Value ?? false;
+		private bool GenerateUVCoords => generateUVCoords.Target?.Value ?? false;
+		private bool TransformUVCoords => transformUVCoords.Target?.Value ?? false;
+		private bool FindInstances => findInstances.Target?.Value ?? false;
+		private bool OptimizeMeshes => optimizeMeshes.Target?.Value ?? false;
+		private bool OptimizeGraph => optimizeGraph.Target?.Value ?? false;
+		private bool FlipUVs => flipUVs.Target?.Value ?? false;
+		private bool FlipWindingOrder => flipWindingOrder.Target?.Value ?? false;
+		private bool Debone => debone.Target?.Value ?? false;
+		private bool ForceGenerateNormals => forceGenerateNormals.Target?.Value ?? false;
+		private bool DropNormals => dropNormals.Target?.Value ?? false;
+
 
 		public override void BuildUI(Entity rootBox) {
-			var checkBOx = rootBox.AddChild("CheckBox").AttachComponent<CheckBox>();
-			checkBOx.Text.Value = "SRGB";
-			srgbTextures.Target = checkBOx.ButtonPressed;
-			checkBOx.ButtonPressed.Value = true;
 			base.BuildUI(rootBox);
+
+			void AddCheckBox(string name, SyncRef<IValueSource<bool>> syncRef, bool defult) {
+				var checkBOx = rootBox.AddChild(name).AttachComponent<CheckBox>();
+				checkBOx.Text.Value = name;
+				syncRef.Target = checkBOx.ButtonPressed;
+				checkBOx.ButtonPressed.Value = defult;
+			}
+
+			AddCheckBox("SRGB", srgbTextures, true);
+			AddCheckBox("JoinIdenticalVertices", joinIdenticalVertices, false);
+			AddCheckBox("MakeLeftHanded", makeLeftHanded, false);
+			AddCheckBox("Triangulate", triangulate, false);
+			AddCheckBox("GenerateNormals", generateNormals, false);
+			AddCheckBox("GenerateSmoothNormals", generateSmoothNormals, false);
+			AddCheckBox("SplitLargeMeshes", splitLargeMeshes, false);
+			AddCheckBox("PreTransformVertices", preTransformVertices, false);
+			AddCheckBox("LimitBoneWeights", limitBoneWeights, false);
+			AddCheckBox("ValidateDataStructure", validateDataStructure, true);
+			AddCheckBox("ImproveCacheLocality", improveCacheLocality, false);
+			AddCheckBox("RemoveRedundantMaterials", removeRedundantMaterials, true);
+			AddCheckBox("FixInFacingNormals", fixInFacingNormals, false);
+			AddCheckBox("SortByPrimitiveType", sortByPrimitiveType, false);
+			AddCheckBox("FindDegenerates", findDegenerates, false);
+			AddCheckBox("FindInvalidData", findInvalidData, false);
+			AddCheckBox("GenerateUVCoords", generateUVCoords, false);
+			AddCheckBox("TransformUVCoords", transformUVCoords, false);
+			AddCheckBox("FindInstances", findInstances, false);
+			AddCheckBox("OptimizeMeshes", optimizeMeshes, false);
+			AddCheckBox("OptimizeGraph", optimizeGraph, false);
+			AddCheckBox("FlipUVs", flipUVs, true);
+			AddCheckBox("FlipWindingOrder", flipWindingOrder, true);
+			AddCheckBox("Debone", debone, false);
+			AddCheckBox("ForceGenerateNormals", forceGenerateNormals, false);
+			AddCheckBox("DropNormals", dropNormals, false);
+
+			AddCheckBox("RemoveNormals", removeNormals, false);
+			AddCheckBox("RemoveNone", removeNone, false);
+			AddCheckBox("RemoveNormals", removeNormals, false);
+			AddCheckBox("RemoveTangentBasis", removeTangentBasis, false);
+			AddCheckBox("RemoveColors", removeColors, false);
+			AddCheckBox("RemoveTexCoords", removeTexCoords, false);
+			AddCheckBox("RemoveBoneweights", removeBoneweights, false);
+			AddCheckBox("RemoveAnimations", removeAnimations, false);
+			AddCheckBox("RemoveTextures", removeTextures, false);
+			AddCheckBox("RemoveLights", removeLights, false);
+			AddCheckBox("RemoveCameras", removeCameras, false);
+			AddCheckBox("RemoveMeshes", removeMeshes, false);
+			AddCheckBox("RemoveMaterials", removeMaterials, false);
 		}
 
 
@@ -105,15 +229,60 @@ namespace RhuEngine.Components
 				_assimpContext ??= new AssimpContext {
 					Scale = .001f,
 				};
+				var postProcessSteps = PostProcessSteps.EmbedTextures;
+				if (JoinIdenticalVertices) { postProcessSteps |= PostProcessSteps.JoinIdenticalVertices; }
+				if (MakeLeftHanded) { postProcessSteps |= PostProcessSteps.MakeLeftHanded; }
+				if (Triangulate) { postProcessSteps |= PostProcessSteps.Triangulate; }
+				if (GenerateNormals) { postProcessSteps |= PostProcessSteps.GenerateNormals; }
+				if (GenerateSmoothNormals) { postProcessSteps |= PostProcessSteps.GenerateSmoothNormals; }
+				if (SplitLargeMeshes) { postProcessSteps |= PostProcessSteps.SplitLargeMeshes; }
+				if (PreTransformVertices) { postProcessSteps |= PostProcessSteps.PreTransformVertices; }
+				if (LimitBoneWeights) { postProcessSteps |= PostProcessSteps.LimitBoneWeights; }
+				if (ValidateDataStructure) { postProcessSteps |= PostProcessSteps.ValidateDataStructure; }
+				if (ImproveCacheLocality) { postProcessSteps |= PostProcessSteps.ImproveCacheLocality; }
+				if (RemoveRedundantMaterials) { postProcessSteps |= PostProcessSteps.RemoveRedundantMaterials; }
+				if (FixInFacingNormals) { postProcessSteps |= PostProcessSteps.FixInFacingNormals; }
+				if (SortByPrimitiveType) { postProcessSteps |= PostProcessSteps.SortByPrimitiveType; }
+				if (FindDegenerates) { postProcessSteps |= PostProcessSteps.FindDegenerates; }
+				if (FindInvalidData) { postProcessSteps |= PostProcessSteps.FindInvalidData; }
+				if (GenerateUVCoords) { postProcessSteps |= PostProcessSteps.GenerateUVCoords; }
+				if (TransformUVCoords) { postProcessSteps |= PostProcessSteps.TransformUVCoords; }
+				if (FindInstances) { postProcessSteps |= PostProcessSteps.FindInstances; }
+				if (OptimizeMeshes) { postProcessSteps |= PostProcessSteps.OptimizeMeshes; }
+				if (OptimizeGraph) { postProcessSteps |= PostProcessSteps.OptimizeGraph; }
+				if (FlipUVs) { postProcessSteps |= PostProcessSteps.FlipUVs; }
+				if (FlipWindingOrder) { postProcessSteps |= PostProcessSteps.FlipWindingOrder; }
+				if (Debone) { postProcessSteps |= PostProcessSteps.Debone; }
+				if (ForceGenerateNormals) { postProcessSteps |= PostProcessSteps.ForceGenerateNormals; }
+				if (DropNormals) { postProcessSteps |= PostProcessSteps.DropNormals; }
+				var excludeComponent = ExcludeComponent.None;
+				if (RemoveNormals) { excludeComponent |= ExcludeComponent.Normals; }
+				if (RemoveNone) { excludeComponent |= ExcludeComponent.None; };
+				if (RemoveNormals) { excludeComponent |= ExcludeComponent.Normals; }
+				if (RemoveTangentBasis) { excludeComponent |= ExcludeComponent.TangentBasis; }
+				if (RemoveColors) { excludeComponent |= ExcludeComponent.Colors; }
+				if (RemoveTexCoords) { excludeComponent |= ExcludeComponent.TexCoords; }
+				if (RemoveBoneweights) { excludeComponent |= ExcludeComponent.Boneweights; }
+				if (RemoveAnimations) { excludeComponent |= ExcludeComponent.Animations; }
+				if (RemoveTextures) { excludeComponent |= ExcludeComponent.Textures; }
+				if (RemoveLights) { excludeComponent |= ExcludeComponent.Lights; }
+				if (RemoveCameras) { excludeComponent |= ExcludeComponent.Cameras; }
+				if (RemoveMeshes) { excludeComponent |= ExcludeComponent.Meshes; }
+				if (RemoveMaterials) { excludeComponent |= ExcludeComponent.Materials; }
+
+				if (excludeComponent != ExcludeComponent.None) {
+					postProcessSteps = PostProcessSteps.RemoveComponent;
+					_assimpContext.SetConfig(new Assimp.Configs.IntegerPropertyConfig("PP_RVC_FLAGS", (int)excludeComponent));
+				}
 				Scene scene;
 				if (_importData.isUrl) {
 					using var client = new HttpClient();
 					using var response = await client.GetAsync(_importData.url_path);
 					using var streamToReadFrom = await response.Content.ReadAsStreamAsync();
-					scene = _assimpContext.ImportFileFromStream(streamToReadFrom);
+					scene = _assimpContext.ImportFileFromStream(streamToReadFrom, postProcessSteps, _importData.ex);
 				}
 				else {
-					scene = _importData.rawData is null ? _assimpContext.ImportFile(_importData.url_path) : _assimpContext.ImportFileFromStream(_importData.rawData);
+					scene = _importData.rawData is null ? _assimpContext.ImportFile(_importData.url_path, postProcessSteps) : _assimpContext.ImportFileFromStream(_importData.rawData, postProcessSteps, _importData.ex);
 				}
 				if (scene is null) {
 					RLog.Err("failed to Load Model Scene not loaded");
@@ -328,7 +497,7 @@ namespace RhuEngine.Components
 				scene.Nodes.TryGetValue(amesh.Bones[0].BoneName, out var armitureEntity);
 				if (armitureEntity?.parent.Target is not null) {
 					armiturer = armitureEntity.parent.Target.GetFirstComponentOrAttach<Armature>();
-					if(armiturer.ArmatureEntitys.Count < amesh.Bones.Count) {
+					if (armiturer.ArmatureEntitys.Count < amesh.Bones.Count) {
 						foreach (var bone in amesh.Bones.Skip(armiturer.ArmatureEntitys.Count)) {
 							if (scene.Nodes.ContainsKey(bone.Name)) {
 								armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];

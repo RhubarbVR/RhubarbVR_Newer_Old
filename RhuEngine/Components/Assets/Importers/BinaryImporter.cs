@@ -16,11 +16,11 @@ namespace RhuEngine.Components
 		private bool WasmScript => wasmScript.Target?.Value ?? false;
 
 		public override void BuildUI(Entity rootBox) {
+			base.BuildUI(rootBox);
 			var checkBOx = rootBox.AddChild("CheckBox").AttachComponent<CheckBox>();
 			checkBOx.Text.Value = "WasmScript";
 			wasmScript.Target = checkBOx.ButtonPressed;
 			checkBOx.ButtonPressed.Value = true;
-			base.BuildUI(rootBox);
 		}
 
 		public override Task ImportAsset() {

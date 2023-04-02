@@ -16,11 +16,11 @@ namespace RhuEngine.Components
 		private bool SrgbTextures => srgbTextures.Target?.Value ?? false;
 
 		public override void BuildUI(Entity rootBox) {
+			base.BuildUI(rootBox);
 			var checkBOx = rootBox.AddChild("CheckBox").AttachComponent<CheckBox>();
 			checkBOx.Text.Value = "SRGB";
 			srgbTextures.Target = checkBOx.ButtonPressed;
 			checkBOx.ButtonPressed.Value = true;
-			base.BuildUI(rootBox);
 		}
 
 		public override Task ImportAsset() {
