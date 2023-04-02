@@ -793,6 +793,7 @@ namespace RNumerics
 
 			if (saveFlags.HasFlag(SaveFlags.Bones)) {
 				var boneGroupCount = reader.ReadInt32();
+				Bones.Clear();
 				for (var i = 0; i < boneGroupCount; i++) {
 					var wateCount = reader.ReadInt32();
 					var amountOfBone = reader.ReadInt32();
@@ -820,11 +821,13 @@ namespace RNumerics
 						for (var curentWeights = 0; curentWeights < wateCount; curentWeights++) {
 							newBone.VertexWeights.Add(new RVertexWeight(reader.ReadSingle(), reader.ReadInt32()));
 						}
+						Bones.Add(newBone);
 					}
 				}
 			}
 
 			if (saveFlags.HasFlag(SaveFlags.ShapeKeys)) {
+				MeshAttachments.Clear();
 				var amountOfShapeKeys = reader.ReadInt32();
 				for (var attach = 0; attach < amountOfShapeKeys; attach++) {
 					var attachment = new RAnimationAttachment {
@@ -958,10 +961,8 @@ namespace RNumerics
 							}
 						}
 					}
-
+					MeshAttachments.Add(attachment);
 				}
-
-
 			}
 		}
 

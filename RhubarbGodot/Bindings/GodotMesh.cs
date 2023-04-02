@@ -363,6 +363,7 @@ namespace RhubarbVR.Bindings
 				return;
 			}
 			if (mesh is IComplexMesh complexMesh) {
+				RLog.Info($"Godot ComplexMesh Name:{complexMesh.MeshName} HasBones:{complexMesh.HasBones} HasMeshAttachments:{complexMesh.HasMeshAttachments} HasSubMeshs:{complexMesh.HasSubMeshs} HasVertexUVs:{complexMesh.HasVertexUVs} HasVertexNormals:{complexMesh.HasVertexNormals} HasVertexColors:{complexMesh.HasVertexColors} VertexCount:{complexMesh.VertexCount}  PrimitiveType:{complexMesh.PrimitiveType}");
 				var cvertices = new Vector3[complexMesh.Vertices.Count];
 				for (var i = 0; i < complexMesh.Vertices.Count; i++) {
 					cvertices[i] = new Vector3(complexMesh.Vertices[i].x, complexMesh.Vertices[i].y, complexMesh.Vertices[i].z);

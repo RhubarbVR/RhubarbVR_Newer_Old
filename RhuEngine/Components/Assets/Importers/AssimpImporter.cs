@@ -493,34 +493,36 @@ namespace RhuEngine.Components
 				rmesh.url.Value = entity.World.CreateLocalAsset(amesh).ToString();
 			}
 			if (amesh.HasBones || amesh.HasMeshAttachments) {
-				Armature armiturer;
-				scene.Nodes.TryGetValue(amesh.Bones[0].BoneName, out var armitureEntity);
-				if (armitureEntity?.parent.Target is not null) {
-					armiturer = armitureEntity.parent.Target.GetFirstComponentOrAttach<Armature>();
-					if (armiturer.ArmatureEntitys.Count < amesh.Bones.Count) {
-						foreach (var bone in amesh.Bones.Skip(armiturer.ArmatureEntitys.Count)) {
-							if (scene.Nodes.ContainsKey(bone.Name)) {
-								armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
-							}
-							else {
-								RLog.Info($"Didn't FindNode for {bone.Name}");
-								var ent = entity.AddChild(bone.Name);
-								armiturer.ArmatureEntitys.Add().Target = ent;
+				Armature armiturer = null;
+				if (amesh.HasBones) {
+					scene.Nodes.TryGetValue(amesh.Bones[0].BoneName, out var armitureEntity);
+					if (armitureEntity?.parent.Target is not null) {
+						armiturer = armitureEntity.parent.Target.GetFirstComponentOrAttach<Armature>();
+						if (armiturer.ArmatureEntitys.Count < amesh.Bones.Count) {
+							foreach (var bone in amesh.Bones.Skip(armiturer.ArmatureEntitys.Count)) {
+								if (scene.Nodes.ContainsKey(bone.Name)) {
+									armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
+								}
+								else {
+									RLog.Info($"Didn't FindNode for {bone.Name}");
+									var ent = entity.AddChild(bone.Name);
+									armiturer.ArmatureEntitys.Add().Target = ent;
+								}
 							}
 						}
 					}
-				}
-				else {
-					armiturer = entity.GetFirstComponentOrAttach<Armature>();
-					if (armiturer.ArmatureEntitys.Count < amesh.Bones.Count) {
-						foreach (var bone in amesh.Bones.Skip(armiturer.ArmatureEntitys.Count)) {
-							if (scene.Nodes.ContainsKey(bone.Name)) {
-								armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
-							}
-							else {
-								RLog.Info($"Didn't FindNode for {bone.Name}");
-								var ent = entity.AddChild(bone.Name);
-								armiturer.ArmatureEntitys.Add().Target = ent;
+					else {
+						armiturer = entity.GetFirstComponentOrAttach<Armature>();
+						if (armiturer.ArmatureEntitys.Count < amesh.Bones.Count) {
+							foreach (var bone in amesh.Bones.Skip(armiturer.ArmatureEntitys.Count)) {
+								if (scene.Nodes.ContainsKey(bone.Name)) {
+									armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
+								}
+								else {
+									RLog.Info($"Didn't FindNode for {bone.Name}");
+									var ent = entity.AddChild(bone.Name);
+									armiturer.ArmatureEntitys.Add().Target = ent;
+								}
 							}
 						}
 					}
