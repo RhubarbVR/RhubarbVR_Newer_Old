@@ -10,6 +10,8 @@ using RhuEngine;
 using RhuEngine.Components;
 using RhuEngine.Linker;
 
+using RNumerics;
+
 namespace RhubarbVR.Bindings.ComponentLinking
 {
 	public sealed class ArmatureLink : WorldPositionLinked<Armature, Skeleton3D>
@@ -32,11 +34,11 @@ namespace RhubarbVR.Bindings.ComponentLinking
 					node.SetBonePoseScale(i, Vector3.One);
 				}
 				else {
-					var entitPos = entity.GlobalTrans * LinkedComp.Entity.GlobalTrans.Inverse;
-					entitPos.Decompose(out var pos, out var rot, out var scale);
-					node.SetBonePosePosition(i, new Vector3(pos.x, pos.y, pos.z));
-					node.SetBonePoseRotation(i, new Quaternion(rot.x, rot.y, rot.z, rot.w));
-					node.SetBonePoseScale(i, new Vector3(scale.x, scale.y, scale.z));
+					var localToMesh = LinkedComp.Entity.GlobalToLocal(entity.GlobalTrans);
+					var casted = localToMesh.CastPosMatrix();
+					node.SetBonePosePosition(i, casted.Origin);
+					node.SetBonePoseRotation(i, casted.Basis.GetRotationQuaternion());
+					node.SetBonePoseScale(i, casted.Basis.Scale);
 				}
 			}
 		}
@@ -47,20 +49,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				var count = LinkedComp.ArmatureEntitys.Count;
 				for (var i = 0; i < count; i++) {
 					node.AddBone(i.ToString());
-					var entity = LinkedComp.ArmatureEntitys[i].Target;
-					if (entity is null) {
-						node.SetBonePosePosition(i, Vector3.Zero);
-						node.SetBonePoseRotation(i, Quaternion.Identity);
-						node.SetBonePoseScale(i, Vector3.One);
-					}
-					else {
-						var entitPos = entity.GlobalTrans * LinkedComp.Entity.GlobalTrans.Inverse;
-						entitPos.Decompose(out var pos, out var rot, out var scale);
-						node.SetBonePosePosition(i, new Vector3(pos.x, pos.y, pos.z));
-						node.SetBonePoseRotation(i, new Quaternion(rot.x, rot.y, rot.z, rot.w));
-						node.SetBonePoseScale(i, new Vector3(scale.x, scale.y, scale.z));
-					}
-
 				}
 			});
 		}

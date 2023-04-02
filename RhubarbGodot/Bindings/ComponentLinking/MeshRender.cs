@@ -33,15 +33,13 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			if (node.Mesh is null) {
 				return;
 			}
-			var currentIndex = 0;
-			for (var i = 0; i < LinkedComp.BlendShapes.Count; i++) {
-				var item = LinkedComp.BlendShapes[i];
-				if (node.Mesh._GetBlendShapeCount() <= currentIndex) {
-					currentIndex++;
-					continue;
+			for (var i = 0; i < node.GetBlendShapeCount(); i++) {
+				if (LinkedComp.BlendShapes.Count > i) {
+					node.SetBlendShapeValue(i, LinkedComp.BlendShapes[i].Weight.Value);
 				}
-				node.SetBlendShapeValue(currentIndex, item.Weight.Value);
-				currentIndex++;
+				else {
+					node.SetBlendShapeValue(i, 0);
+				}
 			}
 		}
 
@@ -204,7 +202,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			else {
 				for (var i = 0; i < LinkedComp.materials.Count; i++) {
 					var mat = ((GodotMaterial)LinkedComp.materials[i].Asset?.Inst)?.Material;
-					if(i < amount) {
+					if (i < amount) {
 						node.SetSurfaceOverrideMaterial(i, mat);
 					}
 				}
