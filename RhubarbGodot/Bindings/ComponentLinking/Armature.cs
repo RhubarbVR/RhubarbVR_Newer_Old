@@ -9,6 +9,7 @@ using Godot;
 using RhuEngine;
 using RhuEngine.Components;
 using RhuEngine.Linker;
+using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
 
@@ -25,9 +26,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		public override void Render() {
 			base.Render();
-			var count = Math.Min(LinkedComp.ArmatureEntitys.Count, node.GetBoneCount());
+			var count = node.GetBoneCount();
 			for (var i = 0; i < count; i++) {
-				var entity = LinkedComp.ArmatureEntitys[i].Target;
+				var entity = LinkedComp.ArmatureEntitys.Count < i ? null : LinkedComp.ArmatureEntitys[i].Target;
 				if (entity is null) {
 					node.SetBonePosePosition(i, Vector3.Zero);
 					node.SetBonePoseRotation(i, Quaternion.Identity);

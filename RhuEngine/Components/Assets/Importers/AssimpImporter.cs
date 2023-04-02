@@ -496,33 +496,18 @@ namespace RhuEngine.Components
 				Armature armiturer = null;
 				if (amesh.HasBones) {
 					scene.Nodes.TryGetValue(amesh.Bones[0].BoneName, out var armitureEntity);
-					if (armitureEntity?.parent.Target is not null) {
-						armiturer = armitureEntity.parent.Target.GetFirstComponentOrAttach<Armature>();
-						if (armiturer.ArmatureEntitys.Count < amesh.Bones.Count) {
-							foreach (var bone in amesh.Bones.Skip(armiturer.ArmatureEntitys.Count)) {
-								if (scene.Nodes.ContainsKey(bone.Name)) {
-									armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
-								}
-								else {
-									RLog.Info($"Didn't FindNode for {bone.Name}");
-									var ent = entity.AddChild(bone.Name);
-									armiturer.ArmatureEntitys.Add().Target = ent;
-								}
+					armiturer = armitureEntity?.parent.Target is not null
+						? armitureEntity.parent.Target.GetFirstComponentOrAttach<Armature>()
+						: entity.GetFirstComponentOrAttach<Armature>();
+					if (armiturer.ArmatureEntitys.Count < amesh.Bones.Count) {
+						foreach (var bone in amesh.Bones.Skip(armiturer.ArmatureEntitys.Count)) {
+							if (scene.Nodes.ContainsKey(bone.Name)) {
+								armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
 							}
-						}
-					}
-					else {
-						armiturer = entity.GetFirstComponentOrAttach<Armature>();
-						if (armiturer.ArmatureEntitys.Count < amesh.Bones.Count) {
-							foreach (var bone in amesh.Bones.Skip(armiturer.ArmatureEntitys.Count)) {
-								if (scene.Nodes.ContainsKey(bone.Name)) {
-									armiturer.ArmatureEntitys.Add().Target = scene.Nodes[bone.Name];
-								}
-								else {
-									RLog.Info($"Didn't FindNode for {bone.Name}");
-									var ent = entity.AddChild(bone.Name);
-									armiturer.ArmatureEntitys.Add().Target = ent;
-								}
+							else {
+								RLog.Info($"Didn't FindNode for {bone.Name}");
+								var ent = entity.AddChild(bone.Name);
+								armiturer.ArmatureEntitys.Add().Target = ent;
 							}
 						}
 					}

@@ -446,36 +446,30 @@ namespace RNumerics
 			}
 
 			if (HasBones) {
-				var bones = Bones.GroupBy(x => x.VertexWeights.Count).ToArray();
-				binaryWriter.Write(bones.Length);
-				for (var i = 0; i < bones.Length; i++) {
-					var bone = bones[i];
-					var amountOfBone = bone.ToArray();
-					binaryWriter.Write(bone.Key);
-					binaryWriter.Write(amountOfBone.Length);
-					for (var currentWate = 0; currentWate < amountOfBone.Length; currentWate++) {
-						var currentBone = amountOfBone[currentWate];
-						binaryWriter.Write(currentBone.BoneName);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M11);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M12);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M13);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M14);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M21);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M22);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M23);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M24);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M31);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M32);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M33);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M34);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M41);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M42);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M43);
-						binaryWriter.Write(currentBone.OffsetMatrix.m.M44);
-						for (var curentWeights = 0; curentWeights < currentBone.VertexWeights.Count; curentWeights++) {
-							binaryWriter.Write(currentBone.VertexWeights[curentWeights].Weight);
-							binaryWriter.Write(currentBone.VertexWeights[curentWeights].VertexID);
-						}
+				binaryWriter.Write(Bones.Count);
+				for (var i = 0; i < Bones.Count; i++) {
+					var currentBone = Bones[i];
+					binaryWriter.Write(currentBone.BoneName);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M11);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M12);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M13);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M14);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M21);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M22);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M23);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M24);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M31);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M32);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M33);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M34);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M41);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M42);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M43);
+					binaryWriter.Write(currentBone.OffsetMatrix.m.M44);
+					binaryWriter.Write(currentBone.VertexWeights.Count);
+					for (var curentWeights = 0; curentWeights < currentBone.VertexWeights.Count; curentWeights++) {
+						binaryWriter.Write(currentBone.VertexWeights[curentWeights].Weight);
+						binaryWriter.Write(currentBone.VertexWeights[curentWeights].VertexID);
 					}
 				}
 			}
@@ -792,15 +786,12 @@ namespace RNumerics
 			}
 
 			if (saveFlags.HasFlag(SaveFlags.Bones)) {
-				var boneGroupCount = reader.ReadInt32();
+				var boneCount = reader.ReadInt32();
 				Bones.Clear();
-				for (var i = 0; i < boneGroupCount; i++) {
-					var wateCount = reader.ReadInt32();
-					var amountOfBone = reader.ReadInt32();
-					for (var currentWate = 0; currentWate < amountOfBone; currentWate++) {
-						var newBone = new RBone {
-							BoneName = reader.ReadString(),
-							OffsetMatrix = new Matrix(new System.Numerics.Matrix4x4(
+				for (var i = 0; i < boneCount; i++) {
+					var newBone = new RBone {
+						BoneName = reader.ReadString(),
+						OffsetMatrix = new Matrix(new System.Numerics.Matrix4x4(
 								reader.ReadSingle(),
 								reader.ReadSingle(),
 								reader.ReadSingle(),
@@ -817,12 +808,12 @@ namespace RNumerics
 								reader.ReadSingle(),
 								reader.ReadSingle(),
 								reader.ReadSingle()))
-						};
-						for (var curentWeights = 0; curentWeights < wateCount; curentWeights++) {
-							newBone.VertexWeights.Add(new RVertexWeight(reader.ReadSingle(), reader.ReadInt32()));
-						}
-						Bones.Add(newBone);
+					};
+					var wateCount = reader.ReadInt32();
+					for (var curentWeights = 0; curentWeights < wateCount; curentWeights++) {
+						newBone.VertexWeights.Add(new RVertexWeight(reader.ReadSingle(), reader.ReadInt32()));
 					}
+					Bones.Add(newBone);
 				}
 			}
 
