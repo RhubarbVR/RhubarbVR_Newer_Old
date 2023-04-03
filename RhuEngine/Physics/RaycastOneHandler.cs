@@ -52,7 +52,7 @@ namespace RhuEngine.Physics
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void OnRayHit(in RayData ray, ref float maximumT, float t, in Vector3 normal, CollidableReference collidable, int childIndex) {
+		public void OnRayHit(in RayData ray, ref float maximumT, float t, Vector3 normal, CollidableReference collidable, int childIndex) {
 			if (t < hitT) {
 				hitT = t;
 				hitNormal = normal;

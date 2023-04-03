@@ -66,7 +66,7 @@ namespace RhuEngine.WorldObjects
 		}
 		[Exposed]
 		public User GetMasterUser() {
-			return IsNetworked ? Users[MasterUser] : Users[0];
+			return Users[MasterUser - 1];
 		}
 
 		public ushort GetUserID(User user) {
@@ -79,7 +79,7 @@ namespace RhuEngine.WorldObjects
 		}
 		[Exposed]
 		public User GetLocalUser() {
-			return Users is null ? null : LocalUserID <= 0 ? null : (LocalUserID - 1) < Users.Count ? Users[LocalUserID - 1] : null;
+			return Users[LocalUserID - 1];
 		}
 		[PrivateSpaceOnly]
 		public sealed partial class RawMeshAsset : ProceduralMesh

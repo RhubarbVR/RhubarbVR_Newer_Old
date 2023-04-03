@@ -17,9 +17,11 @@ namespace RhuEngine
 
 		public WaveFormat WaveFormat { get; set; } = new WaveFormat(48000, 16, 1);
 
+		public int DropExtra { get; set; } = 3;
+
 		public void Enqueue(byte[] data) {
-			if (Count > 3) {
-				return;
+			if (Count > DropExtra) {
+				_audioQueue.Clear();
 			}
 			_audioQueue.Enqueue(data);
 		}

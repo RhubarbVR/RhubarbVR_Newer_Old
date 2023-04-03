@@ -19,9 +19,6 @@ namespace RhuEngine.WorldObjects
 		[OnChanged(nameof(UpateOpusCodec))]
 		[Default(Application.VoIP)]
 		public readonly Sync<Application> TargetApplication;
-		[Default(48000)]
-		[OnChanged(nameof(UpateOpusCodec))]
-		public readonly Sync<int> SampleRate;
 		[Default(64000)]
 		public readonly Sync<int> Bitrate;
 		[Default(1)]
@@ -55,7 +52,7 @@ namespace RhuEngine.WorldObjects
 		[OnChanged(nameof(UpateOpusCodec))]
 		public readonly Sync<FrameSize> BufferSize;
 
-		public WaveFormat WaveFormat => WaveFormat.CreateIeeeFloatWaveFormat(SampleRate.Value, Channels.Value);
+		public WaveFormat WaveFormat => WaveFormat.CreateIeeeFloatWaveFormat(48000, Channels.Value);
 
 		public int GetSampleAmountForBufferSize { get; private set; }
 
@@ -103,7 +100,7 @@ namespace RhuEngine.WorldObjects
 				opusDecoder = null;
 			}
 			AudioQueueWaveProvider.WaveFormat = WaveFormat;
-			var sampilesASecond = SampleRate.Value * Channels.Value;
+			var sampilesASecond = 48000 * Channels.Value;
 			GetSampleAmountForBufferSize = BufferSize.Value switch {
 				FrameSize.time_2_5ms => (int)(sampilesASecond * 0.0025f),
 				FrameSize.time_5ms => (int)(sampilesASecond * 0.005f),
@@ -113,7 +110,7 @@ namespace RhuEngine.WorldObjects
 				_ => (int)(sampilesASecond * 0.06f),
 			};
 			if (LocalUser == Owner) {
-				opusEncoder = new OpusEncoder(TargetApplication, SampleRate, Channels) {
+				opusEncoder = new OpusEncoder(TargetApplication, 48000, Channels) {
 					MaxBandwidth = MaxBandwidth.Value,
 					FEC = FEC,
 					ExpectedPacketLoss = ExpectedPacketLoss,
@@ -125,7 +122,7 @@ namespace RhuEngine.WorldObjects
 			}
 			else {
 				_audioBuffer = new byte[GetSampleAmountForBufferSize * sizeof(float)];
-				opusDecoder = new OpusDecoder(SampleRate, Channels);
+				opusDecoder = new OpusDecoder(48000, Channels);
 			}
 		}
 
@@ -141,13 +138,20 @@ namespace RhuEngine.WorldObjects
 		public int BufferMilliseconds => BufferSize.Value switch { FrameSize.time_2_5ms => 2, FrameSize.time_5ms => 5, FrameSize.time_10ms => 10, FrameSize.time_20ms => 20, FrameSize.time_40ms => 40, _ => 60, } / 2;
 
 		public void LoadMainInput() {
-			//var e = new WaveInEvent {
-			//	WaveFormat = WaveFormat,
-			//	BufferMilliseconds = BufferMilliseconds,
-			//};
-			//LoadAudioInput(e);
-			RAudio.Inst.EngineInputAudio.BufferSizeMilliseconds = BufferMilliseconds;
-			LoadAudioInput(RAudio.Inst.EngineInputAudio);
+			var e = new WaveInEvent {
+				WaveFormat = WaveFormat,
+				BufferMilliseconds = BufferMilliseconds,
+				DeviceNumber = 1
+			};
+			LoadAudioInput(e);
+			//foreach (var item in RAudio.Inst.EngineAudioInputDevices()) {
+			//	if (item.Contains("in")) {
+			//		RAudio.Inst.CurrentAudioInputDevice = item;
+			//		RLog.Info($"Divices {item}");
+			//	}
+			//}
+			//RAudio.Inst.EngineInputAudio.BufferSizeMilliseconds = BufferMilliseconds;
+			//LoadAudioInput(RAudio.Inst.EngineInputAudio);
 			//try {
 
 			//}

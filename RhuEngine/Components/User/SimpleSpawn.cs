@@ -20,7 +20,8 @@ namespace RhuEngine.Components
 				return;
 			}
 			if (user.userRoot.Target is null) {
-				var userEntity = Entity.AddChild("User");
+				RLog.Info($"Loaded User As {LocalUser.ID}({LocalUser.userID.Value})");
+				var userEntity = Entity.AddChild($"User {LocalUser.ID}({LocalUser.userID.Value})");
 				userEntity.persistence.Value = false;
 				var userRoot = userEntity.AttachComponent<UserRoot>();
 				userEntity.AttachComponent<LocomotionManager>().user.Target = World.GetLocalUser();
@@ -61,10 +62,9 @@ namespace RhuEngine.Components
 					var opus = user.FindOrCreateSyncStream<OpusStream>("MainOpusStream");
 					opus.LoadMainInput();
 					var audioPlayer = head.AttachComponent<AudioSource3D>();
-					audioPlayer.Enabled.Value = true;
 					audioPlayer.AudioStream.Target = opus;
 					audioPlayer.AudioBus.Value = AudioSourceBase.TargetBus.Voice;
-					head.AttachComponent<UserAudioManager>().audioMute.SetLinkerTarget(audioPlayer.Enabled);
+					//head.AttachComponent<UserAudioManager>().audioMute.SetLinkerTarget(audioPlayer.Enabled);
 
 					var nameTag = userEntity.AddChild("NameTag").AttachComponent<TextLabel3D>();
 					nameTag.Billboard.Value = RBillboardOptions.YBillboard;
