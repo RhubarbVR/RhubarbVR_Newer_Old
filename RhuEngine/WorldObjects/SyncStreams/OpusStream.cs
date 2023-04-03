@@ -141,18 +141,21 @@ namespace RhuEngine.WorldObjects
 		public int BufferMilliseconds => BufferSize.Value switch { FrameSize.time_2_5ms => 2, FrameSize.time_5ms => 5, FrameSize.time_10ms => 10, FrameSize.time_20ms => 20, FrameSize.time_40ms => 40, _ => 60, } / 2;
 
 		public void LoadMainInput() {
-			try {
-				var e = new WaveInEvent {
-					WaveFormat = WaveFormat,
-					BufferMilliseconds = BufferMilliseconds,
-				};
-				LoadAudioInput(e);
-			}
-			catch {
-				RLog.Info("Falling back to godot");
-				RAudio.Inst.EngineInputAudio.BufferSizeMilliseconds = BufferMilliseconds;
-				LoadAudioInput(RAudio.Inst.EngineInputAudio);
-			}
+			//var e = new WaveInEvent {
+			//	WaveFormat = WaveFormat,
+			//	BufferMilliseconds = BufferMilliseconds,
+			//};
+			//LoadAudioInput(e);
+			RAudio.Inst.EngineInputAudio.BufferSizeMilliseconds = BufferMilliseconds;
+			LoadAudioInput(RAudio.Inst.EngineInputAudio);
+			//try {
+
+			//}
+			//catch {
+			//	RLog.Info("Falling back to godot");
+			//	RAudio.Inst.EngineInputAudio.BufferSizeMilliseconds = BufferMilliseconds;
+			//	LoadAudioInput(RAudio.Inst.EngineInputAudio);
+			//}
 		}
 
 		private IWaveIn _waveIn;
