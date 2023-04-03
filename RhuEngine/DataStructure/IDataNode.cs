@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
+using K4os.Compression.LZ4;
+
 using RhuEngine.Datatypes;
 
 using RNumerics;
 
 using SharedModels.GameSpecific;
+
+using WebAssembly;
 
 using static RhuEngine.WorldObjects.World;
 
@@ -231,7 +235,7 @@ namespace RhuEngine.DataStructure
 		}
 	}
 
-	public sealed class BlockStore : INetPacked, ISerlize<BlockStore>
+	public sealed class BlockStore : ISerlize<BlockStore>
 	{
 		public List<DataNodeHolder> dataNodes = new();
 
@@ -253,18 +257,29 @@ namespace RhuEngine.DataStructure
 	}
 
 
-	public sealed class DataReader
+	public sealed class DataReader: INetPacked
 	{
-		public BlockStore Store = new();
+		public BlockStore Store;
 		public DataReader(byte[] data) {
 			Store = new();
-			var reader = new BinaryReader(new MemoryStream(data));
+			var reader = new BinaryReader(new MemoryStream(LZCompress.DeCompress(data)));
 			Store.DeSerlize(reader);
 			ReadData();
 		}
 		public DataReader(BlockStore storeData) {
 			Store = storeData;
 			ReadData();
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			Store = new();
+			var reader = new BinaryReader(new MemoryStream(LZCompress.DeCompress(binaryReader.ReadBytes(binaryReader.ReadInt32()))));
+			Store.DeSerlize(reader);
+			ReadData();
+		}
+
+		public DataReader() {
+
 		}
 
 		public IDataNode Data { get; private set; }
@@ -281,8 +296,13 @@ namespace RhuEngine.DataStructure
 				Store.dataNodes[i].dataNode.InitData();
 			}
 		}
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			throw new NotSupportedException();
+		}
+
 	}
-	public class DataSaver
+	public class DataSaver : INetPacked
 	{
 		public DataSaver(IDataNode dataNode) {
 			Store.dataNodes.Add(new DataNodeHolder { index = -1, dataNode = dataNode });
@@ -304,11 +324,21 @@ namespace RhuEngine.DataStructure
 			Store.dataNodes.Add(new DataNodeHolder { index = CurrentIndex, dataNode = item });
 		}
 
-		public byte[] SaveStore() {
+		public byte[] SaveStore(LZ4Level level = LZ4Level.L00_FAST) {
 			using var stream = new MemoryStream();
 			var dataNodes = new BinaryWriter(stream);
 			Store.Serlize(dataNodes);
-			return stream.ToArray();
+			return LZCompress.Compress(stream.ToArray(), level);
+		}
+
+		public void Serlize(BinaryWriter binaryWriter) {
+			var savedData = SaveStore();
+			binaryWriter.Write(savedData.Length);
+			binaryWriter.Write(savedData);
+		}
+
+		public void DeSerlize(BinaryReader binaryReader) {
+			throw new NotSupportedException();
 		}
 	}
 }

@@ -412,7 +412,7 @@ namespace RhuEngine.WorldObjects
 		public static class NetPacked
 		{
 			public static void Serlize(BinaryWriter binaryWriter, INetPacked netPacked) {
-				if (netPacked is BlockStore) {
+				if (netPacked is DataSaver) {
 					binaryWriter.Write((byte)11);
 				}
 				else if (netPacked is RequestAsset) {
@@ -436,7 +436,7 @@ namespace RhuEngine.WorldObjects
 				}
 				INetPacked netPacked;
 				if (type == 11) {
-					netPacked = new BlockStore();
+					netPacked = new DataReader();
 				}
 				else if (type == 12) {
 					netPacked = new RequestAsset();
@@ -476,8 +476,8 @@ namespace RhuEngine.WorldObjects
 							ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag);
 						}
 						else if (packed is INetPacked rawDataPacked) {
-							if (rawDataPacked is BlockStore keyValuePairs) {
-								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
+							if (rawDataPacked is DataReader keyValuePairs) {
+								ProcessPackedData((DataNodeGroup)keyValuePairs.Data, deliveryMethod, tag);
 							}
 							else if (rawDataPacked is IAssetRequest assetRequest) {
 								AssetResponses(assetRequest, tag);
@@ -492,8 +492,8 @@ namespace RhuEngine.WorldObjects
 					}
 					else {
 						if (packed is INetPacked rawDataPacked) {
-							if (rawDataPacked is BlockStore keyValuePairs) {
-								ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag);
+							if (rawDataPacked is DataReader keyValuePairs) {
+								ProcessPackedData((DataNodeGroup)keyValuePairs.Data, deliveryMethod, tag);
 							}
 							else if (rawDataPacked is IAssetRequest assetRequest) {
 								AssetResponses(assetRequest, tag);
@@ -522,8 +522,8 @@ namespace RhuEngine.WorldObjects
 								ProcessPackedData((DataNodeGroup)new DataReader(streamDataPacked.Data).Data, deliveryMethod, tag[packede.Id]);
 							}
 							else if (packeder is INetPacked rawDataPacked) {
-								if (rawDataPacked is BlockStore keyValuePairs) {
-									ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packede.Id]);
+								if (rawDataPacked is DataReader keyValuePairs) {
+									ProcessPackedData((DataNodeGroup)keyValuePairs.Data, deliveryMethod, tag[packede.Id]);
 								}
 								else if (rawDataPacked is IAssetRequest assetRequest) {
 									AssetResponses(assetRequest, tag[packede.Id]);
@@ -538,8 +538,8 @@ namespace RhuEngine.WorldObjects
 						}
 						else {
 							if (packeder is INetPacked rawDataPacked) {
-								if (rawDataPacked is BlockStore keyValuePairs) {
-									ProcessPackedData((DataNodeGroup)new DataReader(keyValuePairs).Data, deliveryMethod, tag[packede.Id]);
+								if (rawDataPacked is DataReader keyValuePairs) {
+									ProcessPackedData((DataNodeGroup)keyValuePairs.Data, deliveryMethod, tag[packede.Id]);
 								}
 								else if (rawDataPacked is IAssetRequest assetRequest) {
 									AssetResponses(assetRequest, tag[packede.Id]);
@@ -588,7 +588,7 @@ namespace RhuEngine.WorldObjects
 				dataGroup.SetValue("WorldData", Serialize(new SyncObjectSerializerObject(true)));
 				using var memstream = new MemoryStream();
 				using var reader = new BinaryWriter(memstream);
-				NetPacked.Serlize(reader, new DataSaver(dataGroup).Store);
+				NetPacked.Serlize(reader, new DataSaver(dataGroup));
 				peer.Send(memstream.ToArray(), DeliveryMethod.ReliableOrdered);
 			}
 			else {
@@ -776,7 +776,7 @@ namespace RhuEngine.WorldObjects
 			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
 			using var memstream = new MemoryStream();
 			using var reader = new BinaryWriter(memstream);
-			NetPacked.Serlize(reader, new DataSaver(netData).Store);
+			NetPacked.Serlize(reader, new DataSaver(netData));
 			_netManager.SendToAll(memstream.ToArray(), 0, deliveryMethod);
 		}
 

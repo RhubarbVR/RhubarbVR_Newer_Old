@@ -126,15 +126,16 @@ namespace RhuEngine.AssetSystem
 			var messh = new ComplexMesh();
 			using (var s = new MemoryStream(file.Data)) {
 				using var e = new BinaryReader(s);
-				messh.ReadData(e);
+				messh.DeSerlize(e);
 			}
+
 			return (messh, file);
 		}
 		public static byte[] SaveFile(Guid owner, ComplexMesh amesh) {
 			var buffer = Array.Empty<byte>();
 			using (var s = new MemoryStream()) {
 				using (var e = new BinaryWriter(s)) {
-					amesh.WriteData(e);
+					amesh.Serlize(e);
 				}
 				buffer = s.GetBuffer();
 			}

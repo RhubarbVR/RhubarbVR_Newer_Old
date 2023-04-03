@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Reflection.PortableExecutable;
 using System.Text;
 
 using Assimp;
+
+using K4os.Compression.LZ4;
+using K4os.Compression.LZ4.Encoders;
 
 using Newtonsoft.Json;
 
@@ -288,15 +292,33 @@ namespace RNumerics
 		public const byte MESH_VERSION = 0;
 
 		public void Serlize(BinaryWriter binaryWriter) {
-			WriteData(binaryWriter);
+			Serlize(binaryWriter, LZ4Level.L12_MAX);
+		}
+
+		public void Serlize(BinaryWriter binaryWriter, LZ4Level lZ4Level) {
+			binaryWriter.Write(MESH_VERSION);
+			using var memStream = new MemoryStream();
+			var compressedWriter = new BinaryWriter(memStream);
+			WriteData(compressedWriter);
+			var meshData = memStream.ToArray();
+			var compressed = LZCompress.Compress(meshData, lZ4Level);
+			binaryWriter.Write(compressed.Length);
+			binaryWriter.Write(compressed);
 		}
 
 		public void DeSerlize(BinaryReader binaryReader) {
-			ReadData(binaryReader);
+			var version = binaryReader.ReadByte();
+			var amoutOfData = binaryReader.ReadInt32();
+			using var memStream = new MemoryStream(LZCompress.DeCompress(binaryReader.ReadBytes(amoutOfData)));
+			var uncompressedReader = new BinaryReader(memStream);
+			if (version != MESH_VERSION) {
+
+				throw new Exception($"Don't know how to read mesh version{version}");
+			}
+			ReadData(uncompressedReader, version);
 		}
 
-		public void WriteData(BinaryWriter binaryWriter) {
-			binaryWriter.Write(MESH_VERSION);
+		private void WriteData(BinaryWriter binaryWriter) {
 			binaryWriter.Write(MeshName);
 			var flags = SaveFlags.None;
 			flags |= (SaveFlags)PrimitiveType;
@@ -679,13 +701,7 @@ namespace RNumerics
 		}
 
 
-		public void ReadData(BinaryReader reader) {
-			var version = reader.ReadByte();
-			if (version != MESH_VERSION) {
-				//Add old Read code here
-
-				throw new Exception("Don't know how to read mesh");
-			}
+		private void ReadData(BinaryReader reader, int version) {
 			MeshName = reader.ReadString();
 			var saveFlags = (SaveFlags)reader.ReadUInt16();
 			PrimitiveType = (RPrimitiveType)saveFlags & RPrimitiveType.All;

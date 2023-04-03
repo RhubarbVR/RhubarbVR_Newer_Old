@@ -59,7 +59,7 @@ namespace RhuEngine.Managers
 				RLog.Info("Saving Local World");
 				try {
 					var data = LocalWorld.Serialize(new SyncObjectSerializerObject(false));
-					File.WriteAllBytes(EngineHelpers.BaseDir + "LocalWorldTest.RWorld", new DataSaver(data).SaveStore());
+					File.WriteAllBytes(EngineHelpers.BaseDir + "LocalWorldTest.RWorld", new DataSaver(data).SaveStore(K4os.Compression.LZ4.LZ4Level.L12_MAX));
 				}
 				catch (Exception ex) {
 					RLog.Err($"Failed to save world {ex}");
