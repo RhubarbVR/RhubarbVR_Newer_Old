@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+
 using Godot;
+
 using NAudio.Wave;
+
+using RhuEngine;
 using RhuEngine.Components;
 using RhuEngine.Linker;
 
@@ -11,7 +15,7 @@ public sealed class RhubarbAudioSource : IDisposable
 	public AudioStreamGenerator Audio;
 	private AudioStreamGeneratorPlayback _audioPlayBack;
 	private AudioSourceBase _audioPlayer;
-	private MediaFoundationResampler _waveProvider;
+	private IWaveProvider _waveProvider;
 
 	public RhubarbAudioSource() {
 		Audio = new AudioStreamGenerator {
@@ -44,17 +48,13 @@ public sealed class RhubarbAudioSource : IDisposable
 			return;
 		}
 
-		if (_waveProvider != null && _waveProvider.WaveFormat.Equals(obj.WaveFormat)) {
-			// Reuse existing resampler if input wave format is the same
+		if (RAudio.Inst.WaveFormat.Equals(obj.WaveFormat)) {
+			_waveProvider = obj;
 			return;
 		}
-
-		// Dispose of existing resampler if it exists
-		_waveProvider?.Dispose();
-
 		try {
 			// Create new resampler
-			_waveProvider = new MediaFoundationResampler(obj, RAudio.Inst.WaveFormat);
+			_waveProvider = new AudioConverter(RAudio.Inst.WaveFormat, obj);
 		}
 		catch (Exception ex) {
 			// Log error and return if resampler creation fails
@@ -64,7 +64,7 @@ public sealed class RhubarbAudioSource : IDisposable
 	}
 
 	private unsafe void ReadAudio() {
-		if(_audioPlayBack is null) {
+		if (_audioPlayBack is null) {
 			return;
 		}
 		if (_waveProvider is null) {
@@ -100,7 +100,6 @@ public sealed class RhubarbAudioSource : IDisposable
 		RAudio.UpateAudioSystems -= Update;
 		Audio?.Free();
 		Audio = null;
-		_waveProvider?.Dispose();
 		_waveProvider = null;
 	}
 

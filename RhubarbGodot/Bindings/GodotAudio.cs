@@ -19,118 +19,17 @@ using WebAssembly.Instructions;
 
 namespace RhubarbVR.Bindings
 {
-	public sealed class GodotAudioMicLink : IWaveInWithBufferSize
-	{
-		public GodotAudio godotAudio;
-
-		public GodotAudioMicLink(GodotAudio godotAudio) {
-			this.godotAudio = godotAudio;
-			SetUpMic();
-		}
-
-		private AudioStreamPlayer _streamPlayer;
-
-		public const string MIC_BUS = "Mic";
-
-		private AudioEffectCapture _audioEffectCapture;
-
-		public void SetUpMic() {
-			AudioServer.AddBus(1);
-			AudioServer.SetBusName(1, MIC_BUS);
-			AudioServer.SetBusMute(1, true);
-			AudioServer.SetBusSolo(1, true);
-			_audioEffectCapture = new AudioEffectCapture {
-				BufferLength = 0.5f,
-			};
-			AudioServer.AddBusEffect(1, _audioEffectCapture);
-			_streamPlayer = new AudioStreamPlayer {
-				Stream = new AudioStreamMicrophone(),
-				Playing = false,
-				Bus = MIC_BUS,
-				MixTarget = AudioStreamPlayer.MixTargetEnum.Stereo,
-			};
-			EngineRunnerHelpers._.AddChild(_streamPlayer);
-		}
-
-		public WaveFormat WaveFormat
-		{
-			get => WaveFormat.CreateIeeeFloatWaveFormat((int)AudioServer.GetMixRate(), 1);
-			set { }
-		}
-
-		public int BufferSizeMilliseconds { get; set; }
-
-		public event EventHandler<WaveInEventArgs> DataAvailable;
-		public event EventHandler<StoppedEventArgs> RecordingStopped;
-
-		public void Dispose() {
-			StopRecording();
-		}
-
-		public void StartRecording() {
-			_streamPlayer.Playing = true;
-		}
-
-		public void StopRecording() {
-			_streamPlayer.Playing = false;
-			_ranLastFrame = false;
-			RecordingStopped?.Invoke(this, new StoppedEventArgs());
-		}
-
-		private bool _ranLastFrame = false;
-
-		public int FrameAmount => (int)(AudioServer.GetMixRate() / 1000f * BufferSizeMilliseconds);
-
-		public unsafe void Update() {
-			if (!_streamPlayer.Playing) {
-				_ranLastFrame = false;
-				return;
-			}
-
-			if (!_ranLastFrame) {
-				_audioEffectCapture.ClearBuffer();
-			}
-			_ranLastFrame = true;
-
-			if (!_audioEffectCapture.CanGetBuffer(FrameAmount)) {
-				return;
-			}
-
-			var audioBuffer = _audioEffectCapture.GetBuffer(FrameAmount);
-			var bytes = new byte[audioBuffer.Length * sizeof(float)];
-			fixed (byte* byteData = bytes) {
-				var castedPointer = (float*)byteData;
-				for (var i = 0; i < audioBuffer.Length; i++) {
-					castedPointer[i] = (audioBuffer[i].X + audioBuffer[i].Y) / 2;
-				}
-			}
-			DataAvailable?.Invoke(this, new WaveInEventArgs(bytes, bytes.Length));
-		}
-	}
-
 	public sealed class GodotAudio : IRAudio
 	{
-		public GodotAudio() {
-			_godotAudioMicLink = new GodotAudioMicLink(this);
-		}
 
 		public int BusCount => AudioServer.BusCount;
-
-		public string CurrentAudioInputDevice { get => AudioServer.InputDevice; set => AudioServer.InputDevice = value; }
 		public string CurrentAudioOutputDevice { get => AudioServer.OutputDevice; set => AudioServer.OutputDevice = value; }
 		public float PlayBackSpeed { get => AudioServer.PlaybackSpeedScale; set => AudioServer.PlaybackSpeedScale = value; }
-
-		private readonly GodotAudioMicLink _godotAudioMicLink;
-		public IWaveInWithBufferSize EngineInputAudio => _godotAudioMicLink;
 
 		public WaveFormat WaveFormat => WaveFormat.CreateIeeeFloatWaveFormat((int)AudioServer.GetMixRate(), 2);
 
 		public void AddBus(int atPos = -1) {
 			AudioServer.AddBus(atPos);
-		}
-
-		public string[] EngineAudioInputDevices() {
-			return AudioServer.GetInputDeviceList();
 		}
 
 		public string[] EngineAudioOutputDevices() {
@@ -261,10 +160,6 @@ namespace RhubarbVR.Bindings
 
 		public void UnLock() {
 			AudioServer.Unlock();
-		}
-
-		public void Update() {
-			_godotAudioMicLink.Update();
 		}
 	}
 }

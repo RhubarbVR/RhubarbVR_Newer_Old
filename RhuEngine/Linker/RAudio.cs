@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
 
 using RNumerics;
@@ -18,11 +20,6 @@ namespace RhuEngine.Linker
 		Surround_31 = 1,
 		Surround_51 = 2,
 		Surround_71 = 3,
-	}
-
-	public interface IWaveInWithBufferSize : IWaveIn
-	{
-		public int BufferSizeMilliseconds { set; }
 	}
 
 	public interface IRAudio
@@ -62,13 +59,9 @@ namespace RhuEngine.Linker
 		public void SetEnableTaggingUsedAudioSteams(bool enable);
 		public void SwapBusEffects(int busIndex, int effectIndex, int byEffectIndex);
 		public void UnLock();
-
 		public string[] EngineAudioOutputDevices();
-		public string[] EngineAudioInputDevices();
-		public string CurrentAudioInputDevice { get; set; }
 		public string CurrentAudioOutputDevice { get; set; }
 		public float PlayBackSpeed { get; set; }
-		public IWaveInWithBufferSize EngineInputAudio { get; }
 	}
 
 	public enum AudioBus
@@ -95,6 +88,39 @@ namespace RhuEngine.Linker
 		private static Engine _engine;
 
 		public static event Action UpateAudioSystems;
+
+		public static string[] GetAudioInputs() {
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+				return new MMDeviceEnumerator().EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active).Select(x => x.DeviceFriendlyName).ToArray();
+			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+				return LinuxAudioUtils.GetInputDeviceNames().ToArray();
+			}
+			else {
+				throw new PlatformNotSupportedException();
+			}
+		}
+
+		public static IWaveIn GetWaveIn(WaveFormat waveFormat, int bufferMilliseconds, string deviceName = "default") {
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+				var targetIndex = Array.IndexOf(GetAudioInputs(), deviceName);
+				return new WaveInEvent {
+					WaveFormat = waveFormat,
+					BufferMilliseconds = bufferMilliseconds,
+					DeviceNumber = targetIndex
+				};
+			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+				return new ALSACapture {
+					WaveFormat = waveFormat,
+					BufferMilliseconds = bufferMilliseconds,
+					DeviceName = deviceName
+				};
+			}
+			else {
+				throw new PlatformNotSupportedException();
+			}
+		}
 
 		public static void UpdataAudioSystem() {
 			UpateAudioSystems?.Invoke();

@@ -119,6 +119,9 @@ namespace RhuEngine.WorldObjects
 				};
 				var opusLength = opusEncoder.GetMaxDataBytes(GetSampleAmountForBufferSize, Bitrate.Value);
 				_opusBuffer = new byte[opusLength];
+				if (_selectedAudioDevices != null) {
+					LoadAudioInput(RAudio.GetWaveIn(WaveFormat, BufferMilliseconds, _selectedAudioDevices));
+				}
 			}
 			else {
 				_audioBuffer = new byte[GetSampleAmountForBufferSize * sizeof(float)];
@@ -137,34 +140,18 @@ namespace RhuEngine.WorldObjects
 
 		public int BufferMilliseconds => BufferSize.Value switch { FrameSize.time_2_5ms => 2, FrameSize.time_5ms => 5, FrameSize.time_10ms => 10, FrameSize.time_20ms => 20, FrameSize.time_40ms => 40, _ => 60, } / 2;
 
-		public void LoadMainInput() {
-			var e = new WaveInEvent {
-				WaveFormat = WaveFormat,
-				BufferMilliseconds = BufferMilliseconds,
-				DeviceNumber = 1
-			};
-			LoadAudioInput(e);
-			//foreach (var item in RAudio.Inst.EngineAudioInputDevices()) {
-			//	if (item.Contains("in")) {
-			//		RAudio.Inst.CurrentAudioInputDevice = item;
-			//		RLog.Info($"Divices {item}");
-			//	}
-			//}
-			//RAudio.Inst.EngineInputAudio.BufferSizeMilliseconds = BufferMilliseconds;
-			//LoadAudioInput(RAudio.Inst.EngineInputAudio);
-			//try {
+		private string _selectedAudioDevices = null;
 
-			//}
-			//catch {
-			//	RLog.Info("Falling back to godot");
-			//	RAudio.Inst.EngineInputAudio.BufferSizeMilliseconds = BufferMilliseconds;
-			//	LoadAudioInput(RAudio.Inst.EngineInputAudio);
-			//}
+		public void LoadMainInput() {
+			LoadAudioInput("default"); // todo get audio input from settings
+		}
+		public void LoadAudioInput(string selected = "default") {
+			_selectedAudioDevices = selected;
 		}
 
 		private IWaveIn _waveIn;
 
-		public void LoadAudioInput(IWaveIn waveIn) {
+		private void LoadAudioInput(IWaveIn waveIn) {
 			if (!Engine.EngineLink.CanAudio) {
 				return;
 			}

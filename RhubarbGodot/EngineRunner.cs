@@ -119,7 +119,6 @@ public partial class EngineRunner : Node3D, IRTime
 		while (!engine.IsCloseing) {
 			AudioServer.Lock();
 			try {
-				link.GodotAudio.Update();
 				RAudio.UpdataAudioSystem();
 			}
 			catch(Exception e) {
