@@ -74,7 +74,7 @@ public sealed class RhubarbAudioSource : IDisposable
 			return;
 		}
 		var audioFrames = _audioPlayBack.GetFramesAvailable();
-		if (audioFrames <= 480) {
+		if (audioFrames <= 0) {
 			return;
 		}
 

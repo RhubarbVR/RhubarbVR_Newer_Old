@@ -80,41 +80,37 @@ namespace RhuEngine
 		}
 
 		public static void ExecuteOnEndOfFrame(object target, Action p) {
-			lock (EndOfFrameExecute) {
-				if (isEndOfFrame) {
-					p();
-				}
-				else {
-					EndOfFrameExecute.AddOrUpdate(target, (_) => p, (_, _) => p);
-				}
+			if (isEndOfFrame) {
+				p();
+			}
+			else {
+				EndOfFrameExecute.AddOrUpdate(target, (_) => p, (_, _) => p);
 			}
 		}
 
 		public static void RunOnEndOfFrame() {
-			lock (EndOfFrameExecute) {
-				isEndOfFrame = true;
-				UpdateCount++;
-				while (EndOfFrameList.TryDequeue(out var result)) {
-					try {
-						result();
-					}
-					catch (Exception e) {
-						RLog.Err($"RunOnStartOfFrame Error: {e}");
-					}
+			isEndOfFrame = true;
+			UpdateCount++;
+			while (EndOfFrameList.TryDequeue(out var result)) {
+				try {
+					result();
 				}
-				var dectionaryvalues = EndOfFrameExecute.ToArray();
-				for (var i = 0; i < dectionaryvalues.Length; i++) {
-					var currentobj = dectionaryvalues[i];
-					try {
-						currentobj.Value.Invoke();
-					}
-					catch (Exception e) {
-						RLog.Err($"RunOnStartOfFrame Dictionary Target {currentobj.Key} Error: {e}");
-					}
-					EndOfFrameExecute.TryRemove(currentobj);
+				catch (Exception e) {
+					RLog.Err($"RunOnStartOfFrame Error: {e}");
 				}
-				isEndOfFrame = false;
 			}
+			var dectionaryvalues = EndOfFrameExecute.ToArray();
+			for (var i = 0; i < dectionaryvalues.Length; i++) {
+				var currentobj = dectionaryvalues[i];
+				try {
+					currentobj.Value.Invoke();
+				}
+				catch (Exception e) {
+					RLog.Err($"RunOnStartOfFrame Dictionary Target {currentobj.Key} Error: {e}");
+				}
+				EndOfFrameExecute.TryRemove(currentobj);
+			}
+			isEndOfFrame = false;
 		}
 
 	}
