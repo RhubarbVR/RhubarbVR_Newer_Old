@@ -20,7 +20,6 @@ public sealed class RhubarbAudioSource : IDisposable
 	public RhubarbAudioSource() {
 		Audio = new AudioStreamGenerator {
 			BufferLength = 0.2f,
-			MixRate = RAudio.Inst.WaveFormat.SampleRate,
 		};
 		RAudio.UpateAudioSystems += Update;
 	}
@@ -48,13 +47,16 @@ public sealed class RhubarbAudioSource : IDisposable
 			return;
 		}
 
-		if (RAudio.Inst.WaveFormat.Equals(obj.WaveFormat)) {
+		if (RAudio.Inst.WaveFormat.Channels == obj.WaveFormat.Channels && RAudio.Inst.WaveFormat.Encoding == obj.WaveFormat.Encoding && RAudio.Inst.WaveFormat.BitsPerSample == obj.WaveFormat.BitsPerSample) {
+			Audio.MixRate = obj.WaveFormat.SampleRate;
 			_waveProvider = obj;
 			return;
 		}
 		try {
 			// Create new resampler
-			_waveProvider = new AudioConverter(RAudio.Inst.WaveFormat, obj);
+			Audio.MixRate = obj.WaveFormat.SampleRate;
+			_waveProvider = new AudioConverter(RAudio.Inst.WaveFormat, obj, true);
+
 		}
 		catch (Exception ex) {
 			// Log error and return if resampler creation fails
@@ -72,14 +74,13 @@ public sealed class RhubarbAudioSource : IDisposable
 			return;
 		}
 		var audioFrames = _audioPlayBack.GetFramesAvailable();
-		if (audioFrames <= 0) {
+		if (audioFrames <= 480) {
 			return;
 		}
 
 		var bytes = new byte[audioFrames * sizeof(Vector2)];
 		try {
 			var readAmount = _waveProvider.Read(bytes, 0, bytes.Length) / sizeof(Vector2);
-
 			var audioBuffer = new Vector2[readAmount];
 			fixed (byte* byteData = bytes) {
 				var castedPointer = (Vector2*)byteData;

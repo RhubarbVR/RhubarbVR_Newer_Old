@@ -19,11 +19,19 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		public RhubarbAudioSource audioSource;
 
+		public int _playedWithoutFrames = 0;
+
 		public override void Render() {
 			base.Render();
 			if (_shouldBePlaying && !(node?.Playing??true)) {
-				RLog.Info("Audio Not running when it should");
-				PlayAudio();
+				_playedWithoutFrames++;
+				if(_playedWithoutFrames > 3) {
+					RLog.Info("Audio Skiping");
+					PlayAudio();
+				}
+			}
+			else {
+				_playedWithoutFrames = 0;
 			}
 		}
 

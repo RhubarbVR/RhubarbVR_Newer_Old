@@ -110,7 +110,7 @@ namespace RhuEngine.WorldObjects
 			if (this is IGlobalStepable global) {
 				World.UnregisterGlobalStepable(global);
 			}
-			foreach (var item in _disposables.ToArray()) {
+			foreach (var item in _disposables) {
 				if (item is SyncObject @object) {
 					@object.IsDestroying = true;
 				}

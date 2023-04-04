@@ -11,6 +11,7 @@ using Environment = System.Environment;
 using System.Collections;
 using RNumerics;
 using RhubarbVR.Bindings.Input;
+using System.Diagnostics;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1050:Declare types in namespaces", Justification = "<Pending>")]
 public partial class EngineRunner : Node3D, IRTime
@@ -115,17 +116,16 @@ public partial class EngineRunner : Node3D, IRTime
 	public Vector2f MouseScrollPos;
 	public Vector2f LastMouseScrollPos;
 
+	private readonly Stopwatch _audioStopwatch = new();
+
 	private void AudioThreadUpdate() {
 		while (!engine.IsCloseing) {
-			AudioServer.Lock();
 			try {
 				RAudio.UpdataAudioSystem();
 			}
 			catch(Exception e) {
 				RLog.Err("Audio Error:" + e);
 			}
-			AudioServer.Unlock();
-			Thread.Sleep((int)AudioServer.GetOutputLatency() / 2);
 		}
 	}
 

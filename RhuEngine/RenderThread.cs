@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 
@@ -11,84 +12,70 @@ namespace RhuEngine
 	{
 		public static ulong UpdateCount { get; private set; }
 
-		public static readonly Dictionary<object, Action> StartOfFrameExecute = new();
-		public static readonly List<Action> StartOfFrameList = new();
+		public static readonly ConcurrentDictionary<object, Action> StartOfFrameExecute = new();
+		public static readonly ConcurrentQueue<Action> StartOfFrame = new();
 		[ThreadStatic]
 		public static bool isStartOfFrame;
 
 		public static void ExecuteOnStartOfFrame(Action p) {
-			lock (StartOfFrameExecute) {
-				if (isStartOfFrame) {
-					p();
-				}
-				else {
-					StartOfFrameList.Add(p);
-				}
+			if (isStartOfFrame) {
+				p();
+			}
+			else {
+				StartOfFrame.Enqueue(p);
 			}
 		}
 
 		public static void ExecuteOnStartOfFrame(object target, Action p) {
-			lock (StartOfFrameExecute) {
-				if (isStartOfFrame) {
-					p();
-				}
-				else {
-					if (!StartOfFrameExecute.ContainsKey(target)) {
-						StartOfFrameExecute.Add(target, p);
-					}
-					else {
-						StartOfFrameExecute.Remove(target);
-						StartOfFrameExecute.Add(target, p);
-					}
-				}
+			if (isStartOfFrame) {
+				p();
+			}
+			else {
+				StartOfFrameExecute.AddOrUpdate(target, (_) => p, (_, _) => p);
 			}
 		}
 
 		public static void RunOnStartOfFrame() {
-			lock (StartOfFrameExecute) {
-				isStartOfFrame = true;
-				var startcountlist = StartOfFrameList.Count;
-				for (var i = 0; i < startcountlist; i++) {
-					try {
-						StartOfFrameList[0].Invoke();
-					}
-					catch { }
-					StartOfFrameList.RemoveAt(0);
+			isStartOfFrame = true;
+			while (StartOfFrame.TryDequeue(out var frame)) {
+				try {
+					frame();
 				}
-				var dectionaryvalues = StartOfFrameExecute.ToArray();
-				for (var i = 0; i < dectionaryvalues.Length; i++) {
-					var currentobj = dectionaryvalues[i];
-					try {
-						currentobj.Value.Invoke();
-					}
-					catch { }
-					StartOfFrameExecute.Remove(currentobj.Key);
+				catch (Exception e) {
+					RLog.Err($"RunOnStartOfFrame Error: {e}");
 				}
-				isStartOfFrame = false;
 			}
+			var dectionaryvalues = StartOfFrameExecute.ToArray();
+			for (var i = 0; i < dectionaryvalues.Length; i++) {
+				var currentobj = dectionaryvalues[i];
+				try {
+					currentobj.Value.Invoke();
+				}
+				catch (Exception e) {
+					RLog.Err($"RunOnStartOfFrame Dictionary Target {currentobj.Key} Error: {e}");
+				}
+				StartOfFrameExecute.TryRemove(currentobj);
+			}
+			isStartOfFrame = false;
 		}
 
 
-		public static readonly Dictionary<object, Action> EndOfFrameExecute = new();
-		public static readonly List<Action> EndOfFrameList = new();
+		public static readonly ConcurrentDictionary<object, Action> EndOfFrameExecute = new();
+		public static readonly ConcurrentQueue<Action> EndOfFrameList = new();
 		[ThreadStatic]
 		public static bool isEndOfFrame;
 
 
 		public static void ExecuteOnEndOfFrameNoPass(Action p) {
-			lock (EndOfFrameExecute) {
-				EndOfFrameList.Add(p);
-			}
+			EndOfFrameList.Enqueue(p);
 		}
 
 		public static void ExecuteOnEndOfFrame(Action p) {
-			lock (EndOfFrameExecute) {
-				if (isEndOfFrame) {
-					p();
-				}
-				else {
-					EndOfFrameList.Add(p);
-				}
+			if (isEndOfFrame) {
+				p();
+			}
+			else {
+				EndOfFrameList.Enqueue(p);
 			}
 		}
 
@@ -98,13 +85,7 @@ namespace RhuEngine
 					p();
 				}
 				else {
-					if (!EndOfFrameExecute.ContainsKey(target)) {
-						EndOfFrameExecute.Add(target, p);
-					}
-					else {
-						EndOfFrameExecute.Remove(target);
-						EndOfFrameExecute.Add(target, p);
-					}
+					EndOfFrameExecute.AddOrUpdate(target, (_) => p, (_, _) => p);
 				}
 			}
 		}
@@ -113,13 +94,13 @@ namespace RhuEngine
 			lock (EndOfFrameExecute) {
 				isEndOfFrame = true;
 				UpdateCount++;
-				var startcountlist = EndOfFrameList.Count;
-				for (var i = 0; i < startcountlist; i++) {
+				while (EndOfFrameList.TryDequeue(out var result)) {
 					try {
-						EndOfFrameList[0].Invoke();
+						result();
 					}
-					catch { }
-					EndOfFrameList.RemoveAt(0);
+					catch (Exception e) {
+						RLog.Err($"RunOnStartOfFrame Error: {e}");
+					}
 				}
 				var dectionaryvalues = EndOfFrameExecute.ToArray();
 				for (var i = 0; i < dectionaryvalues.Length; i++) {
@@ -127,8 +108,10 @@ namespace RhuEngine
 					try {
 						currentobj.Value.Invoke();
 					}
-					catch { }
-					EndOfFrameExecute.Remove(currentobj.Key);
+					catch (Exception e) {
+						RLog.Err($"RunOnStartOfFrame Dictionary Target {currentobj.Key} Error: {e}");
+					}
+					EndOfFrameExecute.TryRemove(currentobj);
 				}
 				isEndOfFrame = false;
 			}

@@ -56,11 +56,11 @@ namespace RhuEngine.WorldObjects
 
 		public int GetSampleAmountForBufferSize { get; private set; }
 
-		public AudioQueueWaveProvider AudioQueueWaveProvider = new();
+		private AudioQueueWaveProvider _audioQueueWaveProvider;
 
-		public IWaveProvider Value => AudioQueueWaveProvider;
+		public IWaveProvider Value => _audioQueueWaveProvider;
 
-		public bool Loaded => true;
+		public bool Loaded => _audioQueueWaveProvider is not null;
 
 		public event Action<IWaveProvider> OnAssetLoaded;
 
@@ -82,7 +82,7 @@ namespace RhuEngine.WorldObjects
 			for (var i = 0; i < (pcmDataLength * sizeof(float)); i++) {
 				amoutUsed[i] = _audioBuffer[i];
 			}
-			AudioQueueWaveProvider.Enqueue(amoutUsed);
+			_audioQueueWaveProvider.Enqueue(amoutUsed);
 		}
 
 		private byte[] _opusBuffer = Array.Empty<byte>();
@@ -99,7 +99,9 @@ namespace RhuEngine.WorldObjects
 				opusDecoder.Dispose();
 				opusDecoder = null;
 			}
-			AudioQueueWaveProvider.WaveFormat = WaveFormat;
+			_audioQueueWaveProvider = null;
+			_audioQueueWaveProvider = new(WaveFormat);
+			OnAssetLoaded?.Invoke(_audioQueueWaveProvider);
 			var sampilesASecond = 48000 * Channels.Value;
 			GetSampleAmountForBufferSize = BufferSize.Value switch {
 				FrameSize.time_2_5ms => (int)(sampilesASecond * 0.0025f),
@@ -119,9 +121,6 @@ namespace RhuEngine.WorldObjects
 				};
 				var opusLength = opusEncoder.GetMaxDataBytes(GetSampleAmountForBufferSize, Bitrate.Value);
 				_opusBuffer = new byte[opusLength];
-				if (_selectedAudioDevices != null) {
-					LoadAudioInput(RAudio.GetWaveIn(WaveFormat, BufferMilliseconds, _selectedAudioDevices));
-				}
 			}
 			else {
 				_audioBuffer = new byte[GetSampleAmountForBufferSize * sizeof(float)];
@@ -143,10 +142,11 @@ namespace RhuEngine.WorldObjects
 		private string _selectedAudioDevices = null;
 
 		public void LoadMainInput() {
-			LoadAudioInput("default"); // todo get audio input from settings
+			LoadAudioInput("2- High Definition Audio Device"); // todo get audio input from settings
 		}
 		public void LoadAudioInput(string selected = "default") {
 			_selectedAudioDevices = selected;
+			LoadAudioInput(RAudio.GetWaveIn(WaveFormat, BufferMilliseconds, _selectedAudioDevices));
 		}
 
 		private IWaveIn _waveIn;
@@ -156,7 +156,9 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			if (_waveIn is not null) {
+				_waveIn.StopRecording();
 				_waveIn.DataAvailable -= WaveIn_DataAvailable;
+				_waveIn?.Dispose();
 				_waveIn = null;
 			}
 			_waveIn = waveIn;
@@ -174,7 +176,7 @@ namespace RhuEngine.WorldObjects
 				RLog.Err("Wave in is null");
 				return;
 			}
-			AudioQueueWaveProvider.Enqueue(e.Buffer);
+			_audioQueueWaveProvider.Enqueue(e.Buffer);
 			var amountUsed = opusEncoder.EncodeFloat(e.Buffer, e.BytesRecorded / sizeof(float), _opusBuffer, _opusBuffer.Length);
 			var amoutUsed = new byte[amountUsed];
 			for (var i = 0; i < amountUsed; i++) {

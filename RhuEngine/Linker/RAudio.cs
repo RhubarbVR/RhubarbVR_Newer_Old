@@ -107,7 +107,7 @@ namespace RhuEngine.Linker
 				return new WaveInEvent {
 					WaveFormat = waveFormat,
 					BufferMilliseconds = bufferMilliseconds,
-					DeviceNumber = targetIndex
+					DeviceNumber = targetIndex + 1
 				};
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
