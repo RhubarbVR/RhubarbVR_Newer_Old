@@ -64,7 +64,7 @@ namespace RhuEngine.Components
 					var audioPlayer = head.AttachComponent<AudioSource3D>();
 					audioPlayer.AudioStream.Target = opus;
 					audioPlayer.AudioBus.Value = AudioSourceBase.TargetBus.Voice;
-					//head.AttachComponent<UserAudioManager>().audioMute.SetLinkerTarget(audioPlayer.Enabled);
+					head.AttachComponent<UserAudioManager>().audioMute.SetLinkerTarget(audioPlayer.Enabled);
 
 					var nameTag = userEntity.AddChild("NameTag").AttachComponent<TextLabel3D>();
 					nameTag.Billboard.Value = RBillboardOptions.YBillboard;

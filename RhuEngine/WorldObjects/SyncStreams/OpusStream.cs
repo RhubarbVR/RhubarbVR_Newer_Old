@@ -142,7 +142,7 @@ namespace RhuEngine.WorldObjects
 		private string _selectedAudioDevices = null;
 
 		public void LoadMainInput() {
-			LoadAudioInput("2- High Definition Audio Device"); // todo get audio input from settings
+			LoadAudioInput("default"); // todo get audio input from settings
 		}
 		public void LoadAudioInput(string selected = "default") {
 			_selectedAudioDevices = selected;
