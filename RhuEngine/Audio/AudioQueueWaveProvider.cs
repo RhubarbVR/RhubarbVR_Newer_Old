@@ -17,7 +17,7 @@ namespace RhuEngine
 
 		public WaveFormat WaveFormat { get; }
 
-		public int DropExtra { get; set; } = 4;
+		public int DropExtra { get; set; } = 25;
 
 		public void Enqueue(byte[] data) {
 			if (DropExtra <= 0) {
@@ -43,6 +43,11 @@ namespace RhuEngine
 		}
 
 		public int Read(byte[] buffer, int offset, int count) {
+			if (Count == 0) {
+				Array.Clear(buffer, offset, count);
+				return count;
+			}
+
 			var totalAmountRead = 0;
 
 			while (totalAmountRead < count && _audioQueue.TryDequeue(out var pcmData)) {

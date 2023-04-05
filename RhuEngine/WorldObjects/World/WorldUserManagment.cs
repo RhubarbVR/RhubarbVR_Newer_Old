@@ -85,7 +85,7 @@ namespace RhuEngine.WorldObjects
 		}
 		[Exposed]
 		public User GetLocalUser() {
-			if (IsLoading || WaitingForWorldStartState) {
+			if ((IsLoading) {
 				return null;
 			}
 			if (Users.Count <= LocalUserID - 1) {
