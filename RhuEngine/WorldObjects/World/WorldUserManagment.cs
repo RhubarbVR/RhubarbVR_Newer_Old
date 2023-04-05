@@ -66,6 +66,9 @@ namespace RhuEngine.WorldObjects
 		}
 		[Exposed]
 		public User GetMasterUser() {
+			if(IsLoading || WaitingForWorldStartState) {
+				return null;
+			}
 			return Users[MasterUser - 1];
 		}
 
@@ -75,10 +78,19 @@ namespace RhuEngine.WorldObjects
 
 		[Exposed]
 		public User GetHostUser() {
+			if (IsLoading || WaitingForWorldStartState) {
+				return null;
+			}
 			return Users[0];
 		}
 		[Exposed]
 		public User GetLocalUser() {
+			if (IsLoading || WaitingForWorldStartState) {
+				return null;
+			}
+			if (Users.Count <= LocalUserID - 1) {
+				return null;
+			}
 			return Users[LocalUserID - 1];
 		}
 		[PrivateSpaceOnly]
