@@ -754,7 +754,7 @@ namespace RNumerics
 			return CreateFromEuler(new Vector3f(startData.x - MathUtil.Clean(startData.x % angleStep), startData.y - MathUtil.Clean(startData.y % angleStep), startData.z - MathUtil.Clean(startData.z % angleStep)));
 		}
 
-		internal void ToAngleAxis(out float angle, out Vector3f axis) {
+		public void ToAngleAxis(out float angle, out Vector3f axis) {
 			angle = 2.0f * MathF.Acos(w);
 			axis = new Vector3f(x, y, z).Normalized;
 		}

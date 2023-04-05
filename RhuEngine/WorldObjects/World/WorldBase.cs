@@ -57,7 +57,7 @@ namespace RhuEngine.WorldObjects
 				throw new Exception("Failed to InitializeMembers", ex);
 			}
 			StartTime.Value = DateTime.UtcNow;
-			WorldGravity.Value = new Vector3(0, -10, 0);
+			WorldGravity.Value = new Vector3f(0, -10, 0);
 			if (isPersonalSpace | !networkedWorld) {
 				IsDeserializing = false;
 				AddLocalUser();

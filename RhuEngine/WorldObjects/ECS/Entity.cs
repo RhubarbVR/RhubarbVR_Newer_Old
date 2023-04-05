@@ -645,6 +645,14 @@ namespace RhuEngine.WorldObjects.ECS
 			base.Dispose();
 		}
 
+		public bool IsChildOf(Entity childTransform) {
+			for (var i = 0; i < children.Count; i++) {
+				if(children[i] == childTransform) {
+					return true;
+				}
+			}
+			return false;
+		}
 
 		[NoShow]
 		[NoSave]
