@@ -20,6 +20,7 @@ public sealed class RhubarbAudioSource : IDisposable
 	public RhubarbAudioSource() {
 		Audio = new AudioStreamGenerator {
 			BufferLength = 0.2f,
+
 		};
 		RAudio.UpateAudioSystems += Update;
 	}
@@ -65,6 +66,8 @@ public sealed class RhubarbAudioSource : IDisposable
 		}
 	}
 
+	private byte[] _audioBuffer = Array.Empty<byte>();
+
 	private unsafe void ReadAudio() {
 		if (_audioPlayBack is null) {
 			return;
@@ -77,12 +80,14 @@ public sealed class RhubarbAudioSource : IDisposable
 		if (audioFrames <= 0) {
 			return;
 		}
-
-		var bytes = new byte[audioFrames * sizeof(Vector2)];
+		var bytesNeeded = audioFrames * sizeof(Vector2);
+		if(bytesNeeded > _audioBuffer.Length) {
+			Array.Resize(ref _audioBuffer, bytesNeeded);
+		}
 		try {
-			var readAmount = _waveProvider.Read(bytes, 0, bytes.Length) / sizeof(Vector2);
+			var readAmount = _waveProvider.Read(_audioBuffer, 0, bytesNeeded) / sizeof(Vector2);
 			var audioBuffer = new Vector2[readAmount];
-			fixed (byte* byteData = bytes) {
+			fixed (byte* byteData = _audioBuffer) {
 				var castedPointer = (Vector2*)byteData;
 				for (var i = 0; i < readAmount; i++) {
 					audioBuffer[i] = castedPointer[i];

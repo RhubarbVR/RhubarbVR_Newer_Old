@@ -1,5 +1,4 @@
 ﻿using System;
-
 using NAudio.Wave;
 
 namespace RhuEngine
@@ -12,7 +11,9 @@ namespace RhuEngine
 
 		public bool IgnoreSampleRateChanges { get; }
 
-		private byte[] _readBuffer;
+		private byte[] _readBuffer = Array.Empty<byte>();
+		private float[] _convertBuffer = Array.Empty<float>();
+		private float[] _workBuffer = Array.Empty<float>();
 
 		public AudioConverter(WaveFormat waveFormat, IWaveProvider inputStream, bool ignoreSampleRateChanges) {
 			IgnoreSampleRateChanges = ignoreSampleRateChanges;
@@ -35,50 +36,58 @@ namespace RhuEngine
 
 			// Resize the read buffer if necessary
 			if (_readBuffer == null || _readBuffer.Length < requiredReadBufferLength) {
-				_readBuffer = new byte[requiredReadBufferLength];
+				Array.Resize(ref _readBuffer, requiredReadBufferLength);
 			}
 
 			var bytesRead = InputStream.Read(_readBuffer, 0, requiredReadBufferLength);
-			var floatData = ConvertToFloatArray(_readBuffer, InputStream.WaveFormat, bytesRead);
-			floatData = ConvertChannels(floatData, InputStream.WaveFormat.Channels, WaveFormat.Channels);
-			var convertedBytes = ConvertToByteArray(floatData, WaveFormat);
-			Buffer.BlockCopy(convertedBytes, 0, buffer, offset, convertedBytes.Length);
-			return convertedBytes.Length;
+			var floatDataSize = ConvertToFloatArray(ref _convertBuffer, _readBuffer, InputStream.WaveFormat, bytesRead);
+			var amoutReturned = ConvertChannels(floatDataSize, ref _convertBuffer, ref _workBuffer, InputStream.WaveFormat.Channels, WaveFormat.Channels);
+			var convertedBytesLength = ConvertToByteArray(ref _readBuffer, _workBuffer, amoutReturned, WaveFormat);
+			Buffer.BlockCopy(_readBuffer, 0, buffer, offset, convertedBytesLength);
+			return convertedBytesLength;
 		}
 
-		public static byte[] ConvertToByteArray(float[] floats, WaveFormat waveFormat) {
+		public static int ConvertToByteArray(ref byte[] bytes, float[] floats, int amoutReturn, WaveFormat waveFormat) {
 			return waveFormat.Encoding == WaveFormatEncoding.IeeeFloat
-				? FloatArrayToByteArray(floats)
-				: FloatArrayToByteArray(floats, waveFormat.BitsPerSample);
+				? FloatArrayToByteArray(ref bytes, floats, amoutReturn)
+				: FloatArrayToByteArray(ref bytes, floats, amoutReturn, waveFormat.BitsPerSample);
 		}
 
-		public static float[] ConvertToFloatArray(byte[] bytes, WaveFormat waveFormat, int bytesRead) {
+		public static int ConvertToFloatArray(ref float[] floats, byte[] bytes, WaveFormat waveFormat, int bytesRead) {
 			return waveFormat.Encoding == WaveFormatEncoding.IeeeFloat
-				? ByteArrayToFloatArray(bytesRead, bytes)
-				: ByteArrayToFloatArray(bytesRead, bytes, waveFormat.BitsPerSample);
+				? ByteArrayToFloatArray(ref floats, bytesRead, bytes)
+				: ByteArrayToFloatArray(ref floats, bytesRead, bytes, waveFormat.BitsPerSample);
 		}
 
 
-		public static byte[] FloatArrayToByteArray(float[] floatArray) {
-			var bytes = new byte[floatArray.Length * sizeof(float)];
-			Buffer.BlockCopy(floatArray, 0, bytes, 0, bytes.Length);
-			return bytes;
+		public static int FloatArrayToByteArray(ref byte[] bytes, float[] floatArray, int amoutReturn) {
+			var amount = amoutReturn * sizeof(float);
+			if (amount > bytes.Length) {
+				Array.Resize(ref bytes, amount);
+			}
+			Buffer.BlockCopy(floatArray, 0, bytes, 0, amount);
+			return amount;
 		}
 
-		public static float[] ByteArrayToFloatArray(int bytesRead, byte[] byteArray) {
-			var floats = new float[bytesRead / sizeof(float)];
+		public static int ByteArrayToFloatArray(ref float[] floats, int bytesRead, byte[] byteArray) {
+			var length = bytesRead / sizeof(float);
+			if (length > floats.Length) {
+				Array.Resize(ref floats, length);
+			}
 			Buffer.BlockCopy(byteArray, 0, floats, 0, bytesRead);
-			return floats;
+			return length;
 		}
 
-		public static float[] ByteArrayToFloatArray(int bytesRead, byte[] byteArray, int bitsPerSample) {
+		public static int ByteArrayToFloatArray(ref float[] floatArray, int bytesRead, byte[] byteArray, int bitsPerSample) {
 			if (bitsPerSample is not 16 and not 32) {
 				throw new ArgumentException("Bits per sample must be 16 or 32.");
 			}
 
 			var bytesPerSample = bitsPerSample / 8;
 			var floatArrayLength = bytesRead / bytesPerSample;
-			var floatArray = new float[floatArrayLength];
+			if (floatArrayLength > floatArray.Length) {
+				Array.Resize(ref floatArray, floatArrayLength);
+			}
 
 			for (var i = 0; i < floatArrayLength; i++) {
 				if (bitsPerSample == 16) {
@@ -91,19 +100,21 @@ namespace RhuEngine
 				}
 			}
 
-			return floatArray;
+			return floatArrayLength;
 		}
 
-		public static byte[] FloatArrayToByteArray(float[] floatArray, int bitsPerSample) {
+		public static int FloatArrayToByteArray(ref byte[] byteArray, float[] floatArray, int amoutReturn, int bitsPerSample) {
 			if (bitsPerSample is not 16 and not 32) {
 				throw new ArgumentException("Bits per sample must be 16 or 32.");
 			}
 
 			var bytesPerSample = bitsPerSample / 8;
-			var byteArrayLength = floatArray.Length * bytesPerSample;
-			var byteArray = new byte[byteArrayLength];
+			var byteArrayLength = amoutReturn * bytesPerSample;
+			if (byteArray.Length < byteArrayLength) {
+				Array.Resize(ref byteArray, byteArrayLength);
+			}
 
-			for (var i = 0; i < floatArray.Length; i++) {
+			for (var i = 0; i < amoutReturn; i++) {
 				if (bitsPerSample == 16) {
 					var sample = (short)(floatArray[i] * 32768); // De-normalize from the range [-1, 1]
 					BitConverter.GetBytes(sample).CopyTo(byteArray, i * bytesPerSample);
@@ -114,15 +125,18 @@ namespace RhuEngine
 				}
 			}
 
-			return byteArray;
+			return byteArrayLength;
 		}
 
 
 
-		public static float[] ConvertChannels(float[] inputAudio, int inputChannels, int outputChannels) {
-			var inputFrameCount = inputAudio.Length / inputChannels;
+		public static int ConvertChannels(int inputAudioSize, ref float[] inputAudio, ref float[] outputAudio, int inputChannels, int outputChannels) {
+			var inputFrameCount = inputAudioSize / inputChannels;
 			var outputFrameCount = inputFrameCount;
-			var outputAudio = new float[outputFrameCount * outputChannels];
+			var returnSize = outputFrameCount * outputChannels;
+			if (returnSize > outputAudio.Length) {
+				Array.Resize(ref outputAudio, returnSize);
+			}
 
 			for (var i = 0; i < inputFrameCount; i++) {
 				for (var j = 0; j < outputChannels; j++) {
@@ -151,7 +165,7 @@ namespace RhuEngine
 				}
 			}
 
-			return outputAudio;
+			return returnSize;
 		}
 	}
 }

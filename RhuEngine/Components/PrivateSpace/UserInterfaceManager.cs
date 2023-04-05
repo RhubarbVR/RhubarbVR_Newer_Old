@@ -480,17 +480,24 @@ namespace RhuEngine.Components
 			}
 		}
 
+		private readonly object _lockOnUIChange = new();
+
 		private void Client_StatusUpdate() {
-			UpdateStatus(Engine?.netApiManager?.Client?.Status?.Status ?? UserStatus.Offline);
-			_ststusLineEdit.Text.Value = Engine?.netApiManager?.Client?.Status?.CustomStatusMsg;
+			lock (_lockOnUIChange) {
+				UpdateStatus(Engine?.netApiManager?.Client?.Status?.Status ?? UserStatus.Offline);
+				_ststusLineEdit.Text.Value = Engine?.netApiManager?.Client?.Status?.CustomStatusMsg;
+			}
+
 		}
 
 		private void Client_OnLogin(RhubarbCloudClient.Model.PrivateUser obj) {
-			Client_StatusUpdate();
-			_profileSideButton.Entity.enabled.Value = true;
-			_usernameLabel.Text.Value = obj.UserName;
-			LoadTaskBarAndStart();
-			UpdateProfilePic();
+			lock (_lockOnUIChange) {
+				Client_StatusUpdate();
+				_profileSideButton.Entity.enabled.Value = true;
+				_usernameLabel.Text.Value = obj.UserName;
+				LoadTaskBarAndStart();
+				UpdateProfilePic();
+			}
 		}
 
 		private void UpdateProfilePic() {
