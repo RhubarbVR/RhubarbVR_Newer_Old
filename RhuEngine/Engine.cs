@@ -17,6 +17,7 @@ using System.Threading;
 using RhuEngine.Components;
 using System.Runtime;
 using LiteNetLib;
+using System.Diagnostics;
 
 namespace RhuEngine
 {
@@ -57,6 +58,10 @@ namespace RhuEngine
 			commandManager = new CommandManager();
 			_EngineLink.BindEngine(this);
 			RLog.Info($"Platform Information OSArc: {RuntimeInformation.OSArchitecture} Framework: {RuntimeInformation.FrameworkDescription} OS: {RuntimeInformation.OSDescription} ProcessArc: {RuntimeInformation.ProcessArchitecture}");
+			RLog.Info("Launch Arguments");
+			for (var i = 0; i < arg.Length; i++) {
+				RLog.Info($"	{i}: {arg[i]}");
+			}
 			EngineLink.LoadStatics();
 			if (EngineLink.CanAudio) {
 				RAudio.Initialize(this);
@@ -66,6 +71,12 @@ namespace RhuEngine
 			}
 			EngineHelpers.MainEngine = this;
 			string error = null;
+			if(arg.Any((v) => v.ToLower() == "--runvsdebug") | arg.Any((v) => v.ToLower() == "-runvsdebug") | arg.Any((v) => v.ToLower() == "-run-vsdebug")) {
+				RLog.Info("Trying to launch Debugger");
+				if (!Debugger.IsAttached) {
+					Debugger.Launch();
+				}
+			}
 			DebugVisuals = arg.Any((v) => v.ToLower() == "--debug-visuals") | arg.Any((v) => v.ToLower() == "-debug-visuals") | arg.Any((v) => v.ToLower() == "-debugvisuals");
 			_EngineLink.LoadArgs();
 			string settingsArg = null;

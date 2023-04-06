@@ -9,6 +9,10 @@ namespace RhubarbEasyBuild
 		static readonly string[] _options = new string[] {
 			"-run-debug-novr",
 			"-run-debug-vr",
+			"-run-debug-vsdebug-novr",
+			"-run-debug-vsdebug-vr",
+			"-run-debug-visuals-novr",
+			"-run-debug-visuals-vr",
 			"-build-debug",
 			"-build-headless"
 		};
@@ -63,6 +67,18 @@ namespace RhubarbEasyBuild
 			}
 			else if (selectedOption.Contains("run-debug-vr")) {
 				await RunDebug(true);
+			}
+			else if (selectedOption.Contains("run-debug-vsdebug-novr")) {
+				await RunDebug(false, "-run-vsdebug");
+			}
+			else if (selectedOption.Contains("run-debug-vsdebug-vr")) {
+				await RunDebug(true, "-run-vsdebug");
+			}
+			else if (selectedOption.Contains("run-debug-visuals-novr")) {
+				await RunDebug(false, "-debug-visuals");
+			}
+			else if (selectedOption.Contains("run-debug-visuals-vr")) {
+				await RunDebug(true, "-debug-visuals");
 			}
 			else if (selectedOption.Contains("build-debug")) {
 				await BuildDebug();
@@ -119,10 +135,11 @@ namespace RhubarbEasyBuild
 			process.Dispose();
 		}
 
-		static async Task RunDebug(bool vr) {
+		static async Task RunDebug(bool vr, params string[] extraArgs) {
 			await BuildDebug();
-			var runInVRCommand = vr ? " --xr-mode on" : ""; 
-			var process = GodotRunner.RunGodot("--path " + BaseCommand + runInVRCommand);
+			var extraComand = string.Join(' ', extraArgs);
+			var runInVRCommand = vr ? " --xr-mode on" : "";
+			var process = GodotRunner.RunGodot("--path " + BaseCommand + runInVRCommand + " " + extraComand);
 			await process.WaitForExitAsync();
 			process.Dispose();
 		}
