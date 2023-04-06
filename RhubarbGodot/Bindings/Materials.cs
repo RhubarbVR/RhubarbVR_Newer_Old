@@ -37,7 +37,6 @@ namespace RhubarbVR.Bindings
 		}
 
 		public void Dispose() {
-			Material?.Free();
 			Material = null;
 			GC.SuppressFinalize(this);
 		}

@@ -19,122 +19,30 @@ namespace RhubarbVR.Bindings.ComponentLinking
 	{
 		protected virtual bool FreeKeyboard => false;
 
-		public event Action FocusEntered
-		{
-			add {
-				if (node is null) {
-					return;
-				}
-				node.FocusEntered += value;
-			}
-			remove {
-				if (node is null) {
-					return;
-				}
-				node.FocusEntered -= value;
-			}
-		}
-		public event Action FocusExited
-		{
-			add {
-				if (node is null) {
-					return;
-				}
-				node.FocusExited += value;
-			}
-			remove {
-				if (node is null) {
-					return;
-				}
-				node.FocusExited -= value;
-			}
-		}
-		public event Action Resized
-		{
-			add {
-				if (node is null) {
-					return;
-				}
-				node.Resized += value;
-			}
-			remove {
-				if (node is null) {
-					return;
-				}
-				node.Resized -= value;
-			}
-		}
-		public event Action SizeFlagsChanged
-		{
-			add {
-				if (node is null) {
-					return;
-				}
-				node.SizeFlagsChanged += value;
-			}
-			remove {
-				if (node is null) {
-					return;
-				}
-				node.SizeFlagsChanged -= value;
-			}
-		}
-		public event Action MinimumSizeChanged
-		{
-			add {
-				if (node is null) {
-					return;
-				}
-				node.MinimumSizeChanged += value;
-			}
-			remove {
-				if (node is null) {
-					return;
-				}
-				node.MinimumSizeChanged -= value;
-			}
-		}
-		public event Action InputEntered
-		{
-			add {
-				if (node is null) {
-					return;
-				}
-				node.MouseEntered += value;
-			}
-			remove {
-				if (node is null) {
-					return;
-				}
-				node.MouseEntered -= value;
-			}
-		}
-		public event Action InputExited
-		{
-			add {
-				if (node is null) {
-					return;
-				}
-				node.MouseExited += value;
-			}
-			remove {
-				if (node is null) {
-					return;
-				}
-				node.MouseExited -= value;
-			}
-		}
+		public event Action FocusEntered;
+		public event Action FocusExited;
+		public event Action Resized;
+		public event Action SizeFlagsChanged;
+		public event Action MinimumSizeChanged;
+		public event Action InputEntered;
+		public event Action InputExited;
 
 		public override void Init() {
 			base.Init();
-			node.FocusEntered += Node_FocusEntered;
-			node.FocusExited += Node_FocusExited;
+			// Set up for godot Children
 			foreach (var item in node.GetChildren(true)) {
 				if (item is Control control) {
 					control.FocusEntered += Node_FocusEntered;
 					control.FocusExited += Node_FocusExited;
 				}
 			}
+			node.FocusEntered += Node_FocusEntered;
+			node.FocusExited += Node_FocusExited;
+			node.Resized += Node_Resized;
+			node.SizeFlagsChanged += Node_SizeFlagsChanged;
+			node.MinimumSizeChanged += Node_MinimumSizeChanged;
+			node.MouseEntered += Node_MouseEntered;
+			node.MouseExited += Node_MouseExited;
 			LinkedComp.ClipContents.Changed += ClipContents_Changed;
 			LinkedComp.MinSize.Changed += MinSize_Changed;
 			LinkedComp.LayoutDir.Changed += LayoutDir_Changed;
@@ -185,6 +93,41 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			}
 		}
 
+		private void Node_MouseExited() {
+			if (node is null) {
+				return;
+			}
+			InputExited?.Invoke();
+		}
+
+		private void Node_MouseEntered() {
+			if (node is null) {
+				return;
+			}
+			InputEntered?.Invoke();
+		}
+
+		private void Node_MinimumSizeChanged() {
+			if (node is null) {
+				return;
+			}
+			MinimumSizeChanged?.Invoke();
+		}
+
+		private void Node_SizeFlagsChanged() {
+			if (node is null) {
+				return;
+			}
+			SizeFlagsChanged?.Invoke();
+		}
+
+		private void Node_Resized() {
+			if(node is null) {
+				return;
+			}
+			Resized?.Invoke();
+		}
+
 		private void ToolTipText_Changed(IChangeable obj) {
 			RenderThread.ExecuteOnEndOfFrame(() => node.TooltipText = LinkedComp.ToolTipText.Value);
 		}
@@ -199,6 +142,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			if (LinkedComp.IsRemoved | LinkedComp.IsDestroying) {
 				return;
 			}
+			FocusExited?.Invoke();
 			if (LinkedComp.Entity.Viewport?.TakeKeyboardFocus?.Value ?? true) {
 				LinkedComp.Engine.KeyboardInteractionUnBind(LinkedComp);
 			}
@@ -214,6 +158,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			if(LinkedComp.IsRemoved | LinkedComp.IsDestroying) {
 				return;
 			}
+			FocusEntered?.Invoke();
 			if (FreeKeyboard & (LinkedComp.Entity.Viewport?.TakeKeyboardFocus?.Value ?? true)) {
 				LinkedComp.Engine.KeyboardInteractionBind(LinkedComp);
 			}

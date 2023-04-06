@@ -75,7 +75,7 @@ namespace RhuEngine.Components
 			text.MinSize.Value = new Vector2i(18, 18);
 			text.Text.Value = memberInfo.Name;
 			text.Alignment.Value = RButtonAlignment.Right;
-			text.HorizontalFilling.Value = RFilling.Expand | RFilling.Fill;
+			text.HorizontalFilling.Value = RFilling.Fill | RFilling.Expand;
 			Entity.AddChild("Filed").AttachComponent<T>().TargetObjectWorld = targetValue;
 			DetailColor.Target = box.Modulate;
 		}

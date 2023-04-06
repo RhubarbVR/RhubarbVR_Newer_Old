@@ -67,16 +67,19 @@ public partial class ConnectedViewport : TextureRect
 		if (Viewport.IsRemoved || Viewport.IsDestroying) {
 			return;
 		}
+		//Stops input if is a sub viewport in a the main window
 		if (@event is InputEventKey) {
-			return;
+			if (GetViewport().GetParent() is null) {
+				return;
+			}
 		}
 
 		if (!IsVisibleInTree()) {
 			return;
 		}
-		if (!_hover) {
-			return;
-		}
+		//if (!_hover) {
+		//	return;
+		//}
 		var xform = GetGlobalTransform();
 		var ev = @event.XformedBy(xform.AffineInverse());
 		targetViewport?.PushInput(ev);

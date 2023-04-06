@@ -71,7 +71,7 @@ namespace RhubarbVR.Bindings
 		}
 
 		public void Dispose() {
-			instance3D.Free();
+			instance3D.QueueFree();
 		}
 
 		public MeshInstance3D instance3D;

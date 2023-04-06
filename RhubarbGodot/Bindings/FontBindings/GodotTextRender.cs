@@ -42,7 +42,7 @@ namespace RhubarbVR.Bindings.FontBindings
 		public RVerticalAlignment VerticalAlignment { get => (RVerticalAlignment)Label3D.VerticalAlignment; set => Label3D.VerticalAlignment = (VerticalAlignment)value; }
 
 		public void Dispose() {
-			Label3D.Free();
+			Label3D.QueueFree();
 			GC.SuppressFinalize(this);
 		}
 
