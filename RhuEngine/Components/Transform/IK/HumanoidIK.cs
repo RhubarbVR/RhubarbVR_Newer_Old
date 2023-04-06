@@ -24,12 +24,30 @@ namespace RhuEngine.Components
 			Prefix(transform);
 		}
 
+		public void SetUpIK(Entity entity) {
+			rootTransform.Target = entity;
+			Prefix();
+			ConfigureBoneTransforms();
+		}
+
+		protected override void OnAttach() {
+			base.OnAttach();
+			SetUpIK(Entity);
+		}
+
+		private void PrepareIK() {
+			RenderThread.ExecuteOnStartOfFrame(this, () => Prepare());
+		}
+
 		protected override void OnLoaded() {
 			base.OnLoaded();
-			Awake(Entity);
+			PrepareIK();
 		}
 
 		protected override void Step() {
+			if (!_isPrepared) {
+				return;
+			}
 			Update();
 		}
 
@@ -144,7 +162,7 @@ namespace RhuEngine.Components
 					beginToEndLength,               // lenB
 					_beginToBendingLength);        // lenC
 
-				_defaultSinTheta = IKMath.SqrtClamp01(1.0f - _defaultCosTheta * _defaultCosTheta);
+				_defaultSinTheta = IKMath.SqrtClamp01(1.0f - (_defaultCosTheta * _defaultCosTheta));
 				CheckNaN(_defaultSinTheta);
 			}
 
@@ -235,11 +253,11 @@ namespace RhuEngine.Components
 						var kneeUpperLimitTheta = new CachedDegreesToCosSin(_settings.limbIK.prefixKneeUpperLimitAngle);
 						var legUpperLimitTheta = new CachedDegreesToCosSin(_settings.limbIK.prefixLegUpperLimitAngle);
 
-						_leg_upperLimitNearCircleZ = _beginToBendingLength * legUpperLimitTheta.cos
-													+ _bendingToEndLength * kneeUpperLimitTheta.cos;
+						_leg_upperLimitNearCircleZ = (_beginToBendingLength * legUpperLimitTheta.cos)
+													+ (_bendingToEndLength * kneeUpperLimitTheta.cos);
 
-						_leg_upperLimitNearCircleY = _beginToBendingLength * legUpperLimitTheta.sin
-													+ _bendingToEndLength * kneeUpperLimitTheta.sin;
+						_leg_upperLimitNearCircleY = (_beginToBendingLength * legUpperLimitTheta.sin)
+													+ (_bendingToEndLength * kneeUpperLimitTheta.sin);
 					}
 				}
 
@@ -269,11 +287,11 @@ namespace RhuEngine.Components
 					var kneeUpperLimitTheta = new CachedDegreesToCosSin(_settings.limbIK.prefixKneeUpperLimitAngle);
 					var legUpperLimitTheta = new CachedDegreesToCosSin(_settings.limbIK.prefixLegUpperLimitAngle);
 
-					_leg_upperLimitNearCircleZ = _beginToBendingLength * legUpperLimitTheta.cos
-												+ _bendingToEndLength * kneeUpperLimitTheta.cos;
+					_leg_upperLimitNearCircleZ = (_beginToBendingLength * legUpperLimitTheta.cos)
+												+ (_bendingToEndLength * kneeUpperLimitTheta.cos);
 
-					_leg_upperLimitNearCircleY = _beginToBendingLength * legUpperLimitTheta.sin
-												+ _bendingToEndLength * kneeUpperLimitTheta.sin;
+					_leg_upperLimitNearCircleY = (_beginToBendingLength * legUpperLimitTheta.sin)
+												+ (_bendingToEndLength * kneeUpperLimitTheta.sin);
 				}
 
 				var effectorMaxLengthRate = _limbIKType == LimbIKType.Leg ? _settings.limbIK.legEffectorMaxLengthRate : _settings.limbIK.armEffectorMaxLengthRate;
@@ -434,16 +452,16 @@ namespace RhuEngine.Components
 					}
 					else {
 						y /= rY;
-						var len = IKMath.Sqrt(y * y + z * z);
+						var len = IKMath.Sqrt((y * y) + (z * z));
 						if (len < 1.0f) {
 							isLimited = true;
 						}
 					}
 
 					if (isLimited) {
-						var n = IKMath.Sqrt(1.0f - z * z);
+						var n = IKMath.Sqrt(1.0f - (z * z));
 						if (n > IKMath.IK_EPSILON) { // Memo: Upper only.
-							localEffectorTrans.y = -n * rY + _leg_upperLimitNearCircleY;
+							localEffectorTrans.y = (-n * rY) + _leg_upperLimitNearCircleY;
 						}
 						else { // Failsafe.
 							localEffectorTrans.z = 0.0f;
@@ -463,9 +481,9 @@ namespace RhuEngine.Components
 			static bool PrefixLegEffectorPos_Circular(ref Vector3f localEffectorTrans, float effectorLength, bool isFar) {
 				var y = localEffectorTrans.y;
 				var z = localEffectorTrans.z;
-				var len = IKMath.Sqrt(y * y + z * z);
-				if (isFar && len > effectorLength || !isFar && len < effectorLength) {
-					var n = IKMath.Sqrt(effectorLength * effectorLength - localEffectorTrans.z * localEffectorTrans.z);
+				var len = IKMath.Sqrt((y * y) + (z * z));
+				if ((isFar && len > effectorLength) || (!isFar && len < effectorLength)) {
+					var n = IKMath.Sqrt((effectorLength * effectorLength) - (localEffectorTrans.z * localEffectorTrans.z));
 					if (n > IKMath.IK_EPSILON) { // Memo: Lower only.
 						localEffectorTrans.y = -n;
 					}
@@ -490,9 +508,9 @@ namespace RhuEngine.Components
 					y /= effectorLengthY;
 					z /= effectorLengthZ;
 
-					var len = IKMath.Sqrt(y * y + z * z);
+					var len = IKMath.Sqrt((y * y) + (z * z));
 					if (len > 1.0f) {
-						var n = IKMath.Sqrt(1.0f - z * z);
+						var n = IKMath.Sqrt(1.0f - (z * z));
 						if (n > IKMath.IK_EPSILON) { // Memo: Upper only.
 							localEffectorTrans.y = n * effectorLengthY;
 						}
@@ -522,7 +540,7 @@ namespace RhuEngine.Components
 				}
 				else if (localDir.y > LOCAL_DIR_MAX_THETA - LOCAL_DIR_LERP_THETA - IKMath.IK_EPSILON) {
 					var r = (localDir.y - (LOCAL_DIR_MAX_THETA - LOCAL_DIR_LERP_THETA)) * (1.0f / LOCAL_DIR_LERP_THETA);
-					localDirXZ = new Vector3f(localDir.x + (1.0f - localDir.x) * r, 0.0f, localDir.z - localDir.z * r);
+					localDirXZ = new Vector3f(localDir.x + ((1.0f - localDir.x) * r), 0.0f, localDir.z - (localDir.z * r));
 					if (!IKMath.VecNormalizeXZ(ref localDirXZ)) {
 						localDirXZ = new Vector3f(1.0f, 0.0f, 0.0f);
 					}
@@ -532,7 +550,7 @@ namespace RhuEngine.Components
 				}
 				else if (localDir.y < -(LOCAL_DIR_MAX_THETA - LOCAL_DIR_LERP_THETA - IKMath.IK_EPSILON)) {
 					var r = (-(LOCAL_DIR_MAX_THETA - LOCAL_DIR_LERP_THETA) - localDir.y) * (1.0f / LOCAL_DIR_LERP_THETA);
-					localDirXZ = new Vector3f(localDir.x + (-1.0f - localDir.x) * r, 0.0f, localDir.z - localDir.z * r);
+					localDirXZ = new Vector3f(localDir.x + ((-1.0f - localDir.x) * r), 0.0f, localDir.z - (localDir.z * r));
 					if (!IKMath.VecNormalizeXZ(ref localDirXZ)) {
 						localDirXZ = new Vector3f(-1.0f, 0.0f, 0.0f);
 					}
@@ -552,7 +570,7 @@ namespace RhuEngine.Components
 				}
 				else if (localDir.x > LOCAL_DIR_MAX_THETA - LOCAL_DIR_LERP_THETA - IKMath.IK_EPSILON) {
 					var r = (localDir.x - (LOCAL_DIR_MAX_THETA - LOCAL_DIR_LERP_THETA)) * (1.0f / LOCAL_DIR_LERP_THETA);
-					localDirYZ = new Vector3f(0.0f, localDir.y - localDir.y * r, localDir.z + (-1.0f - localDir.z) * r);
+					localDirYZ = new Vector3f(0.0f, localDir.y - (localDir.y * r), localDir.z + ((-1.0f - localDir.z) * r));
 					if (!IKMath.VecNormalizeYZ(ref localDirYZ)) {
 						localDirYZ = new Vector3f(0.0f, 0.0f, -1.0f);
 					}
@@ -562,7 +580,7 @@ namespace RhuEngine.Components
 				}
 				else if (localDir.x < -(LOCAL_DIR_MAX_THETA - LOCAL_DIR_LERP_THETA - IKMath.IK_EPSILON)) {
 					var r = (-(LOCAL_DIR_MAX_THETA - LOCAL_DIR_LERP_THETA) - localDir.x) * (1.0f / LOCAL_DIR_LERP_THETA);
-					localDirYZ = new Vector3f(0.0f, localDir.y - localDir.y * r, localDir.z + (1.0f - localDir.z) * r);
+					localDirYZ = new Vector3f(0.0f, localDir.y - (localDir.y * r), localDir.z + ((1.0f - localDir.z) * r));
 					if (!IKMath.VecNormalizeYZ(ref localDirYZ)) {
 						localDirYZ = new Vector3f(0.0f, 0.0f, 1.0f);
 					}
@@ -750,7 +768,7 @@ namespace RhuEngine.Components
 							if (lerpLength > IKMath.IK_EPSILON) {
 								var tempLength = MathF.Abs(_presolvedEffectorLength - effectorLen);
 								if (tempLength < lerpLength) {
-									presolvedBendingRate *= 1.0f - tempLength / lerpLength;
+									presolvedBendingRate *= 1.0f - (tempLength / lerpLength);
 								}
 								else {
 									presolvedBendingRate = 0.0f;
@@ -791,7 +809,7 @@ namespace RhuEngine.Components
 								? _limbIKSide == Side.Left ? -presolvedBendingBasis.column0 : presolvedBendingBasis.column0
 								: -presolvedBendingBasis.column1;
 
-							presolvedBendingPos = beginPos + bendingDir * _beginToBendingLength;
+							presolvedBendingPos = beginPos + (bendingDir * _beginToBendingLength);
 							bendingPos = presolvedBendingPos; // Failsafe.
 						}
 					}
@@ -807,7 +825,7 @@ namespace RhuEngine.Components
 							effectorLen,                    // lenB
 							_beginToBendingLength);        // lenC
 
-						var sinTheta = IKMath.SqrtClamp01(1.0f - cosTheta * cosTheta);
+						var sinTheta = IKMath.SqrtClamp01(1.0f - (cosTheta * cosTheta));
 
 						var moveC = _beginToBendingLength * (1.0f - MathF.Max(_defaultCosTheta - cosTheta, 0.0f));
 						var moveS = _beginToBendingLength * MathF.Max(sinTheta - _defaultSinTheta, 0.0f);
@@ -921,15 +939,15 @@ namespace RhuEngine.Components
 									_automaticArmElbowTheta.Reset(elbowAngle);
 								}
 
-								bendingPos = beginPos + dirX * moveC
-									+ _automaticArmElbowTheta.cos * moveS * -dirY
-									+ _automaticArmElbowTheta.sin * moveS * -dirZ;
+								bendingPos = beginPos + (dirX * moveC)
+									+ (_automaticArmElbowTheta.cos * moveS * -dirY)
+									+ (_automaticArmElbowTheta.sin * moveS * -dirZ);
 							}
 						}
 						else { // Leg
 							var automaticKneeBaseAngle = _settings.limbIK.automaticKneeBaseAngle.Value;
 							if (automaticKneeBaseAngle is >= (-IKMath.IK_EPSILON) and <= IKMath.IK_EPSILON) { // Fuzzy 0
-								bendingPos = beginPos + -baseBasis.column1 * moveC + baseBasis.column2 * moveS;
+								bendingPos = beginPos + (-baseBasis.column1 * moveC) + (baseBasis.column2 * moveS);
 							}
 							else {
 								if (_automaticKneeBaseTheta._degrees != automaticKneeBaseAngle) {
@@ -937,7 +955,7 @@ namespace RhuEngine.Components
 								}
 
 								var kneeSin = _automaticKneeBaseTheta.cos;
-								var kneeCos = IKMath.Sqrt(1.0f - kneeSin * kneeSin);
+								var kneeCos = IKMath.Sqrt(1.0f - (kneeSin * kneeSin));
 								if (_limbIKSide == Side.Right) {
 									if (automaticKneeBaseAngle >= 0.0f) {
 										kneeCos = -kneeCos;
@@ -949,9 +967,9 @@ namespace RhuEngine.Components
 									}
 								}
 
-								bendingPos = beginPos + -baseBasis.column1 * moveC
-									+ kneeCos * moveS * baseBasis.column0
-									+ kneeSin * moveS * baseBasis.column2;
+								bendingPos = beginPos + (-baseBasis.column1 * moveC)
+									+ (kneeCos * moveS * baseBasis.column0)
+									+ (kneeSin * moveS * baseBasis.column2);
 							}
 						}
 					}
@@ -965,7 +983,7 @@ namespace RhuEngine.Components
 
 				{
 					var beginToBendingTrans = bendingPos - beginPos;
-					var intersectBendingTrans = beginToBendingTrans - effectorDir * Vector3f.Dot(effectorDir, beginToBendingTrans);
+					var intersectBendingTrans = beginToBendingTrans - (effectorDir * Vector3f.Dot(effectorDir, beginToBendingTrans));
 					var intersectBendingLen = intersectBendingTrans.Magnitude;
 
 					if (intersectBendingLen > IKMath.IK_EPSILON) {
@@ -973,11 +991,11 @@ namespace RhuEngine.Components
 
 						var bc2 = 2.0f * _beginToBendingLength * effectorLen;
 						if (bc2 > IKMath.IK_EPSILON) {
-							var effectorCosTheta = (_beginToBendingLengthSq + effectorLen * effectorLen - _bendingToEndLengthSq) / bc2;
-							var effectorSinTheta = IKMath.SqrtClamp01(1.0f - effectorCosTheta * effectorCosTheta);
+							var effectorCosTheta = (_beginToBendingLengthSq + (effectorLen * effectorLen) - _bendingToEndLengthSq) / bc2;
+							var effectorSinTheta = IKMath.SqrtClamp01(1.0f - (effectorCosTheta * effectorCosTheta));
 
-							var beginToInterTranslate = _beginToBendingLength * effectorCosTheta * effectorDir
-															+ _beginToBendingLength * effectorSinTheta * intersectBendingDir;
+							var beginToInterTranslate = (_beginToBendingLength * effectorCosTheta * effectorDir)
+															+ (_beginToBendingLength * effectorSinTheta * intersectBendingDir);
 							var interToEndTranslate = effectorPos - (beginPos + beginToInterTranslate);
 
 							if (IKMath.VecNormalize2(ref beginToInterTranslate, ref interToEndTranslate)) {
@@ -1001,12 +1019,12 @@ namespace RhuEngine.Components
 					var localX = _limbIKSide == Side.Left ? localBendingDir.x : -localBendingDir.x;
 					if (localX > limitTheta) {
 						localBendingDir.x = _limbIKSide == Side.Left ? limitTheta : -limitTheta;
-						localBendingDir.z = IKMath.Sqrt(1.0f - (localBendingDir.x * localBendingDir.x + localBendingDir.y * localBendingDir.y));
+						localBendingDir.z = IKMath.Sqrt(1.0f - ((localBendingDir.x * localBendingDir.x) + (localBendingDir.y * localBendingDir.y)));
 						if (isBack) {
 							localBendingDir.z = -localBendingDir.z;
 						}
 						IKMath.MatMultVec(out var bendingDir, parentBaseBasis, localBendingDir);
-						var interPos = beginPos + bendingDir * _beginToBendingLength;
+						var interPos = beginPos + (bendingDir * _beginToBendingLength);
 						var endDir = effectorPos - interPos;
 						if (IKMath.VecNormalize(ref endDir)) {
 							solvedBeginToBendingDir = bendingDir;
@@ -1022,7 +1040,7 @@ namespace RhuEngine.Components
 				if (!isSolved) { // Failsafe.
 					var bendingDir = bendingPos - beginPos;
 					if (IKMath.VecNormalize(ref bendingDir)) {
-						var interPos = beginPos + bendingDir * _beginToBendingLength;
+						var interPos = beginPos + (bendingDir * _beginToBendingLength);
 						var endDir = effectorPos - interPos;
 						if (IKMath.VecNormalize(ref endDir)) {
 							isSolved = true;
@@ -1623,7 +1641,7 @@ namespace RhuEngine.Components
 								localDir.y = _internalValues.headIK.neckLimitPitchUpTheta.sin;
 							}
 							localDir.x = 0.0f;
-							localDir.z = IKMath.Sqrt(1.0f - localDir.y * localDir.y);
+							localDir.z = IKMath.Sqrt(1.0f - (localDir.y * localDir.y));
 						}
 
 						IKMath.MatMultVec(out eyesDir, parentBaseBasis, localDir);
@@ -1730,7 +1748,7 @@ namespace RhuEngine.Components
 			void SolveEyes(ref IKMatrix3x3 neckBasis, ref IKMatrix3x3 headBasis, ref IKMatrix3x3 headBaseBasis,
 				ref Quaternionf headPrevRotation, ref Quaternionf leftEyePrevRotation, ref Quaternionf rightEyePrevRotation) {
 				if (_headBone != null && _headBone.TransformIsAlive) {
-					if (_leftEyeBone != null && _leftEyeBone.TransformIsAlive || _rightEyeBone != null && _rightEyeBone.TransformIsAlive) {
+					if ((_leftEyeBone != null && _leftEyeBone.TransformIsAlive) || (_rightEyeBone != null && _rightEyeBone.TransformIsAlive)) {
 						var neckBoneWorldPosition = _neckBone.WorldPosition;
 						IKMath.MatMultVecPreSubAdd(out var headWorldPosition, neckBasis, _headBone._defaultPosition, _neckBone._defaultPosition, neckBoneWorldPosition);
 
@@ -2206,7 +2224,7 @@ namespace RhuEngine.Components
 						var linkLength2 = fingerBranch.fingerLinks[2].childToLength;
 
 						var lengthH0 = MathF.Abs(linkLength0 - linkLength2);
-						var lengthD0 = IKMath.Sqrt(linkLength1 * linkLength1 - lengthH0 * lengthH0);
+						var lengthD0 = IKMath.Sqrt((linkLength1 * linkLength1) - (lengthH0 * lengthH0));
 
 						var beginLink_endCosTheta = 0.0f; // 90'
 
@@ -2219,7 +2237,7 @@ namespace RhuEngine.Components
 								lengthH0 = min_sinTheta * linkLength1;
 
 								var beginLink_endSinTheta = MathUtil.Clamp((linkLength2 + lengthH0) * (1.0f / linkLength0), 0, 1);
-								beginLink_endCosTheta = IKMath.SqrtClamp01(1.0f - beginLink_endSinTheta * beginLink_endSinTheta);
+								beginLink_endCosTheta = IKMath.SqrtClamp01(1.0f - (beginLink_endSinTheta * beginLink_endSinTheta));
 							}
 						}
 
@@ -2256,9 +2274,9 @@ namespace RhuEngine.Components
 					if (IKMath.VecNormalize(ref localThumbToIndex)) {
 						_thumbBranch.thumb0_isLimited = true;
 						_thumbBranch.thumb0_innerLimit = MathF.Max(-localThumbToIndex.z, 0.0f); // innerLimit = under index 0
-						_thumbBranch.thumb0_outerLimit = (float)Math.Sin(MathF.Max(-(IKMath.Asin(_thumbBranch.thumb0_innerLimit) - 40.0f * MathUtil.DEG_2_RADF), 0.0f));
+						_thumbBranch.thumb0_outerLimit = (float)Math.Sin(MathF.Max(-(IKMath.Asin(_thumbBranch.thumb0_innerLimit) - (40.0f * MathUtil.DEG_2_RADF)), 0.0f));
 						_thumbBranch.thumb0_upperLimit = MathF.Max(localThumbToIndex.y, 0.0f); // upperLimit = height index 0
-						_thumbBranch.thumb0_lowerLimit = (float)Math.Sin(MathF.Max(-(IKMath.Asin(_thumbBranch.thumb0_upperLimit) - 45.0f * MathUtil.DEG_2_RADF), 0.0f));
+						_thumbBranch.thumb0_lowerLimit = (float)Math.Sin(MathF.Max(-(IKMath.Asin(_thumbBranch.thumb0_upperLimit) - (45.0f * MathUtil.DEG_2_RADF)), 0.0f));
 					}
 				}
 
@@ -2366,7 +2384,7 @@ namespace RhuEngine.Components
 				if (lerpLength > IKMath.IK_EPSILON) {
 					var subLength = effectorLength - minLength;
 					var r = subLength / lerpLength;
-					effectorLength = minLength + r * (maxLength - minLength);
+					effectorLength = minLength + (r * (maxLength - minLength));
 				}
 				else {
 					effectorLength = minLength;
@@ -2412,9 +2430,9 @@ namespace RhuEngine.Components
 				centerToBendingDirection *= 1.0f / centerToBendingDirectionLengthTemp;
 
 				var solveCosTheta = MathUtil.Lerp(fingerIKParams.beginLink_endCosTheta, 1.0f, MathUtil.Clamp((beginToEndLength - fingerIKParams.lengthD0) * fingerIKParams.lengthABCDInv, 0, 1));
-				var solveSinTheta = IKMath.SqrtClamp01(1.0f - solveCosTheta * solveCosTheta);
+				var solveSinTheta = IKMath.SqrtClamp01(1.0f - (solveCosTheta * solveCosTheta));
 
-				var solvedDirection = beginToEndDirection * solveCosTheta + centerToBendingDirection * solveSinTheta;
+				var solvedDirection = (beginToEndDirection * solveCosTheta) + (centerToBendingDirection * solveSinTheta);
 				return !IKMath.VecNormalize(ref solvedDirection) ? Vector3f.Zero : solvedDirection;
 			}
 
@@ -2465,10 +2483,10 @@ namespace RhuEngine.Components
 					}
 				}
 
-				var sinTheta = IKMath.SqrtClamp01(1.0f - beginToInterTheta * beginToInterTheta);
+				var sinTheta = IKMath.SqrtClamp01(1.0f - (beginToInterTheta * beginToInterTheta));
 
-				var beginToInterDirection = beginToInterBaseLength * beginToInterTheta * beginToEndDirection
-												+ beginToInterBaseLength * sinTheta * centerToBendingDirection;
+				var beginToInterDirection = (beginToInterBaseLength * beginToInterTheta * beginToEndDirection)
+												+ (beginToInterBaseLength * sinTheta * centerToBendingDirection);
 				var beginToInterDirectionLengthTemp = beginToInterDirection.Magnitude;
 				if (beginToInterDirectionLengthTemp <= IKMath.IK_EPSILON) {
 					return Vector3f.Zero;
@@ -2537,8 +2555,8 @@ namespace RhuEngine.Components
 							var dirFrom = moveFrom * (1.0f / lengthFrom);
 							var dirTo = moveTo * (1.0f / lengthTo);
 							var dir = IKMath.LerpDir(ref dirFrom, ref dirTo, effector.positionWeight);
-							var len = MathUtil.Lerp(lengthFrom, lengthTo, MathUtil.Clamp(1.0f - (1.0f - effector.positionWeight) * POSITION_LERP_RATE, 0, 1));
-							return dir * len + beginLinkPosition;
+							var len = MathUtil.Lerp(lengthFrom, lengthTo, MathUtil.Clamp(1.0f - ((1.0f - effector.positionWeight) * POSITION_LERP_RATE), 0, 1));
+							return (dir * len) + beginLinkPosition;
 						}
 					}
 
@@ -2740,12 +2758,12 @@ namespace RhuEngine.Components
 												var extendLen = 0.0f;
 												if (!imm_isLimitL) {
 													extendLen = Vector3f.Dot(beginLinkDirX, effX);
-													extendLen = IKMath.Sqrt(1.0f - extendLen * extendLen); // Cosine to Sine
+													extendLen = IKMath.Sqrt(1.0f - (extendLen * extendLen)); // Cosine to Sine
 													extendLen *= linkLength0; // Sine Length
 												}
 												var smoothLen = linkLength2 * 0.25f;
 												if (extendLen > IKMath.IK_EPSILON && effectorLength >= baseLength - extendLen) {
-													var r = 1.0f - (effectorLength - (baseLength - extendLen)) / extendLen;
+													var r = 1.0f - ((effectorLength - (baseLength - extendLen)) / extendLen);
 													beginLinkDirX = IKMath.FastLerpDir(ref beginLinkDirX, ref effX, r);
 													imm_traceRate += (1.0f - imm_traceRate) * r;
 												}
@@ -2784,7 +2802,7 @@ namespace RhuEngine.Components
 						var bendingLink1Position = beginLink.boneTransform * (bendingLink1.bone._defaultPosition - beginLink.bone._defaultPosition);
 						endPosition = beginLink.boneTransform * (endEffector._defaultPosition - beginLink.bone._defaultPosition);
 
-						var basedEffectorPosition = beginLinkPosition + effectorDirection * baseLength;
+						var basedEffectorPosition = beginLinkPosition + (effectorDirection * baseLength);
 
 						var bendingLink0ToEffectorDirection = basedEffectorPosition - bendingLink0Position;
 						var bendingLink0ToBendingLink0Direction = bendingLink1Position - bendingLink0Position;
@@ -2872,8 +2890,8 @@ namespace RhuEngine.Components
 								var finZ = localFingerSolve.z;
 
 								var cosNotThumb1PitchLLimit = _notThumb1PitchLLimit.cos;
-								if (isRight && finX < cosNotThumb1PitchLLimit || !isRight && finX > -cosNotThumb1PitchLLimit) {
-									var lenY = IKMath.Sqrt(1.0f - (cosNotThumb1PitchLLimit * cosNotThumb1PitchLLimit + finZ * finZ));
+								if ((isRight && finX < cosNotThumb1PitchLLimit) || (!isRight && finX > -cosNotThumb1PitchLLimit)) {
+									var lenY = IKMath.Sqrt(1.0f - ((cosNotThumb1PitchLLimit * cosNotThumb1PitchLLimit) + (finZ * finZ)));
 									localFingerSolve.x = isRight ? cosNotThumb1PitchLLimit : -cosNotThumb1PitchLLimit;
 									localFingerSolve.y = finY >= 0.0f ? lenY : -lenY;
 									IKMath.MatMultVec(out linkSolved, baseBasis, localFingerSolve);
@@ -3041,7 +3059,7 @@ namespace RhuEngine.Components
 							var moveLenASq = _thumbBranch.linkLength0to1Sq;
 							var moveLenB = effectorLength0to3;
 							var moveLenBSq = effectorLength0to3Sq;
-							var moveLenC = effectorLength1to3 + (_thumbBranch.linkLength1to3 - effectorLength1to3) * 0.5f; // 0.5f = Magic number.(Balancer)
+							var moveLenC = effectorLength1to3 + ((_thumbBranch.linkLength1to3 - effectorLength1to3) * 0.5f); // 0.5f = Magic number.(Balancer)
 							var moveLenCSq = moveLenC * moveLenC;
 
 							var moveTheta = ComputeTriangleTheta(moveLenA, moveLenB, moveLenC, moveLenASq, moveLenBSq, moveLenCSq);
@@ -3108,7 +3126,7 @@ namespace RhuEngine.Components
 							var newAngle = IKMath.Acos(moveThetaAtoB) - _thumbBranch.thumb1_Acos_baseThetaAtoB;
 							if (newAngle > 0.01f * MathUtil.DEG_2_RADF) {
 								var moveLenASq2 = moveLenASq * 2.0f;
-								var moveLenAtoAD = IKMath.Sqrt(moveLenASq2 - moveLenASq2 * IKMath.Cos(newAngle));
+								var moveLenAtoAD = IKMath.Sqrt(moveLenASq2 - (moveLenASq2 * IKMath.Cos(newAngle)));
 								{
 									IKMath.MatMultVec(out var solveDirection, fingerLink1.boneTransform.basis, _thumbBranch.thumbSolveZ);
 									var fingerLinkPosition2 = fingerLink1.boneTransform * (fingerLink2.bone._defaultPosition - fingerLink1.bone._defaultPosition);
@@ -3754,7 +3772,7 @@ namespace RhuEngine.Components
 				// presolvedCenterLegPos2 = presolveCenterLegPos + presolved postTranslate.
 				var presolvedCenterLegPos2 = temp.CenterLegPos;
 				if (eyesRate > IKMath.IK_EPSILON) {
-					var source = temp.CenterLegPos + centerArmDirY2 * _defaultCenterLegToCeterArmLen;
+					var source = temp.CenterLegPos + (centerArmDirY2 * _defaultCenterLegToCeterArmLen);
 					presolvedCenterLegPos2 += temp.targetCenterArmPos - source;
 				}
 
@@ -3854,7 +3872,7 @@ namespace RhuEngine.Components
 							}
 
 							var currentDirX = temp.nearArmPos[1] - temp.nearArmPos[0];
-							var currentDirY = (temp.nearArmPos[1] + temp.nearArmPos[0]) * 0.5f - temp.CenterLegPos;
+							var currentDirY = ((temp.nearArmPos[1] + temp.nearArmPos[0]) * 0.5f) - temp.CenterLegPos;
 
 							if (IKMath.VecNormalize(ref currentDirY) && IKMath.ComputeBasisFromXYLockY(out var fromBasis, currentDirX, ref currentDirY)) {
 								IKMath.MatMultInv1(out rotateBasis, ref toBasis, ref fromBasis);
@@ -3889,7 +3907,7 @@ namespace RhuEngine.Components
 					var centerLegToArmLength = _defaultCenterLegToCeterArmLen;
 
 					var centerLegBasisX = temp.CenterLegBasis.column0;
-					var centerArmPosY2 = centerArmDirY2 * centerLegToArmLength + temp.CenterLegPos;
+					var centerArmPosY2 = (centerArmDirY2 * centerLegToArmLength) + temp.CenterLegPos;
 					var upperSpineLerpRate = _settings.bodyIK.upperSpineLerpRate;
 
 					for (var i = 0; i != spineLength; ++i) {
@@ -4135,7 +4153,7 @@ namespace RhuEngine.Components
 					var hipsToSpineDirX = new Vector3f(1.0f, 0.0f, 0.0f);
 
 					var dirX = temp.legs.beginPos[1] - temp.legs.beginPos[0];
-					var dirY = temp.spinePos[0] - (temp.legs.beginPos[1] + temp.legs.beginPos[0]) * 0.5f;
+					var dirY = temp.spinePos[0] - ((temp.legs.beginPos[1] + temp.legs.beginPos[0]) * 0.5f);
 
 					var boneBasis = new IKMatrix3x3();
 
@@ -4210,20 +4228,20 @@ namespace RhuEngine.Components
 			}
 
 			bool IsEffectorEnabled() {
-				return _hipsEffector.positionEnabled && _hipsEffector.pull > IKMath.IK_EPSILON ||
-					_hipsEffector.rotationEnabled && _hipsEffector.rotationWeight > IKMath.IK_EPSILON ||
-					_neckEffector.positionEnabled && _neckEffector.pull > IKMath.IK_EPSILON ||
-					_eyesEffector.positionEnabled && _eyesEffector.positionWeight > IKMath.IK_EPSILON && _eyesEffector.pull > IKMath.IK_EPSILON ||
-					_armEffectors[0].positionEnabled && _armEffectors[0].pull > IKMath.IK_EPSILON ||
-					_armEffectors[1].positionEnabled && _armEffectors[1].pull > IKMath.IK_EPSILON
-					|| _elbowEffectors[0].positionEnabled && _elbowEffectors[0].pull > IKMath.IK_EPSILON ||
-					_elbowEffectors[1].positionEnabled && _elbowEffectors[1].pull > IKMath.IK_EPSILON ||
-					_kneeEffectors[0].positionEnabled && _kneeEffectors[0].pull > IKMath.IK_EPSILON ||
-					_kneeEffectors[1].positionEnabled && _kneeEffectors[1].pull > IKMath.IK_EPSILON ||
-					_wristEffectors[0].positionEnabled && _wristEffectors[0].pull > IKMath.IK_EPSILON ||
-					_wristEffectors[1].positionEnabled && _wristEffectors[1].pull > IKMath.IK_EPSILON ||
-					_footEffectors[0].positionEnabled && _footEffectors[0].pull > IKMath.IK_EPSILON ||
-					_footEffectors[1].positionEnabled && _footEffectors[1].pull > IKMath.IK_EPSILON;
+				return (_hipsEffector.positionEnabled && _hipsEffector.pull > IKMath.IK_EPSILON) ||
+					(_hipsEffector.rotationEnabled && _hipsEffector.rotationWeight > IKMath.IK_EPSILON) ||
+					(_neckEffector.positionEnabled && _neckEffector.pull > IKMath.IK_EPSILON) ||
+					(_eyesEffector.positionEnabled && _eyesEffector.positionWeight > IKMath.IK_EPSILON && _eyesEffector.pull > IKMath.IK_EPSILON) ||
+					(_armEffectors[0].positionEnabled && _armEffectors[0].pull > IKMath.IK_EPSILON) ||
+					(_armEffectors[1].positionEnabled && _armEffectors[1].pull > IKMath.IK_EPSILON)
+					|| (_elbowEffectors[0].positionEnabled && _elbowEffectors[0].pull > IKMath.IK_EPSILON) ||
+					(_elbowEffectors[1].positionEnabled && _elbowEffectors[1].pull > IKMath.IK_EPSILON) ||
+					(_kneeEffectors[0].positionEnabled && _kneeEffectors[0].pull > IKMath.IK_EPSILON) ||
+					(_kneeEffectors[1].positionEnabled && _kneeEffectors[1].pull > IKMath.IK_EPSILON) ||
+					(_wristEffectors[0].positionEnabled && _wristEffectors[0].pull > IKMath.IK_EPSILON) ||
+					(_wristEffectors[1].positionEnabled && _wristEffectors[1].pull > IKMath.IK_EPSILON) ||
+					(_footEffectors[0].positionEnabled && _footEffectors[0].pull > IKMath.IK_EPSILON) ||
+					(_footEffectors[1].positionEnabled && _footEffectors[1].pull > IKMath.IK_EPSILON);
 			}
 
 			bool PrepareSolverInternal() {
@@ -4303,7 +4321,7 @@ namespace RhuEngine.Components
 							? spineDirXRate
 							: i + 1 == spineLength
 								? spineDirXToRate
-								: spineDirXRate + (spineDirXToRate - spineDirXRate) * (i / (float)(spineLength - 1));
+								: spineDirXRate + ((spineDirXToRate - spineDirXRate) * (i / (float)(spineLength - 1)));
 					}
 
 					if (spineLength > 0) {
@@ -4356,7 +4374,7 @@ namespace RhuEngine.Components
 							var nearArmBones = _shoulderBones ?? _armBones;
 							var dirY = nearArmBones[1]._defaultPosition + nearArmBones[0]._defaultPosition;
 							var dirX = nearArmBones[1]._defaultPosition - nearArmBones[0]._defaultPosition;
-							dirY = dirY * 0.5f - _spineUBone._defaultPosition;
+							dirY = (dirY * 0.5f) - _spineUBone._defaultPosition;
 							var dirZ = Vector3f.Cross(dirX, dirY);
 							dirX = Vector3f.Cross(dirY, dirZ);
 							if (IKMath.VecNormalize3(ref dirX, ref dirY, ref dirZ)) {
@@ -4747,7 +4765,7 @@ namespace RhuEngine.Components
 						_isDirtySpineUBasis = false;
 						_spineUBasis = IKMatrix3x3.identity;
 						var dirY = shoulderPos != null ? shoulderPos[1] + shoulderPos[0] : armPos[1] + armPos[0];
-						dirY = dirY * 0.5f - SpineUPos;
+						dirY = (dirY * 0.5f) - SpineUPos;
 						var dirX = shoulderPos != null ? shoulderPos[1] - shoulderPos[0] : armPos[1] - armPos[0];
 						var dirZ = Vector3f.Cross(dirX, dirY);
 						dirX = Vector3f.Cross(dirY, dirZ);
@@ -5061,7 +5079,7 @@ namespace RhuEngine.Components
 
 						Vector3f totalMove;
 						if (headPull > IKMath.IK_EPSILON && bodyPull > IKMath.IK_EPSILON) {
-							totalMove = headMove * headPull + bodyMove * bodyPull;
+							totalMove = (headMove * headPull) + (bodyMove * bodyPull);
 							totalMove *= 1.0f / (headPull + bodyPull);
 						}
 						else {
@@ -5132,7 +5150,7 @@ namespace RhuEngine.Components
 					var enabled1 = wristPull[1] > IKMath.IK_EPSILON || elbowPull[1] > IKMath.IK_EPSILON || armPull[1] > IKMath.IK_EPSILON;
 
 					var neckHeadPull = _solverCaches.neckHeadPull;
-					if (enabled0 && enabled1 || neckHeadPull > IKMath.IK_EPSILON) {
+					if ((enabled0 && enabled1) || neckHeadPull > IKMath.IK_EPSILON) {
 						for (var i = 0; i != 2; ++i) {
 							var idx0 = i;
 							var idx1 = 1 - i;
@@ -5268,7 +5286,7 @@ namespace RhuEngine.Components
 								var tempDir = _tempArmPos[i] - tempShoulderPos;
 								IKMath.VecNormalize(ref tempDir);
 								IKMath.MatMultVec(out var resultDir, m, tempDir);
-								var destArmPos = tempShoulderPos + resultDir * shoulderToArmLength[i];
+								var destArmPos = tempShoulderPos + (resultDir * shoulderToArmLength[i]);
 
 								SolveShoulderToArmInternal(i, ref destArmPos);
 							}
@@ -5551,7 +5569,7 @@ namespace RhuEngine.Components
 								IKMath.MatMultVec(out dirX, worldBasis, dirX);
 							}
 
-							armPos[i] = shoulderPos[i] + dirX * shoulderToArmLength[i];
+							armPos[i] = shoulderPos[i] + (dirX * shoulderToArmLength[i]);
 						}
 					}
 				}
@@ -5565,7 +5583,7 @@ namespace RhuEngine.Components
 				ref Vector3f leftLegPos,
 				ref Vector3f rightLegPos) {
 				var dirX = rightLegPos - leftLegPos;
-				var dirY = spinePos - (rightLegPos + leftLegPos) * 0.5f;
+				var dirY = spinePos - ((rightLegPos + leftLegPos) * 0.5f);
 				if (IKMath.VecNormalize(ref dirY)) {
 					return IKMath.ComputeBasisFromXYLockY(out centerLegBasis, dirX, ref dirY);
 				}
@@ -5600,7 +5618,7 @@ namespace RhuEngine.Components
 			}
 
 			static Quaternionf GetRotation(ref Vector3f axisDir, float theta, float rate) {
-				return theta >= -IKMath.IK_EPSILON && theta <= IKMath.IK_EPSILON || rate >= -IKMath.IK_EPSILON && rate <= IKMath.IK_EPSILON
+				return (theta >= -IKMath.IK_EPSILON && theta <= IKMath.IK_EPSILON) || (rate >= -IKMath.IK_EPSILON && rate <= IKMath.IK_EPSILON)
 					? Quaternionf.Identity
 					: new Quaternionf(axisDir, IKMath.Acos(theta) * rate * MathUtil.RAD_2_DEGF);
 			}
@@ -5612,7 +5630,7 @@ namespace RhuEngine.Components
 					? 1.0f
 					: pull <= IKMath.IK_EPSILON
 					? effectorPull
-					: effectorPull > IKMath.IK_EPSILON ? effectorPull >= 1.0f - IKMath.IK_EPSILON ? 1.0f : pull + (1.0f - pull) * effectorPull : pull;
+					: effectorPull > IKMath.IK_EPSILON ? effectorPull >= 1.0f - IKMath.IK_EPSILON ? 1.0f : pull + ((1.0f - pull) * effectorPull) : pull;
 			}
 
 			static float GetBalancedPullLockTo(float pullFrom, float pullTo) {
@@ -5671,7 +5689,7 @@ namespace RhuEngine.Components
 			[NonSerialized]
 			public Vector3f _hidden_worldPosition = Vector3f.Zero;
 
-			public bool EffectorEnabled => positionEnabled || RotationContained && RotationContained;
+			public bool EffectorEnabled => positionEnabled || (RotationContained && RotationContained);
 
 			[Default(false)]
 			public readonly Sync<bool> _isPresetted;
@@ -5681,13 +5699,6 @@ namespace RhuEngine.Components
 			public readonly Sync<EffectorType> _effectorType;
 			[Default(EffectorFlags.None)]
 			public readonly Sync<EffectorFlags> _effectorFlags;
-
-			// These aren't serialize field.
-			// Memo: If this instance is cloned, will be copyed these properties, too.
-			Effector _parentEffector = null;
-			Bone _bone = null; // Hips : Hips Eyes : Head
-			Bone _leftBone = null; // Hips : LeftLeg Eyes : LeftEye Others : null
-			Bone _rightBone = null; // Hips : RightLeg Eyes : RightEye Others : null
 
 			// Memo: If transform is created & cloned this instance, will be cloned effector transform, too.
 			public readonly SyncRef<Entity> _createdTransform; // Hidden, for destroy check.
@@ -5711,10 +5722,12 @@ namespace RhuEngine.Components
 			// These are read only properties.
 			public EffectorLocation EffectorLocation => _effectorLocation;
 			public EffectorType EffectorType => _effectorType;
-			public Effector ParentEffector => _parentEffector;
-			public Bone Bone => _bone;
-			public Bone LeftBone => _leftBone;
-			public Bone RightBone => _rightBone;
+			// These aren't serialize field.
+			// Memo: If this instance is cloned, will be copyed these properties, too.
+			public Effector ParentEffector { get; private set; }
+			public Bone Bone { get; private set; }// Hips : Hips Eyes : Head
+			public Bone LeftBone { get; private set; } // Hips : LeftLeg Eyes : LeftEye Others : null
+			public Bone RightBone { get; private set; }// Hips : RightLeg Eyes : RightEye Others : null
 			public Vector3f DefaultPosition => _defaultPosition;
 			public Quaternionf DefaultRotation => _defaultRotation;
 
@@ -5750,9 +5763,9 @@ namespace RhuEngine.Components
 			{
 				get {
 					if ((_effectorFlags & EffectorFlags.RotationContained) != EffectorFlags.None) { // Hips, Wrist, Foot
-						Assert(_bone != null);
-						if (_bone != null && _bone.LocalAxisFrom != LocalAxisFrom.None && _bone.BoneType != BoneType.Hips) { // Exclude Hips.
-																															 // Hips is identity transform.
+						Assert(Bone != null);
+						if (Bone != null && Bone.LocalAxisFrom != LocalAxisFrom.None && Bone.BoneType != BoneType.Hips) { // Exclude Hips.
+																														  // Hips is identity transform.
 							return false;
 						}
 					}
@@ -5795,11 +5808,11 @@ namespace RhuEngine.Components
 					effector.PresetEffectorLocation(effectorLocation);
 				}
 
-				effector._parentEffector = parentEffector;
-				effector._bone = bone;
-				effector._leftBone = leftBone;
-				effector._rightBone = rightBone;
-				
+				effector.ParentEffector = parentEffector;
+				effector.Bone = bone;
+				effector.LeftBone = leftBone;
+				effector.RightBone = rightBone;
+
 				// Create or destroy effectorTransform.
 				effector.PrefixTransform(createEffectorTransform, parentTransform ?? parentEffector.transform.Target);
 
@@ -5871,7 +5884,7 @@ namespace RhuEngine.Components
 				// Reset transform.
 				if (TransformIsAlive) {
 					transform.Target.position.Value = _effectorType == EffectorType.Eyes
-						? _defaultPosition + fullBodyIK.internalValues.defaultRootBasis.column2 * EYES_DEFAULTDISTANCE
+						? _defaultPosition + (fullBodyIK.internalValues.defaultRootBasis.column2 * EYES_DEFAULTDISTANCE)
 						: _defaultPosition;
 
 					transform.Target.rotation.Value = _defaultRotation;
@@ -5888,8 +5901,8 @@ namespace RhuEngine.Components
 			}
 
 			public void ComputeDefaultTransform(HumanoidIK fullBodyIK) {
-				if (_parentEffector != null) {
-					_defaultRotation.Value = _parentEffector._defaultRotation;
+				if (ParentEffector != null) {
+					_defaultRotation.Value = ParentEffector._defaultRotation;
 				}
 
 				if (_effectorType == EffectorType.Root) {
@@ -5897,15 +5910,15 @@ namespace RhuEngine.Components
 					_defaultRotation.Value = fullBodyIK.internalValues.defaultRootRotation;
 				}
 				else if (_effectorType == EffectorType.HandFinger) {
-					Assert(_bone != null);
-					if (_bone != null) {
-						if (_bone.TransformIsAlive) {
+					Assert(Bone != null);
+					if (Bone != null) {
+						if (Bone.TransformIsAlive) {
 							_defaultPosition.Value = Bone._defaultPosition;
 						}
 						else { // Failsafe. Simulate finger tips.
 							   // Memo: If transformIsAlive == false, _parentBone is null.
-							Assert(_bone.ParentBoneLocationBased != null && _bone.ParentBoneLocationBased.ParentBoneLocationBased != null);
-							if (_bone.ParentBoneLocationBased != null && _bone.ParentBoneLocationBased.ParentBoneLocationBased != null) {
+							Assert(Bone.ParentBoneLocationBased != null && Bone.ParentBoneLocationBased.ParentBoneLocationBased != null);
+							if (Bone.ParentBoneLocationBased != null && Bone.ParentBoneLocationBased.ParentBoneLocationBased != null) {
 								var tipTranslate = Bone.ParentBoneLocationBased._defaultPosition - Bone.ParentBoneLocationBased.ParentBoneLocationBased._defaultPosition;
 								_defaultPosition.Value = Bone.ParentBoneLocationBased._defaultPosition + tipTranslate;
 								_isSimulateFingerTips = true;
@@ -5914,19 +5927,19 @@ namespace RhuEngine.Components
 					}
 				}
 				else if (_effectorType == EffectorType.Eyes) {
-					Assert(_bone != null);
+					Assert(Bone != null);
 					_isHiddenEyes = fullBodyIK.IsHiddenCustomEyes();
-					if (!_isHiddenEyes && _bone != null && _bone.TransformIsAlive &&
-						_leftBone != null && _leftBone.TransformIsAlive &&
-						_rightBone != null && _rightBone.TransformIsAlive) {
+					if (!_isHiddenEyes && Bone != null && Bone.TransformIsAlive &&
+						LeftBone != null && LeftBone.TransformIsAlive &&
+						RightBone != null && RightBone.TransformIsAlive) {
 						// _bone ... Head / _leftBone ... LeftEye / _rightBone ... RightEye
-						_defaultPosition.Value = (_leftBone._defaultPosition + _rightBone._defaultPosition) * 0.5f;
+						_defaultPosition.Value = (LeftBone._defaultPosition + RightBone._defaultPosition) * 0.5f;
 					}
-					else if (_bone != null && _bone.TransformIsAlive) {
-						_defaultPosition.Value = _bone._defaultPosition;
+					else if (Bone != null && Bone.TransformIsAlive) {
+						_defaultPosition.Value = Bone._defaultPosition;
 						// _bone ... Head / _bone.parentBone ... Neck
-						if (_bone.ParentBone != null && _bone.ParentBone.TransformIsAlive && _bone.ParentBone.BoneType == BoneType.Neck) {
-							var neckToHead = _bone._defaultPosition - _bone.ParentBone._defaultPosition;
+						if (Bone.ParentBone != null && Bone.ParentBone.TransformIsAlive && Bone.ParentBone.BoneType == BoneType.Neck) {
+							var neckToHead = Bone._defaultPosition - Bone.ParentBone._defaultPosition;
 							var neckToHeadY = neckToHead.y > 0.0f ? neckToHead.y : 0.0f;
 							_defaultPosition.Value += fullBodyIK.internalValues.defaultRootBasis.column1 * neckToHeadY;
 							_defaultPosition.Value += fullBodyIK.internalValues.defaultRootBasis.column2 * neckToHeadY;
@@ -5934,15 +5947,15 @@ namespace RhuEngine.Components
 					}
 				}
 				else if (_effectorType == EffectorType.Hips) {
-					Assert(_bone != null && _leftBone != null && _rightBone != null);
-					if (_bone != null && _leftBone != null && _rightBone != null) {
+					Assert(Bone != null && LeftBone != null && RightBone != null);
+					if (Bone != null && LeftBone != null && RightBone != null) {
 						// _bone ... Hips / _leftBone ... LeftLeg / _rightBone ... RightLeg
-						_defaultPosition.Value = (_leftBone._defaultPosition + _rightBone._defaultPosition) * 0.5f;
+						_defaultPosition.Value = (LeftBone._defaultPosition + RightBone._defaultPosition) * 0.5f;
 					}
 				}
 				else { // Normally case.
-					Assert(_bone != null);
-					if (_bone != null) {
+					Assert(Bone != null);
+					if (Bone != null) {
 						_defaultPosition.Value = Bone._defaultPosition;
 						if (!DefaultLocalBasisIsIdentity) { // For wrist & foot.
 							_defaultRotation.Value = Bone._localAxisRotation;
@@ -5986,19 +5999,19 @@ namespace RhuEngine.Components
 			{
 				get {
 					if (_effectorType == EffectorType.Eyes) {
-						if (!_isHiddenEyes && _bone != null && _bone.TransformIsAlive &&
-							_leftBone != null && _leftBone.TransformIsAlive &&
-							_rightBone != null && _rightBone.TransformIsAlive) {
+						if (!_isHiddenEyes && Bone != null && Bone.TransformIsAlive &&
+							LeftBone != null && LeftBone.TransformIsAlive &&
+							RightBone != null && RightBone.TransformIsAlive) {
 							// _bone ... Head / _leftBone ... LeftEye / _rightBone ... RightEye
-							return (_leftBone.WorldPosition + _rightBone.WorldPosition) * 0.5f;
+							return (LeftBone.WorldPosition + RightBone.WorldPosition) * 0.5f;
 						}
-						else if (_bone != null && _bone.TransformIsAlive) {
-							var currentPosition = _bone.WorldPosition;
+						else if (Bone != null && Bone.TransformIsAlive) {
+							var currentPosition = Bone.WorldPosition;
 							// _bone ... Head / _bone.parentBone ... Neck
-							if (_bone.ParentBone != null && _bone.ParentBone.TransformIsAlive && _bone.ParentBone.BoneType == BoneType.Neck) {
-								var neckToHead = _bone._defaultPosition - _bone.ParentBone._defaultPosition;
+							if (Bone.ParentBone != null && Bone.ParentBone.TransformIsAlive && Bone.ParentBone.BoneType == BoneType.Neck) {
+								var neckToHead = Bone._defaultPosition - Bone.ParentBone._defaultPosition;
 								var neckToHeadY = neckToHead.y > 0.0f ? neckToHead.y : 0.0f;
-								var parentBaseRotation = _bone.ParentBone.WorldRotation * _bone.ParentBone._worldToBaseRotation;
+								var parentBaseRotation = Bone.ParentBone.WorldRotation * Bone.ParentBone._worldToBaseRotation;
 								IKMath.MatSetRot(out var parentBaseBasis, ref parentBaseRotation);
 								currentPosition += parentBaseBasis.column1 * neckToHeadY;
 								currentPosition += parentBaseBasis.column2 * neckToHeadY;
@@ -6007,19 +6020,19 @@ namespace RhuEngine.Components
 						}
 					}
 					else if (_isSimulateFingerTips) {
-						if (_bone != null &&
-							_bone.ParentBoneLocationBased != null &&
-							_bone.ParentBoneLocationBased.TransformIsAlive &&
-							_bone.ParentBoneLocationBased.ParentBoneLocationBased != null &&
-							_bone.ParentBoneLocationBased.ParentBoneLocationBased.TransformIsAlive) {
-							var parentPosition = _bone.ParentBoneLocationBased.WorldPosition;
-							var parentParentPosition = _bone.ParentBoneLocationBased.ParentBoneLocationBased.WorldPosition;
+						if (Bone != null &&
+							Bone.ParentBoneLocationBased != null &&
+							Bone.ParentBoneLocationBased.TransformIsAlive &&
+							Bone.ParentBoneLocationBased.ParentBoneLocationBased != null &&
+							Bone.ParentBoneLocationBased.ParentBoneLocationBased.TransformIsAlive) {
+							var parentPosition = Bone.ParentBoneLocationBased.WorldPosition;
+							var parentParentPosition = Bone.ParentBoneLocationBased.ParentBoneLocationBased.WorldPosition;
 							return parentPosition + (parentPosition - parentParentPosition);
 						}
 					}
 					else {
-						if (_bone != null && _bone.TransformIsAlive) {
-							return _bone.WorldPosition;
+						if (Bone != null && Bone.TransformIsAlive) {
+							return Bone.WorldPosition;
 						}
 					}
 
@@ -7201,9 +7214,9 @@ namespace RhuEngine.Components
 					IKMath.MatMultVec(out hipsToFootLength[index].kneeToFoot, internalValues.defaultRootBasisInv, kneeToFootDir);
 
 					hipsToFootLength[index].defaultOffset =
-						hipsToFootLength[index].hipsToLeg * hipsToLegLen +
-						hipsToFootLength[index].legToKnee * legToKneeLen +
-						hipsToFootLength[index].kneeToFoot * kneeToFootLen;
+						(hipsToFootLength[index].hipsToLeg * hipsToLegLen) +
+						(hipsToFootLength[index].legToKnee * legToKneeLen) +
+						(hipsToFootLength[index].kneeToFoot * kneeToFootLen);
 				}
 			}
 
@@ -7214,9 +7227,9 @@ namespace RhuEngine.Components
 					var kneeToFootLen = footBone._defaultLocalLength.length;
 
 					var currentOffset =
-						hipsToFootLength[index].hipsToLeg * hipsToLegLen +
-						hipsToFootLength[index].legToKnee * legToKneeLen +
-						hipsToFootLength[index].kneeToFoot * kneeToFootLen;
+						(hipsToFootLength[index].hipsToLeg * hipsToLegLen) +
+						(hipsToFootLength[index].legToKnee * legToKneeLen) +
+						(hipsToFootLength[index].kneeToFoot * kneeToFootLen);
 
 					return currentOffset - hipsToFootLength[index].defaultOffset;
 				}
@@ -7245,7 +7258,7 @@ namespace RhuEngine.Components
 		}
 
 
-
+		[OnChanged(nameof(PrepareIK))]
 		public readonly SyncRef<Entity> rootTransform;
 
 		public InternalValues internalValues = new();
@@ -7273,11 +7286,8 @@ namespace RhuEngine.Components
 		public readonly FingersEffectors leftHandFingersEffectors;
 		public readonly FingersEffectors rightHandFingersEffectors;
 
-		public Bone[] Bones => _bones;
-		public Effector[] Effectors => _effectors;
-
-		Bone[] _bones = new Bone[(int)BoneType.Max];
-		Effector[] _effectors = new Effector[(int)EffectorLocation.Max];
+		public Bone[] Bones { get; private set; } = new Bone[(int)BoneType.Max];
+		public Effector[] Effectors { get; private set; } = new Effector[(int)EffectorLocation.Max];
 
 		BodyIK _bodyIK;
 		LimbIK[] _limbIK = new LimbIK[(int)LimbIKLocation.Max];
@@ -7291,22 +7301,11 @@ namespace RhuEngine.Components
 
 		public readonly Sync<bool> _isPrefixedAtLeastOnce;
 
-		public void Awake(Entity rootTransorm_) {
-			if (rootTransform.Target != rootTransorm_) {
-				rootTransform.Target = rootTransorm_;
-			}
-
-			Prefix();
-			ConfigureBoneTransforms();
-			Prepare();
-
-		}
-
 		static void SetBoneTransform(Bone bone, Entity transform) {
 			bone.transform.Target = transform;
 		}
 
-		static void SetFingerBoneTransform(ref Bone[] bones, Entity[,] transforms, int index) {
+		public static void SetFingerBoneTransform(ref Bone[] bones, Entity[,] transforms, int index) {
 			if (bones == null || bones.Length != MAX_HAND_FINGER_LENGTH) {
 				bones = new Bone[MAX_HAND_FINGER_LENGTH];
 			}
@@ -7319,7 +7318,7 @@ namespace RhuEngine.Components
 			}
 		}
 
-		static bool IsSpine(Entity trn) {
+		public static bool IsSpine(Entity trn) {
 			if (trn != null) {
 				var name = trn.name.Value;
 				if (name.Contains("Spine") || name.Contains("spine") || name.Contains("SPINE")) {
@@ -7333,7 +7332,7 @@ namespace RhuEngine.Components
 			return false;
 		}
 
-		static bool IsNeck(Entity trn) {
+		public static bool IsNeck(Entity trn) {
 			if (trn != null) {
 				var name = trn.name.Value;
 				if (name != null) {
@@ -7349,7 +7348,7 @@ namespace RhuEngine.Components
 					if (name.Contains("\u30AF\u30D3")) { // Kubi(Kana-kana)
 						return true;
 					}
-					if (name.Contains("\u9996")) { // Kubi(Kanji)
+					if (name.Contains('首')) { // Kubi(Kanji)
 						return true;
 					}
 				}
@@ -7376,11 +7375,11 @@ namespace RhuEngine.Components
 
 			_isPrefixed = true;
 
-			if (_bones == null || _bones.Length != (int)BoneLocation.Max) {
-				_bones = new Bone[(int)BoneLocation.Max];
+			if (Bones == null || Bones.Length != (int)BoneLocation.Max) {
+				Bones = new Bone[(int)BoneLocation.Max];
 			}
-			if (_effectors == null || _effectors.Length != (int)EffectorLocation.Max) {
-				_effectors = new Effector[(int)EffectorLocation.Max];
+			if (Effectors == null || Effectors.Length != (int)EffectorLocation.Max) {
+				Effectors = new Effector[(int)EffectorLocation.Max];
 			}
 
 			Prefix(bodyBones.hips, BoneLocation.Hips, null);
@@ -7461,8 +7460,8 @@ namespace RhuEngine.Components
 
 			if (!_isPrefixedAtLeastOnce.Value) {
 				_isPrefixedAtLeastOnce.Value = true;
-				for (var i = 0; i != _effectors.Length; ++i) {
-					_effectors[i].Prefix();
+				for (var i = 0; i != Effectors.Length; ++i) {
+					Effectors[i].Prefix();
 				}
 			}
 		}
@@ -7479,7 +7478,7 @@ namespace RhuEngine.Components
 			"_r",
 		};
 
-		static Entity FindEye(Entity head, bool isRight) {
+		public static Entity FindEye(Entity head, bool isRight) {
 			if (head != null) {
 				var keywords = isRight ? _rightKeywords : _leftKeywords;
 
@@ -7506,8 +7505,6 @@ namespace RhuEngine.Components
 		}
 
 		public void ConfigureBoneTransforms() {
-			Prefix();
-
 			Assert(settings != null && rootTransform != null);
 			if (settings.automaticPrepareHumanoid && rootTransform != null) {
 				//Todo find bones
@@ -7577,7 +7574,6 @@ namespace RhuEngine.Components
 		// - Wakeup for solvers.
 		// - Require to setup each transforms.
 		public bool Prepare() {
-			Prefix();
 
 			if (_isPrepared) {
 				return false;
@@ -7585,32 +7581,32 @@ namespace RhuEngine.Components
 
 			_isPrepared = true;
 
-			Assert(rootTransform != null);
-			if (rootTransform != null) { // Failsafe.
+			Assert(rootTransform.Target != null);
+			if (rootTransform.Target != null) { // Failsafe.
 				internalValues.defaultRootPosition = rootTransform.Target.GlobalTrans.Translation;
 				//internalValues.defaultRootBasis = IKMatrix3x3.FromColumn(rootTransform.right, rootTransform.up, rootTransform.forward); Todo Add Face values
 				internalValues.defaultRootBasisInv = internalValues.defaultRootBasis.Transpose;
 				internalValues.defaultRootRotation = rootTransform.Target.GlobalTrans.Rotation;
 			}
 
-			if (_bones != null) {
-				var boneLength = _bones.Length;
+			if (Bones != null) {
+				var boneLength = Bones.Length;
 				for (var i = 0; i != boneLength; ++i) {
-					Assert(_bones[i] != null);
-					_bones[i]?.Prepare(this);
+					Assert(Bones[i] != null);
+					Bones[i]?.Prepare(this);
 				}
 				for (var i = 0; i != boneLength; ++i) {
-					_bones[i]?.PostPrepare();
+					Bones[i]?.PostPrepare();
 				}
 			}
 
 			boneCaches.Prepare(this);
 
-			if (_effectors != null) {
-				var effectorLength = _effectors.Length;
+			if (Effectors != null) {
+				var effectorLength = Effectors.Length;
 				for (var i = 0; i != effectorLength; ++i) {
-					Assert(_effectors[i] != null);
-					_effectors[i]?.Prepare(this);
+					Assert(Effectors[i] != null);
+					Effectors[i]?.Prepare(this);
 				}
 			}
 
@@ -7687,29 +7683,29 @@ namespace RhuEngine.Components
 				if (settings.syncDisplacement == SyncDisplacement.Everyframe || !_isSyncDisplacementAtLeastOnce) {
 					_isSyncDisplacementAtLeastOnce = true;
 
-					if (_bones != null) {
-						var boneLength = _bones.Length;
+					if (Bones != null) {
+						var boneLength = Bones.Length;
 						for (var i = 0; i != boneLength; ++i) {
-							_bones[i]?.SyncDisplacement();
+							Bones[i]?.SyncDisplacement();
 						}
 
 						// for Hips
 						boneCaches.SyncDisplacement(this);
 
 						for (var i = 0; i != boneLength; ++i) {
-							_bones[i]?.PostSyncDisplacement(this);
+							Bones[i]?.PostSyncDisplacement(this);
 						}
 
 						for (var i = 0; i != boneLength; ++i) {
-							_bones[i]?.PostPrepare();
+							Bones[i]?.PostPrepare();
 						}
 					}
 
 					// Forceupdate _defaultPosition / _defaultRotation
-					if (_effectors != null) {
-						var effectorLength = _effectors.Length;
+					if (Effectors != null) {
+						var effectorLength = Effectors.Length;
 						for (var i = 0; i != effectorLength; ++i) {
-							_effectors[i]?.ComputeDefaultTransform(this);
+							Effectors[i]?.ComputeDefaultTransform(this);
 						}
 					}
 				}
@@ -7773,10 +7769,10 @@ namespace RhuEngine.Components
 		public void Update() {
 			UpdateInternalValues();
 
-			if (_effectors != null) {
-				var effectorLength = _effectors.Length;
+			if (Effectors != null) {
+				var effectorLength = Effectors.Length;
 				for (var i = 0; i != effectorLength; ++i) {
-					_effectors[i]?.PrepareUpdate();
+					Effectors[i]?.PrepareUpdate();
 				}
 			}
 
@@ -7790,10 +7786,10 @@ namespace RhuEngine.Components
 
 			// Feedback bonePositions to effectorPositions.
 			// (for AnimatorEnabled only.)
-			if (_effectors != null) {
-				var effectorLength = _effectors.Length;
+			if (Effectors != null) {
+				var effectorLength = Effectors.Length;
 				for (var i = 0; i != effectorLength; ++i) {
-					var effector = _effectors[i];
+					var effector = Effectors[i];
 					if (effector != null) {
 						// todo: Optimize. (for BodyIK)
 
@@ -7908,35 +7904,35 @@ namespace RhuEngine.Components
 		}
 
 		void Bones_PrepareUpdate() {
-			if (_bones != null) {
-				var boneLength = _bones.Length;
+			if (Bones != null) {
+				var boneLength = Bones.Length;
 				for (var i = 0; i != boneLength; ++i) {
-					_bones[i]?.PrepareUpdate();
+					Bones[i]?.PrepareUpdate();
 				}
 			}
 		}
 
 		void Bones_WriteToTransform() {
-			if (_bones != null) {
-				var boneLength = _bones.Length;
+			if (Bones != null) {
+				var boneLength = Bones.Length;
 				for (var i = 0; i != boneLength; ++i) {
-					_bones[i]?.WriteToTransform();
+					Bones[i]?.WriteToTransform();
 				}
 			}
 		}
 
 		void Prefix(Bone bone, BoneLocation boneLocation, Bone parentBoneLocationBased) {
-			Assert(_bones != null);
-			Bone.Prefix(_bones, ref bone, boneLocation, parentBoneLocationBased);
+			Assert(Bones != null);
+			Bone.Prefix(Bones, ref bone, boneLocation, parentBoneLocationBased);
 		}
 
 		void Prefix(
 			Effector effector,
 			EffectorLocation effectorLocation) {
-			Assert(_effectors != null);
+			Assert(Effectors != null);
 			var createEffectorTransform = settings.createEffectorTransform;
 			Assert(rootTransform.Target != null);
-			Effector.Prefix(_effectors, ref effector, effectorLocation, createEffectorTransform, rootTransform.Target);
+			Effector.Prefix(Effectors, ref effector, effectorLocation, createEffectorTransform, rootTransform.Target);
 		}
 
 		void Prefix(
@@ -7954,14 +7950,16 @@ namespace RhuEngine.Components
 			Bone bone,
 			Bone leftBone = null,
 			Bone rightBone = null) {
-			Assert(_effectors != null);
+			Assert(Effectors != null);
 			var createEffectorTransform = settings.createEffectorTransform;
-			Effector.Prefix(_effectors, ref effector, effectorLocation, createEffectorTransform, null, parentEffector, bone, leftBone, rightBone);
+			Effector.Prefix(Effectors, ref effector, effectorLocation, createEffectorTransform, null, parentEffector, bone, leftBone, rightBone);
 		}
 
 		//----------------------------------------------------------------------------------------------------------------------------
 
 		// Custom Solver.
+#pragma warning disable CA1822 // Mark members as static
+#pragma warning disable IDE0060 // Remove unused parameter
 		public bool IsHiddenCustomEyes() {
 			return false;
 		}
@@ -7976,6 +7974,8 @@ namespace RhuEngine.Components
 		public void SolveCustomEyes(ref IKMatrix3x3 neckBasis, ref IKMatrix3x3 headBasis, ref IKMatrix3x3 headBaseBasis) {
 		}
 
+#pragma warning restore CA1822 // Mark members as static
+#pragma warning restore IDE0060 // Remove unused parameter
 
 		public static void SafeResize<TYPE_>(ref TYPE_[] objArray, int length) {
 			if (objArray == null) {
@@ -8064,9 +8064,9 @@ namespace RhuEngine.Components
 					eyesDir.z *= 1.0f / (1.0f + shiftZ);
 				}
 
-				var xyLen = IKMath.Sqrt(eyesDir.x * eyesDir.x + eyesDir.y * eyesDir.y);
+				var xyLen = IKMath.Sqrt((eyesDir.x * eyesDir.x) + (eyesDir.y * eyesDir.y));
 				if (xyLen > IKMath.FLOAT_EPSILON) {
-					var xyLenTo = IKMath.Sqrt(1.0f - eyesDir.z * eyesDir.z);
+					var xyLenTo = IKMath.Sqrt(1.0f - (eyesDir.z * eyesDir.z));
 					var xyLenScale = xyLenTo / xyLen;
 					eyesDir.x *= xyLenScale;
 					eyesDir.y *= xyLenScale;
