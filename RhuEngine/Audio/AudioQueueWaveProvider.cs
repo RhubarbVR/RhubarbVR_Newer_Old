@@ -43,11 +43,6 @@ namespace RhuEngine
 		}
 
 		public int Read(byte[] buffer, int offset, int count) {
-			if (Count == 0) {
-				Array.Clear(buffer, offset, count);
-				return count;
-			}
-
 			var totalAmountRead = 0;
 
 			while (totalAmountRead < count && _audioQueue.TryDequeue(out var pcmData)) {
