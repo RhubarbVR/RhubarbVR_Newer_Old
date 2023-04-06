@@ -132,10 +132,15 @@ namespace RhuEngine.Components
 		}
 
 		private void UIUpdate() {
-			CleanUpUI();
-			if (TargetObject.Target is null) { return; }
-			BuildUI();
-			LocalBind();
+			try {
+				CleanUpUI();
+				if (TargetObject.Target is null) { return; }
+				BuildUI();
+				LocalBind();
+			}
+			catch(Exception e) {
+				RLog.Err($"Error Update UI on Inspector {GetType().GetFormattedName()}  World {World.WorldDebugName} Error:{e}");
+			}
 		}
 		public void TargetObjectRebuild() {
 			if (LocalUser != MasterUser) {

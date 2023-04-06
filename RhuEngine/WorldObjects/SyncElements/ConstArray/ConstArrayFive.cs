@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RhuEngine.WorldObjects
 {
-	public partial class ConstArrayFive<T> : ConstArrayFour<T> where T : SyncObject
+	public partial class ConstArrayFive<T> : ConstArrayFour<T> where T : SyncObject, new()
 	{
 		public readonly T Five;
 		public override int Length => 5;

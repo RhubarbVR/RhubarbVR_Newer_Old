@@ -10,7 +10,7 @@ then
 fi
 
 # check if .NET 6 and 7 runtimes are installed
-if ! dotnet --list-runtimes | grep -q -E "Microsoft\.NETCore\.App 6\.|Microsoft\.NETCore\.App 7\."
+if ! dotnet --list-runtimes | grep -q -E "Microsoft\.NETCore\.App 7\."
 then
     echo "Both .NET 6 runtime and 7 sdk are required. Please download and install them."
     exit 1

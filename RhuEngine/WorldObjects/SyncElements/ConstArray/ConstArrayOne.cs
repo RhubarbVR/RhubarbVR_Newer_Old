@@ -12,7 +12,7 @@ namespace RhuEngine.WorldObjects
 		T this[int i] { get; }
 	}
 
-	public partial class ConstArrayOne<T> : SyncObject, IArray<T> where T : SyncObject
+	public partial class ConstArrayOne<T> : SyncObject, IArray<T> where T : SyncObject, new()
 	{
 		public readonly T One;
 

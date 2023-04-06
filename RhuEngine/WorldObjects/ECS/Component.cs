@@ -3,6 +3,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
+using RhuEngine.Linker;
+
 namespace RhuEngine.WorldObjects.ECS
 {
 	public interface IComponent : ISyncObject
@@ -27,16 +29,16 @@ namespace RhuEngine.WorldObjects.ECS
 		protected override void OnInitialize() {
 			base.OnInitialize();
 			Entity = (Entity)Parent.Parent;
-			if(Entity is null) {
+			if (Entity is null) {
 				throw new Exception("Component Failed to bind to entity");
 			}
 			var allowedOnWorldRoot = GetType().GetCustomAttribute<AllowedOnWorldRootAttribute>(true);
-			if(allowedOnWorldRoot is null && Entity.IsRoot) {
+			if (allowedOnWorldRoot is null && Entity.IsRoot) {
 				throw new Exception("Not Allowed on WorldRoot");
 			}
 			var locke = GetType().GetHighestAttributeInherit<SingleComponentLockAttribute>();
-			if(locke is not null) {
-				if(Entity.components.Where(x => x.GetType().IsAssignableTo(locke)).Count() >= 1) {
+			if (locke is not null) {
+				if (Entity.components.Where(x => x.GetType().IsAssignableTo(locke)).Count() >= 1) {
 					throw new Exception("Single Component Locked");
 				}
 			}
@@ -95,13 +97,25 @@ namespace RhuEngine.WorldObjects.ECS
 		internal void RunRenderStep(bool isEnabled) {
 			AlwaysRenderStep();
 			if (isEnabled) {
-				RenderStep();
+				try {
+					RenderStep();
+				}
+				catch (Exception e) {
+					RLog.Err($"Failed to RenderStep Component {Name} {GetType().GetFormattedName()} Wprld {World.WorldDebugName} Error: {e}");
+					Enabled.Value = false;
+				}
 			}
 		}
 		internal void RunStep(bool isEnabled) {
 			AlwaysStep();
 			if (isEnabled) {
-				Step();
+				try {
+					Step();
+				}
+				catch (Exception e) {
+					RLog.Err($"Failed to Step Component {Name} {GetType().GetFormattedName()} Wprld {World.WorldDebugName} Error: {e}");
+					Enabled.Value = false;
+				}
 			}
 		}
 

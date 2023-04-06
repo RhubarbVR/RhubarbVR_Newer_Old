@@ -171,7 +171,7 @@ namespace RhuEngine.WorldObjects
 		[Default("New World")]
 		public readonly Sync<string> WorldName;
 		[Exposed]
-		public string WorldDebugName => $"{(IsPersonalSpace ? "P" : "")}{((worldManager.LocalWorld == this) ? "L" : "")} {SessionName.Value}";
+		public string WorldDebugName => $"{(IsPersonalSpace ? "P" : "")}{((worldManager.LocalWorld == this) ? "L" : "")}{((worldManager.OverlayWorld == this) ? "O" : "")}{((worldManager.FocusedWorld == this) ? "F" : "")} {SessionName.Value}";
 
 		public event Action FoucusChanged;
 

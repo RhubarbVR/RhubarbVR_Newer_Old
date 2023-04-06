@@ -184,5 +184,13 @@ namespace RhuEngine.WorldObjects
 			}
 			World.BroadcastDataToAllStream(this, new DataNode<byte[]>(amoutUsed), LiteNetLib.DeliveryMethod.Unreliable);
 		}
+
+		public override void StreamUpdateOwner() {
+			//Not needed synced on mic input
+		}
+
+		public override void StreamUpdateOther() {
+			//Not needed synced on mic input
+		}
 	}
 }

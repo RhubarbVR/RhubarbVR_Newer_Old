@@ -19,18 +19,11 @@ namespace RhuEngine.WorldObjects
 			set {
 				lock (_locker) {
 					_value = value;
-					BroadcastValue();
 					Changed?.Invoke(this);
 				}
 			}
 		}
 
-		private void BroadcastValue() {
-			if (IsLinkedTo || NoSync) {
-				return;
-			}
-			World.BroadcastDataToAllStream(this, typeof(T).IsEnum ? new DataNode<int>((int)(object)_value) : new DataNode<T>(_value), LiteNetLib.DeliveryMethod.Unreliable);
-		}
 		public override void Received(Peer sender, IDataNode data) {
 			if (NoSync) {
 				return;
@@ -52,15 +45,6 @@ namespace RhuEngine.WorldObjects
 				}
 				catch { }
 			}
-		}
-
-		public void SetValueNoOnChange(T value) {
-			_value = value;
-			BroadcastValue();
-		}
-
-		public void SetValueNoOnChangeAndNetworking(T value) {
-			_value = value;
 		}
 
 		public bool IsLinkedTo { get; private set; }
@@ -118,6 +102,18 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void SetStartingValueNetworked() {
+		}
+
+
+		public override void StreamUpdateOther() {
+
+		}
+
+		public override void StreamUpdateOwner() {
+			if (IsLinkedTo || NoSync) {
+				return;
+			}
+			World.BroadcastDataToAllStream(this, typeof(T).IsEnum ? new DataNode<int>((int)(object)_value) : new DataNode<T>(_value), LiteNetLib.DeliveryMethod.Unreliable);
 		}
 	}
 }

@@ -1,12 +1,13 @@
 ﻿// Copyright (c) 2016 Nora
 // Released under the MIT license
 // http://opensource.org/licenses/mit-license.php
-
+#define IK_DEBUG
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.Xml;
 
+using RhuEngine.Linker;
 using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
@@ -40,7 +41,7 @@ namespace RhuEngine.Components
 				public float rate;
 			}
 
-			private readonly Settings _settings;
+			private readonly IKSettings _settings;
 			private readonly InternalValues _internalValues;
 
 			public LimbIKLocation _limbIKLocation;
@@ -1339,7 +1340,7 @@ namespace RhuEngine.Components
 
 		public class HeadIK
 		{
-			private readonly Settings _settings;
+			private readonly IKSettings _settings;
 			private readonly InternalValues _internalValues;
 
 			private readonly Bone _neckBone;
@@ -1874,7 +1875,7 @@ namespace RhuEngine.Components
 			}
 
 			private readonly FingerIKType _fingerIKType;
-			private readonly Settings _settings;
+			private readonly IKSettings _settings;
 			private readonly InternalValues _internalValues;
 
 			private readonly Bone _parentBone; // wrist/leg
@@ -3261,7 +3262,7 @@ namespace RhuEngine.Components
 
 			SolverInternal _solverInternal;
 
-			private readonly Settings _settings;
+			private readonly IKSettings _settings;
 			private readonly InternalValues _internalValues;
 
 			public BodyIK(HumanoidIK fullBodyIK, LimbIK[] limbIK) {
@@ -4603,7 +4604,7 @@ namespace RhuEngine.Components
 					}
 				}
 
-				public Settings settings;
+				public IKSettings settings;
 				public InternalValues internalValues;
 				public bool[] _shouderLocalAxisYInv;
 				public Effector[] _armEffectors;
@@ -5798,9 +5799,9 @@ namespace RhuEngine.Components
 				effector._bone = bone;
 				effector._leftBone = leftBone;
 				effector._rightBone = rightBone;
-
+				
 				// Create or destroy effectorTransform.
-				effector.PrefixTransform(createEffectorTransform, parentTransform);
+				effector.PrefixTransform(createEffectorTransform, parentTransform ?? parentEffector.transform.Target);
 
 				if (effectors != null) {
 					effectors[(int)effectorLocation] = effector;
@@ -6648,7 +6649,7 @@ namespace RhuEngine.Components
 			Everyframe,
 		}
 
-		public sealed partial class Settings : SyncObject
+		public sealed partial class IKSettings : SyncObject
 		{
 			[Default(AutomaticBool.Auto)]
 			public readonly Sync<AutomaticBool> animatorEnabled;
@@ -6669,7 +6670,15 @@ namespace RhuEngine.Components
 			[Default(true)]
 			public readonly Sync<bool> createEffectorTransform;
 
-			public sealed partial class BodyIK : SyncObject
+			public readonly SyncedBodyIK bodyIK;
+
+			public readonly SyncedLimbIK limbIK;
+
+			public readonly SyncedHeadIK headIK;
+
+			public readonly SyncedFingerIK fingerIK;
+
+			public sealed partial class SyncedBodyIK : SyncObject
 			{
 				[Default(true)]
 				public readonly Sync<bool> forceSolveEnabled;
@@ -6771,7 +6780,7 @@ namespace RhuEngine.Components
 				public readonly Sync<float> upperEyesTraceAngle;
 			}
 
-			public sealed partial class LimbIK : SyncObject
+			public sealed partial class SyncedLimbIK : SyncObject
 			{
 				[Default(true)]
 				public readonly Sync<bool> legAlwaysSolveEnabled;
@@ -6871,7 +6880,7 @@ namespace RhuEngine.Components
 				public readonly Sync<float> footLimitRoll;
 			}
 
-			public sealed partial class HeadIK : SyncObject
+			public sealed partial class SyncedHeadIK : SyncObject
 			{
 				[Default(15.0f)]
 				public readonly Sync<float> neckLimitPitchUp;
@@ -6909,17 +6918,12 @@ namespace RhuEngine.Components
 				public readonly Sync<float> eyesYawInnerRate;
 			}
 
-			public sealed partial class FingerIK : SyncObject
+			public sealed partial class SyncedFingerIK : SyncObject
 			{
 			}
-
-			public readonly BodyIK bodyIK;
-			public readonly LimbIK limbIK;
-			public readonly HeadIK headIK;
-			public readonly FingerIK fingerIK;
 		}
 
-		public sealed partial class EditorSettings : SyncObject
+		public sealed partial class EditorIKSettings : SyncObject
 		{
 			public readonly Sync<bool> isAdvanced;
 			public readonly Sync<int> toolbarSelected;
@@ -6943,7 +6947,7 @@ namespace RhuEngine.Components
 			public Vector3f baseHipsPos = Vector3f.Zero;
 			public IKMatrix3x3 baseHipsBasis = IKMatrix3x3.identity;
 
-			public class BodyIK
+			public class InternalBodyIK
 			{
 				public CachedDegreesToSin shoulderLimitThetaYPlus = CachedDegreesToSin.zero;
 				public CachedDegreesToSin shoulderLimitThetaYMinus = CachedDegreesToSin.zero;
@@ -6974,7 +6978,7 @@ namespace RhuEngine.Components
 				public CachedRate01 upperContinuousCenterLegRotationStableRate = CachedRate01.zero;
 				public CachedRate01 upperContinuousPostTranslateStableRate = CachedRate01.zero;
 
-				public void Update(Settings.BodyIK settingsBodyIK) {
+				public void Update(IKSettings.SyncedBodyIK settingsBodyIK) {
 					// Optimize: Reduce C# fuction call.
 					Assert(settingsBodyIK != null);
 
@@ -7043,7 +7047,7 @@ namespace RhuEngine.Components
 				}
 			}
 
-			public class LimbIK
+			public class InternalLimbIK
 			{
 				public CachedDegreesToSin armEffectorBackBeginTheta = CachedDegreesToSin.zero;
 				public CachedDegreesToSin armEffectorBackCoreBeginTheta = CachedDegreesToSin.zero;
@@ -7061,7 +7065,7 @@ namespace RhuEngine.Components
 				public CachedDegreesToSin footLimitPitchDownTheta = CachedDegreesToSin.zero;
 				public CachedDegreesToSin footLimitRollTheta = CachedDegreesToSin.zero;
 
-				public void Update(Settings.LimbIK settingsLimbIK) {
+				public void Update(IKSettings.SyncedLimbIK settingsLimbIK) {
 					// Optimize: Reduce C# fuction call.
 					Assert(settingsLimbIK != null);
 
@@ -7107,7 +7111,7 @@ namespace RhuEngine.Components
 				}
 			}
 
-			public class HeadIK
+			public class InternalHeadIK
 			{
 				public CachedDegreesToSin neckLimitPitchUpTheta = CachedDegreesToSin.zero;
 				public CachedDegreesToSin neckLimitPitchDownTheta = CachedDegreesToSin.zero;
@@ -7123,7 +7127,7 @@ namespace RhuEngine.Components
 				public CachedDegreesToSin eyesLimitYawTheta = CachedDegreesToSin.zero;
 				public CachedDegreesToSin eyesLimitPitchTheta = CachedDegreesToSin.zero;
 
-				public void Update(Settings.HeadIK settingsHeadIK) {
+				public void Update(IKSettings.SyncedHeadIK settingsHeadIK) {
 					Assert(settingsHeadIK != null);
 
 					if (neckLimitPitchUpTheta._degrees != settingsHeadIK.neckLimitPitchUp) {
@@ -7162,9 +7166,9 @@ namespace RhuEngine.Components
 				}
 			}
 
-			public BodyIK bodyIK = new();
-			public LimbIK limbIK = new();
-			public HeadIK headIK = new();
+			public InternalBodyIK bodyIK = new();
+			public InternalLimbIK limbIK = new();
+			public InternalHeadIK headIK = new();
 		}
 
 		// Memo: Not Serializable
@@ -7247,8 +7251,8 @@ namespace RhuEngine.Components
 		public InternalValues internalValues = new();
 		public BoneCaches boneCaches = new();
 
-		public readonly Settings settings;
-		public readonly EditorSettings editorSettings;
+		public readonly IKSettings settings;
+		public readonly EditorIKSettings editorSettings;
 
 		public readonly BodyBones bodyBones;
 		public readonly HeadBones headBones;
@@ -7292,22 +7296,10 @@ namespace RhuEngine.Components
 				rootTransform.Target = rootTransorm_;
 			}
 
-#if IK_DEBUG
-			var constructBeginTime = Time.realtimeSinceStartup;
-#endif
 			Prefix();
-#if IK_DEBUG
-			var prefixEndTime = Time.realtimeSinceStartup;
-#endif
 			ConfigureBoneTransforms();
-#if IK_DEBUG
-			var configureBoneEndTime = Time.realtimeSinceStartup;
-#endif
 			Prepare();
-#if IK_DEBUG
-			var prefetchEndTime = Time.realtimeSinceStartup;
-			Debug.Log("Total time: " + (prefetchEndTime - constructBeginTime) + " _Prefix():" + (prefixEndTime - constructBeginTime) + " ConfigureBoneTransforms():" + (configureBoneEndTime - prefixEndTime) + " Prefetch():" + (prefetchEndTime - configureBoneEndTime));
-#endif
+
 		}
 
 		static void SetBoneTransform(Bone bone, Entity transform) {
@@ -7810,7 +7802,7 @@ namespace RhuEngine.Components
 						// FingerIK : nothing
 						if (effector.EffectorType is EffectorType.Eyes or EffectorType.HandFinger) { // Optimize.
 #if IK_DEBUG
-							effector._hidden_worldPosition = new Vector3();
+							effector._hidden_worldPosition = new Vector3f();
 #endif
 						}
 						else {
@@ -7943,7 +7935,7 @@ namespace RhuEngine.Components
 			EffectorLocation effectorLocation) {
 			Assert(_effectors != null);
 			var createEffectorTransform = settings.createEffectorTransform;
-			Assert(rootTransform != null);
+			Assert(rootTransform.Target != null);
 			Effector.Prefix(_effectors, ref effector, effectorLocation, createEffectorTransform, rootTransform.Target);
 		}
 
@@ -8095,7 +8087,7 @@ namespace RhuEngine.Components
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void DebugLogError(object msg) {
 #if IK_DEBUG
-			Debug.LogError(msg);
+			RLog.Err(msg.ToString() + Environment.StackTrace);
 #endif
 		}
 
@@ -8103,8 +8095,7 @@ namespace RhuEngine.Components
 		public static void Assert(bool cmp) {
 #if IK_DEBUG
 			if (!cmp) {
-				Debug.LogError("Assert");
-				Debug.Break();
+				RLog.Err("Assert" + Environment.StackTrace);
 			}
 #endif
 		}
@@ -8115,8 +8106,7 @@ namespace RhuEngine.Components
 			var epsilon = 1e-4f;
 			var n = (v.x * v.x) + (v.y * v.y) + (v.z * v.z);
 			if (n < 1.0f - epsilon || n > 1.0f + epsilon) {
-				Debug.LogError("CheckNormalized:" + n.ToString("F6"));
-				Debug.Break();
+				RLog.Err("CheckNormalized:" + n.ToString("F6") + Environment.StackTrace);
 			}
 #endif
 		}
@@ -8125,7 +8115,7 @@ namespace RhuEngine.Components
 		public static void CheckNaN(float f) {
 #if IK_DEBUG
 			if (float.IsNaN(f)) {
-				Debug.LogError("NaN");
+				RLog.Err("NaN" + Environment.StackTrace);
 			}
 #endif
 		}
@@ -8134,7 +8124,7 @@ namespace RhuEngine.Components
 		public static void CheckNaN(Vector3f v) {
 #if IK_DEBUG
 			if (float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z)) {
-				Debug.LogError("NaN:" + v);
+				RLog.Err("NaN:" + v + Environment.StackTrace);
 			}
 #endif
 		}
@@ -8143,7 +8133,7 @@ namespace RhuEngine.Components
 		public static void CheckNaN(Quaternionf q) {
 #if IK_DEBUG
 			if (float.IsNaN(q.x) || float.IsNaN(q.y) || float.IsNaN(q.z) || float.IsNaN(q.w)) {
-				Debug.LogError("NaN:" + q);
+				RLog.Err("NaN:" + q + Environment.StackTrace);
 			}
 #endif
 		}

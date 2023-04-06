@@ -21,7 +21,7 @@ namespace RhuEngine.WorldObjects
 		LeftController,
 		RightController,
 	}
-	public sealed partial class User : SyncObject
+	public sealed partial class User : SyncObject, IGlobalStepable
 	{
 		public Matrix GetBodyNodeTrans(BodyNode bodyNode) {
 			return bodyNode == BodyNode.None
@@ -79,7 +79,7 @@ namespace RhuEngine.WorldObjects
 							var (r, g, b, a) = userdata.IconColor.GetColor();
 							UserColor = new Colorb(r, g, b, a);
 						});
-						if(e is null) {
+						if (e is null) {
 							RLog.Info($"Did not get user info for User ID {userID.Value}");
 						}
 					}
@@ -87,7 +87,7 @@ namespace RhuEngine.WorldObjects
 						RLog.Err($"User ID {userID.Value} Failed to parse");
 					}
 				}
-				catch(Exception e) {
+				catch (Exception e) {
 					RLog.Err($"User ID {userID.Value} Load Error:{e}");
 				}
 			});
@@ -151,6 +151,28 @@ namespace RhuEngine.WorldObjects
 			}
 			else {
 				return thing;
+			}
+		}
+
+		private float _timeAfterLastStreamUpdate = 0f;
+
+		private const float TARGET_UPDATE_TIME = 1.0f / 30f;
+
+		public void Step() {
+			if (LocalUser == this) {
+				_timeAfterLastStreamUpdate += RTime.ElapsedF;
+				if(_timeAfterLastStreamUpdate < TARGET_UPDATE_TIME) {
+					return;
+				}
+				_timeAfterLastStreamUpdate = 0f;
+				for (var i = 0; i < syncStreams.Count; i++) {
+					syncStreams[i].StreamUpdateOwner();
+				}
+			}
+			else {
+				for (var i = 0; i < syncStreams.Count; i++) {
+					syncStreams[i].StreamUpdateOther();
+				}
 			}
 		}
 	}

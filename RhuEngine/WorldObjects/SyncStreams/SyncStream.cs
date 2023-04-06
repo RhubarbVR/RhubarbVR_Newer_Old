@@ -12,5 +12,11 @@ namespace RhuEngine.WorldObjects
 		public bool NoSync { get; set; }
 
 		public abstract void Received(Peer sender, IDataNode data);
+
+
+		public abstract void StreamUpdateOwner();
+
+		public abstract void StreamUpdateOther();
+
 	}
 }

@@ -113,7 +113,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public override IDataNode SaveElement(T val) {
-			return val.Serialize(new SyncObjectSerializerObject(true));
+			return val.Serialize(new SyncObjectSerializerObject(true)); //Todo exsperment with not sending element data
 		}
 	}
 }

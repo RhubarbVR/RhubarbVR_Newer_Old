@@ -11,7 +11,7 @@ if %errorlevel% neq 0 (
 )
 
 :: check if .NET 6 and 7 runtimes are installed
-dotnet --list-runtimes | findstr /i "Microsoft.NETCore.App 6.\|Microsoft.NETCore.App 7.\." >nul 2>&1
+dotnet --list-runtimes | findstr /i "Microsoft.NETCore.App 7.\." >nul 2>&1
 if %errorlevel% neq 0 (
     echo "Both .NET 6 runtime and 7 sdk are required. Please download and install them."
     pause

@@ -197,7 +197,7 @@ namespace RhuEngine.WorldObjects
 			}
 			var sendData = new DataNodeGroup();
 			sendData.SetValue("type", new DataNode<byte>(1));
-			sendData.SetValue("ElementData", SaveElement(data));
+			sendData.SetValue("ElementData", SaveElement(data)); //Todo exsperment with not sending element data
 			World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
 		}
 
@@ -225,7 +225,7 @@ namespace RhuEngine.WorldObjects
 			var nodeGroup = (DataNodeGroup)data;
 			switch (((DataNode<byte>)nodeGroup.GetValue("type")).Value) {
 				case 1:
-					AddInternal(LoadElement(nodeGroup["ElementData"]));
+					AddInternal(LoadElement(nodeGroup["ElementData"])); //Todo exsperment with not sending element data
 					break;
 				case 2:
 					var targetID = ((DataNode<NetPointer>)nodeGroup["ref"]).Value;
