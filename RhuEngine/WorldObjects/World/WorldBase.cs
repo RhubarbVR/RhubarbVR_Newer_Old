@@ -57,7 +57,7 @@ namespace RhuEngine.WorldObjects
 				throw new Exception("Failed to InitializeMembers", ex);
 			}
 			StartTime.Value = DateTime.UtcNow;
-			WorldGravity.Value = new Vector3(0, -10, 0);
+			WorldGravity.Value = new Vector3f(0, -10, 0);
 			if (isPersonalSpace | !networkedWorld) {
 				IsDeserializing = false;
 				AddLocalUser();
@@ -171,7 +171,7 @@ namespace RhuEngine.WorldObjects
 		[Default("New World")]
 		public readonly Sync<string> WorldName;
 		[Exposed]
-		public string WorldDebugName => $"{(IsPersonalSpace ? "P" : "")}{((worldManager.LocalWorld == this) ? "L" : "")} {SessionName.Value}";
+		public string WorldDebugName => $"{(IsPersonalSpace ? "P" : "")}{((worldManager.LocalWorld == this) ? "L" : "")}{((worldManager.OverlayWorld == this) ? "O" : "")}{((worldManager.FocusedWorld == this) ? "F" : "")} {SessionName.Value}";
 
 		public event Action FoucusChanged;
 

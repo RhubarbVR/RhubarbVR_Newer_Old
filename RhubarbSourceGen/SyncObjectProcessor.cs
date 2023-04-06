@@ -34,6 +34,9 @@ namespace RhubarbSourceGen
 				var nameSpace = syncObject.GetNamespaceWithClass();
 				foreach (var field in syncObject.Members.Where(x => x is FieldDeclarationSyntax).Cast<FieldDeclarationSyntax>()) {
 					var isFieldSyncObject = context.GetHasClassOrIterface(context.GetType(field.Declaration.Type.ToString()), "SyncObject");
+					if(field.Declaration.Type.ToString() == "T") {
+						isFieldSyncObject = true;
+					}
 					if (!isFieldSyncObject) {
 						continue;
 					}

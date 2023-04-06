@@ -271,6 +271,9 @@ namespace RhuEngine.GameTests.Tests
 			foreach (var item in SyncObjecs) {
 				if (item.IsGenericType) {
 					Console.WriteLine("Testing Gen SyncObjects " + item.GetFormattedName());
+					if (item.Name.Contains("ConstArray")) {
+						continue; //ConstArray does not need to be tested
+					}
 					foreach (var testType in MakeTestGenerics(item)) {
 						Console.WriteLine("Testing SyncObject " + testType.GetFormattedName());
 						ITestSyncObject e = null;

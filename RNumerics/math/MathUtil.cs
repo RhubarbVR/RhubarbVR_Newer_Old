@@ -747,5 +747,9 @@ namespace RNumerics
 		public static float Clean(in float v) {
 			return float.IsInfinity(v) | float.IsNaN(v) ? 0.0f  : v;
 		}
+
+		public static float Clamp01(in float v) {
+			return Clamp(v, 0, 1);
+		}
 	}
 }

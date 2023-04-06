@@ -72,7 +72,7 @@ namespace RhuEngine.WorldObjects
 		public override IDataNode SaveElement(T val) {
 			var sendData = new DataNodeGroup();
 			sendData.SetValue("fieldType", new DataNode<string>(val.GetType().FullName));
-			sendData.SetValue("ElementData", val.Serialize(new SyncObjectSerializerObject(true)));
+			sendData.SetValue("ElementData", val.Serialize(new SyncObjectSerializerObject(true))); //Todo exsperment with not sending element data
 			return sendData;
 		}
 	}

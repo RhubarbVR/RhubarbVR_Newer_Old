@@ -164,7 +164,12 @@ namespace RhuEngine.WorldObjects
 			}
 			if (localFirstCall) {
 				for (var i = 0; i < _serializeFunctions.Count; i++) {
-					_serializeFunctions[i]._parrentData.SetValue(_serializeFunctions[i]._name, _serializeFunctions[i]._syncObject.Serialize(this));
+					try {
+						_serializeFunctions[i]._parrentData.SetValue(_serializeFunctions[i]._name, _serializeFunctions[i]._syncObject.Serialize(this));
+					}
+					catch (Exception e) {
+						throw new Exception($"Failed to _serializeFunctions {_serializeFunctions[i]._name} Error: {e}");
+					}
 				}
 			}
 			return obj;
