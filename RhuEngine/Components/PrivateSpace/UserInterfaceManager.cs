@@ -501,13 +501,15 @@ namespace RhuEngine.Components
 		}
 
 		private void UpdateProfilePic() {
-			if ((Engine.netApiManager.Client.User?.ProfileIcon ?? Guid.Empty) == Guid.Empty) {
-				_profileSideButton.Icon.Target = _profileSideButton.Entity.GetFirstComponent<RawAssetProvider<RTexture2D>>();
-			}
-			else {
-				var data = _profileSideButton.Entity.GetFirstComponentOrAttach<StaticTexture>();
-				data.url.Value = Engine.netApiManager.Client.User.ProfileURL;
-				_profileSideButton.Icon.Target = data;
+			lock (_lockOnUIChange) {
+				if ((Engine.netApiManager.Client.User?.ProfileIcon ?? Guid.Empty) == Guid.Empty) {
+					_profileSideButton.Icon.Target = _profileSideButton.Entity.GetFirstComponent<RawAssetProvider<RTexture2D>>();
+				}
+				else {
+					var data = _profileSideButton.Entity.GetFirstComponentOrAttach<StaticTexture>();
+					data.url.Value = Engine.netApiManager.Client.User.ProfileURL;
+					_profileSideButton.Icon.Target = data;
+				}
 			}
 		}
 
@@ -521,13 +523,15 @@ namespace RhuEngine.Components
 		}
 
 		private void Client_OnLogout() {
-			if (_profileElement is null) {
-				return;
+			lock (_lockOnUIChange) {
+				if (_profileElement is null) {
+					return;
+				}
+				_profileElement.Entity.enabled.Value = false;
+				_profileSideButton.ButtonPressed.Value = false;
+				_profileSideButton.Entity.enabled.Value = false;
+				LoadTaskBarAndStart();
 			}
-			_profileElement.Entity.enabled.Value = false;
-			_profileSideButton.ButtonPressed.Value = false;
-			_profileSideButton.Entity.enabled.Value = false;
-			LoadTaskBarAndStart();
 		}
 		Button _onlineButton;
 		Button _idleButton;

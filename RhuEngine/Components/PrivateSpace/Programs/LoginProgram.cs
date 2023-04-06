@@ -34,15 +34,15 @@ namespace RhuEngine.Components
 		}
 
 		private void Client_HasGoneOnline() {
-			RebuildUI();
+			RenderThread.ExecuteOnStartOfFrame(this, () => RebuildUI());
 		}
 
 		private void Client_OnLogout() {
-			RebuildUI();
+			RenderThread.ExecuteOnStartOfFrame(this, () => RebuildUI());
 		}
 
 		private void Client_OnLogin(RhubarbCloudClient.Model.PrivateUser obj) {
-			RebuildUI();
+			RenderThread.ExecuteOnStartOfFrame(this, () => RebuildUI());
 		}
 
 		private TextLabel _loadingText;

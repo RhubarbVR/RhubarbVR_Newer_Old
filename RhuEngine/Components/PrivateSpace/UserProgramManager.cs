@@ -22,6 +22,7 @@ namespace RhuEngine.Components
 
 		public OverlayProgram OverlayProgram { get; private set; }
 
+		public object MainScreenLocker = new();
 
 		protected override void OnLoaded() {
 			base.OnLoaded();
@@ -50,19 +51,27 @@ namespace RhuEngine.Components
 		}
 
 		private void Client_HasGoneOnline() {
-			OpenOnePrivateOpenProgram<LoginProgram>();
+			lock (MainScreenLocker) {
+				OpenOnePrivateOpenProgram<LoginProgram>();
+			}
 		}
 
 		private void Client_HasGoneOfline() {
-			OpenOnePrivateOpenProgram<LoginProgram>();
+			lock (MainScreenLocker) {
+				OpenOnePrivateOpenProgram<LoginProgram>();
+			}
 		}
 
 		private void Client_OnLogout() {
-			OpenOnePrivateOpenProgram<LoginProgram>();
+			lock (MainScreenLocker) {
+				OpenOnePrivateOpenProgram<LoginProgram>();
+			}
 		}
 
 		private void Client_OnLogin(RhubarbCloudClient.Model.PrivateUser obj) {
-			GetProgram<LoginProgram>()?.CloseProgram();
+			lock (MainScreenLocker) {
+				GetProgram<LoginProgram>()?.CloseProgram();
+			}
 		}
 
 		public Program this[int index] => Programs[index];
