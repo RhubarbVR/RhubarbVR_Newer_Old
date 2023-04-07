@@ -298,11 +298,10 @@ namespace RhuEngine.Components
 				foreach (var item in AssimpHolder.LoadMeshNodes) {
 					LoadMeshNode(item.Item1, item.Item2, AssimpHolder);
 				}
+				LoadAnimations(AssimpHolder.assetEntity, AssimpHolder);
+				LoadCameras(AssimpHolder.assetEntity, AssimpHolder);
 				AssimpHolder.Rescale();
 				RLog.Info("Done Loading Model");
-				//LoadAnimations(AssimpHolder.assetEntity, AssimpHolder);
-				//LoadCameras(AssimpHolder.assetEntity, AssimpHolder);
-
 			}
 			catch (Exception e) {
 				RLog.Err($"Failed to Load Model Error {e}");
@@ -351,41 +350,42 @@ namespace RhuEngine.Components
 			}
 			foreach (var item in scene.scene.Materials) {
 				if (item.IsPBRMaterial) {
-					//var mat = entity.AttachComponent<PBRMaterial>();
-					//scene.materials.Add(mat);
-					//if (item.HasShininess) {
-					//	mat.Smoothness.Value = item.Shininess;
-					//}
-					//if (item.HasColorDiffuse) {
-					//	mat.AlbedoTint.Value = new Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, item.ColorDiffuse.A);
-					//}
-					//if (item.HasTextureDiffuse) {
-					//	try {
-					//		mat.DetailAlbedo.Target = scene.textures[item.TextureDiffuse.TextureIndex];
-					//	}
-					//	catch { }
-					//}
-					//if (item.HasTextureNormal) {
-					//	try {
-					//		mat.NormalMap.Target = scene.textures[item.TextureNormal.TextureIndex];
-					//	}
-					//	catch { }
-					//}
-					//if (item.HasTextureEmissive) {
-					//	try {
-					//		mat.EmissionTexture.Target = scene.textures[item.TextureEmissive.TextureIndex];
-					//	}
-					//	catch { }
-					//}
-					//if (item.HasColorDiffuse) {
-					//	mat.AlbedoTint.Value = new Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, item.ColorDiffuse.A);
-					//}
-					//if (item.HasTextureDiffuse) {
-					//	try {
-					//		mat.AlbedoTexture.Target = scene.textures[item.TextureDiffuse.TextureIndex];
-					//	}
-					//	catch { }
-					//}
+					var mat = entity.AttachComponent<StandardMaterial>();
+					scene.materials.Add(mat);
+					if (item.HasShininess) {
+						mat.Roughness.Value = item.Shininess;
+					}
+					if (item.HasColorDiffuse) {
+						mat.AlbedoColor.Value = new Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, item.ColorDiffuse.A);
+					}
+					if (item.HasTextureDiffuse) {
+						try {
+							mat.AlbedoTexture.Target = scene.textures[item.TextureDiffuse.TextureIndex];
+						}
+						catch {
+							RLog.Err("Failed to load AlbedoTexture");
+						}
+					}
+					if (item.HasTextureNormal) {
+						var normalMapDeatere = entity.AttachComponent<NormalMapMaterialFeatere>();
+						mat.NormalMap.Target = normalMapDeatere;
+						try {
+							normalMapDeatere.Texture.Target = scene.textures[item.TextureNormal.TextureIndex];
+						}
+						catch {
+							RLog.Err("Failed to load normalMapDeatere Texture");
+						}
+					}
+					if (item.HasTextureEmissive) {
+						var emissionMaterialFeatere = entity.AttachComponent<EmissionMaterialFeatere>();
+						mat.Emission.Target = emissionMaterialFeatere;
+						try {
+							emissionMaterialFeatere.Texture.Target = scene.textures[item.TextureEmissive.TextureIndex];
+						}
+						catch {
+							RLog.Err("Failed to load emissionMaterialFeatere Texture");
+						}
+					}
 					RLog.Info($"Loaded PBR Material");
 				}
 				else {
@@ -398,7 +398,9 @@ namespace RhuEngine.Components
 						try {
 							mat.MainTexture.Target = scene.textures[item.TextureDiffuse.TextureIndex];
 						}
-						catch { }
+						catch {
+							RLog.Err("Failed to load MainTexture");
+						}
 					}
 					RLog.Info($"Loaded Unlit Material");
 				}
@@ -413,15 +415,29 @@ namespace RhuEngine.Components
 			var lights = entity.AddChild("Lights");
 			foreach (var item in scene.scene.Lights) {
 				var ligh = scene.Nodes.ContainsKey(item.Name) ? scene.Nodes[item.Name] : lights.AddChild(item.Name);
-				//Todo Fix light with model import
-				//var lightcomp = ligh.AttachComponent<Light>();
-				//lightcomp.LightType.Value = item.LightType switch {
-				//	LightSourceType.Directional => RLightType.Directional,
-				//	LightSourceType.Spot => RLightType.Spot,
-				//	_ => RLightType.Point,
-				//};
-				//lightcomp.SpotAngle.Value = item.AngleInnerCone;
-				//lightcomp.Color.Value = new RNumerics.Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, 1);
+				Light3D light3D = null;
+				switch (item.LightType) {
+					case LightSourceType.Directional:
+						var directionalLight3D = ligh.AttachComponent<DirectionalLight3D>();
+						light3D = directionalLight3D;
+						break;
+					case LightSourceType.Point:
+						var pointLight3D = ligh.AttachComponent<PointLight3D>();
+						light3D = pointLight3D;
+						break;
+					case LightSourceType.Spot:
+						var spotLight3D = ligh.AttachComponent<SpotLight3D>();
+						light3D = spotLight3D;
+						spotLight3D.Angle.Value = item.AngleInnerCone;
+						break;
+					default:
+						RLog.Err("Did not know light type");
+						break;
+				}
+				if (light3D is null) {
+					return;
+				}
+				light3D.Color.Value = new Colorf(item.ColorDiffuse.R, item.ColorDiffuse.G, item.ColorDiffuse.B, 1);
 			}
 		}
 		private void LoadTextures(Entity entity, AssimpHolder scene) {
@@ -447,20 +463,33 @@ namespace RhuEngine.Components
 			}
 		}
 
-		//private static void LoadAnimations(Entity entity, AssimpHolder scene) {
-		//	if (!scene.scene.HasAnimations) {
-		//		RLog.Info("No Animations");
-		//		return;
-		//	}
-		//	RLog.Err("not supported");
-		//}
+		private static void LoadAnimations(Entity _, AssimpHolder scene) {
+			if (!scene.scene.HasAnimations) {
+				RLog.Info("No Animations");
+				return;
+			}
+			foreach (var item in scene.scene.Animations) {
+				RLog.Err($"Load Anim {item.Name} TicksPerSecond{item.TicksPerSecond}");
+				RLog.Err($"MeshAnimationChannels {item.MeshAnimationChannels.Count}");
+				RLog.Err($"MeshMorphAnimationChannels {item.MeshMorphAnimationChannels.Count}");
+				RLog.Err($"NodeAnimationChannels {item.NodeAnimationChannels.Count}");
+			}
+		}
 
-		//private static void LoadCameras(Entity entity, AssimpHolder scene) {
-		//	if (!scene.scene.HasCameras) {
-		//		RLog.Info("No Cameras");
-		//		return;
-		//	}
-		//}
+		private static void LoadCameras(Entity entity, AssimpHolder scene) {
+			if (!scene.scene.HasCameras) {
+				RLog.Info("No Cameras");
+				return;
+			}
+			var camera = entity.AddChild("Cameras");
+			foreach (var item in scene.scene.Cameras) {
+				var newCamera = (scene.Nodes.ContainsKey(item.Name) ? scene.Nodes[item.Name] : camera.AddChild(item.Name)).AttachComponent<Camera3D>();
+				newCamera.Near.Value = item.ClipPlaneNear;
+				newCamera.Far.Value = item.ClipPlaneFar;
+				newCamera.Perspective_Fov.Value = item.FieldOfview;
+			}
+		}
+
 		private static void LoadMeshNode(Entity entity, Node node, AssimpHolder scene) {
 			ComplexMesh complexMesh = null;
 			var mits = new List<int>();

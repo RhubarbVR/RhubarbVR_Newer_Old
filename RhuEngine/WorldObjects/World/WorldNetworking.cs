@@ -312,7 +312,6 @@ namespace RhuEngine.WorldObjects
 					RLog.Err(LoadMsg = "Failed to start world networking");
 					return false;
 				}
-
 			}
 			return true;
 		}

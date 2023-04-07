@@ -10,7 +10,7 @@ namespace RhuEngine.Components
 {
 	[Category(new string[] { "Assets/Materials/MaterialFeateres" })]
 	[AllowedOnWorldRoot]
-	public sealed partial class NormalMapMaterialFeatere : BaseMaterialFeatere<EmissionMaterialFeatere>
+	public sealed partial class NormalMapMaterialFeatere : BaseMaterialFeatere<NormalMapMaterialFeatere>
 	{
 		[Default(1f)]
 		[OnChanged(nameof(UpdateMaterial))]
