@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -135,7 +136,6 @@ namespace RhuEngine.WorldObjects
 					userConnection.Data = $"{Engine.MainSettings.NetworkingSettings.PublicIP}:{_netManager.LocalPort}";
 				}
 
-
 				if (!joiningSession) {
 					var newGUId = Guid.NewGuid();
 					SessionID.Value = newGUId.ToString();
@@ -153,7 +153,6 @@ namespace RhuEngine.WorldObjects
 						AssociatedGroup = gorupID,
 					};
 					await Engine.netApiManager.Client.CreateSession(sessionConnection);
-
 				}
 				else {
 					var sessionConnection = new JoinSession {
@@ -174,6 +173,9 @@ namespace RhuEngine.WorldObjects
 		public readonly ConcurrentDictionary<string, bool> NatIntroductionSuccessIsGood = new();
 		public readonly ConcurrentDictionary<string, NetPeer> NatConnection = new();
 		public readonly ConcurrentDictionary<string, Guid> NatUserIDS = new();
+
+		private TimeSpan _ntpSyncTime;
+		private DateTime SyncClock => DateTime.UtcNow + _ntpSyncTime;
 
 		private void FindNewMaster() {
 			for (var i = 0; i < Users.Count; i++) {
@@ -274,6 +276,23 @@ namespace RhuEngine.WorldObjects
 				}
 			};
 
+			_clientListener.NtpResponseEvent += (ntpPacket) => {
+				_lastTimeSync.Restart();
+				if (ntpPacket != null) {
+					_ntpSyncTime = ntpPacket.CorrectionOffset;
+					RLog.Info("NTP time test offset: " + ntpPacket.CorrectionOffset);
+					if (StartTime.Value == default) {
+						StartTime.Value = SyncClock;
+					}
+				}
+				else {
+					RLog.Err("NTP time error no CorrectionOffset");
+					if (StartTime.Value == default) {
+						StartTime.Value = SyncClock;
+					}
+				}
+			};
+
 			_netManager = new NetManager(_clientListener) {
 				IPv6Mode = IPv6Mode.SeparateSocket,
 				NatPunchEnabled = true,
@@ -313,7 +332,17 @@ namespace RhuEngine.WorldObjects
 					return false;
 				}
 			}
+			SyncClocks();
 			return true;
+		}
+
+		private readonly Stopwatch _lastTimeSync = new();
+
+		public void SyncClocks() {
+			_lastTimeSync.Start();
+			var targetServer = $"{Random.Shared.Next(0, 3)}.pool.ntp.org";
+			RLog.Info($"Syncing clock with {targetServer}");
+			_netManager.CreateNtpRequest(targetServer);
 		}
 
 		private void ClientListener_NetworkLatencyUpdateEvent(NetPeer peer, int latency) {
@@ -337,7 +366,7 @@ namespace RhuEngine.WorldObjects
 				if (_waitingForUsers) {
 					return;
 				}
-				LoadMsg = "Waiting For World Start State";
+				RLog.Info(LoadMsg = "Waiting For World Start State");
 				var worldData = dataGroup.GetValue("WorldData");
 				if (worldData is null) {
 					return;
@@ -366,7 +395,7 @@ namespace RhuEngine.WorldObjects
 							foreach (var item in deserializer.onLoaded) {
 								item?.Invoke();
 							}
-							RLog.Info(LoadMsg = "DoneDeserlizing");
+							RLog.Info(LoadMsg = "Done Deserlizing");
 							IsDeserializing = false;
 							WaitingForWorldStartState = false;
 						}
