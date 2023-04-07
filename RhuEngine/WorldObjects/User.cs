@@ -154,22 +154,14 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		private float _timeAfterLastStreamUpdate = 0f;
-
-		private const float TARGET_UPDATE_TIME = 1.0f / 30f;
+		public void StreamUpdate() {
+			for (var i = 0; i < syncStreams.Count; i++) {
+				syncStreams[i].StreamUpdateOwner();
+			}
+		}
 
 		public void Step() {
-			if (LocalUser == this) {
-				_timeAfterLastStreamUpdate += RTime.ElapsedF;
-				if(_timeAfterLastStreamUpdate < TARGET_UPDATE_TIME) {
-					return;
-				}
-				_timeAfterLastStreamUpdate = 0f;
-				for (var i = 0; i < syncStreams.Count; i++) {
-					syncStreams[i].StreamUpdateOwner();
-				}
-			}
-			else {
+			if (LocalUser != this) {
 				for (var i = 0; i < syncStreams.Count; i++) {
 					syncStreams[i].StreamUpdateOther();
 				}

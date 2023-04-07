@@ -182,7 +182,7 @@ namespace RhuEngine.WorldObjects
 			for (var i = 0; i < amountUsed; i++) {
 				amoutUsed[i] = _opusBuffer[i];
 			}
-			World.BroadcastDataToAllStream(this, new DataNode<byte[]>(amoutUsed), LiteNetLib.DeliveryMethod.Unreliable);
+			World.StreamToAll(this, new DataNode<byte[]>(amoutUsed), LiteNetLib.DeliveryMethod.Unreliable);
 		}
 
 		public override void StreamUpdateOwner() {

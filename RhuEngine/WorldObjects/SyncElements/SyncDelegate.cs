@@ -72,15 +72,12 @@ namespace RhuEngine.WorldObjects
 			return nodeGroup;
 		}
 
-		protected override void BroadcastValue() {
-			if (IsLinkedTo || NoSync) {
-				return;
-			}
+		public override IDataNode GetUpdateData() {
 			var data = new DataNodeGroup();
 			data["target"] = new DataNode<NetPointer>(_targetPointer);
 			data["_method"] = new DataNode<string>(_method);
 			data["_type"] = new DataNode<string>(_type?.FullName);
-			World.BroadcastDataToAll(this, data, LiteNetLib.DeliveryMethod.ReliableOrdered);
+			return data;
 		}
 
 		public override void Received(Peer sender, IDataNode data) {

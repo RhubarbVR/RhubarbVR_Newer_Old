@@ -333,8 +333,55 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			SyncClocks();
+			_netThread = new Thread(NetworkThread) {
+				Priority = ThreadPriority.Normal
+			};
+			_netThread.Start();
 			return true;
 		}
+
+
+		private readonly ConcurrentHashSet<IDropOldNetworkedObject> _updatedValue = new();
+
+		private void NetworkThread() {
+			while(_netManager.IsRunning) {
+				_networkLoop.Restart();
+				try {
+					if (_updatedValue.Count > 0) {
+						var updateData = new DataNodeGroup();
+
+						var updateValues = new DataNodeList();
+						foreach (var item in _updatedValue) {
+							var packedData = new DataNodeGroup();
+							packedData.SetValue("u", item.GetUpdateData());
+							packedData.SetValue("p", new DataNode<NetPointer>(item.Pointer));
+							updateValues.Add(packedData);
+						}
+						_updatedValue.Clear();
+						using var memstream = new MemoryStream();
+						using var reader = new BinaryWriter(memstream);
+						NetPacked.Serlize(reader, new DataSaver(updateData));
+						_netManager.SendToAll(memstream.ToArray(), DeliveryMethod.ReliableOrdered);
+					}
+					GetLocalUser()?.StreamUpdate();
+					if (_lastTimeSync.Elapsed.TotalSeconds >= 100) {
+						SyncClocks(); // ResyncClocks
+					}
+				}
+				catch(Exception e) {
+					RLog.Err($"Error in Network Loop Error:{e}");
+				}
+				_networkLoop.Stop();
+				var overTime = 32 - _networkLoop.ElapsedMilliseconds;
+				if (overTime > 0) {
+					Thread.Sleep((int)overTime);
+				}
+			}
+		}
+
+		private readonly Stopwatch _networkLoop = new();
+
+		private Thread _netThread;
 
 		private readonly Stopwatch _lastTimeSync = new();
 
@@ -407,28 +454,22 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			else {
-				var target = (DataNode<NetPointer>)dataGroup.GetValue("Pointer");
-				if (target == null) {
-					return;
-				}
-				try {
-					lock (_networkedObjects) {
-						if (_networkedObjects.ContainsKey(target.Value)) {
-							_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
-						}
-						else {
-							if (deliveryMethod == DeliveryMethod.ReliableOrdered && peer.User is not null) {
-								RLog.Err($"Failed to Process NetData target:{target.Value.HexString()} Error: _networkedObjects Not loaded");
+				if (deliveryMethod != DeliveryMethod.ReliableOrdered) {
+					var target = (DataNode<NetPointer>)dataGroup.GetValue("Pointer");
+					if (target == null) {
+						return;
+					}
+					try {
+						lock (_networkedObjects) {
+							if (_networkedObjects.ContainsKey(target.Value)) {
+								_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
 							}
 						}
 					}
+					catch { }
 				}
-				catch (Exception ex) {
-#if DEBUG
-					if (deliveryMethod == DeliveryMethod.ReliableOrdered && peer.User is not null) {
-						RLog.Err($"Failed to Process NetData target:{target.Value.HexString()} Error:{ex}");
-					}
-#endif
+				else {
+					//Read packed packed
 				}
 			}
 		}
@@ -785,7 +826,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public void BroadcastDataToAll(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
+		public void BroadcastObjectUpdate(IDropOldNetworkedObject target) {
 			if (target.IsRemoved) {
 				return;
 			}
@@ -799,16 +840,10 @@ namespace RhuEngine.WorldObjects
 				//LocalValue
 				return;
 			}
-			var netData = new DataNodeGroup();
-			netData.SetValue("Data", data);
-			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			using var memstream = new MemoryStream();
-			using var reader = new BinaryWriter(memstream);
-			NetPacked.Serlize(reader, new DataSaver(netData));
-			_netManager.SendToAll(memstream.ToArray(), 0, deliveryMethod);
+			_updatedValue.Add(target);
 		}
 
-		public void BroadcastDataToAllStream(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
+		public void StreamToAll(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
 			if (target.IsRemoved) {
 				return;
 			}

@@ -113,7 +113,7 @@ namespace RhuEngine.WorldObjects
 			if (IsLinkedTo || NoSync) {
 				return;
 			}
-			World.BroadcastDataToAllStream(this, typeof(T).IsEnum ? new DataNode<int>((int)(object)_value) : new DataNode<T>(_value), LiteNetLib.DeliveryMethod.Unreliable);
+			World.StreamToAll(this, typeof(T).IsEnum ? new DataNode<int>((int)(object)_value) : new DataNode<T>(_value), LiteNetLib.DeliveryMethod.Unreliable);
 		}
 	}
 }

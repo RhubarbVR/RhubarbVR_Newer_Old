@@ -19,7 +19,7 @@ namespace RhuEngine.WorldObjects
 		Type GetRefType { get; }
 	}
 
-	public partial class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, INetworkedObject, IChangeable, ISyncMember where T : class, IWorldObject
+	public partial class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, IDropOldNetworkedObject, IChangeable, ISyncMember where T : class, IWorldObject
 	{
 		public object Object { get => Value; set => Value = (NetPointer)value; }
 
@@ -142,11 +142,15 @@ namespace RhuEngine.WorldObjects
 
 		}
 
-		protected virtual void BroadcastValue() {
+		public virtual IDataNode GetUpdateData() {
+			return new DataNode<NetPointer>(_targetPointer);
+		}
+
+		protected void BroadcastValue() {
 			if (IsLinkedTo || NoSync) {
 				return;
 			}
-			World.BroadcastDataToAll(this, new DataNode<NetPointer>(_targetPointer), LiteNetLib.DeliveryMethod.ReliableOrdered);
+			World.BroadcastObjectUpdate(this);
 		}
 
 		public virtual void Received(Peer sender, IDataNode data) {

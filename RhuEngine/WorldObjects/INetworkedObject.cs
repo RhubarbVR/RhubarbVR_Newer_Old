@@ -3,6 +3,11 @@ using RhuEngine.DataStructure;
 
 namespace RhuEngine.WorldObjects
 {
+	public interface IDropOldNetworkedObject : INetworkedObject
+	{
+		public IDataNode GetUpdateData();
+	}
+
 	public interface INetworkedObject : ISyncObject
 	{
 		public bool NoSync { get; set; }
