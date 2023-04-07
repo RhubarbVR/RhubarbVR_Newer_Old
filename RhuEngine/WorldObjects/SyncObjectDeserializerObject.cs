@@ -83,58 +83,62 @@ namespace RhuEngine.WorldObjects
 				return false;
 			}
 			BindPointer(data, @object);
+			if(data.GetValue("v") is null) {
+				value = default;
+				return false;
+			}
 			if (typeof(ISyncObject).IsAssignableFrom(@object.GetType())) {
 				onLoaded.Add(((ISyncObject)@object).RunOnLoad);
 			}
 			if (typeof(T) == typeof(Type)) {
-				value = ((DataNode<string>)data.GetValue("Value")).Value is null
+				value = ((DataNode<string>)data.GetValue("v")).Value is null
 					? (T)(object)null
-					: (T)(object)Type.GetType(((DataNode<string>)data.GetValue("Value")).Value, false, false);
+					: (T)(object)Type.GetType(((DataNode<string>)data.GetValue("v")).Value, false, false);
 				return true;
 			}
 			else if (typeof(T) == typeof(Uri)) {
-				value = ((DataNode<string>)data.GetValue("Value")).Value is null
+				value = ((DataNode<string>)data.GetValue("v")).Value is null
 					? (T)(object)null
-					: (T)(object)new Uri(((DataNode<string>)data.GetValue("Value")).Value);
+					: (T)(object)new Uri(((DataNode<string>)data.GetValue("v")).Value);
 				return true;
 			}
 			else {
 				if (typeof(T).IsEnum) {
 					var unType = typeof(T).GetEnumUnderlyingType();
 					if (unType == typeof(int)) {
-						value = (T)(object)((DataNode<int>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<int>)data.GetValue("v")).Value;
 						return true;
 					}
 					else if (unType == typeof(uint)) {
-						value = (T)(object)((DataNode<uint>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<uint>)data.GetValue("v")).Value;
 						return true;
 					}
 					else if (unType == typeof(bool)) {
-						value = (T)(object)((DataNode<bool>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<bool>)data.GetValue("v")).Value;
 						return true;
 					}
 					else if (unType == typeof(byte)) {
-						value = (T)(object)((DataNode<byte>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<byte>)data.GetValue("v")).Value;
 						return true;
 					}
 					else if (unType == typeof(sbyte)) {
-						value = (T)(object)((DataNode<sbyte>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<sbyte>)data.GetValue("v")).Value;
 						return true;
 					}
 					else if (unType == typeof(short)) {
-						value = (T)(object)((DataNode<short>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<short>)data.GetValue("v")).Value;
 						return true;
 					}
 					else if (unType == typeof(ushort)) {
-						value = (T)(object)((DataNode<ushort>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<ushort>)data.GetValue("v")).Value;
 						return true;
 					}
 					else if (unType == typeof(long)) {
-						value = (T)(object)((DataNode<long>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<long>)data.GetValue("v")).Value;
 						return true;
 					}
 					else if (unType == typeof(ulong)) {
-						value = (T)(object)((DataNode<ulong>)data.GetValue("Value")).Value;
+						value = (T)(object)((DataNode<ulong>)data.GetValue("v")).Value;
 						return true;
 					}
 					else {
@@ -142,7 +146,7 @@ namespace RhuEngine.WorldObjects
 					}
 				}
 				else {
-					value = ((DataNode<T>)data.GetValue("Value")).Value;
+					value = ((DataNode<T>)data.GetValue("v")).Value;
 					return true;
 				}
 			}

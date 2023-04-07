@@ -107,7 +107,7 @@ namespace RhuEngine.WorldObjects
 						Value = new DataNode<T>(value);
 					}
 				}
-				obj.SetValue("Value", Value);
+				obj.SetValue("v", Value);
 			}
 			return obj;
 		}

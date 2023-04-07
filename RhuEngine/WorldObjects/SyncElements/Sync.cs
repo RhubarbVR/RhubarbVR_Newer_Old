@@ -199,6 +199,9 @@ namespace RhuEngine.WorldObjects
 			if (syncObjectSerializerObject.ValueDeserialize<T>((DataNodeGroup)data, this, out var tempvalue)) {
 				_value = tempvalue;
 			}
+			else {
+				_value = _starting_value;
+			}
 			OnLoad(syncObjectSerializerObject);
 		}
 

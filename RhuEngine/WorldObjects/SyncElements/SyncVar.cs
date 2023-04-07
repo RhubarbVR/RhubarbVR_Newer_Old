@@ -7,7 +7,7 @@ using RhuEngine.Datatypes;
 
 namespace RhuEngine.WorldObjects
 {
-	public sealed partial class SyncVar : SyncObject, INetworkedObject, ISyncMember
+	public sealed partial class SyncVar : SyncObject, ICreationDeletionNetworkedObject, ISyncMember
 	{
 		private Type _type;
 		public Type Type
@@ -22,10 +22,12 @@ namespace RhuEngine.WorldObjects
 				newElement.Initialize(World, this, "Sync Var Element", false, false);
 				Target = newElement;
 				if (!NoSync) {
-					var sendData = new DataNodeGroup();
-					sendData.SetValue("fieldType", new DataNode<string>(value.FullName));
-					sendData.SetValue("ElementData", Target.Serialize(new SyncObjectSerializerObject(true)));
-					World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
+					World.BroadcastObjectCreationDeletion(this, () => {
+						var sendData = new DataNodeGroup();
+						sendData.SetValue("fieldType", new DataNode<string>(value.FullName));
+						sendData.SetValue("ElementData", Target.Serialize(new SyncObjectSerializerObject(true)));
+						return sendData;
+					});
 				}
 			}
 		}
@@ -50,7 +52,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public T SetTarget<T>(out bool Failed) where T : class, INetworkedObject {
-			Type = typeof(T); 
+			Type = typeof(T);
 			return GetTarget<T>(out Failed);
 		}
 
@@ -65,7 +67,7 @@ namespace RhuEngine.WorldObjects
 				var objrc = (INetworkedObject)Activator.CreateInstance(type);
 				objrc.Initialize(World, this, "Sync Var Element", true, false);
 				objrc.Deserialize(nodeGroup.GetValue("ElementData"), new SyncObjectDeserializerObject(false));
-				Target =  objrc;
+				Target = objrc;
 			}
 			else {
 				throw new Exception($"Failed to load received type {typeName}");
@@ -74,9 +76,9 @@ namespace RhuEngine.WorldObjects
 
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
 			var data = SyncObjectSerializerObject.CommonSerialize(this);
-			data.SetValue("fieldType", new DataNode<string>(_type?.FullName??"Null"));
+			data.SetValue("fieldType", new DataNode<string>(_type?.FullName ?? "Null"));
 			if (Target != null) {
-				data.SetValue("ElementData", Target.Serialize(syncObjectSerializerObject)); 
+				data.SetValue("ElementData", Target.Serialize(syncObjectSerializerObject));
 			}
 			return data;
 		}
@@ -100,8 +102,8 @@ namespace RhuEngine.WorldObjects
 					objrc.Deserialize(value, syncObjectSerializerObject);
 					Target = objrc;
 				}
-				catch(Exception e) {
-					throw new Exception($"Failed to load type {typeName} ",e);
+				catch (Exception e) {
+					throw new Exception($"Failed to load type {typeName} ", e);
 				}
 			}
 		}

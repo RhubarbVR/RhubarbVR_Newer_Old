@@ -22,7 +22,7 @@ namespace RhuEngine.WorldObjects
 		void DestroyAtIndex(int index);
 		void DisposeAtIndex(int index);
 	}
-	public abstract partial class SyncListBase<T> : SyncObject, ISyncList, INetworkedObject, IEnumerable<ISyncObject>, IChangeable, ISyncMember where T : class, ISyncObject
+	public abstract partial class SyncListBase<T> : SyncObject, ISyncList, ICreationDeletionNetworkedObject, IEnumerable<ISyncObject>, IChangeable, ISyncMember where T : class, ISyncObject
 	{
 		private readonly List<T> _syncObjects = new(5);
 
@@ -195,10 +195,12 @@ namespace RhuEngine.WorldObjects
 			if (NoSync) {
 				return;
 			}
-			var sendData = new DataNodeGroup();
-			sendData.SetValue("type", new DataNode<byte>(1));
-			sendData.SetValue("ElementData", SaveElement(data)); //Todo exsperment with not sending element data
-			World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
+			World.BroadcastObjectCreationDeletion(this, () => {
+				var sendData = new DataNodeGroup();
+				sendData.SetValue("t", new DataNode<byte>(1));
+				sendData.SetValue("e", SaveElement(data));
+				return sendData;
+			});
 		}
 
 		internal void BroadcastRemove(T data) {
@@ -208,10 +210,12 @@ namespace RhuEngine.WorldObjects
 			if (NoSync) {
 				return;
 			}
-			var sendData = new DataNodeGroup();
-			sendData.SetValue("type", new DataNode<byte>(2));
-			sendData.SetValue("ref", new DataNode<NetPointer>(data.Pointer));
-			World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
+			World.BroadcastObjectCreationDeletion(this, () => {
+				var sendData = new DataNodeGroup();
+				sendData.SetValue("t", new DataNode<byte>(2));
+				sendData.SetValue("r", new DataNode<NetPointer>(data.Pointer));
+				return sendData;
+			});
 		}
 
 		public abstract T LoadElement(IDataNode data);
@@ -223,16 +227,16 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			var nodeGroup = (DataNodeGroup)data;
-			switch (((DataNode<byte>)nodeGroup.GetValue("type")).Value) {
+			switch (((DataNode<byte>)nodeGroup.GetValue("t")).Value) {
 				case 1:
-					AddInternal(LoadElement(nodeGroup["ElementData"])); //Todo exsperment with not sending element data
+					AddInternal(LoadElement(nodeGroup["e"])); //Todo exsperment with not sending element data
 					break;
 				case 2:
-					var targetID = ((DataNode<NetPointer>)nodeGroup["ref"]).Value;
+					var targetID = ((DataNode<NetPointer>)nodeGroup["r"]).Value;
 					var objecte = this[targetID];
 					if(objecte is null) {
 						RLog.Err($"Did not have value in list ID:{targetID}");
-						var worldobject = World.GetWorldObject((DataNode<NetPointer>)nodeGroup["ref"]);
+						var worldobject = World.GetWorldObject((DataNode<NetPointer>)nodeGroup["r"]);
 						if (worldobject is not null) {
 							RLog.Info($"Try to fix error by: removeing world object ID:{targetID}");
 							worldobject.Dispose();

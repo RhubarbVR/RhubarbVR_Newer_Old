@@ -16,6 +16,8 @@ using LibVLCSharp.Shared;
 
 using LiteNetLib;
 
+using NAudio.Dmo;
+
 using Newtonsoft.Json;
 
 using RhubarbCloudClient.Model;
@@ -25,6 +27,8 @@ using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
 using RhuEngine.Linker;
 using RhuEngine.Managers;
+
+using RhuSettings;
 
 using RNumerics;
 
@@ -132,7 +136,7 @@ namespace RhuEngine.WorldObjects
 					ServerPingLevels = Pings,
 					Data = null
 				};
-				if(userConnection.ConnectionType == ConnectionType.Direct) {
+				if (userConnection.ConnectionType == ConnectionType.Direct) {
 					userConnection.Data = $"{Engine.MainSettings.NetworkingSettings.PublicIP}:{_netManager.LocalPort}";
 				}
 
@@ -255,7 +259,7 @@ namespace RhuEngine.WorldObjects
 					PeerDisconect(rpeer);
 				}
 				else if (peer.Tag is RelayPeer repeer) {
-					if(disconnectInfo.Reason == DisconnectReason.ConnectionFailed) {
+					if (disconnectInfo.Reason == DisconnectReason.ConnectionFailed) {
 						if (!repeer._hasUsedFallback) {
 							repeer._hasUsedFallback = true;
 							RLog.Info($"Relay Failed trying local connection");
@@ -311,13 +315,13 @@ namespace RhuEngine.WorldObjects
 			var targetPort = 0;
 			if (Engine.MainSettings.NetworkingSettings.PreferredConnectionType == ConnectionType.Direct) {
 				targetPort = Engine.MainSettings.NetworkingSettings.StartPortRange;
-				if(Engine.MainSettings.NetworkingSettings.EndPortRange <= Engine.MainSettings.NetworkingSettings.StartPortRange) {
+				if (Engine.MainSettings.NetworkingSettings.EndPortRange <= Engine.MainSettings.NetworkingSettings.StartPortRange) {
 					RLog.Err(LoadMsg = "End Port Range needs to be more than StartPortRange");
 					return false;
 				}
 			}
-			if(targetPort != 0) {
-				while(targetPort <= Engine.MainSettings.NetworkingSettings.StartPortRange) {
+			if (targetPort != 0) {
+				while (targetPort <= Engine.MainSettings.NetworkingSettings.StartPortRange) {
 					RLog.Info(LoadMsg = $"Trying to start world networking Port {targetPort}");
 					if (_netManager.Start(targetPort)) {
 						RLog.Info(LoadMsg = $"World networking Port {targetPort}");
@@ -340,24 +344,35 @@ namespace RhuEngine.WorldObjects
 			return true;
 		}
 
+		private readonly ConcurrentQueue<(ICreationDeletionNetworkedObject, Func<IDataNode>)> _objectCreationAndDeleteUpdate = new();
 
 		private readonly ConcurrentHashSet<IDropOldNetworkedObject> _updatedValue = new();
 
 		private void NetworkThread() {
-			while(_netManager.IsRunning) {
+			while (_netManager.IsRunning) {
 				_networkLoop.Restart();
 				try {
-					if (_updatedValue.Count > 0) {
+					if (_updatedValue.Count > 0 && _objectCreationAndDeleteUpdate.Count > 0) {
 						var updateData = new DataNodeGroup();
 
 						var updateValues = new DataNodeList();
 						foreach (var item in _updatedValue) {
 							var packedData = new DataNodeGroup();
-							packedData.SetValue("u", item.GetUpdateData());
 							packedData.SetValue("p", new DataNode<NetPointer>(item.Pointer));
+							packedData.SetValue("d", item.GetUpdateData());
 							updateValues.Add(packedData);
 						}
 						_updatedValue.Clear();
+						updateData.SetValue("u", updateValues);
+						var objectUpdates = new DataNodeList();
+						while (_objectCreationAndDeleteUpdate.TryDequeue(out var updateEvent)) {
+							var packedData = new DataNodeGroup();
+							packedData.SetValue("p", new DataNode<NetPointer>(updateEvent.Item1.Pointer));
+							packedData.SetValue("d", updateEvent.Item2.Invoke());
+							objectUpdates.Add(packedData);
+						}
+						updateData.SetValue("cdu", objectUpdates);
+
 						using var memstream = new MemoryStream();
 						using var reader = new BinaryWriter(memstream);
 						NetPacked.Serlize(reader, new DataSaver(updateData));
@@ -368,7 +383,7 @@ namespace RhuEngine.WorldObjects
 						SyncClocks(); // ResyncClocks
 					}
 				}
-				catch(Exception e) {
+				catch (Exception e) {
 					RLog.Err($"Error in Network Loop Error:{e}");
 				}
 				_networkLoop.Stop();
@@ -460,16 +475,45 @@ namespace RhuEngine.WorldObjects
 						return;
 					}
 					try {
-						lock (_networkedObjects) {
-							if (_networkedObjects.ContainsKey(target.Value)) {
-								_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
-							}
+						if (_networkedObjects.ContainsKey(target.Value)) {
+							_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
 						}
 					}
 					catch { }
 				}
 				else {
-					//Read packed packed
+					var creationDeleteData = (DataNodeList)dataGroup.GetValue("cdu");
+					foreach (DataNodeGroup item in creationDeleteData) {
+						var target = (DataNode<NetPointer>)item.GetValue("p");
+						if (target == null) {
+							RLog.Warn($"valueUpdates {target} not Found");
+							return;
+						}
+						try {
+							if (_networkedObjects.ContainsKey(target.Value)) {
+								_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("d"));
+							}
+						}
+						catch (Exception e) {
+							RLog.Err($"valueUpdates {target} Error:{e}");
+						}
+					}
+					var valueUpdates = (DataNodeList)dataGroup.GetValue("u");
+					foreach (DataNodeGroup item in valueUpdates) {
+						var target = (DataNode<NetPointer>)item.GetValue("p");
+						if (target == null) {
+							RLog.Warn($"valueUpdates {target} not Found");
+							return;
+						}
+						try {
+							if (_networkedObjects.ContainsKey(target.Value)) {
+								_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("d"));
+							}
+						}
+						catch (Exception e) {
+							RLog.Err($"valueUpdates {target} Error:{e}");
+						}
+					}
 				}
 			}
 		}
@@ -525,7 +569,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 
-		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader,byte channel, DeliveryMethod deliveryMethod) {
+		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod) {
 			if (IsDisposed) {
 				return;
 			}
@@ -664,7 +708,7 @@ namespace RhuEngine.WorldObjects
 				RLog.Info($"Local Was {LocalUserID} {MasterUser}");
 			}
 			LoadUserIn(peer);
-			if(IsLoading || WaitingForWorldStartState) {
+			if (IsLoading || WaitingForWorldStartState) {
 				return;
 			}
 			FindNewMaster();
@@ -824,6 +868,23 @@ namespace RhuEngine.WorldObjects
 				RLog.Err(LoadMsg = "Relay Connect Error:" + e.ToString());
 				throw new Exception("Failed to use relay");
 			}
+		}
+
+		public void BroadcastObjectCreationDeletion(ICreationDeletionNetworkedObject target, Func<IDataNode> returnData) {
+			if (target.IsRemoved) {
+				return;
+			}
+			if (_netManager is null) {
+				return;
+			}
+			if (IsLoading) {
+				return;
+			}
+			if (target.Pointer.GetOwnerID() == 0) {
+				//LocalValue
+				return;
+			}
+			_objectCreationAndDeleteUpdate.Enqueue((target, returnData));
 		}
 
 		public void BroadcastObjectUpdate(IDropOldNetworkedObject target) {
