@@ -76,10 +76,7 @@ namespace RhuEngine.Managers
 		/// The mouse system for the engine.
 		/// </summary>
 		public MouseSystem MouseSystem { get; private set; }
-		/// <summary>
-		/// A <see cref="MicSystem"/> instance that can be used to access the microphone.
-		/// </summary>
-		public MicSystem MicSystem { get; private set; }
+
 		/// <summary>
 		/// Gets the head position of the screen.
 		/// </summary>
@@ -100,12 +97,10 @@ namespace RhuEngine.Managers
 			XRInputSystem = new XRInputSystem(this);
 			KeyboardSystem = new KeyboardSystem(this);
 			MouseSystem = new MouseSystem(this);
-			MicSystem = new MicSystem(this);
 			_inputSystems = new IInputSystem[] {
 				XRInputSystem,
 				KeyboardSystem,
 				MouseSystem,
-				MicSystem,
 			};
 			screenInput = new ScreenInput(this);
 			LoadInputActions();

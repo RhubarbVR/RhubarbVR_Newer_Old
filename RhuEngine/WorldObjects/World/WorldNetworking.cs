@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -15,6 +16,8 @@ using LibVLCSharp.Shared;
 
 using LiteNetLib;
 
+using NAudio.Dmo;
+
 using Newtonsoft.Json;
 
 using RhubarbCloudClient.Model;
@@ -22,8 +25,11 @@ using RhubarbCloudClient.Model;
 using RhuEngine.AssetSystem.RequestStructs;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
+using RhuEngine.Input.XRInput;
 using RhuEngine.Linker;
 using RhuEngine.Managers;
+
+using RhuSettings;
 
 using RNumerics;
 
@@ -131,10 +137,9 @@ namespace RhuEngine.WorldObjects
 					ServerPingLevels = Pings,
 					Data = null
 				};
-				if(userConnection.ConnectionType == ConnectionType.Direct) {
+				if (userConnection.ConnectionType == ConnectionType.Direct) {
 					userConnection.Data = $"{Engine.MainSettings.NetworkingSettings.PublicIP}:{_netManager.LocalPort}";
 				}
-
 
 				if (!joiningSession) {
 					var newGUId = Guid.NewGuid();
@@ -153,7 +158,11 @@ namespace RhuEngine.WorldObjects
 						AssociatedGroup = gorupID,
 					};
 					await Engine.netApiManager.Client.CreateSession(sessionConnection);
-
+					foreach (var item in _worldObjects) {
+						if (item.Value is ISyncObject @object) {
+							@object.HasBeenNetSynced = true;
+						}
+					}
 				}
 				else {
 					var sessionConnection = new JoinSession {
@@ -174,6 +183,9 @@ namespace RhuEngine.WorldObjects
 		public readonly ConcurrentDictionary<string, bool> NatIntroductionSuccessIsGood = new();
 		public readonly ConcurrentDictionary<string, NetPeer> NatConnection = new();
 		public readonly ConcurrentDictionary<string, Guid> NatUserIDS = new();
+
+		private TimeSpan _ntpSyncTime;
+		private DateTime SyncClock => DateTime.UtcNow + _ntpSyncTime;
 
 		private void FindNewMaster() {
 			for (var i = 0; i < Users.Count; i++) {
@@ -253,7 +265,7 @@ namespace RhuEngine.WorldObjects
 					PeerDisconect(rpeer);
 				}
 				else if (peer.Tag is RelayPeer repeer) {
-					if(disconnectInfo.Reason == DisconnectReason.ConnectionFailed) {
+					if (disconnectInfo.Reason == DisconnectReason.ConnectionFailed) {
 						if (!repeer._hasUsedFallback) {
 							repeer._hasUsedFallback = true;
 							RLog.Info($"Relay Failed trying local connection");
@@ -271,6 +283,22 @@ namespace RhuEngine.WorldObjects
 				RLog.Info($"PeerDisconnected: " + disconnectInfo.Reason);
 				if (disconnectInfo.AdditionalData.AvailableBytes > 0) {
 					RLog.Info("Disconnect data: " + disconnectInfo.AdditionalData.GetInt());
+				}
+			};
+
+			_clientListener.NtpResponseEvent += (ntpPacket) => {
+				if (ntpPacket != null) {
+					_ntpSyncTime = ntpPacket.CorrectionOffset;
+					RLog.Info("NTP time test offset: " + ntpPacket.CorrectionOffset);
+					if (StartTime.Value == default) {
+						StartTime.Value = SyncClock;
+					}
+				}
+				else {
+					RLog.Err("NTP time error no CorrectionOffset");
+					if (StartTime.Value == default) {
+						StartTime.Value = SyncClock;
+					}
 				}
 			};
 
@@ -292,13 +320,13 @@ namespace RhuEngine.WorldObjects
 			var targetPort = 0;
 			if (Engine.MainSettings.NetworkingSettings.PreferredConnectionType == ConnectionType.Direct) {
 				targetPort = Engine.MainSettings.NetworkingSettings.StartPortRange;
-				if(Engine.MainSettings.NetworkingSettings.EndPortRange <= Engine.MainSettings.NetworkingSettings.StartPortRange) {
+				if (Engine.MainSettings.NetworkingSettings.EndPortRange <= Engine.MainSettings.NetworkingSettings.StartPortRange) {
 					RLog.Err(LoadMsg = "End Port Range needs to be more than StartPortRange");
 					return false;
 				}
 			}
-			if(targetPort != 0) {
-				while(targetPort <= Engine.MainSettings.NetworkingSettings.StartPortRange) {
+			if (targetPort != 0) {
+				while (targetPort <= Engine.MainSettings.NetworkingSettings.StartPortRange) {
 					RLog.Info(LoadMsg = $"Trying to start world networking Port {targetPort}");
 					if (_netManager.Start(targetPort)) {
 						RLog.Info(LoadMsg = $"World networking Port {targetPort}");
@@ -313,7 +341,76 @@ namespace RhuEngine.WorldObjects
 					return false;
 				}
 			}
+			SyncClocks();
+			_netThread = new Thread(NetworkThread) {
+				Priority = ThreadPriority.Normal
+			};
+			_netThread.Start();
 			return true;
+		}
+
+		private readonly ConcurrentQueue<(ICreationDeletionNetworkedObject, Func<IDataNode>)> _objectCreationAndDeleteUpdate = new();
+
+		private readonly ConcurrentHashSet<IDropOldNetworkedObject> _updatedValue = new();
+
+		public int ObjectCreationAndDeleteUpdatesCount => _objectCreationAndDeleteUpdate.Count;
+
+		public int UpdatedNetValuesCount => _updatedValue.Count;
+
+		public uint ReliableNetPackedAmount { get; private set; }
+
+		private void NetworkThread() {
+			while (_netManager.IsRunning) {
+				_networkLoop.Restart();
+				try {
+					if (_updatedValue.Count > 0 || _objectCreationAndDeleteUpdate.Count > 0) {
+						var updateData = new DataNodeGroup();
+
+						var updateValues = new DataNodeList();
+						foreach (var item in _updatedValue.GetSpan()) {
+							var packedData = new DataNodeGroup();
+							packedData.SetValue("p", new DataNode<NetPointer>(item.Pointer));
+							packedData.SetValue("d", item.GetUpdateData());
+							updateValues.Add(packedData);
+						}
+						_updatedValue.Clear();
+						updateData.SetValue("u", updateValues);
+						var objectUpdates = new DataNodeList();
+						while (_objectCreationAndDeleteUpdate.TryDequeue(out var updateEvent)) {
+							var packedData = new DataNodeGroup();
+							packedData.SetValue("p", new DataNode<NetPointer>(updateEvent.Item1.Pointer));
+							packedData.SetValue("d", updateEvent.Item2.Invoke());
+							objectUpdates.Add(packedData);
+						}
+						updateData.SetValue("cdu", objectUpdates);
+
+						using var memstream = new MemoryStream();
+						using var reader = new BinaryWriter(memstream);
+						NetPacked.Serlize(reader, new DataSaver(updateData));
+						_netManager.SendToAll(memstream.ToArray(), DeliveryMethod.ReliableOrdered);
+						ReliableNetPackedAmount++;
+					}
+					GetLocalUser()?.StreamUpdate();
+				}
+				catch (Exception e) {
+					RLog.Err($"Error in Network Loop Error:{e}");
+				}
+				_networkLoop.Stop();
+				var overTime = 32 - _networkLoop.ElapsedMilliseconds;
+				if (overTime > 0) {
+					Thread.Sleep((int)overTime);
+				}
+			}
+		}
+
+		private readonly Stopwatch _networkLoop = new();
+
+		private Thread _netThread;
+
+		public void SyncClocks() {
+			var targetServer = $"{Random.Shared.Next(0, 3)}.pool.ntp.org";
+			RLog.Info($"Syncing clock with {targetServer}");
+			_netManager.CreateNtpRequest(targetServer);
 		}
 
 		private void ClientListener_NetworkLatencyUpdateEvent(NetPeer peer, int latency) {
@@ -337,7 +434,7 @@ namespace RhuEngine.WorldObjects
 				if (_waitingForUsers) {
 					return;
 				}
-				LoadMsg = "Waiting For World Start State";
+				RLog.Info(LoadMsg = "Waiting For World Start State");
 				var worldData = dataGroup.GetValue("WorldData");
 				if (worldData is null) {
 					return;
@@ -366,7 +463,7 @@ namespace RhuEngine.WorldObjects
 							foreach (var item in deserializer.onLoaded) {
 								item?.Invoke();
 							}
-							RLog.Info(LoadMsg = "DoneDeserlizing");
+							RLog.Info(LoadMsg = "Done Deserlizing");
 							IsDeserializing = false;
 							WaitingForWorldStartState = false;
 						}
@@ -378,28 +475,71 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			else {
-				var target = (DataNode<NetPointer>)dataGroup.GetValue("Pointer");
-				if (target == null) {
-					return;
-				}
-				try {
-					lock (_networkedObjects) {
+				if (deliveryMethod != DeliveryMethod.ReliableOrdered) {
+					var target = (DataNode<NetPointer>)dataGroup.GetValue("Pointer");
+					if (target == null) {
+						return;
+					}
+					try {
 						if (_networkedObjects.ContainsKey(target.Value)) {
 							_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
 						}
-						else {
-							if (deliveryMethod == DeliveryMethod.ReliableOrdered && peer.User is not null) {
-								RLog.Err($"Failed to Process NetData target:{target.Value.HexString()} Error: _networkedObjects Not loaded");
+					}
+					catch { }
+				}
+				else {
+					var creationDeleteData = (DataNodeList)dataGroup.GetValue("cdu");
+					IEnumerable<Action> loadActions = null;
+					foreach (DataNodeGroup item in creationDeleteData) {
+						var target = (DataNode<NetPointer>)item.GetValue("p");
+						if (target == null) {
+							RLog.Err($"creationDeleteData p not loaded");
+							return;
+						}
+						try {
+							if (_networkedObjects.ContainsKey(target.Value)) {
+								if (_networkedObjects[target.Value] is ICreationDeletionNetworkedObject creationDeleteNetworkedObject) {
+									var addedList = creationDeleteNetworkedObject.ReceivedCreationDelete(peer, item.GetValue("d"));
+									loadActions = loadActions?.Concat(addedList) ?? addedList;
+								}
+								else {
+									RLog.Err($"creationDeleteData {target} target object was not CreationDeletionNetworkedObject");
+								}
+							}
+							else {
+								RLog.Warn($"creationDeleteData {target} target object not Found");
 							}
 						}
+						catch (Exception e) {
+							RLog.Err($"creationDeleteData {target} Error:{e}");
+						}
 					}
-				}
-				catch (Exception ex) {
-#if DEBUG
-					if (deliveryMethod == DeliveryMethod.ReliableOrdered && peer.User is not null) {
-						RLog.Err($"Failed to Process NetData target:{target.Value.HexString()} Error:{ex}");
+
+					if (loadActions is not null) {
+						foreach (var item in loadActions) {
+							item?.Invoke();
+						}
 					}
-#endif
+
+					var valueUpdates = (DataNodeList)dataGroup.GetValue("u");
+					foreach (DataNodeGroup item in valueUpdates) {
+						var target = (DataNode<NetPointer>)item.GetValue("p");
+						if (target == null) {
+							RLog.Err($"valueUpdates p not loaded");
+							return;
+						}
+						try {
+							if (_networkedObjects.ContainsKey(target.Value)) {
+								_networkedObjects[target.Value].Received(peer, item.GetValue("d"));
+							}
+							else {
+								RLog.Warn($"valueUpdates {target} target object not Found");
+							}
+						}
+						catch (Exception e) {
+							RLog.Err($"valueUpdates {target} Error:{e}");
+						}
+					}
 				}
 			}
 		}
@@ -455,7 +595,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 
-		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader,byte channel, DeliveryMethod deliveryMethod) {
+		private void ClientListener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod) {
 			if (IsDisposed) {
 				return;
 			}
@@ -594,7 +734,7 @@ namespace RhuEngine.WorldObjects
 				RLog.Info($"Local Was {LocalUserID} {MasterUser}");
 			}
 			LoadUserIn(peer);
-			if(IsLoading || WaitingForWorldStartState) {
+			if (IsLoading || WaitingForWorldStartState) {
 				return;
 			}
 			FindNewMaster();
@@ -756,7 +896,7 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		public void BroadcastDataToAll(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
+		public void BroadcastObjectCreationDeletion(ICreationDeletionNetworkedObject target, Func<IDataNode> returnData) {
 			if (target.IsRemoved) {
 				return;
 			}
@@ -770,16 +910,27 @@ namespace RhuEngine.WorldObjects
 				//LocalValue
 				return;
 			}
-			var netData = new DataNodeGroup();
-			netData.SetValue("Data", data);
-			netData.SetValue("Pointer", new DataNode<NetPointer>(target.Pointer));
-			using var memstream = new MemoryStream();
-			using var reader = new BinaryWriter(memstream);
-			NetPacked.Serlize(reader, new DataSaver(netData));
-			_netManager.SendToAll(memstream.ToArray(), 0, deliveryMethod);
+			_objectCreationAndDeleteUpdate.Enqueue((target, returnData));
 		}
 
-		public void BroadcastDataToAllStream(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
+		public void BroadcastObjectUpdate(IDropOldNetworkedObject target) {
+			if (target.IsRemoved) {
+				return;
+			}
+			if (_netManager is null) {
+				return;
+			}
+			if (IsLoading) {
+				return;
+			}
+			if (target.Pointer.GetOwnerID() == 0) {
+				//LocalValue
+				return;
+			}
+			_updatedValue.Add(target);
+		}
+
+		public void StreamToAll(IWorldObject target, IDataNode data, DeliveryMethod deliveryMethod) {
 			if (target.IsRemoved) {
 				return;
 			}
@@ -811,7 +962,13 @@ namespace RhuEngine.WorldObjects
 				ItemIndex = 176;
 				LocalUserID = (ushort)(Users.Count + 1);
 				RLog.Info($"Built local User with id{LocalUserID}");
-				var user = Users.Add();
+				var user = Users.AddWithCustomRefIds(false, false, () => {
+					lock (_buildRefIDLock) {
+						var netPointer = NetPointer.BuildID(ItemIndex, LocalUserID);
+						ItemIndex++;
+						return netPointer;
+					}
+				});
 				user.userID.Value = (worldManager.Engine.netApiManager.Client.User?.Id ?? new Guid()).ToString();
 				user.Platform.Value = Environment.OSVersion.Platform;
 				user.PlatformVersion.Value = Environment.OSVersion.Version.ToString();

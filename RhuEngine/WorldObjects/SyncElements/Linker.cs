@@ -28,6 +28,11 @@
 		public void SetLinkerTarget(ILinkerMember<T> Target) {
 			base.Target = Target;
 		}
+
+		public override void Unbind() {
+			Unlink();
+		}
+
 		public override void Bind() {
 			Link();
 		}

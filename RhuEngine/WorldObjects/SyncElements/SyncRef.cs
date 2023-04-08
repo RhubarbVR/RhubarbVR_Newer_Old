@@ -19,7 +19,7 @@ namespace RhuEngine.WorldObjects
 		Type GetRefType { get; }
 	}
 
-	public partial class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, INetworkedObject, IChangeable, ISyncMember where T : class, IWorldObject
+	public partial class SyncRef<T> : SyncObject, ILinkerMember<NetPointer>, ISyncRef, IDropOldNetworkedObject, IChangeable, ISyncMember where T : class, IWorldObject
 	{
 		public object Object { get => Value; set => Value = (NetPointer)value; }
 
@@ -33,24 +33,19 @@ namespace RhuEngine.WorldObjects
 		{
 			get => _targetPointer;
 			set {
+				Unbind();
 				try {
 					lock (_syncRefLock) {
-						Unbind();
 						_targetPointer = value;
 						var targetValue = World.GetWorldObject(value);
-						if (targetValue == null) {
-							_target = null;
-						}
-						else {
-							if (targetValue.GetType().IsAssignableTo(typeof(T))) {
-								_target = (T)targetValue;
-							}
-						}
-						Bind();
+						_target = targetValue == null ? null : targetValue.GetType().IsAssignableTo(typeof(T)) ? (T)targetValue : null;
 					}
 				}
 				catch {
 					_target = null;
+				}
+				finally {
+					Bind();
 				}
 				Changed?.Invoke(this);
 				OnChanged();
@@ -64,17 +59,20 @@ namespace RhuEngine.WorldObjects
 		{
 			get => _targetPointer;
 			set {
-				try {
-					lock (_syncRefLock) {
-						Unbind();
+				lock (_syncRefLock) {
+					Unbind();
+					try {
 						_targetPointer = value;
 						BroadcastValue();
-						_target = (T)World.GetWorldObject(value);
+						var targetValue = World.GetWorldObject(value);
+						_target = targetValue == null ? null : targetValue.GetType().IsAssignableTo(typeof(T)) ? (T)targetValue : null;
+					}
+					catch {
+						_target = null;
+					}
+					finally {
 						Bind();
 					}
-				}
-				catch {
-					_target = null;
 				}
 				Changed?.Invoke(this);
 				OnChanged();
@@ -122,10 +120,17 @@ namespace RhuEngine.WorldObjects
 				}
 				lock (_syncRefLock) {
 					Unbind();
-					_targetPointer = value == null ? default : value.Pointer;
-					_target = value;
-					BroadcastValue();
-					Bind();
+					try {
+						_targetPointer = value == null ? default : value.Pointer;
+						_target = value;
+						BroadcastValue();
+					}
+					catch {
+						_target = null;
+					}
+					finally {
+						Bind();
+					}
 				}
 				OnChanged();
 				Changed?.Invoke(this);
@@ -142,11 +147,18 @@ namespace RhuEngine.WorldObjects
 
 		}
 
-		protected virtual void BroadcastValue() {
+		public virtual IDataNode GetUpdateData() {
+			return new DataNode<NetPointer>(_targetPointer);
+		}
+
+		protected void BroadcastValue() {
 			if (IsLinkedTo || NoSync) {
 				return;
 			}
-			World.BroadcastDataToAll(this, new DataNode<NetPointer>(_targetPointer), LiteNetLib.DeliveryMethod.ReliableOrdered);
+			if (!_hasBeenNetSynced) {
+				return;
+			}
+			World.BroadcastObjectUpdate(this);
 		}
 
 		public virtual void Received(Peer sender, IDataNode data) {
@@ -167,6 +179,7 @@ namespace RhuEngine.WorldObjects
 
 		}
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
+			_hasBeenNetSynced |= syncObjectSerializerObject.NetSync;
 			return SyncObjectSerializerObject.CommonRefSerialize(this, _targetPointer);
 		}
 

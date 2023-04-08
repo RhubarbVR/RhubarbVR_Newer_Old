@@ -7,7 +7,7 @@ using RhuEngine.Datatypes;
 
 namespace RhuEngine.WorldObjects
 {
-	public sealed partial class SyncVar : SyncObject, INetworkedObject, ISyncMember
+	public sealed partial class SyncVar : SyncObject, ICreationDeletionNetworkedObject, ISyncMember
 	{
 		private Type _type;
 		public Type Type
@@ -21,19 +21,26 @@ namespace RhuEngine.WorldObjects
 				var newElement = (INetworkedObject)Activator.CreateInstance(value);
 				newElement.Initialize(World, this, "Sync Var Element", false, false);
 				Target = newElement;
+				if (!_hasBeenNetSynced) {
+					return;
+				}
 				if (!NoSync) {
-					var sendData = new DataNodeGroup();
-					sendData.SetValue("fieldType", new DataNode<string>(value.FullName));
-					sendData.SetValue("ElementData", Target.Serialize(new SyncObjectSerializerObject(true)));
-					World.BroadcastDataToAll(this, sendData, LiteNetLib.DeliveryMethod.ReliableOrdered);
+					World.BroadcastObjectCreationDeletion(this, () => {
+						var sendData = new DataNodeGroup();
+						sendData.SetValue("fieldType", new DataNode<string>(value.FullName));
+						sendData.SetValue("ElementData", Target.Serialize(new SyncObjectSerializerObject(true)));
+						return sendData;
+					});
 				}
 			}
 		}
+
 		[NoSync]
 		[NoShow]
 		[NoSave]
 		[NoLoad]
 		public INetworkedObject Target { get; private set; }
+
 		public bool NoSync { get; set; }
 
 		public T GetTarget<T>(out bool Failed) where T : class, INetworkedObject {
@@ -48,11 +55,15 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public T SetTarget<T>(out bool Failed) where T : class, INetworkedObject {
-			Type = typeof(T); 
+			Type = typeof(T);
 			return GetTarget<T>(out Failed);
 		}
 
 		public void Received(Peer sender, IDataNode data) {
+			throw new NotSupportedException();
+		}
+
+		public List<Action> ReceivedCreationDelete(Peer sender, IDataNode data) {
 			var nodeGroup = (DataNodeGroup)data;
 			var typeName = nodeGroup.GetValue<string>("fieldType");
 			var type = Type.GetType(typeName);
@@ -62,8 +73,10 @@ namespace RhuEngine.WorldObjects
 				}
 				var objrc = (INetworkedObject)Activator.CreateInstance(type);
 				objrc.Initialize(World, this, "Sync Var Element", true, false);
-				objrc.Deserialize(nodeGroup.GetValue("ElementData"), new SyncObjectDeserializerObject(false));
-				Target =  objrc;
+				var element = new SyncObjectDeserializerObject(false);
+				objrc.Deserialize(nodeGroup.GetValue("ElementData"), element);
+				Target = objrc;
+				return element.onLoaded;
 			}
 			else {
 				throw new Exception($"Failed to load received type {typeName}");
@@ -71,10 +84,11 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
+			_hasBeenNetSynced |= syncObjectSerializerObject.NetSync;
 			var data = SyncObjectSerializerObject.CommonSerialize(this);
-			data.SetValue("fieldType", new DataNode<string>(_type?.FullName??"Null"));
+			data.SetValue("fieldType", new DataNode<string>(_type?.FullName ?? "Null"));
 			if (Target != null) {
-				data.SetValue("ElementData", Target.Serialize(syncObjectSerializerObject)); 
+				data.SetValue("ElementData", Target.Serialize(syncObjectSerializerObject));
 			}
 			return data;
 		}
@@ -98,8 +112,8 @@ namespace RhuEngine.WorldObjects
 					objrc.Deserialize(value, syncObjectSerializerObject);
 					Target = objrc;
 				}
-				catch(Exception e) {
-					throw new Exception($"Failed to load type {typeName} ",e);
+				catch (Exception e) {
+					throw new Exception($"Failed to load type {typeName} ", e);
 				}
 			}
 		}

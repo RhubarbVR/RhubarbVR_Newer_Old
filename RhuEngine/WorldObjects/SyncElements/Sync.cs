@@ -22,8 +22,9 @@ namespace RhuEngine.WorldObjects
 
 		public Type GetValueType();
 	}
+
 	[GenericTypeConstraint()]
-	public partial class Sync<T> : SyncObject, ILinkerMember<T>, ISync, INetworkedObject, IChangeable, ISyncMember
+	public partial class Sync<T> : SyncObject, ILinkerMember<T>, ISync, IDropOldNetworkedObject, IChangeable, ISyncMember
 	{
 		private readonly object _locker = new();
 
@@ -50,10 +51,7 @@ namespace RhuEngine.WorldObjects
 
 		public object Object { get => _value; set => _value = (T)value; }
 
-		private void BroadcastValue() {
-			if (IsLinkedTo || NoSync) {
-				return;
-			}
+		public IDataNode GetUpdateData() {
 			var inputType = typeof(T);
 			IDataNode Value;
 			if (inputType == typeof(Type)) {
@@ -87,7 +85,17 @@ namespace RhuEngine.WorldObjects
 					Value = new DataNode<T>(_value);
 				}
 			}
-			World.BroadcastDataToAll(this, Value, LiteNetLib.DeliveryMethod.ReliableOrdered);
+			return Value;
+		}
+
+		private void BroadcastValue() {
+			if (IsLinkedTo || NoSync) {
+				return;
+			}
+			if (!_hasBeenNetSynced) {
+				return;
+			}
+			World.BroadcastObjectUpdate(this);
 		}
 		public void Received(Peer sender, IDataNode data) {
 			if (IsLinkedTo || NoSync) {
@@ -187,12 +195,16 @@ namespace RhuEngine.WorldObjects
 
 
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
-			return SyncObjectSerializerObject.CommonValueSerialize(this, OnSave(syncObjectSerializerObject));
+			_hasBeenNetSynced |= syncObjectSerializerObject.NetSync;
+			return syncObjectSerializerObject.CommonValueSerialize(this, OnSave(syncObjectSerializerObject),!EqualityComparer<T>.Default.Equals(_starting_value, _value));
 		}
 
 		public override void Deserialize(IDataNode data, SyncObjectDeserializerObject syncObjectSerializerObject) {
 			if (syncObjectSerializerObject.ValueDeserialize<T>((DataNodeGroup)data, this, out var tempvalue)) {
 				_value = tempvalue;
+			}
+			else {
+				_value = _starting_value;
 			}
 			OnLoad(syncObjectSerializerObject);
 		}
@@ -208,7 +220,7 @@ namespace RhuEngine.WorldObjects
 			UpdatedValue();
 		}
 
-		public bool IsLinkedTo { get; private set; }
+		public bool IsLinkedTo => linkedFromObj is not null;
 
 		public ILinker linkedFromObj;
 
@@ -226,7 +238,7 @@ namespace RhuEngine.WorldObjects
 
 		public void KillLink() {
 			linkedFromObj?.RemoveLinkLocation();
-			IsLinkedTo = false;
+			linkedFromObj = null;
 			OnLinked?.Invoke(null);
 		}
 
@@ -241,7 +253,6 @@ namespace RhuEngine.WorldObjects
 			}
 			value.SetLinkLocation(this);
 			linkedFromObj = value;
-			IsLinkedTo = true;
 			OnLinked?.Invoke(value);
 		}
 

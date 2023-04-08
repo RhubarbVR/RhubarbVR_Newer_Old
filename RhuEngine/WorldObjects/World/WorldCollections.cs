@@ -17,13 +17,13 @@ namespace RhuEngine.WorldObjects
 
 		private readonly ConcurrentDictionary<NetPointer, INetworkedObject> _networkedObjects = new();
 
-		private readonly HashSet<Entity> _entities = new();
+		private readonly ConcurrentHashSet<Entity> _entities = new();
 
 		private readonly HashSet<Entity> _updatingEntities = new();
 
-		private readonly HashSet<LinkedWorldComponent> _worldLinkComponents = new();
+		private readonly ConcurrentHashSet<LinkedWorldComponent> _worldLinkComponents = new();
 
-		private readonly HashSet<IGlobalStepable> _globalStepables = new();
+		private readonly ConcurrentHashSet<IGlobalStepable> _globalStepables = new();
 
 		private readonly object _buildRefIDLock = new();
 
@@ -36,6 +36,8 @@ namespace RhuEngine.WorldObjects
 		public int RenderingComponentsCount => _worldLinkComponents.Count;
 		[Exposed]
 		public int GlobalStepableCount => _globalStepables.Count;
+
+		public ConcurrentDictionary<NetPointer, IWorldObject> WorldObjects => _worldObjects;
 
 		public IWorldObject[] AllWorldObjects => _worldObjects.Values.ToArray();
 
@@ -90,36 +92,24 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void RegisterGlobalStepable(IGlobalStepable data) {
-			lock (_globalStepables) {
-				_globalStepables.Add(data);
-			}
+			_globalStepables.Add(data);
 		}
 		public void UnregisterGlobalStepable(IGlobalStepable data) {
-			lock (_globalStepables) {
-				_globalStepables.Remove(data);
-			}
+			_globalStepables.Remove(data);
 		}
 
 		public void RegisterWorldLinkObject(LinkedWorldComponent data) {
-			lock (_worldLinkComponents) {
-				_worldLinkComponents.Add(data);
-			}
+			_worldLinkComponents.Add(data);
 		}
 		public void UnregisterWorldLinkObject(LinkedWorldComponent data) {
-			lock (_worldLinkComponents) {
-				_worldLinkComponents.Remove(data);
-			}
+			_worldLinkComponents.Remove(data);
 		}
 
 		public void RegisterEntity(Entity data) {
-			lock (_entities) {
-				_entities.Add(data);
-			}
+			_entities.Add(data);
 		}
 		public void UnregisterEntity(Entity data) {
-			lock (_entities) {
-				_entities.Remove(data);
-			}
+			_entities.Remove(data);
 		}
 
 		public void RegisterUpdatingEntity(Entity data) {

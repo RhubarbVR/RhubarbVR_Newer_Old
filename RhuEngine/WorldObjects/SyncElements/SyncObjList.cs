@@ -62,7 +62,7 @@ namespace RhuEngine.WorldObjects
 
 	public partial class SyncObjList<T> : SyncListBase<T>, ISyncObjectList<T>, INetworkedObject, IEnumerable<ISyncObject> where T : class, ISyncObject, new()
 	{
-		public T AddWithCustomRefIds(bool networkedObject = false, bool deserialize = false, NetPointerUpdateDelegate func = null) {
+		public T AddWithCustomRefIds(bool networkedObject = true, bool deserialize = false, NetPointerUpdateDelegate func = null) {
 			var newElement = new T();
 			newElement.Initialize(World, this, "List Elemenet", networkedObject, deserialize, func);
 			AddInternal(newElement);
@@ -94,6 +94,7 @@ namespace RhuEngine.WorldObjects
 		protected override void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate func) {
 		}
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
+			_hasBeenNetSynced |= syncObjectSerializerObject.NetSync;
 			return syncObjectSerializerObject.CommonListSerialize(this, this);
 		}
 
@@ -101,15 +102,12 @@ namespace RhuEngine.WorldObjects
 			syncObjectSerializerObject.ListDeserialize((DataNodeGroup)data, this);
 		}
 
-		public override T LoadElement(IDataNode data) {
+		public override (T, List<Action>) LoadElement(IDataNode data) {
 			var newElement = new T();
 			newElement.Initialize(World, this, "List Elemenet", true, true);
 			var deserlizer = new SyncObjectDeserializerObject(false);
 			newElement.Deserialize(data, deserlizer);
-			foreach (var item in deserlizer.onLoaded) {
-				item?.Invoke();
-			}
-			return newElement;
+			return (newElement, deserlizer.onLoaded);
 		}
 
 		public override IDataNode SaveElement(T val) {

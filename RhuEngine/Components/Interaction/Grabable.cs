@@ -54,7 +54,7 @@ namespace RhuEngine.Components
 			grabbingUser.Target = null;
 			Entity.SetParent(lastParent.Target);
 			try {
-				grabbableHolder.Target.GrabbedObjects.Remove(this);
+				grabbableHolder.Target?.DropObject(this);
 			}
 			catch { }
 			grabbableHolder.Target = null;

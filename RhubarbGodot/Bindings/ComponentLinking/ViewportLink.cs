@@ -286,6 +286,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			QuadTwo_Changed(null);
 			QuadThree_Changed(null);
 			LinkedComp.Load(new RTexture2D(new GodotTexture2D(node.GetTexture())));
+			LinkedComp.SendNoInputEvent = NoInput;
 			LinkedComp.SendInputEvent = UpdateInput;
 			LinkedComp.ClearBackGroundCalled = ClearCalled;
 			LinkedComp.RenderFrameCalled = RenderFrameCalled;
@@ -295,6 +296,10 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		private void GUIDisableInput_Changed(RhuEngine.WorldObjects.IChangeable obj) {
 			RenderThread.ExecuteOnEndOfFrame(() => node.GuiDisableInput = LinkedComp.GUIDisableInput.Value);
+		}
+
+		private void NoInput() {
+			InputActions.Clear();
 		}
 
 		private void UpdateInput(RNumerics.Vector2f pos, RNumerics.Vector2f Tilt, float PressForce, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {

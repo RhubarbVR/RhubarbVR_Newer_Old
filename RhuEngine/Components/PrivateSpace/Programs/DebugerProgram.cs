@@ -73,6 +73,7 @@ namespace RhuEngine.Components
 			if (_richText is null) {
 				return;
 			}
+			var FocusedWorldNoneSync = Engine.worldManager.FocusedWorld?.WorldObjects.Where(x => x.Value is ISyncObject syncObject && !syncObject.HasBeenNetSynced);
 			_richText.Text.Value = @$"=====---- EngineStatistics ----=====
 Is Online {Engine.netApiManager.Client.IsOnline}
 Server Ping {Engine.netApiManager.Client.Ping}
@@ -112,8 +113,12 @@ WorldObjects {Engine.worldManager.FocusedWorld?.WorldObjectsCount}
 RenderComponents {Engine.worldManager.FocusedWorld?.RenderingComponentsCount}
 GlobalStepables {Engine.worldManager.FocusedWorld?.GlobalStepableCount}
 stepTime {(Engine.worldManager.FocusedWorld?.stepTime * 1000f).Value:f3}ms
+ObjectCreationAndDeleteUpdatesCount {Engine.worldManager.FocusedWorld?.ObjectCreationAndDeleteUpdatesCount.ToString() ?? "Null"}
+UpdatedNetValuesCount {Engine.worldManager.FocusedWorld?.UpdatedNetValuesCount.ToString() ?? "Null"}
+ReliableNetPackedAmount {Engine.worldManager.FocusedWorld?.ReliableNetPackedAmount.ToString() ?? "Null"}
+NoneNetSynced {FocusedWorldNoneSync?.Count().ToString() ?? "Null"}
+FirstTypeNoneNetSynced {FocusedWorldNoneSync?.FirstOrDefault().Value?.GetType()?.GetFormattedName() ?? "Null"}
 ===== -----------------------=====";
-
 		}
 
 	}

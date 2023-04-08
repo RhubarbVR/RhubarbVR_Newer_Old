@@ -69,44 +69,46 @@ namespace RhuEngine.WorldObjects
 			obj.SetValue("targetPointer", Value);
 			return obj;
 		}
-		public static DataNodeGroup CommonValueSerialize<T>(IWorldObject @object, T value) {
+		public DataNodeGroup CommonValueSerialize<T>(IWorldObject @object, T value,bool hasChanged) {
 			var obj = new DataNodeGroup();
 			var refID = new DataNode<NetPointer>(@object.Pointer);
 			obj.SetValue("Pointer", refID);
-			var inputType = typeof(T);
-			IDataNode Value;
-			if (inputType == typeof(Type)) {
-				Value = new DataNode<string>(((Type)(object)value)?.FullName);
-			}
-			else if (inputType == typeof(Uri)) {
-				Value = new DataNode<string>(((Uri)(object)value)?.ToString());
-			}
-			else {
-				if (inputType.IsEnum) {
-					var unType = inputType.GetEnumUnderlyingType();
-					Value = unType == typeof(int)
-						? new DataNode<int>((int)(object)value)
-						: unType == typeof(uint)
-						? new DataNode<uint>((uint)(object)value)
-						: unType == typeof(bool)
-						? new DataNode<bool>((bool)(object)value)
-						: unType == typeof(byte)
-						? new DataNode<byte>((byte)(object)value)
-						: unType == typeof(sbyte)
-						? new DataNode<sbyte>((sbyte)(object)value)
-						: unType == typeof(short)
-						? new DataNode<short>((short)(object)value)
-						: unType == typeof(ushort)
-						? new DataNode<ushort>((ushort)(object)value)
-						: unType == typeof(long)
-						? new DataNode<long>((long)(object)value)
-																																											: unType == typeof(ulong) ? (IDataNode)new DataNode<ulong>((ulong)(object)value) : throw new NotSupportedException();
+			if (hasChanged || !NetSync) {
+				var inputType = typeof(T);
+				IDataNode Value;
+				if (inputType == typeof(Type)) {
+					Value = new DataNode<string>(((Type)(object)value)?.FullName);
+				}
+				else if (inputType == typeof(Uri)) {
+					Value = new DataNode<string>(((Uri)(object)value)?.ToString());
 				}
 				else {
-					Value = new DataNode<T>(value);
+					if (inputType.IsEnum) {
+						var unType = inputType.GetEnumUnderlyingType();
+						Value = unType == typeof(int)
+							? new DataNode<int>((int)(object)value)
+							: unType == typeof(uint)
+							? new DataNode<uint>((uint)(object)value)
+							: unType == typeof(bool)
+							? new DataNode<bool>((bool)(object)value)
+							: unType == typeof(byte)
+							? new DataNode<byte>((byte)(object)value)
+							: unType == typeof(sbyte)
+							? new DataNode<sbyte>((sbyte)(object)value)
+							: unType == typeof(short)
+							? new DataNode<short>((short)(object)value)
+							: unType == typeof(ushort)
+							? new DataNode<ushort>((ushort)(object)value)
+							: unType == typeof(long)
+							? new DataNode<long>((long)(object)value)
+																																												: unType == typeof(ulong) ? (IDataNode)new DataNode<ulong>((ulong)(object)value) : throw new NotSupportedException();
+					}
+					else {
+						Value = new DataNode<T>(value);
+					}
 				}
+				obj.SetValue("v", Value);
 			}
-			obj.SetValue("Value", Value);
 			return obj;
 		}
 

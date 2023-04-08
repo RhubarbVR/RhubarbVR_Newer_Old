@@ -49,6 +49,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
+			_hasBeenNetSynced |= syncObjectSerializerObject.NetSync;
 			return SyncObjectSerializerObject.CommonSerialize(this);
 		}
 

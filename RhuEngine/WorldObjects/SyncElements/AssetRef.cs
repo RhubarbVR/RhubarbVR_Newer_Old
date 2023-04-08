@@ -33,17 +33,6 @@ namespace RhuEngine.WorldObjects
 			}
 		}
 
-		protected override void OnLoaded() {
-			base.OnLoaded();
-			if (base.Target is null) {
-				return;
-			}
-			base.Target.OnAssetLoaded += LoadedCall;
-			if (base.Target.Loaded) {
-				LoadedCall(base.Target.Value);
-			}
-		}
-
 		public override void Dispose() {
 			LoadChange = null;
 			base.Dispose();

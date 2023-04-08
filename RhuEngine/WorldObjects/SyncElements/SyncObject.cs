@@ -30,6 +30,17 @@ namespace RhuEngine.WorldObjects
 
 		public UserProgramManager ProgramManager => WorldManager?.PrivateSpaceManager?._ProgramManager;
 		public PrivateSpaceManager PrivateSpaceManager => WorldManager?.PrivateSpaceManager;
+		public User OwnerUser => World.Users[Pointer.GetOwnerID() - 1];
+		public User OwnerUserIfThere
+		{
+			get {
+				var targetUser = OwnerUser;
+				if(!(targetUser.IsConnected || targetUser.IsLocalUser)) {
+					targetUser = MasterUser;
+				}
+				return targetUser;
+			}
+		}
 		public User LocalUser => World.GetLocalUser();
 		public User MasterUser => World.GetMasterUser();
 		public InputManager InputManager => Engine.inputManager;
@@ -43,6 +54,9 @@ namespace RhuEngine.WorldObjects
 			get; private set;
 		}
 
+		protected bool _hasBeenNetSynced = false;
+
+		public bool HasBeenNetSynced { get => _hasBeenNetSynced; set => _hasBeenNetSynced = value; }
 
 		public NetPointer Pointer
 		{
@@ -207,6 +221,9 @@ namespace RhuEngine.WorldObjects
 				if (typeof(IGlobalStepable).IsAssignableFrom(GetType())) {
 					world.RegisterGlobalStepable((IGlobalStepable)this);
 				}
+				if (netPointer is not null) {
+					_hasBeenNetSynced = true;
+				}
 				IsInitialized = true;
 			}
 			catch {
@@ -306,6 +323,7 @@ namespace RhuEngine.WorldObjects
 			//}
 		}
 		public virtual IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
+			_hasBeenNetSynced |= syncObjectSerializerObject.NetSync;
 			return syncObjectSerializerObject.CommonWorkerSerialize(this);
 		}
 

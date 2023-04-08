@@ -56,7 +56,6 @@ namespace RhuEngine.WorldObjects
 				RLog.Err("Failed to InitializeMembers" + ex.ToString());
 				throw new Exception("Failed to InitializeMembers", ex);
 			}
-			StartTime.Value = DateTime.UtcNow;
 			WorldGravity.Value = new Vector3f(0, -10, 0);
 			if (isPersonalSpace | !networkedWorld) {
 				IsDeserializing = false;
@@ -166,7 +165,7 @@ namespace RhuEngine.WorldObjects
 		[NoSave]
 		public readonly SyncObjList<User> Users;
 
-		public double WorldTime => (DateTime.UtcNow - StartTime).TotalSeconds;
+		public double WorldTime => (SyncClock - StartTime).TotalSeconds;
 
 		[Default("New World")]
 		public readonly Sync<string> WorldName;
@@ -219,7 +218,7 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			try {
-				foreach (var item in _globalStepables) {
+				foreach (var item in _globalStepables.GetSpan()) {
 					item.Step();
 				}
 			}
@@ -251,7 +250,7 @@ namespace RhuEngine.WorldObjects
 			}
 			try {
 				if (Engine.EngineLink.CanRender) {
-					foreach (var item in _worldLinkComponents) {
+					foreach (var item in _worldLinkComponents.GetSpan()) {
 						item.RunRender();
 					}
 				}

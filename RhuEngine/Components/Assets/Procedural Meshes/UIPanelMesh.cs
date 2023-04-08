@@ -70,9 +70,9 @@ namespace RhuEngine.Components
 				new Vector3f(UVMax.Value.x,UVMax.Value.y),
 			} };
 			mainPanel.PrimitiveType = RPrimitiveType.Triangle;
-			mainPanel.Faces = new List<RFace> { 
-				new RFace(1, 0, 2), 
-				new RFace(1, 2, 3),
+			mainPanel.Faces = new List<RFace> {
+				new RFace(0,1, 2),
+				new RFace(2,1, 3),
 			};
 
 			var backGroundMesh = new ComplexMesh {
@@ -116,48 +116,48 @@ namespace RhuEngine.Components
 
 			backGroundMesh.Faces = new List<RFace> {
 				//TOP
-				new RFace(5, 4, 0),
-				new RFace(1, 5, 0),
+				new RFace(4, 5, 0),
+				new RFace(5, 1, 0),
 
-				new RFace(4, 5, 8),
-				new RFace(5, 9, 8),
+				new RFace( 5,4, 8),
+				new RFace( 9,5, 8),
 
-				new RFace(8, 9, 12),
-				new RFace(9, 13, 12),
+				new RFace( 9, 8,12),
+				new RFace( 13,9, 12),
 
 				//Left
-				new RFace(3, 5, 1),
-				new RFace(7, 5, 3),
+				new RFace(5,3,  1),
+				new RFace(5,7,  3),
 
-				new RFace(5, 7, 9),
-				new RFace(11, 9, 7),
+				new RFace(7, 5, 9),
+				new RFace( 9,11, 7),
 
-				new RFace(9, 11, 13),
-				new RFace(15, 13, 11),
+				new RFace(11, 9, 13),
+				new RFace( 13,15, 11),
 
 				//Bottom
-				new RFace(3, 2, 6),
-				new RFace(7, 3, 6),
+				new RFace(2,3,  6),
+				new RFace(3,7,  6),
 
-				new RFace(7, 6, 10),
-				new RFace(11, 7, 10),
+				new RFace(6, 7, 10),
+				new RFace( 7,11, 10),
 
-				new RFace(11, 10, 14),
-				new RFace(15, 11, 14),
+				new RFace( 10,11, 14),
+				new RFace( 11,15, 14),
 
 				//Right
-                new RFace(2, 0, 6),
-				new RFace(6, 0, 4),
+                new RFace(0,2,  6),
+				new RFace(0,6,  4),
 
-				new RFace(6, 4, 8),
-				new RFace(6, 8, 10),
+				new RFace( 4,6, 8),
+				new RFace( 8,6, 10),
 
-				new RFace(10, 8, 12),
-				new RFace(10, 12, 14),
+				new RFace(8, 10, 12),
+				new RFace(12,10,  14),
 
 				//BackGround
-				new RFace(12, 13, 14),
-				new RFace(13, 15, 14),
+				new RFace( 13,12, 14),
+				new RFace( 15,13, 14),
 			};
 
 			mainPanel.AddSubMesh(backGroundMesh);
