@@ -33,24 +33,19 @@ namespace RhuEngine.WorldObjects
 		{
 			get => _targetPointer;
 			set {
+				Unbind();
 				try {
 					lock (_syncRefLock) {
-						Unbind();
 						_targetPointer = value;
 						var targetValue = World.GetWorldObject(value);
-						if (targetValue == null) {
-							_target = null;
-						}
-						else {
-							if (targetValue.GetType().IsAssignableTo(typeof(T))) {
-								_target = (T)targetValue;
-							}
-						}
-						Bind();
+						_target = targetValue == null ? null : targetValue.GetType().IsAssignableTo(typeof(T)) ? (T)targetValue : null;
 					}
 				}
 				catch {
 					_target = null;
+				}
+				finally {
+					Bind();
 				}
 				Changed?.Invoke(this);
 				OnChanged();
@@ -64,17 +59,20 @@ namespace RhuEngine.WorldObjects
 		{
 			get => _targetPointer;
 			set {
-				try {
-					lock (_syncRefLock) {
-						Unbind();
+				lock (_syncRefLock) {
+					Unbind();
+					try {
 						_targetPointer = value;
 						BroadcastValue();
-						_target = (T)World.GetWorldObject(value);
+						var targetValue = World.GetWorldObject(value);
+						_target = targetValue == null ? null : targetValue.GetType().IsAssignableTo(typeof(T)) ? (T)targetValue : null;
+					}
+					catch {
+						_target = null;
+					}
+					finally {
 						Bind();
 					}
-				}
-				catch {
-					_target = null;
 				}
 				Changed?.Invoke(this);
 				OnChanged();
@@ -122,10 +120,17 @@ namespace RhuEngine.WorldObjects
 				}
 				lock (_syncRefLock) {
 					Unbind();
-					_targetPointer = value == null ? default : value.Pointer;
-					_target = value;
-					BroadcastValue();
-					Bind();
+					try {
+						_targetPointer = value == null ? default : value.Pointer;
+						_target = value;
+						BroadcastValue();
+					}
+					catch {
+						_target = null;
+					}
+					finally {
+						Bind();
+					}
 				}
 				OnChanged();
 				Changed?.Invoke(this);
