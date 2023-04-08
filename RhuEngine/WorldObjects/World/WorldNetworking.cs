@@ -514,8 +514,11 @@ namespace RhuEngine.WorldObjects
 							RLog.Err($"creationDeleteData {target} Error:{e}");
 						}
 					}
-					foreach (var item in loadActions) {
-						item?.Invoke();
+
+					if (loadActions is not null) {
+						foreach (var item in loadActions) {
+							item?.Invoke();
+						}
 					}
 
 					var valueUpdates = (DataNodeList)dataGroup.GetValue("u");
