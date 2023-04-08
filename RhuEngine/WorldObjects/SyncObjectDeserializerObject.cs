@@ -35,6 +35,9 @@ namespace RhuEngine.WorldObjects
 				}
 			}
 			else {
+				if (@object is ISyncObject syncObject) {
+					syncObject.HasBeenNetSynced = true;
+				}
 				@object.Pointer = ((DataNode<NetPointer>)data.GetValue("Pointer")).Value;
 				if (@object.Pointer._id == new NetPointer(0)._id) {
 					RLog.Warn($"RefID of {@object.GetType().FullName} is null");
@@ -70,6 +73,9 @@ namespace RhuEngine.WorldObjects
 
 			}
 			else {
+				if (@object is ISyncObject syncObject) {
+					syncObject.HasBeenNetSynced = true;
+				}
 				@object.Pointer = ((DataNode<NetPointer>)data.GetValue("Pointer")).Value;
 				@object.World.RegisterWorldObject(@object);
 			}
