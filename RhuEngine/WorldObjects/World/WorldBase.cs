@@ -218,7 +218,7 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			try {
-				foreach (var item in _globalStepables) {
+				foreach (var item in _globalStepables.GetSpan()) {
 					item.Step();
 				}
 			}
@@ -250,7 +250,7 @@ namespace RhuEngine.WorldObjects
 			}
 			try {
 				if (Engine.EngineLink.CanRender) {
-					foreach (var item in _worldLinkComponents) {
+					foreach (var item in _worldLinkComponents.GetSpan()) {
 						item.RunRender();
 					}
 				}

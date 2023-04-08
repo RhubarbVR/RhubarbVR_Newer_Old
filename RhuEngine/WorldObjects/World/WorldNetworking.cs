@@ -356,7 +356,7 @@ namespace RhuEngine.WorldObjects
 						var updateData = new DataNodeGroup();
 
 						var updateValues = new DataNodeList();
-						foreach (var item in _updatedValue) {
+						foreach (var item in _updatedValue.GetSpan()) {
 							var packedData = new DataNodeGroup();
 							packedData.SetValue("p", new DataNode<NetPointer>(item.Pointer));
 							packedData.SetValue("d", item.GetUpdateData());

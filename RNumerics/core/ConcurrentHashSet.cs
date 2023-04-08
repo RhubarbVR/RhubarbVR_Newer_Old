@@ -8,23 +8,19 @@ using System.Threading.Tasks;
 
 namespace RNumerics
 {
-	public class ConcurrentHashSet<T> : IDisposable, IEnumerable<T>
+	public class ConcurrentHashSet<T> : IDisposable
 	{
 		private readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.SupportsRecursion);
 		private readonly HashSet<T> _hashSet = new();
 
-		public IEnumerator<T> GetEnumerator() {
+		public unsafe Span<T> GetSpan() {
 			_lock.EnterReadLock();
-			_lock.EnterWriteLock();
 			try {
-				return _hashSet.GetEnumerator();
+				return _hashSet.ToArray().AsSpan();
 			}
 			finally {
 				if (_lock.IsReadLockHeld) {
 					_lock.ExitReadLock();
-				}
-				if (_lock.IsWriteLockHeld) {
-					_lock.ExitWriteLock();
 				}
 			}
 		}
@@ -100,11 +96,6 @@ namespace RNumerics
 			if (disposing) {
 				_lock?.Dispose();
 			}
-		}
-
-
-		IEnumerator IEnumerable.GetEnumerator() {
-			return GetEnumerator();
 		}
 
 		~ConcurrentHashSet() {
