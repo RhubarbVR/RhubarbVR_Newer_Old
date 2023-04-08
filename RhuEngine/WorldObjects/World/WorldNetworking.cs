@@ -286,7 +286,6 @@ namespace RhuEngine.WorldObjects
 			};
 
 			_clientListener.NtpResponseEvent += (ntpPacket) => {
-				_lastTimeSync.Restart();
 				if (ntpPacket != null) {
 					_ntpSyncTime = ntpPacket.CorrectionOffset;
 					RLog.Info("NTP time test offset: " + ntpPacket.CorrectionOffset);
@@ -353,11 +352,17 @@ namespace RhuEngine.WorldObjects
 
 		private readonly ConcurrentHashSet<IDropOldNetworkedObject> _updatedValue = new();
 
+
+		public int ObjectCreationAndDeleteUpdatesCount => _objectCreationAndDeleteUpdate.Count;
+		public int UpdatedNetValuesCount => _updatedValue.Count;
+
+		public uint ReliableNetPackedAmount { get; private set; }
+
 		private void NetworkThread() {
 			while (_netManager.IsRunning) {
 				_networkLoop.Restart();
 				try {
-					if (_updatedValue.Count > 0 && _objectCreationAndDeleteUpdate.Count > 0) {
+					if (_updatedValue.Count > 0 || _objectCreationAndDeleteUpdate.Count > 0) {
 						var updateData = new DataNodeGroup();
 
 						var updateValues = new DataNodeList();
@@ -382,11 +387,9 @@ namespace RhuEngine.WorldObjects
 						using var reader = new BinaryWriter(memstream);
 						NetPacked.Serlize(reader, new DataSaver(updateData));
 						_netManager.SendToAll(memstream.ToArray(), DeliveryMethod.ReliableOrdered);
+						ReliableNetPackedAmount++;
 					}
 					GetLocalUser()?.StreamUpdate();
-					if (_lastTimeSync.Elapsed.TotalSeconds >= 100) {
-						SyncClocks(); // ResyncClocks
-					}
 				}
 				catch (Exception e) {
 					RLog.Err($"Error in Network Loop Error:{e}");
@@ -403,10 +406,7 @@ namespace RhuEngine.WorldObjects
 
 		private Thread _netThread;
 
-		private readonly Stopwatch _lastTimeSync = new();
-
 		public void SyncClocks() {
-			_lastTimeSync.Start();
 			var targetServer = $"{Random.Shared.Next(0, 3)}.pool.ntp.org";
 			RLog.Info($"Syncing clock with {targetServer}");
 			_netManager.CreateNtpRequest(targetServer);

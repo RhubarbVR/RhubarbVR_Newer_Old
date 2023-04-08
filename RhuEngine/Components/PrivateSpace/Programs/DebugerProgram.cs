@@ -113,10 +113,12 @@ WorldObjects {Engine.worldManager.FocusedWorld?.WorldObjectsCount}
 RenderComponents {Engine.worldManager.FocusedWorld?.RenderingComponentsCount}
 GlobalStepables {Engine.worldManager.FocusedWorld?.GlobalStepableCount}
 stepTime {(Engine.worldManager.FocusedWorld?.stepTime * 1000f).Value:f3}ms
-NoneNetSynced {FocusedWorldNoneSync?.Count().ToString() ?? "NULL"}
-FirstTypeNoneNetSynced {FocusedWorldNoneSync?.FirstOrDefault().Value?.GetType()?.GetFormattedName() ?? "NULL"}
+ObjectCreationAndDeleteUpdatesCount {Engine.worldManager.FocusedWorld?.ObjectCreationAndDeleteUpdatesCount.ToString() ?? "Null"}
+UpdatedNetValuesCount {Engine.worldManager.FocusedWorld?.UpdatedNetValuesCount.ToString() ?? "Null"}
+ReliableNetPackedAmount {Engine.worldManager.FocusedWorld?.ReliableNetPackedAmount.ToString() ?? "Null"}
+NoneNetSynced {FocusedWorldNoneSync?.Count().ToString() ?? "Null"}
+FirstTypeNoneNetSynced {FocusedWorldNoneSync?.FirstOrDefault().Value?.GetType()?.GetFormattedName() ?? "Null"}
 ===== -----------------------=====";
-
 		}
 
 	}
