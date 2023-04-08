@@ -491,7 +491,7 @@ namespace RhuEngine.WorldObjects
 						}
 						try {
 							if (_networkedObjects.ContainsKey(target.Value)) {
-								_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("d"));
+								_networkedObjects[target.Value].Received(peer, item.GetValue("d"));
 							}
 						}
 						catch (Exception e) {
@@ -507,7 +507,7 @@ namespace RhuEngine.WorldObjects
 						}
 						try {
 							if (_networkedObjects.ContainsKey(target.Value)) {
-								_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("d"));
+								_networkedObjects[target.Value].Received(peer, item.GetValue("d"));
 							}
 						}
 						catch (Exception e) {
