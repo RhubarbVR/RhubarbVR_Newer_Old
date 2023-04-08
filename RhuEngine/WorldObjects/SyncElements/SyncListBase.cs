@@ -46,6 +46,11 @@ namespace RhuEngine.WorldObjects
 			return _syncObjects[index];
 		}
 
+		protected override void OnLoaded() {
+			base.OnLoaded();
+			ReorderList();
+		}
+
 		public void Clear() {
 			var toBeRemoved = _syncObjects.ToArray();
 			if (Task.CurrentId is null) {
