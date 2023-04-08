@@ -62,7 +62,7 @@ namespace RhuEngine.WorldObjects
 
 	public partial class SyncObjList<T> : SyncListBase<T>, ISyncObjectList<T>, INetworkedObject, IEnumerable<ISyncObject> where T : class, ISyncObject, new()
 	{
-		public T AddWithCustomRefIds(bool networkedObject = false, bool deserialize = false, NetPointerUpdateDelegate func = null) {
+		public T AddWithCustomRefIds(bool networkedObject = true, bool deserialize = false, NetPointerUpdateDelegate func = null) {
 			var newElement = new T();
 			newElement.Initialize(World, this, "List Elemenet", networkedObject, deserialize, func);
 			AddInternal(newElement);

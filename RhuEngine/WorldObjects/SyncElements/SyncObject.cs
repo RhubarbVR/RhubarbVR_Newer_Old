@@ -210,6 +210,9 @@ namespace RhuEngine.WorldObjects
 				if (typeof(IGlobalStepable).IsAssignableFrom(GetType())) {
 					world.RegisterGlobalStepable((IGlobalStepable)this);
 				}
+				if(netPointer is not null) {
+					_hasBeenNetSynced = true;
+				}
 				IsInitialized = true;
 			}
 			catch {
