@@ -31,16 +31,19 @@
 		public void SetLinkerTarget(ILinkable Target) {
 			base.Target = Target;
 		}
-		public override void OnChanged() {
-			if (Target != null) {
-				Link();
-			}
+		public override void Unbind() {
+			Unlink();
 		}
+
+		public override void Bind() {
+			Link();
+		}
+
 		private void Link() {
 			if (Linked) {
 				Unlink();
 			}
-			Target.Link(this);
+			Target?.Link(this);
 		}
 		private void Unlink() {
 			_linked?.KillLink();

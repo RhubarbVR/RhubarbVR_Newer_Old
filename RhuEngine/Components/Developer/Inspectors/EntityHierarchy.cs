@@ -77,7 +77,7 @@ namespace RhuEngine.Components
 
 		protected override void Step() {
 			base.Step();
-			if (LocalUser != MasterUser) {
+			if (LocalUser != OwnerUserIfThere) {
 				return;
 			}
 			if (DropDown.Target?.DropDownButton.Target is null) {
@@ -92,7 +92,7 @@ namespace RhuEngine.Components
 		}
 
 		private void ChildrenUpdate(IChangeable changeable) {
-			if (LocalUser != MasterUser) {
+			if (LocalUser != OwnerUserIfThere) {
 				return;
 			}
 			if (IsRemoved | IsDestroying) {

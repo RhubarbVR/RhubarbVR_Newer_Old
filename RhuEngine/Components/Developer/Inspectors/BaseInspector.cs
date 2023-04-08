@@ -143,7 +143,7 @@ namespace RhuEngine.Components
 			}
 		}
 		public void TargetObjectRebuild() {
-			if (LocalUser != MasterUser) {
+			if (LocalUser != OwnerUserIfThere) {
 				LocalBind();
 				return;
 			}

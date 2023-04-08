@@ -24,9 +24,9 @@ namespace RhuEngine.Components
 		}
 
 		protected override void RenderStep() {
-			var deltaSeconds = RTime.Elapsed;
+			var time = World.WorldTime;
 			if (driver.Linked) {
-				var newval = Entity.LocalTrans * Matrix.R(offset.Value) * Matrix.R((Quaternionf)Quaterniond.CreateFromEuler(speed.Value.x * deltaSeconds, speed.Value.y * deltaSeconds, speed.Value.z * deltaSeconds));
+				var newval = Matrix.R(offset.Value) * Matrix.R((Quaternionf)Quaterniond.CreateFromEuler(speed.Value.x * time, speed.Value.y * time, speed.Value.z * time));
 				newval.Decompose(out _, out var newrotation, out _);
 				driver.LinkedValue = newrotation;
 			}

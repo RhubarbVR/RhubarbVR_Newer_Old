@@ -43,7 +43,7 @@ namespace RhuEngine.Linker.MeshAddons
 			}
 			for (var i = 0; i < mesh.TriangleCount; ++i) {
 				var tri = mesh.GetTriangle(i);
-				TrianglesBuffer[i] = new Triangle(mesh.GetVertex(tri.b), mesh.GetVertex(tri.a), mesh.GetVertex(tri.c));
+				TrianglesBuffer[i] = new Triangle(mesh.GetVertex(tri.a), mesh.GetVertex(tri.b), mesh.GetVertex(tri.c));
 			}
 			Tree = new Tree(BufferPool, TrianglesBuffer.Length);
 			BufferPool.Take(TrianglesBuffer.Length, out Buffer<BoundingBox> buffer);

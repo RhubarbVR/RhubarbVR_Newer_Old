@@ -220,7 +220,7 @@ namespace RhuEngine.WorldObjects
 			UpdatedValue();
 		}
 
-		public bool IsLinkedTo { get; private set; }
+		public bool IsLinkedTo => linkedFromObj is not null;
 
 		public ILinker linkedFromObj;
 
@@ -238,7 +238,7 @@ namespace RhuEngine.WorldObjects
 
 		public void KillLink() {
 			linkedFromObj?.RemoveLinkLocation();
-			IsLinkedTo = false;
+			linkedFromObj = null;
 			OnLinked?.Invoke(null);
 		}
 
@@ -253,7 +253,6 @@ namespace RhuEngine.WorldObjects
 			}
 			value.SetLinkLocation(this);
 			linkedFromObj = value;
-			IsLinkedTo = true;
 			OnLinked?.Invoke(value);
 		}
 

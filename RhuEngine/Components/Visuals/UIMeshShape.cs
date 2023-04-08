@@ -37,27 +37,32 @@ namespace RhuEngine.Components
 
 		protected override void RenderStep() {
 			base.RenderStep();
-			foreach (var item in hitDatas) {
-				var pos = item.HitPointOnCanvas;
-				if (FlipY) {
-					pos = new Vector2f(pos.X, 1 - pos.Y);
-				}
-				var isPrime = item.PressForce >= PrimaryNeededForce.Value;
-				var isSec = item.GripForces >= GripNeededForce.Value;
-				var isMed = InputManager.GetInputAction(InputTypes.Secondary).HandedValue(item.Side) >= SecodaryNeededForce.Value;
-				if (item.Lazer) {
-					if (Laserable) {
-						InputInterface.Target?.SendInput(pos, Tilt.Value, item.PressForce, item.Side, (int)item.TouchUndex, true, isPrime, isSec, isMed);
+			if (hitDatas.Count == 0) {
+				InputInterface.Target?.SendNoInput();
+			}
+			else {
+				foreach (var item in hitDatas) {
+					var pos = item.HitPointOnCanvas;
+					if (FlipY) {
+						pos = new Vector2f(pos.X, 1 - pos.Y);
 					}
-				}
-				else if (item.CustomTouch) {
-					if (CustomTochable) {
-						InputInterface.Target?.SendInput(pos, Tilt.Value, item.PressForce, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
+					var isPrime = item.PressForce >= PrimaryNeededForce.Value;
+					var isSec = item.GripForces >= GripNeededForce.Value;
+					var isMed = InputManager.GetInputAction(InputTypes.Secondary).HandedValue(item.Side) >= SecodaryNeededForce.Value;
+					if (item.Lazer) {
+						if (Laserable) {
+							InputInterface.Target?.SendInput(pos, Tilt.Value, item.PressForce, item.Side, (int)item.TouchUndex, true, isPrime, isSec, isMed);
+						}
 					}
-				}
-				else {
-					if (Touchable) {
-						InputInterface.Target?.SendInput(pos, Tilt.Value, item.PressForce, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
+					else if (item.CustomTouch) {
+						if (CustomTochable) {
+							InputInterface.Target?.SendInput(pos, Tilt.Value, item.PressForce, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
+						}
+					}
+					else {
+						if (Touchable) {
+							InputInterface.Target?.SendInput(pos, Tilt.Value, item.PressForce, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
+						}
 					}
 				}
 			}

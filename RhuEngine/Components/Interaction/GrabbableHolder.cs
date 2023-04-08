@@ -238,5 +238,13 @@ namespace RhuEngine.Components
 			}
 			return;
 		}
+
+		public void DropObject(Grabbable grabbable) {
+			if (grabbable.LaserGrabbed) {
+				AddLazerEntity(null);
+				grabbable.Entity.GlobalTrans = grabbable.Entity.GlobalTrans;
+			}
+			GrabbedObjects.Remove(grabbable);
+		}
 	}
 }
