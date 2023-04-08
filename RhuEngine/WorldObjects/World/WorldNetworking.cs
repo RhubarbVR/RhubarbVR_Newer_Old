@@ -25,6 +25,7 @@ using RhubarbCloudClient.Model;
 using RhuEngine.AssetSystem.RequestStructs;
 using RhuEngine.DataStructure;
 using RhuEngine.Datatypes;
+using RhuEngine.Input.XRInput;
 using RhuEngine.Linker;
 using RhuEngine.Managers;
 
@@ -941,7 +942,13 @@ namespace RhuEngine.WorldObjects
 				ItemIndex = 176;
 				LocalUserID = (ushort)(Users.Count + 1);
 				RLog.Info($"Built local User with id{LocalUserID}");
-				var user = Users.Add();
+				var user = Users.AddWithCustomRefIds(false,false, () => {
+					lock (_buildRefIDLock) {
+						var netPointer = NetPointer.BuildID(ItemIndex, LocalUserID);
+						ItemIndex++;
+						return netPointer;
+					}
+				});
 				user.userID.Value = (worldManager.Engine.netApiManager.Client.User?.Id ?? new Guid()).ToString();
 				user.Platform.Value = Environment.OSVersion.Platform;
 				user.PlatformVersion.Value = Environment.OSVersion.Version.ToString();

@@ -235,7 +235,7 @@ namespace RhuEngine.WorldObjects
 			var nodeGroup = (DataNodeGroup)data;
 			switch (((DataNode<byte>)nodeGroup.GetValue("t")).Value) {
 				case 1:
-					AddInternal(LoadElement(nodeGroup["e"])); //Todo exsperment with not sending element data
+					AddInternal(LoadElement(nodeGroup["e"]));
 					break;
 				case 2:
 					var targetID = ((DataNode<NetPointer>)nodeGroup["r"]).Value;
