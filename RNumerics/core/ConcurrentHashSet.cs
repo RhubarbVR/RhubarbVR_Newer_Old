@@ -15,12 +15,16 @@ namespace RNumerics
 
 		public IEnumerator<T> GetEnumerator() {
 			_lock.EnterReadLock();
+			_lock.EnterWriteLock();
 			try {
 				return _hashSet.GetEnumerator();
 			}
 			finally {
 				if (_lock.IsReadLockHeld) {
 					_lock.ExitReadLock();
+				}
+				if (_lock.IsWriteLockHeld) {
+					_lock.ExitWriteLock();
 				}
 			}
 		}
