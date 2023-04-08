@@ -352,8 +352,8 @@ namespace RhuEngine.WorldObjects
 
 		private readonly ConcurrentHashSet<IDropOldNetworkedObject> _updatedValue = new();
 
-
 		public int ObjectCreationAndDeleteUpdatesCount => _objectCreationAndDeleteUpdate.Count;
+
 		public int UpdatedNetValuesCount => _updatedValue.Count;
 
 		public uint ReliableNetPackedAmount { get; private set; }
