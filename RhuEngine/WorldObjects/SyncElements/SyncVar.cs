@@ -60,6 +60,10 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public void Received(Peer sender, IDataNode data) {
+			throw new NotSupportedException();
+		}
+
+		public List<Action> ReceivedCreationDelete(Peer sender, IDataNode data) {
 			var nodeGroup = (DataNodeGroup)data;
 			var typeName = nodeGroup.GetValue<string>("fieldType");
 			var type = Type.GetType(typeName);
@@ -69,8 +73,10 @@ namespace RhuEngine.WorldObjects
 				}
 				var objrc = (INetworkedObject)Activator.CreateInstance(type);
 				objrc.Initialize(World, this, "Sync Var Element", true, false);
-				objrc.Deserialize(nodeGroup.GetValue("ElementData"), new SyncObjectDeserializerObject(false));
+				var element = new SyncObjectDeserializerObject(false);
+				objrc.Deserialize(nodeGroup.GetValue("ElementData"), element);
 				Target = objrc;
+				return element.onLoaded;
 			}
 			else {
 				throw new Exception($"Failed to load received type {typeName}");

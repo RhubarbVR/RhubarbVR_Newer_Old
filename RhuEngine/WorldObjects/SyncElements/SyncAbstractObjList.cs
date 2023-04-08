@@ -8,7 +8,8 @@ using RhuEngine.Datatypes;
 
 namespace RhuEngine.WorldObjects
 {
-	public interface IAbstractObjList : ISyncObject {
+	public interface IAbstractObjList : ISyncObject
+	{
 
 	}
 
@@ -48,7 +49,7 @@ namespace RhuEngine.WorldObjects
 			syncObjectSerializerObject.AbstractListDeserialize((DataNodeGroup)data, this);
 		}
 
-		public override T LoadElement(IDataNode data) {
+		public override (T, List<Action>) LoadElement(IDataNode data) {
 			var nodeGroup = (DataNodeGroup)data;
 			var typeName = nodeGroup.GetValue<string>("fieldType");
 			var type = Type.GetType(typeName);
@@ -60,10 +61,7 @@ namespace RhuEngine.WorldObjects
 				objrc.Initialize(World, this, "List element", true, true);
 				var deserlizer = new SyncObjectDeserializerObject(false);
 				objrc.Deserialize(nodeGroup.GetValue("ElementData"), deserlizer);
-				foreach (var item in deserlizer.onLoaded) {
-					item?.Invoke();
-				}
-				return objrc;
+				return (objrc, deserlizer.onLoaded);
 			}
 			else {
 				throw new Exception($"Failed to load received type {typeName}");

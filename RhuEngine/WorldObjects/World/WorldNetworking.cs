@@ -489,31 +489,48 @@ namespace RhuEngine.WorldObjects
 				}
 				else {
 					var creationDeleteData = (DataNodeList)dataGroup.GetValue("cdu");
+					IEnumerable<Action> loadActions = null;
 					foreach (DataNodeGroup item in creationDeleteData) {
 						var target = (DataNode<NetPointer>)item.GetValue("p");
 						if (target == null) {
-							RLog.Warn($"valueUpdates {target} not Found");
+							RLog.Err($"creationDeleteData p not loaded");
+							return;
+						}
+						try {
+							if (_networkedObjects.ContainsKey(target.Value)) {
+								if (_networkedObjects[target.Value] is ICreationDeletionNetworkedObject creationDeleteNetworkedObject) {
+									var addedList = creationDeleteNetworkedObject.ReceivedCreationDelete(peer, item.GetValue("d"));
+									loadActions = loadActions?.Concat(addedList) ?? addedList;
+								}
+								else {
+									RLog.Err($"creationDeleteData {target} target object was not CreationDeletionNetworkedObject");
+								}
+							}
+							else {
+								RLog.Warn($"creationDeleteData {target} target object not Found");
+							}
+						}
+						catch (Exception e) {
+							RLog.Err($"creationDeleteData {target} Error:{e}");
+						}
+					}
+					foreach (var item in loadActions) {
+						item?.Invoke();
+					}
+
+					var valueUpdates = (DataNodeList)dataGroup.GetValue("u");
+					foreach (DataNodeGroup item in valueUpdates) {
+						var target = (DataNode<NetPointer>)item.GetValue("p");
+						if (target == null) {
+							RLog.Err($"valueUpdates p not loaded");
 							return;
 						}
 						try {
 							if (_networkedObjects.ContainsKey(target.Value)) {
 								_networkedObjects[target.Value].Received(peer, item.GetValue("d"));
 							}
-						}
-						catch (Exception e) {
-							RLog.Err($"valueUpdates {target} Error:{e}");
-						}
-					}
-					var valueUpdates = (DataNodeList)dataGroup.GetValue("u");
-					foreach (DataNodeGroup item in valueUpdates) {
-						var target = (DataNode<NetPointer>)item.GetValue("p");
-						if (target == null) {
-							RLog.Warn($"valueUpdates {target} not Found");
-							return;
-						}
-						try {
-							if (_networkedObjects.ContainsKey(target.Value)) {
-								_networkedObjects[target.Value].Received(peer, item.GetValue("d"));
+							else {
+								RLog.Warn($"valueUpdates {target} target object not Found");
 							}
 						}
 						catch (Exception e) {
@@ -942,7 +959,7 @@ namespace RhuEngine.WorldObjects
 				ItemIndex = 176;
 				LocalUserID = (ushort)(Users.Count + 1);
 				RLog.Info($"Built local User with id{LocalUserID}");
-				var user = Users.AddWithCustomRefIds(false,false, () => {
+				var user = Users.AddWithCustomRefIds(false, false, () => {
 					lock (_buildRefIDLock) {
 						var netPointer = NetPointer.BuildID(ItemIndex, LocalUserID);
 						ItemIndex++;

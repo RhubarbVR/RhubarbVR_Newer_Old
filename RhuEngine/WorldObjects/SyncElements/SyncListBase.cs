@@ -12,7 +12,7 @@ using RNumerics;
 
 namespace RhuEngine.WorldObjects
 {
-	public interface ISyncList : INetworkedObject, IEnumerable<ISyncObject>, IChangeable, ISyncMember
+	public interface ISyncList : ICreationDeletionNetworkedObject, IEnumerable<ISyncObject>, IChangeable, ISyncMember
 	{
 		int Count { get; }
 		object Lock { get; }
@@ -65,11 +65,12 @@ namespace RhuEngine.WorldObjects
 		[Exposed]
 		public T this[int i] => _syncObjects[i];
 
-		public T this[NetPointer pointer] {
+		public T this[NetPointer pointer]
+		{
 			get {
 				lock (Lock) {
 					foreach (var item in _syncObjects) {
-						if(item.Pointer== pointer) {
+						if (item.Pointer == pointer) {
 							return item;
 						}
 					}
@@ -176,7 +177,7 @@ namespace RhuEngine.WorldObjects
 			if (IsRemoved) {
 				return;
 			}
-			lock (_syncObjects) {				
+			lock (_syncObjects) {
 				var newOrder = _syncObjects.OrderBy(x => typeof(IOffsetableElement).IsAssignableFrom(x.GetType()) ? ((IOffsetableElement)x).Offset : 0).ThenBy(x => x.Pointer._id).ToArray();
 				for (var i = 0; i < newOrder.Length; i++) {
 					newOrder[i].ChangeName(i.ToString());
@@ -224,23 +225,28 @@ namespace RhuEngine.WorldObjects
 			});
 		}
 
-		public abstract T LoadElement(IDataNode data);
+		public abstract (T, List<Action>) LoadElement(IDataNode data);
 
 		public abstract IDataNode SaveElement(T val);
 
 		public void Received(Peer sender, IDataNode data) {
+			throw new NotSupportedException();
+		}
+
+		public List<Action> ReceivedCreationDelete(Peer sender, IDataNode data) {
 			if (NoSync) {
-				return;
+				return null;
 			}
 			var nodeGroup = (DataNodeGroup)data;
 			switch (((DataNode<byte>)nodeGroup.GetValue("t")).Value) {
 				case 1:
-					AddInternal(LoadElement(nodeGroup["e"]));
-					break;
+					var newData = LoadElement(nodeGroup["e"]);
+					AddInternal(newData.Item1);
+					return newData.Item2;
 				case 2:
 					var targetID = ((DataNode<NetPointer>)nodeGroup["r"]).Value;
 					var objecte = this[targetID];
-					if(objecte is null) {
+					if (objecte is null) {
 						RLog.Err($"Did not have value in list ID:{targetID}");
 						var worldobject = World.GetWorldObject((DataNode<NetPointer>)nodeGroup["r"]);
 						if (worldobject is not null) {
@@ -260,6 +266,7 @@ namespace RhuEngine.WorldObjects
 				default:
 					break;
 			}
+			return null;
 		}
 
 		protected override void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate func) {
