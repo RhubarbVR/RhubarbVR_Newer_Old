@@ -43,6 +43,9 @@ namespace RhuEngine.WorldObjects
 			get; private set;
 		}
 
+		protected bool _hasBeenNetSynced = false;
+
+		public bool HasBeenNetSynced { get => _hasBeenNetSynced; set => _hasBeenNetSynced = value; }
 
 		public NetPointer Pointer
 		{
@@ -306,6 +309,7 @@ namespace RhuEngine.WorldObjects
 			//}
 		}
 		public virtual IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
+			_hasBeenNetSynced |= syncObjectSerializerObject.NetSync;
 			return syncObjectSerializerObject.CommonWorkerSerialize(this);
 		}
 

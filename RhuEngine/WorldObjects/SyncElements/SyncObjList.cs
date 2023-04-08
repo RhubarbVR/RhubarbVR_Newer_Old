@@ -94,6 +94,7 @@ namespace RhuEngine.WorldObjects
 		protected override void InitializeMembers(bool networkedObject, bool deserialize, NetPointerUpdateDelegate func) {
 		}
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
+			_hasBeenNetSynced |= syncObjectSerializerObject.NetSync;
 			return syncObjectSerializerObject.CommonListSerialize(this, this);
 		}
 

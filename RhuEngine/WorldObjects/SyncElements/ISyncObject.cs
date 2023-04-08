@@ -9,6 +9,9 @@ namespace RhuEngine.WorldObjects
 {
 	public interface ISyncObject : IWorldObject
 	{
+
+		internal bool HasBeenNetSynced { get; set; }
+
 		bool IsDestroying { get; set; }
 
 		public event Action<object> OnDispose;
@@ -21,6 +24,6 @@ namespace RhuEngine.WorldObjects
 		internal void CallFirstCreation();
 		internal void RunOnLoad();
 		internal void RunOnSave();
-		
+
 	}
 }

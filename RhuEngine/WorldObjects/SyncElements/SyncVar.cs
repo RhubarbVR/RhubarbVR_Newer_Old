@@ -21,6 +21,9 @@ namespace RhuEngine.WorldObjects
 				var newElement = (INetworkedObject)Activator.CreateInstance(value);
 				newElement.Initialize(World, this, "Sync Var Element", false, false);
 				Target = newElement;
+				if (!_hasBeenNetSynced) {
+					return;
+				}
 				if (!NoSync) {
 					World.BroadcastObjectCreationDeletion(this, () => {
 						var sendData = new DataNodeGroup();
@@ -75,6 +78,7 @@ namespace RhuEngine.WorldObjects
 		}
 
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
+			_hasBeenNetSynced |= syncObjectSerializerObject.NetSync;
 			var data = SyncObjectSerializerObject.CommonSerialize(this);
 			data.SetValue("fieldType", new DataNode<string>(_type?.FullName ?? "Null"));
 			if (Target != null) {

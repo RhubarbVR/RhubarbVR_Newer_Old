@@ -195,6 +195,9 @@ namespace RhuEngine.WorldObjects
 			if (NoSync) {
 				return;
 			}
+			if (!_hasBeenNetSynced) {
+				return;
+			}
 			World.BroadcastObjectCreationDeletion(this, () => {
 				var sendData = new DataNodeGroup();
 				sendData.SetValue("t", new DataNode<byte>(1));
@@ -208,6 +211,9 @@ namespace RhuEngine.WorldObjects
 				return;
 			}
 			if (NoSync) {
+				return;
+			}
+			if (!_hasBeenNetSynced) {
 				return;
 			}
 			World.BroadcastObjectCreationDeletion(this, () => {

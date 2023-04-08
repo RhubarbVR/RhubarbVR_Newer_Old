@@ -156,6 +156,11 @@ namespace RhuEngine.WorldObjects
 						IsAssociatedToGroup = Guid.TryParse(AssociatedGroup.Value, out var gorupID),
 						AssociatedGroup = gorupID,
 					};
+					foreach (var item in _worldObjects) {
+						if(item.Value is ISyncObject @object) {
+							@object.HasBeenNetSynced = true;
+						}
+					}
 					await Engine.netApiManager.Client.CreateSession(sessionConnection);
 				}
 				else {

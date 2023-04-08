@@ -150,6 +150,9 @@ namespace RhuEngine.WorldObjects
 			if (IsLinkedTo || NoSync) {
 				return;
 			}
+			if (!_hasBeenNetSynced) {
+				return;
+			}
 			World.BroadcastObjectUpdate(this);
 		}
 

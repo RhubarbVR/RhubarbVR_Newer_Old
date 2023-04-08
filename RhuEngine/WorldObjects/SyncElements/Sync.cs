@@ -92,6 +92,9 @@ namespace RhuEngine.WorldObjects
 			if (IsLinkedTo || NoSync) {
 				return;
 			}
+			if (!_hasBeenNetSynced) {
+				return;
+			}
 			World.BroadcastObjectUpdate(this);
 		}
 		public void Received(Peer sender, IDataNode data) {
@@ -192,6 +195,7 @@ namespace RhuEngine.WorldObjects
 
 
 		public override IDataNode Serialize(SyncObjectSerializerObject syncObjectSerializerObject) {
+			_hasBeenNetSynced |= syncObjectSerializerObject.NetSync;
 			return syncObjectSerializerObject.CommonValueSerialize(this, OnSave(syncObjectSerializerObject),!EqualityComparer<T>.Default.Equals(_starting_value, _value));
 		}
 
