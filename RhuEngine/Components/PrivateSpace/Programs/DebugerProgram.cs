@@ -60,7 +60,7 @@ namespace RhuEngine.Components
 			if (Engine.worldManager.FocusedWorld != null) {
 				for (var i = 0; i < Engine.worldManager.FocusedWorld.Users.Count; i++) {
 					var item = Engine.worldManager.FocusedWorld.Users[i];
-					returnstring += $"User: {i + 1} UserRef: {item.Pointer} UserName: {item.UserName} PeerLoaded: {item.CurrentPeer != null} UserID: {item.userID.Value} IsLocal: {Engine.worldManager.FocusedWorld?.GetLocalUser() == item} SyncStreamsCount: {item.syncStreams.Count} isPresent: {item.isPresent.Value} isConnected: {item.IsConnected} peerID: {item.CurrentPeer?.ID.ToString() ?? "null"}  latency{item.CurrentPeer?.latency ?? -1}\n";
+					returnstring += $"User: {i + 1} UserRef: {item.Pointer} UserName: {item.UserName} PeerLoaded: {item.CurrentPeer != null} UserID: {item.userID.Value} IsLocal: {Engine.worldManager.FocusedWorld?.GetLocalUser() == item} SyncStreamsCount: {item.syncStreams.Count} isPresent: {item.isPresent.Value} isConnected: {item.IsConnected} peerID: {item.CurrentPeer?.ID.ToString() ?? "null"}  latency: {item.CurrentPeer?.latency ?? -1} platform: {item.Platform?.Value.ToString() ?? "null"} \n";
 				}
 			}
 			else {
