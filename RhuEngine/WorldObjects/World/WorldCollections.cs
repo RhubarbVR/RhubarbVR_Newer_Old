@@ -37,6 +37,8 @@ namespace RhuEngine.WorldObjects
 		[Exposed]
 		public int GlobalStepableCount => _globalStepables.Count;
 
+		public ConcurrentDictionary<NetPointer, IWorldObject> WorldObjects => _worldObjects;
+
 		public IWorldObject[] AllWorldObjects => _worldObjects.Values.ToArray();
 
 		[Exposed]

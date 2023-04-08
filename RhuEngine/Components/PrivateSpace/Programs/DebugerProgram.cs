@@ -112,6 +112,7 @@ WorldObjects {Engine.worldManager.FocusedWorld?.WorldObjectsCount}
 RenderComponents {Engine.worldManager.FocusedWorld?.RenderingComponentsCount}
 GlobalStepables {Engine.worldManager.FocusedWorld?.GlobalStepableCount}
 stepTime {(Engine.worldManager.FocusedWorld?.stepTime * 1000f).Value:f3}ms
+NoneNetSynced {Engine.worldManager.FocusedWorld?.WorldObjects.Select(x => x.Value is ISyncObject syncObject && !syncObject.HasBeenNetSynced).Count()}
 ===== -----------------------=====";
 
 		}
