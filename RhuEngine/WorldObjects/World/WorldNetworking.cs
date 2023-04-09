@@ -800,7 +800,8 @@ namespace RhuEngine.WorldObjects
 						var peerCount = _netManager.ConnectedPeersCount;
 						NatUserIDS.TryAdd(user.Data, user.UserID);
 						_netManager.NatPunchModule.SendNatIntroduceRequest(user.Server, 7856, user.Data);
-						for (var i = 0; i < 6; i++) {
+						await Task.Delay(1000);
+						for (var i = 0; i < 7; i++) {
 							if (NatIntroductionSuccessIsGood.TryGetValue(user.Data, out var evalue) && evalue) {
 								if (NatConnection.TryGetValue(user.Data, out var peer)) {
 									if ((peer?.ConnectionState ?? ConnectionState.Disconnected) == ConnectionState.Connected) {
