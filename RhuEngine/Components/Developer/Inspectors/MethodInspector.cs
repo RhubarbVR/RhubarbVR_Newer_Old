@@ -1,4 +1,4 @@
-﻿using RhuEngine.WorldObjects;
+using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;
@@ -31,6 +31,7 @@ namespace RhuEngine.Components
 			text.TextOverrunBehavior.Value = ROverrunBehavior.TrimEllipsis;
 			text.MinSize.Value = new Vector2i(18, 18);
 			text.Text.Value = methodInfo.ReflectedType.GetFormattedName() + " ";
+
 
 			text.Text.Value += methodInfo.Name;
 			if (methodInfo.IsGenericMethod) {

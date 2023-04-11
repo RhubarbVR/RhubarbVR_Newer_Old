@@ -1,4 +1,4 @@
-﻿using RhuEngine.WorldObjects;
+using RhuEngine.WorldObjects;
 using RhuEngine.WorldObjects.ECS;
 
 using RNumerics;

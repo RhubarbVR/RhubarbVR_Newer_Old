@@ -138,7 +138,7 @@ namespace RhuEngine.Components
 				BuildUI();
 				LocalBind();
 			}
-			catch(Exception e) {
+			catch (Exception e) {
 				RLog.Err($"Error Update UI on Inspector {GetType().GetFormattedName()}  World {World.WorldDebugName} Error:{e}");
 			}
 		}
