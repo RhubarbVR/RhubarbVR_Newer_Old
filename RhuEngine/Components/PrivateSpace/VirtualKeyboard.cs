@@ -83,7 +83,7 @@ namespace RhuEngine.Components
 					}
 				}
 				var layerValue = LayerValues[layer];
-				if (PressedEpoch || _justClick || (Button.Target?.ToggleMode.Value??false)) {
+				if (PressedEpoch || _justClick || (Button.Target?.ToggleMode.Value ?? false)) {
 					Engine.inputManager.KeyboardSystem.virtualKeyboard.PressingKeys.Add(layerValue.TypedKey.Value);
 					_lastPressClick = DateTimeOffset.UtcNow;
 					_justClick = false;
@@ -264,10 +264,9 @@ namespace RhuEngine.Components
 			AddCommlexButton(new Vector2f(740, 225), 0, "🠚", null, Key.Right);
 			AddCommlexButton(new Vector2f(695, 180), 0, "🠉", null, Key.Up);
 
-			//TODO add numPad
 			AddButtons(new (string, string, Key)?[] {
 				("Prt",null,Key.Print),
-			    ("Scr",null,Key.Scrolllock),
+				("Scr",null,Key.Scrolllock),
 				("Pau",null,Key.Pause),
 			}, new Vector2f(650, 0));
 			AddButtons(new (string, string, Key)?[] {

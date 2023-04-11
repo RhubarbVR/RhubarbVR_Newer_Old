@@ -15,7 +15,7 @@ using RhuEngine;
 
 namespace RhubarbVR.Bindings.ComponentLinking
 {
-	public sealed class TexturedButtonLink : ButtonBase<RhuEngine.Components.TexturedButton, Godot.TextureButton>
+	public sealed class TexturedButtonLink : ButtonBase<TexturedButton, TextureButton>
 	{
 		public override string ObjectName => "TexturedButton";
 
@@ -45,7 +45,6 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		//Todo Add with bitmap support
 		private void Texture_ClickMask_LoadChange(RTexture2D obj) {
 			var texture = LinkedComp.Texture_ClickMask.Asset?.Inst is GodotTexture2D godotTex ? (godotTex?.Texture2D) : null;
-
 		}
 
 		private void Texture_Focused_LoadChange(RTexture2D obj) {
