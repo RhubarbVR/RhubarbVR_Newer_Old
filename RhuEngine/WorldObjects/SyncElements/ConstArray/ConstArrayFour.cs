@@ -11,14 +11,6 @@ namespace RhuEngine.WorldObjects
 		public readonly T Four;
 		public override int Length => 4;
 
-		public override T this[int index]
-		{
-			get {
-				if(index == 3) {
-					return Four;
-				}
-				return base[index];
-			}
-		}
+		public override T this[int index] => index == 3 ? Four : base[index];
 	}
 }

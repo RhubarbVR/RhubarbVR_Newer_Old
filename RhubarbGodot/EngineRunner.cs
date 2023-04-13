@@ -12,6 +12,7 @@ using System.Collections;
 using RNumerics;
 using RhubarbVR.Bindings.Input;
 using System.Diagnostics;
+using RhubarbVR.Bindings.FontBindings;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1050:Declare types in namespaces", Justification = "<Pending>")]
 public partial class EngineRunner : Node3D, IRTime
@@ -35,7 +36,7 @@ public partial class EngineRunner : Node3D, IRTime
 	public Engine engine;
 
 	[ThreadStatic]
-	private static bool _isMainThread = false;
+	private static bool _isMainThread;
 	public OutputCapture outputCapture;
 
 	public GodotEngineLink link;
@@ -54,6 +55,8 @@ public partial class EngineRunner : Node3D, IRTime
 	}
 
 	private Thread _audioThread;
+
+	public Theme MainTheme { get; private set; }
 
 	public override void _Ready() {
 		SetProcessInternal(true);
@@ -106,8 +109,11 @@ public partial class EngineRunner : Node3D, IRTime
 			Priority = System.Threading.ThreadPriority.Normal
 		};
 		_audioThread.Start();
+		MainTheme = new Theme();
+		if (engine.staticResources.MainFont.Inst is GodotFont font) {
+			MainTheme.DefaultFont = font.FontFile;
+		}
 		engine.Init();
-
 	}
 
 	public string Typer;
@@ -115,8 +121,6 @@ public partial class EngineRunner : Node3D, IRTime
 	public Vector2f MouseScrollDelta;
 	public Vector2f MouseScrollPos;
 	public Vector2f LastMouseScrollPos;
-
-	private readonly Stopwatch _audioStopwatch = new();
 
 	private void AudioThreadUpdate() {
 		while (!engine.IsCloseing) {

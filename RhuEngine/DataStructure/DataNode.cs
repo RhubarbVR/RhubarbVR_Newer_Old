@@ -189,12 +189,7 @@ namespace RhuEngine.DataStructure
 			}
 			else if (Type == typeof(string)) {
 				var isNull = binaryReader.ReadByte();
-				if(isNull != 0) {
-					Value = (T)(object)null;
-				}
-				else {
-					Value = (T)(object)binaryReader.ReadString();
-				}
+				Value = isNull != 0 ? (T)(object)null : (T)(object)binaryReader.ReadString();
 			}
 			else if (Type == typeof(string[])) {
 				var array = new string[binaryReader.ReadInt32()];

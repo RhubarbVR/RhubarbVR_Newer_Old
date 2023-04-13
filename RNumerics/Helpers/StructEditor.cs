@@ -43,12 +43,7 @@ namespace RNumerics
 				var array = GetArrayIndex(currentFieldName);
 				if (array is null) {
 					// Get the field info for the current field
-					var fieldInfo = structType.GetField(currentFieldName);
-
-					// Check if the field exists
-					if (fieldInfo == null) {
-						throw new ArgumentException($"{fieldName} is not a field of type {structType.Name}");
-					}
+					var fieldInfo = structType.GetField(currentFieldName) ?? throw new ArgumentException($"{fieldName} is not a field of type {structType.Name}");
 					if (!fieldInfo.IsPublic) {
 						throw new Exception("Not Public Field");
 					}
@@ -64,11 +59,9 @@ namespace RNumerics
 							throw new Exception("Not Public Field");
 						}
 						// Check if the field exists
-						if (fieldInfo == null) {
-							throw new ArgumentException($"{array.Value.field} is not a field of type {structType.Name}");
-						}
-
-						return GetFielTypeHelper(fieldInfo.FieldType.GetElementType(), remainingFieldName);
+						return fieldInfo == null
+							? throw new ArgumentException($"{array.Value.field} is not a field of type {structType.Name}")
+							: GetFielTypeHelper(fieldInfo.FieldType.GetElementType(), remainingFieldName);
 					}
 					else {
 						if (!structType.IsArray) {
@@ -143,12 +136,7 @@ namespace RNumerics
 				var array = GetArrayIndex(fieldName);
 				if (array is null) {
 					// Get the field info for the current field
-					var fieldInfo = structType.GetField(currentFieldName);
-
-					// Check if the field exists
-					if (fieldInfo == null) {
-						throw new ArgumentException($"{fieldName} is not a field of type {structType.Name}");
-					}
+					var fieldInfo = structType.GetField(currentFieldName) ?? throw new ArgumentException($"{fieldName} is not a field of type {structType.Name}");
 					if (!fieldInfo.IsPublic) {
 						throw new Exception("Not Public Field");
 					}
@@ -162,12 +150,7 @@ namespace RNumerics
 				else {
 					if (!string.IsNullOrEmpty(array.Value.field)) {
 						// Get the field info for the current field
-						var fieldInfo = structType.GetField(array.Value.field);
-
-						// Check if the field exists
-						if (fieldInfo == null) {
-							throw new ArgumentException($"{fieldName} is not a field of type {structType.Name}");
-						}
+						var fieldInfo = structType.GetField(array.Value.field) ?? throw new ArgumentException($"{fieldName} is not a field of type {structType.Name}");
 						if (!fieldInfo.IsPublic) {
 							throw new Exception("Not Public Field");
 						}
@@ -212,31 +195,20 @@ namespace RNumerics
 				else {
 					if (!string.IsNullOrEmpty(array.Value.field)) {
 						// Get the field info for the current field
-						var fieldInfo = structType.GetField(array.Value.field);
-
-						// Check if the field exists
-						if (fieldInfo == null) {
-							throw new ArgumentException($"{array.Value.field} is not a field of type {structType.Name}");
-						}
+						var fieldInfo = structType.GetField(array.Value.field) ?? throw new ArgumentException($"{array.Value.field} is not a field of type {structType.Name}");
 						if (!fieldInfo.IsPublic) {
 							throw new Exception("Not Public Field");
 						}
 
 						var startingArray = fieldInfo.GetValue(targetStructBoxed);
-						if (startingArray is IList list) {
-							return list[array.Value.arrayPos];
-						}
-						else {
-							throw new ArgumentException($"{array.Value.field} is not a array type");
-						}
+						return startingArray is IList list
+							? list[array.Value.arrayPos]
+							: throw new ArgumentException($"{array.Value.field} is not a array type");
 					}
 					else {
-						if (targetStructBoxed is IList list) {
-							return list[array.Value.arrayPos];
-						}
-						else {
-							throw new ArgumentException($"{array.Value.field} is not a array type");
-						}
+						return targetStructBoxed is IList list
+							? list[array.Value.arrayPos]
+							: throw new ArgumentException($"{array.Value.field} is not a array type");
 					}
 				}
 			}
@@ -327,12 +299,7 @@ namespace RNumerics
 				var array = GetArrayIndex(fieldName);
 				if (array is null) {
 					// Get the field info for the current field
-					var fieldInfo = structType.GetField(fieldName);
-
-					// Check if the field exists
-					if (fieldInfo == null) {
-						throw new ArgumentException($"{fieldName} is not a field of type {structType.Name}");
-					}
+					var fieldInfo = structType.GetField(fieldName) ?? throw new ArgumentException($"{fieldName} is not a field of type {structType.Name}");
 					if (!fieldInfo.IsPublic) {
 						throw new Exception("Not Public Field");
 					}
@@ -349,12 +316,7 @@ namespace RNumerics
 				else {
 					if (!string.IsNullOrEmpty(array.Value.field)) {
 						// Get the field info for the current field
-						var fieldInfo = structType.GetField(array.Value.field);
-
-						// Check if the field exists
-						if (fieldInfo == null) {
-							throw new ArgumentException($"{array.Value.field} is not a field of type {structType.Name}");
-						}
+						var fieldInfo = structType.GetField(array.Value.field) ?? throw new ArgumentException($"{array.Value.field} is not a field of type {structType.Name}");
 						if (!fieldInfo.IsPublic) {
 							throw new Exception("Not Public Field");
 						}

@@ -146,8 +146,8 @@ namespace RhubarbVR.Bindings
 		public readonly Dictionary<string, GodotXRTracker> Trackers = new();
 
 		private void XRServer_TrackerRemoved(StringName trackerName, long type) {
-			if (Trackers.ContainsKey(trackerName)) {
-				Engine.inputManager.RemoveInputDriver(Trackers[trackerName]);
+			if (Trackers.TryGetValue(trackerName, out var value)) {
+				Engine.inputManager.RemoveInputDriver(value);
 			}
 			else {
 				RLog.Warn("Tracker Not Found to Removed Name:" + trackerName + " Type:" + (XRServer.TrackerType)type);

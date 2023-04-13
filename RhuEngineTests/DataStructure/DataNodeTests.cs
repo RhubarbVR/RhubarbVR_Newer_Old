@@ -74,7 +74,7 @@ namespace RhuEngine.DataStructure.Tests
 			if (loaded.Data is null) {
 				throw new Exception("Failed to load data at all");
 			}
-			Assert.AreEqual(((DataNode<Vector2f>)(dataNodeGroup).GetValue("ID")).Value, ((DataNode<Vector2f>)((DataNodeGroup)loaded.Data).GetValue("ID")).Value);
+			Assert.AreEqual(((DataNode<Vector2f>)dataNodeGroup.GetValue("ID")).Value, ((DataNode<Vector2f>)((DataNodeGroup)loaded.Data).GetValue("ID")).Value);
 		}
 	}
 }

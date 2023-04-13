@@ -31,18 +31,12 @@ namespace RhuEngine.Components
 				return typeof(SyncListInspector<>).MakeGenericType(type);
 			}
 			if (type.IsAssignableTo(typeof(ISync))) {
-				if (type.IsGenericType) {
-					return typeof(PrimitiveEditorBuilder<>).MakeGenericType(type.GetGenericArguments()[0]);
-				}
-				return typeof(PrimitiveEditor);
+				return type.IsGenericType ? typeof(PrimitiveEditorBuilder<>).MakeGenericType(type.GetGenericArguments()[0]) : typeof(PrimitiveEditor);
 			}
 			if (type.IsAssignableTo(typeof(ISyncRef))) {
-				if (targetObject is ISyncRef @ref) {
-					return typeof(SyncRefInspector<,>).MakeGenericType(type, @ref?.GetRefType ?? typeof(IWorldObject));
-				}
-				else {
-					return typeof(SyncRefInspector<,>).MakeGenericType(type, typeof(IWorldObject));
-				}
+				return targetObject is ISyncRef @ref
+					? typeof(SyncRefInspector<,>).MakeGenericType(type, @ref?.GetRefType ?? typeof(IWorldObject))
+					: typeof(SyncRefInspector<,>).MakeGenericType(type, typeof(IWorldObject));
 			}
 			return typeof(WorldObjectInspector);
 		}
@@ -129,6 +123,7 @@ namespace RhuEngine.Components
 			CleanUpUI();
 			LocalBind();
 			base.Dispose();
+			GC.SuppressFinalize(this);
 		}
 
 		private void UIUpdate() {

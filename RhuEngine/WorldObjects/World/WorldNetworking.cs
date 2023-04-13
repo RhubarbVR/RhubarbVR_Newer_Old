@@ -368,7 +368,7 @@ namespace RhuEngine.WorldObjects
 
 						var updateValues = new DataNodeList();
 						foreach (var item in _updatedValue.GetSpan()) {
-							if(item.IsRemoved || item.IsDestroying) {
+							if (item.IsRemoved || item.IsDestroying) {
 								continue;
 							}
 							var packedData = new DataNodeGroup();
@@ -579,22 +579,13 @@ namespace RhuEngine.WorldObjects
 				if (type <= 10) {
 					return RelayNetPacked.DeSerlize(binaryReader, type);
 				}
-				INetPacked netPacked;
-				if (type == 11) {
-					netPacked = new DataReader();
-				}
-				else if (type == 12) {
-					netPacked = new RequestAsset();
-				}
-				else if (type == 13) {
-					netPacked = new AssetResponse();
-				}
-				else if (type == 14) {
-					netPacked = new PremoteAsset();
-				}
-				else {
-					throw new Exception("Don't know");
-				}
+				INetPacked netPacked = type switch {
+					11 => new DataReader(),
+					12 => new RequestAsset(),
+					13 => new AssetResponse(),
+					14 => new PremoteAsset(),
+					_ => throw new Exception("Don't know"),
+				};
 				netPacked.DeSerlize(binaryReader);
 				return netPacked;
 			}

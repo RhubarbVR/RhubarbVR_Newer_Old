@@ -12,14 +12,6 @@ namespace RhuEngine.WorldObjects
 
 		public override int Length => 14;
 
-		public override T this[int index]
-		{
-			get {
-				if(index == 13) {
-					return Fourteen;
-				}
-				return base[index];
-			}
-		}
+		public override T this[int index] => index == 13 ? Fourteen : base[index];
 	}
 }

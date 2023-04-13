@@ -430,7 +430,7 @@ namespace RhubarbVR.Bindings
 	{
 		public OrmMaterial3D OrmMaterial3D => Material as OrmMaterial3D;
 
-		public RTexture2D ORMTexture { set => OrmMaterial3D.OrmTexture = (value is null ? null : ((GodotTexture2D)value.Texture2D).Texture2D); }
+		public RTexture2D ORMTexture { set => OrmMaterial3D.OrmTexture = value is null ? null : ((GodotTexture2D)value.Texture2D).Texture2D; }
 	}
 
 

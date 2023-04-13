@@ -26,7 +26,7 @@ namespace RhuEngine
 				return Expression.GetActionType(types.ToArray());
 			}
 			else {
-				types.Append(methodInfo.ReturnType);
+				types = types.Append(methodInfo.ReturnType);
 				return Expression.GetFuncType(types.ToArray());
 			}
 		}
@@ -37,7 +37,7 @@ namespace RhuEngine
 				return Expression.GetActionType(types.ToArray());
 			}
 			else {
-				types.Append(methodInfo.ReturnType);
+				types = types.Append(methodInfo.ReturnType);
 				return Expression.GetFuncType(types.ToArray());
 			}
 		}
@@ -263,13 +263,11 @@ namespace RhuEngine
 
 		public static string GetExtendedNameString(this IWorldObject worldObject) {
 			var comp = worldObject.GetClosedComponent();
-			if (comp is null) {
-				return worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null";
-			}
-			if (comp != worldObject) {
-				return GetNameString(worldObject);
-			}
-			return $"{comp.GetType().GetFormattedName()} attached to " + (worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null");
+			return comp is null
+				? worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null"
+				: comp != worldObject
+				? GetNameString(worldObject)
+				: $"{comp.GetType().GetFormattedName()} attached to " + (worldObject?.GetClosedEntity()?.name.Value ?? worldObject?.GetClosedUser()?.UserName ?? worldObject?.GetType().Name ?? "null");
 		}
 
 		public static Type GetHighestAttributeInherit<T>(this Type type) where T : Attribute {

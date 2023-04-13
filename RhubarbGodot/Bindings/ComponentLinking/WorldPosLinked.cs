@@ -27,23 +27,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 	{
 		public T2 node;
 
-		public event Action VisibilityChanged
-		{
-			add {
-				if (node is null) {
-					return;
-				}
-				node.VisibilityChanged += value;
-			}
-			remove {
-				if (node is null) {
-					return;
-				}
-				node.VisibilityChanged -= value;
-			}
-		}
-		public event Action Hidden { add { if (node is null) { return; } node.Hidden += value; } remove { if (node is null) { return; } node.Hidden -= value; } }
-		public event Action ItemRectChanged { add { if (node is null) { return; } node.ItemRectChanged += value; } remove { if (node is null) { return; } node.ItemRectChanged -= value; } }
+		public event Action VisibilityChanged;
+		public event Action Hidden;
+		public event Action ItemRectChanged;
 
 		public abstract string ObjectName { get; }
 
@@ -56,6 +42,9 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				Name = ObjectName,
 				Visible = false
 			};
+			node.ItemRectChanged += Node_ItemRectChanged;
+			node.Hidden += Node_Hidden;
+			node.VisibilityChanged += Node_VisibilityChanged;
 			LinkedComp.Entity.ViewportUpdateEvent += UpdateParrent;
 			LinkedComp.Entity.CanvasItemUpdateEvent += UpdateParrent;
 			LinkedComp.Entity.children.OnReorderList += Children_OnReorderList;
@@ -64,6 +53,18 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			LoadCanvasItemLink();
 			StartContinueInit();
 			Children_OnReorderList();
+		}
+
+		private void Node_VisibilityChanged() {
+			VisibilityChanged?.Invoke();
+		}
+
+		private void Node_Hidden() {
+			Hidden?.Invoke();
+		}
+
+		private void Node_ItemRectChanged() {
+			ItemRectChanged?.Invoke();
 		}
 
 		public void Children_OnReorderList() {

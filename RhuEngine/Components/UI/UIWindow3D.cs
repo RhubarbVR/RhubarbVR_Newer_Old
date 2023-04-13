@@ -8,6 +8,7 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Threading.Channels;
 using static RhuEngine.Components.UIWindow3D;
 using Assimp;
+using System.Linq;
 
 namespace RhuEngine.Components
 {
@@ -41,7 +42,7 @@ namespace RhuEngine.Components
 
 		protected override void Step() {
 			base.Step();
-			foreach (HeaderUIButton item in Buttons) {
+			foreach (var item in Buttons.Cast<HeaderUIButton>()) {
 				item.Step();
 			}
 		}
@@ -208,7 +209,7 @@ namespace RhuEngine.Components
 			if (HeaderPosOffset.Linked) {
 				HeaderPosOffset.LinkedValue = new Vector3f(leftOffset, -(HeaderSize.Value + 0.035f));
 			}
-			foreach (HeaderUIButton item in Buttons) {
+			foreach (var item in Buttons.Cast<HeaderUIButton>()) {
 				leftOffset -= HeaderSize.Value + 0.035f;
 				if (item.Width.Linked) {
 					item.Width.LinkedValue = HeaderSize.Value;

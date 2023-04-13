@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using RhuEngine.Linker;
@@ -51,7 +52,7 @@ namespace RhuEngine.Components
 			return window;
 		}
 		public ProgramWindow GetWindowWithTag(string tag) {
-			foreach (SyncRef<ProgramWindow> item in programWindows) {
+			foreach (var item in programWindows.Cast<SyncRef<ProgramWindow>>()) {
 				if (item.Target?.WindowTag == tag) {
 					return item.Target;
 				}

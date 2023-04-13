@@ -98,7 +98,7 @@ namespace RhuEngine.Components
 		}
 
 		public void AddGizmo(Entity targetEntity) {
-			foreach (SyncRef<WorldGizmo3D> item in Gizmos) {
+			foreach (var item in Gizmos.Cast<SyncRef<WorldGizmo3D>>()) {
 				if (item.Target?.TargetEntity.Target == targetEntity) {
 					return;
 				}

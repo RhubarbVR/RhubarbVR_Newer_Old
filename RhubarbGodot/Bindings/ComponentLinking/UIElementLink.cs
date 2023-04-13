@@ -87,10 +87,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			FocusMode_Changed(null);
 			LinkedComp.KeyboardUnBindAction = KeyboardUnBindAction;
 			LinkedComp.KeyboardBindAction = KeyboardBindAction;
-			if (LinkedComp.Engine.staticResources.MainFont.Inst is GodotFont font) {
-				node.Theme ??= new Theme();
-				node.Theme.DefaultFont = font.FontFile;
-			}
+			node.Theme = EngineRunnerHelpers._.MainTheme;
 		}
 
 		private void Node_MouseExited() {
@@ -122,7 +119,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		private void Node_Resized() {
-			if(node is null) {
+			if (node is null) {
 				return;
 			}
 			Resized?.Invoke();
@@ -149,13 +146,13 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		}
 
 		protected void Node_FocusEntered() {
-			if(LinkedComp is null) {
+			if (LinkedComp is null) {
 				return;
 			}
-			if(node is null) {
+			if (node is null) {
 				return;
 			}
-			if(LinkedComp.IsRemoved | LinkedComp.IsDestroying) {
+			if (LinkedComp.IsRemoved | LinkedComp.IsDestroying) {
 				return;
 			}
 			FocusEntered?.Invoke();

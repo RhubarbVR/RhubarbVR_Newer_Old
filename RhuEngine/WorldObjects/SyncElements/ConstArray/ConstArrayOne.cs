@@ -21,10 +21,7 @@ namespace RhuEngine.WorldObjects
 		public virtual T this[int index]
 		{
 			get {
-				if(index == 0) {
-					return One;
-				}
-				return null;
+				return index == 0 ? One : null;
 			}
 		}
 	}

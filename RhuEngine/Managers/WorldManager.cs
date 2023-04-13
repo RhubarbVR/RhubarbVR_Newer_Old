@@ -158,10 +158,10 @@ namespace RhuEngine.Managers
 			return world;
 		}
 
-		public World LoadWorldFromBytes(World.FocusLevel focusLevel, byte[] data, bool localWorld = false) {
-			return LoadWorldFromDataNodeGroup(focusLevel, (DataNodeGroup)new DataReader(data).Data, localWorld);
+		public World LoadWorldFromBytes(World.FocusLevel focusLevel, byte[] data, string sessionName = null, bool localWorld = false) {
+			return LoadWorldFromDataNodeGroup(focusLevel, (DataNodeGroup)new DataReader(data).Data, sessionName, localWorld);
 		}
-		public World LoadWorldFromDataNodeGroup(World.FocusLevel focusLevel, DataNodeGroup data, bool localWorld = false) {
+		public World LoadWorldFromDataNodeGroup(World.FocusLevel focusLevel, DataNodeGroup data, string sessionName = null, bool localWorld = false) {
 			var world = new World(this) {
 				Focus = World.FocusLevel.Background
 			};
@@ -171,8 +171,12 @@ namespace RhuEngine.Managers
 			foreach (var item in loader.onLoaded) {
 				item?.Invoke();
 			}
-			if ((focusLevel != World.FocusLevel.PrivateOverlay) & !localWorld) {
+			world.SessionName.Value = sessionName;
+			if ((focusLevel != World.FocusLevel.PrivateOverlay) && !localWorld) {
 				Task.Run(async () => await world.StartNetworking(true));
+			}
+			else {
+				world.WaitingForWorldStartState = false;
 			}
 			worlds.Add(world);
 			ShowLoadingFeedback(world, focusLevel);
@@ -199,8 +203,7 @@ namespace RhuEngine.Managers
 			if (LoadLocalWorld && File.Exists(EngineHelpers.BaseDir + "LocalWorldTest.RWorld")) {
 				try {
 					Engine.IntMsg = "Loading Local World From File ";
-					LocalWorld = LoadWorldFromBytes(World.FocusLevel.Focused, File.ReadAllBytes(EngineHelpers.BaseDir + "LocalWorldTest.RWorld"), true);
-					LocalWorld.SessionName.Value = "Local World";
+					LocalWorld = LoadWorldFromBytes(World.FocusLevel.Focused, File.ReadAllBytes(EngineHelpers.BaseDir + "LocalWorldTest.RWorld"), "LocalWorld", true);
 					LocalWorld.WorldName.Value = "Local World";
 					Engine.IntMsg = "Loaded Local World From File";
 					loaddedData = true;
@@ -288,7 +291,7 @@ namespace RhuEngine.Managers
 			}
 			for (var i = 0; i < _backgroundLoading.Count; i++) {
 				var item = _backgroundLoading[i];
-				if(item.IsLoading && !item.IsDisposed) {
+				if (item.IsLoading && !item.IsDisposed) {
 					continue;
 				}
 				i--;

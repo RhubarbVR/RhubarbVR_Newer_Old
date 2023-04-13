@@ -39,7 +39,7 @@ namespace RhuEngine.Wasm
 		private readonly List<object> _refs = new();
 
 
-		private long MakePrem(object target) {
+		private static long MakePrem(object target) {
 			return target is int @int
 				? BitConverter.ToInt64(BitConverter.GetBytes(@int).Concat(new byte[4]).ToArray())
 				: target is float @float
@@ -339,10 +339,7 @@ namespace RhuEngine.Wasm
 				.Where(x => (x.GetCustomAttribute<ExposedAttribute>(true) is not null) || x.FieldType.IsAssignableTo(typeof(IWorldObject)))
 				.Where(x => x.GetCustomAttribute<UnExsposedAttribute>(true) is null)
 				.FirstOrDefault();
-			if (targetField is null) {
-				return -1;
-			}
-			return MakeRef((Delegate)(Func<object, object>)targetField.GetValue);
+			return targetField is null ? -1 : MakeRef((Delegate)(Func<object, object>)targetField.GetValue);
 		}
 
 		/// <summary>
@@ -368,10 +365,9 @@ namespace RhuEngine.Wasm
 				.Where(x => x.CanRead)
 				.Where(x => x.GetMethod is not null)
 				.FirstOrDefault();
-			if (targetProperty is null) {
-				return -1;
-			}
-			return MakeRef(Delegate.CreateDelegate(targetProperty.GetMethod.CreateDelegateTypeWithObject(), targetProperty.GetMethod));
+			return targetProperty is null
+				? -1
+				: MakeRef(Delegate.CreateDelegate(targetProperty.GetMethod.CreateDelegateTypeWithObject(), targetProperty.GetMethod));
 		}
 
 		/// <summary>

@@ -159,7 +159,7 @@ namespace RhubarbVR.Bindings.Input
 
 		public System.Collections.Generic.Dictionary<TrackerPos, IPos> dictionary = new();
 
-		public IPos this[TrackerPos target] => dictionary.ContainsKey(target) ? dictionary[target] : null;
+		public IPos this[TrackerPos target] => dictionary.TryGetValue(target, out var value) ? value : null;
 
 		public TrackerType TrackerType => (TrackerType)Tracker.Type;
 
