@@ -363,7 +363,7 @@ namespace RhuEngine.WorldObjects
 			while (_netManager.IsRunning) {
 				_networkLoop.Restart();
 				try {
-					if (_updatedValue.Count > 0 || _objectCreationAndDeleteUpdate.Count > 0) {
+					if (_updatedValue.Count > 0 || !_objectCreationAndDeleteUpdate.IsEmpty) {
 						var updateData = new DataNodeGroup();
 
 						var updateValues = new DataNodeList();
@@ -487,8 +487,8 @@ namespace RhuEngine.WorldObjects
 						return;
 					}
 					try {
-						if (_networkedObjects.ContainsKey(target.Value)) {
-							_networkedObjects[target.Value].Received(peer, dataGroup.GetValue("Data"));
+						if (_networkedObjects.TryGetValue(target.Value, out var value)) {
+							value.Received(peer, dataGroup.GetValue("Data"));
 						}
 					}
 					catch { }
@@ -503,8 +503,8 @@ namespace RhuEngine.WorldObjects
 							return;
 						}
 						try {
-							if (_networkedObjects.ContainsKey(target.Value)) {
-								if (_networkedObjects[target.Value] is ICreationDeletionNetworkedObject creationDeleteNetworkedObject) {
+							if (_networkedObjects.TryGetValue(target.Value, out var value)) {
+								if (value is ICreationDeletionNetworkedObject creationDeleteNetworkedObject) {
 									var addedList = creationDeleteNetworkedObject.ReceivedCreationDelete(peer, item.GetValue("d"));
 									loadActions = loadActions?.Concat(addedList) ?? addedList;
 								}
@@ -535,8 +535,8 @@ namespace RhuEngine.WorldObjects
 							return;
 						}
 						try {
-							if (_networkedObjects.ContainsKey(target.Value)) {
-								_networkedObjects[target.Value].Received(peer, item.GetValue("d"));
+							if (_networkedObjects.TryGetValue(target.Value, out var value)) {
+								value.Received(peer, item.GetValue("d"));
 							}
 							else {
 								RLog.Warn($"valueUpdates {target} target object not Found");
