@@ -368,6 +368,9 @@ namespace RhuEngine.WorldObjects
 
 						var updateValues = new DataNodeList();
 						foreach (var item in _updatedValue.GetSpan()) {
+							if(item.IsRemoved || item.IsDestroying) {
+								continue;
+							}
 							var packedData = new DataNodeGroup();
 							packedData.SetValue("p", new DataNode<NetPointer>(item.Pointer));
 							packedData.SetValue("d", item.GetUpdateData());
@@ -377,6 +380,9 @@ namespace RhuEngine.WorldObjects
 						updateData.SetValue("u", updateValues);
 						var objectUpdates = new DataNodeList();
 						while (_objectCreationAndDeleteUpdate.TryDequeue(out var updateEvent)) {
+							if (updateEvent.Item1.IsRemoved || updateEvent.Item1.IsDestroying) {
+								continue;
+							}
 							var packedData = new DataNodeGroup();
 							packedData.SetValue("p", new DataNode<NetPointer>(updateEvent.Item1.Pointer));
 							packedData.SetValue("d", updateEvent.Item2.Invoke());
