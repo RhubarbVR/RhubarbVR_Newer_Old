@@ -189,7 +189,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		private void ButtonPressed_Changed(IChangeable obj) {
 			RenderThread.ExecuteOnEndOfFrame(() => {
-				if(LinkedComp.ButtonPressed is null) {
+				if (LinkedComp.ButtonPressed is null) {
 					return;
 				}
 				if (node.ButtonPressed != LinkedComp.ButtonPressed.Value) {

@@ -19,6 +19,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 		public override string ObjectName => "ScrollContainer";
 
 		public override void StartContinueInit() {
+			node.ScrollEnded += Node_ScrollEnded;
 			LinkedComp.FollowFocus.Changed += FollowFocus_Changed;
 			LinkedComp.HorizontalScrollBar.Changed += HorizontalScrollBar_Changed;
 			LinkedComp.VerticalScrollBar.Changed += VerticalScrollBar_Changed;
@@ -34,12 +35,29 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		}
 
+		private void Node_ScrollEnded() {
+			if(node.ScrollVertical != LinkedComp.VerticalScroll.Value) {
+				LinkedComp.VerticalScroll.Value = node.ScrollVertical;
+			}
+			if (node.ScrollHorizontal != LinkedComp.HorizontalScroll.Value) {
+				LinkedComp.HorizontalScroll.Value = node.ScrollHorizontal;
+			}
+		}
+
 		private void VerticalScroll_Changed(IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollVertical = LinkedComp.VerticalScroll.Value);
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node.ScrollVertical != LinkedComp.VerticalScroll.Value) {
+					node.ScrollVertical = LinkedComp.VerticalScroll.Value;
+				}
+			});
 		}
 
 		private void HorizontalScroll_Changed(IChangeable obj) {
-			RenderThread.ExecuteOnEndOfFrame(() => node.ScrollHorizontal = LinkedComp.HorizontalScroll.Value);
+			RenderThread.ExecuteOnEndOfFrame(() => {
+				if (node.ScrollHorizontal != LinkedComp.HorizontalScroll.Value) {
+					node.ScrollHorizontal = LinkedComp.HorizontalScroll.Value;
+				}
+			});
 		}
 
 		private void ScrollDeadZone_Changed(IChangeable obj) {
