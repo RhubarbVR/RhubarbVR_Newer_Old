@@ -26,20 +26,22 @@ namespace RhubarbEasyBuild
 			}
 		}
 
+		public const string VERSION = "4.0.2";
+
 		public static string[] GodotDownloadURL = new string[] {
-			"https://github.com/godotengine/godot/releases/download/4.0.1-stable/Godot_v4.0.1-stable_mono_win64.zip", //Windows
-			"https://github.com/godotengine/godot/releases/download/4.0.1-stable/Godot_v4.0.1-stable_mono_linux_x86_64.zip", //Linux
-			"https://github.com/godotengine/godot/releases/download/4.0.1-stable/Godot_v4.0.1-stable_mono_macos.universal.zip", //Macos
+			$"https://github.com/godotengine/godot/releases/download/{VERSION}-stable/Godot_v{VERSION}-stable_mono_win64.zip", //Windows
+			$"https://github.com/godotengine/godot/releases/download/{VERSION}-stable/Godot_v{VERSION}-stable_mono_linux_x86_64.zip", //Linux
+			$"https://github.com/godotengine/godot/releases/download/{VERSION}-stable/Godot_v{VERSION}-stable_mono_macos.universal.zip", //Macos
 		};
 
 		public static string GetDownloadURL(RunningPlatform platform) {
 			return GodotDownloadURL[(int)platform];
 		}
 
-		public static string GodotPath => Path.Combine(Directory.GetCurrentDirectory(), "godotbuilds", "v4.0.1");
+		public static string GodotPath => Path.Combine(Directory.GetCurrentDirectory(), "godotbuilds", $"v{VERSION}");
 
-		public static string WindowsExeGodotPath => Path.Combine(GodotPath, "Godot_v4.0.1-stable_mono_win64", "Godot_v4.0.1-stable_mono_win64.exe");
-		public static string LinuxGodotPath => Path.Combine(GodotPath, "Godot_v4.0.1-stable_mono_linux_x86_64", "Godot_v4.0.1-stable_mono_linux.x86_64");
+		public static string WindowsExeGodotPath => Path.Combine(GodotPath, $"Godot_v{VERSION}-stable_mono_win64", $"Godot_v{VERSION}-stable_mono_win64.exe");
+		public static string LinuxGodotPath => Path.Combine(GodotPath, $"Godot_v{VERSION}-stable_mono_linux_x86_64", $"Godot_v{VERSION}-stable_mono_linux.x86_64");
 		public static string OSXGodotPath => Path.Combine(GodotPath, "Godot_mono.app", "Contents", "MacOS", "Godot");
 
 		public static string GetExePath(RunningPlatform runningPlatform) {

@@ -14,7 +14,8 @@ namespace RhubarbEasyBuild
 			"-run-debug-visuals-novr",
 			"-run-debug-visuals-vr",
 			"-build-debug",
-			"-build-headless"
+			"-build-headless",
+			"-run-editor",
 		};
 
 		static bool IsRhubarbDir(string path) {
@@ -86,6 +87,9 @@ namespace RhubarbEasyBuild
 			else if (selectedOption.Contains("build-headless")) {
 				await BuildHeadLess();
 			}
+			else if (selectedOption.Contains("run-editor")) {
+				await RunEditor();
+			}
 			else {
 				Console.WriteLine("Command Not known");
 			}
@@ -131,6 +135,13 @@ namespace RhubarbEasyBuild
 				FileName = "dotnet",
 				WorkingDirectory = Program.RhubarbDir
 			});
+			await process.WaitForExitAsync();
+			process.Dispose();
+		}
+
+		static async Task RunEditor() {
+			await BuildDebug();
+			var process = GodotRunner.RunGodot("-e --path " + BaseCommand);
 			await process.WaitForExitAsync();
 			process.Dispose();
 		}
