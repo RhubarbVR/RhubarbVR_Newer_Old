@@ -17,7 +17,7 @@ namespace RhuSettings
 		}
 
 		public DataObject GetDataObject(string loc) {
-			return _list.ContainsKey(loc) ? _list[loc] : null;
+			return _list.TryGetValue(loc, out var value) ? value : null;
 		}
 
 		public DataList AddNewList(string loc) {
@@ -27,8 +27,7 @@ namespace RhuSettings
 		}
 
 		public DataList AddList(string loc) {
-			var data = _list.ContainsKey(loc) ? (DataList)_list[loc] : AddNewList(loc);
-			return data;
+			return _list.TryGetValue(loc, out var value) ? (DataList)value : AddNewList(loc);
 		}
 	}
 }
