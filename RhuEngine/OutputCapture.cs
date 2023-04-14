@@ -39,8 +39,10 @@ namespace RhuEngine
 			RLog.Subscribe(LogCall);
 			_stdOutWriter = Console.Out;
 			Console.SetOut(this);
-			Directory.CreateDirectory(LogsPath);
-			_writer = new StreamWriter(LogsPath + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".txt") {
+			if (!Directory.Exists(LogsPath)) {
+				Directory.CreateDirectory(LogsPath);
+			}
+			_writer = new StreamWriter(Path.Combine(LogsPath, DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".txt")) {
 				AutoFlush = true
 			};
 		}
@@ -67,7 +69,7 @@ namespace RhuEngine
 		}
 
 		override public void WriteLine(string output) {
-			if(string.IsNullOrEmpty(LogsPath)) {
+			if (string.IsNullOrEmpty(LogsPath)) {
 				output = " ";
 			}
 			WriteText(output + "\n");

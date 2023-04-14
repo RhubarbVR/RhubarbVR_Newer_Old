@@ -22,6 +22,7 @@ namespace RhuEngine.Settings
 
 		[SettingsField("Input Settings")]
 		public InputSettingsObject InputSettings = new();
+
 		[SettingsField("Networking Settings")]
 		public NetworkingSettingsObject NetworkingSettings = new();
 
@@ -32,12 +33,15 @@ namespace RhuEngine.Settings
 		public string ThreeLetterLanguageName = null;
 
 		[SettingsField()]
+		public string[] EnabledPlugins = Array.Empty<string>();
+
 		[NeedsReboot]
+		[SettingsField()]
 		public string TargetAPI = null;
 
 		[SettingsField("Master Volume in Audio DB")]
 		public float MasterVolumeDB = 0;
-		
+
 		[SettingsField("Enviroment Volume in Audio DB")]
 		public float WorldVolumeDB = 0;
 

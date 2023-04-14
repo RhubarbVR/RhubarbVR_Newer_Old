@@ -26,7 +26,7 @@ namespace RhuEngine
 		public RhuException(string data) : base(data) { }
 	}
 
-	public sealed class Engine : IDisposable , INetLogger
+	public sealed class Engine : IDisposable, INetLogger
 	{
 		public bool PassErrors { get; private set; }
 		public IEngineLink EngineLink { get; private set; }
@@ -71,7 +71,7 @@ namespace RhuEngine
 			}
 			EngineHelpers.MainEngine = this;
 			string error = null;
-			if(arg.Any((v) => v.ToLower() == "--runvsdebug") | arg.Any((v) => v.ToLower() == "-runvsdebug") | arg.Any((v) => v.ToLower() == "-run-vsdebug")) {
+			if (arg.Any((v) => v.ToLower() == "--runvsdebug") | arg.Any((v) => v.ToLower() == "-runvsdebug") | arg.Any((v) => v.ToLower() == "-run-vsdebug")) {
 				RLog.Info("Trying to launch Debugger");
 				if (!Debugger.IsAttached) {
 					Debugger.Launch();
@@ -106,7 +106,8 @@ namespace RhuEngine
 					}
 				}
 			}
-			outputCapture.LogsPath = _userDataPathOverRide is null ? baseDir + "/Logs/" : _userDataPathOverRide + "/Logs/";
+			EngineHelpers.BaseDir = _userDataPathOverRide is null ? baseDir : _userDataPathOverRide;
+			outputCapture.LogsPath = Path.Combine(EngineHelpers.BaseDir, "Logs");
 			outputCapture.Start();
 			if (error is not null) {
 				RLog.Err(error);
@@ -120,7 +121,7 @@ namespace RhuEngine
 			this.outputCapture = outputCapture;
 
 			var lists = new List<DataList>();
-			SettingsFile = ((_userDataPathOverRide is not null) ? _userDataPathOverRide : baseDir) + "/settings.json";
+			SettingsFile = Path.Combine(EngineHelpers.BaseDir, "settings.json");
 			if (File.Exists(SettingsFile)) {
 				var text = File.ReadAllText(SettingsFile);
 				var liet = SettingsManager.GetDataFromJson(text);
@@ -225,6 +226,8 @@ namespace RhuEngine
 
 		public FileManager fileManager = new();
 
+		public PluginManager pluginManager = new();
+
 		public DiscordManager discordManager = new();
 
 		public LocalisationManager localisationManager = new();
@@ -285,15 +288,24 @@ namespace RhuEngine
 				netApiManager = new NetApiManager((_userDataPathOverRide ?? EngineHelpers.BaseDir) + "/rhuCookie");
 				IntMsg = "Building AssetManager";
 				assetManager = new AssetManager(_cachePathOverRide);
-				_managers = new IManager[] { discordManager, windowManager, fileManager, localisationManager, inputManager, netApiManager, assetManager, wasmManager, worldManager };
-				foreach (var item in _managers) {
-					IntMsg = $"Starting {item.GetType().Name}";
+				_managers = new IManager[] { pluginManager, discordManager, windowManager, fileManager, localisationManager, inputManager, netApiManager, assetManager, wasmManager, worldManager };
+				for (var i = 0; i < _managers.Length; i++) {
+					var manager = _managers[i];
+					IntMsg = $"Starting {manager.GetType().Name}";
 					try {
-						item.Init(this);
+						manager.Init(this);
+						foreach (var item in pluginManager.GetLoadedPlugins()) {
+							try {
+								item.BasePlugin.Initialization((Plugin.InitializationLevel)i, this);
+							}
+							catch (Exception e) {
+								RLog.Err($"Initialization Failed on plugin {item.PluginName} Level {(Plugin.InitializationLevel)i} Error: {e}");
+							}
+						}
 					}
 					catch (Exception ex) {
-						RLog.Err($"Failed to start {item.GetType().GetFormattedName()} Error:{ex}");
-						IntMsg = $"Failed to start {item.GetType().GetFormattedName()} Error:{ex}";
+						RLog.Err($"Failed to start {manager.GetType().GetFormattedName()} Error:{ex}");
+						IntMsg = $"Failed to start {manager.GetType().GetFormattedName()} Error:{ex}";
 						return;
 					}
 				}
@@ -468,7 +480,7 @@ namespace RhuEngine
 					RLog.Err("Networking: " + outputString);
 					break;
 				case NetLogLevel.Trace:
-					RLog.Err("Networking: "+"Trace" + outputString);
+					RLog.Err("Networking: " + "Trace" + outputString);
 					break;
 				default:
 					RLog.Info("Networking: " + outputString);
