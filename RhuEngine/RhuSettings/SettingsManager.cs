@@ -45,15 +45,9 @@ namespace RhuSettings
 				}
 				else {
 					var value = ((DataNode)item.Value)?.Getval();
-					if(value is string[][] data) {
-						obj[item.Key] = new JArray(data.Select(x => new JArray(x)).ToArray());
-					}
-					else if (value is string[] datae) {
-						obj[item.Key] = new JArray(datae);
-					}
-					else {
-						obj[item.Key] = new JValue(value);
-					}
+					obj[item.Key] =
+						value is string[][] data ? new JArray(data.Select(x => new JArray(x)).ToArray())
+						: value is string[] datae ? new JArray(datae) : new JValue(value);
 				}
 			}
 			return obj;
@@ -121,9 +115,9 @@ namespace RhuSettings
 			return obj;
 		}
 		public static object ChangeType(object source, Type dest) {
-			if(dest == typeof(string[][])) {
-				if(source is JArray jArray) {
-					return jArray.Select(x => ((JArray)x).Select(x=>(string)x).ToArray()).ToArray();
+			if (dest == typeof(string[][])) {
+				if (source is JArray jArray) {
+					return jArray.Select(x => ((JArray)x).Select(x => (string)x).ToArray()).ToArray();
 				}
 			}
 			else if (dest == typeof(string[])) {

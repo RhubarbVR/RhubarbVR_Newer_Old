@@ -19,6 +19,11 @@ namespace RhuEngine.Components
 	{
 		AssimpContext _assimpContext;
 
+		public readonly SyncRef<IValueSource<bool>> setupIK;
+		public readonly SyncRef<IValueSource<bool>> setupAvatarBones;
+		private bool SetupIK => setupIK.Target?.Value ?? false;
+		private bool SetupAvatarBones => setupAvatarBones.Target?.Value ?? false;
+
 		public readonly SyncRef<IValueSource<bool>> srgbTextures;
 
 		public readonly SyncRef<IValueSource<bool>> joinIdenticalVertices;
@@ -110,6 +115,8 @@ namespace RhuEngine.Components
 				syncRef.Target = checkBOx.ButtonPressed;
 				checkBOx.ButtonPressed.Value = defult;
 			}
+			AddCheckBox("Setup Avatar Bones", setupAvatarBones, true);
+			AddCheckBox("Setup Avatar IK", setupIK, true);
 
 			AddCheckBox("SRGB", srgbTextures, true);
 			AddCheckBox("JoinIdenticalVertices", joinIdenticalVertices, false);
@@ -302,6 +309,33 @@ namespace RhuEngine.Components
 				LoadCameras(AssimpHolder.assetEntity, AssimpHolder);
 				AssimpHolder.Rescale();
 				RLog.Info("Done Loading Model");
+				if (SetupAvatarBones) {
+					RLog.Info("Setting up Avatar Bones");
+					var bones = new List<AvatarBones>();
+					if (AssimpHolder.Armatures.Count == 0) {
+						RLog.Err("Did not find Avatar");
+						return;
+					}
+					foreach (var item in AssimpHolder.Armatures.Values) {
+						bones.Add(item.Entity.AttachComponent<AvatarBones>());
+					}
+					RLog.Info($"Setting up {AssimpHolder.Armatures.Count} Avatars");
+					foreach (var item in bones) {
+						try {
+							var errorMsg = item.SetupAvatar();
+							if (errorMsg is not null) {
+								RLog.Err($"Armature {item.Entity.name.Value} missing {errorMsg}");
+							}
+							else if (SetupIK) {
+								item.SetupIK();
+							}
+						}
+						catch (Exception e) {
+							RLog.Err($"Armature {item.Entity.name.Value} Error: {e}");
+						}
+
+					}
+				}
 			}
 			catch (Exception e) {
 				RLog.Err($"Failed to Load Model Error {e}");
@@ -541,6 +575,7 @@ namespace RhuEngine.Components
 						}
 					}
 				}
+				scene.Armatures.TryAdd(armiturer.Entity.name.Value, armiturer);
 				var meshRender = entity.AttachComponent<SkinnedMeshRender>();
 				meshRender.Armature.Target = armiturer;
 				foreach (var boneMesh in amesh.MeshAttachments) {
