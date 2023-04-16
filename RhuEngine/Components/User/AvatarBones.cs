@@ -106,7 +106,7 @@ namespace RhuEngine.Components
 		public readonly SyncRef<Entity> RightLittleTip;
 
 		public void SetupIK() {
-
+			Entity.GetFirstComponentOrAttach<HumanoidIK>();
 		}
 
 		public string SetupAvatar(Entity entity = null) {
@@ -379,7 +379,6 @@ namespace RhuEngine.Components
 
 			name = name.Replace("pinky", "little");
 			name = name.Replace("litle", "little");
-
 
 			if (name.Contains('l') && name.Contains('r') && name.Length <= 4) {
 				name = name.Replace("th", "thumb");

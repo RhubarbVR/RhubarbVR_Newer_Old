@@ -110,6 +110,10 @@ namespace RNumerics
 				Matrix4x4.Decompose(m, out var scale, out _, out _);
 				return scale;
 			}
+			set {
+				Matrix4x4.Decompose(m, out var _, out var rotation, out var translation);
+				m = Matrix4x4.CreateScale(value) * Matrix4x4.CreateFromQuaternion(rotation) * Matrix4x4.CreateTranslation(translation);
+			}
 		}
 		/// <summary>A slow function that returns the rotation quaternion 
 		/// embedded in this transform matrix. This is backed by Decompose,
@@ -121,6 +125,10 @@ namespace RNumerics
 			get {
 				Matrix4x4.Decompose(m, out _, out var rot, out _);
 				return (Quaternionf)rot;
+			}
+			set {
+				Matrix4x4.Decompose(m, out var scale, out var rotation, out var translation);
+				m = Matrix4x4.CreateScale(scale) * Matrix4x4.CreateFromQuaternion((Quaternion)value) * Matrix4x4.CreateTranslation(translation);
 			}
 		}
 

@@ -5,10 +5,11 @@ using RNumerics;
 using RhuEngine.Linker;
 using RhuEngine.Components;
 using System.Threading.Tasks;
+using RNumerics.IK;
 
 namespace RhuEngine.WorldObjects.ECS
 {
-	public sealed partial class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox, IChangeable
+	public sealed partial class Entity : SyncObject, IOffsetableElement, IWorldBoundingBox, IChangeable, ITransform
 	{
 		private uint CompDepth => (InternalParent?.Depth + 1) ?? 0;
 
@@ -647,11 +648,15 @@ namespace RhuEngine.WorldObjects.ECS
 
 		public bool IsChildOf(Entity childTransform) {
 			for (var i = 0; i < children.Count; i++) {
-				if(children[i] == childTransform) {
+				if (children[i] == childTransform) {
 					return true;
 				}
 			}
 			return false;
+		}
+
+		ITransform ITransform.AddChild(string v) {
+			return AddChild(v);
 		}
 
 		[NoShow]
@@ -668,5 +673,34 @@ namespace RhuEngine.WorldObjects.ECS
 		[UnExsposed]
 		public CanvasItem CanvasItem { get; private set; }
 
+		Vector3f ITransform.position
+		{
+			get => GlobalTrans.Translation; set {
+				var current = GlobalTrans;
+				current.Translation = value;
+				GlobalTrans = current;
+			}
+		}
+
+		public Vector3f right => (GlobalTrans.Rotation * Vector3f.Right).Normalized;
+
+		public Vector3f up => (GlobalTrans.Rotation * Vector3f.Up).Normalized;
+
+		public Vector3f forward => (GlobalTrans.Rotation * Vector3f.Forward).Normalized;
+
+		public Vector3f localPosition => position.Value;
+
+		public Vector3f localScale { get => scale.Value; set => scale.Value = value; }
+
+		Quaternionf ITransform.rotation
+		{
+			get => GlobalTrans.Rotation; set {
+				var current = GlobalTrans;
+				current.Rotation = value;
+				GlobalTrans = current;
+			}
+		}
+
+		public Quaternionf localRotation { get => rotation.Value; set => rotation.Value = value; }
 	}
 }
