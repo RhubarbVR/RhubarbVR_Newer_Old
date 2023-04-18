@@ -166,7 +166,7 @@ namespace RhuEngine.Components
 		/// Sends input as a 0,1 value
 		/// </summary>
 		/// <param name="pos"></param>
-		void SendInput(Vector2f pos, Vector2f Tilt, float PressForce, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur);
+		void SendInput(Vector2f pos, Vector2f Tilt, Vector2f ExtraScroll, float PressForce, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur);
 		void SendNoInput();
 	}
 
@@ -181,6 +181,9 @@ namespace RhuEngine.Components
 		public readonly Sync<bool> TakeKeyboardFocus;
 		public readonly Sync<bool> UseTAA;
 		public readonly Sync<bool> UseDebanding;
+
+		[Default(true)]
+		public readonly Sync<bool> TouchScreenScroll;
 
 		public readonly Sync<bool> Disable3D;
 		public readonly Sync<bool> OwnWorld3D;
@@ -281,7 +284,7 @@ namespace RhuEngine.Components
 
 		public Action SendNoInputEvent;
 
-		public Action<Vector2f, Vector2f, float, Handed, int, bool, bool, bool, bool> SendInputEvent;
+		public Action<Vector2f, Vector2f, Vector2f, float, Handed, int, bool, bool, bool, bool> SendInputEvent;
 
 		public ViewportConnector ViewportConnector { get; internal set; }
 
@@ -289,9 +292,9 @@ namespace RhuEngine.Components
 
 		public int timeWithoutInput = -1;
 
-		public void SendInput(Vector2f pos, Vector2f Tilt, float PressForce, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
+		public void SendInput(Vector2f pos, Vector2f Tilt, Vector2f ExtraScroll, float PressForce, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
 			timeWithoutInput = -1;
-			SendInputEvent?.Invoke(pos, Tilt, PressForce, side, current, isLazer, IsClickedPrime, IsClickedSecod, IsClickedTur);
+			SendInputEvent?.Invoke(pos, Tilt, ExtraScroll, PressForce, side, current, isLazer, IsClickedPrime, IsClickedSecod, IsClickedTur);
 		}
 
 		public void SendNoInput() {

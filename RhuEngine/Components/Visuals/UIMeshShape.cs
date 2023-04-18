@@ -51,17 +51,17 @@ namespace RhuEngine.Components
 					var isMed = InputManager.GetInputAction(InputTypes.Secondary).HandedValue(item.Side) >= SecodaryNeededForce.Value;
 					if (item.Lazer) {
 						if (Laserable) {
-							InputInterface.Target?.SendInput(pos, Tilt.Value, item.PressForce, item.Side, (int)item.TouchUndex, true, isPrime, isSec, isMed);
+							InputInterface.Target?.SendInput(pos, Tilt.Value, Vector2f.Zero, item.PressForce, item.Side, (int)item.TouchUndex, true, isPrime, isSec, isMed);
 						}
 					}
 					else if (item.CustomTouch) {
 						if (CustomTochable) {
-							InputInterface.Target?.SendInput(pos, Tilt.Value, item.PressForce, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
+							InputInterface.Target?.SendInput(pos, Tilt.Value, Vector2f.Zero, item.PressForce, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
 						}
 					}
 					else {
 						if (Touchable) {
-							InputInterface.Target?.SendInput(pos, Tilt.Value, item.PressForce, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
+							InputInterface.Target?.SendInput(pos, Tilt.Value, Vector2f.Zero, item.PressForce, item.Side, (int)item.TouchUndex, false, isPrime, isSec, isMed);
 						}
 					}
 				}
@@ -148,7 +148,7 @@ namespace RhuEngine.Components
 		static Vector3f ClosestPointOnSegment(Vector3f point, Vector3f a, Vector3f b) {
 			var ab = b - a;
 			var t = Vector3f.Dot(point - a, ab) / Vector3f.Dot(ab, ab);
-			return t < 0 ? a : t > 1 ? b : a + t * ab;
+			return t < 0 ? a : t > 1 ? b : a + (t * ab);
 		}
 
 

@@ -28,6 +28,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 		public class InputAction
 		{
+			public RNumerics.Vector2f ExtraScroll;
 			public RNumerics.Vector2f Pos;
 			public RNumerics.Vector2f LastPos;
 
@@ -125,7 +126,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 				value.LastPos = value.Pos;
 
-				var scroll = LinkedComp.Engine.inputManager.MouseSystem.ScrollDelta;
+				var scroll = LinkedComp.Engine.inputManager.MouseSystem.ScrollDelta + value.ExtraScroll;
 
 				if (scroll.y > 0) {
 					var scrollweel = new InputEventMouseButton {
@@ -307,7 +308,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			InputActions.Clear();
 		}
 
-		private void UpdateInput(RNumerics.Vector2f pos, RNumerics.Vector2f Tilt, float PressForce, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
+		private void UpdateInput(RNumerics.Vector2f pos, RNumerics.Vector2f Tilt, RNumerics.Vector2f ExtraScroll, float PressForce, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
 			if (_isInputUpdate) {
 				node.RenderTargetUpdateMode = SubViewport.UpdateMode.Once;
 			}
@@ -322,6 +323,7 @@ namespace RhubarbVR.Bindings.ComponentLinking
 			inputAction.IsClickedPrime = IsClickedPrime;
 			inputAction.IsClickedSecod = IsClickedSecod;
 			inputAction.IsClickedTur = IsClickedTur;
+			inputAction.ExtraScroll = ExtraScroll;
 		}
 
 		private void Children_OnReorderList() {
