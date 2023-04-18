@@ -109,10 +109,15 @@ namespace RhubarbVR.Bindings.ComponentLinking
 
 
 				if (value.IsClickedPrime & value.IsClickedPrimeLastFrame) {
+					var relitive = new Vector2(value.Pos.x, value.Pos.y) - new Vector2(value.LastPos.x, value.LastPos.y);
 					var dragEvent = new InputEventScreenDrag {
 						Device = id,
 						Position = new Vector2(value.Pos.x, value.Pos.y),
-						Relative = new Vector2(value.Pos.x, value.Pos.y) - new Vector2(value.LastPos.x, value.LastPos.y),
+						Relative = relitive,
+						Velocity = relitive.Normalized(),
+						PenInverted = false,
+						Pressure = value.PressForce,
+						Tilt = new Vector2(value.Tilt.x, value.Tilt.y),
 					};
 					node.PushInput(dragEvent, true);
 				}
@@ -375,7 +380,8 @@ namespace RhubarbVR.Bindings.ComponentLinking
 				RShadowSelect.Shadows_256 => Godot.Viewport.PositionalShadowAtlasQuadrantSubdiv.Subdiv256,
 				RShadowSelect.Shadows_1024 => Godot.Viewport.PositionalShadowAtlasQuadrantSubdiv.Subdiv1024,
 				_ => Godot.Viewport.PositionalShadowAtlasQuadrantSubdiv.Disabled,
-			});;
+			});
+			;
 		}
 
 		private void QuadTwo_Changed(RhuEngine.WorldObjects.IChangeable obj) {

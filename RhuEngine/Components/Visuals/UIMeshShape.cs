@@ -129,7 +129,7 @@ namespace RhuEngine.Components
 
 			var distance = Vector3f.Dot(normal, point) - planeDistance;
 
-			var projection = point + normal * distance;
+			var projection = point + (normal * distance);
 			return Vector3f.Dot(Vector3f.Cross(triangle[1] - triangle[0], projection - triangle[0]), normal) > 0 &&
 				Vector3f.Dot(Vector3f.Cross(triangle[2] - triangle[1], projection - triangle[1]), normal) > 0 &&
 				Vector3f.Dot(Vector3f.Cross(triangle[0] - triangle[2], projection - triangle[2]), normal) > 0

@@ -164,7 +164,7 @@ namespace RhuEngine.WorldObjects
 					var meshrender = debugcube.AttachComponent<TextLabel3D>();
 					meshrender.Modulate.Value = colorf;
 					meshrender.Text.Value = text.ToString();
-					meshrender.Entity.GlobalTrans = Matrix.TS(pos, scale) * matrix;
+					meshrender.Entity.GlobalTrans = Matrix.TS(pos, scale * new Vector3f(0.1f)) * matrix;
 					Task.Run(async () => {
 						await Task.Delay((int)(1000 * drawTime));
 						debugcube.Destroy();

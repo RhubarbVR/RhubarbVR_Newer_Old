@@ -287,12 +287,18 @@ namespace RhuEngine.Components
 
 		public bool IsConnected => ViewportConnector is not null;
 
+		public int timeWithoutInput = -1;
 
 		public void SendInput(Vector2f pos, Vector2f Tilt, float PressForce, Handed side, int current, bool isLazer, bool IsClickedPrime, bool IsClickedSecod, bool IsClickedTur) {
+			timeWithoutInput = -1;
 			SendInputEvent?.Invoke(pos, Tilt, PressForce, side, current, isLazer, IsClickedPrime, IsClickedSecod, IsClickedTur);
 		}
 
 		public void SendNoInput() {
+			timeWithoutInput++;
+			if (timeWithoutInput < 5) { // Do to physics errors it can say it didn't hit for 5 frames
+				return;
+			}
 			SendNoInputEvent?.Invoke();
 		}
 	}
