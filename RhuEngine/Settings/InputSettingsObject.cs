@@ -87,13 +87,13 @@ namespace RhuEngine.Settings
 		public InputAction ObjectPush = new(new[] { new[] { "Mouse.Scroll.y" }, new[] { "XR.Main.Primary.y" } });
 
 		[SettingsField("OpenDash")]
-		public InputAction OpenDash = new(new[] { new[] { "Key.Escape" }, new[] { "Key.Ctrl", "Key.Space" } });
+		public InputAction OpenDash = new(new[] { new[] { "Key.Escape" }, new[] { "Key.Ctrl", "Key.Space" }});
 
 		[SettingsField("ChangeWorld")]
 		public InputAction ChangeWorld = new(new[] { new[] { "Key.Ctrl", "Key.Tab" } });
 
 		[SettingsField("ContextMenu")]
-		public InputAction ContextMenu = new(new[] { new[] { "Key.T" }, new[] { "XR.Main.Menu_Button" } });
+		public InputAction ContextMenu = new(new[] { new[] { "Key.T" }, new[] { "XR.Main.Menu_Button" }, new[] { "XR.Main.BY_Button" }  });
 
 		[SettingsField("Primary")]
 		public InputAction Primary = new(new[] { new[] { "Key.MouseLeft" }, new[] { "XR.Main.Trigger" } });
