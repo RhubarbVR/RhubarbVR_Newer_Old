@@ -288,6 +288,11 @@ namespace RhuEngine.Components
 			return GetLazerEntity(handed)?.GlobalTrans.Translation ?? Vector3f.Zero;
 		}
 
+		protected override void Step() {
+			base.Step();
+			KeyboardOpenThisFrame = false;
+		}
+
 		protected override void RenderStep() {
 			if (!Engine.EngineLink.CanInput) {
 				return;
@@ -486,11 +491,13 @@ namespace RhuEngine.Components
 		internal void HolderGrip() {
 			OnGrip?.Invoke();
 		}
+		public bool KeyboardOpenThisFrame { get; private set; }
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
 		public void KeyBoardUpdate(Matrix openLocation) {
-			var wasAlreadyOpen = KeyboardEntity.enabled.Value;
+			var wasAlreadyOpen = KeyboardEntity.enabled.Value | KeyboardOpenThisFrame;
 			KeyboardEntity.enabled.Value = Engine.HasKeyboard && Engine.IsInVR;
+			KeyboardOpenThisFrame |= KeyboardEntity.enabled.Value;
 			if (!wasAlreadyOpen) {
 				KeyboardEntity.LocalTrans = Matrix.TR(new Vector3f(0, -0.5, -0.5), Quaternionf.CreateFromEuler(0, -10, 0));
 			}
