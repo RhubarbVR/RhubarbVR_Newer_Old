@@ -20,7 +20,7 @@ using System.ComponentModel.DataAnnotations;
 namespace RhuEngine.Components
 {
 	[PrivateSpaceOnly]
-	[UpdateLevel(UpdateEnum.Normal)]
+	[UpdateLevel(UpdateEnum.Rendering)]
 	public sealed partial class LazerVisual : Component
 	{
 		public bool HitPrivate;
@@ -54,7 +54,7 @@ namespace RhuEngine.Components
 
 		protected override void OnAttach() {
 			base.OnAttach();
-			var render = World.RootEntity.AddChild("LazerRender");
+			var render = Entity.AddChild("LazerRender");
 			Render.Target = render;
 			var sprite = Currsor.Target = render.AddChild("Currsor").AttachComponent<Sprite3D>();
 			sprite.texture.Target = World.RootEntity.GetFirstComponentOrAttach<IconsTex>();
@@ -84,40 +84,37 @@ namespace RhuEngine.Components
 			});
 		}
 
-		protected override void Step() {
-			base.Step();
+		protected override void RenderStep() {
+			base.RenderStep();
 			Render.Target.enabled.Value = Engine.EngineLink.InVR;
 			if (!Engine.EngineLink.InVR) {
 				return;
 			}
-			RUpdateManager.ExecuteOnStartOfUpdate(() => {
-				var pos = InputManager.XRInputSystem.GetHand(Side.Value)?[TrackerPos.Aim];
-				Entity.rotation.Value = pos.Rotation;
-				Entity.position.Value = pos.Position;
-				Mesh.Target.Startpoint.Value = Entity.GlobalTrans.Translation;
-			});
+			var pos = InputManager.XRInputSystem.GetHand(Side.Value)?[TrackerPos.Aim];
+			Entity.rotation.Value = pos.Rotation;
+			Entity.position.Value = pos.Position;
+			Mesh.Target.Startpoint.Value = Vector3d.Zero;
 			if (Material.Target is not null && Currsor.Target is not null) {
 				Currsor.Target.Moduluate.Value = Locked
 					? (Material.Target.Tint.Value = new Colorf(1f, 0.95f, 1f, 0.95f))
 					: (Material.Target.Tint.Value = new Colorf(0.95f, 0.95f, 0.95f, 0.95f));
 			}
-			RenderThread.ExecuteOnStartOfFrame(() => {
-				if (Mesh.Target is null) {
-					return;
-				}
-				var globalPos = Entity.GlobalTrans;
-				Mesh.Target.Endpoint.Value = (HitAny | Locked) ? (Vector3d)HitPoint : (globalPos.Rotation * new Vector3d(0, 0, -100));
-				Mesh.Target.EndHandle.Value = Mesh.Target.Endpoint.Value;
-				var lenth = -Mesh.Target.Endpoint.Value.Distance(Mesh.Target.Startpoint.Value);
-				Mesh.Target.StartHandle.Value = (globalPos.Rotation * new Vector3d(0, 0, lenth / 2)) + globalPos.Translation;
+			if (Mesh.Target is null) {
+				return;
+			}
+			var localPos = Matrix.Identity;
+			var localHitPont = Entity.GlobalPointToLocal(HitPoint);
+			Mesh.Target.Endpoint.Value = (HitAny | Locked) ? (Vector3d)localHitPont : (localPos.Rotation * new Vector3d(0, 0, -100));
+			Mesh.Target.EndHandle.Value = Mesh.Target.Endpoint.Value;
+			var lenth = -Mesh.Target.Endpoint.Value.Distance(Mesh.Target.Startpoint.Value);
+			Mesh.Target.StartHandle.Value = new Vector3d(0, 0, lenth / 2);
 
-				if (Currsor.Target is null) {
-					return;
-				}
+			if (Currsor.Target is null) {
+				return;
+			}
 
-				Currsor.Target.Entity.enabled.Value = HitAny | Locked;
-				Currsor.Target.Entity.GlobalTrans = Matrix.T(HitPoint);
-			});
+			Currsor.Target.Entity.enabled.Value = HitAny | Locked;
+			Currsor.Target.Entity.LocalTrans = Matrix.T(localHitPont);
 		}
 	}
 }

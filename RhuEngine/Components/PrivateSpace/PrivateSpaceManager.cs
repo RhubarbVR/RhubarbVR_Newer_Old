@@ -234,7 +234,7 @@ namespace RhuEngine.Components
 
 		public Vector3f HeadLazerVec;
 		public Vector3f LeftLazerVec;
-		public Vector3f RightlaserVec;
+		public Vector3f RightLazerVec;
 		public PhysicsObject GetLazerHitObject(Handed handed) {
 			return handed switch {
 				Handed.Left => Leftlazer?.hitPhysicsObject,
@@ -254,7 +254,7 @@ namespace RhuEngine.Components
 		public Vector3f GetLazerLocal(Handed handed) {
 			return handed switch {
 				Handed.Left => LeftLazerVec,
-				Handed.Right => RightlaserVec,
+				Handed.Right => RightLazerVec,
 				_ => HeadLazerVec,
 			};
 		}
@@ -351,7 +351,7 @@ namespace RhuEngine.Components
 						UpdateLazer(Leftlazer.Entity, Handed.Left, Leftlazer, ref LeftLazerVec);
 					}
 					if (Rightlazer is not null) {
-						UpdateLazer(Rightlazer.Entity, Handed.Right, Rightlazer, ref RightlaserVec);
+						UpdateLazer(Rightlazer.Entity, Handed.Right, Rightlazer, ref RightLazerVec);
 					}
 				}
 				//Todo: fingerPos
@@ -494,7 +494,7 @@ namespace RhuEngine.Components
 		public bool KeyboardOpenThisFrame { get; private set; }
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
-		public void KeyBoardUpdate(Matrix openLocation) {
+		public void KeyboardUpdate(Matrix openLocation) {
 			var wasAlreadyOpen = KeyboardEntity.enabled.Value | KeyboardOpenThisFrame;
 			KeyboardEntity.enabled.Value = Engine.HasKeyboard && Engine.IsInVR;
 			KeyboardOpenThisFrame |= KeyboardEntity.enabled.Value | wasAlreadyOpen;
@@ -503,9 +503,9 @@ namespace RhuEngine.Components
 			}
 		}
 
-		public event Action OnUpdateHolderReferen;
-		internal void UpdateHolderReferen() {
-			OnUpdateHolderReferen?.Invoke();
+		public event Action OnUpdateHolderReference;
+		internal void UpdateHolderReference() {
+			OnUpdateHolderReference?.Invoke();
 		}
 	}
 }

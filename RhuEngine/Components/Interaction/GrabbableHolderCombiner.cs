@@ -86,7 +86,7 @@ namespace RhuEngine.Components
 		}
 
 		public void UpdateHolderReferen() {
-			WorldManager.PrivateSpaceManager.UpdateHolderReferen();
+			WorldManager.PrivateSpaceManager.UpdateHolderReference();
 		}
 
 

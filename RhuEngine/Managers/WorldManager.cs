@@ -265,6 +265,17 @@ namespace RhuEngine.Managers
 			TotalStepTime = totalStep;
 		}
 
+		public void RenderLinked() {
+			for (var i = worlds.Count - 1; i >= 0; i--) {
+				try {
+					worlds[i].RenderWorldLinked();
+				}
+				catch (Exception ex) {
+					RLog.Err($"Failed to Render Linked objects world {worlds[i].WorldDebugName}. Error: {ex}");
+				}
+			}
+		}
+
 		public void RenderStep() {
 			for (var i = worlds.Count - 1; i >= 0; i--) {
 				if (worlds[i].IsOverlayWorld || worlds[i].IsPersonalSpace) {

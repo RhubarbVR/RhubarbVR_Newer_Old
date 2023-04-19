@@ -211,6 +211,20 @@ namespace RhuEngine.WorldObjects
 				_ => null,
 			};
 		}
+
+		public void RenderWorldLinked() {
+			try {
+				if (Engine.EngineLink.CanRender) {
+					foreach (var item in _worldLinkComponents.GetSpan()) {
+						item.RenderLinked();
+					}
+				}
+			}
+			catch (Exception e) {
+				RLog.Err($"Failed to build render queue for session {WorldDebugName}. Error {e}");
+			}
+		}
+
 		public void RenderStep() {
 			_netManager?.NatPunchModule.PollEvents();
 			WorldThreadSafty.MethodCalls = 0;
@@ -247,16 +261,6 @@ namespace RhuEngine.WorldObjects
 			}
 			catch (Exception e) {
 				RLog.Err($"Failed to update entities for session {WorldDebugName}. Error: {e}");
-			}
-			try {
-				if (Engine.EngineLink.CanRender) {
-					foreach (var item in _worldLinkComponents.GetSpan()) {
-						item.RunRender();
-					}
-				}
-			}
-			catch (Exception e) {
-				RLog.Err($"Failed to build render queue for session {WorldDebugName}. Error {e}");
 			}
 		}
 

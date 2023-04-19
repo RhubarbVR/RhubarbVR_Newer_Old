@@ -106,7 +106,7 @@ namespace RhuEngine.Components.UI
 
 		protected override void OnLoaded() {
 			base.OnLoaded();
-			PrivateSpaceManager.OnUpdateHolderReferen += PrivateSpaceManager_OnUpdateHolderReferen;
+			PrivateSpaceManager.OnUpdateHolderReference += PrivateSpaceManager_OnUpdateHolderReferen;
 			PrivateSpaceManager.OnDrop += PrivateSpaceManager_OnDrop;
 		}
 
@@ -118,7 +118,7 @@ namespace RhuEngine.Components.UI
 		}
 
 		public override void Dispose() {
-			PrivateSpaceManager.OnUpdateHolderReferen -= PrivateSpaceManager_OnUpdateHolderReferen;
+			PrivateSpaceManager.OnUpdateHolderReference -= PrivateSpaceManager_OnUpdateHolderReferen;
 			base.Dispose();
 		}
 

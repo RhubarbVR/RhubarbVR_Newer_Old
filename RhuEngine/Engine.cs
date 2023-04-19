@@ -158,7 +158,7 @@ namespace RhuEngine
 		public IKeyboardInteraction KeyboardInteraction { get; private set; }
 
 		private void KeyBoardUpdate() {
-			worldManager.PrivateSpaceManager?.KeyBoardUpdate(KeyboardInteraction?.WorldPos ?? Matrix.Identity);
+			worldManager.PrivateSpaceManager?.KeyboardUpdate(KeyboardInteraction?.WorldPos ?? Matrix.Identity);
 		}
 
 		public void KeyboardInteractionBind(IKeyboardInteraction uITextEditorInteraction) {
@@ -401,6 +401,7 @@ namespace RhuEngine
 			RenderThread.RunOnStartOfFrame();
 			RenderStep();
 			RenderThread.RunOnEndOfFrame();
+			worldManager.RenderLinked();
 		}
 
 		public void RenderStep() {

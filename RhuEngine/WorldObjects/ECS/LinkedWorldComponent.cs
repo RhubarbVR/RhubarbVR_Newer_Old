@@ -106,7 +106,7 @@ namespace RhuEngine.WorldObjects.ECS
 			GC.SuppressFinalize(this);
 		}
 
-		internal void RunRender() {
+		internal void RenderLinked() {
 			Render();
 		}
 
