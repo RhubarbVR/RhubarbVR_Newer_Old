@@ -497,7 +497,7 @@ namespace RhuEngine.Components
 		public void KeyBoardUpdate(Matrix openLocation) {
 			var wasAlreadyOpen = KeyboardEntity.enabled.Value | KeyboardOpenThisFrame;
 			KeyboardEntity.enabled.Value = Engine.HasKeyboard && Engine.IsInVR;
-			KeyboardOpenThisFrame |= KeyboardEntity.enabled.Value;
+			KeyboardOpenThisFrame |= KeyboardEntity.enabled.Value | wasAlreadyOpen;
 			if (!wasAlreadyOpen) {
 				KeyboardEntity.LocalTrans = Matrix.TR(new Vector3f(0, -0.5, -0.5), Quaternionf.CreateFromEuler(0, -10, 0));
 			}
