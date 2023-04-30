@@ -65,24 +65,24 @@ namespace RhuEngine.WorldObjects
 
 		public void RegisterWorldObject(IWorldObject worldObject) {
 			if (!_worldObjects.TryAdd(worldObject.Pointer, worldObject)) {
-				RLog.Warn($"World Object Failed To add {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
+				RLog.Warn($"World Object Failed To add {worldObject.Pointer.Base64String()} typeof {worldObject.GetType().GetFormattedName()}");
 			}
 			else {
 				if (typeof(INetworkedObject).IsAssignableFrom(worldObject.GetType())) {
 					if (!_networkedObjects.TryAdd(worldObject.Pointer, (INetworkedObject)worldObject)) {
-						RLog.Warn($"INetworkedObject Failed To add {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
+						RLog.Warn($"INetworkedObject Failed To add {worldObject.Pointer.Base64String()} typeof {worldObject.GetType().GetFormattedName()}");
 					}
 				}
 			}
 		}
 		public void UnRegisterWorldObject(IWorldObject worldObject) {
 			if (!_worldObjects.TryRemove(worldObject.Pointer, out _)) {
-				RLog.Warn($"World Object Failed To remove {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
+				RLog.Warn($"World Object Failed To remove {worldObject.Pointer.Base64String()} typeof {worldObject.GetType().GetFormattedName()}");
 			}
 			else {
 				if (typeof(INetworkedObject).IsAssignableFrom(worldObject.GetType())) {
 					if (!_networkedObjects.TryRemove(worldObject.Pointer, out _)) {
-						RLog.Warn($"INetworkedObject Failed To remove {worldObject.Pointer.HexString()} typeof {worldObject.GetType().GetFormattedName()}");
+						RLog.Warn($"INetworkedObject Failed To remove {worldObject.Pointer.Base64String()} typeof {worldObject.GetType().GetFormattedName()}");
 					}
 				}
 			}
