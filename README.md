@@ -170,6 +170,7 @@ Distributed under the GPL-3 License. See `LICENSE` for more information.
 
 4. Faolan Rad - Main Developer/Owner - Discord Faolan#0473
 
+[Gabbracoon The API](https://github.com/RhubarbVR/Gabbracoon)
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
