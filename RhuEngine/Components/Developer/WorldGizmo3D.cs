@@ -89,7 +89,7 @@ namespace RhuEngine.Components
 				return;
 			}
 			var gizmoRoot = WorldManager.OverlayWorld.RootEntity.FindChildOrAddChild("GizmosRoot");
-			_privateGizmo = gizmoRoot.AddChild(Pointer.Base64String()).AttachComponent<Gizmo3D>();
+			_privateGizmo = gizmoRoot.AddChild(Pointer.HexString()).AttachComponent<Gizmo3D>();
 			UpdateModeData();
 		}
 

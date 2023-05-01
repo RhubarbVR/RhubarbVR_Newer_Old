@@ -45,7 +45,7 @@ namespace RhuEngine.Components
 		}
 
 		private void Name_Changed(IChangeable obj) {
-			var outPutValue = TargetObject.Target is null ? "NULL" : $"{TargetObject.Target.Name} ({TargetObject.Target.Pointer.Base64String()})"; 
+			var outPutValue = TargetObject.Target is null ? "NULL" : $"{TargetObject.Target.Name} ({TargetObject.Target.Pointer.HexString()})"; 
 			if (TopName.Linked) {
 				TopName.LinkedValue = outPutValue;
 			}
@@ -126,7 +126,7 @@ namespace RhuEngine.Components
 			foreach (var item in TargetObject.Target.children.Cast<Entity>()) {
 				var trains = FindRelation(item);
 				var hraicty = trains is null
-					? DropDown.Target.DropDownData.Target.children[1].AddChild(item.Pointer.Base64String()).AttachComponent<EntityHierarchy>()
+					? DropDown.Target.DropDownData.Target.children[1].AddChild(item.Pointer.HexString()).AttachComponent<EntityHierarchy>()
 					: trains;
 				if (hraicty.TargetObject.Target != item) {
 					hraicty.TargetObject.Target = item;

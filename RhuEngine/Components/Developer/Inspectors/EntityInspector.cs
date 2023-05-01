@@ -36,7 +36,7 @@ namespace RhuEngine.Components
 
 		private void Name_Changed(IChangeable obj) {
 			if (TopName.Linked) {
-				TopName.LinkedValue = TargetObject.Target is null ? "NULL" : $"{TargetObject.Target.Name} ({TargetObject.Target.Pointer.Base64String()})";
+				TopName.LinkedValue = TargetObject.Target is null ? "NULL" : $"{TargetObject.Target.Name} ({TargetObject.Target.Pointer.HexString()})";
 			}
 		}
 

@@ -37,9 +37,46 @@ namespace RhuEngine.Datatypes
 			return new NetPointer((position << 16) | (user & 0xFFFFuL));
 		}
 		public static readonly NetPointer Blank = new();
+
 		public string Base64String() {
-			return Convert.ToBase64String(BitConverter.GetBytes(_id));
+			try {
+				var temp = Convert.ToBase64String(BitConverter.GetBytes(_id).Reverse().ToArray()).Replace("-", "");
+
+				if (!string.IsNullOrEmpty(temp)) {
+					while (!string.IsNullOrEmpty(temp) && temp.Substring(0, 1) == "A") {
+						temp = temp.Substring(1);
+					}
+				}
+				if (string.IsNullOrEmpty(temp)) {
+					temp = "A";
+				}
+				return temp;
+			}
+			catch {
+				return $"A";
+			}
 		}
+
+		public string HexString() {
+			try {
+				var temp = BitConverter.ToString(BitConverter.GetBytes(_id).Reverse().ToArray()).Replace("-", "");
+
+				if (!string.IsNullOrEmpty(temp)) {
+					while (!string.IsNullOrEmpty(temp) && temp.Substring(0, 1) == "0") {
+						temp = temp.Substring(1);
+					}
+				}
+				if (string.IsNullOrEmpty(temp)) {
+					temp = "0";
+				}
+				return temp;
+			}
+			catch {
+				return $"0";
+			}
+		}
+
+
 
 		public bool Equals(NetPointer other) {
 			return other._id == _id;
@@ -54,7 +91,7 @@ namespace RhuEngine.Datatypes
 		}
 
 		public override string ToString() {
-			return Base64String();
+			return HexString();
 		}
 
 		public static explicit operator NetPointer(string data) => new(Convert.ToUInt64(data, 16));
