@@ -77,7 +77,6 @@ namespace RhuEngine.Datatypes
 		}
 
 
-
 		public bool Equals(NetPointer other) {
 			return other._id == _id;
 		}
