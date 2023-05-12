@@ -65,7 +65,7 @@
 
 ## About The Project
 
-RhubarbVR is a networked VR game engine. What does this mean? Well, Rhubarb is a game engine that allows you to add custom shaders and allows you to program in it. It does all of this while synchronizing modifications of the world with everyone in a session so you can collaborate and socialize with people to create amazing things. It allows you to make extensive multiplayer VR games and social experiences.
+Rhubarb is a game engine that allows you to allows you to program and collaborate with others. It does all of this while synchronizing modifications of the world with everyone in a session so you can collaborate and socialize with people to create amazing things. 
 
 ### Libraries
 
