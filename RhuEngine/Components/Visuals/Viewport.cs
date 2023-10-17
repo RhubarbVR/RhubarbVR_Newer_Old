@@ -260,7 +260,6 @@ namespace RhuEngine.Components
 
 		}
 
-
 		public event Action<RTexture2D> OnAssetLoaded;
 
 		public RTexture2D Value { get; private set; }
