@@ -63,9 +63,17 @@
 
 <!-- ABOUT THE PROJECT -->
 
+
+## IMPORTANT
+
+This is an old copy of RhubarbVR before the major Steam and deep godot integration rewrite this repo will stay for people to mess with but RhubarbVR is nolonger be open source do to lisensing problems with new libraries that are in use.
+The new repo for isuse and reports is [RhubarbVR](https://github.com/RhubarbVR/RhubarbVR/)
+
+
 ## About The Project
 
 RhubarbVR is a networked VR game engine. What does this mean? Well, Rhubarb is a game engine that allows you to add custom shaders and allows you to program in it. It does all of this while synchronizing modifications of the world with everyone in a session so you can collaborate and socialize with people to create amazing things. It allows you to make extensive multiplayer VR games and social experiences.
+
 
 ### Libraries
 
